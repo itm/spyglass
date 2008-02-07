@@ -1,0 +1,43 @@
+<!-- =======================
+     SPYGLASS CONFIGURATION
+     ======================= -->
+
+<spyglassConfiguration>
+
+   <!-- Visualization Delay configuration the speed, at which new packets are beeing painted -->
+   <visualizationDelay>50</visualizationDelay>
+   <visualizationInitialDelay>1000</visualizationInitialDelay>
+   <framesPerSecond>25</framesPerSecond>
+   
+   <!-- canvas that is beeing used to produce visual output -->
+   <canvas class="de.uniluebeck.itm.spyglass.drawing.Canvas2D"/>
+
+   <!-- the PacketReader class that reads and parses the packets, coming from the specified gateway -->
+   <packetReader class="de.uniluebeck.itm.spyglass.packet.SimplePacketReader">
+      <gateway class="de.uniluebeck.itm.spyglass.gateway.FileReaderGateway">
+         <file>source.packet.txt</file>
+      </gateway>
+   </packetReader>
+
+   <!-- parametrization of the plugin manager and the loaded plugins -->
+   <pluginManager>
+      <plugins class="java.util.ArrayList">
+
+         <!-- load one nodepainter plugin and it's configuration -->
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.NodePainterPlugin" priority="0" isActive="true">
+
+            <!-- parameters for a default drawing object that is beeing used to draw packets of this plugin -->
+            <defaultDrawingObject class="de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle">
+               <width>20</width>
+               <height>20</height>
+               <colorR>0</colorR>
+               <colorG>0</colorG>
+               <colorB>200</colorB>
+            </defaultDrawingObject>
+         
+         </plugin>
+
+      </plugins>
+   </pluginManager>
+
+</spyglassConfiguration>
