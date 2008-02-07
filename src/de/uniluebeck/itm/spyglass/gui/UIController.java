@@ -7,6 +7,8 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.gui;
 
+import ishell.util.Logging;
+
 import java.util.EventObject;
 
 import org.apache.log4j.Category;
@@ -25,7 +27,6 @@ import de.uniluebeck.itm.spyglass.plugin.GlobalInformationPlugin;
 import de.uniluebeck.itm.spyglass.plugin.NodePainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.RelationPainterPlugin;
-import de.uniluebeck.itm.spyglass.util.Logging;
 
 // --------------------------------------------------------------------------------
 /**
@@ -80,7 +81,7 @@ public class UIController {
 		appWindow.getGui().getCanvas().addPaintListener(new PaintListener() {
 			@Override
 			public void paintControl(PaintEvent e) {
-				renderPackets(e.gc);
+				render(e.gc);
 			}
 		});
 
@@ -101,31 +102,31 @@ public class UIController {
 	/**
 	 * 
 	 */
-	private void renderPackets(GC gc) {
+	private void render(GC gc) {
 		gc.setBackground(canvasBgColor);
 		gc.fillRectangle(appWindow.getGui().getCanvas().getClientArea());
 
 		// Background Painter Plugins
-		for (Plugin plugin : spyglass.getPluginManager().getPlugins())
+		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
 			if (plugin instanceof BackgroundPainterPlugin && plugin.isActive())
 				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects().values())
 					spyglass.getCanvas().draw(object, gc);
 
 		// Relation Painter Plugins
-		for (Plugin plugin : spyglass.getPluginManager().getPlugins())
+		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
 			if (plugin instanceof RelationPainterPlugin && plugin.isActive())
 				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects().values())
 					spyglass.getCanvas().draw(object, gc);
 
 		// Node Painter Plugins
-		for (Plugin plugin : spyglass.getPluginManager().getPlugins())
+		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
 			if (plugin instanceof NodePainterPlugin && plugin.isActive())
 				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects().values())
 					spyglass.getCanvas().draw(object, gc);
 
 		// Global Information Plugins
 		// TODO: Global information plug-ins must add information to a Tree on the GUI, not using drawing objects
-		for (Plugin plugin : spyglass.getPluginManager().getPlugins())
+		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
 			if (plugin instanceof GlobalInformationPlugin && plugin.isActive())
 				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects().values())
 					spyglass.getCanvas().draw(object, gc);

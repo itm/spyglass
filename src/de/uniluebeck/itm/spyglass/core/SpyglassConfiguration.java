@@ -12,6 +12,7 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.SpyglassCanvas;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 
 /**
@@ -22,12 +23,6 @@ import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 @Root
 public class SpyglassConfiguration {
 	@Element
-	private long visualizationDelay = 100;
-
-	@Element
-	private long visualizationInitialDelay = 1000;
-
-	@Element
 	private PacketReader packetReader = null;
 
 	@Element
@@ -35,9 +30,18 @@ public class SpyglassConfiguration {
 
 	@Element
 	private PluginManager pluginManager = null;
+	
+	@Element
+	private long packetDeliveryDelay = 100;
 
+	@Element
+	private long packetDeliveryInitialDelay = 1000;
+	
 	@Element(name = "framesPerSecond")
 	private long fps = 25;
+
+	@Element
+	private NodePositionerPlugin nodePositioner;
 
 	public long getFps() {
 		return fps;
@@ -71,20 +75,30 @@ public class SpyglassConfiguration {
 		this.packetReader = packetReader;
 	}
 
-	public long getVisualizationDelay() {
-		return visualizationDelay;
+	public void setNodePositioner(NodePositionerPlugin randomNodePositioner) {
+		this.nodePositioner = randomNodePositioner;
 	}
 
-	public void setVisualizationDelay(long visualizationDelay) {
-		this.visualizationDelay = visualizationDelay;
+	public NodePositionerPlugin getNodePositioner() {
+		return nodePositioner;
+		
 	}
 
-	public long getVisualizationInitialDelay() {
-		return visualizationInitialDelay;
+	public long getPacketDeliveryDelay() {
+		return packetDeliveryDelay;
 	}
 
-	public void setVisualizationInitialDelay(long visualizationInitialDelay) {
-		this.visualizationInitialDelay = visualizationInitialDelay;
+	public void setPacketDeliveryDelay(long packetDeliveryDelay) {
+		this.packetDeliveryDelay = packetDeliveryDelay;
 	}
+
+	public long getPacketDeliveryInitialDelay() {
+		return packetDeliveryInitialDelay;
+	}
+
+	public void setPacketDeliveryInitialDelay(long packetDeliveryInitialDelay) {
+		this.packetDeliveryInitialDelay = packetDeliveryInitialDelay;
+	}
+	
 
 }

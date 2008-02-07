@@ -7,10 +7,10 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.drawing.primitive;
 
-import org.eclipse.swt.graphics.Point;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
 
 // --------------------------------------------------------------------------------
 /**
@@ -46,7 +46,7 @@ public class Line extends DrawingObject {
 		clone.setColorR(getColorR());
 		clone.setColorG(getColorG());
 		clone.setColorB(getColorB());
-		clone.setPosition(new Point(getPosition().x, getPosition().y));
+		clone.setPosition(new Position(getPosition().x, getPosition().y));
 
 		return clone;
 	}

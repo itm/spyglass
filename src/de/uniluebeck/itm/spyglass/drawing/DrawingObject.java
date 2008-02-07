@@ -7,9 +7,10 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.drawing;
 
-import org.eclipse.swt.graphics.Point;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
+
+import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
 
 /**
  * Abstract class that represents a drawing object. Every DrawingObject should have an unique id, a position and a
@@ -19,7 +20,7 @@ import org.simpleframework.xml.Root;
 public abstract class DrawingObject {
 	private int id = 0;
 
-	private Point position = new Point(0, 0);
+	private Position position = new Position(0, 0);
 
 	@Element
 	private int colorR = 200;
@@ -69,7 +70,7 @@ public abstract class DrawingObject {
 	/**
 	 * 
 	 */
-	public Point getPosition() {
+	public Position getPosition() {
 		return position;
 	}
 
@@ -77,7 +78,7 @@ public abstract class DrawingObject {
 	/**
 	 * 
 	 */
-	public void setPosition(Point position) {
+	public void setPosition(Position position) {
 		this.position = position;
 	}
 

@@ -7,13 +7,16 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.core;
 
+import ishell.util.Logging;
+
+import java.util.Deque;
 import java.util.EventObject;
 
 import org.apache.log4j.Category;
 
 import de.uniluebeck.itm.spyglass.packet.Packet;
-import de.uniluebeck.itm.spyglass.util.Logging;
 import de.uniluebeck.itm.spyglass.util.TimeDiff;
+import de.uniluebeck.itm.spyglass.util.Tools;
 
 /**
  * The visualization task class represents a thread that reads the packet cache and uses a InformationDispatcher object
@@ -22,10 +25,6 @@ import de.uniluebeck.itm.spyglass.util.TimeDiff;
  */
 public class VisualizationTask implements Runnable {
 	private static Category log = Logging.get(VisualizationTask.class);
-
-	private long delay = 100;
-
-	private long initialDelay = 1000;
 
 	private Spyglass spyglass = null;
 
@@ -40,9 +39,7 @@ public class VisualizationTask implements Runnable {
 	 * @param fps
 	 * @param spyglass
 	 */
-	public VisualizationTask(long delay, long initialDelay, long fps, Spyglass spyglass) {
-		this.delay = delay;
-		this.initialDelay = initialDelay;
+	public VisualizationTask(long fps, Spyglass spyglass) {
 		this.spyglass = spyglass;
 		this.fps = fps;
 
@@ -56,53 +53,35 @@ public class VisualizationTask implements Runnable {
 	@Override
 	public void run() {
 		log.debug("Visualization thread start.");
-		try {
-			long repaintInterval = (long) ((1.0 / (double) fps) * 1000);
-			log.debug("Repainting every " + repaintInterval + " ms = " + fps + " fps");
+		long repaintInterval = (long) ((1.0 / (double) fps) * 1000);
+		log.debug("Repainting every " + repaintInterval + " ms = " + fps + " fps");
 
-			TimeDiff timeDiff = new TimeDiff(repaintInterval);
-			Packet packet = null;
+		TimeDiff timeDiff = new TimeDiff(repaintInterval);
+		Packet packet = null;
 
-			Thread.sleep(initialDelay);
-			timeDiff.touch();
+		timeDiff.touch();
 
-			while (spyglass.isVisualizationRunning()) {
-				while ((packet = spyglass.getPacketCache().pollLast()) != null) {
-					if (!spyglass.isVisualizationRunning())
-						break;
+		Deque<Packet> q = spyglass.getPacketCache();
+		
+		while (spyglass.isVisualizationRunning()) {
+			while ((packet = q.pollLast()) != null) {
+				if (!spyglass.isVisualizationRunning())
+					break;
 
-					// Distribute the packet to the plugins
-					spyglass.getInfoDispatcher().dispatchPacket(packet);
+				// Distribute the packet to the plugins
+				spyglass.getInfoDispatcher().dispatchPacket(packet);
 
-					if (timeDiff.isTimeout()) {
-						// Invoke the redraw of the scene by firing a spyglass event
-						spyglass.fireRedrawEvent(eventObject);
-						timeDiff.touch();
-					}
-
-					if (timeDiff.ms() < delay)
-						Thread.sleep(delay - timeDiff.ms());
+				if (timeDiff.isTimeout()) {
+					// Invoke the redraw of the scene by firing a spyglass event
+					spyglass.fireRedrawEvent(eventObject);
+					timeDiff.touch();
 				}
 			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+
+			//Limit the query intervall if no packets are available
+			if( q.size() == 0)
+				Tools.sleep(repaintInterval);
 		}
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public long getDelay() {
-		return delay;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public void setDelay(long delay) {
-		this.delay = delay;
 	}
 
 	// --------------------------------------------------------------------------------

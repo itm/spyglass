@@ -7,8 +7,13 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.plugin;
 
-import java.util.*;
+import ishell.util.Logging;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.log4j.Category;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
@@ -17,15 +22,29 @@ import org.simpleframework.xml.Root;
  */
 @Root
 public class PluginManager {
+	private static Category log = Logging.get(PluginManager.class);
+	
 	@ElementList
-	List<Plugin> plugins = new ArrayList<Plugin>();
+	private List<Plugin> plugins = new ArrayList<Plugin>();
+
+	private NodePositionerPlugin nodePositioner = null;
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public List<Plugin> getPlugins() {
+	public List<Plugin> getActivePlugins() {
 		return plugins;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public void init() {
+		//This is a workaround, since simple-xml does not call the setPlugins() method
+		for (Plugin p : plugins)
+			p.setPluginManager(this);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -37,8 +56,12 @@ public class PluginManager {
 	 *            The plugin object to be added.
 	 */
 	public void addPlugin(Plugin plugin) {
-		plugins.add(plugin);
-		Collections.sort(plugins);
+		log.debug("Added plug-in: " + plugin);
+		plugin.setPluginManager(this);
+		if (plugin.isActive()) {
+			plugins.add(plugin);
+			Collections.sort(plugins);
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -47,6 +70,7 @@ public class PluginManager {
 	 */
 	public void removePlugin(Plugin plugin) {
 		plugins.remove(plugin);
+		log.debug("Removed plug-in: " + plugin);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -54,7 +78,42 @@ public class PluginManager {
 	 * 
 	 */
 	public void setPlugins(List<Plugin> plugins) {
-		this.plugins = plugins;
+		this.plugins.clear();
+		for (Plugin p : plugins)
+			addPlugin(p);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public void setPluginStatus(Plugin plugin, boolean isActive) {
+
+		if (isActive) {
+			if (!plugins.contains(plugin))
+				addPlugin(plugin);
+
+		} else
+			removePlugin(plugin);
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public void setNodePositioner(NodePositionerPlugin np) {
+		this.nodePositioner = np;
+		addPlugin(np);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public NodePositionerPlugin getNodePositioner() {
+		assert (nodePositioner != null);
+		return nodePositioner;
 	}
 
 }

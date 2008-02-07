@@ -7,9 +7,9 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.plugin;
 
-import org.simpleframework.xml.*;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Root;
 
-import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.layer.SubLayer;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 
@@ -26,10 +26,9 @@ public abstract class Plugin implements Comparable<Plugin> {
 	@Attribute
 	private boolean isActive = true;
 
-	@Element
-	private DrawingObject defaultDrawingObject = null;
-
 	private SubLayer subLayer = new SubLayer();
+
+	private PluginManager pluginManager = null;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -42,27 +41,9 @@ public abstract class Plugin implements Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Creates and returns a new DrawingObject by getting and cloning the plugin's default DrawingObject.
-	 * 
-	 * @return The new default DrawingObject for the plugin.
-	 */
-	protected DrawingObject createDrawingObject() {
-		DrawingObject object = null;
-
-		try {
-			object = getDefaultDrawingObject().clone();
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
-
-		return object;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
 	 * 
 	 */
-	public SubLayer getSubLayer() {
+	public final SubLayer getSubLayer() {
 		return subLayer;
 	}
 
@@ -70,7 +51,7 @@ public abstract class Plugin implements Comparable<Plugin> {
 	/**
 	 * 
 	 */
-	public void setSubLayer(SubLayer subLayer) {
+	public final void setSubLayer(SubLayer subLayer) {
 		this.subLayer = subLayer;
 	}
 
@@ -78,7 +59,7 @@ public abstract class Plugin implements Comparable<Plugin> {
 	/**
 	 * 
 	 */
-	public int getPriority() {
+	public final int getPriority() {
 		return priority;
 	}
 
@@ -86,7 +67,7 @@ public abstract class Plugin implements Comparable<Plugin> {
 	/**
 	 * 
 	 */
-	public void setPriority(int priority) {
+	public final void setPriority(int priority) {
 		this.priority = priority;
 	}
 
@@ -108,7 +89,7 @@ public abstract class Plugin implements Comparable<Plugin> {
 	/**
 	 * 
 	 */
-	public boolean isActive() {
+	public final boolean isActive() {
 		return isActive;
 	}
 
@@ -116,24 +97,27 @@ public abstract class Plugin implements Comparable<Plugin> {
 	/**
 	 * 
 	 */
-	public void setActive(boolean isActive) {
+	public final void setActive(boolean isActive) {
 		this.isActive = isActive;
+
+		if (pluginManager != null)
+			pluginManager.setPluginStatus(this, isActive);
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public DrawingObject getDefaultDrawingObject() {
-		return defaultDrawingObject;
+	public final void setPluginManager(PluginManager pluginManager) {
+		this.pluginManager = pluginManager;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public void setDefaultDrawingObject(DrawingObject defaultDrawingObject) {
-		this.defaultDrawingObject = defaultDrawingObject;
+	public final PluginManager getPluginManager() {
+		return pluginManager;
 	}
 
 }

@@ -7,9 +7,10 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.packet;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-import org.eclipse.swt.graphics.Point;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.gateway.Gateway;
@@ -79,11 +80,10 @@ public class SimplePacketReader extends PacketReader {
 		String[] tokens = line.split(":");
 
 		int id = Integer.parseInt(tokens[0]);
-		int x = Integer.parseInt(tokens[1]);
-		int y = Integer.parseInt(tokens[2]);
+		//int x = Integer.parseInt(tokens[1]);
+		//int y = Integer.parseInt(tokens[2]);
 
 		packet.setId(id);
-		packet.setPosition(new Point(x, y));
 
 		return packet;
 	}

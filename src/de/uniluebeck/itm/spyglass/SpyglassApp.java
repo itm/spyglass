@@ -7,14 +7,16 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass;
 
+import ishell.util.Logging;
+
 import org.apache.log4j.Category;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.UIController;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
-import de.uniluebeck.itm.spyglass.util.Logging;
 
 // --------------------------------------------------------------------------------
 /**
@@ -32,14 +34,17 @@ public class SpyglassApp {
 		log.info("New SpyGlass instance.");
 
 		// GUI
-		AppWindow appWindow = new AppWindow();
+		Display display = Display.getDefault();
 
-		Shell shell = appWindow.getShell();
-		Display display = appWindow.getDisplay();
+		Shell shell = new Shell(display);
+		shell.setLayout(new FillLayout());
+		shell.layout();
+		shell.setText("Spyglass");
 		shell.setSize(800, 600);
 		shell.open();
 
 		// Application objects
+		AppWindow appWindow = new AppWindow(display, shell);
 		Spyglass spyglass = new Spyglass();
 
 		@SuppressWarnings("unused")

@@ -7,21 +7,12 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.plugin;
 
-import de.uniluebeck.itm.spyglass.packet.Packet;
 
 // --------------------------------------------------------------------------------
 /**
  * 
  */
-public class GlobalInformationPlugin extends Plugin {
+public abstract class GlobalInformationPlugin extends Plugin {
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * @see Plugin#handlePacket(Packet)
-	 */
-	@Override
-	public void handlePacket(Packet packet) {
-		// TODO Auto-generated method stub
-	}
 
 }

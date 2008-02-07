@@ -8,17 +8,14 @@
 package de.uniluebeck.itm.spyglass.gui.view;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 // --------------------------------------------------------------------------------
 /**
  * 
  */
 public class AppWindow {
-	private Shell shell = null;
-
 	private Display display = null;
 
 	private SpyglassGuiComponent gui = null;
@@ -27,23 +24,9 @@ public class AppWindow {
 	/**
 	 * 
 	 */
-	public AppWindow() {
-		display = Display.getDefault();
-
-		shell = new Shell(display);
-		shell.setLayout(new FillLayout());
-		shell.layout();
-		shell.setText("Spyglass");
-
-		gui = new SpyglassGuiComponent(shell, SWT.NULL);
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public Shell getShell() {
-		return shell;
+	public AppWindow(Display display, Composite parent) {
+		this.display = display;
+		gui = new SpyglassGuiComponent(parent, SWT.NULL);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -60,6 +43,14 @@ public class AppWindow {
 	 */
 	public Display getDisplay() {
 		return display;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public void setDisplay(Display display) {
+		this.display = display;
 	}
 
 }

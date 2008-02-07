@@ -7,7 +7,7 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.layer;
 
-import java.util.*;
+import java.util.HashMap;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 

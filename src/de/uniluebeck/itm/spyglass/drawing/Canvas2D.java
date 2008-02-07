@@ -7,6 +7,8 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.drawing;
 
+import ishell.util.Logging;
+
 import org.apache.log4j.Category;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -15,7 +17,6 @@ import org.simpleframework.xml.Root;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Circle;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
-import de.uniluebeck.itm.spyglass.util.Logging;
 
 // --------------------------------------------------------------------------------
 /**
@@ -70,8 +71,8 @@ public class Canvas2D implements SpyglassCanvas {
 		Color color = new Color(null, rect.getColorR(), rect.getColorG(), rect.getColorB());
 
 		gc.setForeground(color);
-		gc.drawRectangle(rect.getPosition().x - (rect.getWidth() / 2), rect.getPosition().y - (rect.getHeight() / 2), rect.getWidth(), rect
-				.getHeight());
+		gc.drawRectangle((int) (rect.getPosition().x - (rect.getWidth() / 2)), (int) (rect.getPosition().y - (rect.getHeight() / 2)),
+				rect.getWidth(), rect.getHeight());
 	}
 
 	// --------------------------------------------------------------------------------
@@ -85,8 +86,8 @@ public class Canvas2D implements SpyglassCanvas {
 		Color color = new Color(null, circle.getColorR(), circle.getColorG(), circle.getColorB());
 
 		gc.setForeground(color);
-		gc.drawOval(circle.getPosition().x - (circle.getDiameter() / 2), circle.getPosition().y - (circle.getDiameter() / 2), circle.getDiameter(),
-				circle.getDiameter());
+		gc.drawOval(((int) circle.getPosition().x - (circle.getDiameter() / 2)), ((int) circle.getPosition().y - (circle.getDiameter() / 2)), circle
+				.getDiameter(), circle.getDiameter());
 	}
 
 }

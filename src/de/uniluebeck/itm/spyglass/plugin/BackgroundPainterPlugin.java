@@ -7,31 +7,11 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.plugin;
 
-import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.packet.Packet;
 
 // --------------------------------------------------------------------------------
 /**
  * 
  *
  */
-public class BackgroundPainterPlugin extends Plugin {
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * @see Plugin#handlePacket(Packet)
-	 */
-	@Override
-	public void handlePacket(Packet packet) {
-		DrawingObject object = createDrawingObject();
-		if (object == null)
-			throw new RuntimeException("BackgroundPainterPlugin: Cloning of default drawing object (" + getDefaultDrawingObject().getClass()
-					+ ") not successful.");
-
-		object.setId(packet.getId());
-		object.setPosition(packet.getPosition());
-
-		getSubLayer().addOrUpdateDrawingObject(object);
-	}
-
+public abstract class BackgroundPainterPlugin extends Plugin {
 }

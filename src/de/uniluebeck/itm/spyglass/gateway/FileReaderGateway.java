@@ -7,6 +7,8 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.gateway;
 
+import ishell.util.Logging;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,8 +17,6 @@ import java.io.InputStream;
 import org.apache.log4j.Category;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
-
-import de.uniluebeck.itm.spyglass.util.Logging;
 
 // --------------------------------------------------------------------------------
 /**

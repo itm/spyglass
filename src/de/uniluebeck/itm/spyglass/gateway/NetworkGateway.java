@@ -7,6 +7,8 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.gateway;
 
+import ishell.util.Logging;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -15,8 +17,6 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Category;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
-
-import de.uniluebeck.itm.spyglass.util.Logging;
 
 // --------------------------------------------------------------------------------
 /**

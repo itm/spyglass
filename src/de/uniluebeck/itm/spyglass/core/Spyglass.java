@@ -7,6 +7,8 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.core;
 
+import ishell.util.Logging;
+
 import java.io.File;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -25,7 +27,6 @@ import de.uniluebeck.itm.spyglass.drawing.SpyglassCanvas;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
-import de.uniluebeck.itm.spyglass.util.Logging;
 
 // --------------------------------------------------------------------------------
 /**
@@ -43,7 +44,7 @@ public class Spyglass {
 
 	private InformationDispatcher infoDispatcher = null;
 
-	private Deque<Packet> packetCache = new ArrayDeque<Packet>();
+	private Deque<Packet> packetCache = new ArrayDeque<Packet>(250);
 
 	private PluginManager pluginManager = null;
 
@@ -63,10 +64,63 @@ public class Spyglass {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Constructor. Invokes the XML configuration reading.
+	 * Constructor. Invokes the XML configuration reading from the predefined filename CONFIG_FILE
 	 */
 	public Spyglass() {
-		init();
+		this(new File(CONFIG_FILE));
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor. Invokes the XML configuration reading.
+	 */
+	public Spyglass(SpyglassConfiguration config) {
+		init(config);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor. Invokes the XML configuration reading.
+	 */
+	public Spyglass(File configFile) {
+		log.debug("Initializing. Reading config from file: " + configFile);
+		SpyglassConfiguration config = null;
+
+		if (!configFile.isFile())
+			throw new RuntimeException("Can't find config file '" + configFile + "'");
+
+		try {
+			Serializer serializer = new Persister();
+			config = serializer.read(SpyglassConfiguration.class, configFile);
+
+			if (config == null)
+				throw new RuntimeException("Can't load configuration.");
+
+			init(config);
+		} catch (Exception e) {
+			log.error("Unable to load configuration input: " + e, e);
+		}
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	private void init(SpyglassConfiguration config) {
+		// Create and inject objects
+		pluginManager = config.getPluginManager();
+		pluginManager.setNodePositioner(config.getNodePositioner());
+		pluginManager.init();
+
+		canvas = config.getCanvas();
+		packetReader = config.getPacketReader();
+
+		infoDispatcher = new InformationDispatcher(pluginManager);
+		packetProducerTask = new PacketProducerTask(this, config.getPacketDeliveryInitialDelay(), config.getPacketDeliveryDelay());
+		visualizationTask = new VisualizationTask(config.getFps(), this);
+
+		log.debug("Init done");
 	}
 
 	// --------------------------------------------------------------------------------
@@ -109,39 +163,6 @@ public class Spyglass {
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1)
 			((SpyglassListener) list[i]).redraw(e);
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Load the settings
-	 */
-	private void init() {
-		log.debug("Initializing. Reading config from file: " + CONFIG_FILE);
-		SpyglassConfiguration config = null;
-
-		File cfgFile = new File(CONFIG_FILE);
-		if (!cfgFile.isFile())
-			throw new RuntimeException("Can't find config file '" + CONFIG_FILE + "'");
-
-		try {
-			Serializer serializer = new Persister();
-			config = serializer.read(SpyglassConfiguration.class, cfgFile);
-			if (config == null)
-				throw new RuntimeException("Can't load configuration.");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// Create and inject objects
-		pluginManager = config.getPluginManager();
-		canvas = config.getCanvas();
-		packetReader = config.getPacketReader();
-
-		infoDispatcher = new InformationDispatcher(pluginManager);
-		packetProducerTask = new PacketProducerTask(this);
-		visualizationTask = new VisualizationTask(config.getVisualizationDelay(), config.getVisualizationInitialDelay(), config.getFps(), this);
-
-		log.debug("Init done");
 	}
 
 	// --------------------------------------------------------------------------------

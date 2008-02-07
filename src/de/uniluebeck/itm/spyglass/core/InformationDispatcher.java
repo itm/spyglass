@@ -7,6 +7,8 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.core;
 
+import ishell.util.Logging;
+
 import java.util.List;
 
 import org.apache.log4j.Category;
@@ -14,7 +16,6 @@ import org.apache.log4j.Category;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
-import de.uniluebeck.itm.spyglass.util.Logging;
 import de.uniluebeck.itm.spyglass.util.Tools;
 
 // --------------------------------------------------------------------------------
@@ -57,7 +58,7 @@ public class InformationDispatcher {
 		if (packet == null)
 			return;
 
-		List<Plugin> plugins = pluginManager.getPlugins();
+		List<Plugin> plugins = pluginManager.getActivePlugins();
 		if (plugins == null)
 			return;
 
@@ -65,7 +66,11 @@ public class InformationDispatcher {
 			log.debug("Dispatching packet[" + packet + "] to plugins: " + Tools.toString(plugins));
 
 		for (Plugin plugin : plugins)
-			plugin.handlePacket(packet);
+			try {
+				plugin.handlePacket(packet);
+			} catch (Throwable t) {
+				log.error("Error in plugin " + plugin + ": " + t, t);
+			}
 	}
 
 }

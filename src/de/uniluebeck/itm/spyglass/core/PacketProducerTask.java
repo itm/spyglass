@@ -7,13 +7,15 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.core;
 
+import ishell.util.Logging;
+
 import java.util.Deque;
 
 import org.apache.log4j.Category;
 
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
-import de.uniluebeck.itm.spyglass.util.Logging;
+import de.uniluebeck.itm.spyglass.util.Tools;
 
 // --------------------------------------------------------------------------------
 /**
@@ -32,14 +34,21 @@ public class PacketProducerTask implements Runnable {
 
 	private Spyglass spyglass = null;
 
+	private long perPacketDelayMs;
+
+	private long initialDelayMs;
+
 	// -------------------------------------------------------------------------
 	/**
 	 * Constructor.
 	 * 
 	 * @param spyglass
 	 */
-	public PacketProducerTask(Spyglass spyglass) {
+	public PacketProducerTask(Spyglass spyglass, long initialDelayMs, long perPacketDelayMs) {
 		this.spyglass = spyglass;
+		this.perPacketDelayMs = perPacketDelayMs;
+		this.initialDelayMs = initialDelayMs;
+
 		packetCache = spyglass.getPacketCache();
 		packetReader = spyglass.getPacketReader();
 
@@ -53,20 +62,25 @@ public class PacketProducerTask implements Runnable {
 	 */
 	@Override
 	public void run() {
+		Packet packet = null;
 		log.debug("Producer task staring.");
 
-		Packet packet = null;
-		while ((packet = packetReader.getNextPacket()) != null) {
-			if (!spyglass.isVisualizationRunning())
-				break;
+		Tools.sleep(initialDelayMs);
 
-			if (log.isDebugEnabled())
-				log.debug("Added packet: " + packet);
+		while (spyglass.isVisualizationRunning()) {
+			if ((packet = packetReader.getNextPacket()) != null) {
+				if (!spyglass.isVisualizationRunning())
+					break;
 
-			packetCache.push(packet);
+				if (log.isDebugEnabled())
+					log.debug("Added packet: " + packet);
+
+				packetCache.push(packet);
+			}
+
+			Tools.sleep(perPacketDelayMs);
 		}
 
-		if (log.isDebugEnabled())
-			log.debug("PacketProducerTask ended. Done.");
+		log.debug("PacketProducerTask ended. Done.");
 	}
 }

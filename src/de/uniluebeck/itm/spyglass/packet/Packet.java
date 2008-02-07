@@ -7,31 +7,13 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.packet;
 
-import org.eclipse.swt.graphics.Point;
-
 /**
  * The class represents a data packet. Every packet has at least a unique id and a position.
  */
 public class Packet {
 	private int id = 0;
 
-	private Point position = new Point(0, 0);
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public Point getPosition() {
-		return position;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public void setPosition(Point position) {
-		this.position = position;
-	}
+	private byte[] content;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -47,6 +29,22 @@ public class Packet {
 	 */
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public byte[] getContent() {
+		return content;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public void setContent(byte[] content) {
+		this.content = content;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -92,7 +90,7 @@ public class Packet {
 	 */
 	@Override
 	public String toString() {
-		return "Packet [id=" + id + ", position=[" + position.x + "," + position.y + "]]";
+		return "Packet [id=" + id + "]";
 	}
 
 }
