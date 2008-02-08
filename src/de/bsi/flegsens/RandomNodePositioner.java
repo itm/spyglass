@@ -5,7 +5,7 @@
  * under the terms of the BSD License. Refer to spyglass-licence.txt    
  * file in the root of the SpyGlass source tree for further details.  
 ------------------------------------------------------------------------*/
-package de.uniluebeck.itm.spyglass.plugin;
+package de.bsi.flegsens;
 
 import ishell.util.Logging;
 
@@ -14,6 +14,8 @@ import java.util.Random;
 import org.apache.log4j.Category;
 
 import de.uniluebeck.itm.spyglass.packet.Packet;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
 
 // --------------------------------------------------------------------------------
 /**

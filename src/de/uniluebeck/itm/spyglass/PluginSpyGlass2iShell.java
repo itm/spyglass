@@ -19,13 +19,13 @@ import org.apache.log4j.Category;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.widgets.Composite;
 
+import de.bsi.flegsens.RandomNodePositioner;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.core.SpyglassConfiguration;
 import de.uniluebeck.itm.spyglass.drawing.Canvas2D;
 import de.uniluebeck.itm.spyglass.gui.UIController;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
-import de.uniluebeck.itm.spyglass.plugin.RandomNodePositioner;
 
 // --------------------------------------------------------------------------------
 /** To use this plug-in in iShell, you need to add two option to your iShell configuration file (typically
@@ -72,8 +72,8 @@ public class PluginSpyGlass2iShell extends Plugin {
 		// Create the configuration for SpyGlass
 		SpyglassConfiguration config = new SpyglassConfiguration();
 		config.setFps(25);
-		config.setPacketDeliveryInitialDelay(1000);
-		config.setPacketDeliveryDelay(50);
+		config.setPacketDeliveryInitialDelay(500);
+		config.setPacketDeliveryDelay(0);
 		config.setCanvas(new Canvas2D());
 		config.setPacketReader(new PacketReader() {
 
