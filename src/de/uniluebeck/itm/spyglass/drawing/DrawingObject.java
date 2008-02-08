@@ -12,6 +12,7 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
 
+//--------------------------------------------------------------------------------
 /**
  * Abstract class that represents a drawing object. Every DrawingObject should have an unique id, a position and a
  * color, given by the RGB components in a R8G8B8 format.

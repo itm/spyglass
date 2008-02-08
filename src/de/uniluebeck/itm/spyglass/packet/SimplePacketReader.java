@@ -15,6 +15,7 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.gateway.Gateway;
 
+//--------------------------------------------------------------------------------
 /**
  * This class implements a PacketReader. It reads packets from a text file line by line of the format id:x:y Each line
  * is a packet with the given id and position (x and y coordinates).

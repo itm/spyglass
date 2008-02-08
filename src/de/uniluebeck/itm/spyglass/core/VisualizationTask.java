@@ -18,6 +18,7 @@ import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.util.TimeDiff;
 import de.uniluebeck.itm.spyglass.util.Tools;
 
+//--------------------------------------------------------------------------------
 /**
  * The visualization task class represents a thread that reads the packet cache and uses a InformationDispatcher object
  * to distribute the packets to the loaded plugins. It then fires an event to notify all listeners for redraw-purposes.

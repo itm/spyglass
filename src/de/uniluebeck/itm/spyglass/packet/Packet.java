@@ -7,6 +7,7 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.packet;
 
+//--------------------------------------------------------------------------------
 /**
  * The class represents a data packet. Every packet has at least a unique id and a position.
  */

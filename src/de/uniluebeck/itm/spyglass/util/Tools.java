@@ -22,6 +22,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Category;
 
+// --------------------------------------------------------------------------------
 /**
  * Convenience tools
  */

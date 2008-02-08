@@ -15,6 +15,7 @@ import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 
+//--------------------------------------------------------------------------------
 /**
  * Spyglass configuration file, mainly used by the deserialization process of the Spyglass class. The persistence
  * framework to utilize the serialization and deserialization to/from an XML file is "SimpleXML"

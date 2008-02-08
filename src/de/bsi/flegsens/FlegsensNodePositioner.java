@@ -1,16 +1,35 @@
+/* ----------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.       
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project    
+ * SpyGlass is free software; you can redistribute it and/or modify it  
+ * under the terms of the BSD License. Refer to spyglass-licence.txt    
+ * file in the root of the SpyGlass source tree for further details.  
+------------------------------------------------------------------------*/
 package de.bsi.flegsens;
 
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin;
 
+// --------------------------------------------------------------------------------
+/**
+ * 
+ */
 public class FlegsensNodePositioner extends NodePositionerPlugin {
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
 	@Override
 	public Position getPosition(int nodeId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
 	@Override
 	public void handlePacket(Packet packet) {
 		// TODO Auto-generated method stub

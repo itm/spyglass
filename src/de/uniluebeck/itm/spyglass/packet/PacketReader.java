@@ -12,6 +12,7 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.gateway.Gateway;
 
+//--------------------------------------------------------------------------------
 /**
  * Abstract class for all PacketReader implementations. A PacketReader must provide the next packet with the
  * <code>getNextPacket()</code> method.
