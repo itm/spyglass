@@ -1,8 +1,9 @@
 package de.uniluebeck.itm.spyglass;
 
+import ishell.device.MessagePacket;
 import ishell.plugins.Plugin;
+import ishell.util.IconTheme;
 import ishell.util.Logging;
-import ishell.util.messages.Packet;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -58,6 +59,7 @@ public class PluginSpyGlass2iShell extends Plugin {
 		// iShell init (called on each plug-in start)
 		CTabItem tabItem = getTabItem(getName());
 		tabItem.setToolTipText(getName());
+		tabItem.setImage(IconTheme.lookup("system-search"));
 		container = this.getTabContainer(true);
 
 		// Create the configuration for SpyGlass
@@ -95,13 +97,14 @@ public class PluginSpyGlass2iShell extends Plugin {
 	 * 
 	 */
 	@Override
-	public void handlePacket(Packet packet) {
+	public void receivePacket(MessagePacket packet) {
 		de.uniluebeck.itm.spyglass.packet.Packet spyglassPacket = new de.uniluebeck.itm.spyglass.packet.Packet();
 		spyglassPacket.setContent(packet.getContent());
 		synchronized (queue) {
 			queue.push(spyglassPacket);
 		}
 	}
+	
 
 	// --------------------------------------------------------------------------------
 	/**

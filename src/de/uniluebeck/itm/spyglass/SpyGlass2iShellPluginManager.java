@@ -1,9 +1,5 @@
 package de.uniluebeck.itm.spyglass;
 
-import ishell.util.Logging;
-
-import org.apache.log4j.Category;
-
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 
 //TODO: Implement GUI components
@@ -13,16 +9,16 @@ import de.uniluebeck.itm.spyglass.plugin.PluginManager;
  * 
  */
 class SpyGlass2iShellPluginManager extends PluginManager {
-	private static Category log = Logging.get(SpyGlass2iShellPluginManager.class);
+	//private static Category log = Logging.get(SpyGlass2iShellPluginManager.class);
 
-	private PluginSpyGlass2iShell pluginSpyGlass2iShell;
+	//private PluginSpyGlass2iShell pluginSpyGlass2iShell;
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	SpyGlass2iShellPluginManager(PluginSpyGlass2iShell pluginSpyGlass2iShell) {
-		this.pluginSpyGlass2iShell = pluginSpyGlass2iShell;
+		//this.pluginSpyGlass2iShell = pluginSpyGlass2iShell;
 	}
 
 }
