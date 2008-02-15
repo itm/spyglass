@@ -32,6 +32,6 @@
 		</plugins>
 	</pluginManager>
 
-	<nodePositioner class="de.uniluebeck.itm.spyglass.plugin.RandomNodePositioner" priority="0" isActive="true" />
+	<nodePositioner class="de.bsi.flegsens.RandomNodePositioner" priority="0" isActive="true" />
 
 </spyglassConfiguration>
