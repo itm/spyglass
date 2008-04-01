@@ -35,4 +35,10 @@ public class FlegsensNodePositioner extends NodePositionerPlugin {
 		// TODO Auto-generated method stub
 	}
 
+	@Override
+	public String name() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

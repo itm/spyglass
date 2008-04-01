@@ -25,6 +25,16 @@ public class Rectangle extends DrawingObject {
 	@Element
 	private int height = 10;
 
+	private int lineWidth = 1;
+
+	public int getLineWidth() {
+		return lineWidth;
+	}
+
+	public void setLineWidth(int lineWidth) {
+		this.lineWidth = lineWidth;
+	}
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -99,6 +109,16 @@ public class Rectangle extends DrawingObject {
 	public String toString() {
 		// TODO Implement
 		return super.toString();
+	}
+	public void update(DrawingObject other)
+	{
+		if (other instanceof Rectangle)
+		{
+			super.update(other);
+			Rectangle r = (Rectangle)other;
+			setWidth(r.getWidth());
+			setWidth(r.getWidth());
+		}
 	}
 
 }

@@ -10,17 +10,22 @@ package de.uniluebeck.itm.spyglass.drawing;
 import ishell.util.Logging;
 
 import org.apache.log4j.Category;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.primitive.Circle;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
+import de.uniluebeck.itm.spyglass.drawing.primitive.Text.TextJustification;
 
 // --------------------------------------------------------------------------------
 /**
- * A 2D-canvas that is able to draw a DrawingObject onto a SWT graphics context (org.eclipse.swt.graphics.GC).
+ * A 2D-canvas that is able to draw a DrawingObject onto a SWT graphics context
+ * (org.eclipse.swt.graphics.GC).
  */
 @Root
 public class Canvas2D implements SpyglassCanvas {
@@ -33,7 +38,7 @@ public class Canvas2D implements SpyglassCanvas {
 	 * 
 	 */
 	@Override
-	public void draw(DrawingObject drawingObj, GC gc) {
+	public synchronized void draw(DrawingObject drawingObj, GC gc) {
 		this.gc = gc;
 
 		if (drawingObj instanceof Line)
@@ -42,6 +47,8 @@ public class Canvas2D implements SpyglassCanvas {
 			drawRectangle((Rectangle) drawingObj);
 		else if (drawingObj instanceof Circle)
 			drawCircle((Circle) drawingObj);
+		else if (drawingObj instanceof de.uniluebeck.itm.spyglass.drawing.primitive.Text)
+			drawText((de.uniluebeck.itm.spyglass.drawing.primitive.Text) drawingObj);
 		else
 			log.warn("Unknown drawing object. Ignored.");
 	}
@@ -51,13 +58,39 @@ public class Canvas2D implements SpyglassCanvas {
 	 * 
 	 */
 	private void drawLine(Line line) {
-		if (log.isDebugEnabled())
-			log.debug("Drawing line " + line);
-
 		Color color = new Color(null, line.getColorR(), line.getColorG(), line.getColorB());
 		gc.setForeground(color);
-
+		gc.setLineWidth(line.getLineWidth());
+		gc.drawLine((int) (line.getPosition().x), (int) (line.getPosition().y), (int) (line.getEnd().x), (int) (line.getEnd().y));
 		// TODO: Implement the drawing of the line primitive
+		color.dispose();
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	private void drawText(de.uniluebeck.itm.spyglass.drawing.primitive.Text text) {
+		Color color = new Color(null, text.getColorR(), text.getColorG(), text.getColorB());
+		Color bgColor = new Color(null, text.getBgColorR(), text.getBgColorG(), text.getBgColorB());
+		Font f  = new Font(gc.getDevice(), "Arial", 6, SWT.NORMAL);
+		
+		gc.setFont(f);
+		gc.setForeground(color);
+		gc.setBackground(bgColor);
+		String s = text.getText();
+		int offsetX = 0;
+		Point p = gc.stringExtent(s);
+		if (text.getJustification() == TextJustification.center)
+			offsetX = (p.x / -2)+1;
+		else if (text.getJustification() == TextJustification.right)
+			offsetX = -(p.x)+1;
+		int offsetY = p.y / -2;
+		gc.drawString(s, (int) (text.getPosition().x) + offsetX, (int) (text.getPosition().y) + offsetY);
+		// TODO: Implement the drawing of the line primitive
+		color.dispose();
+		bgColor.dispose();
+		f.dispose();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -65,14 +98,19 @@ public class Canvas2D implements SpyglassCanvas {
 	 * 
 	 */
 	private void drawRectangle(Rectangle rect) {
-		if (log.isDebugEnabled())
-			log.debug("Drawing rectangle " + rect);
-
 		Color color = new Color(null, rect.getColorR(), rect.getColorG(), rect.getColorB());
-
+		Color bg = new Color(null, rect.getBgColorR(), rect.getBgColorG(), rect.getBgColorB());
+		
 		gc.setForeground(color);
+		gc.setBackground(bg);
+		gc.setLineWidth(rect.getLineWidth());
+		gc.fillRectangle((int) (rect.getPosition().x - (rect.getWidth() / 2)), (int) (rect.getPosition().y - (rect.getHeight() / 2)),
+				rect.getWidth(), rect.getHeight());
 		gc.drawRectangle((int) (rect.getPosition().x - (rect.getWidth() / 2)), (int) (rect.getPosition().y - (rect.getHeight() / 2)),
 				rect.getWidth(), rect.getHeight());
+		
+		color.dispose();
+		bg.dispose();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -80,14 +118,20 @@ public class Canvas2D implements SpyglassCanvas {
 	 * 
 	 */
 	private void drawCircle(Circle circle) {
-		if (log.isDebugEnabled())
-			log.debug("Drawing circle: " + circle);
-
 		Color color = new Color(null, circle.getColorR(), circle.getColorG(), circle.getColorB());
+		Color bg = new Color(null, circle.getBgColorR(), circle.getBgColorG(), circle.getBgColorB());
 
 		gc.setForeground(color);
+		gc.setBackground(bg);
+		gc.setLineWidth(circle.getLineWidth());
+		
+		gc.fillOval(((int) circle.getPosition().x - (circle.getDiameter() / 2)), ((int) circle.getPosition().y - (circle.getDiameter() / 2)), circle
+				.getDiameter(), circle.getDiameter());
 		gc.drawOval(((int) circle.getPosition().x - (circle.getDiameter() / 2)), ((int) circle.getPosition().y - (circle.getDiameter() / 2)), circle
 				.getDiameter(), circle.getDiameter());
+		
+		color.dispose();
+		bg.dispose();
 	}
 
 }

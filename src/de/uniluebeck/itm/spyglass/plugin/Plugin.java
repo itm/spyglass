@@ -43,6 +43,12 @@ public abstract class Plugin implements Comparable<Plugin> {
 	/**
 	 * 
 	 */
+	public abstract String name();
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
 	public final SubLayer getSubLayer() {
 		return subLayer;
 	}
@@ -91,6 +97,14 @@ public abstract class Plugin implements Comparable<Plugin> {
 	 */
 	public final boolean isActive() {
 		return isActive;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public void reset() {
+		subLayer.reset();
 	}
 
 	// --------------------------------------------------------------------------------

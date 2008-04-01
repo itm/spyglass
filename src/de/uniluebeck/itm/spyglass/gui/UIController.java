@@ -109,26 +109,26 @@ public class UIController {
 		// Background Painter Plugins
 		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
 			if (plugin instanceof BackgroundPainterPlugin && plugin.isActive())
-				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects().values())
+				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects())
 					spyglass.getCanvas().draw(object, gc);
 
 		// Relation Painter Plugins
 		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
 			if (plugin instanceof RelationPainterPlugin && plugin.isActive())
-				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects().values())
+				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects())
 					spyglass.getCanvas().draw(object, gc);
 
 		// Node Painter Plugins
 		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
 			if (plugin instanceof NodePainterPlugin && plugin.isActive())
-				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects().values())
+				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects())
 					spyglass.getCanvas().draw(object, gc);
 
 		// Global Information Plugins
 		// TODO: Global information plug-ins must add information to a Tree on the GUI, not using drawing objects
 		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
 			if (plugin instanceof GlobalInformationPlugin && plugin.isActive())
-				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects().values())
+				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects())
 					spyglass.getCanvas().draw(object, gc);
 	}
 

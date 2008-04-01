@@ -20,6 +20,7 @@ import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
 public class Circle extends DrawingObject {
 	@Element
 	private int diameter = 10;
+	private short lineWidth = 1;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -78,6 +79,28 @@ public class Circle extends DrawingObject {
 	public String toString() {
 		// TODO Implement
 		return super.toString();
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public void update(DrawingObject other)
+	{
+		if (other instanceof Circle)
+		{
+			super.update(other);
+			Circle c = (Circle)other;
+			setDiameter(c.getDiameter());
+		}
+	}
+
+	public short getLineWidth() {
+		return lineWidth;
+	}
+
+	public void setLineWidth(short lineWidth) {
+		this.lineWidth = lineWidth;
 	}
 
 }

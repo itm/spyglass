@@ -19,6 +19,30 @@ import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
 @Root
 public class Line extends DrawingObject {
 
+	private Position lineEnd;
+	private int width;
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public Line(Position p, Position d) {
+		this();
+		setPosition(p);
+		setLineWidth(1);
+		setEnd(d);
+	}
+
+	public void update(DrawingObject other)
+	{
+		if (other instanceof Line)
+		{
+			super.update(other);
+			Line l = (Line)other;
+			setEnd(l.getEnd());
+		}
+	}
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -39,6 +63,21 @@ public class Line extends DrawingObject {
 	/**
 	 * 
 	 */
+	public void setEnd(Position end) {
+		lineEnd = end;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public Position getEnd() {
+		return lineEnd;
+	}
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
 	@Override
 	public DrawingObject clone() throws CloneNotSupportedException {
 		Line clone = new Line();
@@ -47,7 +86,7 @@ public class Line extends DrawingObject {
 		clone.setColorG(getColorG());
 		clone.setColorB(getColorB());
 		clone.setPosition(new Position(getPosition().x, getPosition().y));
-
+		clone.setLineWidth(getLineWidth());
 		return clone;
 	}
 
@@ -59,6 +98,14 @@ public class Line extends DrawingObject {
 	public String toString() {
 		// TODO Implement
 		return super.toString();
+	}
+
+	public int getLineWidth() {
+		return width;
+	}
+
+	public void setLineWidth(int width) {
+		this.width = width;
 	}
 
 }

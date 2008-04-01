@@ -35,14 +35,23 @@ public class FlegsensNodePainterPlugin extends de.uniluebeck.itm.spyglass.plugin
 
 		log.debug("pm: " + getPluginManager());
 		log.debug("np: " + getPluginManager().getNodePositioner());
-		
-		Position p = getPluginManager().getNodePositioner().getPosition(packet.getId() );
-		DrawingObject rect = new Rectangle();
-		rect.setColorR(255);
-		rect.setColorG(0);
-		rect.setColorB(0);
-		rect.setPosition(p);
-		
-		getSubLayer().addOrUpdateDrawingObject(rect);
+
+		Position p = getPluginManager().getNodePositioner().getPosition(packet.getId());
+		if (p != null) {
+			DrawingObject rect = new Rectangle();
+			rect.setId(11);
+			rect.setColorR(255);
+			rect.setColorG(0);
+			rect.setColorB(0);
+			rect.setPosition(p);
+
+			getSubLayer().addOrUpdateDrawingObject(rect);
+		}
+	}
+
+	@Override
+	public String name() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

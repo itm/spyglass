@@ -15,7 +15,6 @@ import org.apache.log4j.Category;
 
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin;
-import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
 
 // --------------------------------------------------------------------------------
 /**
@@ -44,6 +43,12 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 	@Override
 	public void handlePacket(Packet packet) {
 		//
+	}
+
+	@Override
+	public String name() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

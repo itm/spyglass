@@ -58,7 +58,30 @@ public abstract class NodePositionerPlugin extends Plugin {
 			return "[" + x + ", " + y + ", " + z + "]";
 		}
 
-	}
+		// --------------------------------------------------------------------------------
+		/**
+		 *
+		 */
+		public Position mult(double d) {
+			return new Position(x*d, y*d, z*d);
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 *
+		 */
+		public Position add(Position p) {
+			return new Position(x + p.x, y + p.y, z + p.z);
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 *
+		 */
+		public Position clone() {
+			return new Position(this.x, this.y, this.z);
+		}
+}
 
 	// --------------------------------------------------------------------------------
 	/**

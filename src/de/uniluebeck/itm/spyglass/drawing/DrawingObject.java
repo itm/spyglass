@@ -32,6 +32,17 @@ public abstract class DrawingObject {
 	@Element
 	private int colorB = 0;
 
+	@Element
+	private int bgColorR = 255;
+
+	@Element
+	private int bgColorG = 255;
+
+	@Element
+	private int bgColorB = 255;
+
+	private long paintOrderId;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -54,8 +65,10 @@ public abstract class DrawingObject {
 	 */
 	public void update(DrawingObject other) {
 		this.id = other.id;
+		this.paintOrderId = other.paintOrderId;
 		this.position.x = other.position.x;
 		this.position.y = other.position.y;
+		setColor(other.getColorR(), other.getColorG(), other.getColorB());
 	}
 
 	// --------------------------------------------------------------------------------
@@ -151,10 +164,56 @@ public abstract class DrawingObject {
 	/**
 	 * 
 	 */
-	@Override
-	public String toString() {
-		// TODO Implement
-		return super.toString();
+	public void setColor(int R, int G, int B ) {
+		this.colorR = R;
+		this.colorG = G;
+		this.colorB = B;
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "paintOrderId: " + paintOrderId + ", id: " + id + ", " + super.toString();
+	}
+
+	public long getPaintOrderId() {
+		return paintOrderId;
+	}
+
+	public void setPaintOrderId(long paintOrderId) {
+		this.paintOrderId = paintOrderId;
+	}
+
+	public int getBgColorR() {
+		return bgColorR;
+	}
+
+	public void setBgColorR(int bgColorR) {
+		this.bgColorR = bgColorR;
+	}
+
+	public int getBgColorG() {
+		return bgColorG;
+	}
+
+	public void setBgColor(int bgColorG) {
+		this.bgColorG = bgColorG;
+	}
+
+	public int getBgColorB() {
+		return bgColorB;
+	}
+
+	public void setBgColorB(int bgColorB) {
+		this.bgColorB = bgColorB;
+	}
+	
+	public void setBgColor(int r, int b, int g) {
+		this.bgColorR = r;
+		this.bgColorB = b;
+		this.bgColorG = g;
+	}
 }
