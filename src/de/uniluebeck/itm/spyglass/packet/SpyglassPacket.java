@@ -1,346 +1,12 @@
 package de.uniluebeck.itm.spyglass.packet;
-import java.math.BigInteger;
 
 /**
- * Generic Spyglass Packet.
- * It has the following structure:
- * 
- * <table class="MsoNormalTable"
- style="margin-left: -1pt; border-collapse: collapse;" border="0"
- cellpadding="0" cellspacing="0">
-  <tbody>
-    <tr style="">
-      <td
- style="border-style: solid none solid solid; border-color: black -moz-use-text-color black black; border-width: 1pt medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">Byte</p>
-      </td>
-      <td
- style="border-style: solid none solid solid; border-color: black -moz-use-text-color black black; border-width: 1pt medium 1pt 1pt; padding: 0cm 5.4pt; width: 63pt;"
- valign="top" width="84">
-      <p class="MsoNormal" style="">Typ</p>
-      </td>
-      <td
- style="border-style: solid none solid solid; border-color: black -moz-use-text-color black black; border-width: 1pt medium 1pt 1pt; padding: 0cm 5.4pt; width: 232.05pt;"
- valign="top" width="309">
-      <p class="MsoNormal" style="">Bedeutung</p>
-      </td>
-      <td
- style="border: 1pt solid black; padding: 0cm 5.4pt; width: 117.15pt;"
- valign="top" width="156">
-      <p class="MsoNormal" style="">Wert</p>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<p class="MsoNormal">&nbsp;</p>
-<table class="MsoNormalTable"
- style="margin-left: -1pt; border-collapse: collapse;" border="0"
- cellpadding="0" cellspacing="0">
-  <tbody>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: solid none solid solid; border-color: black -moz-use-text-color black black; border-width: 1pt medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">00</p>
-      </td>
-      <td rowspan="2"
- style="border-style: solid none solid solid; border-color: black -moz-use-text-color black black; border-width: 1pt medium 1pt 1pt; padding: 0cm 5.4pt; width: 63pt; height: 25.15pt;"
- valign="top" width="84">
-      <p class="MsoNormal" style="">uint16</p>
-      </td>
-      <td rowspan="2"
- style="border-style: solid none solid solid; border-color: black -moz-use-text-color black black; border-width: 1pt medium 1pt 1pt; padding: 0cm 5.4pt; width: 232.4pt; height: 25.15pt;"
- valign="top" width="310">
-      <p class="MsoNormal" style="">Anzahl
-nachfolgender Bytes</p>
-      </td>
-      <td rowspan="2"
- style="border: 1pt solid black; padding: 0cm 5.4pt; width: 117.4pt; height: 25.15pt;"
- valign="top" width="157">
-      <p class="MsoNormal" style="">&nbsp;</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">01</p>
-      </td>
-    </tr>
-    <tr style="">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">02</p>
-      </td>
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 63pt;"
- valign="top" width="84">
-      <p class="MsoNormal" style="">uint8</p>
-      </td>
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 232.4pt;"
- valign="top" width="310">
-      <p class="MsoNormal" style="">Version</p>
-      </td>
-      <td
- style="border-style: none solid solid; border-color: -moz-use-text-color black black; border-width: medium 1pt 1pt; padding: 0cm 5.4pt; width: 117.4pt;"
- valign="top" width="157">
-      <p class="MsoNormal" style="">02</p>
-      </td>
-    </tr>
-    <tr style="">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">03</p>
-      </td>
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 63pt;"
- valign="top" width="84">
-      <p class="MsoNormal" style="">uint8</p>
-      </td>
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 232.4pt;"
- valign="top" width="310">
-      <p class="MsoNormal" style="">Syntaxtyp</p>
-      </td>
-      <td
- style="border-style: none solid solid; border-color: -moz-use-text-color black black; border-width: medium 1pt 1pt; padding: 0cm 5.4pt; width: 117.4pt;"
- valign="top" width="157">
-      <p class="MsoNormal" style="">0 = std</p>
-      <p class="MsoNormal">1 = uint8-List</p>
-      <p class="MsoNormal">2 = uInt16List</p>
-      <p class="MsoNormal">3 = Int16List</p>
-      <p class="MsoNormal">4 = uInt32List</p>
-      <p class="MsoNormal">5 = uIInt64List</p>
-      <p class="MsoNormal">6 = FloatList </p>
-      <p class="MsoNormal">7 = variable</p>
-      </td>
-    </tr>
-    <tr style="">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">04</p>
-      </td>
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 63pt;"
- valign="top" width="84">
-      <p class="MsoNormal" style="">uint8</p>
-      </td>
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 232.4pt;"
- valign="top" width="310">
-      <p class="MsoNormal" style="">Semantiktyp</p>
-      </td>
-      <td
- style="border-style: none solid solid; border-color: -moz-use-text-color black black; border-width: medium 1pt 1pt; padding: 0cm 5.4pt; width: 117.4pt;"
- valign="top" width="157">
-      <p class="MsoNormal" style="">&nbsp;</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">05</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 63pt; height: 25.15pt;"
- valign="top" width="84">
-      <p class="MsoNormal" style="">uint16</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 232.4pt; height: 25.15pt;"
- valign="top" width="310">
-      <p class="MsoNormal" style="">Sender ID</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none solid solid; border-color: -moz-use-text-color black black; border-width: medium 1pt 1pt; padding: 0cm 5.4pt; width: 117.4pt; height: 25.15pt;"
- valign="top" width="157">
-      <p class="MsoNormal" style="">&nbsp;</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">06</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">07</p>
-      </td>
-      <td rowspan="4"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 63pt; height: 25.15pt;"
- valign="top" width="84">
-      <p class="MsoNormal" style="">uint32</p>
-      </td>
-      <td rowspan="4"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 232.4pt; height: 25.15pt;"
- valign="top" width="310">
-      <p class="MsoNormal" style="">Sekundenanteil
-der Zeit</p>
-      </td>
-      <td rowspan="4"
- style="border-style: none solid solid; border-color: -moz-use-text-color black black; border-width: medium 1pt 1pt; padding: 0cm 5.4pt; width: 117.4pt; height: 25.15pt;"
- valign="top" width="157">
-      <p class="MsoNormal" style="">&nbsp;</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">08</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">09</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">10</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">11</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 63pt; height: 25.15pt;"
- valign="top" width="84">
-      <p class="MsoNormal" style="">uint16</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 232.4pt; height: 25.15pt;"
- valign="top" width="310">
-      <p class="MsoNormal" style="">Millisekundenanteil
-der Zeit</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none solid solid; border-color: -moz-use-text-color black black; border-width: medium 1pt 1pt; padding: 0cm 5.4pt; width: 117.4pt; height: 25.15pt;"
- valign="top" width="157">
-      <p class="MsoNormal" style="">&nbsp;</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">12</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">13</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 63pt; height: 25.15pt;"
- valign="top" width="84">
-      <p class="MsoNormal">int16</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 232.4pt; height: 25.15pt;"
- valign="top" width="310">
-      <p class="MsoNormal">x - Koordinate</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none solid solid; border-color: -moz-use-text-color black black; border-width: medium 1pt 1pt; padding: 0cm 5.4pt; width: 117.4pt; height: 25.15pt;"
- valign="top" width="157">
-      <p class="MsoNormal">&nbsp;</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">14</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">15</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 63pt; height: 25.15pt;"
- valign="top" width="84">
-      <p class="MsoNormal">int16</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 232.4pt; height: 25.15pt;"
- valign="top" width="310">
-      <p class="MsoNormal">y - Koordinate</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none solid solid; border-color: -moz-use-text-color black black; border-width: medium 1pt 1pt; padding: 0cm 5.4pt; width: 117.4pt; height: 25.15pt;"
- valign="top" width="157">
-      <p class="MsoNormal">&nbsp;</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">16</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">17</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 63pt; height: 25.15pt;"
- valign="top" width="84">
-      <p class="MsoNormal">int16</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 232.4pt; height: 25.15pt;"
- valign="top" width="310">
-      <p class="MsoNormal">z - Koordinate</p>
-      </td>
-      <td rowspan="2"
- style="border-style: none solid solid; border-color: -moz-use-text-color black black; border-width: medium 1pt 1pt; padding: 0cm 5.4pt; width: 117.4pt; height: 25.15pt;"
- valign="top" width="157">
-      <p class="MsoNormal">&nbsp;</p>
-      </td>
-    </tr>
-    <tr style="page-break-inside: avoid; height: 25.15pt;">
-      <td
- style="border-style: none none solid solid; border-color: -moz-use-text-color -moz-use-text-color black black; border-width: medium medium 1pt 1pt; padding: 0cm 5.4pt; width: 50.4pt; height: 25.15pt;"
- valign="top" width="67">
-      <p class="MsoNormal" style="">18</p>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
- * 
- * @author Nils Glombitza, ITM Uni Luebeck
- *
+ * Generic Spyglass packet.
  */
 public class SpyglassPacket extends Packet
 {
 
+	// Spyglass Packet Types
 	public static final int ISENSE_SPYGLASS_PACKET_STD = 0;
 	public static final int ISENSE_SPYGLASS_PACKET_UINT8 = 1;
 	public static final int ISENSE_SPYGLASS_PACKET_UINT16 = 2;
@@ -352,21 +18,65 @@ public class SpyglassPacket extends Packet
 
 	public static final int EXPECTED_PACKET_SIZE = 18;
 
+	/**
+	 * Number of bytes in this packet (excluding this field).
+	 */
 	protected int length;
-	// uint8 version_;
+
+	/**
+	 * Syntax type of this spyglass packet.
+	 */
 	protected int syntax_type;
+
+	/**
+	 * Semantic type of this spyglass packet.
+	 */
 	protected int semantic_type;
+
+	/**
+	 * Sender ID of this spyglass packet.
+	 */
 	protected int sender_id;
+
+	/**
+	 * Timestamp of this spyglass packet.
+	 */
 	protected Time time;
+
+	/**
+	 * X-Coordinate of this spyglass packet.
+	 */
 	protected int x;
+
+	/**
+	 * Y-Coordinate of this spyglass packet.
+	 */
 	protected int y;
+
+	/**
+	 * Z-Coordinate of this spyglass packet.
+	 */
 	protected int z;
-	
+
+	/**
+	 * Deserializes a Spyglass Packet.
+	 * 
+	 * @author Nils Glombitza, ITM Uni Luebeck
+	 * @throws SpyglassPacketException
+	 */
 	public void deserialize() throws SpyglassPacketException
 	{
 		deserialize(getContent());
 	}
 
+	/**
+	 * Deserializes a Spyglass Packet
+	 * 
+	 * @author Nils Glombitza, ITM Uni Luebeck
+	 * @param buf
+	 *            Byte Array of the Packet
+	 * @throws SpyglassPacketException
+	 */
 	public void deserialize(byte[] buf) throws SpyglassPacketException
 	{
 		length = deserializeUint16(buf[0], buf[1]);
@@ -447,9 +157,22 @@ public class SpyglassPacket extends Packet
 	 */
 	protected long deserializeUint32(byte b0, byte b1, byte b2, byte b3)
 	{
-		return (((((b3 & 0xFF) & 0xFFFFFFFF) | (((b2 & 0xFF) << 8) & 0xFFFFFFFF))) | (((b1 & 0xFF) << 16) & 0xFFFFFFFF)) | (((b0 & 0xFF) << 24) & 0xFFFFFFFF);
+		long i0 = (long) (b0 & 0xFF);
+		long i1 = (long) (b1 & 0xFF);
+		long i2 = (long) (b2 & 0xFF);
+		long i3 = (long) (b3 & 0xFF);
+		// return (((((b3 & 0xFF) & 0xFFFFFFFF) | (((b2 & 0xFF) << 8) &
+		// 0xFFFFFFFF))) | (((b1 & 0xFF) << 16) & 0xFFFFFFFF)) | (((b0 & 0xFF)
+		// << 24) & 0xFFFFFFFF);
+		long ret = (long) (i3 | (i2 << 8) | (i1 << 16) | (i0 << 24));
+		return ret;
 	}
 
+	/**
+	 * Deserializes a serialized Int64.
+	 * 
+	 * @author Nils Glombitza, ITM Uni Luebeck
+	 */
 	protected long deserializeInt64(byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7)
 	{
 		long i0 = (long) b0;
@@ -465,6 +188,11 @@ public class SpyglassPacket extends Packet
 		return ret;
 	}
 
+	/**
+	 * Deserializes a serialized Float.
+	 * 
+	 * @author Nils Glombitza, ITM Uni Luebeck
+	 */
 	protected float deserializeFloat(byte b0, byte b1, byte b2, byte b3)
 	{
 		int i0 = (int) b0;
@@ -476,12 +204,18 @@ public class SpyglassPacket extends Packet
 
 	}
 
+	/**
+	 * @author Nils Glombitza, ITM Uni Luebeck
+	 * @see de.uniluebeck.itm.spyglass.packet.Packet#toString()
+	 */
 	public String toString()
 	{
 		return "length:" + length + ", syntax_type:" + syntax_type + ", semantic_type:" + semantic_type + ", sender_id:" + sender_id + ",time: " + time.toString() + ", x:" + x + ", y:" + y + ", z:" + z;
 	}
 
 	/**
+	 * Property getter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return the length
 	 */
@@ -491,6 +225,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property setter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @param length
 	 *            the length to set
@@ -501,6 +237,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property getter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return the syntax_type
 	 */
@@ -510,6 +248,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property setter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @param syntax_type
 	 *            the syntax_type to set
@@ -520,6 +260,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property getter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return the semantic_type
 	 */
@@ -529,6 +271,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property setter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @param semantic_type
 	 *            the semantic_type to set
@@ -539,6 +283,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property getter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return the sender_id
 	 */
@@ -548,6 +294,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property setter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @param sender_id
 	 *            the sender_id to set
@@ -558,6 +306,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property getter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return the time
 	 */
@@ -567,6 +317,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property setter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @param time
 	 *            the time to set
@@ -577,6 +329,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property getter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return the x
 	 */
@@ -586,6 +340,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property setter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @param x
 	 *            the x to set
@@ -596,6 +352,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property getter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return the y
 	 */
@@ -605,6 +363,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property setter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @param y
 	 *            the y to set
@@ -615,6 +375,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property getter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return the z
 	 */
@@ -624,6 +386,8 @@ public class SpyglassPacket extends Packet
 	}
 
 	/**
+	 * Property setter
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @param z
 	 *            the z to set
@@ -633,6 +397,3 @@ public class SpyglassPacket extends Packet
 		this.z = z;
 	}
 }
-
-
-
