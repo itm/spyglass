@@ -8,7 +8,9 @@ package de.uniluebeck.itm.spyglass.packet;
  */
 public class Uint8ListPacket extends IntListPacket
 {
-	
+	/**
+	 * Syntaxtype of this Packet
+	 */
 	public static final int SYNTAXTYPE=1;
 
 

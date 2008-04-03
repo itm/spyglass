@@ -4,14 +4,17 @@ package de.uniluebeck.itm.spyglass.packet;
  * Represents a generic IntergerListPacket
  * 
  * @author Nils Glombitza, ITM Uni Luebeck
- *
+ * 
  */
 public class IntListPacket extends SpyglassPacket
 {
 
-	protected int[] values=new int[0];
-	
+	/** Listelements */
+	protected int[] values = new int[0];
+
 	/**
+	 * Returns the Listelements
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return the values
 	 */
@@ -21,26 +24,30 @@ public class IntListPacket extends SpyglassPacket
 	}
 
 	/**
+	 * Sets the Listelements
+	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param values the values to set
+	 * @param values
+	 *            the values to set
 	 */
 	public void setValues(int[] values)
 	{
 		this.values = values;
 	}
 
-	/** 
+	/**
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @see SpyglassPacket#toString()
 	 */
 	@Override
 	public String toString()
 	{
-		String ret=super.toString()+", values: ";
-		for(int i=0;i<values.length;i++)
+		String ret = super.toString() + ", values: ";
+		for (int i = 0; i < values.length; i++)
 		{
-			if(i>0) ret=ret+", ";
-			ret=ret+values[i];
+			if (i > 0)
+				ret = ret + ", ";
+			ret = ret + values[i];
 		}
 		return ret;
 	}
