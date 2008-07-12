@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema
+	targetNamespace="http://plugins.spyglass.itm.uniluebeck.de/SpringEmbedderNodePositionerConfig"
+	elementFormDefault="qualified"
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:senp="http://plugins.spyglass.itm.uniluebeck.de/SpringEmbedderNodePositionerConfig"
+	xmlns:sg="http://spyglass.itm.uniluebeck.de">
+
+    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://spyglass.itm.uniluebeck.de"></import>
+    <element name="root" type="senp:SpringEmbedderNodePositionerConfigType"></element>
+
+    <complexType name="SpringEmbedderNodePositionerConfigType">
+    	<complexContent>
+    		<extension base="sg:PluginCustomConfigType">
+    			<sequence>
+    				<element name="timeToLive" type="int"></element>
+    				<element name="edgeSemanticType" type="int"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+</schema>

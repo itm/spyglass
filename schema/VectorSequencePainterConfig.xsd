@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://plugins.spyglass.itm.uniluebeck.de/VectorSequencePainterConfigType" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://spyglass.itm.uniluebeck.de" xmlns:vsp="http://plugins.spyglass.itm.uniluebeck.de/VectorSequencePainterConfigType">
+
+    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://spyglass.itm.uniluebeck.de"></import>
+    <complexType name="VectorSequencePainterConfigType">
+    	<complexContent>
+    		<extension base="sg:PluginCustomConfigType">
+    			<sequence>
+    				<element name="semanticTypes"
+    					type="sg:SemanticTypeRegistrationType">
+    				</element>
+    				<element name="lineWidth" type="int"></element>
+    				<element name="lineColor" type="sg:RGBType"></element>
+    				<element name="timeToLive" type="int"></element>
+    				<element name="packetSemanticType" type="int"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+
+    <element name="root" type="vsp:VectorSequencePainterConfigType"></element>
+</schema>

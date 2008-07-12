@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://spyglass.itm.uniluebeck.de"
+	xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://spyglass.itm.uniluebeck.de">
+	<element name="spyglassConfig" type="sg:SpyGlassType"></element>
+	<complexType name="SpyGlassType">
+		<sequence minOccurs="1" maxOccurs="1">
+			<element name="general" type="sg:GeneralType" maxOccurs="1"
+				minOccurs="1">
+			</element>
+			<element name="defaults" type="sg:PluginConfigType"
+				maxOccurs="unbounded" minOccurs="0">
+			</element>
+			<element name="instances" type="sg:PluginConfigType"
+				maxOccurs="unbounded" minOccurs="0"></element>
+		</sequence>
+	</complexType>
+	<complexType name="GeneralType">
+		<sequence minOccurs="1" maxOccurs="1">
+			<element name="ruler" type="sg:GeneralRulerType"></element>
+			<element name="metrics" type="sg:GeneralMetricsType"></element>
+			<element name="time" type="sg:GeneralTimeType"></element>
+		</sequence>
+	</complexType>
+	<complexType name="GeneralRulerType">
+		<sequence minOccurs="1" maxOccurs="1">
+			<element name="show" type="boolean"></element>
+		</sequence>
+	</complexType>
+	<complexType name="GeneralMetricsType">
+		<sequence minOccurs="1" maxOccurs="1">
+			<element name="unit" type="string"></element>
+			<element name="abs2metricFactorX" type="float"></element>
+			<element name="abs2metricFactorY" type="float"></element>
+			<element name="abs2metricOffsetX" type="float"></element>
+			<element name="abs2metricOffsetY" type="float"></element>
+			<element name="lockAbs2metricFactor" type="boolean"></element>
+		</sequence>
+	</complexType>
+	<complexType name="GeneralTimeType">
+		<sequence minOccurs="1" maxOccurs="1">
+			<element name="unit" type="string"></element>
+			<element name="scale" type="float"></element>
+		</sequence>
+	</complexType>
+	<complexType name="PluginConfigType" abstract="true">
+		<sequence minOccurs="1" maxOccurs="1">
+			<element name="class" type="string"></element>
+			<element name="instanceName" type="string"></element>
+			<element name="visible" type="boolean"></element>
+			<element name="active" type="boolean"></element>
+			<element name="customConfigType" type="sg:PluginCustomConfigType"></element>
+		</sequence>
+	</complexType>
+	<complexType name="PluginCustomConfigType" abstract="true"></complexType>
+
+    <complexType name="SemanticTypeListType">
+    	<sequence maxOccurs="unbounded" minOccurs="0">
+    		<element name="id" type="int"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="SemanticTypeRegistrationType">
+    	<sequence maxOccurs="1" minOccurs="1">
+    		<element name="registration"
+    			type="sg:SemanticTypeEnumType" maxOccurs="1" minOccurs="1">
+    		</element>
+    		<element name="semanticTypeList" type="sg:SemanticTypeListType" maxOccurs="1" minOccurs="0"></element>
+    	</sequence>
+    </complexType>
+	
+
+    <simpleType name="SemanticTypeEnumType">
+    	<restriction base="string">
+    		<enumeration value="all"></enumeration>
+    		<enumeration value="none"></enumeration>
+    		<enumeration value="list"></enumeration>
+    	</restriction>
+    </simpleType>
+
+    <complexType name="RGBType">
+    	<sequence>
+    		<element name="r" type="int"></element>
+    		<element name="g" type="int"></element>
+    		<element name="b" type="int"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="StringFormatterListType">
+    	<sequence maxOccurs="unbounded" minOccurs="0">
+    		<element name="semanticType" type="int"></element>
+    		<element name="formatterString" type="string"></element>
+    	</sequence>
+    </complexType>
+</schema>

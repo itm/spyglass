@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://plugins.spyglass.itm.uniluebeck.de/MapPainterConfigType" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://spyglass.itm.uniluebeck.de" xmlns:mp="http://plugins.spyglass.itm.uniluebeck.de/MapPainterConfigType">
+
+    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://spyglass.itm.uniluebeck.de"></import>
+    <complexType name="MapPainterConfigType">
+    	<complexContent>
+    		<extension base="sg:PluginCustomConfigType">
+    			<sequence>
+    				<element name="semanticTypes"
+    					type="sg:SemanticTypeRegistrationType">
+    				</element>
+    				<element name="gridConfig"
+    					type="mp:GridConfigType">
+    				</element>
+    				<element name="mapConfig" type="mp:MapConfigType"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+
+    <element name="root" type="mp:MapPainterConfigType"></element>
+
+    <complexType name="GridConfigType">
+    	<sequence>
+    		<element name="lowerLeftX" type="int"></element>
+    		<element name="lowerLeftY" type="int"></element>
+    		<element name="rowCount" type="int"></element>
+            <element name="rowHeight" type="int"></element>
+            <element name="columnCount" type="int"></element>
+            <element name="columnWidth" type="int"></element>
+            <element name="lockRowsColumns" type="boolean"></element>
+            <element name="lockWidthHeight" type="boolean"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="MapConfigType">
+    	<sequence>
+    		<element name="defaultValue" type="float"></element>
+    		<element name="minValue" type="float"></element>
+    		<element name="maxValue" type="float"></element>
+    		<element name="minColor" type="sg:RGBType"></element>
+    		<element name="maxColor" type="sg:RGBType"></element>
+            <element name="updateInterval" type="int"></element>
+            <element name="framePointsHorizontal" type="int"></element>
+            <element name="framePointsVertical" type="int"></element>
+    	</sequence>
+    </complexType>
+</schema>

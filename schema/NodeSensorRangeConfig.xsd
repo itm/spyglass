@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://plugins.spyglass.itm.uniluebeck.de/NodeSensorRangeConfigType" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://spyglass.itm.uniluebeck.de" xmlns:nsr="http://plugins.spyglass.itm.uniluebeck.de/NodeSensorRangeConfigType">
+
+    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://spyglass.itm.uniluebeck.de"></import>
+    <complexType name="NodeSensorRangeConfigType">
+    	<complexContent>
+    		<extension base="sg:PluginCustomConfigType">
+    			<sequence maxOccurs="1" minOccurs="1">
+    				<element name="defaultRangeConfig"
+    					type="nsr:NodeSensorRangeOptionsType" maxOccurs="1" minOccurs="1">
+    				</element>
+    				<element name="perNodeConfigs" type="nsr:NodeSensorRangeOptionsType" maxOccurs="unbounded" minOccurs="0"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+
+    <element name="root" type="nsr:NodeSensorRangeConfigType"></element>
+
+
+    <complexType name="NodeSensorRangeOptionsType">
+    	<sequence>
+    		<element name="color" type="sg:RGBType"></element>
+    		<choice maxOccurs="1" minOccurs="0">
+    			<element name="circle" type="nsr:CircleType"></element>
+    			<element name="rectangle" type="nsr:RectangleType"></element>
+    			<element name="cone" type="nsr:ConeType"></element>
+    		</choice>
+    	</sequence>
+    </complexType>
+
+    <complexType name="CircleType">
+    	<sequence>
+    		<element name="radius" type="int"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="RectangleType">
+    	<sequence>
+    		<element name="width" type="int"></element>
+    		<element name="height" type="int"></element>
+    		<element name="orientation" type="int"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="ConeType">
+    	<sequence>
+    		<element name="radius" type="int"></element>
+    		<element name="angle" type="int"></element>
+    		<element name="orientation" type="int"></element>
+    	</sequence>
+    </complexType>
+</schema>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://plugins.spyglass.itm.uniluebeck.de/LinePainterConfigType" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://spyglass.itm.uniluebeck.de" xmlns:lp="http://plugins.spyglass.itm.uniluebeck.de/LinePainterConfigType">
+
+    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://spyglass.itm.uniluebeck.de"></import>
+    <complexType name="LinePainterConfigType">
+    	<complexContent>
+    		<extension base="sg:PluginCustomConfigType">
+    			<sequence>
+    				<element name="semanticTypes"
+    					type="sg:SemanticTypeRegistrationType">
+    				</element>
+    				<element name="lineWidth" type="int"></element>
+    				<element name="lineColor" type="sg:RGBType"></element>
+    				<element name="stringFormatterConfig" type="sg:StringFormatterListType"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+
+    <element name="root" type="lp:LinePainterConfigType"></element>
+</schema>

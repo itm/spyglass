@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://plugins.spyglass.itm.uniluebeck.de/PositionPacketNodePositionerConfig"
+	xmlns:tns="http://plugins.spyglass.itm.uniluebeck.de/PositionPacketNodePositionerConfig"
+	elementFormDefault="qualified"
+	xmlns:sg="http://spyglass.itm.uniluebeck.de">
+
+    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://spyglass.itm.uniluebeck.de"></import>
+    <complexType name="PositionPaketNodePositionerConfigType">
+    	<complexContent>
+    		<extension base="sg:PluginCustomConfigType">
+    			<sequence maxOccurs="1" minOccurs="1">
+                    <element name="timeToLive" type="int" maxOccurs="1" minOccurs="1"></element>
+                </sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+    <element name="root" type="tns:PositionPaketNodePositionerConfigType"></element>
+</schema>
