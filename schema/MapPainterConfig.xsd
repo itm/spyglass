@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema targetNamespace="http://plugins.spyglass.itm.uniluebeck.de/MapPainterConfigType" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://spyglass.itm.uniluebeck.de" xmlns:mp="http://plugins.spyglass.itm.uniluebeck.de/MapPainterConfigType">
+<schema targetNamespace="http://plugins.xml.spyglass.itm.uniluebeck.de/MapPainterConfigType" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://xml.spyglass.itm.uniluebeck.de" xmlns:mp="http://plugins.xml.spyglass.itm.uniluebeck.de/MapPainterConfigType">
 
-    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://spyglass.itm.uniluebeck.de"></import>
+    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://xml.spyglass.itm.uniluebeck.de"></import>
     
     <complexType name="MapPainterConfigType">
     	<complexContent>

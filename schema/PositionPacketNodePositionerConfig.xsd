@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema
-	xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://plugins.spyglass.itm.uniluebeck.de/PositionPacketNodePositionerConfig"
-	xmlns:tns="http://plugins.spyglass.itm.uniluebeck.de/PositionPacketNodePositionerConfig"
-	elementFormDefault="qualified"
-	xmlns:sg="http://spyglass.itm.uniluebeck.de">
+	targetNamespace="http://plugins.xml.spyglass.itm.uniluebeck.de/PositionPacketNodePositionerConfig"
+	elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://plugins.xml.spyglass.itm.uniluebeck.de/PositionPacketNodePositionerConfig" xmlns:sg="http://xml.spyglass.itm.uniluebeck.de">
 
-    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://spyglass.itm.uniluebeck.de"></import>
+    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://xml.spyglass.itm.uniluebeck.de"></import>
     <complexType name="PositionPaketNodePositionerConfigType">
     	<complexContent>
     		<extension base="sg:PluginCustomConfigType">

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema targetNamespace="http://spyglass.itm.uniluebeck.de"
-	xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://spyglass.itm.uniluebeck.de">
+<schema targetNamespace="http://xml.spyglass.itm.uniluebeck.de" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://xml.spyglass.itm.uniluebeck.de">
 	<element name="spyglassConfig" type="sg:SpyGlassType"></element>
 	<complexType name="SpyGlassType">
 		<sequence minOccurs="1" maxOccurs="1">
@@ -13,73 +12,68 @@
 			<element name="instances" type="sg:PluginConfigType"
 				maxOccurs="unbounded" minOccurs="0">
 			</element>
-			<element name="inputConfig" type="sg:InputConfigType"></element>
-			<element name="outputConfig" type="sg:OutputConfigType"></element>
+			<element name="inputConfig" type="sg:InputConfigType" maxOccurs="1" minOccurs="1"></element>
+			<element name="outputConfig" type="sg:OutputConfigType" maxOccurs="1" minOccurs="1"></element>
 		</sequence>
 	</complexType>
 	<complexType name="GridConfigType">
-    	<sequence>
-    		<element name="lowerLeftX" type="int"></element>
-    		<element name="lowerLeftY" type="int"></element>
-    		<element name="rowCount" type="int"></element>
-            <element name="rowHeight" type="int"></element>
-            <element name="columnCount" type="int"></element>
-            <element name="columnWidth" type="int"></element>
-            <element name="lockRowsColumns" type="boolean"></element>
-            <element name="lockWidthHeight" type="boolean"></element>
+    	<sequence maxOccurs="1" minOccurs="1">
+    		<element name="lowerLeftX" type="int" maxOccurs="1" minOccurs="1"></element>
+    		<element name="lowerLeftY" type="int" maxOccurs="1" minOccurs="1"></element>
+    		<element name="rowCount" type="int" maxOccurs="1" minOccurs="1"></element>
+            <element name="rowHeight" type="int" maxOccurs="1" minOccurs="1"></element>
+            <element name="columnCount" type="int" maxOccurs="1" minOccurs="1"></element>
+            <element name="columnWidth" type="int" maxOccurs="1" minOccurs="1"></element>
+            <element name="lockRowsColumns" type="boolean" maxOccurs="1" minOccurs="1"></element>
+            <element name="lockWidthHeight" type="boolean" maxOccurs="1" minOccurs="1"></element>
     	</sequence>
     </complexType>
 	<complexType name="GeneralType">
 		<sequence minOccurs="1" maxOccurs="1">
-			<element name="ruler" type="sg:GeneralRulerType"></element>
-			<element name="metrics" type="sg:GeneralMetricsType"></element>
-			<element name="time" type="sg:GeneralTimeType"></element>
+			<element name="ruler" type="sg:GeneralRulerType" maxOccurs="1" minOccurs="1"></element>
+			<element name="metrics" type="sg:GeneralMetricsType" maxOccurs="1" minOccurs="1"></element>
+			<element name="time" type="sg:GeneralTimeType" maxOccurs="1" minOccurs="1"></element>
 		</sequence>
 	</complexType>
 	<complexType name="GeneralRulerType">
 		<sequence minOccurs="1" maxOccurs="1">
-			<element name="show" type="boolean"></element>
+			<element name="show" type="boolean" maxOccurs="1" minOccurs="1"></element>
 		</sequence>
 	</complexType>
 	<complexType name="GeneralMetricsType">
 		<sequence minOccurs="1" maxOccurs="1">
-			<element name="unit" type="string"></element>
-			<element name="abs2metricFactorX" type="float"></element>
-			<element name="abs2metricFactorY" type="float"></element>
-			<element name="abs2metricOffsetX" type="float"></element>
-			<element name="abs2metricOffsetY" type="float"></element>
-			<element name="lockAbs2metricFactor" type="boolean"></element>
+			<element name="unit" type="string" maxOccurs="1" minOccurs="1"></element>
+			<element name="abs2metricFactorX" type="float" maxOccurs="1" minOccurs="1"></element>
+			<element name="abs2metricFactorY" type="float" maxOccurs="1" minOccurs="1"></element>
+			<element name="abs2metricOffsetX" type="float" maxOccurs="1" minOccurs="1"></element>
+			<element name="abs2metricOffsetY" type="float" maxOccurs="1" minOccurs="1"></element>
+			<element name="lockAbs2metricFactor" type="boolean" maxOccurs="1" minOccurs="1"></element>
 		</sequence>
 	</complexType>
 	<complexType name="GeneralTimeType">
 		<sequence minOccurs="1" maxOccurs="1">
-			<element name="unit" type="string"></element>
-			<element name="scale" type="float"></element>
-		</sequence>
+			<element name="unit" type="string" maxOccurs="1" minOccurs="1"></element>
+            <element name="scale" type="float" maxOccurs="1" minOccurs="1"></element>
+        </sequence>
 	</complexType>
 	<complexType name="PluginConfigType" abstract="true">
 		<sequence minOccurs="1" maxOccurs="1">
-			<element name="class" type="string"></element>
-			<element name="instanceName" type="string"></element>
-			<element name="visible" type="boolean"></element>
-			<element name="active" type="boolean"></element>
-			<element name="customConfigType" type="sg:PluginCustomConfigType"></element>
+			<element name="class" type="string" maxOccurs="1" minOccurs="1"></element>
+			<element name="instanceName" type="string" maxOccurs="1" minOccurs="1"></element>
+			<element name="visible" type="boolean" maxOccurs="1" minOccurs="1"></element>
+			<element name="active" type="boolean" maxOccurs="1" minOccurs="1"></element>
+			<element name="customConfigType" type="sg:PluginCustomConfigType" maxOccurs="1" minOccurs="0"></element>
 		</sequence>
 	</complexType>
 	<complexType name="PluginCustomConfigType" abstract="true"></complexType>
 
-    <complexType name="SemanticTypeListType">
-    	<sequence maxOccurs="unbounded" minOccurs="0">
-    		<element name="id" type="int"></element>
-    	</sequence>
-    </complexType>
 
     <complexType name="SemanticTypeRegistrationType">
     	<sequence maxOccurs="1" minOccurs="1">
     		<element name="registration"
     			type="sg:SemanticTypeEnumType" maxOccurs="1" minOccurs="1">
     		</element>
-    		<element name="semanticTypeList" type="sg:SemanticTypeListType" maxOccurs="1" minOccurs="0"></element>
+    		<element name="semanticTypes" type="int" maxOccurs="unbounded" minOccurs="0"></element>
     	</sequence>
     </complexType>
 	
@@ -93,17 +87,17 @@
     </simpleType>
 
     <complexType name="RGBType">
-    	<sequence>
-    		<element name="r" type="int"></element>
-    		<element name="g" type="int"></element>
-    		<element name="b" type="int"></element>
+    	<sequence maxOccurs="1" minOccurs="1">
+    		<element name="r" type="int" maxOccurs="1" minOccurs="1"></element>
+    		<element name="g" type="int" maxOccurs="1" minOccurs="1"></element>
+    		<element name="b" type="int" maxOccurs="1" minOccurs="1"></element>
     	</sequence>
     </complexType>
 
     <complexType name="StringFormatterListType">
     	<sequence maxOccurs="unbounded" minOccurs="0">
-    		<element name="semanticType" type="int"></element>
-    		<element name="formatterString" type="string"></element>
+    		<element name="semanticType" type="int" maxOccurs="1" minOccurs="1"></element>
+    		<element name="formatterString" type="string" maxOccurs="1" minOccurs="1"></element>
     	</sequence>
     </complexType>
 
@@ -122,8 +116,8 @@
     </simpleType>
 
     <complexType name="OutputConfigType">
-    	<sequence>
-    		<element name="filePath" type="string"></element>
+    	<sequence maxOccurs="1" minOccurs="1">
+    		<element name="filePath" type="string" maxOccurs="1" minOccurs="0"></element>
     	</sequence>
     </complexType>
 </schema>

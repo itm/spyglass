@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema
-	targetNamespace="http://plugins.spyglass.itm.uniluebeck.de/SpringEmbedderNodePositionerConfig"
-	elementFormDefault="qualified"
-	xmlns="http://www.w3.org/2001/XMLSchema"
-	xmlns:senp="http://plugins.spyglass.itm.uniluebeck.de/SpringEmbedderNodePositionerConfig"
-	xmlns:sg="http://spyglass.itm.uniluebeck.de">
+	targetNamespace="http://plugins.xml.spyglass.itm.uniluebeck.de/SpringEmbedderNodePositionerConfig"
+	elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:senp="http://plugins.xml.spyglass.itm.uniluebeck.de/SpringEmbedderNodePositionerConfig" xmlns:sg="http://xml.spyglass.itm.uniluebeck.de">
 
-    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://spyglass.itm.uniluebeck.de"></import>
+    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://xml.spyglass.itm.uniluebeck.de"></import>
     <element name="root" type="senp:SpringEmbedderNodePositionerConfigType"></element>
 
     <complexType name="SpringEmbedderNodePositionerConfigType">
