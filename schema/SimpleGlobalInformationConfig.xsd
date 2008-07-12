@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://plugins.spyglass.itm.uniluebeck.de/SimpleGlobalInformationConfigType" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://spyglass.itm.uniluebeck.de" xmlns:sgi="http://plugins.spyglass.itm.uniluebeck.de/SimpleGlobalInformationConfigType">
+
+    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://spyglass.itm.uniluebeck.de"></import>
+    <complexType name="SimpleGlobalInformationConfigType">
+    	<complexContent>
+    		<extension base="sg:PluginCustomConfigType">
+    			<sequence maxOccurs="1" minOccurs="1">
+    				<element name="displayAvgNodeDegree"
+    					type="boolean" maxOccurs="1" minOccurs="1">
+    				</element>
+    				<element name="avgNodeDegreeSemanticType"
+    					type="int" maxOccurs="1" minOccurs="1">
+    				</element>
+                    <element name="aggregationConfigs" type="sgi:AggregationConfigType" maxOccurs="unbounded" minOccurs="0"></element>
+                    <element name="displayTotalNodeCount"
+    					type="boolean" maxOccurs="1" minOccurs="1">
+    				</element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+
+    <element name="root" type="sgi:SimpleGlobalInformationConfigType"></element>
+
+    <complexType name="AggregationConfigType">
+    	<sequence>
+    		<element name="semanticType" type="int"></element>
+    		<element name="descriptionString" type="string"></element>
+    		<element name="expression" type="string"></element>
+    	</sequence>
+    </complexType>
+
+    <simpleType name="AggregationAlgorithmType">
+    	<restriction base="string">
+    		<enumeration value="SUM"></enumeration>
+    		<enumeration value="MIN"></enumeration>
+    		<enumeration value="MAX"></enumeration>
+    		<enumeration value="AVG"></enumeration>
+    		<enumeration value="MEDIAN"></enumeration>
+    	</restriction>
+    </simpleType>
+</schema>

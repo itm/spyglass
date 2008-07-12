@@ -11,9 +11,24 @@
 				maxOccurs="unbounded" minOccurs="0">
 			</element>
 			<element name="instances" type="sg:PluginConfigType"
-				maxOccurs="unbounded" minOccurs="0"></element>
+				maxOccurs="unbounded" minOccurs="0">
+			</element>
+			<element name="inputConfig" type="sg:InputConfigType"></element>
+			<element name="outputConfig" type="sg:OutputConfigType"></element>
 		</sequence>
 	</complexType>
+	<complexType name="GridConfigType">
+    	<sequence>
+    		<element name="lowerLeftX" type="int"></element>
+    		<element name="lowerLeftY" type="int"></element>
+    		<element name="rowCount" type="int"></element>
+            <element name="rowHeight" type="int"></element>
+            <element name="columnCount" type="int"></element>
+            <element name="columnWidth" type="int"></element>
+            <element name="lockRowsColumns" type="boolean"></element>
+            <element name="lockWidthHeight" type="boolean"></element>
+    	</sequence>
+    </complexType>
 	<complexType name="GeneralType">
 		<sequence minOccurs="1" maxOccurs="1">
 			<element name="ruler" type="sg:GeneralRulerType"></element>
@@ -89,6 +104,26 @@
     	<sequence maxOccurs="unbounded" minOccurs="0">
     		<element name="semanticType" type="int"></element>
     		<element name="formatterString" type="string"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="InputConfigType">
+    	<choice maxOccurs="1" minOccurs="1">
+            <element name="source" type="sg:InputSourceEnumType" maxOccurs="1" minOccurs="1"></element>
+            <element name="filePath" type="string" maxOccurs="1" minOccurs="0"></element>
+    	</choice>
+    </complexType>
+
+    <simpleType name="InputSourceEnumType">
+    	<restriction base="string">
+    		<enumeration value="FILE"></enumeration>
+    		<enumeration value="NETWORK"></enumeration>
+    	</restriction>
+    </simpleType>
+
+    <complexType name="OutputConfigType">
+    	<sequence>
+    		<element name="filePath" type="string"></element>
     	</sequence>
     </complexType>
 </schema>

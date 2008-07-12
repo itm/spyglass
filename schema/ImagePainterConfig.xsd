@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="http://plugins.spyglass.itm.uniluebeck.de/ImagePainterConfigType" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://spyglass.itm.uniluebeck.de" xmlns:ip="http://plugins.spyglass.itm.uniluebeck.de/ImagePainterConfigType">
+
+    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://spyglass.itm.uniluebeck.de"></import>
+    <complexType name="ImagePainterConfigType">
+    	<complexContent>
+    		<extension base="sg:PluginCustomConfigType">
+    			<sequence>
+    				<element name="imageFile" type="string"></element>
+    				<element name="lowerLeftX" type="float"></element>
+    				<element name="lowerLeftY" type="float"></element>
+    				<element name="width" type="float"></element>
+    				<element name="height" type="float"></element>
+    				<element name="keepProportions" type="boolean"></element>
+    			</sequence>
+    		</extension>
+    	</complexContent>
+    </complexType>
+
+
+    <element name="root" type="ip:ImagePainterConfigType"></element>
+</schema>
