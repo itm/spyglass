@@ -19,6 +19,7 @@ public class AppWindow {
 	private Display display = null;
 
 	private SpyglassGuiComponent gui = null;
+	private final DrawingArea drawingArea = new DrawingArea();
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -51,6 +52,10 @@ public class AppWindow {
 	 */
 	public void setDisplay(Display display) {
 		this.display = display;
+	}
+
+	public DrawingArea getDrawingArea(){
+		return null;
 	}
 
 }

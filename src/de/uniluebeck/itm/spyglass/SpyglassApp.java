@@ -25,6 +25,7 @@ import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
  */
 public class SpyglassApp {
 	private static Category log = Logging.get(SpyglassApp.class);
+	public Spyglass m_Spyglass;
 
 	// -------------------------------------------------------------------------
 	/**

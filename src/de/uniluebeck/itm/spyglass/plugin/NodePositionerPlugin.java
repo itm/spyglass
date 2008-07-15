@@ -90,4 +90,12 @@ public abstract class NodePositionerPlugin extends Plugin {
 	 */
 	public abstract Position getPosition(int nodeId);
 
+	public int getNumNodes(){
+		return 0;
+	}
+
+	public boolean offersMetric(){
+		return false;
+	}
+
 }

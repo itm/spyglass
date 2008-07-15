@@ -7,9 +7,12 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.drawing;
 
+import org.eclipse.swt.graphics.GC;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
+import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
 
 //--------------------------------------------------------------------------------
@@ -215,5 +218,29 @@ public abstract class DrawingObject {
 		this.bgColorR = r;
 		this.bgColorB = b;
 		this.bgColorG = g;
+	}
+
+	/**
+	 * Zeichnet sich selbst auf dem �bergebenen GraphicContext (GC). Erh�lt ben�tigte
+	 * Informationen wie absolute Koordinaten, Zeichenfl�chengr��e in Pixel und
+	 * Zoomstufe von der �bergebenen DrawingArea
+	 * 
+	 * @param drawingArea
+	 * @param gc
+	 */
+	public void draw(DrawingArea drawingArea, GC gc){
+
+	}
+
+	public Rectangle getBoundingBox(){
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param bbox
+	 */
+	public void setBoundingBox(Rectangle bbox){
+
 	}
 }

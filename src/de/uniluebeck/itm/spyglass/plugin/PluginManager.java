@@ -17,11 +17,17 @@ import org.apache.log4j.Category;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
+
 /**
  * The PluginManager holds all loaded plugins and is basically a wrapper for an internal list of plugins.
  */
 @Root
 public class PluginManager {
+
+	public enum ListChangeEvent {
+
+	}
 	private static Category log = Logging.get(PluginManager.class);
 	
 	@ElementList
@@ -55,12 +61,14 @@ public class PluginManager {
 	 * @param plugin
 	 *            The plugin object to be added.
 	 */
-	public void addPlugin(Plugin plugin) {
+	private void addPlugin(Plugin plugin) {
 		log.debug("Added plug-in: " + plugin);
 		plugin.setPluginManager(this);
 		if (plugin.isActive()) {
 			plugins.add(plugin);
-			Collections.sort(plugins);
+		//	Collections.sort(plugins);
+			
+			// TODO: fix!!!
 		}
 	}
 
@@ -114,6 +122,48 @@ public class PluginManager {
 	public NodePositionerPlugin getNodePositioner() {
 		assert (nodePositioner != null);
 		return nodePositioner;
+	}
+
+	/**
+	 * 
+	 * @param clazz
+	 * @param config
+	 */
+	public Plugin createNewPlugin(Class<Plugin> clazz, PluginXMLConfig config){
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param p
+	 * @param what
+	 */
+	private void firePluginListChangedEvent(Plugin p, ListChangeEvent what){
+
+	}
+
+	public List<Class<Plugin>> getAvailablePluginTypes(){
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param clazz
+	 */
+	public List<Plugin> getPluginInstances(Class<Plugin> clazz){
+		return null;
+	}
+
+	public List<Plugin> getVisiblePlugins(){
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param plugin
+	 */
+	public void shutdownPlugin(Plugin plugin){
+
 	}
 
 }

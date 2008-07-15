@@ -7,11 +7,21 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.plugin;
 
+import java.util.List;
+import java.util.Queue;
+
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
+import de.uniluebeck.itm.spyglass.configuration.PreferencesConfigurationWidget;
+import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.SubLayer;
 import de.uniluebeck.itm.spyglass.packet.Packet;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
@@ -19,16 +29,14 @@ import de.uniluebeck.itm.spyglass.packet.Packet;
  * (active or not) and a default drawing object that is being used for drawing jobs.
  */
 @Root
-public abstract class Plugin implements Comparable<Plugin> {
-	@Attribute
-	private int priority = 0;
+public abstract class Plugin implements Runnable {
 
 	@Attribute
 	private boolean isActive = true;
 
-	private SubLayer subLayer = new SubLayer();
-
-	private PluginManager pluginManager = null;
+	private PluginManager pluginManager;
+	private Queue<Packet> packetQueue;
+	private SubLayer quadTree;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -45,55 +53,10 @@ public abstract class Plugin implements Comparable<Plugin> {
 	 */
 	public abstract String name();
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public final SubLayer getSubLayer() {
-		return subLayer;
-	}
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
-	 */
-	public final void setSubLayer(SubLayer subLayer) {
-		this.subLayer = subLayer;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public final int getPriority() {
-		return priority;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public final void setPriority(int priority) {
-		this.priority = priority;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	@Override
-	public int compareTo(Plugin p) {
-		if (priority < p.priority)
-			return 1;
-		else if (priority > p.priority)
-			return -1;
-		else
-			return 0;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
+	 * holt sich die information aus dem PluginXMLConfig-Objekt
 	 */
 	public final boolean isActive() {
 		return isActive;
@@ -101,11 +64,10 @@ public abstract class Plugin implements Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
+	 * Löscht den Zustand des Plugins, z.B. QuadTree leeren, Instanzvariablen auf
+	 * Default stellen
 	 */
-	public void reset() {
-		subLayer.reset();
-	}
+	public abstract void reset();
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -133,5 +95,89 @@ public abstract class Plugin implements Comparable<Plugin> {
 	public final PluginManager getPluginManager() {
 		return pluginManager;
 	}
+
+	/**
+	 * 
+	 * @param pluginManager
+	 * @param drawingArea
+	 */
+	public void Plugin(PluginManager pluginManager, DrawingArea drawingArea){
+
+	}
+
+	/**
+	 * 
+	 * @param parent
+	 * @param cs
+	 */
+	public abstract PreferencesConfigurationWidget  createPreferencesWidget(Widget parent, ConfigStore cs);
+
+	/**
+	 * should be implemented static
+	 * @param parent
+	 * @param cs
+	 */
+	public abstract PreferencesConfigurationWidget createTypePreferencesWidget(Widget parent, ConfigStore cs);
+
+	/**
+	 * 
+	 * @param drawingArea
+	 */
+	public abstract List<DrawingObject> getDrawingObjects(DrawingArea drawingArea);
+
+	public abstract String getHumanReadableName();
+
+	public abstract PluginXMLConfig getXMLConfig();
+
+	/**
+	 * 
+	 * @param e
+	 * @param drawingArea
+	 */
+	public boolean handleEvent(MouseEvent e, DrawingArea drawingArea){
+		return false;
+	}
+
+	/**
+	 * holt sich die Information aus dem PluginXMLConfig-Objekt
+	 */
+	public boolean isVisible(){
+		return false;
+	}
+
+	/**
+	 * must not write in the quadtree
+	 * for expensive calculations
+	 * 
+	 * @param packet
+	 */
+	protected abstract void processPacket(Packet packet);
+
+	/**
+	 * Should never be overridden!!!
+	 */
+	public void run(){
+
+	}
+
+	/**
+	 * 
+	 * @param setVisible
+	 */
+	public void setVisible(boolean setVisible){
+
+	}
+
+	/**
+	 * 
+	 * @param xmlConfig
+	 */
+	public abstract void setXMLConfig(PluginXMLConfig xmlConfig);
+
+	/**
+	 * must only be called from run()
+	 * may change the quadtree, but it should be fast, because it blocks the GUI
+	 */
+	protected abstract void updateQuadTree();
 
 }

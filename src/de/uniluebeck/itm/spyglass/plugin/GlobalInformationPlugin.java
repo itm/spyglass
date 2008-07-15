@@ -7,12 +7,26 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.plugin;
 
+import org.eclipse.swt.widgets.Widget;
+
 
 // --------------------------------------------------------------------------------
 /**
  * 
  */
-public abstract class GlobalInformationPlugin extends Plugin {
+public abstract class GlobalInformationPlugin extends Plugin implements GlobalInformation {
 
 
+
+	/**
+	 * 
+	 * @param widget
+	 */
+	public void addWidget(Widget widget){
+
+	}
+
+	public Widget getWidget(){
+		return null;
+	}
 }

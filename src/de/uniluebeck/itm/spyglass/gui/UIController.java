@@ -9,6 +9,7 @@ package de.uniluebeck.itm.spyglass.gui;
 
 import ishell.util.Logging;
 
+import java.awt.Event;
 import java.util.EventObject;
 
 import org.apache.log4j.Category;
@@ -35,6 +36,31 @@ import de.uniluebeck.itm.spyglass.plugin.RelationPainterPlugin;
  * changed/replaced.
  */
 public class UIController {
+
+	/** TODO: implizit */
+	public class KeyListener {
+
+
+
+		public void finalize() throws Throwable {
+
+		}
+
+
+
+		public void KeyListener(){
+
+		}
+
+		/**
+		 * 
+		 * @param e
+		 */
+		public void keyEvent(Event e){
+
+		}
+
+	}
 	private static Category log = Logging.get(UIController.class);
 
 	private AppWindow appWindow = null;
@@ -105,7 +131,9 @@ public class UIController {
 	private void render(GC gc) {
 		gc.setBackground(canvasBgColor);
 		gc.fillRectangle(appWindow.getGui().getCanvas().getClientArea());
-
+		
+		// TODO: rewrite
+/*
 		// Background Painter Plugins
 		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
 			if (plugin instanceof BackgroundPainterPlugin && plugin.isActive())
@@ -130,6 +158,7 @@ public class UIController {
 			if (plugin instanceof GlobalInformationPlugin && plugin.isActive())
 				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects())
 					spyglass.getCanvas().draw(object, gc);
+	*/
 	}
 
 	// --------------------------------------------------------------------------------
@@ -138,6 +167,18 @@ public class UIController {
 	 */
 	public AppWindow getAppWindow() {
 		return appWindow;
+	}
+
+	public void fireRedrawEvent(){
+
+	}
+
+	/**
+	 * 
+	 * @param e
+	 */
+	public void PreferencesButtonEvent(Event e){
+
 	}
 
 }

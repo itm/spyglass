@@ -13,5 +13,9 @@ package de.uniluebeck.itm.spyglass.plugin;
  * 
  *
  */
-public abstract class BackgroundPainterPlugin extends Plugin {
+public abstract class BackgroundPainterPlugin extends Plugin implements Drawable {
+
+	public abstract float getTimeout();
+
+	public abstract boolean isVisible();
 }

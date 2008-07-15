@@ -1,14 +1,22 @@
 package de.uniluebeck.itm.spyglass.plugin;
 
+import java.util.List;
+
 import ishell.util.Logging;
 
 import org.apache.log4j.Category;
+import org.eclipse.swt.widgets.Widget;
 
+import de.uniluebeck.itm.spyglass.configuration.PreferencesConfigurationWidget;
+import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text.TextJustification;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class DagstuhlConnectivityPainter extends de.uniluebeck.itm.spyglass.plugin.RelationPainterPlugin {
 
@@ -93,13 +101,13 @@ public class DagstuhlConnectivityPainter extends de.uniluebeck.itm.spyglass.plug
 		Line l = new Line(p1, p2);
 		l.setColor(200, 200, 200);
 		l.setId(n1 + n2 + LINK_LINE_OFFSET);
-		getSubLayer().addOrUpdateDrawingObject(l);
+		//getSubLayer().addOrUpdateDrawingObject(l); // TODO
 
 		Position p = (p1.mult(0.75)).add(p2.mult(0.25));
 		Text t = new Text("("+new Integer(metric).toString()+","+new Integer(lqi).toString()+")", p, n1 * 2+ n2 + LINK_TEXT_OFFSET);
 		t.setColor(0, 0, 0);
 		t.setJustification(TextJustification.center);
-		getSubLayer().addOrUpdateDrawingObject(t);
+		//getSubLayer().addOrUpdateDrawingObject(t); // TODO
 
 	}
 
@@ -109,6 +117,68 @@ public class DagstuhlConnectivityPainter extends de.uniluebeck.itm.spyglass.plug
 	
 	public void reset()
 	{
-		super.reset();
+		// TODO
+	}
+
+	@Override
+	public float getTimeout() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean isVisible() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public PreferencesConfigurationWidget createPreferencesWidget(
+			Widget parent, ConfigStore cs) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PreferencesConfigurationWidget createTypePreferencesWidget(
+			Widget parent, ConfigStore cs) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<DrawingObject> getDrawingObjects(DrawingArea drawingArea) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getHumanReadableName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PluginXMLConfig getXMLConfig() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected void processPacket(Packet packet) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setXMLConfig(PluginXMLConfig xmlConfig) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void updateQuadTree() {
+		// TODO Auto-generated method stub
+		
 	}
 }

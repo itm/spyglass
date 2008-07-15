@@ -1,14 +1,22 @@
 package de.uniluebeck.itm.spyglass.plugin;
 
+import java.util.List;
+
 import ishell.util.Logging;
 
 import org.apache.log4j.Category;
+import org.eclipse.swt.widgets.Widget;
 
+import de.uniluebeck.itm.spyglass.configuration.PreferencesConfigurationWidget;
+import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text.TextJustification;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class DagstuhlRoutePainter extends de.uniluebeck.itm.spyglass.plugin.RelationPainterPlugin {
 
@@ -41,7 +49,7 @@ public class DagstuhlRoutePainter extends de.uniluebeck.itm.spyglass.plugin.Rela
 					log.error("route log packet had WRONG LENGTH");
 				
 				
-				getSubLayer().clear();
+				//getSubLayer().clear(); //TODO
 				
 				debug = "Route: ";
 				for (int i = 0; i < count; i++) {
@@ -67,7 +75,7 @@ public class DagstuhlRoutePainter extends de.uniluebeck.itm.spyglass.plugin.Rela
 					l.setColor(255, 0, 0);
 					l.setLineWidth(5);
 					l.setId(hops[i-1] * 2 + hops[i]);
-					getSubLayer().addOrUpdateDrawingObject(l);
+					//getSubLayer().addOrUpdateDrawingObject(l); //TODO
 	
 					//Position p = (p1.mult(0.2)).add(p2.mult(0.8));
 					//Text t = new Text(new Integer(metric).toString(), p, n1 * 2 + n2 + LINK_TEXT_OFFSET);
@@ -101,7 +109,7 @@ public class DagstuhlRoutePainter extends de.uniluebeck.itm.spyglass.plugin.Rela
 				Text t = new Text(new Integer(setup).toString()+","+ds+","+new Integer(no).toString()+"/"+new Integer(count).toString(), p1, 23);
 				t.setColor(0, 0, 0);
 				t.setJustification(TextJustification.center);
-				getSubLayer().addOrUpdateDrawingObject(t);
+				//getSubLayer().addOrUpdateDrawingObject(t); //TODO
 			}
 			if (s[1]==3)
 			{
@@ -113,5 +121,84 @@ public class DagstuhlRoutePainter extends de.uniluebeck.itm.spyglass.plugin.Rela
 
 	public String name() {
 		return "RoutePainter";
+	}
+
+
+	@Override
+	public float getTimeout() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public boolean isVisible() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public PreferencesConfigurationWidget createPreferencesWidget(
+			Widget parent, ConfigStore cs) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public PreferencesConfigurationWidget createTypePreferencesWidget(
+			Widget parent, ConfigStore cs) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public List<DrawingObject> getDrawingObjects(DrawingArea drawingArea) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String getHumanReadableName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public PluginXMLConfig getXMLConfig() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	protected void processPacket(Packet packet) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void reset() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setXMLConfig(PluginXMLConfig xmlConfig) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	protected void updateQuadTree() {
+		// TODO Auto-generated method stub
+		
 	}
 }

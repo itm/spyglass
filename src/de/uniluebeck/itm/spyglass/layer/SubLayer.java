@@ -24,8 +24,10 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 /**
  * A Sublayer is usually used by a plugin to store all drawing objects, that
  * must be rendered to visualize the scene.
+ * 
+ * TODO: obsolete
  */
-public class SubLayer extends Layer {
+public class SubLayer {
 	private static Category log = Logging.get(SubLayer.class);
 
 	private HashMap<Integer, DrawingObject> drawingObjects = new HashMap<Integer, DrawingObject>();

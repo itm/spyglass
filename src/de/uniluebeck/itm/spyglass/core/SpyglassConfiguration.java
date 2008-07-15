@@ -13,6 +13,7 @@ import org.simpleframework.xml.Root;
 import de.uniluebeck.itm.spyglass.drawing.SpyglassCanvas;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 
 //--------------------------------------------------------------------------------
@@ -52,7 +53,7 @@ public class SpyglassConfiguration {
 		this.fps = fps;
 	}
 
-	public PluginManager getPluginManager() {
+	public  PluginManager getPluginManager() {
 		return pluginManager;
 	}
 
@@ -100,6 +101,6 @@ public class SpyglassConfiguration {
 	public void setPacketDeliveryInitialDelay(long packetDeliveryInitialDelay) {
 		this.packetDeliveryInitialDelay = packetDeliveryInitialDelay;
 	}
-	
+
 
 }

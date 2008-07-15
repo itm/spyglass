@@ -23,17 +23,12 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import de.bsi.flegsens.RandomNodePositioner;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.core.SpyglassConfiguration;
 import de.uniluebeck.itm.spyglass.drawing.Canvas2D;
 import de.uniluebeck.itm.spyglass.gui.UIController;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
-import de.uniluebeck.itm.spyglass.plugin.ConfigNodePositioner;
-import de.uniluebeck.itm.spyglass.plugin.DagstuhlConnectivityPainter;
-import de.uniluebeck.itm.spyglass.plugin.DagstuhlNodePainter;
-import de.uniluebeck.itm.spyglass.plugin.DagstuhlRoutePainter;
 
 // --------------------------------------------------------------------------------
 /**
@@ -162,7 +157,7 @@ public class PluginSpyGlass2iShell extends Plugin {
 		//config.getPluginManager().addPlugin(cnp);
 		//config.setNodePositioner(cnp);
 
-		config.setNodePositioner(new RandomNodePositioner());
+//		config.setNodePositioner(new RandomNodePositioner()); // TODO
 		
 		// Add Toolbar Actions
 		//addToolBarAction(new PluginAction(dagstuhlPlugin));

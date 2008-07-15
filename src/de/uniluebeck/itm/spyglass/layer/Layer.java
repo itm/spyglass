@@ -7,9 +7,50 @@
 ------------------------------------------------------------------------*/
 package de.uniluebeck.itm.spyglass.layer;
 
+import java.util.List;
+
+import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
+
 // --------------------------------------------------------------------------------
 /**
  * Convenience class as a base for all Layer classes.
  */
-public abstract class Layer {
+public interface Layer {
+
+	/**
+	 * 
+	 * @param d
+	 */
+	public void add(DrawingObject d);
+
+	/**
+	 * 
+	 * @param do
+	 */
+	public void bringToFront(DrawingObject dob);
+
+	public void clear();
+
+	/**
+	 * 
+	 * @param rect
+	 */
+	public List<DrawingObject> getDrawingObjects(Rectangle rect);
+
+	public List<DrawingObject> getDrawingObjects();
+
+	/**
+	 * 
+	 * @param do
+	 * @param x
+	 * @param y
+	 */
+	public void move(DrawingObject dob, int x, int y);
+
+	/**
+	 * 
+	 * @param d
+	 */
+	public void remove(DrawingObject d);
 }

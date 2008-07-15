@@ -12,6 +12,10 @@ package de.uniluebeck.itm.spyglass.plugin;
 /**
  * A plugin to paint a node.
  */
-public abstract class NodePainterPlugin extends Plugin {
+public abstract class NodePainterPlugin extends Plugin implements Drawable {
 	
+
+	public abstract float getTimeout();
+
+	public abstract boolean isVisible();
 }

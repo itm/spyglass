@@ -42,6 +42,8 @@ public class Spyglass {
 
 	private static final String CONFIG_FILE = "config.xml";
 
+	private PacketDispatcher packetDispatcher = null;
+
 	private InformationDispatcher infoDispatcher = null;
 
 	private Deque<Packet> packetCache = new ArrayDeque<Packet>(250);
@@ -61,6 +63,7 @@ public class Spyglass {
 	private EventListenerList listeners = new EventListenerList();
 
 	private boolean visualizationRunning = true;
+	private ConfigStore configStore;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -224,5 +227,14 @@ public class Spyglass {
 	public void setPacketReader(PacketReader packetReader) {
 		this.packetReader = packetReader;
 	}
+
+	private void createPluginInstancesFromConfig(){
+		// TODO
+	}
+
+	public ConfigStore getConfigStore(){
+		return null; // TODO
+	}
+
 
 }
