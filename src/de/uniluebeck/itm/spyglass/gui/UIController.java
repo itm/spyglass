@@ -24,6 +24,7 @@ import de.uniluebeck.itm.spyglass.core.SpyglassListener;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.plugin.BackgroundPainterPlugin;
+import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.GlobalInformationPlugin;
 import de.uniluebeck.itm.spyglass.plugin.NodePainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -132,33 +133,16 @@ public class UIController {
 		gc.setBackground(canvasBgColor);
 		gc.fillRectangle(appWindow.getGui().getCanvas().getClientArea());
 		
-		// TODO: rewrite
-/*
-		// Background Painter Plugins
+		/* Hacky rewrite of the old code (see history). needs more work */
 		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
-			if (plugin instanceof BackgroundPainterPlugin && plugin.isActive())
-				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects())
+		{
+			if (plugin instanceof Drawable)
+			{
+				for (DrawingObject object : ((Drawable)plugin).getDrawingObjects(null))
 					spyglass.getCanvas().draw(object, gc);
+			}
+		}
 
-		// Relation Painter Plugins
-		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
-			if (plugin instanceof RelationPainterPlugin && plugin.isActive())
-				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects())
-					spyglass.getCanvas().draw(object, gc);
-
-		// Node Painter Plugins
-		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
-			if (plugin instanceof NodePainterPlugin && plugin.isActive())
-				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects())
-					spyglass.getCanvas().draw(object, gc);
-
-		// Global Information Plugins
-		// TODO: Global information plug-ins must add information to a Tree on the GUI, not using drawing objects
-		for (Plugin plugin : spyglass.getPluginManager().getActivePlugins())
-			if (plugin instanceof GlobalInformationPlugin && plugin.isActive())
-				for (DrawingObject object : plugin.getSubLayer().getDrawingObjects())
-					spyglass.getCanvas().draw(object, gc);
-	*/
 	}
 
 	// --------------------------------------------------------------------------------

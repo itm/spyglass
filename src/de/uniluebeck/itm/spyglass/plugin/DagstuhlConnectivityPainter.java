@@ -18,7 +18,12 @@ import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class DagstuhlConnectivityPainter extends de.uniluebeck.itm.spyglass.plugin.RelationPainterPlugin {
+/**
+ * 
+ * 
+ * @deprecated use LinePainter instead.
+ */
+public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 
 	private static Category log = Logging.get(DagstuhlConnectivityPainter.class);
 
@@ -101,13 +106,13 @@ public class DagstuhlConnectivityPainter extends de.uniluebeck.itm.spyglass.plug
 		Line l = new Line(p1, p2);
 		l.setColor(200, 200, 200);
 		l.setId(n1 + n2 + LINK_LINE_OFFSET);
-		//getSubLayer().addOrUpdateDrawingObject(l); // TODO
+		getSubLayer().addOrUpdate(l);
 
 		Position p = (p1.mult(0.75)).add(p2.mult(0.25));
 		Text t = new Text("("+new Integer(metric).toString()+","+new Integer(lqi).toString()+")", p, n1 * 2+ n2 + LINK_TEXT_OFFSET);
 		t.setColor(0, 0, 0);
 		t.setJustification(TextJustification.center);
-		//getSubLayer().addOrUpdateDrawingObject(t); // TODO
+		getSubLayer().addOrUpdate(t);
 
 	}
 
@@ -120,11 +125,6 @@ public class DagstuhlConnectivityPainter extends de.uniluebeck.itm.spyglass.plug
 		// TODO
 	}
 
-	@Override
-	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public boolean isVisible() {

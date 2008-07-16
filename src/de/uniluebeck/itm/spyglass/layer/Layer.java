@@ -22,7 +22,7 @@ public interface Layer {
 	 * 
 	 * @param d
 	 */
-	public void add(DrawingObject d);
+	public void addOrUpdate(DrawingObject d);
 
 	/**
 	 * 

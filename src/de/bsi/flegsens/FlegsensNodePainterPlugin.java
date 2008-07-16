@@ -20,6 +20,7 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.Packet;
+import de.uniluebeck.itm.spyglass.plugin.HistoricalPlugin;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -28,7 +29,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * A plugin to paint a node.
  */
-public class FlegsensNodePainterPlugin extends de.uniluebeck.itm.spyglass.plugin.NodePainterPlugin {
+public class FlegsensNodePainterPlugin extends HistoricalPlugin {
 	private static Category log = Logging.get(FlegsensNodePainterPlugin.class);
 
 	// --------------------------------------------------------------------------------
@@ -52,81 +53,8 @@ public class FlegsensNodePainterPlugin extends de.uniluebeck.itm.spyglass.plugin
 			rect.setColorB(0);
 			rect.setPosition(p);
 
-			//getSubLayer().addOrUpdateDrawingObject(rect); // TODO
+			getSubLayer().addOrUpdate(rect);
 		}
 	}
 
-	@Override
-	public String name() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean isVisible() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public PreferencesConfigurationWidget createPreferencesWidget(
-			Widget parent, ConfigStore cs) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public PreferencesConfigurationWidget createTypePreferencesWidget(
-			Widget parent, ConfigStore cs) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<DrawingObject> getDrawingObjects(DrawingArea drawingArea) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public PluginXMLConfig getXMLConfig() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	protected void processPacket(Packet packet) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void reset() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void setXMLConfig(PluginXMLConfig xmlConfig) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void updateQuadTree() {
-		// TODO Auto-generated method stub
-		
-	}
 }

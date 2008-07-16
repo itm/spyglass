@@ -26,6 +26,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 // --------------------------------------------------------------------------------
 /**
  * 
+ * 
  */
 public class RandomNodePositioner extends NodePositionerPlugin {
 	private static Category log = Logging.get(RandomNodePositioner.class);
@@ -43,21 +44,6 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 		return p;
 	}
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	@Override
-	public void handlePacket(Packet packet) {
-		//
-	}
-
-	@Override
-	public String name() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	@Override
 	public PreferencesConfigurationWidget createPreferencesWidget(
 			Widget parent, ConfigStore cs) {
@@ -73,12 +59,6 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 	}
 
 	@Override
-	public List<DrawingObject> getDrawingObjects(DrawingArea drawingArea) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public String getHumanReadableName() {
 		// TODO Auto-generated method stub
 		return null;
@@ -86,6 +66,18 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 
 	@Override
 	public PluginXMLConfig getXMLConfig() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void handlePacket(Packet packet) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String name() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -113,5 +105,8 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 		// TODO Auto-generated method stub
 		
 	}
+
+	// --------------------------------------------------------------------------------
+
 
 }

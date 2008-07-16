@@ -17,6 +17,10 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
+/**
+ * 
+ * @deprecated TODO: what is this Plugin for?
+ */
 public class ConfigNodePositioner extends NodePositionerPlugin {
 
 	private static Category log = Logging.get(NodePositionerPlugin.class);
@@ -70,12 +74,6 @@ public class ConfigNodePositioner extends NodePositionerPlugin {
 	@Override
 	public PreferencesConfigurationWidget createTypePreferencesWidget(
 			Widget parent, ConfigStore cs) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<DrawingObject> getDrawingObjects(DrawingArea drawingArea) {
 		// TODO Auto-generated method stub
 		return null;
 	}

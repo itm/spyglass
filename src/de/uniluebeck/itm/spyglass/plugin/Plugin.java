@@ -119,12 +119,6 @@ public abstract class Plugin implements Runnable {
 	 */
 	public abstract PreferencesConfigurationWidget createTypePreferencesWidget(Widget parent, ConfigStore cs);
 
-	/**
-	 * 
-	 * @param drawingArea
-	 */
-	public abstract List<DrawingObject> getDrawingObjects(DrawingArea drawingArea);
-
 	public abstract String getHumanReadableName();
 
 	public abstract PluginXMLConfig getXMLConfig();

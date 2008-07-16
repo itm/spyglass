@@ -44,12 +44,6 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	}
 
 	@Override
-	public List<DrawingObject> getDrawingObjects(DrawingArea drawingArea) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public String getHumanReadableName() {
 		// TODO Auto-generated method stub
 		return null;

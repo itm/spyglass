@@ -19,7 +19,11 @@ import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class DagstuhlNodePainter extends de.uniluebeck.itm.spyglass.plugin.NodePainterPlugin {
+/**
+ * 
+ * @deprecated use SimpleNodePainter instead.
+ */
+public class DagstuhlNodePainter extends HistoricalPlugin {
 
 	private static Category log = Logging.get(DagstuhlNodePainter.class);
 
@@ -88,7 +92,7 @@ public class DagstuhlNodePainter extends de.uniluebeck.itm.spyglass.plugin.NodeP
 			rect.setHeight(25);
 			rect.setWidth(25);
 			rect.setPosition(p);
-			//getSubLayer().addOrUpdateDrawingObject(rect); //TODO
+			getSubLayer().addOrUpdate(rect);
 
 			Integer i = counter.get(new Integer(src));
 			if (i!= null) 
@@ -97,7 +101,7 @@ public class DagstuhlNodePainter extends de.uniluebeck.itm.spyglass.plugin.NodeP
 				t2.setColor(200, 200, 200);
 				//t2.setBgColor(0, 0, 0);
 				t2.setJustification(TextJustification.right);
-				//getSubLayer().addOrUpdateDrawingObject(t2); //TODO				
+				getSubLayer().addOrUpdate(t2);			
 			}
 
 			/*
@@ -131,11 +135,6 @@ public class DagstuhlNodePainter extends de.uniluebeck.itm.spyglass.plugin.NodeP
 		counter.clear();
 	}
 
-	@Override
-	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public boolean isVisible() {

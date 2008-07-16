@@ -19,15 +19,16 @@ import java.util.List;
 import org.apache.log4j.Category;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
 
 // --------------------------------------------------------------------------------
 /**
  * A Sublayer is usually used by a plugin to store all drawing objects, that
  * must be rendered to visualize the scene.
  * 
- * TODO: obsolete
+ * @deprecated Use QuadTree instead.
  */
-public class SubLayer {
+public class SubLayer implements Layer {
 	private static Category log = Logging.get(SubLayer.class);
 
 	private HashMap<Integer, DrawingObject> drawingObjects = new HashMap<Integer, DrawingObject>();
@@ -45,6 +46,31 @@ public class SubLayer {
 	private boolean sortRequired = false;
 
 	// --------------------------------------------------------------------------------
+
+	public void clear() {
+		paintOrder.clear();
+		drawingObjects.clear();
+	}
+
+	public List<DrawingObject> getDrawingObjects() {
+		if (sortRequired) {
+			synchronized (paintOrder) {
+				Collections.sort(paintOrder, paintOrderComp);
+				sortRequired = false;
+			}
+		}
+		return paintOrder;
+	}
+
+	public DrawingObject getDrawingObject(int id) {
+		return drawingObjects.get(id);
+	}
+	
+	public void reset()
+	{
+		clear();
+	}
+
 	/**
 	 * Adds a DrawingObject to the internal hashmap. If there is already a
 	 * DrawingObject with the same id, that objects gets updated.
@@ -52,7 +78,8 @@ public class SubLayer {
 	 * @param object
 	 *            The DrawingObject to add or update.
 	 */
-	public void addOrUpdateDrawingObject(DrawingObject object) {
+	@Override
+	public void addOrUpdate(DrawingObject object) {
 		//log.debug(object.toString() + " " + this.drawingObjects.size() + ", " + this.paintOrder.size());
 		DrawingObject obj = getDrawingObject(object.getId());
 		// If the Drawing Object with the ID is not already in the map, add it.
@@ -72,36 +99,29 @@ public class SubLayer {
 		//sortRequired = true; // TODO WEg spaeter
 		//obj.setPaintOrderId(maxPaintOrder++);
 		//log.debug("updating object " + obj);
-
 	}
 
-	public void clear() {
-		paintOrder.clear();
-		drawingObjects.clear();
+	@Override
+	public void bringToFront(DrawingObject dob) {
+		// TODO Auto-generated method stub
 	}
 
-	public Collection<DrawingObject> getDrawingObjects() {
-		if (sortRequired) {
-			synchronized (paintOrder) {
-				Collections.sort(paintOrder, paintOrderComp);
-				sortRequired = false;
-			}
-		}
-		return paintOrder;
+	@Override
+	public List<DrawingObject> getDrawingObjects(Rectangle rect) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
-	public void removeDrawingObject(DrawingObject object) {
-		drawingObjects.remove(object.getId());
-		paintOrder.remove(object);
+	@Override
+	public void move(DrawingObject dob, int x, int y) {
+		// TODO Auto-generated method stub
+		
 	}
 
-	public DrawingObject getDrawingObject(int id) {
-		return drawingObjects.get(id);
-	}
-	
-	public void reset()
-	{
-		clear();
+	@Override
+	public void remove(DrawingObject d) {
+		drawingObjects.remove(d.getId());
+		paintOrder.remove(d);
 	}
 
 }

@@ -50,12 +50,6 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	}
 
 	@Override
-	public List<DrawingObject> getDrawingObjects(DrawingArea drawingArea) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public String getHumanReadableName() {
 		// TODO Auto-generated method stub
 		return null;
