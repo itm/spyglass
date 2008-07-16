@@ -27,11 +27,11 @@
 		<plugins class="java.util.ArrayList">
 
 			<!-- load one nodepainter plugin and it's configuration -->
-			<plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin" priority="0" isActive="true" />
+			<plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin" isActive="true" />
 
 		</plugins>
 	</pluginManager>
 
-	<nodePositioner class="de.bsi.flegsens.RandomNodePositioner" priority="0" isActive="true" />
+	<nodePositioner class="de.bsi.flegsens.RandomNodePositioner" isActive="true" />
 
 </spyglassConfiguration>
