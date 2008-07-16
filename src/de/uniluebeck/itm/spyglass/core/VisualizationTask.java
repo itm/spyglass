@@ -9,12 +9,10 @@ package de.uniluebeck.itm.spyglass.core;
 
 import ishell.util.Logging;
 
-import java.util.Deque;
 import java.util.EventObject;
 
 import org.apache.log4j.Category;
 
-import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.util.TimeDiff;
 import de.uniluebeck.itm.spyglass.util.Tools;
 
@@ -58,10 +56,10 @@ public class VisualizationTask implements Runnable {
 		log.debug("Repainting every " + repaintInterval + " ms = " + fps + " fps");
 
 		TimeDiff timeDiff = new TimeDiff(repaintInterval);
-		Packet packet = null;
-
 		timeDiff.touch();
-
+		
+		/*
+		Packet packet = null;
 		Deque<Packet> q = spyglass.getPacketCache();
 		
 		while (spyglass.isVisualizationRunning()) {
@@ -83,6 +81,21 @@ public class VisualizationTask implements Runnable {
 			if( q.size() == 0)
 				Tools.sleep(repaintInterval);
 		}
+		*/
+		while (!Thread.currentThread().isInterrupted() && spyglass.isVisualizationRunning()) {
+			try{
+				if (timeDiff.isTimeout()) {
+					// Invoke the redraw of the scene by firing a spyglass event
+					spyglass.fireRedrawEvent(eventObject);
+					timeDiff.touch();
+				}
+				Tools.sleep(repaintInterval);
+			}catch (Exception e){
+				e.printStackTrace();
+				Thread.currentThread().interrupt();
+			}
+		}
+		
 	}
 
 	// --------------------------------------------------------------------------------

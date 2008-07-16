@@ -154,6 +154,10 @@ public class PluginManager {
 		return null;
 	}
 
+	/**
+	 * Returns all plugins which are currently visible
+	 * @return all plugins which are currently visible
+	 */
 	public List<Plugin> getVisiblePlugins(){
 		return null;
 	}

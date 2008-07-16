@@ -28,7 +28,7 @@ import de.uniluebeck.itm.spyglass.util.Tools;
 public class PacketProducerTask implements Runnable {
 	private Category log = Logging.get(PacketProducerTask.class);
 
-	private Deque<Packet> packetCache = null;
+	//private Deque<Packet> packetCache = null;
 
 	private PacketReader packetReader = null;
 
@@ -49,7 +49,7 @@ public class PacketProducerTask implements Runnable {
 		this.perPacketDelayMs = perPacketDelayMs;
 		this.initialDelayMs = initialDelayMs;
 
-		packetCache = spyglass.getPacketCache();
+		//packetCache = spyglass.getPacketCache();
 		packetReader = spyglass.getPacketReader();
 
 		log.debug("New producer task.");
@@ -75,7 +75,8 @@ public class PacketProducerTask implements Runnable {
 				if (log.isDebugEnabled())
 					log.debug("Added packet: " + packet);
 
-				packetCache.push(packet);
+				//packetCache.push(packet);
+				spyglass.getInfoDispatcher().dispatchPacket(packet);
 			}
 
 			Tools.sleep(perPacketDelayMs);
