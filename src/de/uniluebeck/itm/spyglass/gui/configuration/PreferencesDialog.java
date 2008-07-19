@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.configuration;
+package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;

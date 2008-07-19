@@ -15,9 +15,9 @@ import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
-import de.uniluebeck.itm.spyglass.configuration.PreferencesConfigurationWidget;
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.gui.configuration.PreferencesConfigurationWidget;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.SubLayer;
 import de.uniluebeck.itm.spyglass.packet.Packet;

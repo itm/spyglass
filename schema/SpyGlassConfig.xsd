@@ -16,6 +16,7 @@
 			<element name="outputConfig" type="sg:OutputConfigType" maxOccurs="1" minOccurs="1"></element>
 		</sequence>
 	</complexType>
+	<!--
 	<complexType name="GridConfigType">
     	<sequence maxOccurs="1" minOccurs="1">
     		<element name="lowerLeftX" type="int" maxOccurs="1" minOccurs="1"></element>
@@ -27,7 +28,7 @@
             <element name="lockRowsColumns" type="boolean" maxOccurs="1" minOccurs="1"></element>
             <element name="lockWidthHeight" type="boolean" maxOccurs="1" minOccurs="1"></element>
     	</sequence>
-    </complexType>
+    </complexType> -->
 	<complexType name="GeneralType">
 		<sequence minOccurs="1" maxOccurs="1">
 			<element name="ruler" type="sg:GeneralRulerType" maxOccurs="1" minOccurs="1"></element>

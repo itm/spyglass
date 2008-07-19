@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.configuration;
+package de.uniluebeck.itm.spyglass.gui.configuration;
 import org.eclipse.swt.widgets.Widget;
 
 public abstract class PreferencesWidget extends Widget {

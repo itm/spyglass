@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema targetNamespace="http://plugins.xml.spyglass.itm.uniluebeck.de/GridPainterConfigType" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:sg="http://xml.spyglass.itm.uniluebeck.de" xmlns:gp="http://plugins.xml.spyglass.itm.uniluebeck.de/GridPainterConfigType">
+<schema targetNamespace="http://plugins.xml.spyglass.itm.uniluebeck.de/GridPainterXMLConfig" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:bp="http://xml.spyglass.itm.uniluebeck.de" xmlns:sg="http://xml.spyglass.itm.uniluebeck.de" xmlns:gp="http://plugins.xml.spyglass.itm.uniluebeck.de/GridPainterXMLConfig" xmlns:Q1="http://plugins.xml.spyglass.itm.uniluebeck.de/BackgroundPainterConfigType">
 
-    <import schemaLocation="SpyGlassConfig.xsd" namespace="http://xml.spyglass.itm.uniluebeck.de"></import>
-    <complexType name="GridPainterConfigType">
+    <import schemaLocation="BackgroundPainter.xsd" namespace="http://plugins.xml.spyglass.itm.uniluebeck.de/BackgroundPainterConfigType"></import>
+    <complexType name="GridPainterXMLConfig">
     	<complexContent>
-    		<extension base="sg:PluginCustomConfigType">
+    		<extension base="Q1:BackgroundPainterXMLConfig">
     			<sequence maxOccurs="1" minOccurs="1">
-                    <element name="gridConfig" type="sg:GridConfigType" maxOccurs="1" minOccurs="1"></element>
-                </sequence>
+		    		<element name="lowerLeftX" type="int" maxOccurs="1" minOccurs="1"></element>
+		    		<element name="lowerLeftY" type="int" maxOccurs="1" minOccurs="1"></element>
+		    		<element name="rowCount" type="int" maxOccurs="1" minOccurs="1"></element>
+		            <element name="rowHeight" type="int" maxOccurs="1" minOccurs="1"></element>
+		            <element name="columnCount" type="int" maxOccurs="1" minOccurs="1"></element>
+		            <element name="columnWidth" type="int" maxOccurs="1" minOccurs="1"></element>
+		            <element name="lockRowsColumns" type="boolean" maxOccurs="1" minOccurs="1"></element>
+		            <element name="lockWidthHeight" type="boolean" maxOccurs="1" minOccurs="1"></element>
+		    	</sequence>
     		</extension>
     	</complexContent>
     </complexType>
+    
 
 
-    <element name="root" type="gp:GridPainterConfigType"></element>
+    <element name="root" type="gp:GridPainterXMLConfig"></element>
 </schema>

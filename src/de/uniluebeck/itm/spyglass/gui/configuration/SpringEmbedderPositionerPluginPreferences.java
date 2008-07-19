@@ -1,9 +1,9 @@
-package de.uniluebeck.itm.spyglass.configuration;
+package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import org.eclipse.swt.widgets.Widget;
 
-import de.uniluebeck.itm.spyglass.configuration.PluginPreferencesWidget.PrefType;
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencesWidget.PrefType;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 public class SpringEmbedderPositionerPluginPreferences extends NodePositionerPluginPreferences {

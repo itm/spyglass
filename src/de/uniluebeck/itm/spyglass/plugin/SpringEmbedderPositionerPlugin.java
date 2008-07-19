@@ -3,9 +3,9 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Widget;
 
-import de.uniluebeck.itm.spyglass.configuration.PreferencesConfigurationWidget;
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.gui.configuration.PreferencesConfigurationWidget;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
