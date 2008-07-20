@@ -1,20 +1,37 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.xmlconfig;
 
 import org.simpleframework.xml.Element;
 
+// --------------------------------------------------------------------------------
+/**
+ * Instances of this class contain the configuration parameters of the general
+ * settings
+ * 
+ * @author Sebastian Ebers
+ * 
+ */
 public class GeneralSettingsXmlConfig {
 	
 	@Element
 	private boolean showRuler = false;
 	
-	@Element
-	private MetricsXMLConfig metrics;
+	@Element(required = false)
+	private MetricsXMLConfig metrics = null;
 	
 	@Element
-	private String timeUnit;
+	private String timeUnit = "s";
 	
 	@Element
-	private float timeScale;
+	private float timeScale = 1;
 	
 	@Element
 	private long packetDeliveryDelay = 100;
@@ -25,11 +42,13 @@ public class GeneralSettingsXmlConfig {
 	@Element(name = "framesPerSecond")
 	private long fps = 25;
 	
+	// --------------------------------------------------------------------------------
 	/** Constructor */
 	public GeneralSettingsXmlConfig() {
 		
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
 	 * 
@@ -64,6 +83,7 @@ public class GeneralSettingsXmlConfig {
 		this.fps = fps;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the showRuler
 	 */
@@ -71,6 +91,7 @@ public class GeneralSettingsXmlConfig {
 		return showRuler;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param showRuler
 	 *            the showRuler to set
@@ -79,6 +100,7 @@ public class GeneralSettingsXmlConfig {
 		this.showRuler = showRuler;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the metrics
 	 */
@@ -86,6 +108,7 @@ public class GeneralSettingsXmlConfig {
 		return metrics;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param metrics
 	 *            the metrics to set
@@ -94,6 +117,7 @@ public class GeneralSettingsXmlConfig {
 		this.metrics = metrics;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the timeUnit
 	 */
@@ -101,6 +125,7 @@ public class GeneralSettingsXmlConfig {
 		return timeUnit;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param timeUnit
 	 *            the timeUnit to set
@@ -109,6 +134,7 @@ public class GeneralSettingsXmlConfig {
 		this.timeUnit = timeUnit;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the timeScale
 	 */
@@ -116,6 +142,7 @@ public class GeneralSettingsXmlConfig {
 		return timeScale;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param timeScale
 	 *            the timeScale to set
@@ -124,6 +151,7 @@ public class GeneralSettingsXmlConfig {
 		this.timeScale = timeScale;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the packetDeliveryDelay
 	 */
@@ -131,6 +159,7 @@ public class GeneralSettingsXmlConfig {
 		return packetDeliveryDelay;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param packetDeliveryDelay
 	 *            the packetDeliveryDelay to set
@@ -139,6 +168,7 @@ public class GeneralSettingsXmlConfig {
 		this.packetDeliveryDelay = packetDeliveryDelay;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the packetDeliveryInitialDelay
 	 */
@@ -146,6 +176,7 @@ public class GeneralSettingsXmlConfig {
 		return packetDeliveryInitialDelay;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param packetDeliveryInitialDelay
 	 *            the packetDeliveryInitialDelay to set
@@ -154,6 +185,7 @@ public class GeneralSettingsXmlConfig {
 		this.packetDeliveryInitialDelay = packetDeliveryInitialDelay;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the fps
 	 */
@@ -161,6 +193,7 @@ public class GeneralSettingsXmlConfig {
 		return fps;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param fps
 	 *            the fps to set

@@ -1,31 +1,52 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.xmlconfig;
 
 import org.simpleframework.xml.Element;
 
+// --------------------------------------------------------------------------------
+/**
+ * Instances of this class contain the configuration parameters concerning
+ * plug-ins which support metrics
+ * 
+ * @author Sebastian Ebers
+ * 
+ */
 public class MetricsXMLConfig {
 	
 	@Element
-	private String unit;
+	private String unit = "m";
 	
 	@Element
-	private float abs2metricFactorX;
+	private float abs2metricFactorX = 1;
 	
 	@Element
-	private float abs2metricFactorY;
+	private float abs2metricFactorY = 1;
 	
 	@Element
-	private float abs2metricOffsetX;
+	private float abs2metricOffsetX = 0;
 	
 	@Element
-	private float abs2metricOffsetY;
+	private float abs2metricOffsetY = 0;
 	
 	@Element
-	private boolean lockAbs2metricFactor;
+	private boolean lockAbs2metricFactor = false;
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 */
 	public MetricsXMLConfig() {
-		// TODO Auto-generated constructor stub
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
 	 * 
@@ -59,6 +80,7 @@ public class MetricsXMLConfig {
 		this.lockAbs2metricFactor = lockAbs2metricFactor;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the unit
 	 */
@@ -66,6 +88,7 @@ public class MetricsXMLConfig {
 		return unit;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param unit
 	 *            the unit to set
@@ -74,6 +97,7 @@ public class MetricsXMLConfig {
 		this.unit = unit;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the abs2metricFactorX
 	 */
@@ -81,6 +105,7 @@ public class MetricsXMLConfig {
 		return abs2metricFactorX;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param abs2metricFactorX
 	 *            the abs2metricFactorX to set
@@ -89,6 +114,7 @@ public class MetricsXMLConfig {
 		this.abs2metricFactorX = abs2metricFactorX;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the abs2metricFactorY
 	 */
@@ -96,6 +122,7 @@ public class MetricsXMLConfig {
 		return abs2metricFactorY;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param abs2metricFactorY
 	 *            the abs2metricFactorY to set
@@ -104,6 +131,7 @@ public class MetricsXMLConfig {
 		this.abs2metricFactorY = abs2metricFactorY;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the abs2metricOffsetX
 	 */
@@ -111,6 +139,7 @@ public class MetricsXMLConfig {
 		return abs2metricOffsetX;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param abs2metricOffsetX
 	 *            the abs2metricOffsetX to set
@@ -119,6 +148,7 @@ public class MetricsXMLConfig {
 		this.abs2metricOffsetX = abs2metricOffsetX;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the abs2metricOffsetY
 	 */
@@ -126,6 +156,7 @@ public class MetricsXMLConfig {
 		return abs2metricOffsetY;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param abs2metricOffsetY
 	 *            the abs2metricOffsetY to set
@@ -134,6 +165,7 @@ public class MetricsXMLConfig {
 		this.abs2metricOffsetY = abs2metricOffsetY;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lockAbs2metricFactor
 	 */
@@ -141,6 +173,7 @@ public class MetricsXMLConfig {
 		return lockAbs2metricFactor;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param lockAbs2metricFactor
 	 *            the lockAbs2metricFactor to set

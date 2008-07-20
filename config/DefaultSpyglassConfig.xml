@@ -15,11 +15,11 @@
                   <isActive nodeID="2">true</isActive>
                   <isActive nodeID="3">false</isActive>
                </extendedInformation>
-               <lineColor length="3">
+               <lineColorRGB length="3">
                   <int>0</int>
                   <int>0</int>
                   <int>255</int>
-               </lineColor>
+               </lineColorRGB>
                <lineWidth>1</lineWidth>
                <stringFormatters/>
                <isActive>true</isActive>
@@ -31,6 +31,15 @@
                   <int>1</int>
                </semanticTypes>
             </xmlConfig>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.ImagePainterPlugin" isActive="true">
+            <test>
+               <image>images/icons/addMarker.png</image>
+               <isActive>true</isActive>
+               <isVisible>true</isVisible>
+               <name>default</name>
+               <priority>-1</priority>
+            </test>
          </plugin>
       </plugins>
    </instances>

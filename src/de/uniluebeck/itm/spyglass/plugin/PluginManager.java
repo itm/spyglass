@@ -12,6 +12,7 @@ package de.uniluebeck.itm.spyglass.plugin;
 import ishell.util.Logging;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Category;
@@ -40,9 +41,23 @@ public class PluginManager {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Returns all plugins which are currently administered by this instance and
+	 * which are marked as 'active'
 	 * 
+	 * @return all plugins which are currently administered by this instance and
+	 *         which are marked as 'active'
 	 */
 	public List<Plugin> getActivePlugins() {
+		return plugins;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns all plugins which are currently administered by this instance
+	 * 
+	 * @return all plugins which are currently administered by this instance
+	 */
+	public List<Plugin> getPlugins() {
 		return plugins;
 	}
 	
@@ -133,6 +148,7 @@ public class PluginManager {
 		return nodePositioner;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 * @param clazz
@@ -142,6 +158,7 @@ public class PluginManager {
 		return null;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 * @param p
@@ -151,18 +168,34 @@ public class PluginManager {
 		
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
 	public List<Class<Plugin>> getAvailablePluginTypes() {
 		return null;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
+	 * Returns all instances of a certain kind of plug-ins which are currently
+	 * administered by this instance
 	 * 
 	 * @param clazz
+	 *            the plug-in instances' class
 	 */
-	public List<Plugin> getPluginInstances(final Class<Plugin> clazz) {
-		return null;
+	public List<Plugin> getPluginInstances(final Class<? extends Plugin> clazz) {
+		
+		final List<Plugin> instances = new LinkedList<Plugin>();
+		for (final Plugin plugin : plugins) {
+			if (plugin.getClass().equals(clazz)) {
+				instances.add(plugin);
+			}
+		}
+		return instances;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * Returns all plugins which are currently visible
 	 * 
@@ -172,6 +205,7 @@ public class PluginManager {
 		return null;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 * @param plugin

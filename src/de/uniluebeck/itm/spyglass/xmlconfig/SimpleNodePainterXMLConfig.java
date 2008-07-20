@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.xmlconfig;
 
 import java.util.HashMap;
@@ -9,27 +18,34 @@ import org.simpleframework.xml.ElementMap;
 
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 
+// --------------------------------------------------------------------------------
+/**
+ * Instances of this class contain the configuration parameters of a
+ * {@link SimpleNodePainterXMLConfig}
+ * 
+ * @author Sebastian Ebers
+ * 
+ */
 public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	
 	@ElementMap(entry = "isActive", key = "nodeID", attribute = true, name = "extendedInformation")
-	private HashMap<Integer, Boolean> isExtendenInformationActive;
+	private HashMap<Integer, Boolean> isExtendenInformationActive = new HashMap<Integer, Boolean>();
 	
-	@ElementArray()
-	private int[] lineColor;
+	@ElementArray
+	private int[] lineColorRGB = { 0, 0, 0 };
 	
 	@Element
-	private int lineWidth;
+	private int lineWidth = 1;
 	
-	@ElementMap(entry = "stringFormatter", key = "nodeID", attribute = true, valueType = StringFormatter.class)
-	private HashMap<Integer, StringFormatter> stringFormatters;
+	@ElementMap(entry = "stringFormatter", key = "nodeID", attribute = true, valueType = StringFormatter.class, required = false)
+	private HashMap<Integer, StringFormatter> stringFormatters = null;
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 */
 	public SimpleNodePainterXMLConfig() {
 		
-	}
-	
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
 	}
 	
 	/**
@@ -48,19 +64,19 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	}
 	
 	/**
-	 * @return the lineColor
+	 * @return the lineColorRGB
 	 */
-	public int[] getLineColor() {
-		return lineColor;
+	public int[] getLineColorRGB() {
+		return lineColorRGB;
 		
 	}
 	
 	/**
-	 * @param lineColor
-	 *            the lineColor to set
+	 * @param lineColorRGB
+	 *            the lineColorRGB to set
 	 */
 	public void setLineColor(final Color lineColor) {
-		this.lineColor = new int[] { lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue() };
+		this.lineColorRGB = new int[] { lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue() };
 	}
 	
 	/**
@@ -91,6 +107,12 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	 */
 	public void setStringFormatters(final HashMap<Integer, StringFormatter> stringFormatters) {
 		this.stringFormatters = stringFormatters;
+	}
+	
+	// --------------------------------------------------------------------------------
+	@Override
+	public void finalize() throws Throwable {
+		super.finalize();
 	}
 	
 }

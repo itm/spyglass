@@ -1,34 +1,59 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.xmlconfig;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
+
+// --------------------------------------------------------------------------------
+/**
+ * Instances of this class contain the configuration parameters of a
+ * {@link Plugin}
+ * 
+ * @author Sebastian Ebers
+ * 
+ */
 public abstract class PluginXMLConfig {
 	
-	@Element
-	private boolean isActive;
+	@Element(name = "isActive")
+	private boolean isActive = true;
 	
-	@Element
-	private boolean isVisible;
+	@Element(name = "isVisible")
+	private boolean isVisible = true;
 	
-	@Element
-	private String name;
+	@Element(name = "name")
+	private String name = "default";
 	
-	@Element
-	private int priority;
+	@Element(name = "priority")
+	private int priority = -1;
 	
-	@ElementArray
+	@ElementArray(name = "semanticTypes", required = false)
 	private int[] semanticTypes;
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 */
 	public PluginXMLConfig() {
 		
 	}
 	
+	// --------------------------------------------------------------------------------
 	@Override
 	public void finalize() throws Throwable {
 		
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the isActive
 	 */
@@ -36,6 +61,7 @@ public abstract class PluginXMLConfig {
 		return isActive;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param isActive
 	 *            the isActive to set
@@ -44,6 +70,7 @@ public abstract class PluginXMLConfig {
 		this.isActive = isActive;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the isVisible
 	 */
@@ -51,6 +78,7 @@ public abstract class PluginXMLConfig {
 		return isVisible;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param isVisible
 	 *            the isVisible to set
@@ -59,6 +87,7 @@ public abstract class PluginXMLConfig {
 		this.isVisible = isVisible;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the name
 	 */
@@ -66,6 +95,7 @@ public abstract class PluginXMLConfig {
 		return name;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param name
 	 *            the name to set
@@ -74,6 +104,7 @@ public abstract class PluginXMLConfig {
 		this.name = name;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the priority
 	 */
@@ -81,6 +112,7 @@ public abstract class PluginXMLConfig {
 		return priority;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param priority
 	 *            the priority to set
@@ -89,6 +121,7 @@ public abstract class PluginXMLConfig {
 		this.priority = priority;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the semanticTypes
 	 */
@@ -96,6 +129,7 @@ public abstract class PluginXMLConfig {
 		return semanticTypes;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param semanticTypes
 	 *            the semanticTypes to set
