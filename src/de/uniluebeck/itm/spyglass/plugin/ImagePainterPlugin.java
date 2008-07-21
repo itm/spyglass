@@ -15,11 +15,11 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class ImagePainterPlugin extends BackgroundPainterPlugin {
 	
-	@Element(name = "test")
+	@Element(name = "parameters")
 	private ImagePainterXMLConfig xmlConfig;
 	
 	public ImagePainterPlugin() {
-		
+		xmlConfig = new ImagePainterXMLConfig();
 	}
 	
 	@Override

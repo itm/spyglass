@@ -50,6 +50,7 @@ public class SpyglassConfiguration {
 	@ElementList
 	private Vector<Plugin> defaults;
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the generalSettings
 	 */
@@ -57,6 +58,7 @@ public class SpyglassConfiguration {
 		return generalSettings;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param generalSettings
 	 *            the generalSettings to set
@@ -65,74 +67,128 @@ public class SpyglassConfiguration {
 		this.generalSettings = generalSettings;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
-	 * @return the defaults
+	 * Returns a collection of plug-ins which are configured by default
+	 * 
+	 * @return the defaults a collection of plug-ins which are configured by
+	 *         default
 	 */
 	public Vector<Plugin> getDefaults() {
 		return defaults;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
+	 * Sets a collection of plug-ins which are configured by default
+	 * 
 	 * @param defaults
-	 *            the defaults to set
+	 *            a collection of plug-ins which are configured by default
 	 */
 	public void setDefaults(final Vector<Plugin> defaults) {
 		this.defaults = defaults;
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Replaces a plug-in in the list of default plug-ins
+	 * 
+	 * @param plugin
+	 *            the new plug-in
+	 * @return the previous plug-in of the same class or <code>null</code> if
+	 *         no plug-in of the same class existet previously
+	 */
+	public Plugin replaceInDefaults(final Plugin plugin) {
+		final Class<? extends Plugin> clazz = plugin.getClass();
+		for (final Plugin p : defaults) {
+			if (p.getClass().equals(clazz)) {
+				defaults.remove(p);
+				defaults.add(plugin);
+				return p;
+			}
+		}
+		defaults.add(plugin);
+		return null;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the frames per second
+	 * 
+	 * @return the frames per second
+	 */
 	public long getFps() {
 		return generalSettings.getFps();
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the frames per second
+	 * 
+	 * @param the
+	 *            frames per second
+	 */
 	public void setFps(final long fps) {
 		generalSettings.setFps(fps);
 	}
 	
+	// --------------------------------------------------------------------------------
 	public PluginManager getPluginManager() {
 		return pluginManager;
 	}
 	
+	// --------------------------------------------------------------------------------
 	public void setPluginManager(final PluginManager pluginManager) {
 		this.pluginManager = pluginManager;
 	}
 	
+	// --------------------------------------------------------------------------------
 	public SpyglassCanvas getCanvas() {
 		return canvas;
 	}
 	
+	// --------------------------------------------------------------------------------
 	public void setCanvas(final SpyglassCanvas canvas) {
 		this.canvas = canvas;
 	}
 	
+	// --------------------------------------------------------------------------------
 	public PacketReader getPacketReader() {
 		return packetReader;
 	}
 	
+	// --------------------------------------------------------------------------------
 	public void setPacketReader(final PacketReader packetReader) {
 		this.packetReader = packetReader;
 	}
 	
+	// --------------------------------------------------------------------------------
 	public void setNodePositioner(final NodePositionerPlugin randomNodePositioner) {
 		this.nodePositioner = randomNodePositioner;
 	}
 	
+	// --------------------------------------------------------------------------------
 	public NodePositionerPlugin getNodePositioner() {
 		return nodePositioner;
 		
 	}
 	
+	// --------------------------------------------------------------------------------
 	public long getPacketDeliveryDelay() {
 		return generalSettings.getPacketDeliveryDelay();
 	}
 	
+	// --------------------------------------------------------------------------------
 	public void setPacketDeliveryDelay(final long packetDeliveryDelay) {
 		generalSettings.setPacketDeliveryDelay(packetDeliveryDelay);
 	}
 	
+	// --------------------------------------------------------------------------------
 	public long getPacketDeliveryInitialDelay() {
 		return generalSettings.getPacketDeliveryInitialDelay();
 	}
 	
+	// --------------------------------------------------------------------------------
 	public void setPacketDeliveryInitialDelay(final long packetDeliveryInitialDelay) {
 		generalSettings.setPacketDeliveryInitialDelay(packetDeliveryInitialDelay);
 	}

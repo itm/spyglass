@@ -9,7 +9,7 @@
       <plugins class="java.util.ArrayList">
          <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin" isActive="true"/>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.SimpleNodePainterPlugin" isActive="true">
-            <xmlConfig>
+            <parameters>
                <extendedInformation>
                   <isActive nodeID="1">false</isActive>
                   <isActive nodeID="2">true</isActive>
@@ -30,16 +30,16 @@
                   <int>0</int>
                   <int>1</int>
                </semanticTypes>
-            </xmlConfig>
+            </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.ImagePainterPlugin" isActive="true">
-            <test>
+            <parameters>
                <image>images/icons/addMarker.png</image>
                <isActive>true</isActive>
                <isVisible>true</isVisible>
                <name>default</name>
                <priority>-1</priority>
-            </test>
+            </parameters>
          </plugin>
       </plugins>
    </instances>
@@ -62,5 +62,62 @@
    </generalSettings>
    <defaults>
       <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin" isActive="true"/>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.GridPainterPlugin" isActive="true">
+         <parameters>
+            <gridElementHeight>1</gridElementHeight>
+            <gridElementWidth>1</gridElementWidth>
+            <gridLowerLeftPoint x="0" y="0" z="0"/>
+            <lineColorRGB length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </lineColorRGB>
+            <lineWidth>1.0</lineWidth>
+            <lockGridElementsSquare>true</lockGridElementsSquare>
+            <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
+            <numCols>1</numCols>
+            <numRows>1</numRows>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.ImagePainterPlugin" isActive="true">
+         <parameters>
+            <image>images/icons/brokenImageLink.png</image>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default</name>
+            <priority>-1</priority>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.MapPainterPlugin" isActive="true">
+         <parameters>
+            <framePointDefaultValue>3.0</framePointDefaultValue>
+            <gridElementHeight>1</gridElementHeight>
+            <gridElementWidth>1</gridElementWidth>
+            <gridLowerLeftPoint x="0" y="0" z="0"/>
+            <lockGridElementSquare>true</lockGridElementSquare>
+            <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
+            <maxColorRGB length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </maxColorRGB>
+            <maxValue>1.0</maxValue>
+            <minColorRGB length="3">
+               <int>255</int>
+               <int>255</int>
+               <int>255</int>
+            </minColorRGB>
+            <minValue>0.0</minValue>
+            <numCols>1</numCols>
+            <numFramePointsHorizontal>3</numFramePointsHorizontal>
+            <numFramePointsVertical>3</numFramePointsVertical>
+            <numRows>1</numRows>
+            <refreshInterval>10</refreshInterval>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default</name>
+            <priority>-1</priority>
+         </parameters>
+      </plugin>
    </defaults>
 </spyglassConfiguration>

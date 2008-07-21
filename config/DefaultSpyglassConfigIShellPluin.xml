@@ -1,0 +1,124 @@
+<spyglassConfiguration>
+   <packetReader class="de.uniluebeck.itm.spyglass.packet.PacketReader">
+      <gateway class="de.uniluebeck.itm.spyglass.gateway.NetworkGateway">
+         <hostname>server</hostname>
+         <port>4711</port>
+      </gateway>
+   </packetReader>
+   <canvas class="de.uniluebeck.itm.spyglass.drawing.Canvas2D"/>
+   <instances>
+      <plugins class="java.util.ArrayList">
+         <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin" isActive="true"/>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.SimpleNodePainterPlugin" isActive="true">
+            <parameters>
+               <extendedInformation>
+                  <isActive nodeID="1">false</isActive>
+                  <isActive nodeID="2">true</isActive>
+                  <isActive nodeID="3">false</isActive>
+               </extendedInformation>
+               <lineColorRGB length="3">
+                  <int>0</int>
+                  <int>0</int>
+                  <int>255</int>
+               </lineColorRGB>
+               <lineWidth>1</lineWidth>
+               <stringFormatters/>
+               <isActive>true</isActive>
+               <isVisible>false</isVisible>
+               <name>SimpleNodePainterTest</name>
+               <priority>1</priority>
+               <semanticTypes length="2">
+                  <int>0</int>
+                  <int>1</int>
+               </semanticTypes>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.ImagePainterPlugin" isActive="true">
+            <parameters>
+               <image>images/icons/addMarker.png</image>
+               <isActive>true</isActive>
+               <isVisible>true</isVisible>
+               <name>default</name>
+               <priority>-1</priority>
+            </parameters>
+         </plugin>
+      </plugins>
+   </instances>
+   <nodePositioner class="de.bsi.flegsens.RandomNodePositioner" isActive="true"/>
+   <generalSettings>
+      <showRuler>true</showRuler>
+      <metrics>
+         <unit>m</unit>
+         <abs2metricFactorX>1.0</abs2metricFactorX>
+         <abs2metricFactorY>2.0</abs2metricFactorY>
+         <abs2metricOffsetX>3.0</abs2metricOffsetX>
+         <abs2metricOffsetY>4.0</abs2metricOffsetY>
+         <lockAbs2metricFactor>true</lockAbs2metricFactor>
+      </metrics>
+      <timeUnit>s</timeUnit>
+      <timeScale>1.0</timeScale>
+      <packetDeliveryDelay>400</packetDeliveryDelay>
+      <packetDeliveryInitialDelay>1000</packetDeliveryInitialDelay>
+      <framesPerSecond>25</framesPerSecond>
+   </generalSettings>
+   <defaults>
+      <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin" isActive="true"/>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.GridPainterPlugin" isActive="true">
+         <parameters>
+            <gridElementHeight>1</gridElementHeight>
+            <gridElementWidth>1</gridElementWidth>
+            <gridLowerLeftPoint x="0" y="0" z="0"/>
+            <lineColorRGB length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </lineColorRGB>
+            <lineWidth>1.0</lineWidth>
+            <lockGridElementsSquare>true</lockGridElementsSquare>
+            <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
+            <numCols>1</numCols>
+            <numRows>1</numRows>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.ImagePainterPlugin" isActive="true">
+         <parameters>
+            <image>images/icons/brokenImageLink.png</image>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default</name>
+            <priority>-1</priority>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.MapPainterPlugin" isActive="true">
+         <parameters>
+            <framePointDefaultValue>3.0</framePointDefaultValue>
+            <gridElementHeight>1</gridElementHeight>
+            <gridElementWidth>1</gridElementWidth>
+            <gridLowerLeftPoint x="0" y="0" z="0"/>
+            <lockGridElementSquare>true</lockGridElementSquare>
+            <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
+            <maxColorRGB length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </maxColorRGB>
+            <maxValue>1.0</maxValue>
+            <minColorRGB length="3">
+               <int>255</int>
+               <int>255</int>
+               <int>255</int>
+            </minColorRGB>
+            <minValue>0.0</minValue>
+            <numCols>1</numCols>
+            <numFramePointsHorizontal>3</numFramePointsHorizontal>
+            <numFramePointsVertical>3</numFramePointsVertical>
+            <numRows>1</numRows>
+            <refreshInterval>10</refreshInterval>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default</name>
+            <priority>-1</priority>
+         </parameters>
+      </plugin>
+   </defaults>
+</spyglassConfiguration>

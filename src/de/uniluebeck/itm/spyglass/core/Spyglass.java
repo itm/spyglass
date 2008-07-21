@@ -44,7 +44,8 @@ public class Spyglass {
 	private static Category log = Logging.get(Spyglass.class);
 	
 	// private static final String CONFIG_FILE = "config.xml";
-	private static final String CONFIG_FILE = "config/DefaultSpyglassConfig.xml";
+	
+	private final boolean isIShellPlugin;
 	
 	private final PacketDispatcher packetDispatcher = null;
 	
@@ -72,28 +73,49 @@ public class Spyglass {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Constructor. Invokes the XML configuration reading from the predefined
-	 * filename CONFIG_FILE
+	 * Constructor. Invokes the XML configuration reading from the default
+	 * configuration files. Which file is used depends on the context (if
+	 * spyglass is used as stand alone application or iShell plug-in).
+	 * 
+	 * @param isIShellPlugin
+	 *            indicates whether or not the application is used as iShell
+	 *            plug-in
 	 */
-	public Spyglass() {
-		this(new File(CONFIG_FILE));
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Constructor. Invokes the XML configuration reading.
-	 */
-	public Spyglass(final SpyglassConfiguration config) {
-		configStore = new ConfigStore(config);
+	public Spyglass(final boolean isIShellPlugin) {
+		this.isIShellPlugin = isIShellPlugin;
+		configStore = new ConfigStore(isIShellPlugin);
 		init(configStore.getSpyglassConfig());
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor. Invokes the XML configuration reading.
+	 * 
+	 * @param isIShellPlugin
+	 *            indicates whether or not the application is used as iShell
+	 *            plug-in
+	 * @param config
+	 *            the configuration parameters
 	 */
-	public Spyglass(final File configFile) {
-		configStore = new ConfigStore(configFile);
+	public Spyglass(final boolean isIShellPlugin, final SpyglassConfiguration config) {
+		this.isIShellPlugin = isIShellPlugin;
+		configStore = new ConfigStore(isIShellPlugin, config);
+		init(configStore.getSpyglassConfig());
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor. Invokes the XML configuration reading.
+	 * 
+	 * @param isIShellPlugin
+	 *            indicates whether or not the application is used as iShell
+	 *            plug-in
+	 * @param configFile
+	 *            the file which contains the configuration parameters
+	 */
+	public Spyglass(final boolean isIShellPlugin, final File configFile) {
+		this.isIShellPlugin = isIShellPlugin;
+		configStore = new ConfigStore(isIShellPlugin, configFile);
 		init(configStore.getSpyglassConfig());
 	}
 	
@@ -103,6 +125,7 @@ public class Spyglass {
 	 */
 	private void init(final SpyglassConfiguration config) {
 		// Create and inject objects
+		// configFilePath = config.get
 		pluginManager = config.getPluginManager();
 		pluginManager.setNodePositioner(config.getNodePositioner());
 		pluginManager.init();

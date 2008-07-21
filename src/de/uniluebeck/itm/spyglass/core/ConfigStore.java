@@ -35,13 +35,19 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public class ConfigStore {
 	
 	/** The path to the file where the default configuration is located */
-	private static final String defaultFileName = "config/DefaultSpyglassConfig.xml";
+	private static final String DEFAULT_CONFIG_FILE_STANDALONE = "config/DefaultSpyglassConfigStandalone.xml";
+	
+	private static final String DEFAULT_CONFIG_FILE_ISHELL_PLUGIN = "config/DefaultSpyglassConfigIShellPluin.xml";
+	
+	private String configFilePath = "config/DefaultSpyglassConfigStandalone.xml";
 	
 	/** An instance of a spyglass configuration object */
 	private SpyglassConfiguration spyglassConfig;
 	
 	/** An object which is used for logging errors and other events */
 	private static Category log = Logging.get(ConfigStore.class);
+	
+	private final boolean isIShellPlugin;
 	
 	@Override
 	public void finalize() throws Throwable {
@@ -52,17 +58,29 @@ public class ConfigStore {
 	/**
 	 * Reads the config from an hardcoded standard-path (which is stored
 	 * internally in this class)
+	 * 
+	 * @param isIShellPlugin
+	 *            indicates whether or not the application is used as iShell
+	 *            plug-in
 	 */
-	public ConfigStore() {
-		this(new File(defaultFileName));
+	public ConfigStore(final boolean isIShellPlugin) {
+		this(isIShellPlugin, new File((isIShellPlugin) ? DEFAULT_CONFIG_FILE_ISHELL_PLUGIN : DEFAULT_CONFIG_FILE_STANDALONE));
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * Reads the config from an hardcoded standard-path (which is stored
 	 * internally in this class)
+	 * 
+	 * @param isIShellPlugin
+	 *            indicates whether or not the application is used as iShell
+	 *            plug-in
+	 * @param spyglassConfig
+	 *            the configuration parameters
 	 */
-	public ConfigStore(final SpyglassConfiguration spyglassConfig) {
+	public ConfigStore(final boolean isIShellPlugin, final SpyglassConfiguration spyglassConfig) {
+		this.isIShellPlugin = isIShellPlugin;
+		this.configFilePath = (isIShellPlugin) ? DEFAULT_CONFIG_FILE_ISHELL_PLUGIN : DEFAULT_CONFIG_FILE_STANDALONE;
 		this.spyglassConfig = spyglassConfig;
 	}
 	
@@ -70,9 +88,15 @@ public class ConfigStore {
 	/**
 	 * creates a new configStore for the given File.
 	 * 
+	 * @param isIShellPlugin
+	 *            indicates whether or not the application is used as iShell
+	 *            plug-in
 	 * @param file
+	 *            the file which contains the configuration parameters
 	 */
-	public ConfigStore(final File configFile) {
+	public ConfigStore(final boolean isIShellPlugin, final File configFile) {
+		this.isIShellPlugin = isIShellPlugin;
+		this.configFilePath = configFile.getPath();
 		load(configFile);
 	}
 	
@@ -271,7 +295,7 @@ public class ConfigStore {
 	 * @return <code>true</code> if the configuration was stored successfully
 	 */
 	public boolean store() {
-		return store(new File(defaultFileName));
+		return store(new File(configFilePath));
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -291,6 +315,7 @@ public class ConfigStore {
 		}
 		final SpyglassConfiguration backup = loadSpyglassConfig(configFile);
 		try {
+			purgeDefaults();
 			new Persister().write(spyglassConfig, configFile);
 			return true;
 		} catch (final Exception e) {
@@ -305,5 +330,14 @@ public class ConfigStore {
 			}
 			return false;
 		}
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Replaces all duplicated class instances from the list of plug-ins which
+	 * are configured by default.
+	 */
+	private void purgeDefaults() {
+		// TODO Auto-generated method stub
 	}
 }

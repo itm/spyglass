@@ -16,7 +16,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.SimpleNodePainterXMLConfig;
 
 public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
-	@Element
+	@Element(name = "parameters")
 	private SimpleNodePainterXMLConfig xmlConfig;
 	
 	// @Element

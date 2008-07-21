@@ -1,10 +1,12 @@
-/* ----------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass.       
- * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project    
- * SpyGlass is free software; you can redistribute it and/or modify it  
- * under the terms of the BSD License. Refer to spyglass-licence.txt    
- * file in the root of the SpyGlass source tree for further details.  
-------------------------------------------------------------------------*/
+/*
+ * ---------------------------------------------------------------------- This
+ * file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass;
 
 import ishell.device.MessagePacket;
@@ -23,9 +25,9 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.core.SpyglassConfiguration;
-import de.uniluebeck.itm.spyglass.drawing.Canvas2D;
 import de.uniluebeck.itm.spyglass.gui.UIController;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
@@ -55,37 +57,37 @@ import de.uniluebeck.itm.spyglass.packet.PacketReader;
  */
 public class PluginSpyGlass2iShell extends Plugin {
 	private static Category log = Logging.get(PluginSpyGlass2iShell.class);
-
+	
 	private static final int SPYGLASS_PACKET_TYPE = 145;
-
+	
 	private Composite container;
-
+	
 	private Spyglass spyglass = null;
-
+	
 	private SpyglassConfiguration config;
-
-	private Deque<de.uniluebeck.itm.spyglass.packet.Packet> queue = new ArrayDeque<de.uniluebeck.itm.spyglass.packet.Packet>(50);
-
+	
+	private final Deque<de.uniluebeck.itm.spyglass.packet.Packet> queue = new ArrayDeque<de.uniluebeck.itm.spyglass.packet.Packet>(50);
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	class PluginAction extends Action {
-		private de.uniluebeck.itm.spyglass.plugin.Plugin plugin;
-
+		private final de.uniluebeck.itm.spyglass.plugin.Plugin plugin;
+		
 		// --------------------------------------------------------------------------------
 		/**
 		 * 
 		 */
-		public PluginAction(de.uniluebeck.itm.spyglass.plugin.Plugin plugin) {
+		public PluginAction(final de.uniluebeck.itm.spyglass.plugin.Plugin plugin) {
 			super();
 			this.plugin = plugin;
-
+			
 			setText("Reset");
 			setToolTipText("Clear");
 			setImageDescriptor(IconTheme.lookupDescriptor("edit-clear"));
 		}
-
+		
 		// --------------------------------------------------------------------------------
 		/**
 		 * 
@@ -93,15 +95,16 @@ public class PluginSpyGlass2iShell extends Plugin {
 		@Override
 		public void run() {
 			log.debug("Ich wurde geklickt");
-
+			
 			if (config != null) {
-				for( de.uniluebeck.itm.spyglass.plugin.Plugin p : config.getPluginManager().getActivePlugins())
+				for (final de.uniluebeck.itm.spyglass.plugin.Plugin p : config.getPluginManager().getActivePlugins()) {
 					p.reset();
-					
+				}
+				
 			}
 		}
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -109,33 +112,34 @@ public class PluginSpyGlass2iShell extends Plugin {
 	@Override
 	public int[] init() {
 		// iShell init (called on each plug-in start)
-		CTabItem tabItem = getTabItem(getName());
+		final CTabItem tabItem = getTabItem(getName());
 		tabItem.setToolTipText(getName());
 		tabItem.setImage(IconTheme.lookup("system-search"));
 		container = this.getTabContainer(true);
 		container.setLayout(new FillLayout());
 		container.addControlListener(new ControlListener() {
-
+			
 			@Override
-			public void controlMoved(ControlEvent e) {
+			public void controlMoved(final ControlEvent e) {
 				// Nothing to do
 			}
-
+			
 			@Override
-			public void controlResized(ControlEvent e) {
+			public void controlResized(final ControlEvent e) {
 				log.debug("Control resized, received event: " + e);
 				// TODO Adapt zoom
 			}
 		});
-
+		
+		final ConfigStore cs = new ConfigStore(true);
 		// Create the configuration for SpyGlass
-		config = new SpyglassConfiguration();
-		config.setFps(5);
-		config.setPacketDeliveryInitialDelay(500);
-		config.setPacketDeliveryDelay(10);
-		config.setCanvas(new Canvas2D());
+		config = cs.getSpyglassConfig();
+		// config.setFps(5);
+		// config.setPacketDeliveryInitialDelay(500);
+		// config.setPacketDeliveryDelay(10);
+		// config.setCanvas(new Canvas2D());
 		config.setPacketReader(new PacketReader() {
-
+			
 			@Override
 			public de.uniluebeck.itm.spyglass.packet.Packet getNextPacket() {
 				synchronized (queue) {
@@ -143,52 +147,53 @@ public class PluginSpyGlass2iShell extends Plugin {
 				}
 			}
 		});
-/*
-		DagstuhlNodePainter dagstuhlPlugin = new DagstuhlNodePainter();
-		DagstuhlConnectivityPainter dagstuhlConnectivityPainter = new DagstuhlConnectivityPainter();
-		DagstuhlRoutePainter dagstuhlRoutePainter = new DagstuhlRoutePainter();
-*/
-		config.setPluginManager(new SpyGlass2iShellPluginManager(this));
-/*		config.getPluginManager().addPlugin(dagstuhlRoutePainter);
-		config.getPluginManager().addPlugin(dagstuhlConnectivityPainter);
-		config.getPluginManager().addPlugin(dagstuhlPlugin);*/
-		//config.getPluginManager().addPlugin(new FlegsensNodePainterPlugin());
-		//ConfigNodePositioner cnp = new ConfigNodePositioner();
-		//config.getPluginManager().addPlugin(cnp);
-		//config.setNodePositioner(cnp);
-
-//		config.setNodePositioner(new RandomNodePositioner()); // TODO
-		
+		/*
+		 * DagstuhlNodePainter dagstuhlPlugin = new DagstuhlNodePainter();
+		 * DagstuhlConnectivityPainter dagstuhlConnectivityPainter = new
+		 * DagstuhlConnectivityPainter(); DagstuhlRoutePainter
+		 * dagstuhlRoutePainter = new DagstuhlRoutePainter();
+		 */
+		// config.setPluginManager(new SpyGlass2iShellPluginManager(this));
+		/*
+		 * config.getPluginManager().addPlugin(dagstuhlRoutePainter);
+		 * config.getPluginManager().addPlugin(dagstuhlConnectivityPainter);
+		 * config.getPluginManager().addPlugin(dagstuhlPlugin);
+		 */
+		// config.getPluginManager().addPlugin(new FlegsensNodePainterPlugin());
+		// ConfigNodePositioner cnp = new ConfigNodePositioner();
+		// config.getPluginManager().addPlugin(cnp);
+		// config.setNodePositioner(cnp);
+		// config.setNodePositioner(new RandomNodePositioner()); // TODO
 		// Add Toolbar Actions
-		//addToolBarAction(new PluginAction(dagstuhlPlugin));
-
+		// addToolBarAction(new PluginAction(dagstuhlPlugin));
 		// Application objects
-		AppWindow appWindow = new AppWindow(container.getDisplay(), container);
-		spyglass = new Spyglass(config);
+		final AppWindow appWindow = new AppWindow(container.getDisplay(), container);
+		spyglass = new Spyglass(true, config);
 		new UIController(spyglass, appWindow);
-
+		
 		// Start visualization
 		spyglass.start();
-
+		
 		return new int[] { SPYGLASS_PACKET_TYPE };
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	@Override
-	public void receivePacket(MessagePacket packet) {
-		if( isPaused() )
+	public void receivePacket(final MessagePacket packet) {
+		if (isPaused()) {
 			return;
+		}
 		
-		de.uniluebeck.itm.spyglass.packet.Packet spyglassPacket = new de.uniluebeck.itm.spyglass.packet.Packet();
+		final de.uniluebeck.itm.spyglass.packet.Packet spyglassPacket = new de.uniluebeck.itm.spyglass.packet.Packet();
 		spyglassPacket.setContent(packet.getContent());
 		synchronized (queue) {
 			queue.push(spyglassPacket);
 		}
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -201,7 +206,7 @@ public class PluginSpyGlass2iShell extends Plugin {
 		container = null;
 		log.info("SpyGlass end. Done.");
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -210,7 +215,7 @@ public class PluginSpyGlass2iShell extends Plugin {
 	public String getName() {
 		return "SpyGlass";
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -219,5 +224,5 @@ public class PluginSpyGlass2iShell extends Plugin {
 	public String getDescription() {
 		return getName() + " is a visualization framework for binary data packets arriving from the WSN";
 	}
-
+	
 }

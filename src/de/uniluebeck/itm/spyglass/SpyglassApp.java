@@ -1,10 +1,12 @@
-/* ----------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass.       
- * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project    
- * SpyGlass is free software; you can redistribute it and/or modify it  
- * under the terms of the BSD License. Refer to spyglass-licence.txt    
- * file in the root of the SpyGlass source tree for further details.  
-------------------------------------------------------------------------*/
+/*
+ * ---------------------------------------------------------------------- This
+ * file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass;
 
 import ishell.util.Logging;
@@ -20,56 +22,58 @@ import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 
 // --------------------------------------------------------------------------------
 /**
- * Application class for wrapping the Spyglass core class and it's user interface/GUI. It instantiate and injects the
- * core classes that are needed to run the application.
+ * Application class for wrapping the Spyglass core class and it's user
+ * interface/GUI. It instantiate and injects the core classes that are needed to
+ * run the application.
  */
 public class SpyglassApp {
 	private static Category log = Logging.get(SpyglassApp.class);
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	public SpyglassApp() {
 		log.info("New SpyGlass instance.");
-
+		
 		// GUI
-		Display display = Display.getDefault();
-
-		Shell shell = new Shell(display);
+		final Display display = Display.getDefault();
+		
+		final Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
 		shell.layout();
 		shell.setText("Spyglass");
 		shell.setSize(800, 600);
 		shell.open();
-
+		
 		// Application objects
-		AppWindow appWindow = new AppWindow(display, shell);
-		Spyglass spyglass = new Spyglass();
-
+		final AppWindow appWindow = new AppWindow(display, shell);
+		final Spyglass spyglass = new Spyglass(false);
+		
 		@SuppressWarnings("unused")
-		UIController uiController = new UIController(spyglass, appWindow);
-
+		final UIController uiController = new UIController(spyglass, appWindow);
+		
 		// Start visualization
 		spyglass.start();
-
+		
 		// SWT message loop
 		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
+			if (!display.readAndDispatch()) {
 				display.sleep();
+			}
 		}
-
+		
 		spyglass.setVisualizationRunning(false);
 		log.info("SpyGlass end. Done.");
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		log.info("Starting SpyGlass app.");
 		new SpyglassApp();
 	}
-
+	
 }
