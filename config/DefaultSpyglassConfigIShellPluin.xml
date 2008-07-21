@@ -1,8 +1,7 @@
 <spyglassConfiguration>
-   <packetReader class="de.uniluebeck.itm.spyglass.packet.PacketReader">
-      <gateway class="de.uniluebeck.itm.spyglass.gateway.NetworkGateway">
-         <hostname>server</hostname>
-         <port>4711</port>
+   <packetReader class="de.uniluebeck.itm.spyglass.packet.SimplePacketReader">
+      <gateway class="de.uniluebeck.itm.spyglass.gateway.FileReaderGateway">
+         <file>source.packet.txt</file>
       </gateway>
    </packetReader>
    <canvas class="de.uniluebeck.itm.spyglass.drawing.Canvas2D"/>
