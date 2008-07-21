@@ -181,12 +181,13 @@ public class ConfigStore {
 		final List<Plugin> plugins = spyglassConfig.getPluginManager().getPlugins();
 		for (final Plugin plugin : plugins) {
 			final PluginXMLConfig cfg = plugin.getXMLConfig();
-			if ((cfg != null) && config.equals(cfg)) {
+			if ((cfg != null) && config.getClass().equals(cfg.getClass())) {
 				plugin.setXMLConfig(config);
 				store();
 				return;
 			}
 		}
+		throw new UnsupportedOperationException("No matching plugin was found! Create a new one first");
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -210,6 +211,7 @@ public class ConfigStore {
 				return;
 			}
 		}
+		throw new UnsupportedOperationException("No matching configuration was found! Create a new one first");
 	}
 	
 	// --------------------------------------------------------------------------------
