@@ -55,7 +55,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		return null;
 	}
 	
-	@Override
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
 		// TODO Auto-generated method stub
 		return new LinkedList<DrawingObject>();

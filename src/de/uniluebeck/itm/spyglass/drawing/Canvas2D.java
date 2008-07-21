@@ -24,7 +24,8 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text.TextJustification;
 
-// --------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// --
 /**
  * A 2D-canvas that is able to draw a DrawingObject onto a SWT graphics context
  * (org.eclipse.swt.graphics.GC).
@@ -36,11 +37,11 @@ public class Canvas2D implements SpyglassCanvas {
 	
 	private GC gc = null;
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
-	@Override
 	public synchronized void draw(final DrawingObject drawingObj, final GC gc) {
 		this.gc = gc;
 		
@@ -57,7 +58,8 @@ public class Canvas2D implements SpyglassCanvas {
 		}
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
@@ -70,7 +72,8 @@ public class Canvas2D implements SpyglassCanvas {
 		color.dispose();
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
@@ -98,7 +101,8 @@ public class Canvas2D implements SpyglassCanvas {
 		f.dispose();
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
@@ -118,7 +122,8 @@ public class Canvas2D implements SpyglassCanvas {
 		bg.dispose();
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */

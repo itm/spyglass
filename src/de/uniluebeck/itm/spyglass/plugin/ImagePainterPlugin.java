@@ -51,7 +51,6 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin {
 		return null;
 	}
 	
-	@Override
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
 		// TODO Auto-generated method stub
 		return null;

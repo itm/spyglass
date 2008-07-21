@@ -10,6 +10,7 @@ package de.uniluebeck.itm.spyglass.core;
 import ishell.util.Logging;
 
 import java.util.EventObject;
+import java.util.LinkedList;
 
 import org.apache.log4j.Category;
 
@@ -49,7 +50,6 @@ public class VisualizationTask implements Runnable {
 	/**
 	 * 
 	 */
-	@Override
 	public void run() {
 		log.debug("Visualization thread start.");
 		long repaintInterval = (long) ((1.0 / (double) fps) * 1000);
@@ -60,10 +60,11 @@ public class VisualizationTask implements Runnable {
 		
 		/*
 		Packet packet = null;
-		Deque<Packet> q = spyglass.getPacketCache();
+		LinkedList<Packet> q = spyglass.getPacketCache();
 		
 		while (spyglass.isVisualizationRunning()) {
-			while ((packet = q.pollLast()) != null) {
+			while ((packet = q.getLast()) != null) {
+				q.removeLast();
 				if (!spyglass.isVisualizationRunning())
 					break;
 

@@ -29,7 +29,8 @@ import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
-// --------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// --
 /**
  * The UI controller is the interface between the core Spyglass functionality
  * and the graphical user interface. It is bound to a specific GUI library. If
@@ -70,18 +71,19 @@ public class UIController {
 	
 	private final Color canvasBgColor = new Color(null, 255, 255, 255);
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
 	private final Runnable paintRunnable = new Runnable() {
-		@Override
 		public void run() {
 			appWindow.getGui().getCanvas().redraw();
 		}
 	};
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
@@ -98,14 +100,14 @@ public class UIController {
 		init();
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
 	private void init() {
 		// Add listeners
 		appWindow.getGui().getCanvas().addPaintListener(new PaintListener() {
-			@Override
 			public void paintControl(final PaintEvent e) {
 				render(e.gc);
 			}
@@ -114,7 +116,6 @@ public class UIController {
 		// Trigger asynchronous redraw (must happen in the gui thread, see SWT
 		// documentation)
 		spyglass.addSpyglassListener(new SpyglassListener() {
-			@Override
 			public void redraw(final EventObject e) {
 				if (log.isDebugEnabled()) {
 					log.debug("Triggering redraw event from " + e.getSource());
@@ -126,7 +127,8 @@ public class UIController {
 		});
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
@@ -151,7 +153,8 @@ public class UIController {
 		
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
