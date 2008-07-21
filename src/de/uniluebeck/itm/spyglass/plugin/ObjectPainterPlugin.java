@@ -3,6 +3,7 @@ package de.uniluebeck.itm.spyglass.plugin;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Widget;
+import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
@@ -14,10 +15,11 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class ObjectPainterPlugin extends BackgroundPainterPlugin implements NeedsMetric {
 	
-	private ObjectPainterXMLConfig xmlConfig;
+	@Element(name = "parameters")
+	private final ObjectPainterXMLConfig xmlConfig;
 	
 	public ObjectPainterPlugin() {
-		
+		xmlConfig = new ObjectPainterXMLConfig();
 	}
 	
 	@Override

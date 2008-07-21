@@ -33,8 +33,8 @@ public abstract class PluginXMLConfig {
 	@Element(name = "name")
 	private String name = "default";
 	
-	@Element(name = "priority")
-	private int priority = -1;
+	// @Element(name = "priority")
+	// private int priority = -1;
 	
 	@ElementArray(name = "semanticTypes", required = false)
 	private int[] semanticTypes;
@@ -104,22 +104,24 @@ public abstract class PluginXMLConfig {
 		this.name = name;
 	}
 	
+	// //
 	// --------------------------------------------------------------------------------
-	/**
-	 * @return the priority
-	 */
-	public int getPriority() {
-		return priority;
-	}
-	
+	// /**
+	// * @return the priority
+	// */
+	// public int getPriority() {
+	// return priority;
+	// }
+	//	
+	// //
 	// --------------------------------------------------------------------------------
-	/**
-	 * @param priority
-	 *            the priority to set
-	 */
-	public void setPriority(final int priority) {
-		this.priority = priority;
-	}
+	// /**
+	// * @param priority
+	// * the priority to set
+	// */
+	// public void setPriority(final int priority) {
+	// this.priority = priority;
+	// }
 	
 	// --------------------------------------------------------------------------------
 	/**

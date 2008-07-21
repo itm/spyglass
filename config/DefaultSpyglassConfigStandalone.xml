@@ -25,7 +25,6 @@
                <isActive>true</isActive>
                <isVisible>false</isVisible>
                <name>SimpleNodePainterTest</name>
-               <priority>1</priority>
                <semanticTypes length="2">
                   <int>0</int>
                   <int>1</int>
@@ -38,7 +37,6 @@
                <isActive>true</isActive>
                <isVisible>true</isVisible>
                <name>default</name>
-               <priority>-1</priority>
             </parameters>
          </plugin>
       </plugins>
@@ -85,7 +83,6 @@
             <isActive>true</isActive>
             <isVisible>true</isVisible>
             <name>default</name>
-            <priority>-1</priority>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.MapPainterPlugin" isActive="true">
@@ -116,7 +113,32 @@
             <isActive>true</isActive>
             <isVisible>true</isVisible>
             <name>default</name>
-            <priority>-1</priority>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.ObjectPainterPlugin" isActive="true">
+         <parameters>
+            <image>images/icons/brokenImageLink.png</image>
+            <size width="10" height="10" lineWidth="1">
+               <colorR>200</colorR>
+               <colorG>0</colorG>
+               <colorB>0</colorB>
+               <bgColorR>255</bgColorR>
+               <bgColorG>255</bgColorG>
+               <bgColorB>255</bgColorB>
+            </size>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default</name>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.SimpleGlobalInformationPlugin" isActive="true">
+         <parameters>
+            <semanticTypes4Neighborhoods class="java.util.LinkedList"/>
+            <showNodeDegree>true</showNodeDegree>
+            <showNumNodes>true</showNumNodes>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default</name>
          </parameters>
       </plugin>
    </defaults>

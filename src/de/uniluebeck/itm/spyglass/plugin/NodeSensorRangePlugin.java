@@ -3,6 +3,7 @@ package de.uniluebeck.itm.spyglass.plugin;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Widget;
+import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
@@ -14,10 +15,11 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	
-	private NodeSensorRangeXMLConfig xmlConfig;
+	@Element(name = "parameters")
+	private final NodeSensorRangeXMLConfig xmlConfig;
 	
 	public NodeSensorRangePlugin() {
-		
+		xmlConfig = new NodeSensorRangeXMLConfig();
 	}
 	
 	@Override
