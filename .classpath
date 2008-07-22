@@ -3,11 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/swt.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://help.eclipse.org/stable/nftopic/org.eclipse.platform.doc.isv/reference/api"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/simple-xml-1.6.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/bsh-2.0b4.jar"/>
@@ -15,7 +10,6 @@
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/ishell-dev-win32.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/jcommon-1.0.5.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/jfreechart-1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.cdt.core_3.1.1.200609270800.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.core.runtime_3.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.jface_3.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.osgi_3.1.1.jar"/>
@@ -24,5 +18,8 @@
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/ostermillerutils_1_05_00_for_java_1_4.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/poi-2.5.1-final-20040804.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/RXTXcomm.jar"/>
+	<classpathentry kind="lib" path="lib/win32/org.eclipse.cdt.core.win32_4.0.0.200709241202.jar"/>
+	<classpathentry kind="lib" path="lib/win32/ishell-win32.jar"/>
+	<classpathentry kind="lib" path="lib/swt_win32.jar"/>
 	<classpathentry kind="output" path="bin/eclipse"/>
 </classpath>
