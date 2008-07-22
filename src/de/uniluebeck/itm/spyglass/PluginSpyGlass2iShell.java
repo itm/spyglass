@@ -12,7 +12,6 @@ package de.uniluebeck.itm.spyglass;
 import ishell.device.MessagePacket;
 import ishell.plugins.Plugin;
 import ishell.util.IconTheme;
-import ishell.util.Logging;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -31,8 +30,10 @@ import de.uniluebeck.itm.spyglass.core.SpyglassConfiguration;
 import de.uniluebeck.itm.spyglass.gui.UIController;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
-// --------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// --
 /**
  * To use this plug-in in iShell, you need to add two option to your iShell
  * configuration file (typically ishell.properties).
@@ -56,7 +57,7 @@ import de.uniluebeck.itm.spyglass.packet.PacketReader;
  * For further information, please refer to the iShell manual.
  */
 public class PluginSpyGlass2iShell extends Plugin {
-	private static Category log = Logging.get(PluginSpyGlass2iShell.class);
+	private static Category log = SpyglassLogger.get(PluginSpyGlass2iShell.class);
 	
 	private static final int SPYGLASS_PACKET_TYPE = 145;
 	
@@ -68,14 +69,16 @@ public class PluginSpyGlass2iShell extends Plugin {
 	
 	private final Deque<de.uniluebeck.itm.spyglass.packet.Packet> queue = new ArrayDeque<de.uniluebeck.itm.spyglass.packet.Packet>(50);
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
 	class PluginAction extends Action {
 		private final de.uniluebeck.itm.spyglass.plugin.Plugin plugin;
 		
-		// --------------------------------------------------------------------------------
+		//----------------------------------------------------------------------
+		// ----------
 		/**
 		 * 
 		 */
@@ -88,7 +91,8 @@ public class PluginSpyGlass2iShell extends Plugin {
 			setImageDescriptor(IconTheme.lookupDescriptor("edit-clear"));
 		}
 		
-		// --------------------------------------------------------------------------------
+		//----------------------------------------------------------------------
+		// ----------
 		/**
 		 * 
 		 */
@@ -105,7 +109,8 @@ public class PluginSpyGlass2iShell extends Plugin {
 		}
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
@@ -177,7 +182,8 @@ public class PluginSpyGlass2iShell extends Plugin {
 		return new int[] { SPYGLASS_PACKET_TYPE };
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
@@ -189,12 +195,14 @@ public class PluginSpyGlass2iShell extends Plugin {
 		
 		final de.uniluebeck.itm.spyglass.packet.Packet spyglassPacket = new de.uniluebeck.itm.spyglass.packet.Packet();
 		spyglassPacket.setContent(packet.getContent());
+		log.debug("Received Packet in spyglass from ishell: " + spyglassPacket);
 		synchronized (queue) {
 			queue.push(spyglassPacket);
 		}
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
@@ -207,7 +215,8 @@ public class PluginSpyGlass2iShell extends Plugin {
 		log.info("SpyGlass end. Done.");
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
@@ -216,7 +225,8 @@ public class PluginSpyGlass2iShell extends Plugin {
 		return "SpyGlass";
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */

@@ -9,12 +9,11 @@
  */
 package de.uniluebeck.itm.spyglass.core;
 
-import ishell.util.Logging;
-
 import org.apache.log4j.Category;
 
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.Tools;
 
 //------------------------------------------------------------------------------
@@ -30,7 +29,7 @@ import de.uniluebeck.itm.spyglass.util.Tools;
  * false.
  */
 public class PacketProducerTask implements Runnable {
-	private final Category log = Logging.get(PacketProducerTask.class);
+	private final Category log = SpyglassLogger.get(PacketProducerTask.class);
 	
 	// private Deque<Packet> packetCache = null;
 	

@@ -9,8 +9,6 @@
  */
 package de.uniluebeck.itm.spyglass.drawing;
 
-import ishell.util.Logging;
-
 import org.apache.log4j.Category;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -23,6 +21,7 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Circle;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text.TextJustification;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 //------------------------------------------------------------------------------
 // --
@@ -33,7 +32,7 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Text.TextJustification;
 @Root
 public class Canvas2D implements SpyglassCanvas {
 	
-	private static Category log = Logging.get(Canvas2D.class);
+	private static Category log = SpyglassLogger.get(Canvas2D.class);
 	
 	private GC gc = null;
 	

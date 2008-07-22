@@ -45,8 +45,8 @@ public class SpyglassLogger {
 	/**
 	 * Returns an object to log messages which can be related to a certain class
 	 * 
-	 * @param clazz -
-	 *            the class
+	 * @param clazz
+	 *            - the class
 	 * @return an object to log messages
 	 * @see Logger
 	 */
@@ -67,13 +67,17 @@ public class SpyglassLogger {
 		return logger;
 	}
 	
+	public static Logger get(final Class<?> clazz) {
+		return getLogger(clazz);
+	}
+	
 	/**
 	 * Log a message object with the {@link Level#DEBUG} level.
 	 * 
-	 * @param message -
-	 *            the message object to log
-	 * @param clazz -
-	 *            the class which called this method
+	 * @param message
+	 *            - the message object to log
+	 * @param clazz
+	 *            - the class which called this method
 	 * @see Logger#debug(Object)
 	 */
 	public static void debug(final Object message, final Class<?> clazz) {
@@ -83,8 +87,8 @@ public class SpyglassLogger {
 	/**
 	 * Log a message object with the {@link Level#DEBUG} level.
 	 * 
-	 * @param message -
-	 *            the message object to log
+	 * @param message
+	 *            - the message object to log
 	 * @see Logger#debug(Object)
 	 */
 	public static void debug(final Object message) {
@@ -94,10 +98,10 @@ public class SpyglassLogger {
 	/**
 	 * Log a message object with the {@link Level#INFO} level.
 	 * 
-	 * @param message -
-	 *            the message object to log
-	 * @param clazz -
-	 *            the class which called this method
+	 * @param message
+	 *            - the message object to log
+	 * @param clazz
+	 *            - the class which called this method
 	 * @see Logger#info(Object)
 	 */
 	public static void info(final Object message, final Class<?> clazz) {
@@ -107,10 +111,10 @@ public class SpyglassLogger {
 	/**
 	 * Log a message object with the {@link Level#DEBUG} level.
 	 * 
-	 * @param message -
-	 *            the message object to log
-	 * @param clazz -
-	 *            the class which called this method
+	 * @param message
+	 *            - the message object to log
+	 * @param clazz
+	 *            - the class which called this method
 	 * @see Logger#debug(Object)
 	 */
 	public static void info(final Object message) {
@@ -120,10 +124,10 @@ public class SpyglassLogger {
 	/**
 	 * Log a message object with the {@link Level#WARN} level.
 	 * 
-	 * @param message -
-	 *            the message object to log
-	 * @param clazz -
-	 *            the class which called this method
+	 * @param message
+	 *            - the message object to log
+	 * @param clazz
+	 *            - the class which called this method
 	 * @see Logger#warn(Object)
 	 */
 	public static void warn(final Object message, final Class<?> clazz) {
@@ -133,8 +137,8 @@ public class SpyglassLogger {
 	/**
 	 * Log a message object with the {@link Level#WARN} level.
 	 * 
-	 * @param message -
-	 *            the message object to log
+	 * @param message
+	 *            - the message object to log
 	 * @see Logger#warn(Object)
 	 */
 	public static void warn(final Object message) {
@@ -145,12 +149,12 @@ public class SpyglassLogger {
 	 * Log a message object with the {@link Level#ERROR} level including the
 	 * stack trace of the Throwable t passed as parameter.
 	 * 
-	 * @param message -
-	 *            the message object to log
-	 * @param clazz -
-	 *            the class which called this method
-	 * @param t -
-	 *            the exception to log, including its stack trace.
+	 * @param message
+	 *            - the message object to log
+	 * @param clazz
+	 *            - the class which called this method
+	 * @param t
+	 *            - the exception to log, including its stack trace.
 	 * @see Logger#error(Object, Throwable)
 	 */
 	public static void error(final Object message, final Class<?> clazz, final Throwable t) {
@@ -160,10 +164,10 @@ public class SpyglassLogger {
 	/**
 	 * Log a message object with the {@link Level#ERROR} level.
 	 * 
-	 * @param message -
-	 *            the message object to log
-	 * @param clazz -
-	 *            the class which called this method
+	 * @param message
+	 *            - the message object to log
+	 * @param clazz
+	 *            - the class which called this method
 	 * @see Logger#error(Object)
 	 */
 	public static void error(final Object message, final Class<?> clazz) {
@@ -173,8 +177,8 @@ public class SpyglassLogger {
 	/**
 	 * Log a message object with the {@link Level#ERROR} level.
 	 * 
-	 * @param message -
-	 *            the message object to log
+	 * @param message
+	 *            - the message object to log
 	 * @see Logger#error(Object)
 	 */
 	public static void error(final Object message) {
@@ -185,12 +189,12 @@ public class SpyglassLogger {
 	 * Log a message object with the {@link Level#FATAL} level including the
 	 * stack trace of the Throwable t passed as parameter.
 	 * 
-	 * @param message -
-	 *            the message object to log
-	 * @param clazz -
-	 *            the class which called this method
-	 * @param t -
-	 *            the exception to log, including its stack trace.
+	 * @param message
+	 *            - the message object to log
+	 * @param clazz
+	 *            - the class which called this method
+	 * @param t
+	 *            - the exception to log, including its stack trace.
 	 * @see Logger#fatal(Object, Throwable)
 	 */
 	public static void fatal(final Object message, final Class<?> clazz, final Throwable t) {
@@ -200,10 +204,10 @@ public class SpyglassLogger {
 	/**
 	 * Log a message object with the {@link Level#FATAL} Level.
 	 * 
-	 * @param message -
-	 *            the message object to log
-	 * @param clazz -
-	 *            the class which called this method
+	 * @param message
+	 *            - the message object to log
+	 * @param clazz
+	 *            - the class which called this method
 	 * @see Logger#fatal(Object)
 	 */
 	public static void fatal(final Object message, final Class<?> clazz) {
@@ -213,8 +217,8 @@ public class SpyglassLogger {
 	/**
 	 * Log a message object with the {@link Level#FATAL} Level.
 	 * 
-	 * @param message -
-	 *            the message object to log
+	 * @param message
+	 *            - the message object to log
 	 * @see Logger#fatal(Object)
 	 */
 	public static void fatal(final Object message) {
@@ -224,10 +228,10 @@ public class SpyglassLogger {
 	/**
 	 * Log a message object with the {@link Level#TRACE} Level.
 	 * 
-	 * @param message -
-	 *            the message object to log
-	 * @param clazz -
-	 *            the class which called this method
+	 * @param message
+	 *            - the message object to log
+	 * @param clazz
+	 *            - the class which called this method
 	 * @see Logger#trace(Object)
 	 */
 	public static void trace(final Object message, final Class<?> clazz) {
@@ -237,8 +241,8 @@ public class SpyglassLogger {
 	/**
 	 * Log a message object with the {@link Level#TRACE} Level.
 	 * 
-	 * @param message -
-	 *            the message object to log
+	 * @param message
+	 *            - the message object to log
 	 * @see Logger#trace(Object)
 	 */
 	public static void trace(final Object message) {
@@ -248,8 +252,8 @@ public class SpyglassLogger {
 	/**
 	 * Returns the assigned {@link Level}, if any, for this Category.
 	 * 
-	 * @param clazz -
-	 *            the class which called this method
+	 * @param clazz
+	 *            - the class which called this method
 	 * @return Level - the assigned Level, can be null.
 	 */
 	public static Level getLevel(final Class<?> clazz) {

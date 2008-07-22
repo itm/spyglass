@@ -1,22 +1,23 @@
 /*
- * --------------------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * ------------------------------------------------------------------------------
+ * -- This file is part of the WSN visualization framework SpyGlass. Copyright
+ * (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
  * software; you can redistribute it and/or modify it under the terms of the BSD
  * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
  * source tree for further details.
- * --------------------------------------------------------------------------------
+ * ----------------------------------------------
+ * ----------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin;
-
-import ishell.util.Logging;
 
 import org.apache.log4j.Category;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-// --------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// --
 /**
  * Instances of this class create spyglass plug-ins.<br>
  * When creating those plug-ins they initialize them with their default values
@@ -27,11 +28,12 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class PluginFactory {
 	
-	private static Category log = Logging.get(PluginFactory.class);
+	private static Category log = SpyglassLogger.get(PluginFactory.class);
 	
 	private final ConfigStore configStore;
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * Constructor
 	 * 
@@ -43,7 +45,8 @@ public class PluginFactory {
 		this.configStore = configStore;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * Crates a plug-in instance of a certain class type and initializes the
 	 * instances parameters using the provided ones
@@ -71,7 +74,8 @@ public class PluginFactory {
 		
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * Crates a plug-in instance of a certain class type and initializes the
 	 * instances parameters using the provided ones
@@ -97,7 +101,8 @@ public class PluginFactory {
 		
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	@Override
 	public void finalize() throws Throwable {
 		

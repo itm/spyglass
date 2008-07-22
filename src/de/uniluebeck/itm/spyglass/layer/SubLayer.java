@@ -9,8 +9,6 @@
  */
 package de.uniluebeck.itm.spyglass.layer;
 
-import ishell.util.Logging;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,6 +19,7 @@ import org.apache.log4j.Category;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 //------------------------------------------------------------------------------
 // --
@@ -32,7 +31,7 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
  */
 @Deprecated
 public class SubLayer implements Layer {
-	private static Category log = Logging.get(SubLayer.class);
+	private static Category log = SpyglassLogger.get(SubLayer.class);
 	
 	private final HashMap<Integer, DrawingObject> drawingObjects = new HashMap<Integer, DrawingObject>();
 	

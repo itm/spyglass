@@ -9,8 +9,6 @@
  */
 package de.uniluebeck.itm.spyglass;
 
-import ishell.util.Logging;
-
 import org.apache.log4j.Category;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
@@ -19,15 +17,17 @@ import org.eclipse.swt.widgets.Shell;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.UIController;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
-// --------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// --
 /**
  * Application class for wrapping the Spyglass core class and it's user
  * interface/GUI. It instantiate and injects the core classes that are needed to
  * run the application.
  */
 public class SpyglassApp {
-	private static Category log = Logging.get(SpyglassApp.class);
+	private static Category log = SpyglassLogger.getLogger(SpyglassApp.class);
 	
 	// -------------------------------------------------------------------------
 	/**

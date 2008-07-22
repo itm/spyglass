@@ -9,8 +9,6 @@
  */
 package de.uniluebeck.itm.spyglass.gui;
 
-import ishell.util.Logging;
-
 import java.awt.Event;
 import java.util.EventObject;
 import java.util.List;
@@ -28,6 +26,7 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 //------------------------------------------------------------------------------
 // --
@@ -61,7 +60,7 @@ public class UIController {
 		
 	}
 	
-	private static Category log = Logging.get(UIController.class);
+	private static Category log = SpyglassLogger.get(UIController.class);
 	
 	private AppWindow appWindow = null;
 	

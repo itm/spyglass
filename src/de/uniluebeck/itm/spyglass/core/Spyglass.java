@@ -9,8 +9,6 @@
  */
 package de.uniluebeck.itm.spyglass.core;
 
-import ishell.util.Logging;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.EventListener;
@@ -26,8 +24,9 @@ import de.uniluebeck.itm.spyglass.drawing.SpyglassCanvas;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
-// ------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 // --
 /**
  * Spyglass is an application for visualizing network packets coming from an
@@ -37,11 +36,11 @@ import de.uniluebeck.itm.spyglass.plugin.PluginManager;
  * After instantiating of this class, call the <code>start()</code> method to
  * start the visualization. An arbitrary GUI can be used with Spyglass, since
  * the visualization is handled by a SpyglassCanvas, which can be easily adopted
- * to other GUI libraries. Use the <code>addSpyglassListener(...)</code>
- * method to get informed when a redraw of the scene is needed.
+ * to other GUI libraries. Use the <code>addSpyglassListener(...)</code> method
+ * to get informed when a redraw of the scene is needed.
  */
 public class Spyglass {
-	private static Category log = Logging.get(Spyglass.class);
+	private static Category log = SpyglassLogger.get(Spyglass.class);
 	
 	// private static final String CONFIG_FILE = "config.xml";
 	
@@ -71,7 +70,8 @@ public class Spyglass {
 	
 	private final ConfigStore configStore;
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * Constructor. Invokes the XML configuration reading from the default
 	 * configuration files. Which file is used depends on the context (if
@@ -87,7 +87,8 @@ public class Spyglass {
 		init(configStore.getSpyglassConfig());
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * Constructor. Invokes the XML configuration reading.
 	 * 
@@ -103,7 +104,8 @@ public class Spyglass {
 		init(configStore.getSpyglassConfig());
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * Constructor. Invokes the XML configuration reading.
 	 * 
@@ -119,7 +121,8 @@ public class Spyglass {
 		init(configStore.getSpyglassConfig());
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
@@ -140,7 +143,8 @@ public class Spyglass {
 		log.debug("Init done");
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * Starts the visualization by starting a packet producer and a
 	 * visualization thread.
@@ -152,7 +156,8 @@ public class Spyglass {
 		executor.shutdown();
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * Adds a SpyglassListener object that gets notified of a Spyglass event
 	 * (e.g. to know when a redraw must be done).
@@ -169,7 +174,8 @@ public class Spyglass {
 		listeners.add(SpyglassListener.class, listener);
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	/**
 	 * 
 	 */
@@ -187,73 +193,87 @@ public class Spyglass {
 		}
 	}
 	
-	// ---------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// -------
 	public InformationDispatcher getInfoDispatcher() {
 		return infoDispatcher;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public void setInfoDispatcher(final InformationDispatcher infoDispatcher) {
 		this.infoDispatcher = infoDispatcher;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public ArrayList<Packet> getPacketCache() {
 		return packetCache;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public void setPacketCache(final ArrayList<Packet> packetCache) {
 		this.packetCache = packetCache;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public SpyglassCanvas getCanvas() {
 		return canvas;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public void setCanvas(final SpyglassCanvas canvas) {
 		this.canvas = canvas;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public PluginManager getPluginManager() {
 		return pluginManager;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public void setPluginManager(final PluginManager pluginManager) {
 		this.pluginManager = pluginManager;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public boolean isVisualizationRunning() {
 		return visualizationRunning;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public void setVisualizationRunning(final boolean visualizationRunning) {
 		this.visualizationRunning = visualizationRunning;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public PacketReader getPacketReader() {
 		return packetReader;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public void setPacketReader(final PacketReader packetReader) {
 		this.packetReader = packetReader;
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	private void createPluginInstancesFromConfig() {
 		// TODO: nothing to do here since the plugin manager is persistent
 		// itself?!?
 	}
 	
-	// --------------------------------------------------------------------------------
+	//--------------------------------------------------------------------------
+	// ------
 	public ConfigStore getConfigStore() {
 		return configStore;
 	}

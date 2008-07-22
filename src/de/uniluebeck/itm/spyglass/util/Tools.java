@@ -1,13 +1,13 @@
-/* ----------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass.       
- * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project    
- * SpyGlass is free software; you can redistribute it and/or modify it  
- * under the terms of the BSD License. Refer to spyglass-licence.txt    
- * file in the root of the SpyGlass source tree for further details.  
-------------------------------------------------------------------------*/
+/*
+ * ---------------------------------------------------------------------- This
+ * file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.util;
-
-import ishell.util.Logging;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -22,76 +22,82 @@ import java.util.Vector;
 
 import org.apache.log4j.Category;
 
-// --------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// --
 /**
  * Convenience tools
  */
 public class Tools {
-	private static Category log = Logging.get(Tools.class);
-
+	private static Category log = SpyglassLogger.get(Tools.class);
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
 	public static Vector<String> getExternalHostIps() {
-		HashSet<String> ips = new HashSet<String>();
-		Vector<String> external = new Vector<String>();
-
+		final HashSet<String> ips = new HashSet<String>();
+		final Vector<String> external = new Vector<String>();
+		
 		try {
 			InetAddress i;
 			NetworkInterface iface = null;
-
-			for (Enumeration ifaces = NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements();) {
+			
+			for (final Enumeration ifaces = NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements();) {
 				iface = (NetworkInterface) ifaces.nextElement();
-				for (Enumeration ifaceips = iface.getInetAddresses(); ifaceips.hasMoreElements();) {
+				for (final Enumeration ifaceips = iface.getInetAddresses(); ifaceips.hasMoreElements();) {
 					i = (InetAddress) ifaceips.nextElement();
-					if (i instanceof Inet4Address)
+					if (i instanceof Inet4Address) {
 						ips.add(i.getHostAddress());
+					}
 				}
 			}
-
-		} catch (Throwable t) {
+			
+		} catch (final Throwable t) {
 			log.error("Unable to retrieve external ips: " + t, t);
-
+			
 			try {
 				log.debug("Trying different lookup scheme");
-
-				InetAddress li = InetAddress.getLocalHost();
-				String strli = li.getHostName();
-				InetAddress ia[] = InetAddress.getAllByName(strli);
-				for (int i = 0; i < ia.length; i++)
+				
+				final InetAddress li = InetAddress.getLocalHost();
+				final String strli = li.getHostName();
+				final InetAddress ia[] = InetAddress.getAllByName(strli);
+				for (int i = 0; i < ia.length; i++) {
 					ips.add(ia[i].getHostAddress());
-			} catch (Throwable t2) {
+				}
+			} catch (final Throwable t2) {
 				log.error("Also unable to retrieve external ips: " + t2, t2);
 			}
-
+			
 		}
-
-		for (String ip : ips)
+		
+		for (final String ip : ips) {
 			if (isExternalIp(ip)) {
 				log.debug("Found external ip: " + ip);
 				external.add(ip);
 			}
-
+		}
+		
 		return external;
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	public static String getFirstLocalIp() {
-		Vector<String> ips = getExternalHostIps();
+		final Vector<String> ips = getExternalHostIps();
 		String localHost = "127.0.0.1";
-
-		for (String ip : ips)
-			if (!"127.0.0.1".equals(ip))
+		
+		for (final String ip : ips) {
+			if (!"127.0.0.1".equals(ip)) {
 				localHost = new String(ip);
-
+			}
+		}
+		
 		return localHost;
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * <pre>
@@ -101,270 +107,289 @@ public class Tools {
 	 * - 192.168.0.0 - 192.168.255.255 (192.168/16 prefix)
 	 * </pre>
 	 */
-	public static boolean isExternalIp(String ip) {
+	public static boolean isExternalIp(final String ip) {
 		boolean external = true;
-
-		if (ip == null)
+		
+		if (ip == null) {
 			external = false;
-		else if (ip.startsWith("127."))
+		} else if (ip.startsWith("127.")) {
 			external = false;
-		else if (ip.startsWith("10."))
+		} else if (ip.startsWith("10.")) {
 			external = false;
-		else if (ip.startsWith("192.168."))
+		} else if (ip.startsWith("192.168.")) {
 			external = false;
-
-		for (int i = 16; i <= 31; ++i)
-			if (ip.startsWith("172." + i + "."))
+		}
+		
+		for (int i = 16; i <= 31; ++i) {
+			if (ip.startsWith("172." + i + ".")) {
 				external = false;
-
+			}
+		}
+		
 		log.debug("IP " + ip + " is an " + (external ? "external" : "internal") + " address");
 		return external;
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * @param millis
 	 */
-	public static void sleep(long millis) {
+	public static void sleep(final long millis) {
 		try {
 			Thread.sleep(millis);
-		} catch (Throwable e) {
+		} catch (final Throwable e) {
 		}
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
-	public static String toString(Collection l) {
+	public static String toString(final Collection l) {
 		return toString(l, ", ");
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static String toString(short[] l, int offset, int length) {
-		LinkedList<Short> ll = new LinkedList<Short>();
-		for (int i = offset; i < offset + length; ++i)
+	public static String toString(final short[] l, final int offset, final int length) {
+		final LinkedList<Short> ll = new LinkedList<Short>();
+		for (int i = offset; i < offset + length; ++i) {
 			ll.add(l[i]);
-
+		}
+		
 		return toString(ll, ", ");
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static String toString(byte[] l) {
-		if (l == null)
+	public static String toString(final byte[] l) {
+		if (l == null) {
 			return "";
+		}
 		return toString(l, 0, l.length);
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static String toString(byte[] l, int offset, int length) {
-		if (l == null)
+	public static String toString(final byte[] l, final int offset, final int length) {
+		if (l == null) {
 			return "";
-
-		LinkedList<String> ll = new LinkedList<String>();
-		for (int i = offset; i < offset + length; ++i)
+		}
+		
+		final LinkedList<String> ll = new LinkedList<String>();
+		for (int i = offset; i < offset + length; ++i) {
 			ll.add(toHexString(l[i]));
-
+		}
+		
 		return toString(ll, ", ");
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
-	public static String toString(Collection l, String divider) {
-		StringBuffer b = new StringBuffer();
-
-		if (l == null)
+	public static String toString(final Collection l, final String divider) {
+		final StringBuffer b = new StringBuffer();
+		
+		if (l == null) {
 			return "<null>";
-
-		for (Object o : l) {
-			String t = o != null ? o.toString() : "{null}";
-			if (b.length() > 0)
+		}
+		
+		for (final Object o : l) {
+			final String t = o != null ? o.toString() : "{null}";
+			if (b.length() > 0) {
 				b.append(divider);
-
+			}
+			
 			b.append(t);
 		}
-
+		
 		return b.toString().trim();
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static String toHexString(char tmp) {
+	public static String toHexString(final char tmp) {
 		return toHexString((byte) tmp);
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static String toHexString(byte tmp) {
+	public static String toHexString(final byte tmp) {
 		return "0x" + Integer.toHexString(tmp & 0xFF);
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static String toHexString(byte[] tmp) {
+	public static String toHexString(final byte[] tmp) {
 		return toHexString(tmp, 0, tmp.length);
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static String toHexString(int i) {
+	public static String toHexString(final int i) {
 		String tmp = "";
-		if (i > 0xFF)
+		if (i > 0xFF) {
 			tmp += toHexString((byte) (i >> 8 & 0xFF)) + " ";
-		else
+		} else {
 			tmp += "    ";
-
+		}
+		
 		tmp += toHexString((byte) (i & 0xFF));
-
+		
 		return tmp;
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static String toHexString(long i) {
+	public static String toHexString(final long i) {
 		String tmp = "";
-
-		if (i > 0xFF)
+		
+		if (i > 0xFF) {
 			tmp += toHexString((byte) (i >> 24 & 0xFF)) + ":";
-		if (i > 0xFF)
+		}
+		if (i > 0xFF) {
 			tmp += toHexString((byte) (i >> 16 & 0xFF)) + ":";
-		if (i > 0xFF)
+		}
+		if (i > 0xFF) {
 			tmp += toHexString((byte) (i >> 8 & 0xFF)) + ":";
-
+		}
+		
 		tmp += toHexString((byte) (i & 0xFF));
-
+		
 		return tmp;
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static String toHexString(byte[] tmp, int offset) {
+	public static String toHexString(final byte[] tmp, final int offset) {
 		return toHexString(tmp, offset, tmp.length - offset);
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static String toHexString(byte[] tmp, int offset, int length) {
-		StringBuffer s = new StringBuffer();
+	public static String toHexString(final byte[] tmp, final int offset, final int length) {
+		final StringBuffer s = new StringBuffer();
 		for (int i = offset; i < offset + length; ++i) {
-			if (s.length() > 0)
+			if (s.length() > 0) {
 				s.append(' ');
+			}
 			s.append("0x");
 			s.append(Integer.toHexString(tmp[i] & 0xFF));
 		}
 		return s.toString();
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
-	public static String toString(HashMap m) {
-		if (m == null || m.size() == 0)
+	public static String toString(final HashMap m) {
+		if ((m == null) || (m.size() == 0)) {
 			return "";
-
-		StringBuffer s = new StringBuffer();
-		for (Object o : m.keySet()) {
-			if (s.length() > 0)
+		}
+		
+		final StringBuffer s = new StringBuffer();
+		for (final Object o : m.keySet()) {
+			if (s.length() > 0) {
 				s.append(", ");
+			}
 			s.append(o.toString());
 			s.append("=");
 			s.append(m.get(o));
 		}
 		return s.toString();
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static int toInteger(String s, int defaultValue) {
+	public static int toInteger(final String s, final int defaultValue) {
 		int retVal = defaultValue;
-
+		
 		try {
 			retVal = Integer.parseInt(s);
-		} catch (Throwable t) {
+		} catch (final Throwable t) {
 		}
-
+		
 		return retVal;
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
-	public static String toString(Iterator it) {
-		LinkedList l = new LinkedList();
-		while (it.hasNext())
+	public static String toString(final Iterator it) {
+		final LinkedList l = new LinkedList();
+		while (it.hasNext()) {
 			l.add(it.next());
+		}
 		return toString(l);
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * @return
 	 */
 	public static StackTraceElement[] getStackTrace() {
-		Throwable ex = new Throwable();
+		final Throwable ex = new Throwable();
 		return ex.getStackTrace();
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * @return
 	 */
-	public static String toString(StackTraceElement[] trace) {
-		StringBuffer s = new StringBuffer();
-		for (StackTraceElement t : trace) {
+	public static String toString(final StackTraceElement[] trace) {
+		final StringBuffer s = new StringBuffer();
+		for (final StackTraceElement t : trace) {
 			s.append(t.toString());
 			s.append('\n');
 		}
 		return s.toString();
 	}
-
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public static String uppercaseFirst(String s) {
-		if (s == null || s.length() <= 0)
+	public static String uppercaseFirst(final String s) {
+		if ((s == null) || (s.length() <= 0)) {
 			return "";
-
+		}
+		
 		String result = s.substring(0, 1).toUpperCase();
-
-		if (s.length() > 1)
+		
+		if (s.length() > 1) {
 			result += s.substring(1);
-
+		}
+		
 		return result;
 	}
-
+	
 }
