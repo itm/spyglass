@@ -23,13 +23,13 @@ public abstract class NodePositionerPlugin extends Plugin {
 	 */
 	public static class Position {
 		@Element
-		public double x;
+		public double	x;
 		
 		@Element
-		public double y;
+		public double	y;
 		
 		@Element
-		public double z;
+		public double	z;
 		
 		// --------------------------------------------------------------------------------
 		/**
