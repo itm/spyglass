@@ -141,5 +141,65 @@
             <name>default</name>
          </parameters>
       </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.SimpleNodePainterPlugin" isActive="true">
+         <parameters>
+            <extendedInformation/>
+            <lineColorRGB length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </lineColorRGB>
+            <lineWidth>1</lineWidth>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default</name>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.PositionPacketNodePositionerPlugin" isActive="true">
+         <parameters>
+            <timeToLive>10</timeToLive>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default</name>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.SpringEmbedderPositionerPlugin" isActive="true">
+         <parameters>
+            <edgeSemanticTypes class="java.util.LinkedList"/>
+            <timeToLive>10</timeToLive>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default</name>
+         </parameters>
+      </plugin>
+      <plugin class="de.bsi.flegsens.RandomNodePositioner" isActive="true"/>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.LinePainterPlugin" isActive="true">
+         <parameters>
+            <lineColorRGB length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </lineColorRGB>
+            <lineWidth>1</lineWidth>
+            <stringFormatters/>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default</name>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.VectorSequencePainterPlugin" isActive="true">
+         <parameters>
+            <dimension>2</dimension>
+            <lineColorRGB length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </lineColorRGB>
+            <lineWidth>1</lineWidth>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default</name>
+         </parameters>
+      </plugin>
    </defaults>
 </spyglassConfiguration>

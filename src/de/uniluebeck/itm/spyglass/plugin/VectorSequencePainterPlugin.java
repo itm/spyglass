@@ -1,8 +1,18 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.plugin;
 
 import java.util.List;
 
 import org.eclipse.swt.widgets.Widget;
+import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
@@ -14,10 +24,11 @@ import de.uniluebeck.itm.spyglass.xmlconfig.VektorSequencePainterXMLConfig;
 
 public class VectorSequencePainterPlugin extends RelationPainterPlugin implements NeedsMetric {
 	
-	private VektorSequencePainterXMLConfig xmlConfig;
+	@Element(name = "parameters")
+	private final VektorSequencePainterXMLConfig xmlConfig;
 	
 	public VectorSequencePainterPlugin() {
-		
+		xmlConfig = new VektorSequencePainterXMLConfig();
 	}
 	
 	@Override
