@@ -25,7 +25,7 @@ public class SpyglassLogger {
 	private static Logger standardLogger = Logger.getLogger(SpyglassLogger.class);
 	private static Logger newline = Logger.getLogger(SpyglassLogger.class);
 	private static Map<String, Logger> loggerMap = new HashMap<String, Logger>();
-	private static Level loglevel = Level.INFO;
+	private static Level loglevel = Level.DEBUG;
 	public static boolean writeLogfile = false;
 	
 	static {
