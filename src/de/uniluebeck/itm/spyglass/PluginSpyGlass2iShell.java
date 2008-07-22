@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass;
 
@@ -28,27 +26,27 @@ import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.core.SpyglassConfiguration;
 import de.uniluebeck.itm.spyglass.gui.UIController;
+import de.uniluebeck.itm.spyglass.gui.actions.Actions;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
- * To use this plug-in in iShell, you need to add two option to your iShell
- * configuration file (typically ishell.properties).
+ * To use this plug-in in iShell, you need to add two option to your iShell configuration file
+ * (typically ishell.properties).
  * 
- * The first one determines the additional classpath parameters in where this
- * plug-in and its libraries are located. Please note that you must escape any
- * backslash and colon with a backslash character. An example of how this could
- * look like is shown in the following line:
+ * The first one determines the additional classpath parameters in where this plug-in and its
+ * libraries are located. Please note that you must escape any backslash and colon with a backslash
+ * character. An example of how this could look like is shown in the following line:
  * 
  * <pre>
  * plugin_classpath=C\:\\work\\java\\spyglass-lean\\bin\\eclipse;C\:\\work\\java\\spyglass-lean\\lib\\simple-xml-1.6.jar
  * </pre>
  * 
- * The second parameter denotes the fully classified class name of the plug-in.
- * This should remain unchanged and look like the following:
+ * The second parameter denotes the fully classified class name of the plug-in. This should remain
+ * unchanged and look like the following:
  * 
  * <pre>
  * plugin_classes = de.uniluebeck.itm.spyglass.PluginSpyGlass2iShell
@@ -69,7 +67,7 @@ public class PluginSpyGlass2iShell extends Plugin {
 	
 	private final Deque<de.uniluebeck.itm.spyglass.packet.Packet> queue = new ArrayDeque<de.uniluebeck.itm.spyglass.packet.Packet>(50);
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -77,7 +75,7 @@ public class PluginSpyGlass2iShell extends Plugin {
 	class PluginAction extends Action {
 		private final de.uniluebeck.itm.spyglass.plugin.Plugin plugin;
 		
-		//----------------------------------------------------------------------
+		// ----------------------------------------------------------------------
 		// ----------
 		/**
 		 * 
@@ -91,7 +89,7 @@ public class PluginSpyGlass2iShell extends Plugin {
 			setImageDescriptor(IconTheme.lookupDescriptor("edit-clear"));
 		}
 		
-		//----------------------------------------------------------------------
+		// ----------------------------------------------------------------------
 		// ----------
 		/**
 		 * 
@@ -109,7 +107,7 @@ public class PluginSpyGlass2iShell extends Plugin {
 		}
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -117,9 +115,11 @@ public class PluginSpyGlass2iShell extends Plugin {
 	@Override
 	public int[] init() {
 		// iShell init (called on each plug-in start)
+		
 		final CTabItem tabItem = getTabItem(getName());
 		tabItem.setToolTipText(getName());
 		tabItem.setImage(IconTheme.lookup("system-search"));
+		
 		container = this.getTabContainer(true);
 		container.setLayout(new FillLayout());
 		container.addControlListener(new ControlListener() {
@@ -155,8 +155,8 @@ public class PluginSpyGlass2iShell extends Plugin {
 		/*
 		 * DagstuhlNodePainter dagstuhlPlugin = new DagstuhlNodePainter();
 		 * DagstuhlConnectivityPainter dagstuhlConnectivityPainter = new
-		 * DagstuhlConnectivityPainter(); DagstuhlRoutePainter
-		 * dagstuhlRoutePainter = new DagstuhlRoutePainter();
+		 * DagstuhlConnectivityPainter(); DagstuhlRoutePainter dagstuhlRoutePainter = new
+		 * DagstuhlRoutePainter();
 		 */
 		// config.setPluginManager(new SpyGlass2iShellPluginManager(this));
 		/*
@@ -170,19 +170,29 @@ public class PluginSpyGlass2iShell extends Plugin {
 		// config.setNodePositioner(cnp);
 		// config.setNodePositioner(new RandomNodePositioner()); // TODO
 		// Add Toolbar Actions
-		// addToolBarAction(new PluginAction(dagstuhlPlugin));
+		addToolBarAction(Actions.PLAY_SELECT_INPUT);
+		addToolBarAction(Actions.PLAY_PLAY_PAUSE);
+		addToolBarAction(Actions.PLAY_RESET);
+		addToolBarAction(Actions.RECORD_SELECT_OUTPUT);
+		addToolBarAction(Actions.RECORD_RECORD);
+		addToolBarAction(Actions.ZOOM_IN);
+		addToolBarAction(Actions.ZOOM_OUT);
+		addToolBarAction(Actions.ZOOM_COMPLETE_MAP);
+		addToolBarAction(Actions.OPEN_PREFERENCES);
+		
 		// Application objects
 		final AppWindow appWindow = new AppWindow(container.getDisplay(), container);
 		spyglass = new Spyglass(true, config);
 		new UIController(spyglass, appWindow);
 		
 		// Start visualization
+		spyglass.setVisualizationRunning(false);
 		spyglass.start();
 		
 		return new int[] { SPYGLASS_PACKET_TYPE };
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -201,7 +211,7 @@ public class PluginSpyGlass2iShell extends Plugin {
 		}
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -215,7 +225,7 @@ public class PluginSpyGlass2iShell extends Plugin {
 		log.info("SpyGlass end. Done.");
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -225,7 +235,7 @@ public class PluginSpyGlass2iShell extends Plugin {
 		return "SpyGlass";
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
