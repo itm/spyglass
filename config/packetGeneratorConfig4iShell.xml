@@ -1,0 +1,88 @@
+<!-- a sample configuration file for the packet generator
+ -->
+<packetGenerator>
+
+	<!-- number of nodes sent per second -->
+	<packetsPerSecond>10</packetsPerSecond>
+
+	<!-- Sinks which will handle each generated packet. -->
+	<sinks>
+		<!-- this sink opens a socket, from which iShell can fetch the packets. -->
+		<sink class="de.uniluebeck.itm.spyglass.packetgenerator.sinks.IShellSocketSink">
+			<ip>0.0.0.0</ip>
+			<port>8472</port>
+			<iShellSourceNode>1</iShellSourceNode>
+		</sink>
+
+	</sinks>
+
+	<sampleChooser>
+		<!-- list of samples from which the packets are generated. each sample
+		 ! has a given probability of being selected. when editing this file you
+		 ! must make sure that the probabilities add up to 1.0 ! -->
+		<samples>
+			<!-- The PayloadSample is currently the only available sampleType.
+			 ! it creates a packet header based on the abstract data given below
+			 ! and adds an raw payload. -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<!-- this field is not used. -->
+				<name>demo sample1</name>
+				
+				<!-- the probability that this sample is selected -->
+				<probability>0.4</probability>
+				
+				<!-- a list of node IDs. the IDs can be seperated by commata. additionally
+				 ! they can be given as a range. for each packet a node ID is randomly selected.
+				 ! -->				 
+				<nodeIDs>5,6,7,10-15</nodeIDs>
+				
+				<!-- the syntaxType. -->
+				<syntaxType>uint8List</syntaxType>
+				
+				<!-- a list of semantic types. the types can be seperated by commata. additionally
+				 ! they can be given as a range. for each packet a type is randomly selected.
+				 ! -->				 
+				<semanticTypes>9</semanticTypes>
+				
+				<!-- the position of the packets. as with the nodeIDs and the semanticTypes,
+				 ! lists or ranges can be given. -->
+				<position x="40-100" y="6-10" z="0"/>
+				
+				<!-- the payload in hexadecimal -->
+				<payload>10AABBCCDDEEFF</payload>
+			</sample>
+
+			<!-- and now some more examples. -->
+
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample2</name>
+				<probability>0.25</probability>
+				<nodeIDs>53</nodeIDs>
+				<syntaxType>uint8List</syntaxType>
+				<semanticTypes>10,12</semanticTypes>
+				<position x="3" y="6" z="52"/>
+				<payload>AABBFF</payload>
+			</sample>
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample3</name>
+				<probability>0.25</probability>
+				<nodeIDs>53</nodeIDs>
+				<syntaxType>uint8List</syntaxType>
+				<semanticTypes>10-20</semanticTypes>
+				<position x="3" y="6" z="52"/>
+				<payload>AABBFF</payload>
+			</sample>
+			
+			<!-- this is a raw sample. the bytes contained in this sample will be
+			 ! sent out as a packet, without adding a header or doing anything else.
+			 -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.RawSample">
+				<name>demo Raw sample</name>
+				<probability>0.1</probability>
+			    <packet>0018020109000C4887328701B6003A0009000010AABBCCDDEEFF</packet>
+			</sample>
+
+		</samples>
+	</sampleChooser>
+	
+</packetGenerator>
