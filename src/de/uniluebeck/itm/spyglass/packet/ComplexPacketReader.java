@@ -27,9 +27,9 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * position (x and y coordinates).
  */
 @Root
-public class SimplePacketReader extends PacketReader {
+public class ComplexPacketReader extends PacketReader {
 	
-	private static Category log = SpyglassLogger.get(SimplePacketReader.class);
+	private static Category log = SpyglassLogger.get(ComplexPacketReader.class);
 	
 	private BufferedReader bufferedReader = null;
 	
@@ -37,9 +37,11 @@ public class SimplePacketReader extends PacketReader {
 	// ------
 	/**
 	 * 
+	 * @throws Exception
+	 * 
 	 */
 	@Override
-	public Packet getNextPacket() {
+	public Packet getNextPacket() throws SpyglassPacketException {
 		try {
 			Packet packet = null;
 			String line = null;
@@ -76,14 +78,15 @@ public class SimplePacketReader extends PacketReader {
 	// ------
 	
 	/**
-	 * Parses the given string to retrieve a apropriate id, x and y data. The
-	 * method then creates and returns a new Packet instance.
+	 * each line is made up by a timestamp and a packet in hex, seperated by a
+	 * colon.
 	 * 
 	 * @param line
 	 *            A String containing the packet format.
 	 * @return A packet object or null, if the line could be parsed.
+	 * @throws SpyglassPacketException
 	 */
-	private Packet parsePacketLine(String line) {
+	private Packet parsePacketLine(String line) throws SpyglassPacketException {
 		if ((line == null) || line.trim().equals("")) {
 			return null;
 		}
@@ -94,14 +97,20 @@ public class SimplePacketReader extends PacketReader {
 			return null;
 		}
 		
-		final Packet packet = new Packet();
-		final String[] tokens = line.split(":");
+		final String[] tokens = line.split(":\\s*");
 		
-		final int id = Integer.parseInt(tokens[0]);
-		// int x = Integer.parseInt(tokens[1]);
-		// int y = Integer.parseInt(tokens[2]);
+		final SpyglassPacket packet = new SpyglassPacket();
 		
-		packet.setId(id);
+		final String hexPacket = tokens[1];
+		final int length = hexPacket.length() / 2;
+		final byte[] array = new byte[length];
+		
+		for (int i = 0; i < hexPacket.length(); i += 2) {
+			final String byteString = hexPacket.substring(i, i + 2);
+			array[i / 2] = (byte) Integer.parseInt(byteString, 16);
+		}
+		
+		packet.deserialize(array);
 		
 		return packet;
 	}

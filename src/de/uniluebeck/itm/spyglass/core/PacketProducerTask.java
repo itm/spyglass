@@ -13,6 +13,7 @@ import org.apache.log4j.Category;
 
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.Tools;
 
@@ -71,17 +72,21 @@ public class PacketProducerTask implements Runnable {
 		Tools.sleep(initialDelayMs);
 		
 		while (spyglass.isVisualizationRunning()) {
-			if ((packet = packetReader.getNextPacket()) != null) {
-				if (!spyglass.isVisualizationRunning()) {
-					break;
+			try {
+				if ((packet = packetReader.getNextPacket()) != null) {
+					if (!spyglass.isVisualizationRunning()) {
+						break;
+					}
+					
+					if (log.isDebugEnabled()) {
+						log.debug("Added packet: " + packet);
+					}
+					
+					// packetCache.push(packet);
+					spyglass.getInfoDispatcher().dispatchPacket(packet);
 				}
-				
-				if (log.isDebugEnabled()) {
-					log.debug("Added packet: " + packet);
-				}
-				
-				// packetCache.push(packet);
-				spyglass.getInfoDispatcher().dispatchPacket(packet);
+			} catch (final SpyglassPacketException e) {
+				log.error("Could not receive a packet from the packetReader.", e);
 			}
 			
 			Tools.sleep(perPacketDelayMs);
