@@ -4,6 +4,7 @@ import org.eclipse.swt.graphics.GC;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 public class NodeObject extends DrawingObject {
 	
@@ -14,7 +15,7 @@ public class NodeObject extends DrawingObject {
 	}
 	
 	@Override
-	public Rectangle getBoundingBox() {
+	public AbsoluteRectangle getBoundingBox() {
 		// TODO Auto-generated method stub
 		return null;
 	}

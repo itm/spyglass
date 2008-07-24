@@ -15,6 +15,7 @@ import org.simpleframework.xml.Root;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 // --------------------------------------------------------------------------------
 /**
@@ -143,7 +144,7 @@ public class Rectangle extends DrawingObject {
 	}
 	
 	@Override
-	public Rectangle getBoundingBox() {
+	public AbsoluteRectangle getBoundingBox() {
 		// TODO Auto-generated method stub
 		return null;
 	}

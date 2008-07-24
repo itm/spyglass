@@ -10,7 +10,7 @@ package de.uniluebeck.itm.spyglass.layer;
 import java.util.List;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 // --------------------------------------------------------------------------------
 /**
@@ -36,7 +36,7 @@ public interface Layer {
 	 * 
 	 * @param rect
 	 */
-	public List<DrawingObject> getDrawingObjects(Rectangle rect);
+	public List<DrawingObject> getDrawingObjects(AbsoluteRectangle rect);
 	
 	public List<DrawingObject> getDrawingObjects();
 	
