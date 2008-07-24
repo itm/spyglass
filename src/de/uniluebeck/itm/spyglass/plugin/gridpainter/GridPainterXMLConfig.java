@@ -12,7 +12,7 @@ package de.uniluebeck.itm.spyglass.plugin.gridpainter;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 
-import de.uniluebeck.itm.spyglass.packet.AbsolutePosition;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 
 // --------------------------------------------------------------------------------
 /**

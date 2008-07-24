@@ -1,52 +1,86 @@
 package de.uniluebeck.itm.spyglass.drawing.primitive;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
+
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
 
 public class Text extends DrawingObject {
-
+	
 	public String text;
 	
-	public enum TextJustification{
+	public enum TextJustification {
 		center, right, left
 	}
 	
 	public TextJustification justification;
 	
-	public Text( String s, Position p, int id )
-	{
+	public Text(final String s, final Position p, final int id) {
 		super(id);
-		setPosition( p );
+		setPosition(p);
 		text = s;
 		justification = TextJustification.left;
 	}
 	
-	public void setText(String s)
-	{
+	public void setText(final String s) {
 		text = s;
 	}
-
-	public String getText()
-	{
+	
+	public String getText() {
 		return text;
 	}
-
+	
 	public TextJustification getJustification() {
 		return justification;
 	}
-
-	public void setJustification(TextJustification justification) {
+	
+	public void setJustification(final TextJustification justification) {
 		this.justification = justification;
 	}
 	
-	public void update(DrawingObject other)
-	{
-		if (other instanceof Text)
-		{
+	@Override
+	public void update(final DrawingObject other) {
+		if (other instanceof Text) {
 			super.update(other);
-			Text t = (Text)other;
+			final Text t = (Text) other;
 			setJustification(t.getJustification());
 			setText(t.getText());
 		}
+	}
+	
+	@Override
+	public void draw(final DrawingArea drawingArea, final GC gc) {
+		final Color color = new Color(null, getColorR(), getColorG(), getColorB());
+		final Color bgColor = new Color(null, getBgColorR(), getBgColorG(), getBgColorB());
+		final Font f = new Font(gc.getDevice(), "Arial", 6, SWT.NORMAL);
+		
+		gc.setFont(f);
+		gc.setForeground(color);
+		gc.setBackground(bgColor);
+		final String s = getText();
+		int offsetX = 0;
+		final Point p = gc.stringExtent(s);
+		if (getJustification() == TextJustification.center) {
+			offsetX = (p.x / -2) + 1;
+		} else if (getJustification() == TextJustification.right) {
+			offsetX = -(p.x) + 1;
+		}
+		final int offsetY = p.y / -2;
+		gc.drawString(s, (int) (getPosition().x) + offsetX, (int) (getPosition().y) + offsetY);
+		// TODO: Implement the drawing of the line primitive
+		color.dispose();
+		bgColor.dispose();
+		f.dispose();
+	}
+	
+	@Override
+	public Rectangle getBoundingBox() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

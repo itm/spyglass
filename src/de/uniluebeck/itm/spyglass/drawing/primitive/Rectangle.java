@@ -1,18 +1,19 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.drawing.primitive;
 
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
 
 // --------------------------------------------------------------------------------
@@ -122,6 +123,29 @@ public class Rectangle extends DrawingObject {
 			setWidth(r.getWidth());
 			setWidth(r.getWidth());
 		}
+	}
+	
+	@Override
+	public void draw(final DrawingArea drawingArea, final GC gc) {
+		final Color color = new Color(null, this.getColorR(), this.getColorG(), this.getColorB());
+		final Color bg = new Color(null, this.getBgColorR(), this.getBgColorG(), this.getBgColorB());
+		
+		gc.setForeground(color);
+		gc.setBackground(bg);
+		gc.setLineWidth(this.getLineWidth());
+		gc.fillRectangle((int) (this.getPosition().x - (this.getWidth() / 2)), (int) (this.getPosition().y - (this.getHeight() / 2)),
+				this.getWidth(), this.getHeight());
+		gc.drawRectangle((int) (this.getPosition().x - (this.getWidth() / 2)), (int) (this.getPosition().y - (this.getHeight() / 2)),
+				this.getWidth(), this.getHeight());
+		
+		color.dispose();
+		bg.dispose();
+	}
+	
+	@Override
+	public Rectangle getBoundingBox() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

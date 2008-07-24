@@ -20,7 +20,7 @@ public abstract class NodePositionerPlugin extends Plugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
+	 * TODO: if possible, use AbsolutePosition instead?!?
 	 */
 	public static class Position {
 		@Element

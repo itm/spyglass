@@ -9,6 +9,7 @@ package de.uniluebeck.itm.spyglass.plugin.globalinformation;
 
 import org.eclipse.swt.widgets.Widget;
 
+import de.uniluebeck.itm.spyglass.plugin.GlobalInformation;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 // --------------------------------------------------------------------------------

@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui;
 
@@ -28,13 +26,12 @@ import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
- * The UI controller is the interface between the core Spyglass functionality
- * and the graphical user interface. It is bound to a specific GUI library. If
- * the GUI must be completely replaced, the UI controller must also be
- * changed/replaced.
+ * The UI controller is the interface between the core Spyglass functionality and the graphical user
+ * interface. It is bound to a specific GUI library. If the GUI must be completely replaced, the UI
+ * controller must also be changed/replaced.
  */
 public class UIController {
 	
@@ -70,7 +67,7 @@ public class UIController {
 	
 	private final Color canvasBgColor = new Color(null, 255, 255, 255);
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -81,7 +78,7 @@ public class UIController {
 		}
 	};
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -99,7 +96,7 @@ public class UIController {
 		init();
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -126,7 +123,7 @@ public class UIController {
 		});
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -138,13 +135,13 @@ public class UIController {
 		/* Hacky rewrite of the old code (see history). needs more work */
 		for (final Plugin plugin : spyglass.getPluginManager().getActivePlugins()) {
 			if (plugin instanceof Drawable) {
-				final List<DrawingObject> dos = ((Drawable) plugin).getDrawingObjects(null);
+				final List<DrawingObject> dos = ((Drawable) plugin).getDrawingObjects(this.appWindow.getDrawingArea());
 				if (dos != null) {
 					for (final DrawingObject object : dos) {
-						spyglass.getCanvas().draw(object, gc);
+						object.draw(this.appWindow.getDrawingArea(), gc);
 					}
 				} else {
-					log.error("The plugin named '" + plugin.getHumanReadableName() + "' of class " + plugin.getClass().getName()
+					log.error("The plugin named '" + Plugin.getHumanReadableName() + "' of class " + plugin.getClass().getName()
 							+ " did not provide any drawing objects!");
 				}
 			}
@@ -152,7 +149,7 @@ public class UIController {
 		
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 

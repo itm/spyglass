@@ -7,7 +7,7 @@
  * source tree for further details.
  * --------------------------------------------------------------------------------
  */
-package de.uniluebeck.itm.spyglass.plugin.globalinformation;
+package de.uniluebeck.itm.spyglass.plugin;
 
 import org.eclipse.swt.widgets.Widget;
 

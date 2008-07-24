@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.plugin.misc;
+package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
 public class Min {
 

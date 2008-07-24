@@ -1,10 +1,10 @@
-/* ----------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass.       
- * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project    
- * SpyGlass is free software; you can redistribute it and/or modify it  
- * under the terms of the BSD License. Refer to spyglass-licence.txt    
- * file in the root of the SpyGlass source tree for further details.  
-------------------------------------------------------------------------*/
+/*
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.drawing;
 
 import org.eclipse.swt.graphics.GC;
@@ -15,37 +15,37 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
 
-//--------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
 /**
- * Abstract class that represents a drawing object. Every DrawingObject should have an unique id, a position and a
- * color, given by the RGB components in a R8G8B8 format.
+ * Abstract class that represents a drawing object. Every DrawingObject should have an unique id, a
+ * position and a color, given by the RGB components in a R8G8B8 format.
  */
 @Root
 public abstract class DrawingObject {
 	private int id = 0;
-
+	
 	private Position position = new Position(0, 0);
-
+	
 	@Element
 	private int colorR = 200;
-
+	
 	@Element
 	private int colorG = 0;
-
+	
 	@Element
 	private int colorB = 0;
-
+	
 	@Element
 	private int bgColorR = 255;
-
+	
 	@Element
 	private int bgColorG = 255;
-
+	
 	@Element
 	private int bgColorB = 255;
-
+	
 	private long paintOrderId;
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -53,27 +53,27 @@ public abstract class DrawingObject {
 	public DrawingObject() {
 		this.id = -1;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public DrawingObject(int id) {
+	public DrawingObject(final int id) {
 		this.id = id;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public void update(DrawingObject other) {
+	public void update(final DrawingObject other) {
 		this.id = other.id;
 		this.paintOrderId = other.paintOrderId;
 		this.position.x = other.position.x;
 		this.position.y = other.position.y;
 		setColor(other.getColorR(), other.getColorG(), other.getColorB());
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -82,7 +82,7 @@ public abstract class DrawingObject {
 	public DrawingObject clone() throws CloneNotSupportedException {
 		throw new CloneNotSupportedException();
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -90,15 +90,15 @@ public abstract class DrawingObject {
 	public Position getPosition() {
 		return position;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public void setPosition(Position position) {
+	public void setPosition(final Position position) {
 		this.position = position;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -106,15 +106,15 @@ public abstract class DrawingObject {
 	public int getId() {
 		return id;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public void setId(int id) {
+	public void setId(final int id) {
 		this.id = id;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -122,15 +122,15 @@ public abstract class DrawingObject {
 	public int getColorR() {
 		return colorR;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public void setColorR(int colorR) {
+	public void setColorR(final int colorR) {
 		this.colorR = colorR;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -138,15 +138,15 @@ public abstract class DrawingObject {
 	public int getColorG() {
 		return colorG;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public void setColorG(int colorG) {
+	public void setColorG(final int colorG) {
 		this.colorG = colorG;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -154,25 +154,25 @@ public abstract class DrawingObject {
 	public int getColorB() {
 		return colorB;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public void setColorB(int colorB) {
+	public void setColorB(final int colorB) {
 		this.colorB = colorB;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public void setColor(int R, int G, int B ) {
+	public void setColor(final int R, final int G, final int B) {
 		this.colorR = R;
 		this.colorG = G;
 		this.colorB = B;
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -181,66 +181,59 @@ public abstract class DrawingObject {
 	public String toString() {
 		return "paintOrderId: " + paintOrderId + ", id: " + id + ", " + super.toString();
 	}
-
+	
 	public long getPaintOrderId() {
 		return paintOrderId;
 	}
-
-	public void setPaintOrderId(long paintOrderId) {
+	
+	public void setPaintOrderId(final long paintOrderId) {
 		this.paintOrderId = paintOrderId;
 	}
-
+	
 	public int getBgColorR() {
 		return bgColorR;
 	}
-
-	public void setBgColorR(int bgColorR) {
+	
+	public void setBgColorR(final int bgColorR) {
 		this.bgColorR = bgColorR;
 	}
-
+	
 	public int getBgColorG() {
 		return bgColorG;
 	}
-
-	public void setBgColor(int bgColorG) {
+	
+	public void setBgColor(final int bgColorG) {
 		this.bgColorG = bgColorG;
 	}
-
+	
 	public int getBgColorB() {
 		return bgColorB;
 	}
-
-	public void setBgColorB(int bgColorB) {
+	
+	public void setBgColorB(final int bgColorB) {
 		this.bgColorB = bgColorB;
 	}
 	
-	public void setBgColor(int r, int b, int g) {
+	public void setBgColor(final int r, final int b, final int g) {
 		this.bgColorR = r;
 		this.bgColorB = b;
 		this.bgColorG = g;
 	}
-
+	
+	// --------------------------------------------------------------------------------
 	/**
-	 * Zeichnet sich selbst auf dem �bergebenen GraphicContext (GC). Erh�lt ben�tigte
-	 * Informationen wie absolute Koordinaten, Zeichenfl�chengr��e in Pixel und
-	 * Zoomstufe von der �bergebenen DrawingArea
+	 * Forces this DrawingObject to paint itself on the given GC.
+	 * 
+	 * Optionally the DrawingObject can inform itself about the current zoom level by queriing the
+	 * additonally given drawingArea.
 	 * 
 	 * @param drawingArea
 	 * @param gc
 	 */
-	public void draw(DrawingArea drawingArea, GC gc){
-
-	}
-
-	public Rectangle getBoundingBox(){
-		return null;
-	}
-
+	public abstract void draw(DrawingArea drawingArea, GC gc);
+	
 	/**
-	 * 
-	 * @param bbox
+	 * Return the bounding box of this drawing object
 	 */
-	public void setBoundingBox(Rectangle bbox){
-
-	}
+	public abstract Rectangle getBoundingBox();
 }

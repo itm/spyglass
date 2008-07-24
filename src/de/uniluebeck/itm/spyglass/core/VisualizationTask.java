@@ -63,24 +63,6 @@ public class VisualizationTask implements Runnable {
 		final TimeDiff timeDiff = new TimeDiff(repaintInterval);
 		timeDiff.touch();
 		
-		/*
-		 * Packet packet = null; LinkedList<Packet> q =
-		 * spyglass.getPacketCache();
-		 * 
-		 * while (spyglass.isVisualizationRunning()) { while ((packet =
-		 * q.getLast()) != null) { q.removeLast(); if
-		 * (!spyglass.isVisualizationRunning()) break;
-		 * 
-		 * // Distribute the packet to the plugins
-		 * spyglass.getInfoDispatcher().dispatchPacket(packet);
-		 * 
-		 * if (timeDiff.isTimeout()) { // Invoke the redraw of the scene by
-		 * firing a spyglass event spyglass.fireRedrawEvent(eventObject);
-		 * timeDiff.touch(); } }
-		 * 
-		 * //Limit the query intervall if no packets are available if( q.size()
-		 * == 0) Tools.sleep(repaintInterval); }
-		 */
 		while (!Thread.currentThread().isInterrupted() && spyglass.isVisualizationRunning()) {
 			try {
 				if (timeDiff.isTimeout()) {

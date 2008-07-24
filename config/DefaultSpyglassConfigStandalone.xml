@@ -4,7 +4,6 @@
          <file>source.packet.txt</file>
       </gateway>
    </packetReader>
-   <canvas class="de.uniluebeck.itm.spyglass.drawing.Canvas2D"/>
    <instances>
       <plugins class="java.util.ArrayList">
          <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin" isActive="true"/>
