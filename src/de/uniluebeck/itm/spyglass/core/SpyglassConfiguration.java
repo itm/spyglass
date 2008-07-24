@@ -17,9 +17,9 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.SpyglassCanvas;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
-import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXmlConfig;
 
 // --------------------------------------------------------------------------------

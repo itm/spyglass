@@ -13,7 +13,7 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
 
 // --------------------------------------------------------------------------------
 /**

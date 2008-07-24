@@ -1,10 +1,10 @@
-/* ----------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass.       
- * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project    
- * SpyGlass is free software; you can redistribute it and/or modify it  
- * under the terms of the BSD License. Refer to spyglass-licence.txt    
- * file in the root of the SpyGlass source tree for further details.  
-------------------------------------------------------------------------*/
+/*
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.view;
 
 import org.eclipse.swt.SWT;
@@ -25,81 +25,82 @@ import com.cloudgarden.resource.SWTResourceManager;
  *
  */
 public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
-
+	
 	{
 		// Register as a resource user - SWTResourceManager will
 		// handle the obtaining and disposing of resources
 		SWTResourceManager.registerResourceUser(this);
 	}
-
+	
 	private Canvas canvas;
-
+	
 	private Composite composite1;
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * Displays this org.eclipse.swt.widgets.Composite inside a new Shell.
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		showGUI();
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * Displays this org.eclipse.swt.widgets.Composite inside a new Shell.
 	 */
 	public static void showGUI() {
-		Display display = Display.getDefault();
-		Shell shell = new Shell(display);
-		SpyglassGuiComponent inst = new SpyglassGuiComponent(shell, SWT.NULL);
-		Point size = inst.getSize();
+		final Display display = Display.getDefault();
+		final Shell shell = new Shell(display);
+		final SpyglassGuiComponent inst = new SpyglassGuiComponent(shell, SWT.NULL);
+		final Point size = inst.getSize();
 		shell.setLayout(new FillLayout());
 		shell.layout();
-
-		if (size.x == 0 && size.y == 0) {
+		
+		if ((size.x == 0) && (size.y == 0)) {
 			inst.pack();
 			shell.pack();
 		} else {
-			Rectangle shellBounds = shell.computeTrim(0, 0, size.x, size.y);
+			final Rectangle shellBounds = shell.computeTrim(0, 0, size.x, size.y);
 			shell.setSize(shellBounds.width, shellBounds.height);
 		}
-
+		
 		shell.open();
-
+		
 		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
+			if (!display.readAndDispatch()) {
 				display.sleep();
+			}
 		}
-
+		
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param parent
 	 * @param style
 	 */
-	public SpyglassGuiComponent(org.eclipse.swt.widgets.Composite parent, int style) {
+	public SpyglassGuiComponent(final org.eclipse.swt.widgets.Composite parent, final int style) {
 		super(parent, style);
 		initGUI();
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	private void initGUI() {
 		try {
-			GridLayout thisLayout = new GridLayout();
+			final GridLayout thisLayout = new GridLayout();
 			thisLayout.makeColumnsEqualWidth = true;
 			this.setLayout(thisLayout);
 			this.setSize(678, 472);
 			{
 				composite1 = new Composite(this, SWT.NONE);
-				GridLayout composite1Layout = new GridLayout();
+				final GridLayout composite1Layout = new GridLayout();
 				composite1Layout.makeColumnsEqualWidth = true;
 				composite1Layout.marginHeight = 0;
 				composite1Layout.marginWidth = 0;
-				GridData composite1LData = new GridData();
+				final GridData composite1LData = new GridData();
 				composite1LData.grabExcessHorizontalSpace = true;
 				composite1LData.horizontalAlignment = GridData.FILL;
 				composite1LData.verticalAlignment = GridData.FILL;
@@ -108,7 +109,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 				composite1.setLayout(composite1Layout);
 				composite1.setBackground(SWTResourceManager.getColor(255, 255, 255));
 				{
-					GridData canvas1LData = new GridData();
+					final GridData canvas1LData = new GridData();
 					canvas1LData.horizontalAlignment = GridData.FILL;
 					canvas1LData.grabExcessHorizontalSpace = true;
 					canvas1LData.verticalAlignment = GridData.FILL;
@@ -119,11 +120,11 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 				}
 			}
 			this.layout();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -131,5 +132,5 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	public Canvas getCanvas() {
 		return canvas;
 	}
-
+	
 }

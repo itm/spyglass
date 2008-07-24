@@ -8,7 +8,7 @@
    <instances>
       <plugins class="java.util.ArrayList">
          <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin" isActive="true"/>
-         <plugin class="de.uniluebeck.itm.spyglass.plugin.SimpleNodePainterPlugin" isActive="true">
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin" isActive="true">
             <parameters>
                <extendedInformation>
                   <isActive nodeID="1">false</isActive>
@@ -31,7 +31,7 @@
                </semanticTypes>
             </parameters>
          </plugin>
-         <plugin class="de.uniluebeck.itm.spyglass.plugin.ImagePainterPlugin" isActive="true">
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin" isActive="true">
             <parameters>
                <image>images/icons/addMarker.png</image>
                <isActive>true</isActive>
@@ -60,7 +60,7 @@
    </generalSettings>
    <defaults>
       <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin" isActive="true"/>
-      <plugin class="de.uniluebeck.itm.spyglass.plugin.GridPainterPlugin" isActive="true">
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin" isActive="true">
          <parameters>
             <gridElementHeight>1</gridElementHeight>
             <gridElementWidth>1</gridElementWidth>
@@ -77,7 +77,7 @@
             <numRows>1</numRows>
          </parameters>
       </plugin>
-      <plugin class="de.uniluebeck.itm.spyglass.plugin.ImagePainterPlugin" isActive="true">
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin" isActive="true">
          <parameters>
             <image>images/icons/brokenImageLink.png</image>
             <isActive>true</isActive>
@@ -85,7 +85,7 @@
             <name>default</name>
          </parameters>
       </plugin>
-      <plugin class="de.uniluebeck.itm.spyglass.plugin.MapPainterPlugin" isActive="true">
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin" isActive="true">
          <parameters>
             <framePointDefaultValue>3.0</framePointDefaultValue>
             <gridElementHeight>1</gridElementHeight>
@@ -115,7 +115,7 @@
             <name>default</name>
          </parameters>
       </plugin>
-      <plugin class="de.uniluebeck.itm.spyglass.plugin.ObjectPainterPlugin" isActive="true">
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin" isActive="true">
          <parameters>
             <image>images/icons/brokenImageLink.png</image>
             <size width="10" height="10" lineWidth="1">
@@ -131,7 +131,7 @@
             <name>default</name>
          </parameters>
       </plugin>
-      <plugin class="de.uniluebeck.itm.spyglass.plugin.SimpleGlobalInformationPlugin" isActive="true">
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin" isActive="true">
          <parameters>
             <semanticTypes4Neighborhoods class="java.util.LinkedList"/>
             <showNodeDegree>true</showNodeDegree>

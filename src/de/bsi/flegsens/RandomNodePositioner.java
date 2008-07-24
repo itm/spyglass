@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.bsi.flegsens;
 
@@ -15,13 +13,13 @@ import org.apache.log4j.Category;
 import org.eclipse.swt.widgets.Widget;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
-import de.uniluebeck.itm.spyglass.gui.configuration.PreferencesConfigurationWidget;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.Packet;
-import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin;
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
  * 
@@ -32,7 +30,7 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 	
 	private final Random r = new Random();
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -45,13 +43,13 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PreferencesConfigurationWidget createPreferencesWidget(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<RandomNodePositioner> createPreferencePage(final Widget parent, final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	@Override
-	public PreferencesConfigurationWidget createTypePreferencesWidget(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<RandomNodePositioner> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -104,7 +102,19 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 		
 	}
 	
-	//--------------------------------------------------------------------------
+	@Override
+	public int getNumNodes() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
+	public boolean offersMetric() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	// --------------------------------------------------------------------------
 	// ------
 	
 }

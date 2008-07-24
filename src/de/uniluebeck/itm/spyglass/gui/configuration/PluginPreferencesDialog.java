@@ -22,7 +22,7 @@ public class PluginPreferencesDialog {
 	private void addPreferenceNodes() {
 		
 		final PreferenceNode general = new PreferenceNode("General", "General", null, GeneralPreferencePage.class.getCanonicalName());
-		final PreferenceNode plugins = new PreferenceNode("Plugins", "Plugins", null, PluginsPreferencePage.class.getCanonicalName());
+		final PreferenceNode plugins = new PreferenceNode("Plugins", "Plugins", null, PluginManagerPreferencePage.class.getCanonicalName());
 		
 		preferenceManager.addToRoot(general);
 		preferenceManager.addToRoot(plugins);

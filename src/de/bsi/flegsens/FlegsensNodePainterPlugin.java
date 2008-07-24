@@ -16,7 +16,7 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.plugin.HistoricalPlugin;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
-import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 //------------------------------------------------------------------------------

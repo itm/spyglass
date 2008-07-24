@@ -6,7 +6,7 @@ import org.eclipse.swt.widgets.Widget;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.gui.configuration.PreferencesConfigurationWidget;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.layer.SubLayer;
@@ -14,8 +14,8 @@ import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
- * Temporary class which all old Plugins inherit. It adds a compatibillity layer
- * to the Plugin interface so that the old Plugins can run without much change.
+ * Temporary class which all old Plugins inherit. It adds a compatibillity layer to the Plugin
+ * interface so that the old Plugins can run without much change.
  * 
  * @author dariush
  * @deprecated
@@ -26,13 +26,13 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 	private final Layer layer = new SubLayer();
 	
 	@Override
-	public PreferencesConfigurationWidget createPreferencesWidget(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<? extends Plugin> createPreferencePage(final Widget parent, final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	@Override
-	public PreferencesConfigurationWidget createTypePreferencesWidget(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<? extends Plugin> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}

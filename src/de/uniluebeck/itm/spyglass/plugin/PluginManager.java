@@ -20,6 +20,7 @@ import org.apache.log4j.Category;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 

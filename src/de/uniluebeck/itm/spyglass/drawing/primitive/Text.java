@@ -1,7 +1,7 @@
 package de.uniluebeck.itm.spyglass.drawing.primitive;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
 
 public class Text extends DrawingObject {
 

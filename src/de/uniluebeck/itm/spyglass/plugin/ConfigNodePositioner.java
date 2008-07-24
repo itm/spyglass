@@ -9,8 +9,9 @@ import org.apache.log4j.Category;
 import org.eclipse.swt.widgets.Widget;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
-import de.uniluebeck.itm.spyglass.gui.configuration.PreferencesConfigurationWidget;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.Packet;
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -61,13 +62,13 @@ public class ConfigNodePositioner extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PreferencesConfigurationWidget createPreferencesWidget(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<ConfigNodePositioner> createPreferencePage(final Widget parent, final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	@Override
-	public PreferencesConfigurationWidget createTypePreferencesWidget(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<ConfigNodePositioner> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -106,6 +107,18 @@ public class ConfigNodePositioner extends NodePositionerPlugin {
 	protected void updateQuadTree() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public int getNumNodes() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
+	public boolean offersMetric() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 }
