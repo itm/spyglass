@@ -13,7 +13,7 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.plugin.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
 
 //--------------------------------------------------------------------------------
 /**
