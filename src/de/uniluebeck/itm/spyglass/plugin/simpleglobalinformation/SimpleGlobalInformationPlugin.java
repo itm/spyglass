@@ -46,19 +46,16 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<SimpleGlobalInformationPlugin> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<SimpleGlobalInformationPlugin> createPreferencePage(final ConfigStore cs) {
 		return new SimpleGlobalInformationPluginPreferences(cs, this);
 	}
 	
-	@Override
-	public PluginPreferencePage<SimpleGlobalInformationPlugin> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
+	public static PluginPreferencePage<SimpleGlobalInformationPlugin> createTypePreferencePage(final ConfigStore cs) {
 		return new SimpleGlobalInformationPluginPreferences(cs);
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "SimpleGlobalInformation";
 	}
 	
 	@Override

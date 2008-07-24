@@ -8,7 +8,6 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
 
-import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
@@ -38,19 +37,16 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<PositionPacketNodePositionerPlugin> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<PositionPacketNodePositionerPlugin> createPreferencePage(final ConfigStore cs) {
 		return new PositionPacketNodePositionerPluginPreferences(cs, this);
 	}
 	
-	@Override
-	public PluginPreferencePage<PositionPacketNodePositionerPlugin> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
-		return new PositionPacketNodePositionerPluginPreferences(cs, this);
+	public static PluginPreferencePage<PositionPacketNodePositionerPlugin> createTypePreferencePage(final ConfigStore cs) {
+		return new PositionPacketNodePositionerPluginPreferences(cs);
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "PositionPacketNodePositioner";
 	}
 	
 	@Override

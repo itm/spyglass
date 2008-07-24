@@ -111,4 +111,8 @@ public abstract class NodePositionerPlugin extends Plugin {
 	 */
 	public abstract boolean offersMetric();
 	
+	public static String getHumanReadableName() {
+		return "NodePositioner";
+	}
+	
 }

@@ -10,11 +10,12 @@ package de.bsi.flegsens;
 import java.util.Random;
 
 import org.apache.log4j.Category;
-import org.eclipse.swt.widgets.Widget;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.gui.configuration.AbstractPluginTypePreferencePage;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.Packet;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -43,21 +44,16 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<RandomNodePositioner> createPreferencePage(final Widget parent, final ConfigStore cs) {
-		// TODO Auto-generated method stub
-		return null;
+	public PluginPreferencePage<Plugin> createPreferencePage(final ConfigStore cs) {
+		return new AbstractPluginTypePreferencePage(RandomNodePositioner.getHumanReadableName());
 	}
 	
-	@Override
-	public PluginPreferencePage<RandomNodePositioner> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
-		// TODO Auto-generated method stub
-		return null;
+	public static PluginPreferencePage<Plugin> createTypePreferencePage(final ConfigStore cs) {
+		return new AbstractPluginTypePreferencePage(RandomNodePositioner.getHumanReadableName());
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "RandomNodePositioner";
 	}
 	
 	@Override

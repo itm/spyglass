@@ -10,7 +10,6 @@ package de.uniluebeck.itm.spyglass.plugin.linepainter;
 
 import java.util.List;
 
-import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
@@ -50,12 +49,11 @@ public class LinePainterPlugin extends RelationPainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<LinePainterPlugin> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<LinePainterPlugin> createPreferencePage(final ConfigStore cs) {
 		return new LinePainterPluginPreferences(cs, this);
 	}
 	
-	@Override
-	public PluginPreferencePage<LinePainterPlugin> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
+	public static PluginPreferencePage<LinePainterPlugin> createTypePreferencePage(final ConfigStore cs) {
 		return new LinePainterPluginPreferences(cs);
 	}
 	
@@ -64,10 +62,8 @@ public class LinePainterPlugin extends RelationPainterPlugin {
 		return null;
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "LinePainter";
 	}
 	
 	@Override

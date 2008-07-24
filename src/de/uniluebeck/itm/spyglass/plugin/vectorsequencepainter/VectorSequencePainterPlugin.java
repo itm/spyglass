@@ -10,7 +10,6 @@ package de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter;
 
 import java.util.List;
 
-import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
@@ -49,12 +48,11 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	}
 	
 	@Override
-	public PluginPreferencePage<VectorSequencePainterPlugin> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<VectorSequencePainterPlugin> createPreferencePage(final ConfigStore cs) {
 		return new VectorSequencePainterPluginPreferences(cs, this);
 	}
 	
-	@Override
-	public PluginPreferencePage<VectorSequencePainterPlugin> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
+	public static PluginPreferencePage<VectorSequencePainterPlugin> createTypePreferencePage(final ConfigStore cs) {
 		return new VectorSequencePainterPluginPreferences(cs);
 	}
 	
@@ -63,10 +61,8 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 		return null;
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "VectorSequencePainter";
 	}
 	
 	@Override

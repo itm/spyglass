@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Category;
-import org.eclipse.swt.widgets.Widget;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
@@ -139,13 +138,12 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<DagstuhlNodePainter> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<DagstuhlNodePainter> createPreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	@Override
-	public PluginPreferencePage<DagstuhlNodePainter> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
+	public static PluginPreferencePage<DagstuhlNodePainter> createTypePreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -156,10 +154,8 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 		return null;
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "DagstuhlNodePainter";
 	}
 	
 	@Override

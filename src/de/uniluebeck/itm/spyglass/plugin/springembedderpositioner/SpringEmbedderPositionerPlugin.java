@@ -8,7 +8,6 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.springembedderpositioner;
 
-import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
@@ -38,19 +37,16 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<SpringEmbedderPositionerPlugin> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<SpringEmbedderPositionerPlugin> createPreferencePage(final ConfigStore cs) {
 		return new SpringEmbedderPositionerPluginPreferences(cs, this);
 	}
 	
-	@Override
-	public PluginPreferencePage<SpringEmbedderPositionerPlugin> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
+	public static PluginPreferencePage<SpringEmbedderPositionerPlugin> createTypePreferencePage(final ConfigStore cs) {
 		return new SpringEmbedderPositionerPluginPreferences(cs);
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "SpringEmbedderPositioner";
 	}
 	
 	@Override

@@ -11,7 +11,6 @@ package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
@@ -52,12 +51,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<SimpleNodePainterPlugin> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<SimpleNodePainterPlugin> createPreferencePage(final ConfigStore cs) {
 		return new SimpleNodePainterPluginPreferences(cs, this);
 	}
 	
-	@Override
-	public PluginPreferencePage<SimpleNodePainterPlugin> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
+	public static PluginPreferencePage<SimpleNodePainterPlugin> createTypePreferencePage(final ConfigStore cs) {
 		return new SimpleNodePainterPluginPreferences(cs);
 	}
 	
@@ -66,10 +64,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		return new LinkedList<DrawingObject>();
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "SimpleNodePainter";
 	}
 	
 	@Override

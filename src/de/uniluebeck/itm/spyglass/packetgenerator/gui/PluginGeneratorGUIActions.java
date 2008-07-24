@@ -7,7 +7,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 
-import de.uniluebeck.itm.spyglass.gui.actions.Actions;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 public class PluginGeneratorGUIActions {
@@ -17,7 +16,7 @@ public class PluginGeneratorGUIActions {
 	private final PacketGeneratorIShellPlugin gen;
 	
 	private final URL getResourceUrl(final String suffix) {
-		return Actions.class.getResource(suffix);
+		return Action.class.getResource(suffix);
 	}
 	
 	public PluginGeneratorGUIActions(final PacketGeneratorIShellPlugin gen) {

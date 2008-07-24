@@ -6,7 +6,6 @@ import ishell.util.Settings.SettingsKey;
 import java.util.HashMap;
 
 import org.apache.log4j.Category;
-import org.eclipse.swt.widgets.Widget;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
@@ -62,21 +61,18 @@ public class ConfigNodePositioner extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<ConfigNodePositioner> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<ConfigNodePositioner> createPreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	@Override
-	public PluginPreferencePage<ConfigNodePositioner> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
+	public static PluginPreferencePage<ConfigNodePositioner> createTypePreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "ConfigNodePositioner";
 	}
 	
 	@Override

@@ -10,7 +10,6 @@ package de.uniluebeck.itm.spyglass.plugin.objectpainter;
 
 import java.util.List;
 
-import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
@@ -49,12 +48,11 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	}
 	
 	@Override
-	public PluginPreferencePage<ObjectPainterPlugin> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<ObjectPainterPlugin> createPreferencePage(final ConfigStore cs) {
 		return new ObjectPainterPluginPreferences(cs, this);
 	}
 	
-	@Override
-	public PluginPreferencePage<ObjectPainterPlugin> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
+	public static PluginPreferencePage<ObjectPainterPlugin> createTypePreferencePage(final ConfigStore cs) {
 		return new ObjectPainterPluginPreferences(cs);
 	}
 	
@@ -63,10 +61,8 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 		return null;
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "ObjectPainter";
 	}
 	
 	@Override

@@ -10,7 +10,6 @@ package de.uniluebeck.itm.spyglass.plugin;
 import java.util.Queue;
 
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
@@ -109,7 +108,7 @@ public abstract class Plugin implements Runnable {
 	 * @param parent
 	 * @param cs
 	 */
-	public abstract PluginPreferencePage<? extends Plugin> createPreferencePage(Widget parent, ConfigStore cs);
+	public abstract PluginPreferencePage<? extends Plugin> createPreferencePage(final ConfigStore cs);
 	
 	/**
 	 * should be implemented static
@@ -117,9 +116,13 @@ public abstract class Plugin implements Runnable {
 	 * @param parent
 	 * @param cs
 	 */
-	public abstract PluginPreferencePage<? extends Plugin> createTypePreferencePage(Widget parent, ConfigStore cs);
+	public static PluginPreferencePage<? extends Plugin> createTypePreferencePage(final ConfigStore cs) {
+		throw new RuntimeException("This method must only be called on subclasses and must be implemented in every instantiable subclass.");
+	}
 	
-	public abstract String getHumanReadableName();
+	public static String getHumanReadableName() {
+		throw new RuntimeException("This method must only be called on subclasses and must be implemented by every abstract or instantiable suclass.");
+	}
 	
 	public abstract PluginXMLConfig getXMLConfig();
 	

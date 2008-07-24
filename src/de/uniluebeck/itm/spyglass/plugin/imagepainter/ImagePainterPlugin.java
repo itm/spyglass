@@ -11,7 +11,6 @@ package de.uniluebeck.itm.spyglass.plugin.imagepainter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
@@ -49,12 +48,11 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<ImagePainterPlugin> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<ImagePainterPlugin> createPreferencePage(final ConfigStore cs) {
 		return new ImagePainterPluginPreferences(cs, this);
 	}
 	
-	@Override
-	public PluginPreferencePage<ImagePainterPlugin> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
+	public static PluginPreferencePage<ImagePainterPlugin> createTypePreferencePage(final ConfigStore cs) {
 		return new ImagePainterPluginPreferences(cs);
 	}
 	
@@ -63,10 +61,8 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin {
 		return new ArrayList<DrawingObject>();
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "ImagePainter";
 	}
 	
 	@Override

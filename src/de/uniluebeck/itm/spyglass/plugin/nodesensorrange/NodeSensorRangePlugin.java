@@ -10,7 +10,6 @@ package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
 import java.util.List;
 
-import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
@@ -48,12 +47,11 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<NodeSensorRangePlugin> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<NodeSensorRangePlugin> createPreferencePage(final ConfigStore cs) {
 		return new NodeSensorRangePluginPreferences(cs, this);
 	}
 	
-	@Override
-	public PluginPreferencePage<NodeSensorRangePlugin> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
+	public static PluginPreferencePage<NodeSensorRangePlugin> createTypePreferencePage(final ConfigStore cs) {
 		return new NodeSensorRangePluginPreferences(cs);
 	}
 	
@@ -62,10 +60,8 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 		return null;
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "NodeSensorRange";
 	}
 	
 	@Override

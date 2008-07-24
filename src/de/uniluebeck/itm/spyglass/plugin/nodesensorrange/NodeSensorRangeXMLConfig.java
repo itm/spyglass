@@ -14,7 +14,6 @@ import java.util.HashMap;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementMap;
 
-import de.uniluebeck.itm.spyglass.plugin.sensorrange.NodeSensorRange;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------

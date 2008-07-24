@@ -3,7 +3,6 @@ package de.uniluebeck.itm.spyglass.plugin.dagstuhl;
 import java.util.List;
 
 import org.apache.log4j.Category;
-import org.eclipse.swt.widgets.Widget;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
@@ -129,13 +128,12 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<DagstuhlConnectivityPainter> createPreferencePage(final Widget parent, final ConfigStore cs) {
+	public PluginPreferencePage<DagstuhlConnectivityPainter> createPreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	@Override
-	public PluginPreferencePage<DagstuhlConnectivityPainter> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
+	public static PluginPreferencePage<DagstuhlConnectivityPainter> createTypePreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -146,10 +144,8 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 		return null;
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "DagstuhlConnectivityPainter";
 	}
 	
 	@Override

@@ -2,10 +2,9 @@ package de.uniluebeck.itm.spyglass.plugin;
 
 import java.util.List;
 
-import org.eclipse.swt.widgets.Widget;
-
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.gui.configuration.AbstractPluginTypePreferencePage;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
@@ -26,25 +25,20 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 	private final Layer layer = new SubLayer();
 	
 	@Override
-	public PluginPreferencePage<? extends Plugin> createPreferencePage(final Widget parent, final ConfigStore cs) {
-		// TODO Auto-generated method stub
-		return null;
+	public PluginPreferencePage<? extends Plugin> createPreferencePage(final ConfigStore cs) {
+		return new AbstractPluginTypePreferencePage(HistoricalPlugin.getHumanReadableName());
 	}
 	
-	@Override
-	public PluginPreferencePage<? extends Plugin> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
-		// TODO Auto-generated method stub
-		return null;
+	public static PluginPreferencePage<? extends Plugin> createTypePreferencePage(final ConfigStore cs) {
+		return new AbstractPluginTypePreferencePage(HistoricalPlugin.getHumanReadableName());
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
 		return this.layer.getDrawingObjects();
 	}
 	
-	@Override
-	public String getHumanReadableName() {
-		// TODO Auto-generated method stub
-		return null;
+	public static String getHumanReadableName() {
+		return "HistoricalPlugin";
 	}
 	
 	@Override
