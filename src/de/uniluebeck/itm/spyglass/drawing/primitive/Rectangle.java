@@ -14,7 +14,7 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 // --------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ public class Rectangle extends DrawingObject {
 		clone.setColorR(getColorR());
 		clone.setColorG(getColorG());
 		clone.setColorB(getColorB());
-		clone.setPosition(new Position(getPosition().x, getPosition().y));
+		clone.setPosition(new AbsolutePosition(getPosition().x, getPosition().y, 0));
 		
 		return clone;
 	}
@@ -134,10 +134,10 @@ public class Rectangle extends DrawingObject {
 		gc.setForeground(color);
 		gc.setBackground(bg);
 		gc.setLineWidth(this.getLineWidth());
-		gc.fillRectangle((int) (this.getPosition().x - (this.getWidth() / 2)), (int) (this.getPosition().y - (this.getHeight() / 2)),
-				this.getWidth(), this.getHeight());
-		gc.drawRectangle((int) (this.getPosition().x - (this.getWidth() / 2)), (int) (this.getPosition().y - (this.getHeight() / 2)),
-				this.getWidth(), this.getHeight());
+		gc.fillRectangle((this.getPosition().x - (this.getWidth() / 2)), (this.getPosition().y - (this.getHeight() / 2)), this.getWidth(), this
+				.getHeight());
+		gc.drawRectangle((this.getPosition().x - (this.getWidth() / 2)), (this.getPosition().y - (this.getHeight() / 2)), this.getWidth(), this
+				.getHeight());
 		
 		color.dispose();
 		bg.dispose();

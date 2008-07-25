@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass;
 
@@ -19,12 +17,11 @@ import de.uniluebeck.itm.spyglass.gui.UIController;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
- * Application class for wrapping the Spyglass core class and it's user
- * interface/GUI. It instantiate and injects the core classes that are needed to
- * run the application.
+ * Application class for wrapping the Spyglass core class and it's user interface/GUI. It
+ * instantiate and injects the core classes that are needed to run the application.
  */
 public class SpyglassApp {
 	private static Category log = SpyglassLogger.getLogger(SpyglassApp.class);
@@ -53,6 +50,7 @@ public class SpyglassApp {
 		@SuppressWarnings("unused")
 		final UIController uiController = new UIController(spyglass, appWindow);
 		
+		spyglass.getDrawingArea().setAppWindow(appWindow);
 		// Start visualization
 		spyglass.start();
 		

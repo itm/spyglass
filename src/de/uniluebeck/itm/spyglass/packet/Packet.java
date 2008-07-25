@@ -1,44 +1,41 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.packet;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
- * The class represents a data packet. Every packet has at least a unique id and
- * a position.
+ * The class represents a data packet. Every packet has at least a unique id and a position.
  */
 public class Packet {
-	private int id = 0;
+	private int packetID = 0;
 	
 	private byte[] content;
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
 	 */
-	public int getId() {
-		return id;
+	public int getPacketId() {
+		return packetID;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
 	 */
 	public void setId(final int id) {
-		this.id = id;
+		this.packetID = id;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -47,7 +44,7 @@ public class Packet {
 		return content;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -56,7 +53,7 @@ public class Packet {
 		this.content = content;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -66,12 +63,12 @@ public class Packet {
 		final int prime = 31;
 		int result = 1;
 		
-		result = prime * result + id;
+		result = prime * result + packetID;
 		
 		return result;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -92,21 +89,21 @@ public class Packet {
 		
 		final Packet other = (Packet) obj;
 		
-		if (id != other.id) {
+		if (packetID != other.packetID) {
 			return false;
 		}
 		
 		return true;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
 	 */
 	@Override
 	public String toString() {
-		return "Packet [id=" + id + "]";
+		return "Packet [id=" + packetID + "]";
 	}
 	
 }

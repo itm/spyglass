@@ -18,6 +18,7 @@ import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -38,8 +39,8 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 	 * 
 	 */
 	@Override
-	public Position getPosition(final int nodeId) {
-		final Position p = new Position((int) Math.abs(r.nextFloat() * 800), (int) Math.abs(r.nextFloat() * 800));
+	public AbsolutePosition getPosition(final int nodeId) {
+		final AbsolutePosition p = new AbsolutePosition((int) Math.abs(r.nextFloat() * 800), (int) Math.abs(r.nextFloat() * 800), 0);
 		log.debug("Random position: " + p);
 		return p;
 	}

@@ -14,8 +14,9 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
+import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
 /**
  * A primitive drawing object, representing a circle.
@@ -54,7 +55,7 @@ public class Circle extends DrawingObject {
 		clone.setColorR(getColorR());
 		clone.setColorG(getColorG());
 		clone.setColorB(getColorB());
-		clone.setPosition(new Position(getPosition().x, getPosition().y));
+		clone.setPosition(new AbsolutePosition(getPosition().x, getPosition().y, 0));
 		
 		return clone;
 	}
@@ -115,10 +116,10 @@ public class Circle extends DrawingObject {
 		gc.setBackground(bg);
 		gc.setLineWidth(this.getLineWidth());
 		
-		gc.fillOval(((int) this.getPosition().x - (this.getDiameter() / 2)), ((int) this.getPosition().y - (this.getDiameter() / 2)), this
-				.getDiameter(), this.getDiameter());
-		gc.drawOval(((int) this.getPosition().x - (this.getDiameter() / 2)), ((int) this.getPosition().y - (this.getDiameter() / 2)), this
-				.getDiameter(), this.getDiameter());
+		final PixelPosition px = drawingArea.absPoint2PixelPoint(this.getPosition());
+		
+		gc.fillOval((px.x - (this.getDiameter() / 2)), (px.y - (this.getDiameter() / 2)), this.getDiameter(), this.getDiameter());
+		gc.drawOval((px.x - (this.getDiameter() / 2)), (px.y - (this.getDiameter() / 2)), this.getDiameter(), this.getDiameter());
 		
 		color.dispose();
 		bg.dispose();

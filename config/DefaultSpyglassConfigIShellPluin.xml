@@ -1,9 +1,14 @@
 <spyglassConfiguration>
-   <packetReader class="de.uniluebeck.itm.spyglass.packet.SimplePacketReader">
+   <packetReader class="de.uniluebeck.itm.spyglass.packet.ComplexPacketReader">
       <gateway class="de.uniluebeck.itm.spyglass.gateway.FileReaderGateway">
-         <file>source.packet.txt</file>
+         <file>generator.txt</file>
       </gateway>
    </packetReader>
+   <drawingArea>
+   <zoom>1</zoom>
+   <upperLeft x="-100" y="-100" z="0"></upperLeft>
+   </drawingArea>
+   
    <instances>
       <plugins class="java.util.ArrayList">
          <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin" isActive="true"/>
@@ -40,7 +45,14 @@
          </plugin>
       </plugins>
    </instances>
-   <nodePositioner class="de.bsi.flegsens.RandomNodePositioner" isActive="true"/>
+   <nodePositioner class="de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin" isActive="true">
+   	<parameters>
+   	  <timeToLive>60</timeToLive>
+      <isActive>true</isActive>
+      <isVisible>true</isVisible>
+      <name>default</name>
+   	</parameters>
+   </nodePositioner>
    <generalSettings>
       <showRuler>true</showRuler>
       <metrics>

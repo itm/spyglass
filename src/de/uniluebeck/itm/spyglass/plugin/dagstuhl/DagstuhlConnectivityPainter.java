@@ -14,7 +14,7 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.HistoricalPlugin;
-import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -89,8 +89,8 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 	}
 	
 	public void paintConnectivity(final int n1, final int n2, final int metric, final int lqi) {
-		final Position p1 = getPluginManager().getNodePositioner().getPosition(n1);
-		final Position p2 = getPluginManager().getNodePositioner().getPosition(n2);
+		final AbsolutePosition p1 = getPluginManager().getNodePositioner().getPosition(n1);
+		final AbsolutePosition p2 = getPluginManager().getNodePositioner().getPosition(n2);
 		if (p1 == null) {
 			log.error("paintConnectivity: p1 for " + Integer.toHexString(n1) + " was null");
 			return;
@@ -104,7 +104,7 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 		l.setId(n1 + n2 + LINK_LINE_OFFSET);
 		getSubLayer().addOrUpdate(l);
 		
-		final Position p = (p1.mult(0.75)).add(p2.mult(0.25));
+		final AbsolutePosition p = (p1.mult(0.75)).add(p2.mult(0.25));
 		final Text t = new Text("(" + new Integer(metric).toString() + "," + new Integer(lqi).toString() + ")", p, n1 * 2 + n2 + LINK_TEXT_OFFSET);
 		t.setColor(0, 0, 0);
 		t.setJustification(TextJustification.center);

@@ -8,7 +8,7 @@ import org.eclipse.swt.graphics.Point;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 public class Text extends DrawingObject {
@@ -21,7 +21,7 @@ public class Text extends DrawingObject {
 	
 	public TextJustification justification;
 	
-	public Text(final String s, final Position p, final int id) {
+	public Text(final String s, final AbsolutePosition p, final int id) {
 		super(id);
 		setPosition(p);
 		text = s;
@@ -72,7 +72,7 @@ public class Text extends DrawingObject {
 			offsetX = -(p.x) + 1;
 		}
 		final int offsetY = p.y / -2;
-		gc.drawString(s, (int) (getPosition().x) + offsetX, (int) (getPosition().y) + offsetY);
+		gc.drawString(s, (getPosition().x) + offsetX, (getPosition().y) + offsetY);
 		// TODO: Implement the drawing of the line primitive
 		color.dispose();
 		bgColor.dispose();

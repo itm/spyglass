@@ -13,7 +13,7 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 // --------------------------------------------------------------------------------
@@ -23,14 +23,14 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 @Root
 public class Line extends DrawingObject {
 	
-	private Position lineEnd;
+	private AbsolutePosition lineEnd;
 	private int width;
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public Line(final Position p, final Position d) {
+	public Line(final AbsolutePosition p, final AbsolutePosition d) {
 		this();
 		setPosition(p);
 		setLineWidth(1);
@@ -66,7 +66,7 @@ public class Line extends DrawingObject {
 	/**
 	 * 
 	 */
-	public void setEnd(final Position end) {
+	public void setEnd(final AbsolutePosition end) {
 		lineEnd = end;
 	}
 	
@@ -74,7 +74,7 @@ public class Line extends DrawingObject {
 	/**
 	 * 
 	 */
-	public Position getEnd() {
+	public AbsolutePosition getEnd() {
 		return lineEnd;
 	}
 	
@@ -89,7 +89,7 @@ public class Line extends DrawingObject {
 		clone.setColorR(getColorR());
 		clone.setColorG(getColorG());
 		clone.setColorB(getColorB());
-		clone.setPosition(new Position(getPosition().x, getPosition().y));
+		clone.setPosition(new AbsolutePosition(getPosition().x, getPosition().y, 0));
 		clone.setLineWidth(getLineWidth());
 		return clone;
 	}
@@ -117,7 +117,7 @@ public class Line extends DrawingObject {
 		final Color color = new Color(null, this.getColorR(), this.getColorG(), this.getColorB());
 		gc.setForeground(color);
 		gc.setLineWidth(this.getLineWidth());
-		gc.drawLine((int) (this.getPosition().x), (int) (this.getPosition().y), (int) (this.getEnd().x), (int) (this.getEnd().y));
+		gc.drawLine((this.getPosition().x), (this.getPosition().y), (this.getEnd().x), (this.getEnd().y));
 		// TODO: Implement the drawing of the line primitive
 		color.dispose();
 	}

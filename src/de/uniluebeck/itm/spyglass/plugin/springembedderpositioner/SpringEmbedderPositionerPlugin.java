@@ -15,6 +15,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
@@ -32,7 +33,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public Position getPosition(final int nodeId) {
+	public AbsolutePosition getPosition(final int nodeId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -10,7 +10,7 @@ import org.simpleframework.xml.Attribute;
  * @author Sebastian Ebers
  * 
  */
-public class AbsolutePosition {
+public class AbsolutePosition implements Cloneable {
 	
 	@Attribute
 	/* The x-coordinate */
@@ -32,6 +32,36 @@ public class AbsolutePosition {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+	
+	@Override
+	public AbsolutePosition clone() {
+		return new AbsolutePosition(x, y, z);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "[" + x + ", " + y + ", " + z + "]";
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public AbsolutePosition mult(final double d) {
+		return new AbsolutePosition((int) (x * d), (int) (y * d), (int) (z * d));
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public AbsolutePosition add(final AbsolutePosition p) {
+		return new AbsolutePosition(x + p.x, y + p.y, z + p.z);
 	}
 	
 }

@@ -14,7 +14,7 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.HistoricalPlugin;
-import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -63,8 +63,8 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 				for (int i = 1; i < count; i++) {
 					
 					log.debug("Line from " + hops[i - 1] + "->" + hops[i]);
-					final Position p1 = getPluginManager().getNodePositioner().getPosition(hops[i - 1]);
-					final Position p2 = getPluginManager().getNodePositioner().getPosition(hops[i]);
+					final AbsolutePosition p1 = getPluginManager().getNodePositioner().getPosition(hops[i - 1]);
+					final AbsolutePosition p2 = getPluginManager().getNodePositioner().getPosition(hops[i]);
 					if (p1 == null) {
 						log.error("paintRoute: p1 for " + Integer.toHexString(hops[i - 1]) + " was null");
 						break;
@@ -108,7 +108,7 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 				} else {
 					ds = "?";
 				}
-				final Position p1 = getPluginManager().getNodePositioner().getPosition(src).add(new Position(0, -20, 0));
+				final AbsolutePosition p1 = getPluginManager().getNodePositioner().getPosition(src).add(new AbsolutePosition(0, -20, 0));
 				final Text t = new Text(new Integer(setup).toString() + "," + ds + "," + new Integer(no).toString() + "/"
 						+ new Integer(count).toString(), p1, 23);
 				t.setColor(0, 0, 0);

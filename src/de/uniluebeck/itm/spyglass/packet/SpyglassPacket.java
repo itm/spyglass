@@ -1,5 +1,7 @@
 package de.uniluebeck.itm.spyglass.packet;
 
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
+
 /**
  * Generic Spyglass packet.
  */
@@ -48,19 +50,9 @@ public class SpyglassPacket extends Packet {
 	protected Time time;
 	
 	/**
-	 * X-Coordinate of this spyglass packet.
+	 * positon of this spyglass packet.
 	 */
-	protected int x;
-	
-	/**
-	 * Y-Coordinate of this spyglass packet.
-	 */
-	protected int y;
-	
-	/**
-	 * Z-Coordinate of this spyglass packet.
-	 */
-	protected int z;
+	AbsolutePosition position;
 	
 	/**
 	 * Deserializes a Spyglass Packet.
@@ -92,9 +84,10 @@ public class SpyglassPacket extends Packet {
 		time = new Time();
 		time.sec_ = deserializeUint32(buf[7], buf[8], buf[9], buf[10]);
 		time.ms_ = deserializeUint16(buf[11], buf[12]);
-		x = deserializeInt16(buf[13], buf[14]);
-		y = deserializeInt16(buf[15], buf[16]);
-		z = deserializeInt16(buf[17], buf[18]);
+		final int x = deserializeInt16(buf[13], buf[14]);
+		final int y = deserializeInt16(buf[15], buf[16]);
+		final int z = deserializeInt16(buf[17], buf[18]);
+		this.position = new AbsolutePosition(x, y, z);
 		
 	}
 	
@@ -210,7 +203,7 @@ public class SpyglassPacket extends Packet {
 	@Override
 	public String toString() {
 		return "length:" + length + ", syntax_type:" + syntax_type + ", semantic_type:" + semantic_type + ", sender_id:" + sender_id + ",time: "
-				+ time.toString() + ", x:" + x + ", y:" + y + ", z:" + z;
+				+ time.toString() + ", Position:" + position;
 	}
 	
 	/**
@@ -318,66 +311,12 @@ public class SpyglassPacket extends Packet {
 		this.time = time;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
-	 * Property getter
-	 * 
-	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @return the x
+	 * @return the position
 	 */
-	public int getX() {
-		return x;
+	public AbsolutePosition getPosition() {
+		return position;
 	}
 	
-	/**
-	 * Property setter
-	 * 
-	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param x
-	 *            the x to set
-	 */
-	public void setX(final int x) {
-		this.x = x;
-	}
-	
-	/**
-	 * Property getter
-	 * 
-	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @return the y
-	 */
-	public int getY() {
-		return y;
-	}
-	
-	/**
-	 * Property setter
-	 * 
-	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param y
-	 *            the y to set
-	 */
-	public void setY(final int y) {
-		this.y = y;
-	}
-	
-	/**
-	 * Property getter
-	 * 
-	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @return the z
-	 */
-	public int getZ() {
-		return z;
-	}
-	
-	/**
-	 * Property setter
-	 * 
-	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param z
-	 *            the z to set
-	 */
-	public void setZ(final int z) {
-		this.z = z;
-	}
 }

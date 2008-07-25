@@ -12,7 +12,7 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 // --------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 public abstract class DrawingObject {
 	private int id = 0;
 	
-	private Position position = new Position(0, 0);
+	private AbsolutePosition position = new AbsolutePosition(0, 0, 0);
 	
 	@Element
 	private int colorR = 200;
@@ -87,7 +87,7 @@ public abstract class DrawingObject {
 	/**
 	 * 
 	 */
-	public Position getPosition() {
+	public AbsolutePosition getPosition() {
 		return position;
 	}
 	
@@ -95,7 +95,7 @@ public abstract class DrawingObject {
 	/**
 	 * 
 	 */
-	public void setPosition(final Position position) {
+	public void setPosition(final AbsolutePosition position) {
 		this.position = position;
 	}
 	

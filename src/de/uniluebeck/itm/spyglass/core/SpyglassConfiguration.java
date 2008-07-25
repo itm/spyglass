@@ -14,6 +14,7 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
@@ -43,6 +44,9 @@ public class SpyglassConfiguration {
 	
 	@ElementList
 	private Vector<Plugin> defaults;
+	
+	@Element
+	private DrawingArea drawingArea;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -174,6 +178,23 @@ public class SpyglassConfiguration {
 	// --------------------------------------------------------------------------------
 	public void setPacketDeliveryInitialDelay(final long packetDeliveryInitialDelay) {
 		generalSettings.setPacketDeliveryInitialDelay(packetDeliveryInitialDelay);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the drawingArea
+	 */
+	public DrawingArea getDrawingArea() {
+		return drawingArea;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param drawingArea
+	 *            the drawingArea to set
+	 */
+	public void setDrawingArea(final DrawingArea drawingArea) {
+		this.drawingArea = drawingArea;
 	}
 	
 }

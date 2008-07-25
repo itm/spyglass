@@ -22,6 +22,7 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.core.SpyglassListener;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
@@ -118,13 +119,48 @@ public class UIController {
 			
 		}
 		
+		// drawDebugMarkers(gc);
+		
+	}
+	
+	/**
+	 * positioning markers to calibrate the zoom
+	 * 
+	 * @param gc
+	 */
+	private void drawDebugMarkers(final GC gc) {
+		final DrawingArea da = this.spyglass.getDrawingArea();
+		final DrawingObject dob = new de.uniluebeck.itm.spyglass.drawing.primitive.Circle();
+		dob.getPosition().x = 10;
+		dob.getPosition().y = 10;
+		dob.draw(da, gc);
+		
+		final DrawingObject dob2 = new de.uniluebeck.itm.spyglass.drawing.primitive.Circle();
+		dob2.getPosition().x = 100;
+		dob2.getPosition().y = 100;
+		dob2.draw(da, gc);
+		
+		final DrawingObject dob3 = new de.uniluebeck.itm.spyglass.drawing.primitive.Circle();
+		dob3.getPosition().x = -100;
+		dob3.getPosition().y = -100;
+		dob3.draw(da, gc);
+		
+		final DrawingObject dob4 = new de.uniluebeck.itm.spyglass.drawing.primitive.Circle();
+		dob4.getPosition().x = 100;
+		dob4.getPosition().y = -100;
+		dob4.draw(da, gc);
+		
+		final DrawingObject dob5 = new de.uniluebeck.itm.spyglass.drawing.primitive.Circle();
+		dob5.getPosition().x = -100;
+		dob5.getPosition().y = 100;
+		dob5.draw(da, gc);
 	}
 	
 	private void renderPlugin(final GC gc, final Plugin plugin) {
-		final List<DrawingObject> dos = ((Drawable) plugin).getDrawingObjects(this.appWindow.getDrawingArea());
+		final List<DrawingObject> dos = ((Drawable) plugin).getDrawingObjects(this.spyglass.getDrawingArea());
 		if (dos != null) {
 			for (final DrawingObject object : dos) {
-				object.draw(this.appWindow.getDrawingArea(), gc);
+				object.draw(this.spyglass.getDrawingArea(), gc);
 			}
 			log.error("The plugin " + plugin + " did provide any drawing objects!");
 		} else {

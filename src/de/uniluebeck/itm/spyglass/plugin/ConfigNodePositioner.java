@@ -12,6 +12,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -24,7 +25,7 @@ public class ConfigNodePositioner extends NodePositionerPlugin {
 	
 	private static Category log = SpyglassLogger.get(NodePositionerPlugin.class);
 	
-	HashMap<Integer, Position> positions = new HashMap<Integer, Position>();
+	HashMap<Integer, AbsolutePosition> positions = new HashMap<Integer, AbsolutePosition>();
 	
 	public ConfigNodePositioner() {
 		final String n = Settings.instance().get(SettingsKey.nodes);
@@ -35,14 +36,15 @@ public class ConfigNodePositioner extends NodePositionerPlugin {
 			if (elements.length == 4) {
 				log.debug("node=" + Integer.toHexString(new Integer(elements[0])) + " (" + elements[1] + "," + elements[2] + "," + elements[3] + ")");
 				
-				positions.put(new Integer(elements[0]), new Position(new Integer(elements[1]), new Integer(elements[2]), new Integer(elements[3])));
+				positions.put(new Integer(elements[0]), new AbsolutePosition(new Integer(elements[1]), new Integer(elements[2]), new Integer(
+						elements[3])));
 			}
 		}
 	}
 	
 	@Override
-	public Position getPosition(final int nodeId) {
-		final Position p = positions.get(new Integer(nodeId));
+	public AbsolutePosition getPosition(final int nodeId) {
+		final AbsolutePosition p = positions.get(new Integer(nodeId));
 		if (p != null) {
 			return p.clone();
 		} else {

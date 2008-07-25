@@ -15,7 +15,7 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.HistoricalPlugin;
-import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -84,7 +84,7 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 	}
 	
 	public void paintNode(final int src) {
-		final Position p = getPluginManager().getNodePositioner().getPosition(src);
+		final AbsolutePosition p = getPluginManager().getNodePositioner().getPosition(src);
 		if (p != null) {
 			final Rectangle rect = new Rectangle();
 			rect.setColor(0, 0, 0);
@@ -97,7 +97,7 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 			
 			final Integer i = counter.get(new Integer(src));
 			if (i != null) {
-				final Text t2 = new Text(i.toString(), p.add(new Position(-13, 0, 0)), src + COUNTER_TEXT_OFFSET);
+				final Text t2 = new Text(i.toString(), p.add(new AbsolutePosition(-13, 0, 0)), src + COUNTER_TEXT_OFFSET);
 				t2.setColor(200, 200, 200);
 				// t2.setBgColor(0, 0, 0);
 				t2.setJustification(TextJustification.right);

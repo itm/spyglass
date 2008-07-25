@@ -1,11 +1,9 @@
 /*
- * ----------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * -------------------------------------------------------------------------
+ * ----------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. -------------------------------------------------------------------------
  */
 package de.bsi.flegsens;
 
@@ -16,10 +14,10 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.HistoricalPlugin;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
-import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
  * A plugin to paint a node.
@@ -27,7 +25,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 public class FlegsensNodePainterPlugin extends HistoricalPlugin {
 	private static Category log = SpyglassLogger.get(FlegsensNodePainterPlugin.class);
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * @see Plugin#handlePacket(SpyglassPacket)
@@ -41,7 +39,7 @@ public class FlegsensNodePainterPlugin extends HistoricalPlugin {
 		log.debug("pm: " + getPluginManager());
 		log.debug("np: " + getPluginManager().getNodePositioner());
 		
-		final Position p = getPluginManager().getNodePositioner().getPosition(packet.getId());
+		final AbsolutePosition p = getPluginManager().getNodePositioner().getPosition(packet.getSender_id());
 		if (p != null) {
 			final DrawingObject rect = new Rectangle();
 			rect.setId(11);
