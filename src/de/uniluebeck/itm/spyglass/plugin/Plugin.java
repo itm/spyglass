@@ -7,8 +7,6 @@
  */
 package de.uniluebeck.itm.spyglass.plugin;
 
-import java.util.Queue;
-
 import org.eclipse.swt.events.MouseEvent;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
@@ -16,7 +14,6 @@ import org.simpleframework.xml.Root;
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.layer.SubLayer;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -33,8 +30,6 @@ public abstract class Plugin implements Runnable {
 	private boolean isActive = true;
 	
 	private PluginManager pluginManager;
-	private Queue<Packet> packetQueue;
-	private SubLayer quadTree;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -92,15 +87,6 @@ public abstract class Plugin implements Runnable {
 	 */
 	public final PluginManager getPluginManager() {
 		return pluginManager;
-	}
-	
-	/**
-	 * 
-	 * @param pluginManager
-	 * @param drawingArea
-	 */
-	public void Plugin(final PluginManager pluginManager, final DrawingArea drawingArea) {
-		
 	}
 	
 	/**
