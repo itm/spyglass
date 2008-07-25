@@ -47,7 +47,13 @@ public class Runner {
 			throw new RuntimeException("Could not load configuration.");
 		}
 		
-		generator.run();
+		try {
+			generator.run();
+		} catch (final Exception e) {
+			generator.shutdown();
+			log.error("Shutting down the generator", e);
+		}
+		
 	}
 	
 }

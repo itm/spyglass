@@ -9,10 +9,9 @@ import java.util.TreeSet;
 
 import org.simpleframework.xml.Element;
 
-
 /**
- * This type of sample allows abstract specifications of all headerelements. the
- * payload must be supplied as a hex string.
+ * This type of sample allows abstract specifications of all headerelements. the payload must be
+ * supplied as a hex string.
  * 
  * @author dariush
  */
@@ -135,7 +134,7 @@ public class PayloadSample extends Sample {
 		final String[] parts = intList.split(",");
 		for (int i = 0; i < parts.length; i++) {
 			final String s = parts[i];
-			if (s.matches("\\d+")) {
+			if (s.matches("-?\\d+")) {
 				intSet.add(new Integer(s));
 			} else if (s.matches("\\d+-\\d+")) {
 				final String[] nums = s.split("-", 2);

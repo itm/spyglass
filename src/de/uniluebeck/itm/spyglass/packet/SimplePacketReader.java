@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.packet;
 
@@ -19,12 +17,11 @@ import org.simpleframework.xml.Root;
 import de.uniluebeck.itm.spyglass.gateway.Gateway;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
- * This class implements a PacketReader. It reads packets from a text file line
- * by line of the format id:x:y Each line is a packet with the given id and
- * position (x and y coordinates).
+ * This class implements a PacketReader. It reads packets from a text file line by line of the
+ * format id:x:y Each line is a packet with the given id and position (x and y coordinates).
  */
 @Root
 public class SimplePacketReader extends PacketReader {
@@ -33,15 +30,15 @@ public class SimplePacketReader extends PacketReader {
 	
 	private BufferedReader bufferedReader = null;
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
 	 */
 	@Override
-	public Packet getNextPacket() {
+	public SpyglassPacket getNextPacket() {
 		try {
-			Packet packet = null;
+			SpyglassPacket packet = null;
 			String line = null;
 			
 			log.debug("called getNextPacket...");
@@ -60,7 +57,7 @@ public class SimplePacketReader extends PacketReader {
 		return null;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -72,18 +69,18 @@ public class SimplePacketReader extends PacketReader {
 		bufferedReader = new BufferedReader(new InputStreamReader(gateway.getInputStream()));
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	
 	/**
-	 * Parses the given string to retrieve a apropriate id, x and y data. The
-	 * method then creates and returns a new Packet instance.
+	 * Parses the given string to retrieve a apropriate id, x and y data. The method then creates
+	 * and returns a new Packet instance.
 	 * 
 	 * @param line
 	 *            A String containing the packet format.
 	 * @return A packet object or null, if the line could be parsed.
 	 */
-	private Packet parsePacketLine(String line) {
+	private SpyglassPacket parsePacketLine(String line) {
 		if ((line == null) || line.trim().equals("")) {
 			return null;
 		}
@@ -94,7 +91,7 @@ public class SimplePacketReader extends PacketReader {
 			return null;
 		}
 		
-		final Packet packet = new Packet();
+		final SpyglassPacket packet = new SpyglassPacket();
 		final String[] tokens = line.split(":");
 		
 		final int id = Integer.parseInt(tokens[0]);

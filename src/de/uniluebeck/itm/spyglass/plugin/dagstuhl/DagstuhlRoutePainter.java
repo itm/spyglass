@@ -12,6 +12,7 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Text.TextJustification;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.Packet;
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.HistoricalPlugin;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
@@ -29,7 +30,7 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 	// private int counter = 0;
 	
 	@Override
-	public void handlePacket(final Packet packet) {
+	public void handlePacket(final SpyglassPacket packet) {
 		final byte[] s = packet.getContent();
 		
 		String debug = new String();

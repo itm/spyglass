@@ -8,11 +8,14 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
 
+import java.util.HashMap;
+
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.Packet;
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -25,15 +28,15 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 		xmlConfig = new PositionPacketNodePositionerXMLConfig();
 	}
 	
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
+	private final HashMap<Integer, Position> positionMap = new HashMap<Integer, Position>();
 	
 	@Override
 	public Position getPosition(final int nodeId) {
-		// TODO Auto-generated method stub
-		return null;
+		if (!positionMap.containsKey(nodeId)) {
+			throw new IllegalArgumentException("I don't know any node with the ID " + nodeId);
+		} else {
+			return positionMap.get(nodeId);
+		}
 	}
 	
 	@Override
@@ -56,9 +59,8 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public void handlePacket(final Packet packet) {
-		// TODO Auto-generated method stub
-		
+	public void handlePacket(final SpyglassPacket packet) {
+		// TODO
 	}
 	
 	@Override

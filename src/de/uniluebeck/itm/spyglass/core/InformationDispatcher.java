@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.apache.log4j.Category;
 
-import de.uniluebeck.itm.spyglass.packet.Packet;
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
@@ -61,7 +61,7 @@ public class InformationDispatcher {
 	 * @param packet
 	 *            The packet object to be distributed.
 	 */
-	public void dispatchPacket(final Packet packet) {
+	public void dispatchPacket(final SpyglassPacket packet) {
 		if (packet == null) {
 			return;
 		}

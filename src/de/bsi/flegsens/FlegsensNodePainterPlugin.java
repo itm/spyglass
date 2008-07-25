@@ -13,7 +13,7 @@ import org.apache.log4j.Category;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
-import de.uniluebeck.itm.spyglass.packet.Packet;
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.HistoricalPlugin;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin.Position;
@@ -30,10 +30,10 @@ public class FlegsensNodePainterPlugin extends HistoricalPlugin {
 	//--------------------------------------------------------------------------
 	// ------
 	/**
-	 * @see Plugin#handlePacket(Packet)
+	 * @see Plugin#handlePacket(SpyglassPacket)
 	 */
 	@Override
-	public void handlePacket(final Packet packet) {
+	public void handlePacket(final SpyglassPacket packet) {
 		if (log.isDebugEnabled()) {
 			log.debug("Handling packet " + packet);
 		}

@@ -36,9 +36,9 @@ public class ComplexPacketReader extends PacketReader {
 	 * 
 	 */
 	@Override
-	public Packet getNextPacket() throws SpyglassPacketException {
+	public SpyglassPacket getNextPacket() throws SpyglassPacketException {
 		try {
-			Packet packet = null;
+			SpyglassPacket packet = null;
 			String line = null;
 			
 			log.debug("called getNextPacket...");
@@ -80,7 +80,7 @@ public class ComplexPacketReader extends PacketReader {
 	 * @return A packet object or null, if the line could be parsed.
 	 * @throws SpyglassPacketException
 	 */
-	private Packet parsePacketLine(String line) throws SpyglassPacketException {
+	private SpyglassPacket parsePacketLine(String line) throws SpyglassPacketException {
 		if ((line == null) || line.trim().equals("")) {
 			return null;
 		}

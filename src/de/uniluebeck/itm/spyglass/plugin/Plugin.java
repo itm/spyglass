@@ -15,6 +15,7 @@ import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.Packet;
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -39,7 +40,7 @@ public abstract class Plugin implements Runnable {
 	 * @param packet
 	 *            The packet object to handle.
 	 */
-	public abstract void handlePacket(Packet packet);
+	public abstract void handlePacket(SpyglassPacket packet);
 	
 	// --------------------------------------------------------------------------------
 	/**

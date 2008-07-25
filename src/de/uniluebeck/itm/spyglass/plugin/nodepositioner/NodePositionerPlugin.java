@@ -8,9 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.nodepositioner;
 
-import org.simpleframework.xml.Element;
-
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 
 // --------------------------------------------------------------------------------
 /**
@@ -22,15 +21,7 @@ public abstract class NodePositionerPlugin extends Plugin {
 	/**
 	 * TODO: if possible, use AbsolutePosition instead?!?
 	 */
-	public static class Position {
-		@Element
-		public double x;
-		
-		@Element
-		public double y;
-		
-		@Element
-		public double z;
+	public static class Position extends AbsolutePosition {
 		
 		// --------------------------------------------------------------------------------
 		/**
@@ -43,7 +34,7 @@ public abstract class NodePositionerPlugin extends Plugin {
 		/**
 		 * 
 		 */
-		public Position(final double x, final double y, final double z) {
+		public Position(final int x, final int y, final int z) {
 			this.x = x;
 			this.y = y;
 			this.z = z;
@@ -53,7 +44,7 @@ public abstract class NodePositionerPlugin extends Plugin {
 		/**
 		 * 
 		 */
-		public Position(final double x, final double y) {
+		public Position(final int x, final int y) {
 			this(x, y, 0);
 		}
 		
@@ -71,7 +62,7 @@ public abstract class NodePositionerPlugin extends Plugin {
 		 * 
 		 */
 		public Position mult(final double d) {
-			return new Position(x * d, y * d, z * d);
+			return new Position((int) (x * d), (int) (y * d), (int) (z * d));
 		}
 		
 		// --------------------------------------------------------------------------------

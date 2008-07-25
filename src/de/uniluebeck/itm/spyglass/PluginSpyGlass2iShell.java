@@ -157,7 +157,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		config.setPacketReader(new PacketReader() {
 			
 			@Override
-			public de.uniluebeck.itm.spyglass.packet.Packet getNextPacket() {
+			public SpyglassPacket getNextPacket() {
 				synchronized (queue) {
 					return queue.pollLast();
 				}
