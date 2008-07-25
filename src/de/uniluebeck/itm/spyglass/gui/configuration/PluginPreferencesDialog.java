@@ -2,6 +2,7 @@ package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import ishell.util.Logging;
 
+import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Category;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
@@ -20,6 +22,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
@@ -108,13 +111,24 @@ public class PluginPreferencesDialog {
 	}
 	
 	private void clickedButtonSavePreferences() {
-		// TODO Auto-generated method stub
-		
+		final File saveFile = getSaveLoadFileFromUser(SWT.SAVE);
+		final String msg = saveFile == null ? "The user cancelled selecting a file." : "The preferences would now be saved to "
+				+ saveFile.getAbsolutePath() + " if it was implemented.";
+		MessageDialog.openInformation(preferenceDialog.getShell(), "Save Preferences...", msg);
+	}
+	
+	private File getSaveLoadFileFromUser(final int swtStyle) {
+		final FileDialog fd = new FileDialog(preferenceDialog.getShell(), swtStyle);
+		fd.setFilterExtensions(new String[] { "*.xml" });
+		final String path = fd.open();
+		return path == null ? null : new File(path);
 	}
 	
 	private void clickedButtonLoadPreferences() {
-		// TODO Auto-generated method stub
-		
+		final File loadFile = getSaveLoadFileFromUser(SWT.OPEN);
+		final String msg = loadFile == null ? "The user cancelled selecting a file." : "The preferences would now be loaded from "
+				+ loadFile.getAbsolutePath() + " if it was implemented.";
+		MessageDialog.openInformation(preferenceDialog.getShell(), "Save Preferences...", msg);
 	};
 	
 	private void addPreferenceNodes() {
