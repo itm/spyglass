@@ -1,5 +1,8 @@
 package de.uniluebeck.itm.spyglass.positions;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+
 /**
  * This class represents an rectangle, messured in absolute coordinates.
  * 
@@ -11,16 +14,19 @@ public class AbsoluteRectangle {
 	/**
 	 * Height of the rectangle
 	 */
+	@Attribute
 	private int height;
 	
 	/**
 	 * Upper left position (reference point)
 	 */
+	@Element
 	private AbsolutePosition upperLeft;
 	
 	/**
 	 * Width of the rectangle
 	 */
+	@Attribute
 	private int width;
 	
 	// --------------------------------------------------------------------------------

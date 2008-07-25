@@ -1,6 +1,13 @@
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -64,6 +71,24 @@ public abstract class PluginPreferencePage<T extends Plugin> extends PreferenceP
 	@Override
 	public void finalize() throws Throwable {
 		super.finalize();
+	}
+	
+	private Button testButton;
+	
+	@Override
+	protected void contributeButtons(final Composite parent) {
+		testButton = createButton(parent, "Test", new SelectionAdapter() {
+		});
+	}
+	
+	private Button createButton(final Composite parent, final String label, final SelectionListener selectionListener) {
+		((GridLayout) parent.getLayout()).numColumns++;
+		final Button button = new Button(parent, SWT.PUSH);
+		button.setText(label);
+		button.setFont(JFaceResources.getDialogFont());
+		button.addSelectionListener(selectionListener);
+		setButtonLayoutData(button);
+		return button;
 	}
 	
 	// --------------------------------------------------------------------------------

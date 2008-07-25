@@ -12,6 +12,14 @@ import org.apache.log4j.Category;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
@@ -19,6 +27,43 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 public class PluginPreferencesDialog {
+	
+	private class CustomPreferenceDialog extends PreferenceDialog {
+		
+		public CustomPreferenceDialog(final Shell parentShell, final PreferenceManager preferenceManager) {
+			super(parentShell, preferenceManager);
+			setShellStyle(SWT.DIALOG_TRIM | getDefaultOrientation());
+		}
+		
+		@Override
+		protected void configureShell(final Shell newShell) {
+			super.configureShell(newShell);
+			newShell.setText("SpyGlass Preferences");
+		}
+		
+		@Override
+		protected void createButtonsForButtonBar(final Composite parent) {
+			buttonSavePreferences = createButton(parent, "Save Preferences...", buttonSelectionListener);
+			buttonLoadPreferences = createButton(parent, "Load Preferences...", buttonSelectionListener);
+			buttonClose = createButton(parent, "Close", buttonSelectionListener);
+		}
+		
+		@Override
+		public void updateButtons() {
+			// nothing to do
+		}
+		
+		private Button createButton(final Composite parent, final String label, final SelectionListener selectionListener) {
+			((GridLayout) parent.getLayout()).numColumns++;
+			final Button button = new Button(parent, SWT.PUSH);
+			button.setText(label);
+			button.setFont(JFaceResources.getDialogFont());
+			button.addSelectionListener(selectionListener);
+			setButtonLayoutData(button);
+			return button;
+		}
+		
+	}
 	
 	private static final Category log = Logging.get(PluginPreferencesDialog.class);
 	
@@ -33,11 +78,44 @@ public class PluginPreferencesDialog {
 		this.spyglass = spyglass;
 		
 		preferenceManager = new PreferenceManager();
-		preferenceDialog = new PreferenceDialog(parentShell, preferenceManager);
+		preferenceDialog = new CustomPreferenceDialog(parentShell, preferenceManager);
 		
 		addPreferenceNodes();
 		
 	}
+	
+	private Button buttonClose;
+	
+	private Button buttonSavePreferences;
+	
+	private Button buttonLoadPreferences;
+	
+	private final SelectionListener buttonSelectionListener = new SelectionAdapter() {
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (e.getSource() == buttonSavePreferences) {
+				clickedButtonSavePreferences();
+			} else if (e.getSource() == buttonLoadPreferences) {
+				clickedButtonLoadPreferences();
+			} else if (e.getSource() == buttonClose) {
+				clickedButtonClose();
+			}
+		}
+	};
+	
+	private void clickedButtonClose() {
+		preferenceDialog.close();
+	}
+	
+	private void clickedButtonSavePreferences() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void clickedButtonLoadPreferences() {
+		// TODO Auto-generated method stub
+		
+	};
 	
 	private void addPreferenceNodes() {
 		

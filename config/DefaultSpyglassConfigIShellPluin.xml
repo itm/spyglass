@@ -4,7 +4,6 @@
          <file>source.packet.txt</file>
       </gateway>
    </packetReader>
-   <canvas class="de.uniluebeck.itm.spyglass.drawing.Canvas2D"/>
    <instances>
       <plugins class="java.util.ArrayList">
          <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin" isActive="true"/>
@@ -118,13 +117,8 @@
       <plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin" isActive="true">
          <parameters>
             <image>images/icons/brokenImageLink.png</image>
-            <size width="10" height="10" lineWidth="1">
-               <colorR>200</colorR>
-               <colorG>0</colorG>
-               <colorB>0</colorB>
-               <bgColorR>255</bgColorR>
-               <bgColorG>255</bgColorG>
-               <bgColorB>255</bgColorB>
+            <size width="10" height="10">
+        		<upperLeft x="0" y="0" z="0"/>
             </size>
             <isActive>true</isActive>
             <isVisible>true</isVisible>
