@@ -79,7 +79,7 @@ public class PacketProducerTask implements Runnable {
 					}
 					
 					// packetCache.push(packet);
-					spyglass.getInfoDispatcher().dispatchPacket(packet);
+					spyglass.getPacketDispatcher().dispatchPacket(packet);
 				}
 			} catch (final SpyglassPacketException e) {
 				log.error("Could not receive a packet from the packetReader.", e);
