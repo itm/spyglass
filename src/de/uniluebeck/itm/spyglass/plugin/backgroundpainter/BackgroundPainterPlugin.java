@@ -26,4 +26,8 @@ public abstract class BackgroundPainterPlugin extends Plugin implements Drawable
 		return "BackgroundPainter";
 	}
 	
+	@Override
+	public String toString() {
+		return BackgroundPainterPlugin.getHumanReadableName() + "." + this.getName();
+	}
 }

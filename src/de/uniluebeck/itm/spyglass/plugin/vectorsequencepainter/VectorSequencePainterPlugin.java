@@ -78,7 +78,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	}
 	
 	@Override
-	public String name() {
+	public String getName() {
 		// TODO Auto-generated method stub
 		return null;
 	}

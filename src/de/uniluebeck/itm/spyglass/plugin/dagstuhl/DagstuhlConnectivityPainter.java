@@ -112,7 +112,7 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public String name() {
+	public String getName() {
 		return "Dagstuhl";
 	}
 	

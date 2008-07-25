@@ -35,28 +35,6 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public class UIController {
 	
-	/** TODO: implizit */
-	public class KeyListener {
-		
-		@Override
-		public void finalize() throws Throwable {
-			
-		}
-		
-		public void KeyListener() {
-			
-		}
-		
-		/**
-		 * 
-		 * @param e
-		 */
-		public void keyEvent(final Event e) {
-			
-		}
-		
-	}
-	
 	private static Category log = SpyglassLogger.get(UIController.class);
 	
 	private AppWindow appWindow = null;
@@ -123,8 +101,6 @@ public class UIController {
 		});
 	}
 	
-	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * 
 	 */
@@ -132,21 +108,28 @@ public class UIController {
 		gc.setBackground(canvasBgColor);
 		gc.fillRectangle(appWindow.getGui().getCanvas().getClientArea());
 		
-		/* Hacky rewrite of the old code (see history). needs more work */
 		for (final Plugin plugin : spyglass.getPluginManager().getActivePlugins()) {
+			
 			if (plugin instanceof Drawable) {
-				final List<DrawingObject> dos = ((Drawable) plugin).getDrawingObjects(this.appWindow.getDrawingArea());
-				if (dos != null) {
-					for (final DrawingObject object : dos) {
-						object.draw(this.appWindow.getDrawingArea(), gc);
-					}
-				} else {
-					log.error("The plugin named '" + Plugin.getHumanReadableName() + "' of class " + plugin.getClass().getName()
-							+ " did not provide any drawing objects!");
-				}
+				
+				renderPlugin(gc, plugin);
+				
 			}
+			
 		}
 		
+	}
+	
+	private void renderPlugin(final GC gc, final Plugin plugin) {
+		final List<DrawingObject> dos = ((Drawable) plugin).getDrawingObjects(this.appWindow.getDrawingArea());
+		if (dos != null) {
+			for (final DrawingObject object : dos) {
+				object.draw(this.appWindow.getDrawingArea(), gc);
+			}
+			log.error("The plugin " + plugin + " did provide any drawing objects!");
+		} else {
+			log.error("The plugin " + plugin + " did not provide any drawing objects!");
+		}
 	}
 	
 	// --------------------------------------------------------------------------

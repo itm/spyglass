@@ -78,7 +78,7 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	}
 	
 	@Override
-	public String name() {
+	public String getName() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -50,7 +50,7 @@ public abstract class Plugin implements Runnable {
 	/**
 	 * 
 	 */
-	public abstract String name();
+	public abstract String getName();
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -175,5 +175,13 @@ public abstract class Plugin implements Runnable {
 	 * blocks the GUI
 	 */
 	protected abstract void updateQuadTree();
+	
+	/**
+	 * This method returns an identification string representing the plugin. it is primarily used
+	 * for identifiing plugins (and which classes they are instanciated of) in log messages.
+	 * 
+	 */
+	@Override
+	public abstract String toString();
 	
 }

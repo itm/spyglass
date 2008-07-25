@@ -55,7 +55,7 @@ public class ConfigNodePositioner extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public String name() {
+	public String getName() {
 		// TODO Auto-generated method stub
 		return null;
 	}

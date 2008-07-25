@@ -121,7 +121,7 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public String name() {
+	public String getName() {
 		return "Dagstuhl";
 	}
 	

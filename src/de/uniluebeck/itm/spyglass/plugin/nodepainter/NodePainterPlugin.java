@@ -25,4 +25,9 @@ public abstract class NodePainterPlugin extends Plugin implements Drawable {
 		return "NodePainter";
 	}
 	
+	@Override
+	public String toString() {
+		return NodePainterPlugin.getHumanReadableName() + "." + this.getName();
+	}
+	
 }

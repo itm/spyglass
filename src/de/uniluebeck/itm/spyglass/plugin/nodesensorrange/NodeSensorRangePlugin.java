@@ -77,7 +77,7 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public String name() {
+	public String getName() {
 		// TODO Auto-generated method stub
 		return null;
 	}

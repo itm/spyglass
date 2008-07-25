@@ -54,9 +54,8 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 	}
 	
 	@Override
-	public String name() {
-		// TODO Auto-generated method stub
-		return null;
+	public String getName() {
+		return "unnamed";
 	}
 	
 	@Override
@@ -90,6 +89,11 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 	public float getTimeout() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	@Override
+	public String toString() {
+		return HistoricalPlugin.getHumanReadableName() + "." + this.getName();
 	}
 	
 }

@@ -26,4 +26,8 @@ public abstract class RelationPainterPlugin extends Plugin implements Drawable {
 		return "RelationPainter";
 	}
 	
+	@Override
+	public String toString() {
+		return RelationPainterPlugin.getHumanReadableName() + "." + this.getName();
+	}
 }
