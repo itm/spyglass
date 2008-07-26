@@ -307,7 +307,7 @@ public abstract class Plugin implements Runnable {
 	 *            if the packet queue is currently empty
 	 * @return the head of the packet queue, or <tt>null</tt> if it is empty
 	 */
-	protected SpyglassPacket getPacketFromQueue(final boolean wait) {
+	private SpyglassPacket getPacketFromQueue(final boolean wait) {
 		
 		synchronized (packetQueue) {
 			// wait for the arrival of a new packet if the packet queue is
