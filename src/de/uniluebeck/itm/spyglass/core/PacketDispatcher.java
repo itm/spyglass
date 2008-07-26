@@ -16,6 +16,7 @@ import org.apache.log4j.Category;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.Tools;
 
@@ -66,6 +67,16 @@ public class PacketDispatcher {
 			return;
 		}
 		
+		// get the active node positioner which has to handle the packet
+		// synchronously.
+		// Note that no exception is caught here since an error
+		// here affects the whole application (since there has to be an active
+		// note positionen which can handle packets all the time!)
+		// An exception like this has to be handled differently
+		final NodePositionerPlugin np = pluginManager.getNodePositioner();
+		np.handlePacket(packet);
+		
+		//
 		final List<Plugin> plugins = pluginManager.getActivePlugins();
 		if (plugins == null) {
 			return;
@@ -79,7 +90,7 @@ public class PacketDispatcher {
 			try {
 				plugin.handlePacket(packet);
 			} catch (final Throwable t) {
-				log.error("Error in plugin " + plugin + ": " + t, t);
+				log.error("The plugin " + plugin + " could not handle a packet : " + t, t);
 			}
 		}
 	}

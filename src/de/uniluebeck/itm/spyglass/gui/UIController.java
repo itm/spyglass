@@ -1,9 +1,11 @@
 /*
- * ---------------------------------------------------------------------- This file is part of the
- * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
- * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
- * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
- * further details. ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This
+ * file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui;
 
@@ -30,9 +32,10 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 // ------------------------------------------------------------------------------
 // --
 /**
- * The UI controller is the interface between the core Spyglass functionality and the graphical user
- * interface. It is bound to a specific GUI library. If the GUI must be completely replaced, the UI
- * controller must also be changed/replaced.
+ * The UI controller is the interface between the core Spyglass functionality
+ * and the graphical user interface. It is bound to a specific GUI library. If
+ * the GUI must be completely replaced, the UI controller must also be
+ * changed/replaced.
  */
 public class UIController {
 	
@@ -162,7 +165,8 @@ public class UIController {
 			for (final DrawingObject object : dos) {
 				object.draw(this.spyglass.getDrawingArea(), gc);
 			}
-			log.error("The plugin " + plugin + " did provide any drawing objects!");
+			// log.error("The plugin " + plugin + " did provide any drawing
+			// objects!");
 		} else {
 			log.error("The plugin " + plugin + " did not provide any drawing objects!");
 		}

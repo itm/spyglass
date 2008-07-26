@@ -15,19 +15,19 @@ public class AbsoluteRectangle {
 	 * Height of the rectangle
 	 */
 	@Attribute
-	private int height;
+	private int height = 1;
 	
 	/**
 	 * Upper left position (reference point)
 	 */
 	@Element
-	private AbsolutePosition upperLeft;
+	private AbsolutePosition upperLeft = new AbsolutePosition();
 	
 	/**
 	 * Width of the rectangle
 	 */
 	@Attribute
-	private int width;
+	private int width = 1;
 	
 	// --------------------------------------------------------------------------------
 	/**

@@ -13,6 +13,7 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
@@ -22,7 +23,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
  * @author Sebastian Ebers
  * 
  */
-public class GridPainterXMLConfig {
+public class GridPainterXMLConfig extends PluginXMLConfig {
 	
 	@Element
 	private int gridElementHeight = 1;
