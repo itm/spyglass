@@ -1,9 +1,11 @@
 /*
- * ---------------------------------------------------------------------- This file is part of the
- * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
- * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
- * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
- * further details. ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This
+ * file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.packet;
 
@@ -12,17 +14,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.apache.log4j.Category;
-import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.gateway.Gateway;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 // --------------------------------------------------------------------------------
 /**
- * This class implements a PacketReader. It reads packets from a text file line by line of the
- * format id:x:y Each line is a packet with the given id and position (x and y coordinates).
+ * This class implements a PacketReader. It reads packets from a text file line
+ * by line of the format id:x:y Each line is a packet with the given id and
+ * position (x and y coordinates).
  */
-@Root
 public class ComplexPacketReader extends PacketReader {
 	
 	private static Category log = SpyglassLogger.get(ComplexPacketReader.class);
@@ -73,7 +74,8 @@ public class ComplexPacketReader extends PacketReader {
 	// ------
 	
 	/**
-	 * each line is made up by a timestamp and a packet in hex, seperated by a colon.
+	 * each line is made up by a timestamp and a packet in hex, seperated by a
+	 * colon.
 	 * 
 	 * @param line
 	 *            A String containing the packet format.

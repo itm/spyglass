@@ -1,17 +1,16 @@
 /*
- * ---------------------------------------------------------------------- This file is part of the
- * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
- * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
- * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
- * further details. ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This
+ * file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass;
 
 import ishell.device.MessagePacket;
 import ishell.util.IconTheme;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 import org.apache.log4j.Category;
 import org.eclipse.jface.action.Action;
@@ -35,7 +34,7 @@ import de.uniluebeck.itm.spyglass.gui.actions.ZoomCompleteMapAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomInAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomOutAction;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
-import de.uniluebeck.itm.spyglass.packet.PacketReader;
+import de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketBroker;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
@@ -43,19 +42,20 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 // ------------------------------------------------------------------------------
 // --
 /**
- * To use this plug-in in iShell, you need to add two option to your iShell configuration file
- * (typically ishell.properties).
+ * To use this plug-in in iShell, you need to add two option to your iShell
+ * configuration file (typically ishell.properties).
  * 
- * The first one determines the additional classpath parameters in where this plug-in and its
- * libraries are located. Please note that you must escape any backslash and colon with a backslash
- * character. An example of how this could look like is shown in the following line:
+ * The first one determines the additional classpath parameters in where this
+ * plug-in and its libraries are located. Please note that you must escape any
+ * backslash and colon with a backslash character. An example of how this could
+ * look like is shown in the following line:
  * 
  * <pre>
  * plugin_classpath=C\:\\work\\java\\spyglass-lean\\bin\\eclipse;C\:\\work\\java\\spyglass-lean\\lib\\simple-xml-1.6.jar
  * </pre>
  * 
- * The second parameter denotes the fully classified class name of the plug-in. This should remain
- * unchanged and look like the following:
+ * The second parameter denotes the fully classified class name of the plug-in.
+ * This should remain unchanged and look like the following:
  * 
  * <pre>
  * plugin_classes = de.uniluebeck.itm.spyglass.PluginSpyGlass2iShell
@@ -76,7 +76,9 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	
 	private SpyglassConfiguration config;
 	
-	private final Deque<SpyglassPacket> queue = new ArrayDeque<SpyglassPacket>(50);
+	// private Deque<SpyglassPacket> queue = new ArrayDeque<SpyglassPacket>(50);
+	
+	private IShellToSpyGlassPacketBroker packetBroker;
 	
 	// --------------------------------------------------------------------------
 	// ------
@@ -150,24 +152,25 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		final ConfigStore cs = new ConfigStore(true);
 		// Create the configuration for SpyGlass
 		config = cs.getSpyglassConfig();
+		packetBroker = ((IShellToSpyGlassPacketBroker) config.getPacketReader());
 		// config.setFps(5);
 		// config.setPacketDeliveryInitialDelay(500);
 		// config.setPacketDeliveryDelay(10);
 		// config.setCanvas(new Canvas2D());
-		config.setPacketReader(new PacketReader() {
-			
-			@Override
-			public SpyglassPacket getNextPacket() {
-				synchronized (queue) {
-					return queue.pollLast();
-				}
-			}
-		});
+		// config.setPacketReader(new PacketReader() {
+		//			
+		// @Override
+		// public SpyglassPacket getNextPacket() {
+		// synchronized (queue) {
+		// return queue.pollLast();
+		// }
+		// }
+		// });
 		/*
 		 * DagstuhlNodePainter dagstuhlPlugin = new DagstuhlNodePainter();
 		 * DagstuhlConnectivityPainter dagstuhlConnectivityPainter = new
-		 * DagstuhlConnectivityPainter(); DagstuhlRoutePainter dagstuhlRoutePainter = new
-		 * DagstuhlRoutePainter();
+		 * DagstuhlConnectivityPainter(); DagstuhlRoutePainter
+		 * dagstuhlRoutePainter = new DagstuhlRoutePainter();
 		 */
 		// config.setPluginManager(new SpyGlass2iShellPluginManager(this));
 		/*
@@ -224,9 +227,11 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		
 		log.debug("Received Packet in spyglass from ishell: " + spyglassPacket);
 		
-		synchronized (queue) {
-			queue.push(spyglassPacket);
-		}
+		packetBroker.push(spyglassPacket);
+		
+		// synchronized (queue) {
+		// queue.push(spyglassPacket);
+		// }
 		
 	}
 	

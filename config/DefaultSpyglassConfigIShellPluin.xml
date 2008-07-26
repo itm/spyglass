@@ -1,9 +1,5 @@
 <spyglassConfiguration>
-   <packetReader class="de.uniluebeck.itm.spyglass.packet.ComplexPacketReader">
-      <gateway class="de.uniluebeck.itm.spyglass.gateway.FileReaderGateway">
-         <file>generator.txt</file>
-      </gateway>
-   </packetReader>
+   <packetReader class="de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketQueue"/>
    <instances>
       <plugins class="java.util.ArrayList">
          <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin"/>
