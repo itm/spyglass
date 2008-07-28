@@ -2,7 +2,6 @@ package de.uniluebeck.itm.spyglass.plugin;
 
 import java.util.List;
 
-
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.AbstractPluginTypePreferencePage;
@@ -15,8 +14,8 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
- * Temporary class which all old Plugins inherit. It adds a compatibillity layer
- * to the Plugin interface so that the old Plugins can run without much change.
+ * Temporary class which all old Plugins inherit. It adds a compatibillity layer to the Plugin
+ * interface so that the old Plugins can run without much change.
  * 
  * @author dariush
  * @deprecated
@@ -31,11 +30,11 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 	}
 	
 	@Override
-	public PluginPreferencePage<? extends Plugin> createPreferencePage(final ConfigStore cs) {
+	public PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
 		return new AbstractPluginTypePreferencePage(HistoricalPlugin.getHumanReadableName());
 	}
 	
-	public static PluginPreferencePage<? extends Plugin> createTypePreferencePage(final ConfigStore cs) {
+	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(final ConfigStore cs) {
 		return new AbstractPluginTypePreferencePage(HistoricalPlugin.getHumanReadableName());
 	}
 	
@@ -51,6 +50,12 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 	public PluginXMLConfig getXMLConfig() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public boolean isVisible() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	@Override

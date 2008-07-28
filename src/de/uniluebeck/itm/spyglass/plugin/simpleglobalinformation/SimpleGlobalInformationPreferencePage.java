@@ -7,22 +7,15 @@ import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class SimpleGlobalInformationPluginPreferences extends PluginPreferencePage<SimpleGlobalInformationPlugin> {
+public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> {
 	
-	public SimpleGlobalInformationPluginPreferences(final ConfigStore cs) {
+	public SimpleGlobalInformationPreferencePage(final ConfigStore cs) {
 		super(cs);
 	}
 	
-	public SimpleGlobalInformationPluginPreferences(final ConfigStore cs, final SimpleGlobalInformationPlugin plugin) {
+	public SimpleGlobalInformationPreferencePage(final ConfigStore cs, final SimpleGlobalInformationPlugin plugin) {
 		super(cs, plugin);
-	}
-	
-	@Override
-	public PluginXMLConfig getCurrentPluginConfig() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	@Override
@@ -45,21 +38,15 @@ public class SimpleGlobalInformationPluginPreferences extends PluginPreferencePa
 	}
 	
 	@Override
-	public boolean performRestore() {
+	public SimpleGlobalInformationXMLConfig getFormValues() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 	
 	@Override
-	public boolean performRestoreDefaults() {
+	public void setFormValues(final SimpleGlobalInformationXMLConfig config) {
 		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public boolean performSaveAsDefault() {
-		// TODO Auto-generated method stub
-		return false;
+		
 	}
 	
 }

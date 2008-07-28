@@ -4,6 +4,7 @@ import ishell.util.Logging;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -11,9 +12,11 @@ import java.util.Set;
 
 import org.apache.log4j.Category;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -28,8 +31,9 @@ import org.eclipse.swt.widgets.Shell;
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class PluginPreferencesDialog {
+public class PluginPreferenceDialog {
 	
 	private class CustomPreferenceDialog extends PreferenceDialog {
 		
@@ -68,7 +72,7 @@ public class PluginPreferencesDialog {
 		
 	}
 	
-	private static final Category log = Logging.get(PluginPreferencesDialog.class);
+	private static final Category log = Logging.get(PluginPreferenceDialog.class);
 	
 	private final PreferenceManager preferenceManager;
 	
@@ -76,7 +80,7 @@ public class PluginPreferencesDialog {
 	
 	private final Spyglass spyglass;
 	
-	public PluginPreferencesDialog(final Shell parentShell, final Spyglass spyglass) {
+	public PluginPreferenceDialog(final Shell parentShell, final Spyglass spyglass) {
 		
 		this.spyglass = spyglass;
 		
@@ -131,6 +135,30 @@ public class PluginPreferencesDialog {
 		MessageDialog.openInformation(preferenceDialog.getShell(), "Save Preferences...", msg);
 	};
 	
+	private class PluginPreferenceNode extends PreferenceNode {
+		
+		private final String labelText;
+		
+		private final ImageDescriptor imageDescriptor;
+		
+		public PluginPreferenceNode(final String id, final String labelText, final ImageDescriptor image, final IPreferencePage preferencePage) {
+			super(id, preferencePage);
+			this.labelText = labelText;
+			this.imageDescriptor = image;
+		}
+		
+		@Override
+		public String getLabelText() {
+			return labelText;
+		}
+		
+		@Override
+		protected ImageDescriptor getImageDescriptor() {
+			return imageDescriptor;
+		}
+		
+	}
+	
 	private void addPreferenceNodes() {
 		
 		final PreferenceNode generalPreferenceNode = new PreferenceNode("General", "General", null, GeneralPreferencePage.class.getCanonicalName());
@@ -159,10 +187,11 @@ public class PluginPreferencesDialog {
 			
 		}
 		
-		final PreferenceNode preferenceNode;
-		PreferenceNode instancePreferenceNode;
-		String preferenceNodeId;
-		PluginPreferencePage<? extends Plugin> preferencePage;
+		final PluginPreferenceNode preferenceNode;
+		PluginPreferenceNode instancePreferenceNode;
+		String preferenceNodeId, preferenceNodeLabel;
+		ImageDescriptor preferenceNodeImageDescriptor;
+		PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> preferencePage;
 		
 		try {
 			
@@ -170,7 +199,8 @@ public class PluginPreferencesDialog {
 			
 			preferenceNodeId = classTree.clazz.getCanonicalName() + "_" + System.currentTimeMillis();
 			preferencePage = getTypePreferencePage(classTree.clazz);
-			preferenceNode = new PreferenceNode(preferenceNodeId, preferencePage);
+			preferenceNodeLabel = getPluginName(classTree.clazz);
+			preferenceNode = new PluginPreferenceNode(preferenceNodeId, preferenceNodeLabel, null, preferencePage);
 			parentPreferenceNode.add(preferenceNode);
 			
 			// add nodes for instantiated plugins
@@ -178,7 +208,10 @@ public class PluginPreferencesDialog {
 				
 				preferenceNodeId = p.getClass().getCanonicalName() + "_" + p.hashCode();
 				preferencePage = getPreferencePage(classTree.clazz, p);
-				instancePreferenceNode = new PreferenceNode(preferenceNodeId, preferencePage);
+				preferenceNodeLabel = getInstanceName(classTree.clazz, p);
+				preferenceNodeImageDescriptor = getInstanceImageDescriptor(classTree.clazz, p);
+				instancePreferenceNode = new PluginPreferenceNode(preferenceNodeId, preferenceNodeLabel, preferenceNodeImageDescriptor,
+						preferencePage);
 				
 				preferenceNode.add(instancePreferenceNode);
 				
@@ -197,6 +230,44 @@ public class PluginPreferencesDialog {
 		
 	}
 	
+	private ImageDescriptor getInstanceImageDescriptor(final Class<? extends Plugin> clazz, final Plugin p) {
+		
+		try {
+			
+			final boolean isActive = (Boolean) clazz.getMethod("isActive").invoke(p);
+			final boolean isVisible = (Boolean) clazz.getMethod("isVisible").invoke(p);
+			
+			return (isActive && isVisible) ? getImageDescriptor("active_visible.png") : (isActive) ? getImageDescriptor("active_not_visible.png")
+					: getImageDescriptor("not_active.png");
+			
+		} catch (final Exception e) {
+			log.error("", e);
+			return null;
+		}
+		
+	}
+	
+	private URL getResourceUrl(final String suffix) {
+		return PluginPreferenceDialog.class.getResource(suffix);
+	}
+	
+	protected ImageDescriptor getImageDescriptor(final String fileName) {
+		return ImageDescriptor.createFromURL(getResourceUrl(fileName));
+	}
+	
+	private String getInstanceName(final Class<? extends Plugin> clazz, final Plugin p) {
+		
+		try {
+			
+			return (String) clazz.getMethod("getName").invoke(p);
+			
+		} catch (final Exception e) {
+			log.error("", e);
+			return "SEE_ERROR_LOG";
+		}
+		
+	}
+	
 	private boolean isAbstract(final Class<? extends Plugin> clazz) {
 		
 		return Modifier.isAbstract(clazz.getModifiers());
@@ -209,6 +280,13 @@ public class PluginPreferencesDialog {
 			
 			return (String) clazz.getDeclaredMethod("getHumanReadableName").invoke(null);
 			
+		} catch (final NoSuchMethodException e) {
+			
+			final String message = "The SpyGlass Plug-In " + clazz.getCanonicalName()
+					+ " must implement the method \"public static String getHumanReadableName()\"";
+			MessageDialog.openWarning(preferenceDialog.getShell(), "Incorrect plug-in implementation", message);
+			log.error("", e);
+			
 		} catch (final Exception e) {
 			log.error("", e);
 		}
@@ -218,7 +296,7 @@ public class PluginPreferencesDialog {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private PluginPreferencePage<? extends Plugin> getPreferencePage(final Class<? extends Plugin> clazz, final Plugin p) {
+	private PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> getPreferencePage(final Class<? extends Plugin> clazz, final Plugin p) {
 		
 		try {
 			
@@ -233,7 +311,7 @@ public class PluginPreferencesDialog {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private PluginPreferencePage<? extends Plugin> getTypePreferencePage(final Class<? extends Plugin> clazz) {
+	private PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> getTypePreferencePage(final Class<? extends Plugin> clazz) {
 		
 		try {
 			

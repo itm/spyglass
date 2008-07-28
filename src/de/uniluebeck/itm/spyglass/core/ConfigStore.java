@@ -1,11 +1,9 @@
 /*
- * ------------------------------------------------------------------------------
- * -- This file is part of the WSN visualization framework SpyGlass. Copyright
- * (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ----------------------------------------------
+ * ------------------------------------------------------------------------------ -- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details. ----------------------------------------------
  * ----------------------------------
  */
 package de.uniluebeck.itm.spyglass.core;
@@ -23,11 +21,11 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXmlConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
- * Instances of this class are used to load and store the spyglass configuration
- * from and into the local file system, respectively.<br>
+ * Instances of this class are used to load and store the spyglass configuration from and into the
+ * local file system, respectively.<br>
  * Additionally, configuration parameters can be loaded and stored partially.
  * 
  * @author Sebastian Ebers
@@ -55,29 +53,25 @@ public class ConfigStore {
 		spyglassConfig = null;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Reads the config from an hardcoded standard-path (which is stored
-	 * internally in this class)
+	 * Reads the config from an hardcoded standard-path (which is stored internally in this class)
 	 * 
 	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell
-	 *            plug-in
+	 *            indicates whether or not the application is used as iShell plug-in
 	 */
 	public ConfigStore(final boolean isIShellPlugin) {
 		this(isIShellPlugin, new File((isIShellPlugin) ? DEFAULT_CONFIG_FILE_ISHELL_PLUGIN : DEFAULT_CONFIG_FILE_STANDALONE));
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Reads the config from an hardcoded standard-path (which is stored
-	 * internally in this class)
+	 * Reads the config from an hardcoded standard-path (which is stored internally in this class)
 	 * 
 	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell
-	 *            plug-in
+	 *            indicates whether or not the application is used as iShell plug-in
 	 * @param spyglassConfig
 	 *            the configuration parameters
 	 */
@@ -87,14 +81,13 @@ public class ConfigStore {
 		this.spyglassConfig = spyglassConfig;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * creates a new configStore for the given File.
 	 * 
 	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell
-	 *            plug-in
+	 *            indicates whether or not the application is used as iShell plug-in
 	 * @param file
 	 *            the file which contains the configuration parameters
 	 */
@@ -104,7 +97,7 @@ public class ConfigStore {
 		load(configFile);
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * @return the spyglassConfig
@@ -113,7 +106,7 @@ public class ConfigStore {
 		return spyglassConfig;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * @param spyglassConfig
@@ -123,7 +116,7 @@ public class ConfigStore {
 		this.spyglassConfig = spyglassConfig;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Returns the general settings configuration parameters
@@ -134,7 +127,7 @@ public class ConfigStore {
 		return spyglassConfig.getGeneralSettings();
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Returns the configuration parameters of a plug-in
@@ -145,14 +138,14 @@ public class ConfigStore {
 	public PluginXMLConfig readPluginInstanceConfig(final String instanceName) {
 		final List<Plugin> plugins = spyglassConfig.getPluginManager().getPlugins();
 		for (final Plugin plugin : plugins) {
-			if (plugin.getHumanReadableName().equals(instanceName)) {
+			if (plugin.getName().equals(instanceName)) {
 				return plugin.getXMLConfig();
 			}
 		}
 		return null;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Returns the configuration parameters of a certain kind of plug-ins
@@ -169,7 +162,7 @@ public class ConfigStore {
 		return configs;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Returns the default configuration parameters of a plug-in
@@ -189,7 +182,7 @@ public class ConfigStore {
 		return null;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Stores the general settings configuration
@@ -202,13 +195,12 @@ public class ConfigStore {
 		store();
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Stores the provided configuration parameters of a plug-in persistently.<br>
-	 * The matching plug-in is determined by comparing the provided
-	 * configuration instance with the configuration instance of each plug-in
-	 * currently administered by the plug-in manager.
+	 * The matching plug-in is determined by comparing the provided configuration instance with the
+	 * configuration instance of each plug-in currently administered by the plug-in manager.
 	 * 
 	 * @param config
 	 *            the configuration to be stored
@@ -226,14 +218,13 @@ public class ConfigStore {
 		throw new UnsupportedOperationException("No matching plugin was found! Create a new one first");
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Stores the provided configuration as default configuration for a plug-in.<br>
-	 * The matching plug-in is determined by comparing the provided
-	 * configuration's class with the configuration classes of each plug-in
-	 * which configuration parameters are available within the configuration
-	 * file
+	 * The matching plug-in is determined by comparing the provided configuration's class with the
+	 * configuration classes of each plug-in which configuration parameters are available within the
+	 * configuration file
 	 * 
 	 * @param config
 	 *            the configuration to be stored
@@ -251,7 +242,7 @@ public class ConfigStore {
 		throw new UnsupportedOperationException("No matching configuration was found! Create a new one first");
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Loads the configuration from a file
@@ -269,7 +260,7 @@ public class ConfigStore {
 		return false;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Loads and returns the configuration from a file
@@ -301,12 +292,11 @@ public class ConfigStore {
 		}
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Stores the configuration persistently into the local file system.<br>
-	 * Since no file is provided the file {@link ConfigStore#defaultFileName} is
-	 * used.
+	 * Since no file is provided the file {@link ConfigStore#defaultFileName} is used.
 	 * 
 	 * @return <code>true</code> if the configuration was stored successfully
 	 */
@@ -314,7 +304,7 @@ public class ConfigStore {
 		return store(new File(configFilePath));
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Stores the configuration persistently into the local file system.
@@ -349,11 +339,11 @@ public class ConfigStore {
 		}
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Replaces all duplicated class instances from the list of plug-ins which
-	 * are configured by default.
+	 * Replaces all duplicated class instances from the list of plug-ins which are configured by
+	 * default.
 	 */
 	private void purgeDefaults() {
 		// TODO Auto-generated method stub

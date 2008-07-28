@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
+package de.uniluebeck.itm.spyglass.plugin.gridpainter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -7,28 +7,21 @@ import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class NodeSensorRangePluginPreferences extends PluginPreferencePage<NodeSensorRangePlugin> {
+public class GridPainterPreferencePage extends PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> {
 	
-	public NodeSensorRangePluginPreferences(final ConfigStore cs) {
+	public GridPainterPreferencePage(final ConfigStore cs) {
 		super(cs);
 	}
 	
-	public NodeSensorRangePluginPreferences(final ConfigStore cs, final NodeSensorRangePlugin plugin) {
+	public GridPainterPreferencePage(final ConfigStore cs, final GridPainterPlugin plugin) {
 		super(cs, plugin);
-	}
-	
-	@Override
-	public PluginXMLConfig getCurrentPluginConfig() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	@Override
 	protected Control createContents(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-		label.setText("NodeSensorRangePlugin Preference Page");
+		label.setText("GridPainterPlugin Preference Page");
 		return label;
 	}
 	
@@ -45,21 +38,15 @@ public class NodeSensorRangePluginPreferences extends PluginPreferencePage<NodeS
 	}
 	
 	@Override
-	public boolean performRestore() {
+	public GridPainterXMLConfig getFormValues() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 	
 	@Override
-	public boolean performRestoreDefaults() {
+	public void setFormValues(final GridPainterXMLConfig config) {
 		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public boolean performSaveAsDefault() {
-		// TODO Auto-generated method stub
-		return false;
+		
 	}
 	
 }

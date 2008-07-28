@@ -7,22 +7,16 @@ import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class SpringEmbedderPositionerPluginPreferences extends PluginPreferencePage<SpringEmbedderPositionerPlugin> {
+public class SpringEmbedderPositionerPreferencePage extends
+		PluginPreferencePage<SpringEmbedderPositionerPlugin, SpringEmbedderPositionerXMLConfig> {
 	
-	public SpringEmbedderPositionerPluginPreferences(final ConfigStore cs) {
+	public SpringEmbedderPositionerPreferencePage(final ConfigStore cs) {
 		super(cs);
 	}
 	
-	public SpringEmbedderPositionerPluginPreferences(final ConfigStore cs, final SpringEmbedderPositionerPlugin plugin) {
+	public SpringEmbedderPositionerPreferencePage(final ConfigStore cs, final SpringEmbedderPositionerPlugin plugin) {
 		super(cs, plugin);
-	}
-	
-	@Override
-	public PluginXMLConfig getCurrentPluginConfig() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	@Override
@@ -45,21 +39,15 @@ public class SpringEmbedderPositionerPluginPreferences extends PluginPreferenceP
 	}
 	
 	@Override
-	public boolean performRestore() {
+	public SpringEmbedderPositionerXMLConfig getFormValues() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 	
 	@Override
-	public boolean performRestoreDefaults() {
+	public void setFormValues(final SpringEmbedderPositionerXMLConfig config) {
 		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public boolean performSaveAsDefault() {
-		// TODO Auto-generated method stub
-		return false;
+		
 	}
 	
 }

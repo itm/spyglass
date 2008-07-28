@@ -114,7 +114,7 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 	
 	@Override
 	public String getName() {
-		return "Dagstuhl";
+		return "DagstuhlConnectivity-Instance";
 	}
 	
 	@Override
@@ -129,12 +129,12 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<DagstuhlConnectivityPainter> createPreferencePage(final ConfigStore cs) {
+	public PluginPreferencePage<DagstuhlConnectivityPainter, PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public static PluginPreferencePage<DagstuhlConnectivityPainter> createTypePreferencePage(final ConfigStore cs) {
+	public static PluginPreferencePage<DagstuhlConnectivityPainter, PluginXMLConfig> createTypePreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}

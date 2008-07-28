@@ -123,7 +123,7 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 	
 	@Override
 	public String getName() {
-		return "Dagstuhl";
+		return "DagstuhlNodePainter-Instance";
 	}
 	
 	@Override
@@ -139,12 +139,12 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<DagstuhlNodePainter> createPreferencePage(final ConfigStore cs) {
+	public PluginPreferencePage<DagstuhlNodePainter, PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public static PluginPreferencePage<DagstuhlNodePainter> createTypePreferencePage(final ConfigStore cs) {
+	public static PluginPreferencePage<DagstuhlNodePainter, PluginXMLConfig> createTypePreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}

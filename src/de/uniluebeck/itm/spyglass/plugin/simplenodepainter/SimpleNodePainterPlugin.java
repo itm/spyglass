@@ -52,12 +52,12 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<SimpleNodePainterPlugin> createPreferencePage(final ConfigStore cs) {
-		return new SimpleNodePainterPluginPreferences(cs, this);
+	public PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> createPreferencePage(final ConfigStore cs) {
+		return new SimpleNodePainterPreferencePage(cs, this);
 	}
 	
-	public static PluginPreferencePage<SimpleNodePainterPlugin> createTypePreferencePage(final ConfigStore cs) {
-		return new SimpleNodePainterPluginPreferences(cs);
+	public static PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> createTypePreferencePage(final ConfigStore cs) {
+		return new SimpleNodePainterPreferencePage(cs);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
@@ -82,8 +82,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig.getName();
 	}
 	
 	@Override

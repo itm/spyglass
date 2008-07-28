@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.plugin.imagepainter;
+package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -7,28 +7,21 @@ import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class ImagePainterPluginPreferences extends PluginPreferencePage<ImagePainterPlugin> {
+public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> {
 	
-	public ImagePainterPluginPreferences(final ConfigStore cs) {
+	public NodeSensorRangePreferencePage(final ConfigStore cs) {
 		super(cs);
 	}
 	
-	public ImagePainterPluginPreferences(final ConfigStore cs, final ImagePainterPlugin plugin) {
+	public NodeSensorRangePreferencePage(final ConfigStore cs, final NodeSensorRangePlugin plugin) {
 		super(cs, plugin);
-	}
-	
-	@Override
-	public PluginXMLConfig getCurrentPluginConfig() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	@Override
 	protected Control createContents(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-		label.setText("ImagePainterPlugin Preference Page");
+		label.setText("NodeSensorRangePlugin Preference Page");
 		return label;
 	}
 	
@@ -45,21 +38,15 @@ public class ImagePainterPluginPreferences extends PluginPreferencePage<ImagePai
 	}
 	
 	@Override
-	public boolean performRestore() {
+	public NodeSensorRangeXMLConfig getFormValues() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 	
 	@Override
-	public boolean performRestoreDefaults() {
+	public void setFormValues(final NodeSensorRangeXMLConfig config) {
 		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public boolean performSaveAsDefault() {
-		// TODO Auto-generated method stub
-		return false;
+		
 	}
 	
 }

@@ -50,12 +50,12 @@ public class LinePainterPlugin extends RelationPainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<LinePainterPlugin> createPreferencePage(final ConfigStore cs) {
-		return new LinePainterPluginPreferences(cs, this);
+	public PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> createPreferencePage(final ConfigStore cs) {
+		return new LinePainterPreferencePage(cs, this);
 	}
 	
-	public static PluginPreferencePage<LinePainterPlugin> createTypePreferencePage(final ConfigStore cs) {
-		return new LinePainterPluginPreferences(cs);
+	public static PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> createTypePreferencePage(final ConfigStore cs) {
+		return new LinePainterPreferencePage(cs);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
@@ -69,8 +69,7 @@ public class LinePainterPlugin extends RelationPainterPlugin {
 	
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig;
 	}
 	
 	@Override
@@ -81,8 +80,7 @@ public class LinePainterPlugin extends RelationPainterPlugin {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig.getName();
 	}
 	
 	@Override

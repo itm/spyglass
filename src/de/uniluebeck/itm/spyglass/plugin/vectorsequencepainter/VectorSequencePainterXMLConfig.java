@@ -22,7 +22,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * @author Sebastian Ebers
  * 
  */
-public class VektorSequencePainterXMLConfig extends PluginXMLConfig {
+public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	
 	@Element
 	private byte dimension = 2;
@@ -37,7 +37,7 @@ public class VektorSequencePainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * Constructor
 	 */
-	public VektorSequencePainterXMLConfig() {
+	public VectorSequencePainterXMLConfig() {
 		
 	}
 	

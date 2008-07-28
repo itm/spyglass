@@ -53,12 +53,13 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<PositionPacketNodePositionerPlugin> createPreferencePage(final ConfigStore cs) {
-		return new PositionPacketNodePositionerPluginPreferences(cs, this);
+	public PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> createPreferencePage(final ConfigStore cs) {
+		return new PositionPacketNodePositionerPreferencePage(cs, this);
 	}
 	
-	public static PluginPreferencePage<PositionPacketNodePositionerPlugin> createTypePreferencePage(final ConfigStore cs) {
-		return new PositionPacketNodePositionerPluginPreferences(cs);
+	public static PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> createTypePreferencePage(
+			final ConfigStore cs) {
+		return new PositionPacketNodePositionerPreferencePage(cs);
 	}
 	
 	public static String getHumanReadableName() {

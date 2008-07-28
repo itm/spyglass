@@ -8,18 +8,13 @@ import org.eclipse.swt.widgets.Label;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class AbstractPluginTypePreferencePage extends PluginPreferencePage<Plugin> {
+public class AbstractPluginTypePreferencePage extends PluginPreferencePage<Plugin, PluginXMLConfig> {
 	
 	private final String pluginName;
 	
 	public AbstractPluginTypePreferencePage(final String pluginName) {
 		super(null);
 		this.pluginName = pluginName;
-	}
-	
-	@Override
-	public PluginXMLConfig getCurrentPluginConfig() {
-		return null;
 	}
 	
 	@Override
@@ -33,25 +28,21 @@ public class AbstractPluginTypePreferencePage extends PluginPreferencePage<Plugi
 	}
 	
 	@Override
-	public boolean performRestore() {
-		return false;
-	}
-	
-	@Override
-	public boolean performRestoreDefaults() {
-		return false;
-	}
-	
-	@Override
-	public boolean performSaveAsDefault() {
-		return false;
-	}
-	
-	@Override
 	protected Control createContents(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(pluginName + " Preference Page");
 		return label;
+	}
+	
+	@Override
+	public PluginXMLConfig getFormValues() {
+		// nothing to do, since this is abstract (!)
+		throw new RuntimeException("This method should never be called");
+	}
+	
+	@Override
+	public void setFormValues(final PluginXMLConfig config) {
+		// nothing to do, since this is abstract (!)
 	}
 	
 }

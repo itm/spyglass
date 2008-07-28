@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.plugin.gridpainter;
+package de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -7,28 +7,21 @@ import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class GridPainterPluginPreferences extends PluginPreferencePage<GridPainterPlugin> {
+public class VectorSequencePainterPreferencePage extends PluginPreferencePage<VectorSequencePainterPlugin, VectorSequencePainterXMLConfig> {
 	
-	public GridPainterPluginPreferences(final ConfigStore cs) {
+	public VectorSequencePainterPreferencePage(final ConfigStore cs) {
 		super(cs);
 	}
 	
-	public GridPainterPluginPreferences(final ConfigStore cs, final GridPainterPlugin plugin) {
+	public VectorSequencePainterPreferencePage(final ConfigStore cs, final VectorSequencePainterPlugin plugin) {
 		super(cs, plugin);
-	}
-	
-	@Override
-	public PluginXMLConfig getCurrentPluginConfig() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	@Override
 	protected Control createContents(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-		label.setText("GridPainterPlugin Preference Page");
+		label.setText("VectorSequencePainterPlugin Preference Page");
 		return label;
 	}
 	
@@ -45,21 +38,15 @@ public class GridPainterPluginPreferences extends PluginPreferencePage<GridPaint
 	}
 	
 	@Override
-	public boolean performRestore() {
+	public VectorSequencePainterXMLConfig getFormValues() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 	
 	@Override
-	public boolean performRestoreDefaults() {
+	public void setFormValues(final VectorSequencePainterXMLConfig config) {
 		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public boolean performSaveAsDefault() {
-		// TODO Auto-generated method stub
-		return false;
+		
 	}
 	
 }

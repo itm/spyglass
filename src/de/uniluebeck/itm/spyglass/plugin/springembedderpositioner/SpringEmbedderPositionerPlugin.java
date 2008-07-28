@@ -39,12 +39,13 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<SpringEmbedderPositionerPlugin> createPreferencePage(final ConfigStore cs) {
-		return new SpringEmbedderPositionerPluginPreferences(cs, this);
+	public PluginPreferencePage<SpringEmbedderPositionerPlugin, SpringEmbedderPositionerXMLConfig> createPreferencePage(final ConfigStore cs) {
+		return new SpringEmbedderPositionerPreferencePage(cs, this);
 	}
 	
-	public static PluginPreferencePage<SpringEmbedderPositionerPlugin> createTypePreferencePage(final ConfigStore cs) {
-		return new SpringEmbedderPositionerPluginPreferences(cs);
+	public static PluginPreferencePage<SpringEmbedderPositionerPlugin, SpringEmbedderPositionerXMLConfig> createTypePreferencePage(
+			final ConfigStore cs) {
+		return new SpringEmbedderPositionerPreferencePage(cs);
 	}
 	
 	public static String getHumanReadableName() {
@@ -53,8 +54,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig;
 	}
 	
 	@Override
@@ -65,8 +65,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig.getName();
 	}
 	
 	@Override

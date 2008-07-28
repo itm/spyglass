@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.plugin.mappainter;
+package de.uniluebeck.itm.spyglass.plugin.linepainter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -7,28 +7,21 @@ import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class MapPainterPluginPreferences extends PluginPreferencePage<MapPainterPlugin> {
+public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> {
 	
-	public MapPainterPluginPreferences(final ConfigStore cs) {
+	public LinePainterPreferencePage(final ConfigStore cs) {
 		super(cs);
 	}
 	
-	public MapPainterPluginPreferences(final ConfigStore cs, final MapPainterPlugin plugin) {
+	public LinePainterPreferencePage(final ConfigStore cs, final LinePainterPlugin plugin) {
 		super(cs, plugin);
-	}
-	
-	@Override
-	public PluginXMLConfig getCurrentPluginConfig() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	@Override
 	protected Control createContents(final Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-		label.setText("MapPainterPlugin Preference Page");
+		label.setText("LinePainterPlugin Preference Page");
 		return label;
 	}
 	
@@ -45,21 +38,15 @@ public class MapPainterPluginPreferences extends PluginPreferencePage<MapPainter
 	}
 	
 	@Override
-	public boolean performRestore() {
+	public LinePainterXMLConfig getFormValues() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 	
 	@Override
-	public boolean performRestoreDefaults() {
+	public void setFormValues(final LinePainterXMLConfig config) {
 		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public boolean performSaveAsDefault() {
-		// TODO Auto-generated method stub
-		return false;
+		
 	}
 	
 }

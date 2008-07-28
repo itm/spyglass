@@ -64,12 +64,12 @@ public class ConfigNodePositioner extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<ConfigNodePositioner> createPreferencePage(final ConfigStore cs) {
+	public PluginPreferencePage<ConfigNodePositioner, PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public static PluginPreferencePage<ConfigNodePositioner> createTypePreferencePage(final ConfigStore cs) {
+	public static PluginPreferencePage<ConfigNodePositioner, PluginXMLConfig> createTypePreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}

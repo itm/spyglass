@@ -47,12 +47,12 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<SimpleGlobalInformationPlugin> createPreferencePage(final ConfigStore cs) {
-		return new SimpleGlobalInformationPluginPreferences(cs, this);
+	public PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> createPreferencePage(final ConfigStore cs) {
+		return new SimpleGlobalInformationPreferencePage(cs, this);
 	}
 	
-	public static PluginPreferencePage<SimpleGlobalInformationPlugin> createTypePreferencePage(final ConfigStore cs) {
-		return new SimpleGlobalInformationPluginPreferences(cs);
+	public static PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> createTypePreferencePage(final ConfigStore cs) {
+		return new SimpleGlobalInformationPreferencePage(cs);
 	}
 	
 	public static String getHumanReadableName() {
@@ -73,8 +73,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig.getName();
 	}
 	
 	@Override

@@ -1,10 +1,9 @@
 /*
- * --------------------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
+ * -------------------------------------------------------------------------------- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.mappainter;
@@ -54,12 +53,12 @@ public class MapPainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<MapPainterPlugin> createPreferencePage(final ConfigStore cs) {
-		return new MapPainterPluginPreferences(cs, this);
+	public PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> createPreferencePage(final ConfigStore cs) {
+		return new MapPainterPreferencePage(cs, this);
 	}
 	
-	public static PluginPreferencePage<MapPainterPlugin> createTypePreferencePage(final ConfigStore cs) {
-		return new MapPainterPluginPreferences(cs);
+	public static PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> createTypePreferencePage(final ConfigStore cs) {
+		return new MapPainterPreferencePage(cs);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
@@ -73,8 +72,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin {
 	
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig;
 	}
 	
 	@Override
@@ -85,8 +83,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig.getName();
 	}
 	
 	@Override

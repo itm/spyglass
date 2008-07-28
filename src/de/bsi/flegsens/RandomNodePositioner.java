@@ -46,11 +46,11 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<Plugin> createPreferencePage(final ConfigStore cs) {
+	public PluginPreferencePage<Plugin, PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
 		return new AbstractPluginTypePreferencePage(RandomNodePositioner.getHumanReadableName());
 	}
 	
-	public static PluginPreferencePage<Plugin> createTypePreferencePage(final ConfigStore cs) {
+	public static PluginPreferencePage<Plugin, PluginXMLConfig> createTypePreferencePage(final ConfigStore cs) {
 		return new AbstractPluginTypePreferencePage(RandomNodePositioner.getHumanReadableName());
 	}
 	

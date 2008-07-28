@@ -123,7 +123,7 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 	
 	@Override
 	public String getName() {
-		return "RoutePainter";
+		return "DagstuhlRoutePainter-Instance";
 	}
 	
 	@Override
@@ -133,12 +133,12 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<DagstuhlRoutePainter> createPreferencePage(final ConfigStore cs) {
+	public PluginPreferencePage<DagstuhlRoutePainter, PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public static PluginPreferencePage<DagstuhlRoutePainter> createTypePreferencePage(final ConfigStore cs) {
+	public static PluginPreferencePage<DagstuhlRoutePainter, PluginXMLConfig> createTypePreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
 	}

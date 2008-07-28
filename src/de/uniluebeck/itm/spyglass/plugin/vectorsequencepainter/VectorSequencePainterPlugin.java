@@ -25,10 +25,10 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public class VectorSequencePainterPlugin extends RelationPainterPlugin implements NeedsMetric {
 	
 	@Element(name = "parameters")
-	private final VektorSequencePainterXMLConfig xmlConfig;
+	private final VectorSequencePainterXMLConfig xmlConfig;
 	
 	public VectorSequencePainterPlugin() {
-		xmlConfig = new VektorSequencePainterXMLConfig();
+		xmlConfig = new VectorSequencePainterXMLConfig();
 	}
 	
 	@Override
@@ -49,12 +49,12 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	}
 	
 	@Override
-	public PluginPreferencePage<VectorSequencePainterPlugin> createPreferencePage(final ConfigStore cs) {
-		return new VectorSequencePainterPluginPreferences(cs, this);
+	public PluginPreferencePage<VectorSequencePainterPlugin, VectorSequencePainterXMLConfig> createPreferencePage(final ConfigStore cs) {
+		return new VectorSequencePainterPreferencePage(cs, this);
 	}
 	
-	public static PluginPreferencePage<VectorSequencePainterPlugin> createTypePreferencePage(final ConfigStore cs) {
-		return new VectorSequencePainterPluginPreferences(cs);
+	public static PluginPreferencePage<VectorSequencePainterPlugin, VectorSequencePainterXMLConfig> createTypePreferencePage(final ConfigStore cs) {
+		return new VectorSequencePainterPreferencePage(cs);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
@@ -68,8 +68,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig;
 	}
 	
 	@Override
@@ -80,8 +79,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig.getName();
 	}
 	
 	@Override

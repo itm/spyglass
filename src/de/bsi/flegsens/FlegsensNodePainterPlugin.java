@@ -52,4 +52,8 @@ public class FlegsensNodePainterPlugin extends HistoricalPlugin {
 		}
 	}
 	
+	public static String getHumanReadableName() {
+		return "FlegsensNodePainter";
+	}
+	
 }

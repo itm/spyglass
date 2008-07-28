@@ -1,10 +1,9 @@
 /*
- * --------------------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
+ * -------------------------------------------------------------------------------- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
@@ -50,12 +49,12 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<NodeSensorRangePlugin> createPreferencePage(final ConfigStore cs) {
-		return new NodeSensorRangePluginPreferences(cs, this);
+	public PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> createPreferencePage(final ConfigStore cs) {
+		return new NodeSensorRangePreferencePage(cs, this);
 	}
 	
-	public static PluginPreferencePage<NodeSensorRangePlugin> createTypePreferencePage(final ConfigStore cs) {
-		return new NodeSensorRangePluginPreferences(cs);
+	public static PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> createTypePreferencePage(final ConfigStore cs) {
+		return new NodeSensorRangePreferencePage(cs);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
@@ -69,8 +68,7 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig;
 	}
 	
 	@Override
@@ -81,8 +79,7 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return xmlConfig.getName();
 	}
 	
 	@Override

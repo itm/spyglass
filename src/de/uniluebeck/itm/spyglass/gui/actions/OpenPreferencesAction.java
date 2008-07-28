@@ -4,7 +4,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
-import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencesDialog;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 
 public class OpenPreferencesAction extends Action {
 	
@@ -21,7 +21,7 @@ public class OpenPreferencesAction extends Action {
 	
 	@Override
 	public void run() {
-		new PluginPreferencesDialog(parentShell, spyglass).open();
+		new PluginPreferenceDialog(parentShell, spyglass).open();
 	};
 	
 	@Override

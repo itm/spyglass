@@ -7,28 +7,25 @@ import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class PositionPacketNodePositionerPluginPreferences extends PluginPreferencePage<PositionPacketNodePositionerPlugin> {
+public class PositionPacketNodePositionerPreferencePage extends
+		PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> {
 	
-	public PositionPacketNodePositionerPluginPreferences(final ConfigStore cs) {
+	public PositionPacketNodePositionerPreferencePage(final ConfigStore cs) {
 		super(cs);
 	}
 	
-	public PositionPacketNodePositionerPluginPreferences(final ConfigStore cs, final PositionPacketNodePositionerPlugin plugin) {
+	public PositionPacketNodePositionerPreferencePage(final ConfigStore cs, final PositionPacketNodePositionerPlugin plugin) {
 		super(cs, plugin);
 	}
 	
 	@Override
-	public PluginXMLConfig getCurrentPluginConfig() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
 	protected Control createContents(final Composite parent) {
+		String msg = "PositionPacketNodePositionerPlugin Preference Page\n";
+		msg += (type == PrefType.INSTANCE ? "Instance Name: " + plugin.getName() + "\n" + "IsActive: " + plugin.isActive() + "\n" + "IsVisible: "
+				+ plugin.isVisible() : "");
 		final Label label = new Label(parent, SWT.NONE);
-		label.setText("PositionPacketNodePositionerPlugin Preference Page");
+		label.setText(msg);
 		return label;
 	}
 	
@@ -45,21 +42,15 @@ public class PositionPacketNodePositionerPluginPreferences extends PluginPrefere
 	}
 	
 	@Override
-	public boolean performRestore() {
+	public PositionPacketNodePositionerXMLConfig getFormValues() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 	
 	@Override
-	public boolean performRestoreDefaults() {
+	public void setFormValues(final PositionPacketNodePositionerXMLConfig config) {
 		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public boolean performSaveAsDefault() {
-		// TODO Auto-generated method stub
-		return false;
+		
 	}
 	
 }

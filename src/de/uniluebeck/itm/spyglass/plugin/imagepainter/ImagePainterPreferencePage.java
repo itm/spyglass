@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.plugin.linepainter;
+package de.uniluebeck.itm.spyglass.plugin.imagepainter;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -7,28 +7,24 @@ import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class LinePainterPluginPreferences extends PluginPreferencePage<LinePainterPlugin> {
+public class ImagePainterPreferencePage extends PluginPreferencePage<ImagePainterPlugin, ImagePainterXMLConfig> {
 	
-	public LinePainterPluginPreferences(final ConfigStore cs) {
+	public ImagePainterPreferencePage(final ConfigStore cs) {
 		super(cs);
 	}
 	
-	public LinePainterPluginPreferences(final ConfigStore cs, final LinePainterPlugin plugin) {
+	public ImagePainterPreferencePage(final ConfigStore cs, final ImagePainterPlugin plugin) {
 		super(cs, plugin);
 	}
 	
 	@Override
-	public PluginXMLConfig getCurrentPluginConfig() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
 	protected Control createContents(final Composite parent) {
+		String msg = "ImagePainterPlugin Preference Page\n";
+		msg += (type == PrefType.INSTANCE ? "Instance Name: " + plugin.getName() + "\n" + "IsActive: " + plugin.isActive() + "\n" + "IsVisible: "
+				+ plugin.isVisible() : "");
 		final Label label = new Label(parent, SWT.NONE);
-		label.setText("LinePainterPlugin Preference Page");
+		label.setText(msg);
 		return label;
 	}
 	
@@ -45,21 +41,15 @@ public class LinePainterPluginPreferences extends PluginPreferencePage<LinePaint
 	}
 	
 	@Override
-	public boolean performRestore() {
+	public ImagePainterXMLConfig getFormValues() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 	
 	@Override
-	public boolean performRestoreDefaults() {
+	public void setFormValues(final ImagePainterXMLConfig config) {
 		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public boolean performSaveAsDefault() {
-		// TODO Auto-generated method stub
-		return false;
+		
 	}
 	
 }

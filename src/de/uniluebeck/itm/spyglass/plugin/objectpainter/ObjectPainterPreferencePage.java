@@ -7,22 +7,15 @@ import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class ObjectPainterPluginPreferences extends PluginPreferencePage<ObjectPainterPlugin> {
+public class ObjectPainterPreferencePage extends PluginPreferencePage<ObjectPainterPlugin, ObjectPainterXMLConfig> {
 	
-	public ObjectPainterPluginPreferences(final ConfigStore cs) {
+	public ObjectPainterPreferencePage(final ConfigStore cs) {
 		super(cs);
 	}
 	
-	public ObjectPainterPluginPreferences(final ConfigStore cs, final ObjectPainterPlugin plugin) {
+	public ObjectPainterPreferencePage(final ConfigStore cs, final ObjectPainterPlugin plugin) {
 		super(cs, plugin);
-	}
-	
-	@Override
-	public PluginXMLConfig getCurrentPluginConfig() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	@Override
@@ -45,21 +38,15 @@ public class ObjectPainterPluginPreferences extends PluginPreferencePage<ObjectP
 	}
 	
 	@Override
-	public boolean performRestore() {
+	public ObjectPainterXMLConfig getFormValues() {
 		// TODO Auto-generated method stub
-		return false;
+		return null;
 	}
 	
 	@Override
-	public boolean performRestoreDefaults() {
+	public void setFormValues(final ObjectPainterXMLConfig config) {
 		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
-	public boolean performSaveAsDefault() {
-		// TODO Auto-generated method stub
-		return false;
+		
 	}
 	
 }
