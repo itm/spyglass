@@ -1,5 +1,5 @@
 <spyglassConfiguration>
-   <packetReader class="de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketQueue"/>
+   <packetReader class="de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketBroker"/>
    <instances>
       <plugins class="java.util.ArrayList">
          <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin"/>
