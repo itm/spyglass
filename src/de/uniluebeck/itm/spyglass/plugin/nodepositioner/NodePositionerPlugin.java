@@ -51,7 +51,7 @@ public abstract class NodePositionerPlugin extends Plugin {
 	
 	@Override
 	public String toString() {
-		return NodePositionerPlugin.getHumanReadableName() + "." + this.getName();
+		return NodePositionerPlugin.getHumanReadableName() + "." + this.getInstanceName();
 	}
 	
 }

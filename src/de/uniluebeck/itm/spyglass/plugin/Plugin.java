@@ -40,11 +40,6 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public abstract class Plugin implements Runnable {
 	
 	/**
-	 * Indicator of the plug-in's activation state
-	 */
-	private boolean isActive = true;
-	
-	/**
 	 * The plug-in's manager (which manages all currently available plug-ins as
 	 * well)
 	 */
@@ -92,16 +87,22 @@ public abstract class Plugin implements Runnable {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Returns the name of the plug-in instance
 	 * 
+	 * @return the name of the plug-in instance
 	 */
-	public abstract String getName();
+	public final String getInstanceName() {
+		return getXMLConfig().getName();
+	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * holt sich die information aus dem PluginXMLConfig-Objekt
+	 * Returns if the plug-in is currently active
+	 * 
+	 * @return <tt>true</tt> if the plug-in is currently active
 	 */
 	public final boolean isActive() {
-		return isActive;
+		return getXMLConfig().isActive();
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -119,7 +120,7 @@ public abstract class Plugin implements Runnable {
 	 *            indicates the plug-in's activation state
 	 */
 	public final void setActive(final boolean isActive) {
-		this.isActive = isActive;
+		getXMLConfig().setActive(isActive);
 		if (pluginManager != null) {
 			pluginManager.setPluginStatus(this, isActive);
 		}
@@ -222,7 +223,7 @@ public abstract class Plugin implements Runnable {
 	 * 
 	 * @return <tt>true</tt> if the plug-in is visible
 	 */
-	public boolean isVisible() {
+	public final boolean isVisible() {
 		return getXMLConfig().isVisible();
 	}
 	
@@ -247,7 +248,7 @@ public abstract class Plugin implements Runnable {
 	 * @param setVisible
 	 *            isVisible
 	 */
-	public void setVisible(final boolean setVisible) {
+	public final void setVisible(final boolean setVisible) {
 		getXMLConfig().setVisible(setVisible);
 	}
 	

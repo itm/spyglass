@@ -22,7 +22,7 @@ public class PositionPacketNodePositionerPreferencePage extends
 	@Override
 	protected Control createContents(final Composite parent) {
 		String msg = "PositionPacketNodePositionerPlugin Preference Page\n";
-		msg += (type == PrefType.INSTANCE ? "Instance Name: " + plugin.getName() + "\n" + "IsActive: " + plugin.isActive() + "\n" + "IsVisible: "
+		msg += (type == PrefType.INSTANCE ? "Instance Name: " + plugin.getInstanceName() + "\n" + "IsActive: " + plugin.isActive() + "\n" + "IsVisible: "
 				+ plugin.isVisible() : "");
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(msg);

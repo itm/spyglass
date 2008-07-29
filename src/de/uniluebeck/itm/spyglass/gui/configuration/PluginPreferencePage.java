@@ -167,7 +167,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 */
 	@SuppressWarnings("unchecked")
 	protected void performRestore() {
-		setFormValues((ConfigClass) cs.readPluginInstanceConfig(plugin.getName()));
+		setFormValues((ConfigClass) cs.readPluginInstanceConfig(plugin.getInstanceName()));
 	}
 	
 	// --------------------------------------------------------------------------------

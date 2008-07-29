@@ -118,9 +118,4 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 		return true;
 	}
 	
-	@Override
-	public String getName() {
-		return this.xmlConfig.getName();
-	}
-	
 }

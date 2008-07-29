@@ -25,15 +25,12 @@ public abstract class RelationPainterPlugin extends Plugin implements Drawable {
 	
 	public abstract float getTimeout();
 	
-	@Override
-	public abstract boolean isVisible();
-	
 	public static String getHumanReadableName() {
 		return "RelationPainter";
 	}
 	
 	@Override
 	public String toString() {
-		return RelationPainterPlugin.getHumanReadableName() + "." + this.getName();
+		return RelationPainterPlugin.getHumanReadableName() + "." + this.getInstanceName();
 	}
 }

@@ -34,16 +34,13 @@ public abstract class NodePainterPlugin extends Plugin implements Drawable {
 	
 	public abstract float getTimeout();
 	
-	@Override
-	public abstract boolean isVisible();
-	
 	public static String getHumanReadableName() {
 		return "NodePainter";
 	}
 	
 	@Override
 	public String toString() {
-		return NodePainterPlugin.getHumanReadableName() + "." + this.getName();
+		return NodePainterPlugin.getHumanReadableName() + "." + this.getInstanceName();
 	}
 	
 	@Override

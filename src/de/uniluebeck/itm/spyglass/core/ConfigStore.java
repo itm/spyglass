@@ -138,7 +138,7 @@ public class ConfigStore {
 	public PluginXMLConfig readPluginInstanceConfig(final String instanceName) {
 		final List<Plugin> plugins = spyglassConfig.getPluginManager().getPlugins();
 		for (final Plugin plugin : plugins) {
-			if (plugin.getName().equals(instanceName)) {
+			if (plugin.getInstanceName().equals(instanceName)) {
 				return plugin.getXMLConfig();
 			}
 		}

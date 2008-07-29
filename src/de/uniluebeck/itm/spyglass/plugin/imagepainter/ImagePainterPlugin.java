@@ -1,9 +1,11 @@
 /*
- * ------------------------------------------------------------------------------ -- This file is
- * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
- * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
- * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
- * SpyGlass source tree for further details. ----------------------------------------------
+ * ------------------------------------------------------------------------------ --
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ----------------------------------------------
  * ----------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.imagepainter;
@@ -48,12 +50,6 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public boolean isVisible() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
 	public PluginPreferencePage<ImagePainterPlugin, ImagePainterXMLConfig> createPreferencePage(final ConfigStore cs) {
 		return new ImagePainterPreferencePage(cs, this);
 	}
@@ -80,11 +76,6 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin {
 	public void handlePacket(final SpyglassPacket packet) {
 		// TODO Auto-generated method stub
 		
-	}
-	
-	@Override
-	public String getName() {
-		return xmlConfig.getName();
 	}
 	
 	@Override

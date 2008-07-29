@@ -35,15 +35,12 @@ public abstract class BackgroundPainterPlugin extends Plugin implements Drawable
 	
 	public abstract float getTimeout();
 	
-	@Override
-	public abstract boolean isVisible();
-	
 	public static String getHumanReadableName() {
 		return "BackgroundPainter";
 	}
 	
 	@Override
 	public String toString() {
-		return BackgroundPainterPlugin.getHumanReadableName() + "." + this.getName();
+		return BackgroundPainterPlugin.getHumanReadableName() + "." + this.getInstanceName();
 	}
 }

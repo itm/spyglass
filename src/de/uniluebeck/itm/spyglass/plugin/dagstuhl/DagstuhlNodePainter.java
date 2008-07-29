@@ -75,8 +75,9 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 				}
 				paintNode(src);
 				/*
-				 * Text t = new Text(new Integer(c++).toString(), new Position(10, 10, 0),
-				 * 99999999); t.setColor(200, 200, 200); getSubLayer().addOrUpdateDrawingObject(t);
+				 * Text t = new Text(new Integer(c++).toString(), new
+				 * Position(10, 10, 0), 99999999); t.setColor(200, 200, 200);
+				 * getSubLayer().addOrUpdateDrawingObject(t);
 				 */
 				log.debug(debug);
 			}
@@ -105,8 +106,9 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 			}
 			
 			/*
-			 * Circle rect = new Circle(); rect.setColor(0, 0, 0); rect.setBgColor(0, 0, 0);
-			 * rect.setId(src + NODE_RECT_OFFSET); rect.setDiameter(30); rect.setPosition(p);
+			 * Circle rect = new Circle(); rect.setColor(0, 0, 0);
+			 * rect.setBgColor(0, 0, 0); rect.setId(src + NODE_RECT_OFFSET);
+			 * rect.setDiameter(30); rect.setPosition(p);
 			 * getSubLayer().addOrUpdateDrawingObject(rect);
 			 */
 
@@ -122,20 +124,9 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public String getName() {
-		return "DagstuhlNodePainter-Instance";
-	}
-	
-	@Override
 	public void reset() {
 		// TODO
 		counter.clear();
-	}
-	
-	@Override
-	public boolean isVisible() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 	
 	@Override
@@ -161,8 +152,17 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 	
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PluginXMLConfig() {
+			@Override
+			public String getName() {
+				return "DagstuhlNodePainter-Instance";
+			}
+			
+			@Override
+			public boolean isVisible() {
+				return false;
+			}
+		};
 	}
 	
 	@Override

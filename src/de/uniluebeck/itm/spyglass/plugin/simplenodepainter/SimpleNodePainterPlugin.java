@@ -1,14 +1,14 @@
 /*
- * -------------------------------------------------------------------------------- This file is
- * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
- * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
- * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
- * SpyGlass source tree for further details.
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.simpleframework.xml.Element;
@@ -17,6 +17,8 @@ import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.layer.Layer;
+import de.uniluebeck.itm.spyglass.layer.SubLayer;
 import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.nodepainter.NodePainterPlugin;
@@ -27,11 +29,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	@Element(name = "parameters")
 	private SimpleNodePainterXMLConfig xmlConfig;
 	
+	private final Layer layer;
+	
 	// @Element
 	// public StringFormatter m_StringFormatter;
 	
 	public SimpleNodePainterPlugin() {
 		xmlConfig = new SimpleNodePainterXMLConfig();
+		layer = new SubLayer();
 	}
 	
 	@Override
@@ -41,14 +46,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	@Override
 	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	@Override
-	public boolean isVisible() {
-		// TODO Auto-generated method stub
-		return false;
+		// a node which has actually been painted will not be removed
+		// automatically from the GUI.
+		// To remove the node from the GUI, it has to be removed from the
+		// model as well
+		return -1;
 	}
 	
 	@Override
@@ -61,8 +63,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
-		// TODO Auto-generated method stub
-		return new LinkedList<DrawingObject>();
+		return layer.getDrawingObjects();
 	}
 	
 	public static String getHumanReadableName() {
@@ -78,11 +79,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	public void handlePacket(final SpyglassPacket packet) {
 		// TODO Auto-generated method stub
 		
-	}
-	
-	@Override
-	public String getName() {
-		return xmlConfig.getName();
 	}
 	
 	@Override

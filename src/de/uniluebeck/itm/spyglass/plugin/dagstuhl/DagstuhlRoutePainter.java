@@ -87,8 +87,9 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 				}
 				
 				/*
-				 * Text t = new Text(new Integer(counter++).toString(), new Position(100, 10, 0),
-				 * 99999999); t.setColor(0, 0, 0); getSubLayer().addOrUpdateDrawingObject(t);
+				 * Text t = new Text(new Integer(counter++).toString(), new
+				 * Position(100, 10, 0), 99999999); t.setColor(0, 0, 0);
+				 * getSubLayer().addOrUpdateDrawingObject(t);
 				 */
 				log.debug(debug);
 			}
@@ -122,17 +123,6 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public String getName() {
-		return "DagstuhlRoutePainter-Instance";
-	}
-	
-	@Override
-	public boolean isVisible() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
 	public PluginPreferencePage<DagstuhlRoutePainter, PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
 		// TODO Auto-generated method stub
 		return null;
@@ -155,8 +145,17 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 	
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PluginXMLConfig() {
+			@Override
+			public String getName() {
+				return "DagstuhlRoutePainter-Instance";
+			}
+			
+			@Override
+			public boolean isVisible() {
+				return false;
+			}
+		};
 	}
 	
 	@Override

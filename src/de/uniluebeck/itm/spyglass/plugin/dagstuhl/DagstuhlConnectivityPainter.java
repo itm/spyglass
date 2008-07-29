@@ -76,12 +76,12 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 					debug += " " + Integer.toHexString(neighbors[i]) + "=" + metrics[i] + "," + metrics[i];
 				}
 				/*
-				 * for (int i = 0; i < neighborCount; i++) { paintNode(neighbors[i]);
+				 * for (int i = 0; i < neighborCount; i++) {
+				 * paintNode(neighbors[i]); } paintNode(src);
 				 * 
-				 * } paintNode(src);
-				 * 
-				 * Text t = new Text(new Integer(counter++).toString(), new Position(10, 10, 0),
-				 * 99999999); t.setColor(0, 0, 0); getSubLayer().addOrUpdateDrawingObject(t);
+				 * Text t = new Text(new Integer(counter++).toString(), new
+				 * Position(10, 10, 0), 99999999); t.setColor(0, 0, 0);
+				 * getSubLayer().addOrUpdateDrawingObject(t);
 				 */
 				log.debug(debug);
 			}
@@ -113,19 +113,8 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public String getName() {
-		return "DagstuhlConnectivity-Instance";
-	}
-	
-	@Override
 	public void reset() {
 		// TODO
-	}
-	
-	@Override
-	public boolean isVisible() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 	
 	@Override
@@ -151,8 +140,17 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 	
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		// TODO Auto-generated method stub
-		return null;
+		return new PluginXMLConfig() {
+			@Override
+			public String getName() {
+				return "DagstuhlConnectivity-Instance";
+			}
+			
+			@Override
+			public boolean isVisible() {
+				return false;
+			}
+		};
 	}
 	
 	@Override

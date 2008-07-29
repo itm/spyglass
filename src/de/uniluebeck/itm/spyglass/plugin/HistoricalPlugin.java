@@ -14,8 +14,8 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
- * Temporary class which all old Plugins inherit. It adds a compatibillity layer to the Plugin
- * interface so that the old Plugins can run without much change.
+ * Temporary class which all old Plugins inherit. It adds a compatibillity layer
+ * to the Plugin interface so that the old Plugins can run without much change.
  * 
  * @author dariush
  * @deprecated
@@ -48,25 +48,24 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 	
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public boolean isVisible() {
-		// TODO Auto-generated method stub
-		return false;
+		// TODO remove this workaround
+		return new PluginXMLConfig() {
+			@Override
+			public String getName() {
+				return "unnamedHP";
+			}
+			
+			@Override
+			public boolean isVisible() {
+				return false;
+			}
+		};
 	}
 	
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
 		// TODO Auto-generated method stub
 		
-	}
-	
-	@Override
-	public String getName() {
-		return "unnamed";
 	}
 	
 	@Override
@@ -104,7 +103,7 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 	
 	@Override
 	public String toString() {
-		return HistoricalPlugin.getHumanReadableName() + "." + this.getName();
+		return HistoricalPlugin.getHumanReadableName() + "." + this.getInstanceName();
 	}
 	
 }

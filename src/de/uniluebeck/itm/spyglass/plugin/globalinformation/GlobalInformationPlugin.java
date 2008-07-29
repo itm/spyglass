@@ -38,7 +38,7 @@ public abstract class GlobalInformationPlugin extends Plugin implements GlobalIn
 	
 	@Override
 	public String toString() {
-		return GlobalInformationPlugin.getHumanReadableName() + "." + this.getName();
+		return GlobalInformationPlugin.getHumanReadableName() + "." + this.getInstanceName();
 	}
 	
 }
