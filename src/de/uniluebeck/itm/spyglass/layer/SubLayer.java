@@ -1,9 +1,11 @@
 /*
- * ---------------------------------------------------------------------- This file is part of the
- * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
- * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
- * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
- * further details. ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This
+ * file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.layer;
 
@@ -22,8 +24,8 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 // ------------------------------------------------------------------------------
 // --
 /**
- * A Sublayer is usually used by a plugin to store all drawing objects, that must be rendered to
- * visualize the scene.
+ * A Sublayer is usually used by a plugin to store all drawing objects, that
+ * must be rendered to visualize the scene.
  * 
  * @deprecated Use QuadTree instead.
  */
@@ -70,8 +72,8 @@ public class SubLayer implements Layer {
 	}
 	
 	/**
-	 * Adds a DrawingObject to the internal hashmap. If there is already a DrawingObject with the
-	 * same id, that objects gets updated.
+	 * Adds a DrawingObject to the internal hashmap. If there is already a
+	 * DrawingObject with the same id, that objects gets updated.
 	 * 
 	 * @param object
 	 *            The DrawingObject to add or update.
@@ -105,7 +107,7 @@ public class SubLayer implements Layer {
 	
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle rect) {
 		// TODO Auto-generated method stub
-		return null;
+		return getDrawingObjects();
 	}
 	
 	public void move(final DrawingObject dob, final int x, final int y) {

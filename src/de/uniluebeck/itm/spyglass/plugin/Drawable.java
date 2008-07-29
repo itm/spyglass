@@ -26,18 +26,25 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 public interface Drawable {
 	
 	/**
-	 * TODO: really needed??
+	 * Returns the time the plug-in's drawing objects will be visible.
+	 * 
+	 * @return the time the plug-in's drawing objects will be visible.
 	 */
 	public int getTimeout();
 	
 	/**
-	 * Return if this plugin is currently visible.
+	 * Returns if this plug-in is currently visible.
+	 * 
+	 * @return <tt>true</tt> if this plug-in is currently visible.
 	 */
 	public boolean isVisible();
 	
 	/**
+	 * Returns the objects the plug-in wants to be drawn on the GUI
 	 * 
 	 * @param drawingArea
+	 *            the description of the currently visible part of the area
+	 *            where the sensor nodes are placed
 	 */
 	public abstract List<DrawingObject> getDrawingObjects(DrawingArea drawingArea);
 	

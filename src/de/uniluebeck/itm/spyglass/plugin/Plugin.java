@@ -19,7 +19,6 @@ import org.simpleframework.xml.Root;
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -182,14 +181,13 @@ public abstract class Plugin implements Runnable {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the plug-in's denotation which has to be in a human readable
-	 * style
+	 * Returns the plug-in's denotation in a human readable style
 	 * 
-	 * @return the plug-in's denotation which has to be in a human readable
-	 *         style
+	 * @return the plug-in's denotation in a human readable style
+	 * 
 	 * @throws UnsupportedOperationException
-	 *             if this operation is called on an abstract superclass of a
-	 *             plug-in
+	 *             if this operation is called on the plug-in superclass
+	 *             {@link Plugin}
 	 */
 	public static String getHumanReadableName() throws UnsupportedOperationException {
 		throw new UnsupportedOperationException(
@@ -239,7 +237,7 @@ public abstract class Plugin implements Runnable {
 	 * @param packet
 	 *            the packet
 	 */
-	protected abstract void processPacket(Packet packet);
+	protected abstract void processPacket(SpyglassPacket packet);
 	
 	// --------------------------------------------------------------------------------
 	/**

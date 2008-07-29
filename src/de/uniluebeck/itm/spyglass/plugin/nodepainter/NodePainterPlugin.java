@@ -18,7 +18,10 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 // --------------------------------------------------------------------------------
 /**
- * A plugin to paint a node.
+ * Instances of this class are used create and administer visualizations of
+ * sensor nodes.
+ * 
+ * @author Sebastian Ebers
  */
 public abstract class NodePainterPlugin extends Plugin implements Drawable {
 	
@@ -29,13 +32,26 @@ public abstract class NodePainterPlugin extends Plugin implements Drawable {
 	 * Constructor
 	 */
 	public NodePainterPlugin() {
+		// for this plug-in a packet queue has to be used
 		super(true);
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the time the plug-in's drawing objects will be visible
+	 * 
+	 * @return he time the plug-in's drawing objects will be visible
+	 */
 	public final int getTimeout() {
 		return getXMLConfig().getTimeout();
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the plug-in's denotation in a human readable style
+	 * 
+	 * @return the plug-in's denotation in a human readable style
+	 */
 	public static String getHumanReadableName() {
 		return "NodePainter";
 	}
@@ -47,17 +63,22 @@ public abstract class NodePainterPlugin extends Plugin implements Drawable {
 	
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
+		
+		// if the packet is not null, check if its semantic type is one of
+		// those, the plug-in is interested in
 		if (packet != null) {
 			final int[] mySemanticTypes = getXMLConfig().getSemanticTypes();
 			final int packetSemanticType = packet.getSemantic_type();
 			for (int i = 0; i < mySemanticTypes.length; i++) {
+				// if the packets semantic type matches ...
 				if (mySemanticTypes[i] == packetSemanticType) {
+					// put it into the packet queue (the process which fetches
+					// from the queue afterwards will be notified automatically)
 					enqueuePacket(packet);
 					break;
 				}
 			}
 		}
-		this.notify();
 	}
 	
 }

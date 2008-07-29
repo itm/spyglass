@@ -14,7 +14,6 @@ import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.globalinformation.GlobalInformationPlugin;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -73,7 +72,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	}
 	
 	@Override
-	protected void processPacket(final Packet packet) {
+	protected void processPacket(final SpyglassPacket packet) {
 		// TODO Auto-generated method stub
 		
 	}

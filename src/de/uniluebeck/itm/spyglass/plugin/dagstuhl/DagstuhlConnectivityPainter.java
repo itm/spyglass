@@ -11,7 +11,6 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Text;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text.TextJustification;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.HistoricalPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
@@ -154,7 +153,7 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	protected void processPacket(final Packet packet) {
+	protected void processPacket(final SpyglassPacket packet) {
 		// TODO Auto-generated method stub
 		
 	}
