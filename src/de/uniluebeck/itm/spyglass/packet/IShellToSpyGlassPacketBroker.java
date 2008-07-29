@@ -7,7 +7,10 @@ package de.uniluebeck.itm.spyglass.packet;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.Root;
+
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 // --------------------------------------------------------------------------------
 /**
@@ -25,6 +28,8 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	 * The queue where packets provided by iShell are stored
 	 */
 	private Deque<SpyglassPacket> queue = new ArrayDeque<SpyglassPacket>(50);
+	
+	private static final Logger log = SpyglassLogger.getLogger(IShellToSpyGlassPacketBroker.class);
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -56,6 +61,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	@Override
 	public SpyglassPacket getNextPacket() {
 		synchronized (queue) {
+			log.debug("Return packet from queue if available");
 			return queue.pollLast();
 		}
 	}
@@ -71,6 +77,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	 */
 	public void push(final SpyglassPacket packet) {
 		synchronized (queue) {
+			log.trace("Push packet into the queue");
 			queue.push(packet);
 		}
 	}

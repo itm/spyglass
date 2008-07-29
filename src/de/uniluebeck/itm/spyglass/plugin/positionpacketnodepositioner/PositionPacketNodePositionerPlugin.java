@@ -1,9 +1,10 @@
 /*
- * -------------------------------------------------------------------------------- This file is
- * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
- * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
- * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
- * SpyGlass source tree for further details.
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
@@ -23,7 +24,8 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
- * Default node positioner. it reads the position information from the incoming packets.
+ * Default node positioner. it reads the position information from the incoming
+ * packets.
  * 
  * @author dariush
  * 
@@ -32,16 +34,19 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	private static Category log = SpyglassLogger.get(PositionPacketNodePositionerPlugin.class);
 	
 	@Element(name = "parameters")
-	private final PositionPacketNodePositionerXMLConfig xmlConfig;
-	
-	public PositionPacketNodePositionerPlugin() {
-		xmlConfig = new PositionPacketNodePositionerXMLConfig();
-	}
+	private PositionPacketNodePositionerXMLConfig xmlConfig;
 	
 	/**
 	 * Hashmap containing the position information.
 	 */
 	private final HashMap<Integer, AbsolutePosition> positionMap = new HashMap<Integer, AbsolutePosition>();
+	
+	/**
+	 * Constructor
+	 */
+	public PositionPacketNodePositionerPlugin() {
+		xmlConfig = new PositionPacketNodePositionerXMLConfig();
+	}
 	
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
@@ -72,8 +77,8 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	}
 	
 	/**
-	 * Contrary to the usual convention for packet handling, a NodePositioner must handle packets
-	 * synchroniously.
+	 * Contrary to the usual convention for packet handling, a NodePositioner
+	 * must handle packets synchroniously.
 	 */
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
@@ -91,13 +96,11 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	@Override
 	public void reset() {
 		this.positionMap.clear();
-		
 	}
 	
 	@Override
 	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
-		// TODO Auto-generated method stub
-		
+		this.xmlConfig = (PositionPacketNodePositionerXMLConfig) xmlConfig;
 	}
 	
 	@Override

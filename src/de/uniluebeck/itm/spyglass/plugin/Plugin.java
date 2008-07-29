@@ -1,9 +1,11 @@
 /*
- * ---------------------------------------------------------------------- This file is part of the
- * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
- * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
- * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
- * further details. ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This
+ * file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin;
 
@@ -12,7 +14,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.widgets.Widget;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
@@ -26,11 +27,12 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 // --------------------------------------------------------------------------------
 /**
  * Abstract base class for all Spyglass plug-ins.<br>
- * This abstract class implements the {@link Runnable} interface to enhance the performance of
- * packet handling. When new packets arrive, they are just dropped in a queue to enable the
- * dispatcher's thread to go on. The plug-in's packet handling thread is automatically notified
- * about the arrival and starts processing the packet. Since this occurs in a thread separated from
- * the main thread a slow plug in does not slow down the whole application.
+ * This abstract class implements the {@link Runnable} interface to enhance the
+ * performance of packet handling. When new packets arrive, they are just
+ * dropped in a queue to enable the dispatcher's thread to go on. The plug-in's
+ * packet handling thread is automatically notified about the arrival and starts
+ * processing the packet. Since this occurs in a thread separated from the main
+ * thread a slow plug in does not slow down the whole application.
  * 
  * @author Sebastian Ebers
  */
@@ -43,13 +45,14 @@ public abstract class Plugin implements Runnable {
 	private boolean isActive = true;
 	
 	/**
-	 * The plug-in's manager (which manages all currently available plug-ins as well)
+	 * The plug-in's manager (which manages all currently available plug-ins as
+	 * well)
 	 */
 	private PluginManager pluginManager;
 	
 	/**
-	 * The queue where packets are dropped by the packet dispatcher and which is maintained
-	 * concurrently
+	 * The queue where packets are dropped by the packet dispatcher and which is
+	 * maintained concurrently
 	 */
 	private ConcurrentLinkedQueue<SpyglassPacket> packetQueue = null;
 	
@@ -61,10 +64,12 @@ public abstract class Plugin implements Runnable {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor<br>
-	 * If the plug-in has to administer a packet queue a new thread will be started.
+	 * If the plug-in has to administer a packet queue a new thread will be
+	 * started.
 	 * 
 	 * @param needsPacketQueue
-	 *            indicates whether or not the plug-in has to administer a packet queue
+	 *            indicates whether or not the plug-in has to administer a
+	 *            packet queue
 	 */
 	public Plugin(final boolean needsPacketQueue) {
 		if (needsPacketQueue) {
@@ -77,8 +82,8 @@ public abstract class Plugin implements Runnable {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * This method handles a Packet object. Usually, a plugin creates a new DrawingObject for each
-	 * packet it handles.
+	 * This method handles a Packet object. Usually, a plugin creates a new
+	 * DrawingObject for each packet it handles.
 	 * 
 	 * @param packet
 	 *            The packet object to handle.
@@ -101,7 +106,8 @@ public abstract class Plugin implements Runnable {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Löscht den Zustand des Plugins, z.B. QuadTree leeren, Instanzvariablen auf Default stellen
+	 * Löscht den Zustand des Plugins, z.B. QuadTree leeren, Instanzvariablen
+	 * auf Default stellen
 	 */
 	public abstract void reset();
 	
@@ -153,28 +159,40 @@ public abstract class Plugin implements Runnable {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Creates and returns a widget which can be used to configure the plug-in's type.<br>
-	 * Since the type does not need to provide information about configuration options of a certain
-	 * plug-in instance this method can be called in a static way.
+	 * Creates and returns a widget which can be used to configure the plug-in's
+	 * type.<br>
+	 * Since the type does not need to provide information about configuration
+	 * options of a certain plug-in instance this method can be called in a
+	 * static way.
 	 * 
-	 * @param parent
-	 *            the parent widget
 	 * @param cs
 	 *            the instance which is used to load and store the configuration
+	 * 
 	 * @return a widget which can be used to configure the plug-in's type
+	 * @throws UnsupportedOperationException
+	 *             if this operation is called on an abstract superclass of a
+	 *             plug-in
 	 */
-	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(final Widget parent, final ConfigStore cs) {
-		throw new RuntimeException("This method must only be called on subclasses and must be implemented in every instantiable subclass.");
+	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(final ConfigStore cs)
+			throws UnsupportedOperationException {
+		throw new UnsupportedOperationException(
+				"This method must only be called on subclasses and must be implemented in every instantiable subclass.");
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the plug-in's name which has to be in a human readable style
+	 * Returns the plug-in's denotation which has to be in a human readable
+	 * style
 	 * 
-	 * @return the plug-in's name which has to be in a human readable style
+	 * @return the plug-in's denotation which has to be in a human readable
+	 *         style
+	 * @throws UnsupportedOperationException
+	 *             if this operation is called on an abstract superclass of a
+	 *             plug-in
 	 */
-	public static String getHumanReadableName() {
-		throw new RuntimeException("This method must only be called on subclasses and must be implemented by every abstract or instantiable suclass.");
+	public static String getHumanReadableName() throws UnsupportedOperationException {
+		throw new UnsupportedOperationException(
+				"This method must only be called on subclasses and must be implemented by every abstract or instantiable suclass.");
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -211,9 +229,10 @@ public abstract class Plugin implements Runnable {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Processes a packet<br>
-	 * This method is used to do the time consuming work on the plug in prior to any operations that
-	 * have any influence on the quad tree. This is useful since the quad tree stays in a valid
-	 * state and can be used by the main thread while the time consuming work goes on.<br>
+	 * This method is used to do the time consuming work on the plug in prior to
+	 * any operations that have any influence on the quad tree. This is useful
+	 * since the quad tree stays in a valid state and can be used by the main
+	 * thread while the time consuming work goes on.<br>
 	 * This method must not have any write operations on the quad tree!
 	 * 
 	 * @param packet
@@ -243,24 +262,25 @@ public abstract class Plugin implements Runnable {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Updates the quad tree after all sensible information provided by a packet have been
-	 * processed. This method should be processed quickly since the graphical user interface has to
-	 * wait while the quad tree is updated.
+	 * Updates the quad tree after all sensible information provided by a packet
+	 * have been processed. This method should be processed quickly since the
+	 * graphical user interface has to wait while the quad tree is updated.
 	 */
 	protected abstract void updateQuadTree();
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * This method returns an identification string representing the plugin. it is primarily used
-	 * for identifiing plugins (and which classes they are instanciated of) in log messages.
+	 * This method returns an identification string representing the plugin. it
+	 * is primarily used for identifiing plugins (and which classes they are
+	 * instanciated of) in log messages.
 	 */
 	@Override
 	public abstract String toString();
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Concurrently processes packets which are available in the packet queue and update's the quad
-	 * tree.
+	 * Concurrently processes packets which are available in the packet queue
+	 * and update's the quad tree.
 	 */
 	public final void run() {
 		
@@ -288,11 +308,12 @@ public abstract class Plugin implements Runnable {
 	}
 	
 	/**
-	 * Retrieves and removes the head of the packet queue, or returns <tt>null</tt> if it is empty.
+	 * Retrieves and removes the head of the packet queue, or returns
+	 * <tt>null</tt> if it is empty.
 	 * 
 	 * @param wait
-	 *            indicates whether or not the caller wants to wait for a packet if the packet queue
-	 *            is currently empty
+	 *            indicates whether or not the caller wants to wait for a packet
+	 *            if the packet queue is currently empty
 	 * @return the head of the packet queue, or <tt>null</tt> if it is empty
 	 */
 	private SpyglassPacket getPacketFromQueue(final boolean wait) {
