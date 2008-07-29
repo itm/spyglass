@@ -96,9 +96,8 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 		return layer;
 	}
 	
-	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getTimeout() {
+		return getXMLConfig().getTimeout();
 	}
 	
 	@Override

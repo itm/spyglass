@@ -42,12 +42,6 @@ public class MapPainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	@Override
 	public PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> createPreferencePage(final ConfigStore cs) {
 		return new MapPainterPreferencePage(cs, this);
 	}

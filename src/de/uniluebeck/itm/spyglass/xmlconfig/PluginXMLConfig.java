@@ -27,14 +27,14 @@ public abstract class PluginXMLConfig {
 	@Element(name = "isActive")
 	private boolean isActive = true;
 	
-	@Element(name = "isVisible")
+	@Element(name = "isVisible", required = false)
 	private boolean isVisible = true;
 	
 	@Element(name = "name")
 	private String name = "default";
 	
-	// @Element(name = "priority")
-	// private int priority = -1;
+	@Element(name = "timeout", required = false)
+	private int timeout = -1;
 	
 	@ElementArray(name = "semanticTypes", required = false)
 	private int[] semanticTypes;
@@ -122,6 +122,27 @@ public abstract class PluginXMLConfig {
 	// public void setPriority(final int priority) {
 	// this.priority = priority;
 	// }
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the timeout value
+	 * 
+	 * @return the timeout value
+	 */
+	public int getTimeout() {
+		return timeout;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the timeout value
+	 * 
+	 * @param timeout
+	 *            the timeout value to set
+	 */
+	public void setTimeout(final int timeout) {
+		this.timeout = timeout;
+	}
 	
 	// --------------------------------------------------------------------------------
 	/**

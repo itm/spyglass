@@ -38,12 +38,6 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	}
 	
 	@Override
-	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	@Override
 	public PluginPreferencePage<VectorSequencePainterPlugin, VectorSequencePainterXMLConfig> createPreferencePage(final ConfigStore cs) {
 		return new VectorSequencePainterPreferencePage(cs, this);
 	}

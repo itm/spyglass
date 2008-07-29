@@ -23,7 +23,9 @@ public abstract class RelationPainterPlugin extends Plugin implements Drawable {
 		super(true);
 	}
 	
-	public abstract float getTimeout();
+	public final int getTimeout() {
+		return getXMLConfig().getTimeout();
+	}
 	
 	public static String getHumanReadableName() {
 		return "RelationPainter";

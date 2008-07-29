@@ -42,12 +42,6 @@ public class GridPainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	@Override
 	public PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createPreferencePage(final ConfigStore cs) {
 		return new GridPainterPreferencePage(cs, this);
 	}

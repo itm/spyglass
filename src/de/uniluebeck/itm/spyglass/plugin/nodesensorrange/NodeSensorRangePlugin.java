@@ -38,12 +38,6 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	@Override
 	public PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> createPreferencePage(final ConfigStore cs) {
 		return new NodeSensorRangePreferencePage(cs, this);
 	}

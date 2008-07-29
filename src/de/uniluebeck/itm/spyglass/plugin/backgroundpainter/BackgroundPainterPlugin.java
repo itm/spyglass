@@ -33,7 +33,9 @@ public abstract class BackgroundPainterPlugin extends Plugin implements Drawable
 		super(needsPacketQueue);
 	}
 	
-	public abstract float getTimeout();
+	public final int getTimeout() {
+		return getXMLConfig().getTimeout();
+	}
 	
 	public static String getHumanReadableName() {
 		return "BackgroundPainter";

@@ -43,12 +43,6 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	}
 	
 	@Override
-	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	@Override
 	public PluginPreferencePage<ObjectPainterPlugin, ObjectPainterXMLConfig> createPreferencePage(final ConfigStore cs) {
 		return new ObjectPainterPreferencePage(cs, this);
 	}

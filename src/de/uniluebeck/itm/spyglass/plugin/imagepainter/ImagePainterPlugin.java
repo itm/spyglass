@@ -44,12 +44,6 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	@Override
 	public PluginPreferencePage<ImagePainterPlugin, ImagePainterXMLConfig> createPreferencePage(final ConfigStore cs) {
 		return new ImagePainterPreferencePage(cs, this);
 	}

@@ -79,6 +79,7 @@
             <numRows>1</numRows>
             <isActive>true</isActive>
             <isVisible>true</isVisible>
+            <timeout>0</timeout>
             <name>default</name>
          </parameters>
       </plugin>
@@ -86,7 +87,8 @@
          <parameters>
             <image>images/icons/brokenImageLink.png</image>
             <isActive>true</isActive>
-            <isVisible>true</isVisible>
+            <isVisible>true</isVisible>            
+            <timeout>0</timeout>
             <name>default</name>
          </parameters>
       </plugin>
@@ -117,6 +119,7 @@
             <refreshInterval>10</refreshInterval>
             <isActive>true</isActive>
             <isVisible>true</isVisible>
+            <timeout>0</timeout>
             <name>default</name>
          </parameters>
       </plugin>
@@ -127,7 +130,8 @@
                <upperLeft x="0" y="0" z="0"/>
             </size>
             <isActive>true</isActive>
-            <isVisible>true</isVisible>
+            <isVisible>true</isVisible>            
+            <timeout>0</timeout>
             <name>default</name>
          </parameters>
       </plugin>
@@ -137,7 +141,8 @@
             <showNodeDegree>true</showNodeDegree>
             <showNumNodes>true</showNumNodes>
             <isActive>true</isActive>
-            <isVisible>true</isVisible>
+            <isVisible>true</isVisible>            
+            <timeout>0</timeout>
             <name>default</name>
          </parameters>
       </plugin>

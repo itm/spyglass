@@ -39,12 +39,6 @@ public class LinePainterPlugin extends RelationPainterPlugin {
 	}
 	
 	@Override
-	public float getTimeout() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	@Override
 	public PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> createPreferencePage(final ConfigStore cs) {
 		return new LinePainterPreferencePage(cs, this);
 	}

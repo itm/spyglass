@@ -45,15 +45,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	}
 	
 	@Override
-	public float getTimeout() {
-		// a node which has actually been painted will not be removed
-		// automatically from the GUI.
-		// To remove the node from the GUI, it has to be removed from the
-		// model as well
-		return -1;
-	}
-	
-	@Override
 	public PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> createPreferencePage(final ConfigStore cs) {
 		return new SimpleNodePainterPreferencePage(cs, this);
 	}
