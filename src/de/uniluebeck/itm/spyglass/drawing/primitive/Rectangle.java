@@ -16,6 +16,7 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
+import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
 // --------------------------------------------------------------------------------
 /**
@@ -131,13 +132,13 @@ public class Rectangle extends DrawingObject {
 		final Color color = new Color(null, this.getColorR(), this.getColorG(), this.getColorB());
 		final Color bg = new Color(null, this.getBgColorR(), this.getBgColorG(), this.getBgColorB());
 		
+		final PixelPosition px = drawingArea.absPoint2PixelPoint(this.getPosition());
+		
 		gc.setForeground(color);
 		gc.setBackground(bg);
 		gc.setLineWidth(this.getLineWidth());
-		gc.fillRectangle((this.getPosition().x - (this.getWidth() / 2)), (this.getPosition().y - (this.getHeight() / 2)), this.getWidth(), this
-				.getHeight());
-		gc.drawRectangle((this.getPosition().x - (this.getWidth() / 2)), (this.getPosition().y - (this.getHeight() / 2)), this.getWidth(), this
-				.getHeight());
+		gc.fillRectangle((px.x - (this.getWidth() / 2)), (px.y - (this.getHeight() / 2)), this.getWidth(), this.getHeight());
+		gc.drawRectangle((px.x - (this.getWidth() / 2)), (px.y - (this.getHeight() / 2)), this.getWidth(), this.getHeight());
 		
 		color.dispose();
 		bg.dispose();

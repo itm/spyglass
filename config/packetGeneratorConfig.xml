@@ -3,7 +3,7 @@
 <packetGenerator>
 
 	<!-- number of nodes sent per second -->
-	<packetsPerSecond>10</packetsPerSecond>
+	<packetsPerSecond>1</packetsPerSecond>
 
 	<!-- Sinks which will handle each generated packet. -->
 	<sinks>

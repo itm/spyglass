@@ -14,7 +14,6 @@ import java.io.InputStreamReader;
 import org.apache.log4j.Category;
 import org.simpleframework.xml.Root;
 
-import de.uniluebeck.itm.spyglass.gateway.Gateway;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 // ------------------------------------------------------------------------------
@@ -30,43 +29,44 @@ public class SimplePacketReader extends PacketReader {
 	
 	private BufferedReader bufferedReader = null;
 	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * 
-	 */
-	@Override
-	public SpyglassPacket getNextPacket() {
-		try {
-			SpyglassPacket packet = null;
-			String line = null;
-			
-			log.debug("called getNextPacket...");
-			
-			while ((line = bufferedReader.readLine()) != null) {
-				packet = parsePacketLine(line);
-				if (packet != null) {
-					return packet;
-				}
-			}
-			
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
-	}
+	private long lastPacketTimestamp = -1;
 	
 	// --------------------------------------------------------------------------
 	// ------
 	/**
+	 * @throws InterruptedException
 	 * 
 	 */
 	@Override
-	public void setGateway(final Gateway gateway) {
-		super.setGateway(gateway);
+	public SpyglassPacket getNextPacket() throws InterruptedException {
+		if (bufferedReader == null) {
+			bufferedReader = new BufferedReader(new InputStreamReader(this.getGateway().getInputStream()));
+		}
 		
-		bufferedReader = new BufferedReader(new InputStreamReader(gateway.getInputStream()));
+		SpyglassPacket packet = null;
+		
+		try {
+			
+			String line = null;
+			while ((line = bufferedReader.readLine()) != null) {
+				packet = parsePacketLine(line);
+				if (packet != null) {
+					break;
+				}
+			}
+			
+		} catch (final IOException e) {
+			log.error("Error while reading a new packet...", e);
+		}
+		
+		// Hold back the packet
+		final long now = System.currentTimeMillis();
+		final long diff = now - this.lastPacketTimestamp;
+		if (diff < this.delayMillies) {
+			Thread.sleep(this.delayMillies - diff);
+		}
+		this.lastPacketTimestamp = now;
+		return packet;
 	}
 	
 	// --------------------------------------------------------------------------

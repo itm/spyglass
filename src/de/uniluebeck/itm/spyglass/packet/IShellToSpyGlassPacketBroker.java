@@ -14,12 +14,10 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class are used as packet broker between iShell and
- * Spyglass.<br>
- * iShell can push packets for Spyglass in a queue and Spyglass can read them
- * afterwards.<br>
- * By extending the abstract class {@link PacketReader} Spyglass can use this
- * broker as an ordinary packet reader.
+ * Instances of this class are used as packet broker between iShell and Spyglass.<br>
+ * iShell can push packets for Spyglass in a queue and Spyglass can read them afterwards.<br>
+ * By extending the abstract class {@link PacketReader} Spyglass can use this broker as an ordinary
+ * packet reader.
  */
 @Root
 public class IShellToSpyGlassPacketBroker extends PacketReader {
@@ -52,18 +50,36 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Retrieves and removes the last packet of the packet queue, or returns
-	 * <tt>null</tt> if this packet queue is empty.
+	 * Retrieves and removes the last packet of the packet queue, or returns <tt>null</tt> if this
+	 * packet queue is empty.
 	 * 
-	 * @return the tail of the packet queue, or <tt>null</tt> if the packet
-	 *         queue is empty
+	 * @return the tail of the packet queue, or <tt>null</tt> if the packet queue is empty
 	 */
 	@Override
-	public SpyglassPacket getNextPacket() {
+	public SpyglassPacket getNextPacket() throws InterruptedException {
+		
 		synchronized (queue) {
-			log.debug("Return packet from queue if available");
-			return queue.pollLast();
+			
+			SpyglassPacket packet = null;
+			
+			// Loop until we have a packet.
+			while (packet == null) {
+				
+				if (queue.isEmpty()) {
+					
+					// the queue is empty, wait until we have something.
+					queue.wait();
+					
+				}
+				
+				packet = queue.getFirst();
+				
+			}
+			
+			log.debug("Returning packet from queue");
+			return packet;
 		}
+		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -77,9 +93,9 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	 */
 	public void push(final SpyglassPacket packet) {
 		synchronized (queue) {
-			log.trace("Push packet into the queue");
+			log.debug("Push packet into the queue");
 			queue.push(packet);
+			queue.notifyAll(); // wake up all waiting threads
 		}
 	}
-	
 }

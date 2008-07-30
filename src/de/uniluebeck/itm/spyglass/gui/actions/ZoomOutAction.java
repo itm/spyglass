@@ -1,19 +1,27 @@
 package de.uniluebeck.itm.spyglass.gui.actions;
 
-import ishell.util.Logging;
-
 import org.apache.log4j.Category;
 import org.eclipse.jface.resource.ImageDescriptor;
 
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+
 public class ZoomOutAction extends Action {
 	
-	private static final Category log = Logging.get(ZoomOutAction.class);
+	private static final Category log = SpyglassLogger.get(ZoomOutAction.class);
 	
 	private final ImageDescriptor imageDescriptor = getImageDescriptor("zoom_out.png");
+	
+	private final DrawingArea drawingArea;
+	
+	public ZoomOutAction(final DrawingArea da) {
+		this.drawingArea = da;
+	}
 	
 	@Override
 	public void run() {
 		log.debug("Pressed button ZOOM_OUT.");
+		drawingArea.zoomOut();
 	};
 	
 	@Override

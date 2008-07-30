@@ -15,6 +15,7 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
+import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
 // --------------------------------------------------------------------------------
 /**
@@ -117,7 +118,11 @@ public class Line extends DrawingObject {
 		final Color color = new Color(null, this.getColorR(), this.getColorG(), this.getColorB());
 		gc.setForeground(color);
 		gc.setLineWidth(this.getLineWidth());
-		gc.drawLine((this.getPosition().x), (this.getPosition().y), (this.getEnd().x), (this.getEnd().y));
+		
+		final PixelPosition start = drawingArea.absPoint2PixelPoint(this.getPosition());
+		final PixelPosition end = drawingArea.absPoint2PixelPoint(this.getEnd());
+		
+		gc.drawLine((start.x), (start.y), (end.x), (end.y));
 		// TODO: Implement the drawing of the line primitive
 		color.dispose();
 	}

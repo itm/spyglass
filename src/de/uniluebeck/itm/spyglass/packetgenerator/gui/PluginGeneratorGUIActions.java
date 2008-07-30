@@ -16,7 +16,7 @@ public class PluginGeneratorGUIActions {
 	private final PacketGeneratorIShellPlugin gen;
 	
 	private final URL getResourceUrl(final String suffix) {
-		return Action.class.getResource(suffix);
+		return de.uniluebeck.itm.spyglass.gui.actions.Action.class.getResource(suffix);
 	}
 	
 	public PluginGeneratorGUIActions(final PacketGeneratorIShellPlugin gen) {
@@ -41,8 +41,10 @@ public class PluginGeneratorGUIActions {
 			setImageDescriptor(isPlaying ? pauseImageDescriptor : playImageDescriptor);
 			
 			if (isPlaying) {
+				log.debug("Resuming PacketGenerator.");
 				gen.generator.resume();
 			} else {
+				log.debug("Pausing PacketGenerator.");
 				gen.generator.pause();
 			}
 		};

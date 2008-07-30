@@ -12,8 +12,7 @@ import de.uniluebeck.itm.spyglass.packetgenerator.sinks.Sink;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 /**
- * The Main Generator class. it runs in a loop and creates and distributes
- * packets.
+ * The Main Generator class. it runs in a loop and creates and distributes packets.
  * 
  * @author dariush
  * 
@@ -42,8 +41,7 @@ public class PacketGenerator {
 	private final ArrayList<Sink> sinks = new ArrayList<Sink>();
 	
 	/**
-	 * this methods sole existence is to convince, that the mentioned variable
-	 * must not be final!
+	 * this methods sole existence is to convince, that the mentioned variable must not be final!
 	 */
 	private void methodToWorkaroundEclipse() {
 		packetsPerSecond = packetsPerSecond;
@@ -55,8 +53,7 @@ public class PacketGenerator {
 	private volatile boolean paused = false;
 	
 	/**
-	 * When false, then the generator will shutdown within a short amount of
-	 * time.
+	 * When false, then the generator will shutdown within a short amount of time.
 	 */
 	private volatile boolean running = true;
 	
@@ -64,6 +61,7 @@ public class PacketGenerator {
 	 * pause the generator
 	 */
 	public void pause() {
+		log.info("Pausing the packet generator.");
 		this.paused = true;
 	}
 	
@@ -71,6 +69,7 @@ public class PacketGenerator {
 	 * Resume the generator
 	 */
 	public void resume() {
+		log.info("Resuming the packet generator.");
 		this.paused = false;
 	}
 	
@@ -78,6 +77,7 @@ public class PacketGenerator {
 	 * Stopp the generator
 	 */
 	public void shutdown() {
+		log.info("Shutting down the packet generator.");
 		this.running = false;
 		
 	}
@@ -90,8 +90,8 @@ public class PacketGenerator {
 	}
 	
 	/**
-	 * Start the generator. this method will not terminate until an error
-	 * happens or the generator is killed by calling shutdown().
+	 * Start the generator. this method will not terminate until an error happens or the generator
+	 * is killed by calling shutdown().
 	 */
 	public void run() throws Exception {
 		
@@ -115,10 +115,10 @@ public class PacketGenerator {
 			}
 		}
 		
-		log.info("Shutting down PacketGenerator.");
 		for (final Sink sink : this.sinks) {
 			sink.shutdown();
 		}
+		log.info("PacketGenerator shutted down.");
 		
 	}
 	

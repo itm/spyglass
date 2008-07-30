@@ -34,8 +34,6 @@ public class PacketProducerTask implements Runnable {
 	
 	private Spyglass spyglass = null;
 	
-	private final long perPacketDelayMs;
-	
 	private final long initialDelayMs;
 	
 	// -------------------------------------------------------------------------
@@ -44,9 +42,8 @@ public class PacketProducerTask implements Runnable {
 	 * 
 	 * @param spyglass
 	 */
-	public PacketProducerTask(final Spyglass spyglass, final long initialDelayMs, final long perPacketDelayMs) {
+	public PacketProducerTask(final Spyglass spyglass, final long initialDelayMs) {
 		this.spyglass = spyglass;
-		this.perPacketDelayMs = perPacketDelayMs;
 		this.initialDelayMs = initialDelayMs;
 		
 		// packetCache = spyglass.getPacketCache();
@@ -69,23 +66,23 @@ public class PacketProducerTask implements Runnable {
 		
 		while (spyglass.isVisualizationRunning()) {
 			try {
-				if ((packet = packetReader.getNextPacket()) != null) {
-					if (!spyglass.isVisualizationRunning()) {
-						break;
-					}
-					
-					if (log.isDebugEnabled()) {
-						log.debug("Added packet: " + packet);
-					}
-					
-					// packetCache.push(packet);
-					spyglass.getPacketDispatcher().dispatchPacket(packet);
+				packet = packetReader.getNextPacket();
+				
+				if (!spyglass.isVisualizationRunning()) {
+					break;
 				}
+				
+				log.debug("Added packet: " + packet);
+				
+				// packetCache.push(packet);
+				spyglass.getPacketDispatcher().dispatchPacket(packet);
+				
+			} catch (final InterruptedException e) {
+				log.error("PacketReader has been interrupted.", e);
 			} catch (final SpyglassPacketException e) {
 				log.error("Could not receive a packet from the packetReader.", e);
 			}
 			
-			Tools.sleep(perPacketDelayMs);
 		}
 		
 		log.debug("PacketProducerTask ended. Done.");

@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass;
 
@@ -42,20 +40,19 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 // ------------------------------------------------------------------------------
 // --
 /**
- * To use this plug-in in iShell, you need to add two option to your iShell
- * configuration file (typically ishell.properties).
+ * To use this plug-in in iShell, you need to add two option to your iShell configuration file
+ * (typically ishell.properties).
  * 
- * The first one determines the additional classpath parameters in where this
- * plug-in and its libraries are located. Please note that you must escape any
- * backslash and colon with a backslash character. An example of how this could
- * look like is shown in the following line:
+ * The first one determines the additional classpath parameters in where this plug-in and its
+ * libraries are located. Please note that you must escape any backslash and colon with a backslash
+ * character. An example of how this could look like is shown in the following line:
  * 
  * <pre>
  * plugin_classpath=C\:\\work\\java\\spyglass-lean\\bin\\eclipse;C\:\\work\\java\\spyglass-lean\\lib\\simple-xml-1.6.jar
  * </pre>
  * 
- * The second parameter denotes the fully classified class name of the plug-in.
- * This should remain unchanged and look like the following:
+ * The second parameter denotes the fully classified class name of the plug-in. This should remain
+ * unchanged and look like the following:
  * 
  * <pre>
  * plugin_classes = de.uniluebeck.itm.spyglass.PluginSpyGlass2iShell
@@ -65,8 +62,6 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	private static Category log = SpyglassLogger.get(PluginSpyGlass2iShell.class);
-	// private static Category log =
-	// SpyglassLogger.get(PluginSpyGlass2iShell.class);
 	
 	private static final int SPYGLASS_PACKET_TYPE = 0x91;
 	
@@ -167,8 +162,8 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		addToolBarAction(new PlayResetAction());
 		addToolBarAction(new RecordSelectOutputAction());
 		addToolBarAction(new RecordRecordAction());
-		addToolBarAction(new ZoomInAction());
-		addToolBarAction(new ZoomOutAction());
+		addToolBarAction(new ZoomInAction(spyglass.getDrawingArea()));
+		addToolBarAction(new ZoomOutAction(spyglass.getDrawingArea()));
 		addToolBarAction(new ZoomCompleteMapAction());
 		addToolBarAction(new OpenPreferencesAction(container.getShell(), spyglass));
 		
@@ -186,6 +181,8 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	 */
 	@Override
 	public void receivePacket(final MessagePacket packet) {
+		log.debug("receivePacket called from iShell");
+		
 		if (isPaused()) {
 			return;
 		}
@@ -200,10 +197,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		log.debug("Received Packet in spyglass from ishell: " + spyglassPacket);
 		
 		packetBroker.push(spyglassPacket);
-		
-		// synchronized (queue) {
-		// queue.push(spyglassPacket);
-		// }
 		
 	}
 	

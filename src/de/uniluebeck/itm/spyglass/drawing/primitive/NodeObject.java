@@ -9,6 +9,7 @@ import org.eclipse.swt.graphics.Point;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
+import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 
 public class NodeObject extends DrawingObject {
@@ -213,10 +214,12 @@ public class NodeObject extends DrawingObject {
 		final int width = size.x;
 		final int height = size.y;
 		
+		final PixelPosition px = drawingArea.absPoint2PixelPoint(this.getPosition());
+		
 		gc.setForeground(color);
 		gc.setBackground(bg);
 		gc.setLineWidth(getLineWidth());
-		final Point upperLeft = new Point(((getPosition().x - (width / 2))), ((getPosition().y - (height / 2))));
+		final Point upperLeft = new Point(((px.x - (width / 2))), ((px.y - (height / 2))));
 		gc.fillRectangle(upperLeft.x, upperLeft.y, width, height);
 		gc.drawRectangle(upperLeft.x, upperLeft.y, width, height);
 		gc.drawString(string, upperLeft.x, upperLeft.y);

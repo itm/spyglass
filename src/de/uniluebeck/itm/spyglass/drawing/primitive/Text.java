@@ -10,6 +10,7 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
+import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
 public class Text extends DrawingObject {
 	
@@ -60,6 +61,8 @@ public class Text extends DrawingObject {
 		final Color bgColor = new Color(null, getBgColorR(), getBgColorG(), getBgColorB());
 		final Font f = new Font(gc.getDevice(), "Arial", 6, SWT.NORMAL);
 		
+		final PixelPosition px = drawingArea.absPoint2PixelPoint(this.getPosition());
+		
 		gc.setFont(f);
 		gc.setForeground(color);
 		gc.setBackground(bgColor);
@@ -72,7 +75,7 @@ public class Text extends DrawingObject {
 			offsetX = -(p.x) + 1;
 		}
 		final int offsetY = p.y / -2;
-		gc.drawString(s, (getPosition().x) + offsetX, (getPosition().y) + offsetY);
+		gc.drawString(s, (px.x) + offsetX, (px.y) + offsetY);
 		// TODO: Implement the drawing of the line primitive
 		color.dispose();
 		bgColor.dispose();

@@ -9,6 +9,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.net.SocketAppender;
 
 /**
  * Static wrapper class for accessing log4j
@@ -27,6 +28,7 @@ public class SpyglassLogger {
 	private static Map<String, Logger> loggerMap = new HashMap<String, Logger>();
 	private static Level loglevel = Level.DEBUG;
 	public static boolean writeLogfile = false;
+	public static boolean write2Socket = true;
 	
 	static {
 		try {
@@ -35,6 +37,9 @@ public class SpyglassLogger {
 			// newline.setLevel(loglevel);
 			if (writeLogfile) {
 				standardLogger.addAppender(new FileAppender(fileLoggerLayout, fileNameLog));
+			}
+			if (write2Socket) {
+				standardLogger.addAppender(new SocketAppender("127.0.0.1", 4560));
 			}
 			standardLogger.setLevel(loglevel);
 		} catch (final Exception e) {
@@ -57,6 +62,9 @@ public class SpyglassLogger {
 				logger = Logger.getLogger(clazz);
 				if (writeLogfile) {
 					logger.addAppender(new FileAppender(fileLoggerLayout, fileNameLog));
+				}
+				if (write2Socket) {
+					standardLogger.addAppender(new SocketAppender("127.0.0.1", 4560));
 				}
 				logger.setLevel(loglevel);
 				loggerMap.put(clazz.getName(), logger);
@@ -146,8 +154,8 @@ public class SpyglassLogger {
 	}
 	
 	/**
-	 * Log a message object with the {@link Level#ERROR} level including the
-	 * stack trace of the Throwable t passed as parameter.
+	 * Log a message object with the {@link Level#ERROR} level including the stack trace of the
+	 * Throwable t passed as parameter.
 	 * 
 	 * @param message
 	 *            - the message object to log
@@ -186,8 +194,8 @@ public class SpyglassLogger {
 	}
 	
 	/**
-	 * Log a message object with the {@link Level#FATAL} level including the
-	 * stack trace of the Throwable t passed as parameter.
+	 * Log a message object with the {@link Level#FATAL} level including the stack trace of the
+	 * Throwable t passed as parameter.
 	 * 
 	 * @param message
 	 *            - the message object to log

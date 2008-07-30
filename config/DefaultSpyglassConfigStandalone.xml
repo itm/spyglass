@@ -3,6 +3,7 @@
       <gateway class="de.uniluebeck.itm.spyglass.gateway.FileReaderGateway">
          <file>generator.txt</file>
       </gateway>
+      <delayMillies>1000</delayMillies>
    </packetReader>
    <instances>
       <plugins class="java.util.ArrayList">
@@ -61,7 +62,6 @@
       </metrics>
       <timeUnit>s</timeUnit>
       <timeScale>1.0</timeScale>
-      <packetDeliveryDelay>400</packetDeliveryDelay>
       <packetDeliveryInitialDelay>1000</packetDeliveryInitialDelay>
       <framesPerSecond>25</framesPerSecond>
    </generalSettings>

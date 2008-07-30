@@ -161,16 +161,6 @@ public class SpyglassConfiguration {
 	}
 	
 	// --------------------------------------------------------------------------------
-	public long getPacketDeliveryDelay() {
-		return generalSettings.getPacketDeliveryDelay();
-	}
-	
-	// --------------------------------------------------------------------------------
-	public void setPacketDeliveryDelay(final long packetDeliveryDelay) {
-		generalSettings.setPacketDeliveryDelay(packetDeliveryDelay);
-	}
-	
-	// --------------------------------------------------------------------------------
 	public long getPacketDeliveryInitialDelay() {
 		return generalSettings.getPacketDeliveryInitialDelay();
 	}

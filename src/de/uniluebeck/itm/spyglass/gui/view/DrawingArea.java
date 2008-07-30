@@ -12,8 +12,8 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 /**
- * The drawing area is the place, where all nodes etc. are painted on. this
- * class contains all information about the dimensions of the draw
+ * The drawing area is the place, where all nodes etc. are painted on. this class contains all
+ * information about the dimensions of the draw
  * 
  * @author dariush
  * 
@@ -29,14 +29,14 @@ public class DrawingArea {
 	 * The upper left point of the currently visible area.
 	 */
 	@Element
-	private final AbsolutePosition upperLeft = new AbsolutePosition(0, 0, 0);
+	private AbsolutePosition upperLeft = new AbsolutePosition(0, 0, 0);
 	
 	/**
-	 * The zoom level. a zoomlevel of 1 means that px coordinates are identical
-	 * to absolute coordinates.
+	 * The zoom level. a zoomlevel of 1 means that px coordinates are identical to absolute
+	 * coordinates.
 	 */
 	@Element
-	private final float zoom = 1;
+	private double zoom = 4;
 	
 	/**
 	 * 
@@ -66,8 +66,7 @@ public class DrawingArea {
 	}
 	
 	/**
-	 * Entspricht der derzeitigen Zeichenfläche in Pixeln, wird vom appWindow
-	 * ausgelesen
+	 * Entspricht der derzeitigen Zeichenfläche in Pixeln, wird vom appWindow ausgelesen
 	 */
 	public PixelRectangle getDrawingRectangle() {
 		final int height = getDrawingCanvasRectangle().height;
@@ -77,8 +76,7 @@ public class DrawingArea {
 	}
 	
 	/**
-	 * Entspricht der derzeitigen Zeichenfläche in Pixeln, wird vom appWindow
-	 * ausgelesen
+	 * Entspricht der derzeitigen Zeichenfläche in Pixeln, wird vom appWindow ausgelesen
 	 */
 	public AbsoluteRectangle getAbsoluteDrawingRectangle() {
 		final AbsoluteRectangle absRect = new AbsoluteRectangle();
@@ -140,12 +138,20 @@ public class DrawingArea {
 		this.appWindow = appWindow;
 	}
 	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the appWindow
-	 */
-	public AppWindow getAppWindow() {
-		return appWindow;
+	public double getZoom() {
+		return this.zoom;
+	}
+	
+	public void zoomIn() {
+		this.zoom *= 1.1;
+		// TODO: vorher translation machen, so dass mittelpunkt der bildfläche
+		// skalierungszentrum ist.
+	}
+	
+	public void zoomOut() {
+		this.zoom /= 1.1;
+		// TODO: vorher translation machen, so dass mittelpunkt der bildfläche
+		// skalierungszentrum ist.
 	}
 	
 }

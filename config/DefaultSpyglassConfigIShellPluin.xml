@@ -56,7 +56,6 @@
       </metrics>
       <timeUnit>s</timeUnit>
       <timeScale>1.0</timeScale>
-      <packetDeliveryDelay>400</packetDeliveryDelay>
       <packetDeliveryInitialDelay>1000</packetDeliveryInitialDelay>
       <framesPerSecond>25</framesPerSecond>
    </generalSettings>
