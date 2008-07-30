@@ -122,6 +122,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	protected void processPacket(final SpyglassPacket packet) {
 		
 		final int nodeID = packet.getSender_id();
+		boolean needsUpdate = false;
 		
 		// get the absolute position of the node which sent the packet
 		final AbsolutePosition position = getPluginManager().getNodePositioner().getPosition(nodeID);
@@ -132,28 +133,38 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			drawingObjects.addAll(layer.getDrawingObjects());
 		}
 		
-		// get the up to date instance of the node's visualization
-		final NodeObject nodeObject = updateMatchingNodeObject(nodeID, position, drawingObjects);
+		// get the instance of the node's visualization
+		final NodeObject nodeObject = getMatchingNodeObject(nodeID, position, drawingObjects);
 		
-		// if the object is null, there is no need to draw it
-		if (nodeObject == null) {
-			return;
+		// if the node object did not have any information about the node's
+		// position or the position has changed, update the node object
+		if ((nodeObject.getPosition() == null) || !position.equals(nodeObject.getPosition())) {
+			nodeObject.setPosition(position);
+			needsUpdate = true;
 		}
-		// add the object to the one which have to be (re)drawn ...
-		synchronized (updatedObjects) {
-			updatedObjects.add(nodeObject);
+		
+		// TODO: check if the StringFormatter has changed at all
+		final StringFormatter sf = nodeObject.getDescription();
+		if (sf != null) {
+			sf.parse(packet);
+			needsUpdate = true;
+		}
+		
+		if (needsUpdate) {
+			
+			// add the object to the one which have to be (re)drawn ...
+			synchronized (updatedObjects) {
+				updatedObjects.add(nodeObject);
+			}
 		}
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the up to date instance of a node's visualization or
-	 * <code>null</code> if the instance did not change at all.<br>
+	 * Returns the instance of a node's visualization<br>
 	 * Note that either a matching instance if found in the quad tree or a new
-	 * instance is to be created.<br>
-	 * If an existing instance was found, only its position information will be
-	 * updated. If the position has not changed, nothing has to be done and
-	 * <code>null</code> will be returned.
+	 * instance is to be created and initialized as configured by the default
+	 * parameters.<br>
 	 * 
 	 * @param nodeID
 	 *            the node's identifier
@@ -162,12 +173,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * @param drawingObjects
 	 *            the drawing objects which are currently available in the quad
 	 *            tree
-	 * @return the up to date instance of a node's visualization or
-	 *         <code>null</code> if the instance did not change at all.
+	 * @return the up to date instance of a node's visualization
 	 */
-	private NodeObject updateMatchingNodeObject(final int nodeID, final AbsolutePosition position, final List<DrawingObject> drawingObjects) {
+	private NodeObject getMatchingNodeObject(final int nodeID, final AbsolutePosition position, final List<DrawingObject> drawingObjects) {
 		
-		boolean found = false;
 		NodeObject nodeObject = null;
 		
 		// if there is already an instance of the node's visualization
@@ -178,34 +187,21 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				
 				// if the matching node is found ...
 				if (nodeObject.getNodeID() == nodeID) {
-					
-					// and the position is still the same, null is returned to
-					// indicate that the matching object has not changed at all
-					if (nodeObject.getPosition().equals(position)) {
-						return null;
-					}
-					
-					// otherwise update the position
-					nodeObject.setPosition(position);
-					found = true;
+					return nodeObject;
 				}
 			}
 		}
 		
 		// if not, create a new object
-		if (!found) {
-			Boolean isExtended = xmlConfig.getIsExtendenInformationActive().get(nodeID);
-			if (isExtended == null) {
-				isExtended = xmlConfig.isExtendedDefaultValue();
-			}
-			
-			final StringFormatter sf = xmlConfig.getStringFormatters().get(nodeID);
-			final int[] lineColorRGB = xmlConfig.getLineColorRGB();
-			final int lineWidth = xmlConfig.getLineWidth();
-			nodeObject = new NodeObject(nodeID, "Node " + nodeID, sf, isExtended, lineColorRGB, lineWidth);
-			nodeObject.setPosition(position);
+		Boolean isExtended = xmlConfig.getIsExtendenInformationActive().get(nodeID);
+		if (isExtended == null) {
+			isExtended = xmlConfig.isExtendedDefaultValue();
 		}
-		return nodeObject;
+		
+		final StringFormatter sf = xmlConfig.getStringFormatters().get(nodeID);
+		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
+		final int lineWidth = xmlConfig.getLineWidth();
+		return new NodeObject(nodeID, "Node " + nodeID, sf, isExtended, lineColorRGB, lineWidth);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -265,12 +261,25 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	@Override
 	protected void updateQuadTree() {
 		
+		// TEAMQUESTION:
+		// A plug-in is still able to crash the GUI by taking the lock of the
+		// layer and holding it
+		// What about making the interface Drawable abstract and encapsulating
+		// the layer there. The layer will be only accessible by accessors.
+		// Other plug-in developers will no longer be able to mess this up!
+		
 		// copy all objects which have to be updated in a separate List and
 		// clear the original list
 		final List<DrawingObject> update = new LinkedList<DrawingObject>();
 		synchronized (updatedObjects) {
 			update.addAll(updatedObjects);
 			updatedObjects.clear();
+		}
+		
+		// if no drawing objects are available, there is no need to get the
+		// layer's lock
+		if (update.size() == 0) {
+			return;
 		}
 		
 		// catch the layer's lock and update the objects
