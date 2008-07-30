@@ -21,7 +21,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	
 	@Element(name = "parameters")
-	private final SimpleGlobalInformationXMLConfig xmlConfig;
+	private SimpleGlobalInformationXMLConfig xmlConfig;
 	
 	public SimpleGlobalInformationPlugin() {
 		xmlConfig = new SimpleGlobalInformationXMLConfig();
@@ -61,14 +61,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		// TODO Auto-generated method stub
 		return xmlConfig;
-	}
-	
-	@Override
-	public void handlePacket(final SpyglassPacket packet) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override
@@ -85,8 +78,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	
 	@Override
 	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
-		// TODO Auto-generated method stub
-		
+		this.xmlConfig = (SimpleGlobalInformationXMLConfig) xmlConfig;
 	}
 	
 	@Override

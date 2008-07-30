@@ -4,8 +4,8 @@ import org.simpleframework.xml.Attribute;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class represent the coordinate's of a single point when using absolute
- * coordinates
+ * Instances of this class represent the coordinate's of a single point when
+ * using absolute coordinates
  * 
  * @author Sebastian Ebers
  * 
@@ -62,6 +62,26 @@ public class AbsolutePosition implements Cloneable {
 	 */
 	public AbsolutePosition add(final AbsolutePosition p) {
 		return new AbsolutePosition(x + p.x, y + p.y, z + p.z);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Indicates whether some other object is "equal to" this one according to
+	 * their coordinate information.
+	 * 
+	 * @param obj
+	 *            the reference object with which to compare.
+	 * @return <code>true</code> if this object is the same as the obj
+	 *         argument; <code>false</code> otherwise.
+	 */
+	@Override
+	public boolean equals(final Object obj) {
+		obj.equals(new Object());
+		if (obj instanceof AbsolutePosition) {
+			final AbsolutePosition other = (AbsolutePosition) obj;
+			return ((other.x == this.x) && (other.y == this.y) && (other.z == this.z));
+		}
+		return false;
 	}
 	
 }

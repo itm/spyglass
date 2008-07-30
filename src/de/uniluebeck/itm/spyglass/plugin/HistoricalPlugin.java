@@ -62,12 +62,6 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 	}
 	
 	@Override
-	public void handlePacket(final SpyglassPacket packet) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	protected void processPacket(final SpyglassPacket packet) {
 		// TODO Auto-generated method stub
 		

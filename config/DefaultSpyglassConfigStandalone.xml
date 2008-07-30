@@ -14,6 +14,7 @@
                   <isActive nodeID="2">true</isActive>
                   <isActive nodeID="3">false</isActive>
                </extendedInformation>
+               <isExtendedDefaultValue>false</isExtendedDefaultValue>
                <lineColorRGB length="3">
                   <int>0</int>
                   <int>0</int>
@@ -151,6 +152,7 @@
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
          <parameters>
             <extendedInformation/>
+            <isExtendedDefaultValue>false</isExtendedDefaultValue>
             <lineColorRGB length="3">
                <int>0</int>
                <int>0</int>

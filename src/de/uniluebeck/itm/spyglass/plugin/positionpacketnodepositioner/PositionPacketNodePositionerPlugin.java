@@ -77,7 +77,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	
 	/**
 	 * Contrary to the usual convention for packet handling, a NodePositioner
-	 * must handle packets synchroniously.
+	 * must handle packets synchronously.
 	 */
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {

@@ -11,7 +11,6 @@ package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
 import java.util.HashMap;
 
-import org.eclipse.swt.graphics.Color;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 import org.simpleframework.xml.ElementMap;
@@ -32,14 +31,20 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	@ElementMap(entry = "isActive", key = "nodeID", attribute = true, name = "extendedInformation")
 	private HashMap<Integer, Boolean> isExtendenInformationActive = new HashMap<Integer, Boolean>();
 	
+	@Element(name = "isExtendedDefaultValue")
+	private boolean isExtendedDefaultValue = false;
+	
 	@ElementArray
-	private int[] lineColorRGB = { 0, 0, 0 };
+	private int[] lineColorRGB = { 255, 0, 0 };
 	
 	@Element
 	private int lineWidth = 1;
 	
 	@ElementMap(entry = "stringFormatter", key = "nodeID", attribute = true, valueType = StringFormatter.class, required = false)
 	private HashMap<Integer, StringFormatter> stringFormatters = null;
+	
+	@Element(name = "defaultStringFormatter", required = false)
+	private StringFormatter defaultStringFormatter = null;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -49,6 +54,7 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the isExtendenInformationActive
 	 */
@@ -56,6 +62,7 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		return isExtendenInformationActive;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param isExtendenInformationActive
 	 *            the isExtendenInformationActive to set
@@ -64,6 +71,7 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		this.isExtendenInformationActive = isExtendenInformationActive;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lineColorRGB
 	 */
@@ -72,14 +80,16 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param lineColorRGB
 	 *            the lineColorRGB to set
 	 */
-	public void setLineColor(final Color lineColor) {
-		this.lineColorRGB = new int[] { lineColor.getRed(), lineColor.getGreen(), lineColor.getBlue() };
+	public void setLineColorRGB(final int[] lineColorRGB) {
+		this.lineColorRGB = lineColorRGB;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lineWidth
 	 */
@@ -87,6 +97,7 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		return lineWidth;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param lineWidth
 	 *            the lineWidth to set
@@ -95,6 +106,7 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		this.lineWidth = lineWidth;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @return the stringFormatters
 	 */
@@ -102,6 +114,7 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		return stringFormatters;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * @param stringFormatters
 	 *            the stringFormatters to set
@@ -111,9 +124,47 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	}
 	
 	// --------------------------------------------------------------------------------
+	/**
+	 * @return the isExtendedDefaultValue
+	 */
+	public boolean isExtendedDefaultValue() {
+		return isExtendedDefaultValue;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param isExtendedDefaultValue
+	 *            the isExtendedDefaultValue to set
+	 */
+	public void setExtendedDefaultValue(final boolean isExtendedDefaultValue) {
+		this.isExtendedDefaultValue = isExtendedDefaultValue;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the defaultStringFormatter
+	 */
+	public StringFormatter getDefaultStringFormatter() {
+		return defaultStringFormatter;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param defaultStringFormatter
+	 *            the defaultStringFormatter to set
+	 */
+	public void setDefaultStringFormatter(final StringFormatter defaultStringFormatter) {
+		this.defaultStringFormatter = defaultStringFormatter;
+	}
+	
+	// --------------------------------------------------------------------------------
 	@Override
 	public void finalize() throws Throwable {
 		super.finalize();
+		isExtendenInformationActive.clear();
+		isExtendenInformationActive = null;
+		stringFormatters.clear();
+		stringFormatters = null;
 	}
 	
 }

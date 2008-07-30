@@ -65,12 +65,14 @@ public class GridPainterPlugin extends BackgroundPainterPlugin {
 	
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
-		// drop the packet since no information are used
+		// since the plug-in is not interested in packets, nothing has to be
+		// done here
 	}
 	
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
-		// nothing to do since packets are not used at all here
+		// since the plug-in is not interested in packets, nothing has to be
+		// done here
 	}
 	
 	@Override
@@ -87,7 +89,8 @@ public class GridPainterPlugin extends BackgroundPainterPlugin {
 	
 	@Override
 	protected void updateQuadTree() {
-		// TODO Auto-generated method stub
+		// since the plug-in is not interested in packets, nothing has to be
+		// done here
 	}
 	
 }

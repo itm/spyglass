@@ -82,7 +82,26 @@ public abstract class Plugin implements Runnable {
 	 * @param packet
 	 *            The packet object to handle.
 	 */
-	public abstract void handlePacket(SpyglassPacket packet);
+	public void handlePacket(final SpyglassPacket packet) {
+		// if the packet is not null, check if its semantic type is one of
+		// those, the plug-in is interested in
+		if (packet != null) {
+			final int[] mySemanticTypes = getXMLConfig().getSemanticTypes();
+			final int packetSemanticType = packet.getSemantic_type();
+			for (int i = 0; i < mySemanticTypes.length; i++) {
+				// if the packets semantic type matches ...
+				// (note that the value "-1" in the plug-ins semantic type list
+				// indicates that the plug-in in interested in all semantic
+				// types)
+				if ((mySemanticTypes[i] == -1) || (mySemanticTypes[i] == packetSemanticType)) {
+					// put it into the packet queue (the process which fetches
+					// from the queue afterwards will be notified automatically)
+					enqueuePacket(packet);
+					break;
+				}
+			}
+		}
+	}
 	
 	// --------------------------------------------------------------------------------
 	/**

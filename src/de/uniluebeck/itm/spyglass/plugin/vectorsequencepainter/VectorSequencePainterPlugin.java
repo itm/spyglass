@@ -60,12 +60,6 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	}
 	
 	@Override
-	public void handlePacket(final SpyglassPacket packet) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	protected void processPacket(final SpyglassPacket packet) {
 		// TODO Auto-generated method stub
 		

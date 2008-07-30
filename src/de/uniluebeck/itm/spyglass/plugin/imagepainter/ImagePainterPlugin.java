@@ -67,14 +67,14 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin {
 	
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
-		// TODO Auto-generated method stub
-		
+		// since the plug-in is not interested in packets, nothing has to be
+		// done here
 	}
 	
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
-		// TODO Auto-generated method stub
-		
+		// since the plug-in is not interested in packets, nothing has to be
+		// done here
 	}
 	
 	@Override
@@ -91,8 +91,8 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin {
 	
 	@Override
 	protected void updateQuadTree() {
-		// TODO Auto-generated method stub
-		
+		// since the plug-in is not interested in packets, nothing has to be
+		// done here
 	}
 	
 }

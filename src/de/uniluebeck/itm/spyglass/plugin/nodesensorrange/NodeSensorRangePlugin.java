@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	
 	@Element(name = "parameters")
-	private final NodeSensorRangeXMLConfig xmlConfig;
+	private NodeSensorRangeXMLConfig xmlConfig;
 	
 	public NodeSensorRangePlugin() {
 		super(false);
@@ -61,13 +61,14 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
-		// TODO Auto-generated method stub
-		
+		// since the plug-in is not interested in packets, nothing has to be
+		// done here
 	}
 	
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
-		// TODO Auto-generated method stub
+		// since the plug-in is not interested in packets, nothing has to be
+		// done here
 		
 	}
 	
@@ -79,13 +80,14 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	
 	@Override
 	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
-		// TODO Auto-generated method stub
+		this.xmlConfig = (NodeSensorRangeXMLConfig) xmlConfig;
 		
 	}
 	
 	@Override
 	protected void updateQuadTree() {
-		// TODO Auto-generated method stub
+		// since the plug-in is not interested in packets, nothing has to be
+		// done here
 		
 	}
 	

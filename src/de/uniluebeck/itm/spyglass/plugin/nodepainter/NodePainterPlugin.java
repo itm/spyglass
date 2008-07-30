@@ -11,7 +11,6 @@ package de.uniluebeck.itm.spyglass.plugin.nodepainter;
 
 import org.apache.log4j.Logger;
 
-import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
@@ -59,26 +58,6 @@ public abstract class NodePainterPlugin extends Plugin implements Drawable {
 	@Override
 	public String toString() {
 		return NodePainterPlugin.getHumanReadableName() + "." + this.getInstanceName();
-	}
-	
-	@Override
-	public void handlePacket(final SpyglassPacket packet) {
-		
-		// if the packet is not null, check if its semantic type is one of
-		// those, the plug-in is interested in
-		if (packet != null) {
-			final int[] mySemanticTypes = getXMLConfig().getSemanticTypes();
-			final int packetSemanticType = packet.getSemantic_type();
-			for (int i = 0; i < mySemanticTypes.length; i++) {
-				// if the packets semantic type matches ...
-				if (mySemanticTypes[i] == packetSemanticType) {
-					// put it into the packet queue (the process which fetches
-					// from the queue afterwards will be notified automatically)
-					enqueuePacket(packet);
-					break;
-				}
-			}
-		}
 	}
 	
 }

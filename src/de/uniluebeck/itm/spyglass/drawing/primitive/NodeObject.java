@@ -1,7 +1,10 @@
 package de.uniluebeck.itm.spyglass.drawing.primitive;
 
+import java.util.Date;
+
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
@@ -72,6 +75,7 @@ public class NodeObject extends DrawingObject {
 	public NodeObject(final int nodeID, final String denotation, final StringFormatter description, final boolean isExtended,
 			final int[] lineColorRGB, final int lineWidth) {
 		super();
+		super.setId((int) new Date().getTime());
 		this.nodeID = nodeID;
 		this.denotation = denotation;
 		this.description = description;
@@ -199,22 +203,23 @@ public class NodeObject extends DrawingObject {
 	
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
-		// TODO Auto-generated method stub
+		
 		final Color color = new Color(null, this.getColorR(), this.getColorG(), this.getColorB());
 		final Color bg = new Color(null, this.getBgColorR(), this.getBgColorG(), this.getBgColorB());
 		
+		final String string = (isExtended) ? denotation + "\r\n" + description : denotation;
+		
+		final Point size = gc.textExtent(string);
+		final int width = size.x;
+		final int height = size.y;
+		
 		gc.setForeground(color);
 		gc.setBackground(bg);
-		// gc.setLineWidth(this.getLineWidth());
-		// gc.fillRectangle((this.getPosition().x - (this.getWidth() / 2)),
-		// (this.getPosition().y - (this.getHeight() / 2)), this.getWidth(),
-		// this
-		// .getHeight());
-		// gc.drawRectangle((this.getPosition().x - (this.getWidth() / 2)),
-		// (this.getPosition().y - (this.getHeight() / 2)), this.getWidth(),
-		// this
-		// .getHeight());
-		//		
+		gc.setLineWidth(getLineWidth());
+		final Point upperLeft = new Point(((getPosition().x - (width / 2))), ((getPosition().y - (height / 2))));
+		gc.fillRectangle(upperLeft.x, upperLeft.y, width, height);
+		gc.drawRectangle(upperLeft.x, upperLeft.y, width, height);
+		gc.drawString(string, upperLeft.x, upperLeft.y);
 		color.dispose();
 		bg.dispose();
 	}

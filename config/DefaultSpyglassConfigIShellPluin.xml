@@ -10,6 +10,7 @@
                   <isActive nodeID="2">true</isActive>
                   <isActive nodeID="3">false</isActive>
                </extendedInformation>
+                <isExtendedDefaultValue>false</isExtendedDefaultValue>
                <lineColorRGB length="3">
                   <int>0</int>
                   <int>0</int>
@@ -18,11 +19,10 @@
                <lineWidth>1</lineWidth>
                <stringFormatters/>
                <isActive>true</isActive>
-               <isVisible>false</isVisible>
+               <isVisible>true</isVisible>
                <name>SimpleNodePainterTest</name>
-               <semanticTypes length="2">
-                  <int>0</int>
-                  <int>1</int>
+               <semanticTypes length="1">
+                  <int>-1</int>
                </semanticTypes>
             </parameters>
          </plugin>
@@ -69,7 +69,7 @@
             <gridLowerLeftPoint x="0" y="0" z="0"/>
             <lineColorRGB length="3">
                <int>0</int>
-               <int>0</int>
+               <int>255</int>
                <int>0</int>
             </lineColorRGB>
             <lineWidth>1.0</lineWidth>
@@ -149,6 +149,7 @@
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
          <parameters>
             <extendedInformation/>
+            <isExtendedDefaultValue>false</isExtendedDefaultValue>
             <lineColorRGB length="3">
                <int>0</int>
                <int>0</int>

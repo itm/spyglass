@@ -28,8 +28,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
 	
 	@Element(name = "default")
 	// TODO: solve cyclic dependencies here
-	private NodeSensorRange defalutNodeSensorRange = new NodeSensorRange();
-	
+	// private NodeSensorRange defalutNodeSensorRange = new NodeSensorRange();
 	@ElementMap(entry = "ranges", key = "nodeID", attribute = true, valueType = NodeSensorRange.class)
 	private HashMap<Integer, NodeSensorRange> nodeRanges = new HashMap<Integer, NodeSensorRange>();
 	
@@ -41,22 +40,25 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
 		
 	}
 	
+	// //
 	// --------------------------------------------------------------------------------
-	/**
-	 * @return the defalutNodeSensorRange
-	 */
-	public NodeSensorRange getDefalutNodeSensorRange() {
-		return defalutNodeSensorRange;
-	}
-	
+	// /**
+	// * @return the defalutNodeSensorRange
+	// */
+	// public NodeSensorRange getDefalutNodeSensorRange() {
+	// return defalutNodeSensorRange;
+	// }
+	//	
+	// //
 	// --------------------------------------------------------------------------------
-	/**
-	 * @param defalutNodeSensorRange
-	 *            the defalutNodeSensorRange to set
-	 */
-	public void setDefalutNodeSensorRange(final NodeSensorRange defalutNodeSensorRange) {
-		this.defalutNodeSensorRange = defalutNodeSensorRange;
-	}
+	// /**
+	// * @param defalutNodeSensorRange
+	// * the defalutNodeSensorRange to set
+	// */
+	// public void setDefalutNodeSensorRange(final NodeSensorRange
+	// defalutNodeSensorRange) {
+	// this.defalutNodeSensorRange = defalutNodeSensorRange;
+	// }
 	
 	// --------------------------------------------------------------------------------
 	/**
