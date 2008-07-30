@@ -211,18 +211,18 @@ public class NodeObject extends DrawingObject {
 		final String string = (isExtended) ? denotation + "\r\n" + description : denotation;
 		
 		final Point size = gc.textExtent(string);
-		final int width = size.x;
-		final int height = size.y;
+		final int width = size.x + lineWidth;
+		final int height = size.y + lineWidth;
 		
 		final PixelPosition px = drawingArea.absPoint2PixelPoint(this.getPosition());
 		
 		gc.setForeground(color);
 		gc.setBackground(bg);
-		gc.setLineWidth(getLineWidth());
+		gc.setLineWidth(lineWidth);
 		final Point upperLeft = new Point(((px.x - (width / 2))), ((px.y - (height / 2))));
 		gc.fillRectangle(upperLeft.x, upperLeft.y, width, height);
 		gc.drawRectangle(upperLeft.x, upperLeft.y, width, height);
-		gc.drawString(string, upperLeft.x, upperLeft.y);
+		gc.drawString(string, upperLeft.x + lineWidth, upperLeft.y + lineWidth);
 		color.dispose();
 		bg.dispose();
 	}
