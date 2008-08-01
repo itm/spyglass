@@ -7,11 +7,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.jfree.util.Log;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -78,15 +82,21 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 */
 	protected PrefType type;
 	
+	private final Spyglass spyglass;
+	
+	private final PluginPreferenceDialog dialog;
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param cs
 	 */
-	public PluginPreferencePage(final ConfigStore cs) {
+	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.TYPE;
-		this.cs = cs;
+		this.dialog = dialog;
+		this.cs = spyglass.getConfigStore();
+		this.spyglass = spyglass;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -94,11 +104,13 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @param cs
 	 * @param plugin
 	 */
-	public PluginPreferencePage(final ConfigStore cs, final PluginClass plugin) {
+	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final PluginClass plugin) {
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.INSTANCE;
-		this.cs = cs;
+		this.dialog = dialog;
+		this.cs = spyglass.getConfigStore();
+		this.spyglass = spyglass;
 		this.plugin = plugin;
 	}
 	
@@ -152,13 +164,15 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	public abstract void performApply();
 	
 	private void performCreateInstance() {
-		// TODO
-		MessageDialog.openInformation(getShell(), "TODO", "Create instance function not yet implemented.");
+		spyglass.getPluginManager().createNewPlugin(getPluginClass(), getFormValues());
 	}
 	
 	private void performDelete() {
-		// TODO
-		MessageDialog.openInformation(getShell(), "TODO", "Delete function not yet implemented.");
+		final boolean ok = MessageDialog.openQuestion(getShell(), "Remove plugin instance", "Are you sure you want to remove the plugin instance?");
+		if (ok) {
+			spyglass.getPluginManager().removePlugin(this.plugin);
+			dialog.selectPluginManagerPage();
+		}
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -176,8 +190,15 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 */
 	@SuppressWarnings("unchecked")
 	protected void performRestoreDefaults() {
-		final Class<? extends Plugin> pluginClass = (Class<? extends Plugin>) this.getClass().getTypeParameters()[0].getClass();
-		setFormValues((ConfigClass) cs.readPluginTypeDefaults(pluginClass));
+		try {
+			
+			final Class<? extends Plugin> pluginClass = (Class<? extends Plugin>) this.getClass().getMethod("getPluginClass").invoke(this);
+			setFormValues((ConfigClass) cs.readPluginTypeDefaults(pluginClass));
+			
+		} catch (final Exception e) {
+			Log.error("", e);
+		}
+		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -190,7 +211,66 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Checks if this is an instance page or a type page.
+	 * 
+	 * @return <code>true</code> if this is a preference page for a plugin instance,
+	 *         <code>false</code> if this is a preference page for an instantiable plugin type.
+	 */
+	public boolean isInstancePage() {
+		return type == PrefType.INSTANCE;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the <code>Plugin</code> instance associated with this page.
+	 * 
+	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a type
+	 *         page (i.e. not an instance page, also see
+	 *         {@link PluginPreferencePage#isInstancePage()})
+	 */
+	public Plugin getPlugin() {
+		return plugin;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the class-Object of the plugin this preference page is associated with. Needed for
+	 * runtime-reflection.
+	 * 
+	 * @return the class-Object of the plugin this preference page is associated with
+	 */
+	public abstract Class<? extends Plugin> getPluginClass();
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the class-Object of the plugins' PluginXMLConfig this preference page is associated
+	 * with. Needed for runtime reflection.
+	 * 
+	 * @return the class-Object of the plugins' PluginXMLConfig this preference page is associated
+	 *         with
+	 */
+	public abstract Class<? extends PluginXMLConfig> getConfigClass();
+	
+	// --------------------------------------------------------------------------------
+	/**
 	 */
 	public abstract void setFormValues(ConfigClass config);
 	
+	protected Composite createComposite(final Composite parent) {
+		final Composite c = new Composite(parent, SWT.NONE);
+		c.setLayout(new GridLayout());
+		final GridData gridData = new GridData(SWT.LEFT, SWT.TOP, true, true);
+		gridData.horizontalSpan = 50;
+		gridData.verticalSpan = 50;
+		c.setLayoutData(gridData);
+		return c;
+	}
+	
+	protected Group createGroup(final Composite parent, final String groupText) {
+		final Group g = new Group(parent, SWT.SHADOW_ETCHED_IN);
+		g.setText(groupText);
+		g.setLayout(new GridLayout());
+		g.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
+		return g;
+	}
 }

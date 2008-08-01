@@ -22,6 +22,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
  */
 @Root
 public abstract class DrawingObject {
+	
 	private int id = 0;
 	
 	private AbsolutePosition position = new AbsolutePosition(0, 0, 0);
@@ -182,6 +183,15 @@ public abstract class DrawingObject {
 		return "paintOrderId: " + paintOrderId + ", id: " + id + ", " + super.toString();
 	}
 	
+	public String toString(final int tabCount) {
+		final StringBuffer buff = new StringBuffer();
+		for (int i = 0; i < tabCount; i++) {
+			buff.append("\t");
+		}
+		buff.append(toString());
+		return buff.toString();
+	}
+	
 	public long getPaintOrderId() {
 		return paintOrderId;
 	}
@@ -236,4 +246,12 @@ public abstract class DrawingObject {
 	 * Return the bounding box of this drawing object
 	 */
 	public abstract AbsoluteRectangle getBoundingBox();
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the bounding box of this drawing object
+	 * 
+	 * @param box
+	 */
+	public abstract void setBoundingBox(AbsoluteRectangle box);
 }
