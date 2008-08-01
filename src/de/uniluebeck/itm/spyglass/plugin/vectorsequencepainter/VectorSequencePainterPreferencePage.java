@@ -5,17 +5,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class VectorSequencePainterPreferencePage extends PluginPreferencePage<VectorSequencePainterPlugin, VectorSequencePainterXMLConfig> {
 	
-	public VectorSequencePainterPreferencePage(final ConfigStore cs) {
-		super(cs);
+	public VectorSequencePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+		super(dialog, spyglass);
 	}
 	
-	public VectorSequencePainterPreferencePage(final ConfigStore cs, final VectorSequencePainterPlugin plugin) {
-		super(cs, plugin);
+	public VectorSequencePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final VectorSequencePainterPlugin plugin) {
+		super(dialog, spyglass, plugin);
 	}
 	
 	@Override
@@ -47,6 +50,16 @@ public class VectorSequencePainterPreferencePage extends PluginPreferencePage<Ve
 	public void setFormValues(final VectorSequencePainterXMLConfig config) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Class<? extends PluginXMLConfig> getConfigClass() {
+		return VectorSequencePainterXMLConfig.class;
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return VectorSequencePainterPlugin.class;
 	}
 	
 }

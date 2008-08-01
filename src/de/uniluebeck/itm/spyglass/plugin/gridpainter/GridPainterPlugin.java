@@ -1,10 +1,9 @@
 /*
- * --------------------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
+ * -------------------------------------------------------------------------------- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.gridpainter;
@@ -13,8 +12,9 @@ import java.util.List;
 
 import org.simpleframework.xml.Element;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
@@ -41,12 +41,14 @@ public class GridPainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createPreferencePage(final ConfigStore cs) {
-		return new GridPainterPreferencePage(cs, this);
+	public PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
+		return new GridPainterPreferencePage(dialog, spyglass, this);
 	}
 	
-	public static PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createTypePreferencePage(final ConfigStore cs) {
-		return new GridPainterPreferencePage(cs);
+	public static PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
+		return new GridPainterPreferencePage(dialog, spyglass);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {

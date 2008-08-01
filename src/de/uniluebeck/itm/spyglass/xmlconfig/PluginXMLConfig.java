@@ -1,10 +1,9 @@
 /*
- * --------------------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
+ * -------------------------------------------------------------------------------- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.xmlconfig;
@@ -16,8 +15,7 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class contain the configuration parameters of a
- * {@link Plugin}
+ * Instances of this class contain the configuration parameters of a {@link Plugin}
  * 
  * @author Sebastian Ebers
  * 
@@ -159,6 +157,12 @@ public abstract class PluginXMLConfig {
 	 */
 	public void setSemanticTypes(final int[] semanticTypes) {
 		this.semanticTypes = semanticTypes;
+	}
+	
+	public abstract boolean equals(final PluginXMLConfig other);
+	
+	protected boolean equalsRGB(final int[] lineColorRGB, final int[] otherLineColorRGB) {
+		return (lineColorRGB[0] == otherLineColorRGB[0]) && (lineColorRGB[1] == otherLineColorRGB[1]) && (lineColorRGB[2] == otherLineColorRGB[2]);
 	}
 	
 }

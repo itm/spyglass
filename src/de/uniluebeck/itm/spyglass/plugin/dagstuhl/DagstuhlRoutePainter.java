@@ -4,11 +4,12 @@ import java.util.List;
 
 import org.apache.log4j.Category;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text.TextJustification;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
@@ -86,9 +87,8 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 				}
 				
 				/*
-				 * Text t = new Text(new Integer(counter++).toString(), new
-				 * Position(100, 10, 0), 99999999); t.setColor(0, 0, 0);
-				 * getSubLayer().addOrUpdateDrawingObject(t);
+				 * Text t = new Text(new Integer(counter++).toString(), new Position(100, 10, 0),
+				 * 99999999); t.setColor(0, 0, 0); getSubLayer().addOrUpdateDrawingObject(t);
 				 */
 				log.debug(debug);
 			}
@@ -122,12 +122,14 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<DagstuhlRoutePainter, PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
+	public PluginPreferencePage<DagstuhlRoutePainter, PluginXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public static PluginPreferencePage<DagstuhlRoutePainter, PluginXMLConfig> createTypePreferencePage(final ConfigStore cs) {
+	public static PluginPreferencePage<DagstuhlRoutePainter, PluginXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -152,6 +154,11 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 			
 			@Override
 			public boolean isVisible() {
+				return false;
+			}
+			
+			@Override
+			public boolean equals(final PluginXMLConfig other) {
 				return false;
 			}
 		};

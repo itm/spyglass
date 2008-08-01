@@ -1,10 +1,9 @@
 /*
- * --------------------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
+ * -------------------------------------------------------------------------------- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
@@ -165,6 +164,17 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		isExtendenInformationActive = null;
 		stringFormatters.clear();
 		stringFormatters = null;
+	}
+	
+	@Override
+	public boolean equals(final PluginXMLConfig other) {
+		if (!(other instanceof SimpleNodePainterXMLConfig)) {
+			return false;
+		}
+		final SimpleNodePainterXMLConfig o = (SimpleNodePainterXMLConfig) other;
+		return defaultStringFormatter.equals(o.defaultStringFormatter) && (isExtendedDefaultValue == o.isExtendedDefaultValue)
+				&& (isExtendenInformationActive == o.isExtendenInformationActive) && equalsRGB(lineColorRGB, o.lineColorRGB)
+				&& (lineWidth == o.lineWidth) && stringFormatters.equals(o.stringFormatters);
 	}
 	
 }

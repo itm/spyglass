@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.bsi.flegsens;
 
@@ -13,8 +11,9 @@ import java.util.Random;
 
 import org.apache.log4j.Category;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.AbstractPluginTypePreferencePage;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -47,12 +46,12 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<Plugin, PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
-		return new AbstractPluginTypePreferencePage(RandomNodePositioner.getHumanReadableName());
+	public PluginPreferencePage<Plugin, PluginXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+		return new AbstractPluginTypePreferencePage(dialog, spyglass, RandomNodePositioner.getHumanReadableName());
 	}
 	
-	public static PluginPreferencePage<Plugin, PluginXMLConfig> createTypePreferencePage(final ConfigStore cs) {
-		return new AbstractPluginTypePreferencePage(RandomNodePositioner.getHumanReadableName());
+	public static PluginPreferencePage<Plugin, PluginXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+		return new AbstractPluginTypePreferencePage(dialog, spyglass, RandomNodePositioner.getHumanReadableName());
 	}
 	
 	public static String getHumanReadableName() {
@@ -65,6 +64,11 @@ public class RandomNodePositioner extends NodePositionerPlugin {
 			@Override
 			public String getName() {
 				return "unnamedRNP";
+			}
+			
+			@Override
+			public boolean equals(final PluginXMLConfig other) {
+				return false;
 			}
 		};
 	}

@@ -5,17 +5,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> {
 	
-	public LinePainterPreferencePage(final ConfigStore cs) {
-		super(cs);
+	public LinePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+		super(dialog, spyglass);
 	}
 	
-	public LinePainterPreferencePage(final ConfigStore cs, final LinePainterPlugin plugin) {
-		super(cs, plugin);
+	public LinePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final LinePainterPlugin plugin) {
+		super(dialog, spyglass, plugin);
 	}
 	
 	@Override
@@ -47,6 +50,16 @@ public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterP
 	public void setFormValues(final LinePainterXMLConfig config) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return LinePainterPlugin.class;
+	}
+	
+	@Override
+	public Class<? extends PluginXMLConfig> getConfigClass() {
+		return LinePainterXMLConfig.class;
 	}
 	
 }

@@ -28,7 +28,7 @@ public class SpyglassLogger {
 	private static Map<String, Logger> loggerMap = new HashMap<String, Logger>();
 	private static Level loglevel = Level.DEBUG;
 	public static boolean writeLogfile = false;
-	public static boolean write2Socket = true;
+	public static boolean write2Socket = false;
 	
 	static {
 		try {

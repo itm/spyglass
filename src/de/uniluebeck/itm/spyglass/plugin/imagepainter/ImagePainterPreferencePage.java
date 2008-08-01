@@ -5,24 +5,27 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class ImagePainterPreferencePage extends PluginPreferencePage<ImagePainterPlugin, ImagePainterXMLConfig> {
 	
-	public ImagePainterPreferencePage(final ConfigStore cs) {
-		super(cs);
+	public ImagePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+		super(dialog, spyglass);
 	}
 	
-	public ImagePainterPreferencePage(final ConfigStore cs, final ImagePainterPlugin plugin) {
-		super(cs, plugin);
+	public ImagePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final ImagePainterPlugin plugin) {
+		super(dialog, spyglass, plugin);
 	}
 	
 	@Override
 	protected Control createContents(final Composite parent) {
 		String msg = "ImagePainterPlugin Preference Page\n";
-		msg += (type == PrefType.INSTANCE ? "Instance Name: " + plugin.getInstanceName() + "\n" + "IsActive: " + plugin.isActive() + "\n" + "IsVisible: "
-				+ plugin.isVisible() : "");
+		msg += (type == PrefType.INSTANCE ? "Instance Name: " + plugin.getInstanceName() + "\n" + "IsActive: " + plugin.isActive() + "\n"
+				+ "IsVisible: " + plugin.isVisible() : "");
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(msg);
 		return label;
@@ -50,6 +53,16 @@ public class ImagePainterPreferencePage extends PluginPreferencePage<ImagePainte
 	public void setFormValues(final ImagePainterXMLConfig config) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return ImagePainterPlugin.class;
+	}
+	
+	@Override
+	public Class<? extends PluginXMLConfig> getConfigClass() {
+		return ImagePainterXMLConfig.class;
 	}
 	
 }

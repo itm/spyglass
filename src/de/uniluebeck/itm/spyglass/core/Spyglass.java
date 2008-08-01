@@ -175,9 +175,9 @@ public class Spyglass {
 		// Get listeners
 		final EventListener[] list = listeners.getListeners(SpyglassListener.class);
 		
-		if (log.isDebugEnabled()) {
-			log.debug("Fire redraw event");
-		}
+		// if (log.isDebugEnabled()) {
+		// log.debug("Fire redraw event");
+		// }
 		
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {

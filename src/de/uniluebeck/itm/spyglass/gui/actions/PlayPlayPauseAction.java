@@ -15,12 +15,13 @@ public class PlayPlayPauseAction extends Action {
 	
 	private final ImageDescriptor playImageDescriptor = getImageDescriptor("play_play.png");
 	
-	private boolean isPlaying = false;
+	private boolean isPlaying;
 	
 	private final Spyglass spyglass;
 	
 	public PlayPlayPauseAction(final Spyglass spyglass) {
 		this.spyglass = spyglass;
+		this.isPlaying = spyglass.isVisualizationRunning();
 	}
 	
 	@Override

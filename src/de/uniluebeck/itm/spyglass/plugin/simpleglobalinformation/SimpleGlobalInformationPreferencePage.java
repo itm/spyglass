@@ -5,17 +5,21 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> {
 	
-	public SimpleGlobalInformationPreferencePage(final ConfigStore cs) {
-		super(cs);
+	public SimpleGlobalInformationPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+		super(dialog, spyglass);
 	}
 	
-	public SimpleGlobalInformationPreferencePage(final ConfigStore cs, final SimpleGlobalInformationPlugin plugin) {
-		super(cs, plugin);
+	public SimpleGlobalInformationPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,
+			final SimpleGlobalInformationPlugin plugin) {
+		super(dialog, spyglass, plugin);
 	}
 	
 	@Override
@@ -47,6 +51,16 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 	public void setFormValues(final SimpleGlobalInformationXMLConfig config) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return SimpleGlobalInformationPlugin.class;
+	}
+	
+	@Override
+	public Class<? extends PluginXMLConfig> getConfigClass() {
+		return SimpleGlobalInformationXMLConfig.class;
 	}
 	
 }

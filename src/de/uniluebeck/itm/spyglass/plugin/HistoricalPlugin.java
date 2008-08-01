@@ -2,9 +2,10 @@ package de.uniluebeck.itm.spyglass.plugin;
 
 import java.util.List;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.AbstractPluginTypePreferencePage;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
@@ -13,8 +14,8 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
- * Temporary class which all old Plugins inherit. It adds a compatibillity layer
- * to the Plugin interface so that the old Plugins can run without much change.
+ * Temporary class which all old Plugins inherit. It adds a compatibillity layer to the Plugin
+ * interface so that the old Plugins can run without much change.
  * 
  * @author dariush
  * @deprecated
@@ -29,12 +30,14 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 	}
 	
 	@Override
-	public PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
-		return new AbstractPluginTypePreferencePage(HistoricalPlugin.getHumanReadableName());
+	public PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
+		return new AbstractPluginTypePreferencePage(dialog, spyglass, HistoricalPlugin.getHumanReadableName());
 	}
 	
-	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(final ConfigStore cs) {
-		return new AbstractPluginTypePreferencePage(HistoricalPlugin.getHumanReadableName());
+	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
+		return new AbstractPluginTypePreferencePage(dialog, spyglass, HistoricalPlugin.getHumanReadableName());
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
@@ -56,6 +59,11 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 			
 			@Override
 			public boolean isVisible() {
+				return false;
+			}
+			
+			@Override
+			public boolean equals(final PluginXMLConfig other) {
 				return false;
 			}
 		};

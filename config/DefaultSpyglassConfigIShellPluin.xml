@@ -31,7 +31,7 @@
                <image>images/icons/addMarker.png</image>
                <isActive>true</isActive>
                <isVisible>true</isVisible>
-               <name>default</name>
+               <name>default2</name>
             </parameters>
          </plugin>
       </plugins>
@@ -88,7 +88,7 @@
             <isActive>true</isActive>
             <isVisible>true</isVisible>            
             <timeout>0</timeout>
-            <name>default</name>
+            <name>default3</name>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
@@ -119,7 +119,7 @@
             <isActive>true</isActive>
             <isVisible>true</isVisible>
             <timeout>0</timeout>
-            <name>default</name>
+            <name>default4</name>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin">
@@ -131,7 +131,7 @@
             <isActive>true</isActive>
             <isVisible>true</isVisible>            
             <timeout>0</timeout>
-            <name>default</name>
+            <name>default5</name>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
@@ -142,7 +142,7 @@
             <isActive>true</isActive>
             <isVisible>true</isVisible>            
             <timeout>0</timeout>
-            <name>default</name>
+            <name>default6</name>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
@@ -157,7 +157,7 @@
             <lineWidth>1</lineWidth>
             <isActive>true</isActive>
             <isVisible>true</isVisible>
-            <name>default</name>
+            <name>default7</name>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin">
@@ -165,7 +165,7 @@
             <timeToLive>10</timeToLive>
             <isActive>true</isActive>
             <isVisible>true</isVisible>
-            <name>default</name>
+            <name>default8</name>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.springembedderpositioner.SpringEmbedderPositionerPlugin">
@@ -174,7 +174,7 @@
             <timeToLive>10</timeToLive>
             <isActive>true</isActive>
             <isVisible>true</isVisible>
-            <name>default</name>
+            <name>default9</name>
          </parameters>
       </plugin>
       <plugin class="de.bsi.flegsens.RandomNodePositioner"/>
@@ -189,7 +189,7 @@
             <stringFormatters/>
             <isActive>true</isActive>
             <isVisible>true</isVisible>
-            <name>default</name>
+            <name>default10</name>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter.VectorSequencePainterPlugin">
@@ -203,7 +203,7 @@
             <lineWidth>1</lineWidth>
             <isActive>true</isActive>
             <isVisible>true</isVisible>
-            <name>default</name>
+            <name>default11</name>
          </parameters>
       </plugin>
    </defaults>

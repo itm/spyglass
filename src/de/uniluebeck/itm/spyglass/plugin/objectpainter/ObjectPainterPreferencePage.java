@@ -5,17 +5,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class ObjectPainterPreferencePage extends PluginPreferencePage<ObjectPainterPlugin, ObjectPainterXMLConfig> {
 	
-	public ObjectPainterPreferencePage(final ConfigStore cs) {
-		super(cs);
+	public ObjectPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+		super(dialog, spyglass);
 	}
 	
-	public ObjectPainterPreferencePage(final ConfigStore cs, final ObjectPainterPlugin plugin) {
-		super(cs, plugin);
+	public ObjectPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final ObjectPainterPlugin plugin) {
+		super(dialog, spyglass, plugin);
 	}
 	
 	@Override
@@ -47,6 +50,16 @@ public class ObjectPainterPreferencePage extends PluginPreferencePage<ObjectPain
 	public void setFormValues(final ObjectPainterXMLConfig config) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return ObjectPainterPlugin.class;
+	}
+	
+	@Override
+	public Class<? extends PluginXMLConfig> getConfigClass() {
+		return ObjectPainterXMLConfig.class;
 	}
 	
 }

@@ -233,4 +233,10 @@ public class NodeObject extends DrawingObject {
 		return null;
 	}
 	
+	@Override
+	public void setBoundingBox(final AbsoluteRectangle box) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

@@ -1,10 +1,9 @@
 /*
- * --------------------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
+ * -------------------------------------------------------------------------------- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
@@ -14,7 +13,8 @@ import java.util.HashMap;
 import org.apache.log4j.Category;
 import org.simpleframework.xml.Element;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
@@ -23,8 +23,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
- * Default node positioner. it reads the position information from the incoming
- * packets.
+ * Default node positioner. it reads the position information from the incoming packets.
  * 
  * @author dariush
  * 
@@ -57,13 +56,14 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> createPreferencePage(final ConfigStore cs) {
-		return new PositionPacketNodePositionerPreferencePage(cs, this);
+	public PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> createPreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+		return new PositionPacketNodePositionerPreferencePage(dialog, spyglass, this);
 	}
 	
 	public static PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> createTypePreferencePage(
-			final ConfigStore cs) {
-		return new PositionPacketNodePositionerPreferencePage(cs);
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+		return new PositionPacketNodePositionerPreferencePage(dialog, spyglass);
 	}
 	
 	public static String getHumanReadableName() {
@@ -76,8 +76,8 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	}
 	
 	/**
-	 * Contrary to the usual convention for packet handling, a NodePositioner
-	 * must handle packets synchronously.
+	 * Contrary to the usual convention for packet handling, a NodePositioner must handle packets
+	 * synchronously.
 	 */
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {

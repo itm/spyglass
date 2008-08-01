@@ -1,10 +1,9 @@
 /*
- * --------------------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
+ * -------------------------------------------------------------------------------- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
@@ -14,9 +13,10 @@ import java.util.List;
 
 import org.simpleframework.xml.Element;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.NodeObject;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
@@ -29,17 +29,15 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class are used create and administer simple visualizations
- * of sensor nodes.<br>
- * The nodes can be visualized in two way's according to the amount of
- * information the user wants to see.
+ * Instances of this class are used create and administer simple visualizations of sensor nodes.<br>
+ * The nodes can be visualized in two way's according to the amount of information the user wants to
+ * see.
  * <ul>
- * <li> In the <tt>non-extended mode</tt>, the nodes are represented by
- * rectangles which only contain the node's identifier.</li>
- * <li>In the <tt>extended mode</tt> the nodes are again represented by
- * rectangles which contain the node's identifier. But additionally, further
- * information which are extracted from the packets of certain semantic types
- * are displayed, too.</li>
+ * <li>In the <tt>non-extended mode</tt>, the nodes are represented by rectangles which only contain
+ * the node's identifier.</li>
+ * <li>In the <tt>extended mode</tt> the nodes are again represented by rectangles which contain the
+ * node's identifier. But additionally, further information which are extracted from the packets of
+ * certain semantic types are displayed, too.</li>
  * </ul>
  * 
  * @author Sebastian Ebers
@@ -58,9 +56,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	private final Layer layer;
 	
 	/**
-	 * Objects which have recently been updated and which needs to be updated in
-	 * the quad tree as well (which is done in
-	 * {@link SimpleNodePainterPlugin#updateQuadTree()}
+	 * Objects which have recently been updated and which needs to be updated in the quad tree as
+	 * well (which is done in {@link SimpleNodePainterPlugin#updateQuadTree()}
 	 */
 	private final List<DrawingObject> updatedObjects;
 	
@@ -89,12 +86,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> createPreferencePage(final ConfigStore cs) {
-		return new SimpleNodePainterPreferencePage(cs, this);
+	public PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
+		return new SimpleNodePainterPreferencePage(dialog, spyglass, this);
 	}
 	
-	public static PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> createTypePreferencePage(final ConfigStore cs) {
-		return new SimpleNodePainterPreferencePage(cs);
+	public static PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> createTypePreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+		return new SimpleNodePainterPreferencePage(dialog, spyglass);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
@@ -162,17 +161,15 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the instance of a node's visualization<br>
-	 * Note that either a matching instance if found in the quad tree or a new
-	 * instance is to be created and initialized as configured by the default
-	 * parameters.<br>
+	 * Note that either a matching instance if found in the quad tree or a new instance is to be
+	 * created and initialized as configured by the default parameters.<br>
 	 * 
 	 * @param nodeID
 	 *            the node's identifier
 	 * @param position
 	 *            the node's position
 	 * @param drawingObjects
-	 *            the drawing objects which are currently available in the quad
-	 *            tree
+	 *            the drawing objects which are currently available in the quad tree
 	 * @return the up to date instance of a node's visualization
 	 */
 	private NodeObject getMatchingNodeObject(final int nodeID, final AbsolutePosition position, final List<DrawingObject> drawingObjects) {
@@ -206,10 +203,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Resets the configuration parameters of the node visualizations according
-	 * to the node painter's configuration parameters.<br>
-	 * <b>Note:</b> This object updates the quadTree in a synchronized block
-	 * which means that the GUI has to wait for the end of the processing
+	 * Resets the configuration parameters of the node visualizations according to the node
+	 * painter's configuration parameters.<br>
+	 * <b>Note:</b> This object updates the quadTree in a synchronized block which means that the
+	 * GUI has to wait for the end of the processing
 	 */
 	public synchronized void refreshNodeObjectConfiguration() {
 		

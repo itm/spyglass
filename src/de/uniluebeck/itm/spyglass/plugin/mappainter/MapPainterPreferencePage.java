@@ -5,17 +5,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class MapPainterPreferencePage extends PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> {
 	
-	public MapPainterPreferencePage(final ConfigStore cs) {
-		super(cs);
+	public MapPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+		super(dialog, spyglass);
 	}
 	
-	public MapPainterPreferencePage(final ConfigStore cs, final MapPainterPlugin plugin) {
-		super(cs, plugin);
+	public MapPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final MapPainterPlugin plugin) {
+		super(dialog, spyglass, plugin);
 	}
 	
 	@Override
@@ -47,6 +50,16 @@ public class MapPainterPreferencePage extends PluginPreferencePage<MapPainterPlu
 	public void setFormValues(final MapPainterXMLConfig config) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return MapPainterPlugin.class;
+	}
+	
+	@Override
+	public Class<? extends PluginXMLConfig> getConfigClass() {
+		return MapPainterXMLConfig.class;
 	}
 	
 }

@@ -4,11 +4,12 @@ import java.util.List;
 
 import org.apache.log4j.Category;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text.TextJustification;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
@@ -75,12 +76,11 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 					debug += " " + Integer.toHexString(neighbors[i]) + "=" + metrics[i] + "," + metrics[i];
 				}
 				/*
-				 * for (int i = 0; i < neighborCount; i++) {
-				 * paintNode(neighbors[i]); } paintNode(src);
+				 * for (int i = 0; i < neighborCount; i++) { paintNode(neighbors[i]); }
+				 * paintNode(src);
 				 * 
-				 * Text t = new Text(new Integer(counter++).toString(), new
-				 * Position(10, 10, 0), 99999999); t.setColor(0, 0, 0);
-				 * getSubLayer().addOrUpdateDrawingObject(t);
+				 * Text t = new Text(new Integer(counter++).toString(), new Position(10, 10, 0),
+				 * 99999999); t.setColor(0, 0, 0); getSubLayer().addOrUpdateDrawingObject(t);
 				 */
 				log.debug(debug);
 			}
@@ -117,12 +117,14 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<DagstuhlConnectivityPainter, PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
+	public PluginPreferencePage<DagstuhlConnectivityPainter, PluginXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public static PluginPreferencePage<DagstuhlConnectivityPainter, PluginXMLConfig> createTypePreferencePage(final ConfigStore cs) {
+	public static PluginPreferencePage<DagstuhlConnectivityPainter, PluginXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -147,6 +149,11 @@ public class DagstuhlConnectivityPainter extends HistoricalPlugin {
 			
 			@Override
 			public boolean isVisible() {
+				return false;
+			}
+			
+			@Override
+			public boolean equals(final PluginXMLConfig other) {
 				return false;
 			}
 		};

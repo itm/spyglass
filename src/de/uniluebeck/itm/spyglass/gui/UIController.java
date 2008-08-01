@@ -92,9 +92,9 @@ public class UIController {
 		// documentation)
 		spyglass.addSpyglassListener(new SpyglassListener() {
 			public void redraw(final EventObject e) {
-				if (log.isDebugEnabled()) {
-					log.debug("Triggering redraw event from " + e.getSource());
-				}
+				// if (log.isDebugEnabled()) {
+				// log.debug("Triggering redraw event from " + e.getSource());
+				// }
 				
 				// Asynchrony execution, waiting for operation to finish
 				display.asyncExec(paintRunnable);

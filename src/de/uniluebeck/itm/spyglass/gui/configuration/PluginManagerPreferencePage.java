@@ -11,7 +11,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	@Override
 	protected Control createContents(final Composite arg0) {
 		final Label label = new Label(arg0, SWT.NONE);
-		label.setText("Plugins Preference Page");
+		label.setText("Plugin Manager Preference Page");
 		return label;
 	}
 	

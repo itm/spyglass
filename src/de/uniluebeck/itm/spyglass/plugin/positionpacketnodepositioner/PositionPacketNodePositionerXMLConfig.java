@@ -9,6 +9,7 @@
 package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
 
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerXMLConfig;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
@@ -19,5 +20,10 @@ import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerXMLConfig;
  * 
  */
 public class PositionPacketNodePositionerXMLConfig extends NodePositionerXMLConfig {
+	
+	@Override
+	public boolean equals(final PluginXMLConfig other) {
+		return other instanceof PositionPacketNodePositionerXMLConfig ? getTimeToLive() == ((NodePositionerXMLConfig) other).getTimeToLive() : false;
+	}
 	
 }

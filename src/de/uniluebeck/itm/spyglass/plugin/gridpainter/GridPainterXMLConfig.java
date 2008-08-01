@@ -1,10 +1,9 @@
 /*
- * --------------------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
+ * -------------------------------------------------------------------------------- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.gridpainter;
@@ -17,8 +16,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class contain the configuration parameters of a
- * {@link GridPainterPlugin}
+ * Instances of this class contain the configuration parameters of a {@link GridPainterPlugin}
  * 
  * @author Sebastian Ebers
  * 
@@ -218,4 +216,18 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 	public void finalize() throws Throwable {
 		
 	}
+	
+	@Override
+	public boolean equals(final PluginXMLConfig other) {
+		if (!(other instanceof GridPainterXMLConfig)) {
+			return false;
+		}
+		
+		final GridPainterXMLConfig o = (GridPainterXMLConfig) other;
+		return (gridElementHeight == o.gridElementHeight) && (gridElementWidth == o.gridElementWidth)
+				&& gridLowerLeftPoint.equals(o.gridLowerLeftPoint) && equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth)
+				&& (lockGridElementsSquare == o.lockGridElementsSquare) && (lockNumberOfRowsNCols == o.lockNumberOfRowsNCols)
+				&& (numCols == o.numCols) && (numRows == o.numRows);
+	}
+	
 }

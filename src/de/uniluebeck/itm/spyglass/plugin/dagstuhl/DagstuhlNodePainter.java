@@ -5,11 +5,12 @@ import java.util.List;
 
 import org.apache.log4j.Category;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Rectangle;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Text.TextJustification;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
@@ -74,9 +75,8 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 				}
 				paintNode(src);
 				/*
-				 * Text t = new Text(new Integer(c++).toString(), new
-				 * Position(10, 10, 0), 99999999); t.setColor(200, 200, 200);
-				 * getSubLayer().addOrUpdateDrawingObject(t);
+				 * Text t = new Text(new Integer(c++).toString(), new Position(10, 10, 0),
+				 * 99999999); t.setColor(200, 200, 200); getSubLayer().addOrUpdateDrawingObject(t);
 				 */
 				log.debug(debug);
 			}
@@ -105,9 +105,8 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 			}
 			
 			/*
-			 * Circle rect = new Circle(); rect.setColor(0, 0, 0);
-			 * rect.setBgColor(0, 0, 0); rect.setId(src + NODE_RECT_OFFSET);
-			 * rect.setDiameter(30); rect.setPosition(p);
+			 * Circle rect = new Circle(); rect.setColor(0, 0, 0); rect.setBgColor(0, 0, 0);
+			 * rect.setId(src + NODE_RECT_OFFSET); rect.setDiameter(30); rect.setPosition(p);
 			 * getSubLayer().addOrUpdateDrawingObject(rect);
 			 */
 
@@ -129,12 +128,14 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<DagstuhlNodePainter, PluginXMLConfig> createPreferencePage(final ConfigStore cs) {
+	public PluginPreferencePage<DagstuhlNodePainter, PluginXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public static PluginPreferencePage<DagstuhlNodePainter, PluginXMLConfig> createTypePreferencePage(final ConfigStore cs) {
+	public static PluginPreferencePage<DagstuhlNodePainter, PluginXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -159,6 +160,11 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 			
 			@Override
 			public boolean isVisible() {
+				return false;
+			}
+			
+			@Override
+			public boolean equals(final PluginXMLConfig other) {
 				return false;
 			}
 		};
