@@ -122,6 +122,7 @@ public class AbsoluteRectangle {
 	public void setSize(final int width, final int height) {
 		this.rectangle.width = width;
 		this.rectangle.height = height;
+		
 	}
 	
 }

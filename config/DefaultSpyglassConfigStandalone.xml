@@ -212,7 +212,6 @@
       </plugin>
    </defaults>
    <drawingArea>
-      <upperLeft x="-100" y="-100" z="0"/>
-      <zoom>1.0</zoom>
+
    </drawingArea>
 </spyglassConfiguration>

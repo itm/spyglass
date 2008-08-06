@@ -1,8 +1,11 @@
 package de.uniluebeck.itm.spyglass.gui.view;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
+
 import org.apache.log4j.Category;
 import org.eclipse.swt.graphics.Rectangle;
-import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
@@ -15,7 +18,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * The drawing area is the place, where all nodes etc. are painted on. this class contains all
  * information about the dimensions of the draw
  * 
- * @author dariush
+ * @author Dariush Forouher
  * 
  */
 @Root
@@ -23,114 +26,203 @@ public class DrawingArea {
 	
 	private static Category log = SpyglassLogger.get(DrawingArea.class);
 	
+	/**
+	 * Scale factor applied while zooming.
+	 */
+	private final double ZOOM_FACTOR = 1.1;
+	
+	/**
+	 * Reference to the appWindow
+	 */
 	private AppWindow appWindow;
 	
 	/**
-	 * The upper left point of the currently visible area.
+	 * The transformation matrix. it transforms coordinates from the absolute reference frame to the
+	 * reference frame of the drawing area
 	 */
-	@Element
-	private AbsolutePosition upperLeft = new AbsolutePosition(0, 0, 0);
+	AffineTransform at = new AffineTransform();
 	
 	/**
-	 * The zoom level. a zoomlevel of 1 means that px coordinates are identical to absolute
-	 * coordinates.
-	 */
-	@Element
-	private double zoom = 4;
-	
-	/**
+	 * Maps a point from the absolute reference frame to the reference frame of the drawing area.
 	 * 
 	 * @param absPoint
+	 *            a point in the absolute reference frame
 	 */
 	public PixelPosition absPoint2PixelPoint(final AbsolutePosition absPoint) {
-		final PixelPosition pos = new PixelPosition();
-		pos.x = (int) (zoom * (absPoint.x - upperLeft.x));
-		pos.y = (int) (zoom * (absPoint.y - upperLeft.y));
-		return pos;
+		
+		final Point2D pxPoint = at.transform(absPoint.toPoint2D(), null);
+		
+		return new PixelPosition(pxPoint);
 	}
 	
 	/**
+	 * * Transforms a rectangle from absolute coordinates into a one with pixel coordinates.
+	 * 
 	 * 
 	 * @param absRect
 	 */
 	public PixelRectangle absRect2PixelRect(final AbsoluteRectangle absRect) {
+		
 		final PixelRectangle rect = new PixelRectangle();
-		rect.setHeight((int) (absRect.getHeight() * zoom));
-		rect.setWidth((int) (absRect.getWidth() * zoom));
-		rect.setUpperLeft(this.absPoint2PixelPoint(absRect.getUpperLeft()));
+		
+		final PixelPosition upperLeft = this.absPoint2PixelPoint(absRect.getUpperLeft());
+		rect.setUpperLeft(upperLeft);
+		
+		final AbsolutePosition lowerRightAbs = new AbsolutePosition();
+		lowerRightAbs.x = absRect.getUpperLeft().x - absRect.getWidth();
+		lowerRightAbs.y = absRect.getUpperLeft().y - absRect.getHeight();
+		final PixelPosition lowerRight = this.absPoint2PixelPoint(lowerRightAbs);
+		
+		rect.setWidth(lowerRight.x - upperLeft.x);
+		rect.setHeight(upperLeft.y - lowerRight.y);
+		
 		return rect;
 	}
 	
+	/**
+	 * Returns the transformation matrix.
+	 * 
+	 * this matrix maps points from the absolute reference frame to the reference frame of the
+	 * drawing area.
+	 * 
+	 * @param absRect
+	 */
+	public AffineTransform getTransform() {
+		return (AffineTransform) at.clone();
+	}
+	
+	/**
+	 * Returns the Rectangle describing the drawing area (short-cut method)
+	 */
 	private Rectangle getDrawingCanvasRectangle() {
 		return this.appWindow.getGui().getCanvas().getClientArea();
 	}
 	
 	/**
-	 * Entspricht der derzeitigen Zeichenfläche in Pixeln, wird vom appWindow ausgelesen
+	 * return a rectangle descrbing the dimensions of the drawing area.
 	 */
 	public PixelRectangle getDrawingRectangle() {
-		final int height = getDrawingCanvasRectangle().height;
-		final int width = getDrawingCanvasRectangle().width;
-		log.debug(String.format("Size of the drawing area in px: %dx%d\n", width, height));
-		return null;
+		final PixelRectangle ret = new PixelRectangle();
+		ret.setHeight(getDrawingCanvasRectangle().height);
+		ret.setWidth(getDrawingCanvasRectangle().width);
+		return ret;
 	}
 	
 	/**
-	 * Entspricht der derzeitigen Zeichenfläche in Pixeln, wird vom appWindow ausgelesen
+	 * return a rectangle descrbing the dimensions and position of the currently visible part of the
+	 * absolute frame of reference.
 	 */
 	public AbsoluteRectangle getAbsoluteDrawingRectangle() {
 		final AbsoluteRectangle absRect = new AbsoluteRectangle();
-		absRect.setUpperLeft(this.upperLeft);
-		final int height = getDrawingCanvasRectangle().height;
-		final int width = getDrawingCanvasRectangle().width;
-		absRect.setHeight((int) (height / zoom));
-		absRect.setWidth((int) (width / zoom));
+		
+		final AbsolutePosition upperLeft = this.getUpperLeft();
+		final AbsolutePosition lowerRight = this.getLowerRight();
+		
+		final int height = upperLeft.y - lowerRight.y;
+		final int width = lowerRight.x - upperLeft.x;
+		
+		absRect.setHeight((height));
+		absRect.setWidth((width));
+		
 		log.debug(String.format("Size of the drawing area in px: %dx%d\n", width, height));
+		
 		return absRect;
 	}
 	
 	/**
-	 * Berechnet sich aus upperLeft, Zoom und getDrawingRectangle
+	 * return the absolute point represented by the lower right point of the drawing area.
 	 */
 	public AbsolutePosition getLowerRight() {
-		return null; // TODO
+		try {
+			
+			final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(), this.getDrawingRectangle().getHeight());
+			final Point2D lowerRight2D = at.inverseTransform(lowerRight, null);
+			return new AbsolutePosition(lowerRight2D);
+			
+		} catch (final NoninvertibleTransformException e) {
+			throw new RuntimeException("Transformation matrix in illegal state!", e);
+		}
 	}
 	
 	/**
-	 * Verschiebung der Zeichenfläche um die gegebene Anzahl an Pixel
+	 * return the absolute point represented by the upper left point of the drawing area.
+	 */
+	public AbsolutePosition getUpperLeft() {
+		try {
+			
+			final Point2D upperLeft2D = at.inverseTransform(new Point2D.Double(0, 0), null);
+			return new AbsolutePosition(upperLeft2D);
+			
+		} catch (final NoninvertibleTransformException e) {
+			throw new RuntimeException("Transformation matrix in illegal state!", e);
+		}
+	}
+	
+	/**
+	 * Moves the drawing area by the given number of pixels
 	 * 
 	 * @param pixelX
 	 * @param pixelY
 	 */
 	public void move(final int pixelX, final int pixelY) {
-		// TODO
+		
+		log.debug("Moving about " + pixelX + "; " + pixelY);
+		
+		// Build the scale matrix
+		final AffineTransform sca = new AffineTransform();
+		sca.translate(pixelX, pixelY);
+		
+		// add the scale matrix to the transformation matrix.
+		at.preConcatenate(sca);
+		
 	}
 	
 	/**
+	 * Maps a point from the reference frame of the drawing are to the absolute reference frame.
 	 * 
 	 * @param point
+	 *            a point in the reference frame of the drawing area
 	 */
-	public AbsolutePosition pixelPoint2absPoint(final PixelPosition point) {
-		final AbsolutePosition pos = new AbsolutePosition();
-		pos.x = (int) ((point.x - upperLeft.x) / zoom);
-		pos.y = (int) ((point.y - upperLeft.y) / zoom);
-		return pos;
+	public AbsolutePosition pixelPoint2AbsPoint(final PixelPosition point) {
+		
+		try {
+			
+			final Point2D a = at.inverseTransform(point.toPoint2D(), null);
+			return new AbsolutePosition(a);
+			
+		} catch (final NoninvertibleTransformException e) {
+			throw new RuntimeException("Transformation matrix in illegal state!", e);
+		}
 	}
 	
 	/**
+	 * Transforms a rectangle from pixel coordinates into a one with absolute coordinates.
 	 * 
 	 * @param rect
 	 */
 	public AbsoluteRectangle pixelRect2AbsRect(final PixelRectangle rect) {
 		final AbsoluteRectangle absRect = new AbsoluteRectangle();
-		absRect.setHeight((int) (rect.getHeight() / zoom));
-		absRect.setWidth((int) (rect.getWidth() / zoom));
-		absRect.setUpperLeft(this.pixelPoint2absPoint(rect.getUpperLeft()));
+		
+		final AbsolutePosition upperLeftAbs = this.pixelPoint2AbsPoint(rect.getUpperLeft());
+		absRect.setUpperLeft(upperLeftAbs);
+		
+		final PixelPosition lowerRight = new PixelPosition();
+		lowerRight.x = rect.getUpperLeft().x - rect.getWidth();
+		lowerRight.y = rect.getUpperLeft().y - rect.getHeight();
+		final AbsolutePosition lowerRightAbs = this.pixelPoint2AbsPoint(lowerRight);
+		
+		absRect.setWidth(lowerRightAbs.x - upperLeftAbs.x);
+		absRect.setHeight(upperLeftAbs.y - lowerRightAbs.y);
+		
 		return absRect;
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Sets the object reference to the given object.
+	 * 
+	 * note that this method should only be called during start up.
+	 * 
 	 * @param appWindow
 	 *            the appWindow to set
 	 */
@@ -138,20 +230,83 @@ public class DrawingArea {
 		this.appWindow = appWindow;
 	}
 	
+	/**
+	 * Returns the current zoom level. The zoom level can take any value in the range (0;\inf)
+	 * 
+	 */
 	public double getZoom() {
-		return this.zoom;
+		return at.getScaleX();
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Zoom Out. Use the given pixel position as the zoom center
+	 * 
+	 * @param px
+	 * @param py
+	 */
+	public void zoomOut(final int px, final int py) {
+		log.debug("Zooming from " + px + "; " + py);
+		
+		try {
+			
+			// The centerpoint of the zoom (where the user clicked)
+			final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
+			
+			// Build the scale matrix
+			final AffineTransform sca = new AffineTransform();
+			sca.translate(a.getX(), a.getY());
+			sca.scale(1 / ZOOM_FACTOR, 1 / ZOOM_FACTOR);
+			sca.translate(-a.getX(), -a.getY());
+			
+			// add the scale matrix to the transformation matrix.
+			at.concatenate(sca);
+		} catch (final NoninvertibleTransformException e) {
+			throw new RuntimeException("Transformation matrix in illegal state!", e);
+		}
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Zooms in.
+	 * 
+	 * @param px
+	 * @param py
+	 */
+	public void zoomIn(final int px, final int py) {
+		log.debug("Zooming into " + px + "; " + py);
+		
+		try {
+			// The centerpoint of the zoom (where the user clicked)
+			final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
+			
+			// Build the scale matrix
+			final AffineTransform sca = new AffineTransform();
+			sca.translate(a.getX(), a.getY());
+			sca.scale(ZOOM_FACTOR, ZOOM_FACTOR);
+			sca.translate(-a.getX(), -a.getY());
+			
+			// add the scale matrix to the transformation matrix.
+			at.concatenate(sca);
+		} catch (final NoninvertibleTransformException e) {
+			throw new RuntimeException("Transformation matrix in illegal state!", e);
+		}
+	}
+	
+	/**
+	 * Zoom in and implicitly asume that the center of the drawing area is the scale center.
+	 */
 	public void zoomIn() {
-		this.zoom *= 1.1;
-		// TODO: vorher translation machen, so dass mittelpunkt der bildfläche
-		// skalierungszentrum ist.
+		this.zoomIn(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle().getHeight() / 2);
+		
 	}
 	
+	/**
+	 * Zoom out and implicitly asume that the center of the drawing area is the scale center.
+	 */
 	public void zoomOut() {
-		this.zoom /= 1.1;
-		// TODO: vorher translation machen, so dass mittelpunkt der bildfläche
-		// skalierungszentrum ist.
+		this.zoomOut(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle().getHeight() / 2);
+		
 	}
 	
 }

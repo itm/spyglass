@@ -1,11 +1,13 @@
 package de.uniluebeck.itm.spyglass.positions;
 
+import java.awt.geom.Point2D;
+
 import org.simpleframework.xml.Attribute;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class represent the coordinate's of a single point when
- * using absolute coordinates
+ * Instances of this class represent the coordinate's of a single point when using absolute
+ * coordinates
  * 
  * @author Sebastian Ebers
  * 
@@ -26,6 +28,17 @@ public class AbsolutePosition implements Cloneable {
 	
 	public AbsolutePosition() {
 		
+	}
+	
+	/**
+	 * Create a new AbsolutePosition object based on a Point2D instance.
+	 * 
+	 * The z-coordinate is implicitly set to 0.
+	 */
+	public AbsolutePosition(final Point2D point) {
+		x = (int) point.getX();
+		y = (int) point.getY();
+		z = 0;
 	}
 	
 	public AbsolutePosition(final int x, final int y, final int z) {
@@ -66,13 +79,13 @@ public class AbsolutePosition implements Cloneable {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Indicates whether some other object is "equal to" this one according to
-	 * their coordinate information.
+	 * Indicates whether some other object is "equal to" this one according to their coordinate
+	 * information.
 	 * 
 	 * @param obj
 	 *            the reference object with which to compare.
-	 * @return <code>true</code> if this object is the same as the obj
-	 *         argument; <code>false</code> otherwise.
+	 * @return <code>true</code> if this object is the same as the obj argument; <code>false</code>
+	 *         otherwise.
 	 */
 	@Override
 	public boolean equals(final Object obj) {
@@ -82,6 +95,10 @@ public class AbsolutePosition implements Cloneable {
 			return ((other.x == this.x) && (other.y == this.y) && (other.z == this.z));
 		}
 		return false;
+	}
+	
+	public Point2D toPoint2D() {
+		return new Point2D.Double(x, y);
 	}
 	
 }

@@ -1,5 +1,7 @@
 package de.uniluebeck.itm.spyglass.positions;
 
+import java.awt.geom.Point2D;
+
 import org.eclipse.swt.graphics.Point;
 
 // --------------------------------------------------------------------------------
@@ -27,8 +29,22 @@ public class PixelPosition {
 		y = point.y;
 	}
 	
+	public PixelPosition(final int x, final int y) {
+		this.x = x;
+		this.y = y;
+	}
+	
+	public PixelPosition(final Point2D point) {
+		x = (int) point.getX();
+		y = (int) point.getY();
+	}
+	
 	public PixelPosition() {
 		//
+	}
+	
+	public Point2D toPoint2D() {
+		return new Point2D.Double(x, y);
 	}
 	
 }
