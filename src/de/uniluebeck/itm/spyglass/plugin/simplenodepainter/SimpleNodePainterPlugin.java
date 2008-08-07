@@ -287,4 +287,12 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 	}
 	
+	@Override
+	public List<DrawingObject> getAutoZoomDrawingObjects() {
+		// TODO Auto-generated method stub
+		synchronized (layer) {
+			return layer.getDrawingObjects();
+		}
+	}
+	
 }

@@ -8,6 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simpleframework.xml.Element;
@@ -93,4 +94,9 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 		
 	}
 	
+	@Override
+	public List<DrawingObject> getAutoZoomDrawingObjects() {
+		// TODO Auto-generated method stub
+		return new ArrayList<DrawingObject>();
+	}
 }

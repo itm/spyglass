@@ -8,6 +8,7 @@ import org.eclipse.swt.graphics.Point;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
@@ -229,8 +230,15 @@ public class NodeObject extends DrawingObject {
 	
 	@Override
 	public AbsoluteRectangle getBoundingBox() {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO: replace with real code... (this was just for testing)
+		final AbsoluteRectangle ret = new AbsoluteRectangle();
+		final AbsolutePosition absPos = this.getPosition().clone();
+		absPos.x += 40;
+		absPos.y += 15;
+		ret.setHeight(30);
+		ret.setWidth(80);
+		ret.setUpperLeft(absPos);
+		return ret;
 	}
 	
 	@Override

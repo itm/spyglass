@@ -13,7 +13,7 @@ import org.simpleframework.xml.Element;
  */
 public class AbsoluteRectangle {
 	
-	private final Rectangle rectangle;
+	private Rectangle rectangle;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -98,6 +98,22 @@ public class AbsoluteRectangle {
 	
 	public boolean contains(final Point p) {
 		return this.rectangle.contains(p);
+	}
+	
+	/**
+	 * Returns a new rectangle which represents the union of the receiver and the given rectangle.
+	 * 
+	 * The union of two rectangles is the smallest single rectangle that completely covers both of
+	 * the areas covered by the two given rectangles.
+	 * 
+	 * @param other
+	 *            the rectangle to perform union with
+	 * @return the union of the receiver and the argument
+	 */
+	public AbsoluteRectangle union(final AbsoluteRectangle other) {
+		final AbsoluteRectangle ret = new AbsoluteRectangle();
+		ret.rectangle = this.rectangle.union(other.rectangle);
+		return ret;
 	}
 	
 	public boolean contains(final AbsoluteRectangle rect) {

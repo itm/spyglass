@@ -106,4 +106,9 @@ public class HistoricalPlugin extends Plugin implements Drawable {
 		return HistoricalPlugin.getHumanReadableName() + "." + this.getInstanceName();
 	}
 	
+	@Override
+	public List<DrawingObject> getAutoZoomDrawingObjects() {
+		return this.layer.getDrawingObjects();
+	}
+	
 }

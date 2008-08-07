@@ -8,6 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.linepainter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simpleframework.xml.Element;
@@ -84,6 +85,12 @@ public class LinePainterPlugin extends RelationPainterPlugin {
 	protected void updateQuadTree() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public List<DrawingObject> getAutoZoomDrawingObjects() {
+		// TODO Auto-generated method stub
+		return new ArrayList<DrawingObject>();
 	}
 	
 }

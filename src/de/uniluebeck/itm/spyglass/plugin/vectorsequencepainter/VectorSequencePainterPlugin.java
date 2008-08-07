@@ -8,6 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simpleframework.xml.Element;
@@ -85,4 +86,9 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 		
 	}
 	
+	@Override
+	public List<DrawingObject> getAutoZoomDrawingObjects() {
+		// TODO Auto-generated method stub
+		return new ArrayList<DrawingObject>();
+	}
 }

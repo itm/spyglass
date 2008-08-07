@@ -164,7 +164,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		addToolBarAction(new RecordRecordAction());
 		addToolBarAction(new ZoomInAction(spyglass.getDrawingArea()));
 		addToolBarAction(new ZoomOutAction(spyglass.getDrawingArea()));
-		addToolBarAction(new ZoomCompleteMapAction());
+		addToolBarAction(new ZoomCompleteMapAction(spyglass));
 		addToolBarAction(new OpenPreferencesAction(container.getShell(), spyglass));
 		
 		// Start visualization

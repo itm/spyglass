@@ -96,4 +96,10 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin {
 		// done here
 	}
 	
+	@Override
+	public List<DrawingObject> getAutoZoomDrawingObjects() {
+		// TODO Auto-generated method stub
+		return new ArrayList<DrawingObject>();
+	}
+	
 }

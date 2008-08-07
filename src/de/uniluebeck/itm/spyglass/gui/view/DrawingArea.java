@@ -124,7 +124,7 @@ public class DrawingArea {
 		absRect.setHeight((height));
 		absRect.setWidth((width));
 		
-		log.debug(String.format("Size of the drawing area in px: %dx%d\n", width, height));
+		// log.debug(String.format("Size of the drawing area in px: %dx%d\n", width, height));
 		
 		return absRect;
 	}
@@ -309,4 +309,25 @@ public class DrawingArea {
 		
 	}
 	
+	/**
+	 * Adjusts the transformation matrix to make the given rectangle fit exactly in the drawing
+	 * area.
+	 * 
+	 * TODO: needs some refinements
+	 */
+	public void autoZoom(final AbsoluteRectangle rect) {
+		log.debug("Auto zooming to " + rect);
+		final AffineTransform newAt = new AffineTransform();
+		
+		final int height = rect.getHeight();
+		final int width = rect.getWidth();
+		
+		final double scaleX = (double) this.getDrawingCanvasRectangle().width / (double) width;
+		final double scaleY = (double) this.getDrawingCanvasRectangle().height / (double) height;
+		final double scale = Math.min(scaleX, scaleY);
+		
+		newAt.translate(rect.getUpperLeft().x, rect.getUpperLeft().y);
+		newAt.scale(scale, scale);
+		this.at = newAt;
+	}
 }
