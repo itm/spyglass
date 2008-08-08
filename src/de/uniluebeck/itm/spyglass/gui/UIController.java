@@ -249,7 +249,7 @@ public class UIController {
 			
 		}
 		
-		drawDebugMarkers(gc);
+		// drawDebugMarkers(gc);
 		
 	}
 	
