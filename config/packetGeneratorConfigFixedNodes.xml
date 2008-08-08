@@ -15,7 +15,7 @@
 		</sink>
 		<!-- this sink writes the packets into the given file. -->
 		<sink class="de.uniluebeck.itm.spyglass.packetgenerator.sinks.FileSink">
-			<filename>generator.txt</filename>
+			<filename>packet-samples/6fixedNodes.txt</filename>
 			<append>false</append>
 		</sink>
 
@@ -29,13 +29,13 @@
 				<nodeIDs>1</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>1</semanticTypes>
-				<position x="0" y="0" z="0"/>
+				<position x="1" y="1" z="0"/>
 				<payload>00</payload>
 			</sample>
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>node2</name>
 				<probability>0.20</probability>
-				<nodeIDs>1</nodeIDs>
+				<nodeIDs>2</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>1</semanticTypes>
 				<position x="-100" y="-100" z="0"/>
@@ -44,7 +44,7 @@
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>node3</name>
 				<probability>0.20</probability>
-				<nodeIDs>1</nodeIDs>
+				<nodeIDs>3</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>1</semanticTypes>
 				<position x="100" y="100" z="0"/>
@@ -53,7 +53,7 @@
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>node4</name>
 				<probability>0.20</probability>
-				<nodeIDs>1</nodeIDs>
+				<nodeIDs>4</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>1</semanticTypes>
 				<position x="-100" y="100" z="0"/>
@@ -62,7 +62,7 @@
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>node5</name>
 				<probability>0.10</probability>
-				<nodeIDs>1</nodeIDs>
+				<nodeIDs>5</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>1</semanticTypes>
 				<position x="100" y="-100" z="0"/>
@@ -71,7 +71,7 @@
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>node6</name>
 				<probability>0.10</probability>
-				<nodeIDs>1</nodeIDs>
+				<nodeIDs>6</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>1</semanticTypes>
 				<position x="0" y="10" z="0"/>
