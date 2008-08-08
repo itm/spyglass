@@ -1,11 +1,9 @@
 /*
- * ------------------------------------------------------------------------------
- * -- This file is part of the WSN visualization framework SpyGlass. Copyright
- * (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ----------------------------------------------
+ * ------------------------------------------------------------------------------ -- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details. ----------------------------------------------
  * ----------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin;
@@ -20,38 +18,66 @@ import org.apache.log4j.Category;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
+import de.bsi.flegsens.RandomNodePositioner;
+import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener.ListChangeEvent;
+import de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin;
+import de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin;
+import de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin;
+import de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
+import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangePlugin;
+import de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin;
+import de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin;
+import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin;
+import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin;
+import de.uniluebeck.itm.spyglass.plugin.springembedderpositioner.SpringEmbedderPositionerPlugin;
+import de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter.VectorSequencePainterPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
- * The PluginManager holds all loaded plugins and is basically a wrapper for an
- * internal list of plugins.
+ * The PluginManager holds all loaded plugins and is basically a wrapper for an internal list of
+ * plugins.
  */
 @Root
 public class PluginManager {
-	
-	public enum ListChangeEvent {
-		PRIORITY_CHANGED, NEW_PLUGIN, PLUGIN_REMOVED, PLUGIN_STATE_CHANGED
-	}
 	
 	private static Category log = SpyglassLogger.get(PluginManager.class);
 	
 	@ElementList
 	private final List<Plugin> plugins = new ArrayList<Plugin>();
 	
+	private final Set<PluginListChangeListener> pluginListChangeListeners = new HashSet<PluginListChangeListener>();
+	
+	private static final List<Class<? extends Plugin>> availablePluginsTypes = new ArrayList<Class<? extends Plugin>>();
+	
+	static {
+		availablePluginsTypes.add(GridPainterPlugin.class);
+		availablePluginsTypes.add(ImagePainterPlugin.class);
+		availablePluginsTypes.add(MapPainterPlugin.class);
+		availablePluginsTypes.add(NodeSensorRangePlugin.class);
+		availablePluginsTypes.add(ObjectPainterPlugin.class);
+		availablePluginsTypes.add(SimpleGlobalInformationPlugin.class);
+		availablePluginsTypes.add(SimpleNodePainterPlugin.class);
+		availablePluginsTypes.add(PositionPacketNodePositionerPlugin.class);
+		availablePluginsTypes.add(RandomNodePositioner.class);
+		availablePluginsTypes.add(SpringEmbedderPositionerPlugin.class);
+		availablePluginsTypes.add(LinePainterPlugin.class);
+		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
+	}
+	
 	private NodePositionerPlugin nodePositioner = null;
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Returns all plugins which are currently administered by this instance and
-	 * which are marked as 'active'
+	 * Returns all plugins which are currently administered by this instance and which are marked as
+	 * 'active'
 	 * 
-	 * @return all plugins which are currently administered by this instance and
-	 *         which are marked as 'active'
+	 * @return all plugins which are currently administered by this instance and which are marked as
+	 *         'active'
 	 */
 	public List<Plugin> getActivePlugins() {
 		final List<Plugin> activePlugIns = new LinkedList<Plugin>();
@@ -63,7 +89,30 @@ public class PluginManager {
 		return activePlugIns;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------
+	/**
+	 * Adds a <code>PluginListChangeListener</code> instance to the list of listeners. Every
+	 * listener will be informed of changes when plugin-instances are added or removed.
+	 * 
+	 * @param listener
+	 *            the listener to add
+	 */
+	public void addPluginListChangeListener(final PluginListChangeListener listener) {
+		pluginListChangeListeners.add(listener);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Removes a <code>PluginListChangeListener</code> instance from the list of listeners.
+	 * 
+	 * @param listener
+	 *            the listener to add
+	 */
+	public void removePluginListChangeListener(final PluginListChangeListener listener) {
+		pluginListChangeListeners.remove(listener);
+	}
+	
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Returns all plugins which are currently administered by this instance
@@ -74,11 +123,11 @@ public class PluginManager {
 		return plugins;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Initializes the instance by setting it as administration instance for all
-	 * currently available plug-ins
+	 * Initializes the instance by setting it as administration instance for all currently available
+	 * plug-ins
 	 */
 	public void init() {
 		// This is a workaround, since simple-xml does not call the setPlugins()
@@ -88,11 +137,11 @@ public class PluginManager {
 		}
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Adds a plug-in. The plug-in is put at the end of the list which means
-	 * that the new plug-in has the lowest priority
+	 * Adds a plug-in. The plug-in is put at the end of the list which means that the new plug-in
+	 * has the lowest priority
 	 * 
 	 * @param plugin
 	 *            The plugin object to be added.
@@ -109,13 +158,12 @@ public class PluginManager {
 		
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Puts a plug-in at the top of the list which means that its priority is
-	 * the highest one<br>
-	 * The others plug-ins' priorities are decreased by one which means that
-	 * their order stays intact.
+	 * Puts a plug-in at the top of the list which means that its priority is the highest one<br>
+	 * The others plug-ins' priorities are decreased by one which means that their order stays
+	 * intact.
 	 * 
 	 * @param plugin
 	 *            The plugin object to be added.
@@ -128,7 +176,7 @@ public class PluginManager {
 		firePluginListChangedEvent(plugin, ListChangeEvent.PRIORITY_CHANGED);
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Removes a plug-in
@@ -139,7 +187,7 @@ public class PluginManager {
 		firePluginListChangedEvent(plugin, ListChangeEvent.PLUGIN_REMOVED);
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Replaces the list of plug-ins
@@ -154,7 +202,7 @@ public class PluginManager {
 		}
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Sets the state of a plug-in
@@ -174,7 +222,7 @@ public class PluginManager {
 		
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Sets the instances which holds information about the nodes' positions.<br>
@@ -188,7 +236,7 @@ public class PluginManager {
 		addPlugin(np);
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Returns the instances which holds information about the nodes' positions
@@ -200,7 +248,7 @@ public class PluginManager {
 		return nodePositioner;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Creates a new instance of a plug-in and entails it in the list
@@ -216,11 +264,10 @@ public class PluginManager {
 		return plugin;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Fires an event which informs the listener about changes concerning a
-	 * certain plug-in
+	 * Fires an event which informs the listener about changes concerning a certain plug-in
 	 * 
 	 * @param p
 	 *            the plug-in
@@ -228,31 +275,27 @@ public class PluginManager {
 	 *            the reason
 	 */
 	private void firePluginListChangedEvent(final Plugin p, final ListChangeEvent what) {
-		// TODO: do sth. here ;)
+		for (final PluginListChangeListener listener : pluginListChangeListeners) {
+			listener.pluginListChanged(p, what);
+		}
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Returns a list of all types of plug-ins which are currently administered
-	 * by this instance
+	 * Returns a list of all types of plug-ins which are currently administered by this instance
 	 * 
-	 * @return a list of all types of plug-ins which are currently administered
-	 *         by this instance
+	 * @return a list of all types of plug-ins which are currently administered by this instance
 	 */
 	public List<Class<? extends Plugin>> getAvailablePluginTypes() {
-		final Set<Class<? extends Plugin>> classes = new HashSet<Class<? extends Plugin>>();
-		for (final Plugin plugin : plugins) {
-			classes.add(plugin.getClass());
-		}
-		return new LinkedList<Class<? extends Plugin>>(classes);
+		return availablePluginsTypes;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Returns all instances of a certain kind of plug-ins which are currently
-	 * administered by this instance
+	 * Returns all instances of a certain kind of plug-ins which are currently administered by this
+	 * instance
 	 * 
 	 * @param clazz
 	 *            the plug-in instances' class
@@ -268,7 +311,7 @@ public class PluginManager {
 		return instances;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Returns all plug-ins which are currently visible
@@ -285,7 +328,7 @@ public class PluginManager {
 		return visiblePlugins;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 

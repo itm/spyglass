@@ -171,7 +171,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		final boolean ok = MessageDialog.openQuestion(getShell(), "Remove plugin instance", "Are you sure you want to remove the plugin instance?");
 		if (ok) {
 			spyglass.getPluginManager().removePlugin(this.plugin);
-			dialog.selectPluginManagerPage();
 		}
 	}
 	

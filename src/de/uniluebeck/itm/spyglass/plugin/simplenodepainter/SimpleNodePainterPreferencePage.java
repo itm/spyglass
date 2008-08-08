@@ -32,12 +32,6 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 	}
 	
 	@Override
-	public boolean hasUnsavedChanges() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	
-	@Override
 	public void performApply() {
 		// TODO Auto-generated method stub
 		
@@ -45,14 +39,15 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 	
 	@Override
 	public SimpleNodePainterXMLConfig getFormValues() {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO implement
+		return tmpConfig;
 	}
+	
+	private SimpleNodePainterXMLConfig tmpConfig;
 	
 	@Override
 	public void setFormValues(final SimpleNodePainterXMLConfig config) {
-		// TODO Auto-generated method stub
-		
+		this.tmpConfig = config;
 	}
 	
 	@Override
@@ -63,6 +58,12 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return SimpleNodePainterPlugin.class;
+	}
+	
+	@Override
+	public boolean hasUnsavedChanges() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 }
