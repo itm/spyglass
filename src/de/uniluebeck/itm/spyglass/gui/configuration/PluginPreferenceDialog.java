@@ -159,7 +159,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 	}
 	
-	private class PluginPreferenceNode extends PreferenceNode {
+	private class CustomPreferenceNode extends PreferenceNode {
 		
 		private final ImageDescriptor imageDescriptor;
 		
@@ -170,10 +170,16 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		 */
 		private Image image;
 		
-		public PluginPreferenceNode(final String id, final String labelText, final ImageDescriptor image, final IPreferencePage preferencePage) {
+		public CustomPreferenceNode(final String id, final String labelText, final ImageDescriptor image, final IPreferencePage preferencePage) {
+			
 			super(id, preferencePage);
+			
 			this.labelText = labelText;
 			this.imageDescriptor = image;
+			
+			preferencePage.setTitle(labelText);
+			preferencePage.setImageDescriptor(imageDescriptor);
+			
 		}
 		
 		@Override
@@ -252,8 +258,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 		final PreferenceNode generalPreferenceNode = new PreferenceNode(NODE_ID_GENERAL_SETTINGS, "General", getImageDescriptor("general.png"),
 				GeneralPreferencePage.class.getCanonicalName());
-		final PreferenceNode pluginsPreferenceNode = new PreferenceNode(NODE_ID_PLUGINMANAGER, "Plugins", getImageDescriptor("plugin_manager.png"),
-				PluginManagerPreferencePage.class.getCanonicalName());
+		final PreferenceNode pluginsPreferenceNode = new CustomPreferenceNode(NODE_ID_PLUGINMANAGER, "Plugins",
+				getImageDescriptor("plugin_manager.png"), new PluginManagerPreferencePage(spyglass));
 		
 		preferenceManager.addToRoot(generalPreferenceNode);
 		preferenceManager.addToRoot(pluginsPreferenceNode);
@@ -277,8 +283,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			
 		}
 		
-		final PluginPreferenceNode preferenceNode;
-		PluginPreferenceNode instancePreferenceNode;
+		final CustomPreferenceNode preferenceNode;
+		CustomPreferenceNode instancePreferenceNode;
 		String preferenceNodeId, preferenceNodeLabel;
 		ImageDescriptor preferenceNodeImageDescriptor;
 		PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> preferencePage;
@@ -291,7 +297,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			preferencePage = getTypePreferencePage(classTree.clazz);
 			preferenceNodeLabel = getPluginName(classTree.clazz);
 			preferenceNodeImageDescriptor = getPluginImageDescriptor();
-			preferenceNode = new PluginPreferenceNode(preferenceNodeId, preferenceNodeLabel, preferenceNodeImageDescriptor, preferencePage);
+			preferenceNode = new CustomPreferenceNode(preferenceNodeId, preferenceNodeLabel, preferenceNodeImageDescriptor, preferencePage);
 			parentPreferenceNode.add(preferenceNode);
 			
 			// add nodes for instantiated plugins
@@ -301,7 +307,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 				preferencePage = getPreferencePage(classTree.clazz, p);
 				preferenceNodeLabel = getInstanceName(classTree.clazz, p);
 				preferenceNodeImageDescriptor = getInstanceImageDescriptor(classTree.clazz, p);
-				instancePreferenceNode = new PluginPreferenceNode(preferenceNodeId, preferenceNodeLabel, preferenceNodeImageDescriptor,
+				instancePreferenceNode = new CustomPreferenceNode(preferenceNodeId, preferenceNodeLabel, preferenceNodeImageDescriptor,
 						preferencePage);
 				
 				// add to parent tree node
