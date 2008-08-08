@@ -6,36 +6,45 @@ import java.io.File;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Category;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangedEvent;
+import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.IPreferencePage;
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TreeItem;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class PluginPreferenceDialog {
+public class PluginPreferenceDialog implements PluginListChangeListener {
 	
 	private class ClassTree {
 		
@@ -50,7 +59,7 @@ public class PluginPreferenceDialog {
 		
 	}
 	
-	private class CustomPreferenceDialog extends PreferenceDialog implements IPageChangedListener {
+	private class CustomPreferenceDialog extends PreferenceDialog implements IPageChangedListener, DisposeListener {
 		
 		public CustomPreferenceDialog(final Shell parentShell, final PreferenceManager preferenceManager) {
 			super(parentShell, preferenceManager);
@@ -62,6 +71,7 @@ public class PluginPreferenceDialog {
 		protected void configureShell(final Shell newShell) {
 			super.configureShell(newShell);
 			newShell.setText("SpyGlass Preferences");
+			newShell.addDisposeListener(this);
 		}
 		
 		private Button createButton(final Composite parent, final String label, final SelectionListener selectionListener) {
@@ -79,11 +89,6 @@ public class PluginPreferenceDialog {
 			buttonSavePreferences = createButton(parent, "Save Preferences...", buttonSelectionListener);
 			buttonLoadPreferences = createButton(parent, "Load Preferences...", buttonSelectionListener);
 			buttonClose = createButton(parent, "Close", buttonSelectionListener);
-		}
-		
-		@Override
-		public void updateButtons() {
-			// nothing to do
 		}
 		
 		@SuppressWarnings("unchecked")
@@ -122,6 +127,36 @@ public class PluginPreferenceDialog {
 			
 		}
 		
+		@Override
+		public void updateButtons() {
+			// nothing to do
+		}
+		
+		@Override
+		public void widgetDisposed(final DisposeEvent e) {
+			spyglass.getPluginManager().removePluginListChangeListener(PluginPreferenceDialog.this);
+		}
+		
+		public void selectPluginManagerPreferenceNode() {
+			final IPreferenceNode pluginManagerNode = findNodeMatching(NODE_ID_PLUGINMANAGER);
+			if (pluginManagerNode.getPage() == null) {
+				pluginManagerNode.createPage();
+			}
+			showPage(pluginManagerNode);
+			getTreeViewer().setSelection(new StructuredSelection(findPluginManagerTreeItem()), true);
+			getTreeViewer().refresh();
+		}
+		
+		private IPreferenceNode findPluginManagerTreeItem() {
+			for (final TreeItem item : getTreeViewer().getTree().getItems()) {
+				if (((IPreferenceNode) item.getData()).getId().equals(NODE_ID_PLUGINMANAGER)) {
+					return (IPreferenceNode) item.getData();
+				}
+			}
+			// should never reach here
+			return null;
+		}
+		
 	}
 	
 	private class PluginPreferenceNode extends PreferenceNode {
@@ -129,6 +164,11 @@ public class PluginPreferenceDialog {
 		private final ImageDescriptor imageDescriptor;
 		
 		private final String labelText;
+		
+		/**
+		 * Cached image, or <code>null</code> if none.
+		 */
+		private Image image;
 		
 		public PluginPreferenceNode(final String id, final String labelText, final ImageDescriptor image, final IPreferencePage preferencePage) {
 			super(id, preferencePage);
@@ -142,8 +182,24 @@ public class PluginPreferenceDialog {
 		}
 		
 		@Override
+		public Image getLabelImage() {
+			if ((image == null) && (imageDescriptor != null)) {
+				image = imageDescriptor.createImage();
+			}
+			return image;
+		}
+		
+		@Override
 		public String getLabelText() {
 			return labelText;
+		}
+		
+		@Override
+		public void disposeResources() {
+			if (image != null) {
+				image.dispose();
+				image = null;
+			}
 		}
 		
 	}
@@ -173,11 +229,13 @@ public class PluginPreferenceDialog {
 		}
 	};
 	
-	private final PreferenceDialog preferenceDialog;
+	private final CustomPreferenceDialog preferenceDialog;
 	
 	private final PreferenceManager preferenceManager;
 	
 	private final Spyglass spyglass;
+	
+	private final Map<Plugin, String> instancePreferenceNodes = new HashMap<Plugin, String>();
 	
 	public PluginPreferenceDialog(final Shell parentShell, final Spyglass spyglass) {
 		
@@ -192,10 +250,10 @@ public class PluginPreferenceDialog {
 	
 	private void addPreferenceNodes() {
 		
-		final PreferenceNode generalPreferenceNode = new PreferenceNode(NODE_ID_GENERAL_SETTINGS, "General", null, GeneralPreferencePage.class
-				.getCanonicalName());
-		final PreferenceNode pluginsPreferenceNode = new PreferenceNode(NODE_ID_PLUGINMANAGER, "Plugins", null, PluginManagerPreferencePage.class
-				.getCanonicalName());
+		final PreferenceNode generalPreferenceNode = new PreferenceNode(NODE_ID_GENERAL_SETTINGS, "General", getImageDescriptor("general.png"),
+				GeneralPreferencePage.class.getCanonicalName());
+		final PreferenceNode pluginsPreferenceNode = new PreferenceNode(NODE_ID_PLUGINMANAGER, "Plugins", getImageDescriptor("plugin_manager.png"),
+				PluginManagerPreferencePage.class.getCanonicalName());
 		
 		preferenceManager.addToRoot(generalPreferenceNode);
 		preferenceManager.addToRoot(pluginsPreferenceNode);
@@ -204,7 +262,7 @@ public class PluginPreferenceDialog {
 		
 		addPreferenceNodesRecursive(buildClassTree(pluginTypes), pluginsPreferenceNode);
 		
-	}
+	};
 	
 	private void addPreferenceNodesRecursive(final ClassTree classTree, final PreferenceNode parentPreferenceNode) {
 		
@@ -232,7 +290,8 @@ public class PluginPreferenceDialog {
 			preferenceNodeId = classTree.clazz.getCanonicalName() + "_" + System.currentTimeMillis();
 			preferencePage = getTypePreferencePage(classTree.clazz);
 			preferenceNodeLabel = getPluginName(classTree.clazz);
-			preferenceNode = new PluginPreferenceNode(preferenceNodeId, preferenceNodeLabel, null, preferencePage);
+			preferenceNodeImageDescriptor = getPluginImageDescriptor();
+			preferenceNode = new PluginPreferenceNode(preferenceNodeId, preferenceNodeLabel, preferenceNodeImageDescriptor, preferencePage);
 			parentPreferenceNode.add(preferenceNode);
 			
 			// add nodes for instantiated plugins
@@ -245,7 +304,11 @@ public class PluginPreferenceDialog {
 				instancePreferenceNode = new PluginPreferenceNode(preferenceNodeId, preferenceNodeLabel, preferenceNodeImageDescriptor,
 						preferencePage);
 				
+				// add to parent tree node
 				preferenceNode.add(instancePreferenceNode);
+				
+				// add to hashmap (needed for lookup when removing instances)
+				instancePreferenceNodes.put(p, preferenceNodeId);
 				
 			}
 			
@@ -271,7 +334,7 @@ public class PluginPreferenceDialog {
 			addToClassSet((Class<? extends Plugin>) c.getSuperclass(), classSet);
 		}
 		
-	};
+	}
 	
 	private void buildClassTree(final ClassTree classTree, final Set<Class<? extends Plugin>> classSet) {
 		
@@ -289,7 +352,7 @@ public class PluginPreferenceDialog {
 		
 	}
 	
-	private ClassTree buildClassTree(final List<Class<? extends Plugin>> pluginTypes) {
+	public ClassTree buildClassTree(final List<Class<? extends Plugin>> pluginTypes) {
 		
 		// build class set
 		final Set<Class<? extends Plugin>> classSet = new HashSet<Class<? extends Plugin>>();
@@ -338,6 +401,10 @@ public class PluginPreferenceDialog {
 		return ImageDescriptor.createFromURL(getResourceUrl(fileName));
 	}
 	
+	private ImageDescriptor getPluginImageDescriptor() {
+		return getImageDescriptor("plugin.png");
+	}
+	
 	private ImageDescriptor getInstanceImageDescriptor(final Class<? extends Plugin> clazz, final Plugin p) {
 		
 		try {
@@ -345,8 +412,8 @@ public class PluginPreferenceDialog {
 			final boolean isActive = (Boolean) clazz.getMethod("isActive").invoke(p);
 			final boolean isVisible = (Boolean) clazz.getMethod("isVisible").invoke(p);
 			
-			return (isActive && isVisible) ? getImageDescriptor("active_visible.png") : (isActive) ? getImageDescriptor("active_not_visible.png")
-					: getImageDescriptor("not_active.png");
+			return (isActive && isVisible) ? getImageDescriptor("plugin_active_visible.png")
+					: (isActive) ? getImageDescriptor("plugin_not_visible.png") : getImageDescriptor("plugin_not_active.png");
 			
 		} catch (final Exception e) {
 			log.error("", e);
@@ -443,7 +510,27 @@ public class PluginPreferenceDialog {
 	 * @return see {@link org.eclipse.jface.window.Window#open()}
 	 */
 	public int open() {
+		spyglass.getPluginManager().addPluginListChangeListener(this);
 		return preferenceDialog.open();
+	}
+	
+	@Override
+	public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
+		switch (what) {
+			case NEW_PLUGIN:
+				// TODO
+				break;
+			case PLUGIN_REMOVED:
+				preferenceManager.remove(instancePreferenceNodes.get(p));
+				preferenceDialog.selectPluginManagerPreferenceNode();
+				break;
+			case PLUGIN_STATE_CHANGED:
+				// TODO
+				break;
+			case PRIORITY_CHANGED:
+				// TODO
+				break;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -463,9 +550,19 @@ public class PluginPreferenceDialog {
 			needToAsk = !selectedPage.okToLeave();
 		}
 		
-		// check if currently opened preference page contains unsaved values
-		if (((PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig>) selectedPage).hasUnsavedChanges()) {
-			needToAsk = true;
+		if (selectedPage instanceof PluginPreferencePage) {
+			
+			// check if currently opened preference page contains unsaved values
+			if (((PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig>) selectedPage).hasUnsavedChanges()) {
+				needToAsk = true;
+			}
+			
+		} else {
+			
+			if (!(selectedPage).okToLeave()) {
+				needToAsk = true;
+			}
+			
 		}
 		
 		if (needToAsk) {
@@ -476,10 +573,6 @@ public class PluginPreferenceDialog {
 		
 		return true;
 		
-	}
-	
-	public void selectPluginManagerPage() {
-		preferenceDialog.setSelectedNode(NODE_ID_PLUGINMANAGER);
 	}
 	
 }
