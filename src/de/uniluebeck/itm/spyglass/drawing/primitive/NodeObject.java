@@ -12,6 +12,13 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 
+// --------------------------------------------------------------------------------
+/**
+ * Instances of this class represent a node.
+ * 
+ * @author Sebastian Ebers
+ * 
+ */
 public class NodeObject extends DrawingObject {
 	
 	private final int nodeID;
@@ -227,8 +234,6 @@ public class NodeObject extends DrawingObject {
 		// get the node's position in the drawing area
 		final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(this.getPosition());
 		
-		// final Point upperLeft = new Point(((px.x - (width / 2))), ((px.y -
-		// (height / 2))));
 		setBoundingBox(new AbsoluteRectangle(upperLeft.x, upperLeft.y, width, height));
 		gc.fillRectangle(upperLeft.x, upperLeft.y, width, height);
 		gc.drawRectangle(upperLeft.x, upperLeft.y, width, height);
@@ -239,15 +244,6 @@ public class NodeObject extends DrawingObject {
 	
 	@Override
 	public AbsoluteRectangle getBoundingBox() {
-		// TODO: replace with real code... (this was just for testing)
-		// final AbsoluteRectangle ret = new AbsoluteRectangle();
-		// final AbsolutePosition absPos = this.getPosition().clone();
-		// absPos.x += 40;
-		// absPos.y += 15;
-		// ret.setHeight(30);
-		// ret.setWidth(80);
-		// ret.setUpperLeft(absPos);
-		// return ret;
 		return boundingBox;
 	}
 	
