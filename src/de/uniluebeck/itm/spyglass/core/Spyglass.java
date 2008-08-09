@@ -1,9 +1,11 @@
 /*
- * ---------------------------------------------------------------------- This file is part of the
- * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
- * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
- * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
- * further details. ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This
+ * file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.core;
 
@@ -27,14 +29,15 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 // ------------------------------------------------------------------------------
 // --
 /**
- * Spyglass is an application for visualizing network packets coming from an arbitrary source,
- * defined by a gateway instance. This class is the core of the Spyglass program. It reads the XML
- * configuration, instantiate objects, injects dependencies and handles the PacketReader and
- * Visualization threads. After instantiating of this class, call the <code>start()</code> method to
- * start the visualization. An arbitrary GUI can be used with Spyglass, since the visualization is
- * handled by a SpyglassCanvas, which can be easily adopted to other GUI libraries. Use the
- * <code>addSpyglassListener(...)</code> method to get informed when a redraw of the scene is
- * needed.
+ * Spyglass is an application for visualizing network packets coming from an
+ * arbitrary source, defined by a gateway instance. This class is the core of
+ * the Spyglass program. It reads the XML configuration, instantiate objects,
+ * injects dependencies and handles the PacketReader and Visualization threads.
+ * After instantiating of this class, call the <code>start()</code> method to
+ * start the visualization. An arbitrary GUI can be used with Spyglass, since
+ * the visualization is handled by a SpyglassCanvas, which can be easily adopted
+ * to other GUI libraries. Use the <code>addSpyglassListener(...)</code>
+ * method to get informed when a redraw of the scene is needed.
  */
 public class Spyglass {
 	private static Category log = SpyglassLogger.get(Spyglass.class);
@@ -68,12 +71,13 @@ public class Spyglass {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Constructor. Invokes the XML configuration reading from the default configuration files.
-	 * Which file is used depends on the context (if spyglass is used as stand alone application or
-	 * iShell plug-in).
+	 * Constructor. Invokes the XML configuration reading from the default
+	 * configuration files. Which file is used depends on the context (if
+	 * spyglass is used as stand alone application or iShell plug-in).
 	 * 
 	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell plug-in
+	 *            indicates whether or not the application is used as iShell
+	 *            plug-in
 	 */
 	public Spyglass(final boolean isIShellPlugin) {
 		this.isIShellPlugin = isIShellPlugin;
@@ -87,7 +91,8 @@ public class Spyglass {
 	 * Constructor. Invokes the XML configuration reading.
 	 * 
 	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell plug-in
+	 *            indicates whether or not the application is used as iShell
+	 *            plug-in
 	 * @param config
 	 *            the configuration parameters
 	 */
@@ -103,7 +108,8 @@ public class Spyglass {
 	 * Constructor. Invokes the XML configuration reading.
 	 * 
 	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell plug-in
+	 *            indicates whether or not the application is used as iShell
+	 *            plug-in
 	 * @param configFile
 	 *            the file which contains the configuration parameters
 	 */
@@ -125,6 +131,13 @@ public class Spyglass {
 		pluginManager.setNodePositioner(config.getNodePositioner());
 		pluginManager.init();
 		
+		for (final de.uniluebeck.itm.spyglass.plugin.Plugin p : pluginManager.getPlugins()) {
+			System.out.println(p.getInstanceName());
+			System.out.println(p.isActive());
+			System.out.println(p.isThreadRunning());
+			System.out.println("");
+		}
+		
 		drawingArea = config.getDrawingArea();
 		
 		packetReader = config.getPacketReader();
@@ -139,7 +152,8 @@ public class Spyglass {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Starts the visualization by starting a packet producer and a visualization thread.
+	 * Starts the visualization by starting a packet producer and a
+	 * visualization thread.
 	 */
 	public void start() {
 		log.debug("Starting visualization and packetProducer Task");
@@ -151,8 +165,8 @@ public class Spyglass {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Adds a SpyglassListener object that gets notified of a Spyglass event (e.g. to know when a
-	 * redraw must be done).
+	 * Adds a SpyglassListener object that gets notified of a Spyglass event
+	 * (e.g. to know when a redraw must be done).
 	 * 
 	 * @param listener
 	 *            The SpyglassListener object to add.

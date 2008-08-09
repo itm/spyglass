@@ -1,9 +1,11 @@
 /*
- * ---------------------------------------------------------------------- This file is part of the
- * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
- * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
- * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
- * further details. ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This
+ * file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui;
 
@@ -24,6 +26,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Display;
 
+import de.uniluebeck.itm.spyglass.core.EventDispatcher;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.core.SpyglassListener;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
@@ -37,9 +40,10 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 // ------------------------------------------------------------------------------
 // --
 /**
- * The UI controller is the interface between the core Spyglass functionality and the graphical user
- * interface. It is bound to a specific GUI library. If the GUI must be completely replaced, the UI
- * controller must also be changed/replaced.
+ * The UI controller is the interface between the core Spyglass functionality
+ * and the graphical user interface. It is bound to a specific GUI library. If
+ * the GUI must be completely replaced, the UI controller must also be
+ * changed/replaced.
  */
 public class UIController {
 	
@@ -50,6 +54,9 @@ public class UIController {
 	private Spyglass spyglass = null;
 	
 	private final Display display;
+	
+	/** User events will be dispatched here */
+	private final EventDispatcher eventDispatcher;
 	
 	private final Color canvasBgColor = new Color(null, 255, 255, 255);
 	
@@ -91,6 +98,7 @@ public class UIController {
 		
 		this.spyglass = spyglass;
 		this.appWindow = appWindow;
+		this.eventDispatcher = new EventDispatcher(spyglass.getPluginManager(), spyglass.getDrawingArea());
 		
 		display = appWindow.getDisplay();
 		
@@ -162,9 +170,8 @@ public class UIController {
 		appWindow.getGui().getCanvas().addMouseListener((new MouseListener() {
 			
 			@Override
-			public void mouseDoubleClick(final MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
+			public void mouseDoubleClick(final MouseEvent e) {
+				eventDispatcher.handleEvent(e);
 			}
 			
 			@Override
@@ -177,18 +184,21 @@ public class UIController {
 			@Override
 			public void mouseUp(final MouseEvent arg0) {
 				log.debug("mouse up: " + arg0);
-				
+				mouseDragInProgress = false;
 				// if moving in progress, stop it.
-				if (mouseDragInProgress) {
-					
-					mouseDragInProgress = false;
-					final PixelPosition mouseDragStopPosition = new PixelPosition(arg0.x, arg0.y);
-					
-					final int deltaX = mouseDragStopPosition.x - mouseDragStartPosition.x;
-					final int deltaY = mouseDragStopPosition.y - mouseDragStartPosition.y;
-					
-					spyglass.getDrawingArea().move(deltaX, deltaY);
-				}
+				// if (mouseDragInProgress) {
+				//					
+				// mouseDragInProgress = false;
+				// final PixelPosition mouseDragStopPosition = new
+				// PixelPosition(arg0.x, arg0.y);
+				//					
+				// final int deltaX = mouseDragStopPosition.x -
+				// mouseDragStartPosition.x;
+				// final int deltaY = mouseDragStopPosition.y -
+				// mouseDragStartPosition.y;
+				//					
+				// spyglass.getDrawingArea().move(deltaX, deltaY);
+				// }
 			}
 			
 		}));
@@ -201,7 +211,8 @@ public class UIController {
 			@Override
 			public void mouseMove(final MouseEvent arg0) {
 				
-				// if a movement is in progress, update the drawing area by appling the current
+				// if a movement is in progress, update the drawing area by
+				// appling the current
 				// delta.
 				if (mouseDragInProgress) {
 					
@@ -233,24 +244,23 @@ public class UIController {
 	}
 	
 	/**
+	 * Renders the visible plug-in's.<br>
+	 * The plug-ins provide objects which are drawn into the drawing area.
 	 * 
+	 * @param gc
+	 *            the graphic context used to actually draw the provided objects
+	 * @see DrawingObject
 	 */
 	private void render(final GC gc) {
 		gc.setBackground(canvasBgColor);
 		gc.fillRectangle(appWindow.getGui().getCanvas().getClientArea());
-		
-		for (final Plugin plugin : spyglass.getPluginManager().getActivePlugins()) {
-			
+		final List<Plugin> plugins = spyglass.getPluginManager().getVisiblePlugins();
+		for (final Plugin plugin : plugins) {
 			if (plugin instanceof Drawable) {
-				
 				renderPlugin(gc, plugin);
-				
 			}
-			
 		}
-		
 		// drawDebugMarkers(gc);
-		
 	}
 	
 	/**

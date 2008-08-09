@@ -101,8 +101,31 @@ public class SubLayer implements Layer {
 		// log.debug("updating object " + obj);
 	}
 	
-	public void bringToFront(final DrawingObject dob) {
-		// TODO Auto-generated method stub
+	/**
+	 * Sets the point order parameter of a drawing object to make it the last
+	 * one in the set to be painted. This way, the drawing object will be in
+	 * front of all other ones.
+	 * 
+	 * @param object
+	 *            the drawing object to be brought to the front
+	 */
+	public void bringToFront(final DrawingObject object) {
+		final List<DrawingObject> dos = getDrawingObjects();
+		final long size = dos.size();
+		int pos = 0;
+		for (final DrawingObject drawingObject : dos) {
+			
+			// if the current drawing object is not the one which is to be
+			// brought to the front ...
+			if (!drawingObject.equals(object)) {
+				// ... "normalize" it's position parameter
+				drawingObject.setPaintOrderId(pos++);
+			} else {
+				// ... otherwise set it's position parameter to the maximum
+				// possible one
+				object.setPaintOrderId(size - 1);
+			}
+		}
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle rect) {

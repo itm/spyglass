@@ -1,9 +1,11 @@
 /*
- * ------------------------------------------------------------------------------ -- This file is
- * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
- * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
- * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
- * SpyGlass source tree for further details. ----------------------------------------------
+ * ------------------------------------------------------------------------------ --
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * ----------------------------------------------
  * ----------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin;
@@ -38,8 +40,8 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 // ------------------------------------------------------------------------------
 // --
 /**
- * The PluginManager holds all loaded plugins and is basically a wrapper for an internal list of
- * plugins.
+ * The PluginManager holds all loaded plugins and is basically a wrapper for an
+ * internal list of plugins.
  */
 @Root
 public class PluginManager {
@@ -73,11 +75,11 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Returns all plugins which are currently administered by this instance and which are marked as
-	 * 'active'
+	 * Returns all plugins which are currently administered by this instance and
+	 * which are marked as 'active'
 	 * 
-	 * @return all plugins which are currently administered by this instance and which are marked as
-	 *         'active'
+	 * @return all plugins which are currently administered by this instance and
+	 *         which are marked as 'active'
 	 */
 	public List<Plugin> getActivePlugins() {
 		final List<Plugin> activePlugIns = new LinkedList<Plugin>();
@@ -91,8 +93,9 @@ public class PluginManager {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Adds a <code>PluginListChangeListener</code> instance to the list of listeners. Every
-	 * listener will be informed of changes when plugin-instances are added or removed.
+	 * Adds a <code>PluginListChangeListener</code> instance to the list of
+	 * listeners. Every listener will be informed of changes when
+	 * plugin-instances are added or removed.
 	 * 
 	 * @param listener
 	 *            the listener to add
@@ -103,7 +106,8 @@ public class PluginManager {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Removes a <code>PluginListChangeListener</code> instance from the list of listeners.
+	 * Removes a <code>PluginListChangeListener</code> instance from the list
+	 * of listeners.
 	 * 
 	 * @param listener
 	 *            the listener to add
@@ -126,13 +130,14 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Initializes the instance by setting it as administration instance for all currently available
-	 * plug-ins
+	 * Initializes the instance by setting it as administration instance for all
+	 * currently available plug-ins
 	 */
 	public void init() {
 		// This is a workaround, since simple-xml does not call the setPlugins()
 		// method
 		for (final Plugin p : plugins) {
+			p.initializePacketConsumerThread();
 			p.setPluginManager(this);
 		}
 	}
@@ -140,14 +145,15 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Adds a plug-in. The plug-in is put at the end of the list which means that the new plug-in
-	 * has the lowest priority
+	 * Adds a plug-in. The plug-in is put at the end of the list which means
+	 * that the new plug-in has the lowest priority
 	 * 
 	 * @param plugin
 	 *            The plugin object to be added.
 	 */
 	public void addPlugin(final Plugin plugin) {
 		plugin.setPluginManager(this);
+		plugin.initializePacketConsumerThread();
 		plugins.add(plugin);
 		log.debug("Added plug-in: " + plugin);
 		firePluginListChangedEvent(plugin, ListChangeEvent.NEW_PLUGIN);
@@ -161,9 +167,10 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Puts a plug-in at the top of the list which means that its priority is the highest one<br>
-	 * The others plug-ins' priorities are decreased by one which means that their order stays
-	 * intact.
+	 * Puts a plug-in at the top of the list which means that its priority is
+	 * the highest one<br>
+	 * The others plug-ins' priorities are decreased by one which means that
+	 * their order stays intact.
 	 * 
 	 * @param plugin
 	 *            The plugin object to be added.
@@ -182,6 +189,7 @@ public class PluginManager {
 	 * Removes a plug-in
 	 */
 	public void removePlugin(final Plugin plugin) {
+		plugin.setActive(false);
 		plugins.remove(plugin);
 		log.debug("Removed plug-in: " + plugin);
 		firePluginListChangedEvent(plugin, ListChangeEvent.PLUGIN_REMOVED);
@@ -196,8 +204,14 @@ public class PluginManager {
 	 *            the new list of plug-ins
 	 */
 	public void setPlugins(final List<Plugin> plugins) {
+		// deactivate all plug-ins which are currently available in the list (by
+		// deactivating a plug-in, its thread is stopped)
+		for (final Plugin plugin : plugins) {
+			plugin.setActive(false);
+		}
 		this.plugins.clear();
 		for (final Plugin p : plugins) {
+			p.initializePacketConsumerThread();
 			addPlugin(p);
 		}
 	}
@@ -267,7 +281,8 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Fires an event which informs the listener about changes concerning a certain plug-in
+	 * Fires an event which informs the listener about changes concerning a
+	 * certain plug-in
 	 * 
 	 * @param p
 	 *            the plug-in
@@ -283,9 +298,11 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Returns a list of all types of plug-ins which are currently administered by this instance
+	 * Returns a list of all types of plug-ins which are currently administered
+	 * by this instance
 	 * 
-	 * @return a list of all types of plug-ins which are currently administered by this instance
+	 * @return a list of all types of plug-ins which are currently administered
+	 *         by this instance
 	 */
 	public List<Class<? extends Plugin>> getAvailablePluginTypes() {
 		return availablePluginsTypes;
@@ -294,8 +311,8 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Returns all instances of a certain kind of plug-ins which are currently administered by this
-	 * instance
+	 * Returns all instances of a certain kind of plug-ins which are currently
+	 * administered by this instance
 	 * 
 	 * @param clazz
 	 *            the plug-in instances' class

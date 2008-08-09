@@ -1,9 +1,10 @@
 /*
- * -------------------------------------------------------------------------------- This file is
- * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
- * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
- * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
- * SpyGlass source tree for further details.
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
@@ -11,6 +12,8 @@ package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Point;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -29,15 +32,17 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class are used create and administer simple visualizations of sensor nodes.<br>
- * The nodes can be visualized in two way's according to the amount of information the user wants to
- * see.
+ * Instances of this class are used create and administer simple visualizations
+ * of sensor nodes.<br>
+ * The nodes can be visualized in two way's according to the amount of
+ * information the user wants to see.
  * <ul>
- * <li>In the <tt>non-extended mode</tt>, the nodes are represented by rectangles which only contain
- * the node's identifier.</li>
- * <li>In the <tt>extended mode</tt> the nodes are again represented by rectangles which contain the
- * node's identifier. But additionally, further information which are extracted from the packets of
- * certain semantic types are displayed, too.</li>
+ * <li>In the <tt>non-extended mode</tt>, the nodes are represented by
+ * rectangles which only contain the node's identifier.</li>
+ * <li>In the <tt>extended mode</tt> the nodes are again represented by
+ * rectangles which contain the node's identifier. But additionally, further
+ * information which are extracted from the packets of certain semantic types
+ * are displayed, too.</li>
  * </ul>
  * 
  * @author Sebastian Ebers
@@ -56,8 +61,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	private final Layer layer;
 	
 	/**
-	 * Objects which have recently been updated and which needs to be updated in the quad tree as
-	 * well (which is done in {@link SimpleNodePainterPlugin#updateQuadTree()}
+	 * Objects which have recently been updated and which needs to be updated in
+	 * the quad tree as well (which is done in
+	 * {@link SimpleNodePainterPlugin#updateQuadTree()}
 	 */
 	private final List<DrawingObject> updatedObjects;
 	
@@ -161,15 +167,17 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the instance of a node's visualization<br>
-	 * Note that either a matching instance if found in the quad tree or a new instance is to be
-	 * created and initialized as configured by the default parameters.<br>
+	 * Note that either a matching instance if found in the quad tree or a new
+	 * instance is to be created and initialized as configured by the default
+	 * parameters.<br>
 	 * 
 	 * @param nodeID
 	 *            the node's identifier
 	 * @param position
 	 *            the node's position
 	 * @param drawingObjects
-	 *            the drawing objects which are currently available in the quad tree
+	 *            the drawing objects which are currently available in the quad
+	 *            tree
 	 * @return the up to date instance of a node's visualization
 	 */
 	private NodeObject getMatchingNodeObject(final int nodeID, final AbsolutePosition position, final List<DrawingObject> drawingObjects) {
@@ -203,10 +211,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Resets the configuration parameters of the node visualizations according to the node
-	 * painter's configuration parameters.<br>
-	 * <b>Note:</b> This object updates the quadTree in a synchronized block which means that the
-	 * GUI has to wait for the end of the processing
+	 * Resets the configuration parameters of the node visualizations according
+	 * to the node painter's configuration parameters.<br>
+	 * <b>Note:</b> This object updates the quadTree in a synchronized block
+	 * which means that the GUI has to wait for the end of the processing
 	 */
 	public synchronized void refreshNodeObjectConfiguration() {
 		
@@ -258,13 +266,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	@Override
 	protected void updateQuadTree() {
 		
-		// TEAMQUESTION:
-		// A plug-in is still able to crash the GUI by taking the lock of the
-		// layer and holding it
-		// What about making the interface Drawable abstract and encapsulating
-		// the layer there. The layer will be only accessible by accessors.
-		// Other plug-in developers will no longer be able to mess this up!
-		
 		// copy all objects which have to be updated in a separate List and
 		// clear the original list
 		final List<DrawingObject> update = new LinkedList<DrawingObject>();
@@ -295,4 +296,89 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 	}
 	
+	@Override
+	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) {
+		
+		// get the objects to draw (ordered)
+		final List<DrawingObject> dos = layer.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle());
+		final Point clickPoint = new Point(e.x, e.y);
+		
+		// check if a button except the left one was clicked.
+		// if so, change the drawing object's paint order (if a drawing object
+		// is visible underneath the mouse cursor)
+		if (e.button > 1) {
+			if (handleNonLeftMouseClick(dos, clickPoint)) {
+				return true;
+			}
+		}
+
+		// if the mouse event was a double click
+		else if (e.count > 1) {
+			if (handleDoubleClick(dos, clickPoint)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Handles a mouse click event which was actually a double click returns
+	 * <code>true</code> if a drawing object was found which bounding box
+	 * contains the point clicked by the user.
+	 * 
+	 * @param drawingObjects
+	 *            the plug-in's drawing objects
+	 * @param clickPoint
+	 *            the point which was clicked
+	 * @return <code>true</code> if a matching drawing object was found
+	 */
+	private boolean handleDoubleClick(final List<DrawingObject> drawingObjects, final Point clickPoint) {
+		
+		// check all drawing objects
+		for (final DrawingObject drawingObject : drawingObjects) {
+			
+			// check which plug-in's bounding box contains the point which
+			// was clicked (if any)
+			if (drawingObject.getBoundingBox().contains(clickPoint)) {
+				// check if the object is representing a node
+				if (drawingObject instanceof NodeObject) {
+					// if so, toggle its extension state
+					final NodeObject no = (NodeObject) drawingObject;
+					no.setExtended(!no.isExtended());
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Handles a mouse click event which was not a left click and returns
+	 * <code>true</code> if a drawing object was found which bounding box
+	 * contains the point clicked by the user.
+	 * 
+	 * @param drawingObjects
+	 *            the plug-in's drawing objects
+	 * @param clickPoint
+	 *            the point which was clicked
+	 * @return <code>true</code> if a matching drawing object was found
+	 */
+	private boolean handleNonLeftMouseClick(final List<DrawingObject> drawingObjects, final Point clickPoint) {
+		
+		// check all drawing objects
+		for (final DrawingObject drawingObject : drawingObjects) {
+			
+			// check which plug-in's bounding box contains the point which
+			// was clicked (if any)
+			if (drawingObject.getBoundingBox().contains(clickPoint)) {
+				synchronized (layer) {
+					layer.bringToFront(drawingObject);
+				}
+				return true;
+			}
+		}
+		return false;
+	}
 }
