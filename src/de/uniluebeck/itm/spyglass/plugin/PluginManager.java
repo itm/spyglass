@@ -11,6 +11,7 @@
 package de.uniluebeck.itm.spyglass.plugin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class PluginManager {
 	private static Category log = SpyglassLogger.get(PluginManager.class);
 	
 	@ElementList
-	private final List<Plugin> plugins = new ArrayList<Plugin>();
+	private final List<Plugin> plugins = Collections.synchronizedList(new ArrayList<Plugin>());
 	
 	private final Set<PluginListChangeListener> pluginListChangeListeners = new HashSet<PluginListChangeListener>();
 	
@@ -83,9 +84,11 @@ public class PluginManager {
 	 */
 	public List<Plugin> getActivePlugins() {
 		final List<Plugin> activePlugIns = new LinkedList<Plugin>();
-		for (final Plugin p : plugins) {
-			if (p.isActive()) {
-				activePlugIns.add(p);
+		synchronized (plugins) {
+			for (final Plugin p : plugins) {
+				if (p.isActive()) {
+					activePlugIns.add(p);
+				}
 			}
 		}
 		return activePlugIns;
@@ -124,7 +127,9 @@ public class PluginManager {
 	 * @return all plugins which are currently administered by this instance
 	 */
 	public List<Plugin> getPlugins() {
-		return plugins;
+		synchronized (plugins) {
+			return plugins;
+		}
 	}
 	
 	// --------------------------------------------------------------------------
@@ -136,9 +141,11 @@ public class PluginManager {
 	public void init() {
 		// This is a workaround, since simple-xml does not call the setPlugins()
 		// method
-		for (final Plugin p : plugins) {
-			p.initializePacketConsumerThread();
-			p.setPluginManager(this);
+		synchronized (plugins) {
+			for (final Plugin p : plugins) {
+				p.initializePacketConsumerThread();
+				p.setPluginManager(this);
+			}
 		}
 	}
 	
@@ -154,7 +161,9 @@ public class PluginManager {
 	public void addPlugin(final Plugin plugin) {
 		plugin.setPluginManager(this);
 		plugin.initializePacketConsumerThread();
-		plugins.add(plugin);
+		synchronized (plugins) {
+			plugins.add(plugin);
+		}
 		log.debug("Added plug-in: " + plugin);
 		firePluginListChangedEvent(plugin, ListChangeEvent.NEW_PLUGIN);
 		
@@ -177,8 +186,10 @@ public class PluginManager {
 	 */
 	public void increasePluginPriorityToTop(final Plugin plugin) {
 		plugin.setPluginManager(this);
-		plugins.remove(plugin);
-		plugins.add(0, plugin);
+		synchronized (plugins) {
+			plugins.remove(plugin);
+			plugins.add(0, plugin);
+		}
 		log.debug("The plug-in: " + plugin + " is now the one with the highest priority");
 		firePluginListChangedEvent(plugin, ListChangeEvent.PRIORITY_CHANGED);
 	}
@@ -190,7 +201,9 @@ public class PluginManager {
 	 */
 	public void removePlugin(final Plugin plugin) {
 		plugin.setActive(false);
-		plugins.remove(plugin);
+		synchronized (plugins) {
+			plugins.remove(plugin);
+		}
 		log.debug("Removed plug-in: " + plugin);
 		firePluginListChangedEvent(plugin, ListChangeEvent.PLUGIN_REMOVED);
 	}
@@ -209,10 +222,12 @@ public class PluginManager {
 		for (final Plugin plugin : plugins) {
 			plugin.setActive(false);
 		}
-		this.plugins.clear();
-		for (final Plugin p : plugins) {
-			p.initializePacketConsumerThread();
-			addPlugin(p);
+		synchronized (plugins) {
+			this.plugins.clear();
+			for (final Plugin p : plugins) {
+				p.initializePacketConsumerThread();
+				addPlugin(p);
+			}
 		}
 	}
 	
@@ -229,8 +244,10 @@ public class PluginManager {
 	public void setPluginStatus(final Plugin plugin, final boolean isActive) {
 		
 		plugin.setActive(isActive);
-		if (!plugins.contains(plugin)) {
-			addPlugin(plugin);
+		synchronized (plugins) {
+			if (!plugins.contains(plugin)) {
+				addPlugin(plugin);
+			}
 		}
 		firePluginListChangedEvent(plugin, ListChangeEvent.PLUGIN_STATE_CHANGED);
 		
@@ -246,7 +263,13 @@ public class PluginManager {
 	 *            a node positioner instance
 	 */
 	public void setNodePositioner(final NodePositionerPlugin np) {
-		this.nodePositioner = np;
+		if (nodePositioner == null) {
+			this.nodePositioner = np;
+		} else {
+			synchronized (nodePositioner) {
+				this.nodePositioner = np;
+			}
+		}
 		addPlugin(np);
 	}
 	
@@ -258,8 +281,10 @@ public class PluginManager {
 	 * @return the instances which holds information about the nodes' positions
 	 */
 	public NodePositionerPlugin getNodePositioner() {
-		assert (nodePositioner != null);
-		return nodePositioner;
+		synchronized (nodePositioner) {
+			assert (nodePositioner != null);
+			return nodePositioner;
+		}
 	}
 	
 	// --------------------------------------------------------------------------
@@ -320,9 +345,11 @@ public class PluginManager {
 	public List<Plugin> getPluginInstances(final Class<? extends Plugin> clazz) {
 		
 		final List<Plugin> instances = new LinkedList<Plugin>();
-		for (final Plugin plugin : plugins) {
-			if (plugin.getClass().equals(clazz)) {
-				instances.add(plugin);
+		synchronized (plugins) {
+			for (final Plugin plugin : plugins) {
+				if (plugin.getClass().equals(clazz)) {
+					instances.add(plugin);
+				}
 			}
 		}
 		return instances;
@@ -337,9 +364,11 @@ public class PluginManager {
 	 */
 	public List<Plugin> getVisiblePlugins() {
 		final List<Plugin> visiblePlugins = new LinkedList<Plugin>();
-		for (final Plugin p : plugins) {
-			if (p.isVisible()) {
-				visiblePlugins.add(p);
+		synchronized (plugins) {
+			for (final Plugin p : plugins) {
+				if (p.isVisible()) {
+					visiblePlugins.add(p);
+				}
 			}
 		}
 		return visiblePlugins;
@@ -352,7 +381,10 @@ public class PluginManager {
 	 * @param plugin
 	 */
 	public void shutdownPlugin(final Plugin plugin) {
-		
+		synchronized (plugins) {
+			plugin.reset();
+			plugins.remove(plugin);
+		}
 	}
 	
 }

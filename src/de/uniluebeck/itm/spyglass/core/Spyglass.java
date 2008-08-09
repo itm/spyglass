@@ -131,13 +131,6 @@ public class Spyglass {
 		pluginManager.setNodePositioner(config.getNodePositioner());
 		pluginManager.init();
 		
-		for (final de.uniluebeck.itm.spyglass.plugin.Plugin p : pluginManager.getPlugins()) {
-			System.out.println(p.getInstanceName());
-			System.out.println(p.isActive());
-			System.out.println(p.isThreadRunning());
-			System.out.println("");
-		}
-		
 		drawingArea = config.getDrawingArea();
 		
 		packetReader = config.getPacketReader();

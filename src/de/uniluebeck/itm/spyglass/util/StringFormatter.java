@@ -11,6 +11,8 @@ public class StringFormatter {
 	private final String formatExpression;
 	private static final Pattern notNumeric = Pattern.compile("[^0-9]");
 	
+	private String resultString = "";
+	
 	public StringFormatter(String pFormatExpression) throws IllegalArgumentException {
 		
 		// temporarily replace "%%" with "percent_twice" to avoid trouble
@@ -119,7 +121,8 @@ public class StringFormatter {
 		result += tmpExp;
 		
 		result = result.replaceAll("percent_twice", "%");
-		return result;
+		resultString = result;
+		return resultString;
 	}
 	
 	private static int indexOfNonNumeric(final String lookIn) {
@@ -129,6 +132,11 @@ public class StringFormatter {
 		} else {
 			return -1;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return resultString;
 	}
 	
 	public static void main(final String[] args) {

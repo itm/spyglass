@@ -9,9 +9,12 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Point;
 import org.simpleframework.xml.Element;
@@ -27,6 +30,7 @@ import de.uniluebeck.itm.spyglass.layer.SubLayer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.nodepainter.NodePainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -48,6 +52,8 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * @author Sebastian Ebers
  */
 public class SimpleNodePainterPlugin extends NodePainterPlugin {
+	
+	public static final Logger log = SpyglassLogger.getLogger(SimpleNodePainterPlugin.class);
 	
 	/**
 	 * The configuration parameters of this plug-in instance
@@ -299,25 +305,39 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	@Override
 	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) {
 		
-		// get the objects to draw (ordered)
-		final List<DrawingObject> dos = layer.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle());
+		// get the objects to draw
+		final List<DrawingObject> dos = new LinkedList<DrawingObject>(layer.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle()));
+		
+		// order the elements oppositional to the paint order
+		Collections.sort(dos, new Comparator<DrawingObject>() {
+			public int compare(final DrawingObject o1, final DrawingObject o2) {
+				return (int) (o2.getPaintOrderId() - o1.getPaintOrderId());
+			}
+		});
+		
 		final Point clickPoint = new Point(e.x, e.y);
 		
-		// check if a button except the left one was clicked.
-		// if so, change the drawing object's paint order (if a drawing object
-		// is visible underneath the mouse cursor)
-		if (e.button > 1) {
-			if (handleNonLeftMouseClick(dos, clickPoint)) {
-				return true;
-			}
-		}
-
-		// if the mouse event was a double click
-		else if (e.count > 1) {
+		// if the mouse event was a (left) double click
+		if ((e.button == 1)) {
 			if (handleDoubleClick(dos, clickPoint)) {
 				return true;
 			}
 		}
+
+		// if the mouse event was a wheel click
+		else if (e.button == 2) {
+			if (handleWheelClick(dos, clickPoint)) {
+				return true;
+			}
+		}
+
+		// if the mouse event was a right click
+		else if (e.button == 3) {
+			if (handleRightClick(dos, clickPoint)) {
+				return true;
+			}
+		}
+		
 		return false;
 	}
 	
@@ -365,7 +385,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 *            the point which was clicked
 	 * @return <code>true</code> if a matching drawing object was found
 	 */
-	private boolean handleNonLeftMouseClick(final List<DrawingObject> drawingObjects, final Point clickPoint) {
+	private boolean handleRightClick(final List<DrawingObject> drawingObjects, final Point clickPoint) {
 		
 		// check all drawing objects
 		for (final DrawingObject drawingObject : drawingObjects) {
@@ -375,6 +395,35 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if (drawingObject.getBoundingBox().contains(clickPoint)) {
 				synchronized (layer) {
 					layer.bringToFront(drawingObject);
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Handles a mouse click event which was not a left click and returns
+	 * <code>true</code> if a drawing object was found which bounding box
+	 * contains the point clicked by the user.
+	 * 
+	 * @param drawingObjects
+	 *            the plug-in's drawing objects
+	 * @param clickPoint
+	 *            the point which was clicked
+	 * @return <code>true</code> if a matching drawing object was found
+	 */
+	private boolean handleWheelClick(final List<DrawingObject> drawingObjects, final Point clickPoint) {
+		
+		// check all drawing objects
+		for (final DrawingObject drawingObject : drawingObjects) {
+			
+			// check which plug-in's bounding box contains the point which
+			// was clicked (if any)
+			if (drawingObject.getBoundingBox().contains(clickPoint)) {
+				synchronized (layer) {
+					layer.pushBack(drawingObject);
 				}
 				return true;
 			}

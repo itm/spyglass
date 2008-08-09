@@ -76,16 +76,15 @@ public abstract class Plugin implements Runnable {
 	public Plugin(final boolean needsPacketQueue) {
 		if (needsPacketQueue) {
 			packetQueue = new ConcurrentLinkedQueue<SpyglassPacket>();
-			// packetConsumerThread = new Thread(this);
-			// packetConsumerThread.setDaemon(true);
-			// packetConsumerThread.start();
 		}
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * This method handles a Packet object. Usually, a plugin creates a new
-	 * DrawingObject for each packet it handles.
+	 * This method handles a Packet object. Usually, a plug-in creates a new
+	 * DrawingObject for each packet it handles.<br>
+	 * <b>Note:</b> Nothing is done here if the plug-in is currently
+	 * deactivated.
 	 * 
 	 * @param packet
 	 *            The packet object to handle.
@@ -93,7 +92,7 @@ public abstract class Plugin implements Runnable {
 	public void handlePacket(final SpyglassPacket packet) {
 		// if the packet is not null, check if its semantic type is one of
 		// those, the plug-in is interested in
-		if (packet != null) {
+		if ((packet != null) && isActive()) {
 			final int[] mySemanticTypes = getXMLConfig().getSemanticTypes();
 			final int packetSemanticType = packet.getSemantic_type();
 			for (int i = 0; i < mySemanticTypes.length; i++) {

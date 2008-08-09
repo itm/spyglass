@@ -11,9 +11,9 @@ package de.uniluebeck.itm.spyglass.layer;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Category;
 
@@ -33,7 +33,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 public class SubLayer implements Layer {
 	private static Category log = SpyglassLogger.get(SubLayer.class);
 	
-	private final HashMap<Integer, DrawingObject> drawingObjects = new HashMap<Integer, DrawingObject>();
+	private final ConcurrentHashMap<Integer, DrawingObject> drawingObjects = new ConcurrentHashMap<Integer, DrawingObject>();
 	
 	private final Comparator<DrawingObject> paintOrderComp = new Comparator<DrawingObject>() {
 		public int compare(final DrawingObject o1, final DrawingObject o2) {
@@ -41,26 +41,20 @@ public class SubLayer implements Layer {
 		}
 	};
 	
-	private final List<DrawingObject> paintOrder = new LinkedList<DrawingObject>();
-	private long maxPaintOrder = 0;
-	private boolean sortRequired = false;
+	private final List<DrawingObject> paintOrder = Collections.synchronizedList(new LinkedList<DrawingObject>());
 	
 	// --------------------------------------------------------------------------
-	// ------
-	
 	public void clear() {
-		paintOrder.clear();
+		synchronized (paintOrder) {
+			paintOrder.clear();
+		}
 		drawingObjects.clear();
 	}
 	
 	public List<DrawingObject> getDrawingObjects() {
-		if (sortRequired) {
-			synchronized (paintOrder) {
-				Collections.sort(paintOrder, paintOrderComp);
-				sortRequired = false;
-			}
+		synchronized (paintOrder) {
+			return paintOrder;
 		}
-		return paintOrder;
 	}
 	
 	public DrawingObject getDrawingObject(final int id) {
@@ -85,20 +79,17 @@ public class SubLayer implements Layer {
 		// If the Drawing Object with the ID is not already in the map, add it.
 		if (obj == null) {
 			log.debug("add object " + object);
-			object.setPaintOrderId(maxPaintOrder++);
-			drawingObjects.put(object.getId(), object);
 			synchronized (paintOrder) {
 				paintOrder.add(object);
-				sortRequired = true;
+				object.setPaintOrderId(paintOrder.size() - 1);
+				Collections.sort(paintOrder, paintOrderComp);
 			}
+			drawingObjects.put(object.getId(), object);
 			return;
 		}
 		
 		// Otherwise, update the object
 		obj.update(object);
-		// sortRequired = true; // TODO WEg spaeter
-		// obj.setPaintOrderId(maxPaintOrder++);
-		// log.debug("updating object " + obj);
 	}
 	
 	/**
@@ -126,6 +117,38 @@ public class SubLayer implements Layer {
 				object.setPaintOrderId(size - 1);
 			}
 		}
+		synchronized (paintOrder) {
+			Collections.sort(paintOrder, paintOrderComp);
+		}
+	}
+	
+	/**
+	 * Sets the point order parameter of a drawing object to make it the first
+	 * one in the set to be painted. This way, the drawing object will be behind
+	 * all other ones.
+	 * 
+	 * @param object
+	 *            the drawing object to be brought to the front
+	 */
+	public void pushBack(final DrawingObject object) {
+		final List<DrawingObject> dos = getDrawingObjects();
+		int pos = 0;
+		for (final DrawingObject drawingObject : dos) {
+			
+			// if the current drawing object is not the one which is to be
+			// brought to the front ...
+			if (!drawingObject.equals(object)) {
+				// ... "normalize" it's position parameter
+				drawingObject.setPaintOrderId(++pos);
+			} else {
+				// ... otherwise set it's position parameter to the maximum
+				// possible one
+				object.setPaintOrderId(0);
+			}
+		}
+		synchronized (paintOrder) {
+			Collections.sort(paintOrder, paintOrderComp);
+		}
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle rect) {
@@ -140,7 +163,9 @@ public class SubLayer implements Layer {
 	
 	public void remove(final DrawingObject d) {
 		drawingObjects.remove(d.getId());
-		paintOrder.remove(d);
+		synchronized (paintOrder) {
+			paintOrder.remove(d);
+		}
 	}
 	
 }

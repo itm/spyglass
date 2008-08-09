@@ -8,7 +8,6 @@ import org.eclipse.swt.graphics.Point;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
@@ -21,11 +20,13 @@ public class NodeObject extends DrawingObject {
 	
 	private StringFormatter description;
 	
-	private boolean isExtended;
+	private volatile boolean isExtended;
 	
 	private int[] lineColorRGB;
 	
 	private int lineWidth;
+	
+	private AbsoluteRectangle boundingBox;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -206,24 +207,32 @@ public class NodeObject extends DrawingObject {
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 		
+		// set the colors and the with of the rectangle's line
 		final Color color = new Color(null, this.getColorR(), this.getColorG(), this.getColorB());
 		final Color bg = new Color(null, this.getBgColorR(), this.getBgColorG(), this.getBgColorB());
+		gc.setForeground(color);
+		gc.setBackground(bg);
+		gc.setLineWidth(lineWidth);
 		
-		final String string = (isExtended) ? denotation + "\r\n" + description : denotation;
+		final String descriptionString = (description == null) ? "sorry, no additional\r\ninformation available!" : description.toString();
 		
+		// create the string to be displayed
+		final String string = (isExtended) ? denotation + "\r\n" + descriptionString : denotation;
+		
+		// determine the size of the rectangle which represents the node
 		final Point size = gc.textExtent(string);
 		final int width = size.x + lineWidth;
 		final int height = size.y + lineWidth;
 		
-		final PixelPosition px = drawingArea.absPoint2PixelPoint(this.getPosition());
+		// get the node's position in the drawing area
+		final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(this.getPosition());
 		
-		gc.setForeground(color);
-		gc.setBackground(bg);
-		gc.setLineWidth(lineWidth);
-		final Point upperLeft = new Point(((px.x - (width / 2))), ((px.y - (height / 2))));
+		// final Point upperLeft = new Point(((px.x - (width / 2))), ((px.y -
+		// (height / 2))));
+		setBoundingBox(new AbsoluteRectangle(upperLeft.x, upperLeft.y, width, height));
 		gc.fillRectangle(upperLeft.x, upperLeft.y, width, height);
 		gc.drawRectangle(upperLeft.x, upperLeft.y, width, height);
-		gc.drawString(string, upperLeft.x + lineWidth, upperLeft.y + lineWidth);
+		gc.drawText(string, upperLeft.x + lineWidth, upperLeft.y + lineWidth);
 		color.dispose();
 		bg.dispose();
 	}
@@ -231,20 +240,20 @@ public class NodeObject extends DrawingObject {
 	@Override
 	public AbsoluteRectangle getBoundingBox() {
 		// TODO: replace with real code... (this was just for testing)
-		final AbsoluteRectangle ret = new AbsoluteRectangle();
-		final AbsolutePosition absPos = this.getPosition().clone();
-		absPos.x += 40;
-		absPos.y += 15;
-		ret.setHeight(30);
-		ret.setWidth(80);
-		ret.setUpperLeft(absPos);
-		return ret;
+		// final AbsoluteRectangle ret = new AbsoluteRectangle();
+		// final AbsolutePosition absPos = this.getPosition().clone();
+		// absPos.x += 40;
+		// absPos.y += 15;
+		// ret.setHeight(30);
+		// ret.setWidth(80);
+		// ret.setUpperLeft(absPos);
+		// return ret;
+		return boundingBox;
 	}
 	
 	@Override
 	public void setBoundingBox(final AbsoluteRectangle box) {
-		// TODO Auto-generated method stub
-		
+		boundingBox = box;
 	}
 	
 }

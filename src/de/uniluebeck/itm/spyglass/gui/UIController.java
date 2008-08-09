@@ -11,6 +11,7 @@ package de.uniluebeck.itm.spyglass.gui;
 
 import java.awt.Event;
 import java.util.EventObject;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Category;
@@ -138,7 +139,6 @@ public class UIController {
 				if (arg0.keyCode == 16777218) {
 					spyglass.getDrawingArea().move(0, MOVE_OFFSET);
 				}
-				
 			}
 			
 			@Override
@@ -171,14 +171,19 @@ public class UIController {
 			
 			@Override
 			public void mouseDoubleClick(final MouseEvent e) {
-				eventDispatcher.handleEvent(e);
+				if (e.button == 1) {
+					eventDispatcher.handleEvent(e);
+				}
 			}
 			
 			@Override
-			public void mouseDown(final MouseEvent arg0) {
-				log.debug("mouse down: " + arg0);
+			public void mouseDown(final MouseEvent e) {
+				if (e.button > 1) {
+					eventDispatcher.handleEvent(e);
+				}
+				log.debug("mouse down: " + e);
 				mouseDragInProgress = true;
-				mouseDragStartPosition = new PixelPosition(arg0.x, arg0.y);
+				mouseDragStartPosition = new PixelPosition(e.x, e.y);
 			}
 			
 			@Override
@@ -298,10 +303,11 @@ public class UIController {
 	}
 	
 	private void renderPlugin(final GC gc, final Plugin plugin) {
-		final List<DrawingObject> dos = ((Drawable) plugin).getDrawingObjects(this.spyglass.getDrawingArea());
+		final List<DrawingObject> dos = new LinkedList<DrawingObject>(((Drawable) plugin).getDrawingObjects(this.spyglass.getDrawingArea()));
+		final DrawingArea area = spyglass.getDrawingArea();
 		if (dos != null) {
 			for (final DrawingObject object : dos) {
-				object.draw(this.spyglass.getDrawingArea(), gc);
+				object.draw(area, gc);
 			}
 			// log.error("The plugin " + plugin + " did provide any drawing
 			// objects!");
@@ -317,10 +323,6 @@ public class UIController {
 	 */
 	public AppWindow getAppWindow() {
 		return appWindow;
-	}
-	
-	public void fireRedrawEvent() {
-		
 	}
 	
 	/**

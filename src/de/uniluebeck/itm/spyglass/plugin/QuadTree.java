@@ -63,8 +63,9 @@ public class QuadTree implements Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Creates son nodes if the nodes to be created are larger or equal than the minimum size of
-	 * <code>MIN_BOX_SIZE_X</code> x <code>MIN_BOX_SIZE_Y</code> .
+	 * Creates son nodes if the nodes to be created are larger or equal than the
+	 * minimum size of <code>MIN_BOX_SIZE_X</code> x
+	 * <code>MIN_BOX_SIZE_Y</code> .
 	 * 
 	 * @return true, if son nodes were created, false otherwise
 	 */
@@ -192,7 +193,8 @@ public class QuadTree implements Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Adds all objects recursively to the <code>ArrayList</code> <code>list</code>.
+	 * Adds all objects recursively to the
+	 * <code>ArrayList</code> <code>list</code>.
 	 * 
 	 * @param list
 	 *            the <code>ArrayList</code> instance to add the objects to
@@ -222,7 +224,8 @@ public class QuadTree implements Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the QuadTree into which the Entity <code>entity</code> can be inserted.
+	 * Returns the QuadTree into which the Entity <code>entity</code> can be
+	 * inserted.
 	 * 
 	 * @param entity
 	 * @return
@@ -233,8 +236,8 @@ public class QuadTree implements Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the QuadTree into which an Entity with position <code>pos</code> and box
-	 * <code>box</code> can be inserted.
+	 * Returns the QuadTree into which an Entity with position <code>pos</code>
+	 * and box <code>box</code> can be inserted.
 	 * 
 	 * @param pos
 	 * @param box
@@ -262,8 +265,8 @@ public class QuadTree implements Layer {
 	/**
 	 * Returns the parent element of this <code>QuadTree</code>.
 	 * 
-	 * @return the parent element of this <code>QuadTree</code> or <code>null</code> if this node is
-	 *         the root
+	 * @return the parent element of this <code>QuadTree</code> or
+	 *         <code>null</code> if this node is the root
 	 */
 	public QuadTree getParent() {
 		return parent;
@@ -326,8 +329,8 @@ public class QuadTree implements Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Moves and entity from its old position to <code>newPos</code> as long as it is inside the
-	 * root elements bounding box.
+	 * Moves and entity from its old position to <code>newPos</code> as long
+	 * as it is inside the root elements bounding box.
 	 * 
 	 * @param object
 	 * @param newPos
@@ -408,8 +411,8 @@ public class QuadTree implements Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Searches for an entity at the given position. Will return an Entity instance if
-	 * <code>position</code> lies within the objects' box.
+	 * Searches for an entity at the given position. Will return an Entity
+	 * instance if <code>position</code> lies within the objects' box.
 	 * 
 	 * @param position
 	 * @return
@@ -446,7 +449,8 @@ public class QuadTree implements Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Checks if there are son nodes to be created or destroyed and executes this.
+	 * Checks if there are son nodes to be created or destroyed and executes
+	 * this.
 	 */
 	private void updateSons() {
 		
@@ -511,10 +515,33 @@ public class QuadTree implements Layer {
 		
 	}
 	
+	// ------------------------------------------------------------------------------
+	/**
+	 * Sets the point order parameter of a drawing object to make it the first
+	 * one in the set to be painted. This way, the drawing object will be behind
+	 * all other ones.
+	 * 
+	 * @param object
+	 *            the drawing object to be brought to the front
+	 */
 	@Override
 	public void bringToFront(final DrawingObject dob) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	// ------------------------------------------------------------------------------
+	/**
+	 * Sets the point order parameter of a drawing object to make it the first
+	 * one in the set to be painted. This way, the drawing object will be behind
+	 * all other ones.
+	 * 
+	 * @param object
+	 *            the drawing object to be brought to the front
+	 */
+	@Override
+	public void pushBack(final DrawingObject object) {
+		// TODO Auto-generated method stub
 	}
 	
 	@Override
