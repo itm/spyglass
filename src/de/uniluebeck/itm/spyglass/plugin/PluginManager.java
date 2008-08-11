@@ -128,6 +128,69 @@ public class PluginManager {
 		}
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns a list-copy of all plugins which are currently administered by this instance, except
+	 * of the plugins that are of a class (or extending a class) contained in the excludes list
+	 * 
+	 * @param checkHierarchy
+	 *            <code>true</code> if the class hierarchy should be checked, such that even plugins
+	 *            derived from a class included in the <code>excludes</code> list will be excluded,
+	 *            <code>false</code> if only plugins of exactly the class contained in
+	 *            <code>exclude</code> list shall be excluded
+	 * @param excludes
+	 *            plugin class to exclude from the list
+	 * @return a list-copy of plugin instances
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Plugin> getPlugins(final boolean checkHierarchy, final Class<? extends Plugin>... excludes) {
+		
+		Class<? extends Plugin> currentClass;
+		final List<Plugin> pluginList = new ArrayList<Plugin>();
+		boolean containedInExcludes;
+		
+		synchronized (plugins) {
+			for (final Plugin plugin : plugins) {
+				
+				containedInExcludes = false;
+				currentClass = plugin.getClass();
+				
+				if (checkHierarchy) {
+					
+					while (!currentClass.equals(Plugin.class)) {
+						
+						currentClass = (Class<? extends Plugin>) currentClass.getSuperclass();
+						
+						for (final Class<? extends Plugin> exclude : excludes) {
+							if (currentClass.equals(exclude)) {
+								containedInExcludes = true;
+								break;
+							}
+						}
+						
+					}
+					
+				} else {
+					
+					for (final Class<? extends Plugin> exclude : excludes) {
+						if (currentClass.equals(exclude)) {
+							containedInExcludes = true;
+							break;
+						}
+					}
+					
+				}
+				
+				if (!containedInExcludes) {
+					pluginList.add(plugin);
+				}
+				
+			}
+		}
+		
+		return pluginList;
+	}
+	
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -148,8 +211,8 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Adds a plug-in. The plug-in is put at the end of the list which means that the new plug-in
-	 * has the lowest priority
+	 * Adds a plug-in if it is not contained yet. The plug-in is put at the end of the list which
+	 * means that the new plug-in has the lowest priority
 	 * 
 	 * @param plugin
 	 *            The plugin object to be added.
@@ -158,7 +221,9 @@ public class PluginManager {
 		plugin.setPluginManager(this);
 		plugin.initializePacketConsumerThread();
 		synchronized (plugins) {
-			plugins.add(plugin);
+			if (!plugins.contains(plugin)) {
+				plugins.add(plugin);
+			}
 		}
 		log.debug("Added plug-in: " + plugin);
 		firePluginListChangedEvent(plugin, ListChangeEvent.NEW_PLUGIN);
