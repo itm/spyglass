@@ -1,16 +1,27 @@
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
+import ishell.util.Logging;
+
 import java.util.List;
 
+import org.apache.log4j.Category;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.viewers.ICellModifier;
-import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.CellEditor;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ComboBoxCellEditor;
+import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -19,8 +30,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -28,72 +37,6 @@ import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 
 public class PluginManagerPreferencePage extends PreferencePage {
-	
-	private class PluginTableCellModifier implements ICellModifier {
-		
-		@Override
-		public boolean canModify(final Object arg0, final String arg1) {
-			return false;
-		}
-		
-		private int findColumnIndex(final String property) {
-			
-			int columnIndex = Integer.MIN_VALUE, i = 0;
-			for (final String p : (String[]) pluginTableViewer.getColumnProperties()) {
-				if (p.equals(property)) {
-					columnIndex = i;
-				}
-				i++;
-			}
-			
-			assert columnIndex != Integer.MIN_VALUE;
-			
-			return columnIndex;
-		}
-		
-		@Override
-		public Object getValue(final Object element, final String property) {
-			
-			final int columnIndex = findColumnIndex(property);
-			
-			final Object result = null;
-			
-			switch (columnIndex) {
-				case 0:
-					break;
-				case 1:
-					break;
-				case 2:
-					break;
-				case 3:
-					break;
-				case 4:
-					break;
-			}
-			return result;
-		}
-		
-		@Override
-		public void modify(final Object element, final String property, final Object value) {
-			
-			final int columnIndex = findColumnIndex(property);
-			
-			switch (columnIndex) {
-				case 0:
-					break;
-				case 1:
-					break;
-				case 2:
-					break;
-				case 3:
-					break;
-				case 4:
-					break;
-			}
-			
-		}
-		
-	}
 	
 	private class PluginTableContentProvider implements IStructuredContentProvider, PluginListChangeListener {
 		
@@ -123,66 +66,36 @@ public class PluginManagerPreferencePage extends PreferencePage {
 			pluginTableViewer.update(p, null);
 		}
 		
-	}
-	
-	private class PluginTableLabelProvider implements ITableLabelProvider {
-		@Override
-		public void addListener(final ILabelProviderListener arg0) {
-			// nothing to do
-		}
-		
-		@Override
-		public void dispose() {
-			// nothing to do
-		}
-		
-		@Override
-		public Image getColumnImage(final Object arg0, final int columnIndex) {
-			// nothing to do
-			return null;
-		}
-		
-		@Override
-		public String getColumnText(final Object element, final int columnIndex) {
+		public boolean isFirstInList(final Plugin selectedPlugin) {
 			
-			final Plugin p = (Plugin) element;
+			if (selectedPlugin == null) {
+				return true;
+			}
 			
-			switch (columnIndex) {
-				case 0:
-					return getCategory(p);
-				case 1:
-					return getType(p);
-				case 2:
-					return p.getInstanceName();
-				case 3:
-					return p.getXMLConfig().isActive() + "";
-				default:
-					return p.getXMLConfig().isVisible() + "";
+			final List<Plugin> plugins = spyglass.getPluginManager().getPlugins();
+			if (plugins.size() > 0) {
+				return plugins.get(0) == selectedPlugin;
 			}
+			
+			throw new RuntimeException("We should never reach this code block hopefully.");
+			
 		}
 		
-		private String getType(final Plugin p) {
-			return p.getClass().getSimpleName();
-		}
-		
-		@SuppressWarnings("unchecked")
-		private String getCategory(final Plugin p) {
-			Class<? extends Plugin> clazz = p.getClass();
-			while (!clazz.getSuperclass().equals(Plugin.class)) {
-				clazz = (Class<? extends Plugin>) clazz.getSuperclass();
+		public boolean isLastInList(final Plugin selectedPlugin) {
+			
+			if (selectedPlugin == null) {
+				return true;
 			}
-			return clazz.getSimpleName();
+			
+			final List<Plugin> plugins = spyglass.getPluginManager().getPlugins();
+			if (plugins.size() > 0) {
+				return plugins.get(plugins.size() - 1) == selectedPlugin;
+			}
+			
+			throw new RuntimeException("We should never reach this code block hopefully.");
+			
 		}
 		
-		@Override
-		public boolean isLabelProperty(final Object arg0, final String arg1) {
-			return true;
-		}
-		
-		@Override
-		public void removeListener(final ILabelProviderListener arg0) {
-			// nothing to do
-		}
 	}
 	
 	private static final String COLUMN_CATEGORY = "Category";
@@ -195,24 +108,42 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private static final String COLUMN_VISIBLE = "Visible";
 	
-	private static final String[] columNames = new String[] { COLUMN_CATEGORY, COLUMN_TYPE, COLUMN_NAME, COLUMN_ACTIVE, COLUMN_VISIBLE };
+	private static final String[] columnNames = new String[] { COLUMN_CATEGORY, COLUMN_TYPE, COLUMN_NAME, COLUMN_ACTIVE, COLUMN_VISIBLE };
 	
 	private TableViewer pluginTableViewer;
 	
-	private final PluginTableCellModifier pluginTableCellModifier = new PluginTableCellModifier();
-	
 	private final PluginTableContentProvider pluginTableContentProvider = new PluginTableContentProvider();
-	
-	private final PluginTableLabelProvider pluginTableLabelProvider = new PluginTableLabelProvider();
 	
 	private final Spyglass spyglass;
 	
-	private Table pluginTable;
+	private Button buttonUp;
+	
+	private Button buttonDown;
 	
 	public PluginManagerPreferencePage(final Spyglass spyglass) {
 		this.spyglass = spyglass;
 		
 		noDefaultAndApplyButton();
+	}
+	
+	private static final Category log = Logging.get(PluginManagerPreferencePage.class);
+	
+	private String getType(final Plugin p) {
+		try {
+			return (String) p.getClass().getMethod("getHumanReadableName").invoke(p);
+		} catch (final Exception e) {
+			log.error("", e);
+			return "__ERROR__";
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private String getCategory(final Plugin p) {
+		Class<? extends Plugin> clazz = p.getClass();
+		while (!clazz.getSuperclass().equals(Plugin.class)) {
+			clazz = (Class<? extends Plugin>) clazz.getSuperclass();
+		}
+		return clazz.getSimpleName();
 	}
 	
 	private void addNodePositionerSelectionGroup(final Composite composite) {
@@ -230,6 +161,39 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		final Combo activeNPComboBox = new Combo(npSelGroup, SWT.SIMPLE | SWT.DROP_DOWN | SWT.READ_ONLY);
 		activeNPComboBox.setItems(getActiveNPs());
 		
+	}
+	
+	private final SelectionListener buttonSelectionListener = new SelectionAdapter() {
+		
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			if (e.getSource() == buttonUp) {
+				clickedButtonUp();
+			} else if (e.getSource() == buttonDown) {
+				clickedButtonDown();
+			}
+		}
+		
+	};
+	
+	private void clickedButtonDown() {
+		final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer.getSelection()).getFirstElement();
+		final Plugin nextPlugin;
+		final List<Plugin> plugins = spyglass.getPluginManager().getPlugins();
+		nextPlugin = plugins.get(plugins.indexOf(selectedPlugin) + 1);
+		spyglass.getPluginManager().togglePluginPriorities(selectedPlugin, nextPlugin);
+		pluginTableViewer.refresh();
+		updateButtons(selectedPlugin);
+	}
+	
+	private void clickedButtonUp() {
+		final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer.getSelection()).getFirstElement();
+		final Plugin previousPlugin;
+		final List<Plugin> plugins = spyglass.getPluginManager().getPlugins();
+		previousPlugin = plugins.get(plugins.indexOf(selectedPlugin) - 1);
+		spyglass.getPluginManager().togglePluginPriorities(selectedPlugin, previousPlugin);
+		pluginTableViewer.refresh();
+		updateButtons(selectedPlugin);
 	}
 	
 	private void addPluginManagerList(final Composite parent) {
@@ -253,8 +217,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		pluginTableData.heightHint = 300;
 		pluginTableData.widthHint = 500;
 		
-		createTable(pluginsGroup);
-		createTableViewer();
+		// createTable(pluginsGroup);
+		createTableViewer(pluginsGroup);
 		
 		pluginTableViewer.getTable().setLayoutData(pluginTableData);
 		
@@ -274,61 +238,280 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		final GridData buttonDownData = new GridData();
 		buttonDownData.widthHint = 70;
 		
-		final Button buttonUp = new Button(buttonComposite, SWT.PUSH);
+		buttonUp = new Button(buttonComposite, SWT.PUSH);
 		buttonUp.setText("Up");
 		buttonUp.setLayoutData(buttonUpData);
+		buttonUp.setEnabled(false);
+		buttonUp.addSelectionListener(buttonSelectionListener);
 		
-		final Button buttonDown = new Button(buttonComposite, SWT.PUSH);
+		buttonDown = new Button(buttonComposite, SWT.PUSH);
 		buttonDown.setText("Down");
 		buttonDown.setLayoutData(buttonDownData);
+		buttonDown.setEnabled(false);
+		buttonDown.addSelectionListener(buttonSelectionListener);
 		
 	}
 	
-	private void createTable(final Composite parent) {
+	private class CategoryLabelProvider extends ColumnLabelProvider {
 		
-		final int style = SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL;
-		
-		pluginTable = new Table(parent, style);
-		pluginTable.setLinesVisible(true);
-		pluginTable.setHeaderVisible(true);
-		
-		TableColumn column;
-		
-		column = new TableColumn(pluginTable, SWT.CENTER, 0);
-		column.setText(COLUMN_CATEGORY);
-		
-		column = new TableColumn(pluginTable, SWT.CENTER, 1);
-		column.setText(COLUMN_TYPE);
-		
-		column = new TableColumn(pluginTable, SWT.CENTER, 2);
-		column.setText(COLUMN_NAME);
-		
-		column = new TableColumn(pluginTable, SWT.CENTER, 3);
-		column.setText(COLUMN_ACTIVE);
-		
-		column = new TableColumn(pluginTable, SWT.CENTER, 4);
-		column.setText(COLUMN_VISIBLE);
+		@Override
+		public String getText(final Object element) {
+			return getCategory((Plugin) element);
+		}
 		
 	}
 	
-	private void createTableViewer() {
+	private class CategoryEditing extends EditingSupport {
 		
-		// final CellEditor[] pluginTableEditors = new CellEditor[columNames.length];
-		// pluginTableEditors[0] = null;
-		// pluginTableEditors[1] = null;
-		// pluginTableEditors[2] = new TextCellEditor();
-		// pluginTableEditors[3] = new CheckboxCellEditor();
-		// pluginTableEditors[4] = new CheckboxCellEditor();
+		public CategoryEditing(final TableViewer viewer) {
+			super(viewer);
+		}
 		
-		pluginTableViewer = new TableViewer(pluginTable);
-		// pluginTableViewer.setUseHashlookup(true);
-		pluginTableViewer.setColumnProperties(columNames);
-		// pluginTableViewer.setCellEditors(pluginTableEditors);
-		// pluginTableViewer.setCellModifier(pluginTableCellModifier);
+		@Override
+		protected boolean canEdit(final Object arg0) {
+			return false;
+		}
+		
+		@Override
+		protected CellEditor getCellEditor(final Object arg0) {
+			return null;
+		}
+		
+		@Override
+		protected Object getValue(final Object arg0) {
+			return getCategory((Plugin) arg0);
+		}
+		
+		@Override
+		protected void setValue(final Object arg0, final Object arg1) {
+			// not allowed to edit so nothing is to do
+		}
+		
+	}
+	
+	private class TypeLabelProvider extends ColumnLabelProvider {
+		
+		@Override
+		public String getText(final Object element) {
+			return getType((Plugin) element);
+		}
+		
+	}
+	
+	private class TypeEditing extends EditingSupport {
+		
+		public TypeEditing(final TableViewer viewer) {
+			super(viewer);
+		}
+		
+		@Override
+		protected boolean canEdit(final Object arg0) {
+			return false;
+		}
+		
+		@Override
+		protected CellEditor getCellEditor(final Object arg0) {
+			return null;
+		}
+		
+		@Override
+		protected Object getValue(final Object arg0) {
+			return getType((Plugin) arg0);
+		}
+		
+		@Override
+		protected void setValue(final Object arg0, final Object arg1) {
+			// not allowed to edit so nothing is to do
+		}
+		
+	}
+	
+	private class NameLabelProvider extends ColumnLabelProvider {
+		
+		@Override
+		public String getText(final Object element) {
+			return ((Plugin) element).getInstanceName();
+		}
+		
+	}
+	
+	private class NameEditing extends EditingSupport {
+		
+		private final TextCellEditor cellEditor;
+		
+		public NameEditing(final TableViewer viewer) {
+			super(viewer);
+			cellEditor = new TextCellEditor(viewer.getTable());
+		}
+		
+		@Override
+		protected boolean canEdit(final Object arg0) {
+			return true;
+		}
+		
+		@Override
+		protected CellEditor getCellEditor(final Object arg0) {
+			return cellEditor;
+		}
+		
+		@Override
+		protected Object getValue(final Object arg0) {
+			return ((Plugin) arg0).getInstanceName();
+		}
+		
+		@Override
+		protected void setValue(final Object arg0, final Object arg1) {
+			// TODO unique name validation (!!!)
+			((Plugin) arg0).getXMLConfig().setName((String) arg1);
+			pluginTableViewer.update(arg0, new String[] { COLUMN_NAME });
+		}
+	}
+	
+	private class ActiveLabelProvider extends ColumnLabelProvider {
+		
+		@Override
+		public String getText(final Object element) {
+			return ((Plugin) element).isActive() + "";
+		}
+		
+	}
+	
+	private class ActiveEditing extends EditingSupport {
+		
+		private final ComboBoxCellEditor cellEditor;
+		
+		public ActiveEditing(final TableViewer viewer) {
+			super(viewer);
+			cellEditor = new ComboBoxCellEditor(viewer.getTable(), new String[] { "true", "false" });
+		}
+		
+		@Override
+		protected boolean canEdit(final Object arg0) {
+			return true;
+		}
+		
+		@Override
+		protected CellEditor getCellEditor(final Object arg0) {
+			return cellEditor;
+		}
+		
+		@Override
+		protected Object getValue(final Object arg0) {
+			return ((Plugin) arg0).isActive() ? 0 : 1;
+		}
+		
+		@Override
+		protected void setValue(final Object arg0, final Object arg1) {
+			// TODO unique name validation (!!!)
+			final int selected = ((Integer) arg1);
+			((Plugin) arg0).setActive(selected == 0 ? true : false);
+			pluginTableViewer.update(arg0, new String[] { COLUMN_ACTIVE });
+		}
+		
+	}
+	
+	private class VisibleLabelProvider extends ColumnLabelProvider {
+		
+		@Override
+		public String getText(final Object element) {
+			return ((Plugin) element).isVisible() + "";
+		}
+		
+	}
+	
+	private class VisibleEditing extends EditingSupport {
+		
+		private final ComboBoxCellEditor cellEditor;
+		
+		public VisibleEditing(final TableViewer viewer) {
+			super(viewer);
+			cellEditor = new ComboBoxCellEditor(viewer.getTable(), new String[] { "true", "false" });
+		}
+		
+		@Override
+		protected boolean canEdit(final Object arg0) {
+			return true;
+		}
+		
+		@Override
+		protected CellEditor getCellEditor(final Object arg0) {
+			return cellEditor;
+		}
+		
+		@Override
+		protected Object getValue(final Object arg0) {
+			return ((Plugin) arg0).isVisible() ? 0 : 1;
+		}
+		
+		@Override
+		protected void setValue(final Object arg0, final Object arg1) {
+			// TODO unique name validation (!!!)
+			final int selected = ((Integer) arg1);
+			((Plugin) arg0).setVisible(selected == 0 ? true : false);
+			pluginTableViewer.update(arg0, new String[] { COLUMN_VISIBLE });
+		}
+		
+	}
+	
+	private void createTableViewer(final Composite parent) {
+		
+		final int style = SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION;
+		
+		pluginTableViewer = new TableViewer(parent, style);
+		
+		TableViewerColumn column;
+		
+		column = new TableViewerColumn(pluginTableViewer, SWT.NONE);
+		column.getColumn().setWidth(130);
+		column.getColumn().setText(COLUMN_CATEGORY);
+		column.setLabelProvider(new CategoryLabelProvider());
+		column.setEditingSupport(new CategoryEditing(pluginTableViewer));
+		
+		column = new TableViewerColumn(pluginTableViewer, SWT.NONE);
+		column.getColumn().setWidth(130);
+		column.getColumn().setText(COLUMN_TYPE);
+		column.setLabelProvider(new TypeLabelProvider());
+		column.setEditingSupport(new TypeEditing(pluginTableViewer));
+		
+		column = new TableViewerColumn(pluginTableViewer, SWT.NONE);
+		column.getColumn().setWidth(140);
+		column.getColumn().setText(COLUMN_NAME);
+		column.setLabelProvider(new NameLabelProvider());
+		column.setEditingSupport(new NameEditing(pluginTableViewer));
+		
+		column = new TableViewerColumn(pluginTableViewer, SWT.NONE);
+		column.getColumn().setWidth(50);
+		column.getColumn().setText(COLUMN_ACTIVE);
+		column.setLabelProvider(new ActiveLabelProvider());
+		column.setEditingSupport(new ActiveEditing(pluginTableViewer));
+		
+		column = new TableViewerColumn(pluginTableViewer, SWT.NONE);
+		column.getColumn().setWidth(50);
+		column.getColumn().setText(COLUMN_VISIBLE);
+		column.setLabelProvider(new VisibleLabelProvider());
+		column.setEditingSupport(new VisibleEditing(pluginTableViewer));
+		
+		pluginTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			
+			@Override
+			public void selectionChanged(final SelectionChangedEvent e) {
+				final IStructuredSelection selection = (IStructuredSelection) e.getSelection();
+				updateButtons((Plugin) selection.getFirstElement());
+			}
+			
+		});
+		
+		pluginTableViewer.getTable().setLinesVisible(true);
+		pluginTableViewer.getTable().setHeaderVisible(true);
+		
 		pluginTableViewer.setContentProvider(pluginTableContentProvider);
-		pluginTableViewer.setLabelProvider(pluginTableLabelProvider);
 		pluginTableViewer.setInput(spyglass);
 		
+	}
+	
+	private void updateButtons(final Plugin selectedPlugin) {
+		buttonUp.setEnabled(!pluginTableContentProvider.isFirstInList(selectedPlugin));
+		buttonDown.setEnabled(!pluginTableContentProvider.isLastInList(selectedPlugin));
 	}
 	
 	@Override
@@ -353,9 +536,16 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	@Override
 	public void dispose() {
-		pluginTable.dispose();
-		pluginTable = null;
+		
+		pluginTableViewer.getTable().dispose();
 		pluginTableViewer = null;
+		
+		buttonUp.dispose();
+		buttonUp = null;
+		
+		buttonDown.dispose();
+		buttonDown = null;
+		
 	}
 	
 	private String[] getActiveNPs() {
