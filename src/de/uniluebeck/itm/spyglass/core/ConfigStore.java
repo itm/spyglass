@@ -154,7 +154,7 @@ public class ConfigStore {
 	 *            the plug-ins' class
 	 */
 	public List<PluginXMLConfig> readPluginInstanceConfigs(final Class<? extends Plugin> clazz) {
-		final List<Plugin> plugins = spyglassConfig.getPluginManager().getPluginInstances(clazz);
+		final List<Plugin> plugins = spyglassConfig.getPluginManager().getPluginInstances(clazz, false);
 		final List<PluginXMLConfig> configs = new LinkedList<PluginXMLConfig>();
 		for (final Plugin plugin : plugins) {
 			configs.add(plugin.getXMLConfig());

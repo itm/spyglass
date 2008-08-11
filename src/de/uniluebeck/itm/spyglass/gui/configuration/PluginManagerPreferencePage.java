@@ -550,7 +550,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private String[] getActiveNPs() {
 		
-		final List<Plugin> pluginInstances = spyglass.getPluginManager().getPluginInstances(NodePositionerPlugin.class);
+		final List<Plugin> pluginInstances = spyglass.getPluginManager().getPluginInstances(NodePositionerPlugin.class, true);
 		final String[] activeNPs = new String[pluginInstances.size()];
 		
 		int i = 0;

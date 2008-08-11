@@ -378,17 +378,45 @@ public class PluginManager {
 	 * 
 	 * @param clazz
 	 *            the plug-in instances' class
+	 * @param checkHierarchy
+	 *            <code>true</code> if also Plugins that extend <code>clazz</code> should be
+	 *            returned, <code>false</code> otherwise
 	 */
-	public List<Plugin> getPluginInstances(final Class<? extends Plugin> clazz) {
+	@SuppressWarnings("unchecked")
+	public List<Plugin> getPluginInstances(final Class<? extends Plugin> clazz, final boolean checkHierarchy) {
 		
 		final List<Plugin> instances = new LinkedList<Plugin>();
+		Class<? extends Plugin> currentClass;
+		
 		synchronized (plugins) {
+			
 			for (final Plugin plugin : plugins) {
-				if (plugin.getClass().equals(clazz)) {
-					instances.add(plugin);
+				
+				if (checkHierarchy) {
+					
+					currentClass = plugin.getClass();
+					
+					while (!currentClass.equals(Plugin.class)) {
+						
+						currentClass = (Class<? extends Plugin>) currentClass.getSuperclass();
+						
+						if (currentClass.equals(clazz)) {
+							instances.add(plugin);
+							break;
+						}
+						
+					}
+					
+				} else {
+					if (plugin.getClass().equals(clazz)) {
+						instances.add(plugin);
+					}
 				}
+				
 			}
+			
 		}
+		
 		return instances;
 	}
 	

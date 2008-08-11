@@ -301,7 +301,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			parentPreferenceNode.add(preferenceNode);
 			
 			// add nodes for instantiated plugins
-			for (final Plugin p : spyglass.getPluginManager().getPluginInstances(classTree.clazz)) {
+			for (final Plugin p : spyglass.getPluginManager().getPluginInstances(classTree.clazz, false)) {
 				
 				preferenceNodeId = p.getClass().getCanonicalName() + "_" + p.hashCode();
 				preferencePage = getPreferencePage(classTree.clazz, p);
