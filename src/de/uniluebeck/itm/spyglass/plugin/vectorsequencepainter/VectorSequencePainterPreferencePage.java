@@ -5,11 +5,12 @@ import org.eclipse.swt.widgets.Composite;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 public class VectorSequencePainterPreferencePage extends PluginPreferencePage<VectorSequencePainterPlugin, VectorSequencePainterXMLConfig> {
 	
 	public VectorSequencePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, VectorSequencePainterPlugin.class, BasicOptions.ALL);
+		super(dialog, spyglass, BasicOptions.ALL);
 	}
 	
 	public VectorSequencePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final VectorSequencePainterPlugin plugin) {
@@ -31,6 +32,11 @@ public class VectorSequencePainterPreferencePage extends PluginPreferencePage<Ve
 	public void setFormValues(final VectorSequencePainterXMLConfig config) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return VectorSequencePainterPlugin.class;
 	}
 	
 }

@@ -1,13 +1,14 @@
 package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
 
 import org.apache.log4j.Category;
-import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 public class PositionPacketNodePositionerPreferencePage extends
@@ -18,7 +19,7 @@ public class PositionPacketNodePositionerPreferencePage extends
 	private static Category log = SpyglassLogger.get(PositionPacketNodePositionerPlugin.class);
 	
 	public PositionPacketNodePositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, PositionPacketNodePositionerPlugin.class, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
+		super(dialog, spyglass, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
 	}
 	
 	public PositionPacketNodePositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,
@@ -27,7 +28,7 @@ public class PositionPacketNodePositionerPreferencePage extends
 		// this.config = (PositionPacketNodePositionerXMLConfig) plugin.getXMLConfig();
 	}
 	
-	private StringFieldEditor ttlFieldEditor;
+	private IntegerFieldEditor ttlFieldEditor;
 	
 	@Override
 	protected Composite createContents(final Composite parent) {
@@ -36,14 +37,12 @@ public class PositionPacketNodePositionerPreferencePage extends
 		
 		final Group optionsGroup = createGroup(composite, "Options");
 		
-		ttlFieldEditor = new StringFieldEditor(PREF_STORE_TTL, "Time to Live (sec)", optionsGroup);
+		ttlFieldEditor = new IntegerFieldEditor(PREF_STORE_TTL, "Time to Live (sec)", optionsGroup);
 		ttlFieldEditor.setEmptyStringAllowed(false);
 		ttlFieldEditor.setEnabled(true, optionsGroup);
 		ttlFieldEditor.setErrorMessage("You must provide a TTL parameter.");
 		ttlFieldEditor.setPage(this);
-		ttlFieldEditor.setTextLimit(Integer.toString(Integer.MAX_VALUE).length());
-		ttlFieldEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
-		ttlFieldEditor.setPreferenceStore(this.prefStore);
+		ttlFieldEditor.setValidRange(0, Integer.MAX_VALUE);
 		
 		return composite;
 		
@@ -54,7 +53,8 @@ public class PositionPacketNodePositionerPreferencePage extends
 		final PositionPacketNodePositionerXMLConfig config = new PositionPacketNodePositionerXMLConfig();
 		super.fillInFormValues(config);
 		
-		config.setTimeToLive(this.prefStore.getInt(PREF_STORE_TTL));
+		this.ttlFieldEditor.store();
+		config.setTimeToLive(ttlFieldEditor.getIntValue());
 		return config;
 	}
 	
@@ -63,9 +63,13 @@ public class PositionPacketNodePositionerPreferencePage extends
 		super.setFormValues(config);
 		
 		listenForPropertyChanges = false;
-		this.prefStore.setValue(PREF_STORE_TTL, config.getTimeToLive());
-		ttlFieldEditor.load();
+		ttlFieldEditor.setStringValue(Integer.toString(config.getTimeToLive()));
 		listenForPropertyChanges = true;
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return PositionPacketNodePositionerPlugin.class;
 	}
 	
 }

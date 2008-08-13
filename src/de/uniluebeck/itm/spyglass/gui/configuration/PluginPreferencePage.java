@@ -3,7 +3,6 @@ package de.uniluebeck.itm.spyglass.gui.configuration;
 import org.apache.log4j.Category;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -96,21 +95,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 */
 	protected ConfigStore cs;
 	
-	/**
-	 * This is a PreferenceStore foro storinbgf
-	 */
-	protected final IPreferenceStore prefStore = new PreferenceStore();
-	
 	private final String PREF_STORE_NAME = "instanceName";
 	private final String PREF_STORE_SEMANTIC_TYPES = "semanticTypes";
 	private final String PREF_STORE_ALL_SEMANTIC_TYPES = "allSemanticTypes";
 	private final String PREF_STORE_VISIBLE = "isVisible";
 	private final String PREF_STORE_ACTIVE = "isActive";
-	
-	/**
-	 * The class of the plugin handled by this preference page. guarantied to be set correctly.
-	 */
-	protected Class<? extends Plugin> pluginClass;
 	
 	/**
 	 * Reference to the plugin instance. may be null if PrefType==TYPE.
@@ -158,8 +147,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * @param cs
 	 */
-	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final Class<? extends Plugin> clazz,
-			final BasicOptions basicOptions) {
+	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final BasicOptions basicOptions) {
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.TYPE;
@@ -167,7 +155,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.cs = spyglass.getConfigStore();
 		this.spyglass = spyglass;
 		this.basicOptions = basicOptions;
-		this.pluginClass = clazz;
+		
+		this.setPreferenceStore(new PreferenceStore());
 		
 		// This is fine
 		this.config = (ConfigClass) cs.readPluginTypeDefaults(this.getPluginClass());
@@ -189,7 +178,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.spyglass = spyglass;
 		this.plugin = plugin;
 		this.basicOptions = basicOptions;
-		this.pluginClass = plugin.getClass();
+		
+		this.setPreferenceStore(new PreferenceStore());
 		
 		// This is fine
 		this.config = (ConfigClass) plugin.getXMLConfig();
@@ -230,8 +220,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		fields.instanceName.setTextLimit(100);
 		fields.instanceName.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
 		fields.instanceName.setPropertyChangeListener(propertyChangeListener);
-		fields.instanceName.setPreferenceStore(prefStore);
-		fields.instanceName.load();
 		
 		final Composite c2 = new Composite(basicGroup, SWT.NONE);
 		c2.setLayout(new GridLayout(2, false));
@@ -244,12 +232,10 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		fields.semanticTypes.setTextLimit(100);
 		fields.semanticTypes.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE); // TODO
 		fields.semanticTypes.setPropertyChangeListener(propertyChangeListener);
-		fields.semanticTypes.setPreferenceStore(prefStore);
-		fields.semanticTypes.load();
 		
 		final Composite c2b = new Composite(c2, SWT.NONE);
 		fields.allSemanticTypes = new BooleanFieldEditor(PREF_STORE_ALL_SEMANTIC_TYPES, "All types", c2b);
-		fields.allSemanticTypes.setPreferenceStore(prefStore);
+		fields.allSemanticTypes.setPreferenceStore(getPreferenceStore());
 		fields.allSemanticTypes.load();
 		
 		final Composite c3 = new Composite(basicGroup, SWT.NONE);
@@ -257,12 +243,12 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		
 		final Composite c3a = new Composite(c3, SWT.NONE);
 		fields.isVisible = new BooleanFieldEditor(PREF_STORE_VISIBLE, "Visible", c3a);
-		fields.isVisible.setPreferenceStore(prefStore);
+		fields.isVisible.setPreferenceStore(getPreferenceStore());
 		fields.isVisible.load();
 		
 		final Composite c3b = new Composite(c3, SWT.NONE);
 		fields.isActive = new BooleanFieldEditor(PREF_STORE_ACTIVE, "Active", c3b);
-		fields.isActive.setPreferenceStore(prefStore);
+		fields.isActive.setPreferenceStore(getPreferenceStore());
 		fields.isActive.load();
 		
 		switch (this.basicOptions) {
@@ -310,11 +296,17 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	
 	protected void fillInFormValues(final ConfigClass config) {
 		
-		config.setActive(this.prefStore.getBoolean(PREF_STORE_ACTIVE));
-		config.setName(this.prefStore.getString(PREF_STORE_NAME));
+		// First the values have to be pushed from the Fields into the preference store.
+		this.fields.allSemanticTypes.store();
+		this.fields.isActive.store();
+		this.fields.isVisible.store();
+		
+		// Now read them out from the preference store
+		config.setActive(getPreferenceStore().getBoolean(PREF_STORE_ACTIVE));
+		config.setName(this.fields.instanceName.getStringValue());
 		// config.setSemanticTypes(semanticTypes) TODO
-		config.setVisible(this.prefStore.getBoolean(PREF_STORE_VISIBLE));
-		if (this.prefStore.getBoolean(PREF_STORE_ALL_SEMANTIC_TYPES)) {
+		config.setVisible(getPreferenceStore().getBoolean(PREF_STORE_VISIBLE));
+		if (getPreferenceStore().getBoolean(PREF_STORE_ALL_SEMANTIC_TYPES)) {
 			config.setSemanticTypes(PluginXMLConfig.ALL_SEMANTIC_TYPES); // TODO
 		}
 	}
@@ -428,9 +420,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * 
 	 * @return the class-Object of the plugin this preference page is associated with
 	 */
-	public final Class<? extends Plugin> getPluginClass() {
-		return this.pluginClass;
-	}
+	public abstract Class<? extends Plugin> getPluginClass();
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -450,21 +440,20 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	public void setFormValues(final ConfigClass config) {
 		listenForPropertyChanges = false;
 		
-		this.prefStore.setValue(PREF_STORE_ACTIVE, config.isActive());
-		this.prefStore.setValue(PREF_STORE_VISIBLE, config.isVisible());
-		this.prefStore.setValue(PREF_STORE_NAME, config.getName());
-		// this.prefStore.setValue("semanticTypes", config.getSemanticTypes()); // TODO
+		getPreferenceStore().setValue(PREF_STORE_ACTIVE, config.isActive());
+		getPreferenceStore().setValue(PREF_STORE_VISIBLE, config.isVisible());
+		getPreferenceStore().setValue(PREF_STORE_NAME, config.getName());
 		
 		if (config.isAllSemanticTypes()) {
-			this.prefStore.setValue(PREF_STORE_ALL_SEMANTIC_TYPES, true);
+			getPreferenceStore().setValue(PREF_STORE_ALL_SEMANTIC_TYPES, true);
 			this.fields.semanticTypes.setEnabled(false, null);
 		}
 		
+		this.fields.instanceName.setStringValue(config.getName());
+		this.fields.semanticTypes.setStringValue("fff"); // TODO
 		this.fields.allSemanticTypes.load();
-		this.fields.instanceName.load();
 		this.fields.isActive.load();
 		this.fields.isVisible.load();
-		this.fields.semanticTypes.load();
 		
 		this.config = config;
 		

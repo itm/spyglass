@@ -9,11 +9,12 @@ import org.eclipse.swt.widgets.Group;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 public class SimpleNodePainterPreferencePage extends PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> {
 	
 	public SimpleNodePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, SimpleNodePainterPlugin.class, BasicOptions.ALL);
+		super(dialog, spyglass, BasicOptions.ALL);
 	}
 	
 	public SimpleNodePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final SimpleNodePainterPlugin plugin) {
@@ -32,19 +33,16 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 		lineWidthFieldEditor.setEnabled(true, optionsGroup);
 		lineWidthFieldEditor.setErrorMessage("You must provide a line width.");
 		lineWidthFieldEditor.setPage(this);
-		lineWidthFieldEditor.setTextLimit(Integer.toString(Integer.MAX_VALUE).length());
-		// lineWidthFieldEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
-		lineWidthFieldEditor.setPreferenceStore(this.prefStore);
+		lineWidthFieldEditor.setValidRange(0, 100);
 		
-		final BooleanFieldEditor extInfFieldEditor = new BooleanFieldEditor("width", "Display extended information", optionsGroup);
+		final BooleanFieldEditor extInfFieldEditor = new BooleanFieldEditor("extinf", "Display extended information", optionsGroup);
 		extInfFieldEditor.setEnabled(true, optionsGroup);
 		extInfFieldEditor.setPage(this);
-		extInfFieldEditor.setPreferenceStore(this.prefStore);
+		extInfFieldEditor.setPreferenceStore(getPreferenceStore());
 		
 		final ColorFieldEditor colorFieldEditor = new ColorFieldEditor("color", "Line color", optionsGroup);
 		colorFieldEditor.setEnabled(true, optionsGroup);
 		colorFieldEditor.setPage(this);
-		colorFieldEditor.setPreferenceStore(this.prefStore);
 		
 		// TODO: table for semantic types
 		
@@ -64,4 +62,8 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 		this.tmpConfig = config;
 	}
 	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return SimpleNodePainterPlugin.class;
+	}
 }

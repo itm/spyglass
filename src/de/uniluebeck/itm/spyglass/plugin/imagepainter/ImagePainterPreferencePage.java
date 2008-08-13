@@ -5,11 +5,12 @@ import org.eclipse.swt.widgets.Composite;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 public class ImagePainterPreferencePage extends PluginPreferencePage<ImagePainterPlugin, ImagePainterXMLConfig> {
 	
 	public ImagePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, ImagePainterPlugin.class, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
+		super(dialog, spyglass, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
 	}
 	
 	public ImagePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final ImagePainterPlugin plugin) {
@@ -37,6 +38,11 @@ public class ImagePainterPreferencePage extends PluginPreferencePage<ImagePainte
 	public void setFormValues(final ImagePainterXMLConfig config) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return ImagePainterPlugin.class;
 	}
 	
 }

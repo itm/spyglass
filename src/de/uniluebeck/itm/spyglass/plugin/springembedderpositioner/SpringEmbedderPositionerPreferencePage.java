@@ -5,11 +5,12 @@ import org.eclipse.swt.widgets.Composite;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 public class SpringEmbedderPositionerPreferencePage extends PluginPreferencePage<SpringEmbedderPositionerPlugin, SpringEmbedderPositionerXMLConfig> {
 	
 	public SpringEmbedderPositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, SpringEmbedderPositionerPlugin.class, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
+		super(dialog, spyglass, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
 	}
 	
 	public SpringEmbedderPositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,
@@ -32,5 +33,10 @@ public class SpringEmbedderPositionerPreferencePage extends PluginPreferencePage
 	public void setFormValues(final SpringEmbedderPositionerXMLConfig config) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return SpringEmbedderPositionerPlugin.class;
 	}
 }

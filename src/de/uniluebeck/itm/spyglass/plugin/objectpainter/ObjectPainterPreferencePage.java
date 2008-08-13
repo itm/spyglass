@@ -5,11 +5,12 @@ import org.eclipse.swt.widgets.Composite;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 public class ObjectPainterPreferencePage extends PluginPreferencePage<ObjectPainterPlugin, ObjectPainterXMLConfig> {
 	
 	public ObjectPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, ObjectPainterPlugin.class, BasicOptions.ALL);
+		super(dialog, spyglass, BasicOptions.ALL);
 	}
 	
 	public ObjectPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final ObjectPainterPlugin plugin) {
@@ -31,6 +32,11 @@ public class ObjectPainterPreferencePage extends PluginPreferencePage<ObjectPain
 	public void setFormValues(final ObjectPainterXMLConfig config) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return ObjectPainterPlugin.class;
 	}
 	
 }

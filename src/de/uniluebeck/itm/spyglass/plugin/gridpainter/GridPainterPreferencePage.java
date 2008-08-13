@@ -5,11 +5,12 @@ import org.eclipse.swt.widgets.Composite;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 public class GridPainterPreferencePage extends PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> {
 	
 	public GridPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, GridPainterPlugin.class, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
+		super(dialog, spyglass, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
 	}
 	
 	public GridPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final GridPainterPlugin plugin) {
@@ -31,6 +32,11 @@ public class GridPainterPreferencePage extends PluginPreferencePage<GridPainterP
 	public void setFormValues(final GridPainterXMLConfig config) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return GridPainterPlugin.class;
 	}
 	
 }

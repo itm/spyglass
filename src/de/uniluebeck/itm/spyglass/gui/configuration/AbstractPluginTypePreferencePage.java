@@ -12,7 +12,7 @@ public class AbstractPluginTypePreferencePage extends PluginPreferencePage<Plugi
 	private final String pluginName;
 	
 	public AbstractPluginTypePreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final String pluginName) {
-		super(dialog, spyglass, Plugin.class, BasicOptions.ALL);
+		super(dialog, spyglass, BasicOptions.ALL);
 		this.pluginName = pluginName;
 	}
 	
@@ -30,6 +30,11 @@ public class AbstractPluginTypePreferencePage extends PluginPreferencePage<Plugi
 	@Override
 	public void setFormValues(final PluginXMLConfig config) {
 		// nothing to do, since this is abstract (!)
+	}
+	
+	@Override
+	public Class<? extends Plugin> getPluginClass() {
+		return Plugin.class;
 	}
 	
 }
