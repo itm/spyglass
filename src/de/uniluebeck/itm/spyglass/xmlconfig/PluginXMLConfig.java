@@ -22,6 +22,8 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
  */
 public abstract class PluginXMLConfig {
 	
+	public static final int[] ALL_SEMANTIC_TYPES = new int[256];
+	
 	@Element(name = "isActive")
 	private boolean isActive = true;
 	
@@ -36,6 +38,13 @@ public abstract class PluginXMLConfig {
 	
 	@ElementArray(name = "semanticTypes", required = false)
 	private int[] semanticTypes;
+	
+	static {
+		// Fill static final field
+		for (int i = 0; i < 256; i++) {
+			ALL_SEMANTIC_TYPES[i] = i;
+		}
+	}
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -148,6 +157,10 @@ public abstract class PluginXMLConfig {
 	 */
 	public int[] getSemanticTypes() {
 		return semanticTypes;
+	}
+	
+	public boolean isAllSemanticTypes() {
+		return false; // TODO
 	}
 	
 	// --------------------------------------------------------------------------------

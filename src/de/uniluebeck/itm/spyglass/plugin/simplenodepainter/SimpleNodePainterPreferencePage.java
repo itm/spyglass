@@ -1,40 +1,54 @@
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
-import org.eclipse.swt.SWT;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ColorFieldEditor;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Group;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.plugin.Plugin;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class SimpleNodePainterPreferencePage extends PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> {
 	
 	public SimpleNodePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass);
+		super(dialog, spyglass, BasicOptions.ALL);
 	}
 	
 	public SimpleNodePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final SimpleNodePainterPlugin plugin) {
-		super(dialog, spyglass, plugin);
+		super(dialog, spyglass, plugin, BasicOptions.ALL);
 	}
 	
 	@Override
-	protected Control createContents(final Composite parent) {
-		String msg = "SimpleNodePainterPreferencePage Preference Page\n";
-		msg += (type == PrefType.INSTANCE ? "Instance Name: " + plugin.getInstanceName() + "\n" + "IsActive: " + plugin.isActive() + "\n"
-				+ "IsVisible: " + plugin.isVisible() : "");
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(msg);
-		return label;
-	}
-	
-	@Override
-	public void performApply() {
-		// TODO Auto-generated method stub
+	protected Composite createContents(final Composite parent) {
 		
+		final Composite composite = super.createContents(parent);
+		
+		final Group optionsGroup = createGroup(composite, "Display");
+		
+		final IntegerFieldEditor lineWidthFieldEditor = new IntegerFieldEditor("lineWidth", "Line width (pixels)", optionsGroup);
+		lineWidthFieldEditor.setEmptyStringAllowed(false);
+		lineWidthFieldEditor.setEnabled(true, optionsGroup);
+		lineWidthFieldEditor.setErrorMessage("You must provide a line width.");
+		lineWidthFieldEditor.setPage(this);
+		lineWidthFieldEditor.setTextLimit(Integer.toString(Integer.MAX_VALUE).length());
+		// lineWidthFieldEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+		lineWidthFieldEditor.setPreferenceStore(this.prefStore);
+		
+		final BooleanFieldEditor extInfFieldEditor = new BooleanFieldEditor("width", "Display extended information", optionsGroup);
+		extInfFieldEditor.setEnabled(true, optionsGroup);
+		extInfFieldEditor.setPage(this);
+		extInfFieldEditor.setPreferenceStore(this.prefStore);
+		
+		final ColorFieldEditor colorFieldEditor = new ColorFieldEditor("color", "Line color", optionsGroup);
+		colorFieldEditor.setEnabled(true, optionsGroup);
+		colorFieldEditor.setPage(this);
+		colorFieldEditor.setPreferenceStore(this.prefStore);
+		
+		// TODO: table for semantic types
+		
+		return composite;
 	}
 	
 	@Override
@@ -48,22 +62,6 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 	@Override
 	public void setFormValues(final SimpleNodePainterXMLConfig config) {
 		this.tmpConfig = config;
-	}
-	
-	@Override
-	public Class<? extends PluginXMLConfig> getConfigClass() {
-		return SimpleNodePainterXMLConfig.class;
-	}
-	
-	@Override
-	public Class<? extends Plugin> getPluginClass() {
-		return SimpleNodePainterPlugin.class;
-	}
-	
-	@Override
-	public boolean hasUnsavedChanges() {
-		// TODO Auto-generated method stub
-		return false;
 	}
 	
 }

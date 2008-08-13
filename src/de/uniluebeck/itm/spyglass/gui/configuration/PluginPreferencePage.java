@@ -1,8 +1,15 @@
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
+import org.apache.log4j.Category;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.preference.PreferenceStore;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -17,6 +24,7 @@ import org.jfree.util.Log;
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -27,6 +35,8 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig> extends PreferencePage {
 	
+	private static Category log = SpyglassLogger.get(PluginPreferencePage.class);
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * Enumeration. Decides, if the surrounding PluginPreferencesWidget represents an Type or an
@@ -36,46 +46,73 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		INSTANCE, TYPE
 	}
 	
-	private Button applyButton;
+	protected enum BasicOptions {
+		/**
+		 * Show all Fields in the the optionsGroup Basic
+		 */
+		ALL,
+
+		/**
+		 * Show all Fields except "isVisible" in the the optionsGroup Basic
+		 */
+		ALL_BUT_VISIBLE,
+
+		/**
+		 * Show all Fields except "isVisible" and fields for handling semantic types in the the
+		 * optionsGroup Basic
+		 */
+		ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES,
+
+		/**
+		 * Show all Fields except fields for handling semantic types in the the optionsGroup Basic
+		 */
+		ALL_BUT_SEMANTIC_TYPES
+		
+	}
+	
+	BasicOptions basicOptions = BasicOptions.ALL;
 	
 	private final SelectionListener buttonSelectionListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			if (e.getSource() == deleteButton) {
+			if (e.getSource() == buttons.deleteButton) {
 				performDelete();
-			} else if (e.getSource() == restoreButton) {
+			} else if (e.getSource() == buttons.restoreButton) {
 				performRestore();
-			} else if (e.getSource() == applyButton) {
+			} else if (e.getSource() == buttons.applyButton) {
 				performApply();
-			} else if (e.getSource() == restoreDefaultsButton) {
+			} else if (e.getSource() == buttons.restoreDefaultsButton) {
 				performRestoreDefaults();
-			} else if (e.getSource() == saveAsDefaultButton) {
+			} else if (e.getSource() == buttons.saveAsDefaultButton) {
 				performSaveAsDefault();
-			} else if (e.getSource() == createInstanceButton) {
+			} else if (e.getSource() == buttons.createInstanceButton) {
 				performCreateInstance();
 			}
 		}
 	};
-	
-	private Button createInstanceButton;
 	
 	/**
 	 * 
 	 */
 	protected ConfigStore cs;
 	
-	private Button deleteButton;
+	/**
+	 * This is a PreferenceStore foro storinbgf
+	 */
+	protected final IPreferenceStore prefStore = new PreferenceStore();
+	
+	private final String PREF_STORE_NAME = "instanceName";
+	private final String PREF_STORE_SEMANTIC_TYPES = "semanticTypes";
+	private final String PREF_STORE_ALL_SEMANTIC_TYPES = "allSemanticTypes";
+	private final String PREF_STORE_VISIBLE = "isVisible";
+	private final String PREF_STORE_ACTIVE = "isActive";
 	
 	/**
 	 * 
 	 */
 	protected PluginClass plugin;
 	
-	private Button restoreButton;
-	
-	private Button restoreDefaultsButton;
-	
-	private Button saveAsDefaultButton;
+	protected ConfigClass config;
 	
 	/**
 	 * 
@@ -86,17 +123,41 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	
 	private final PluginPreferenceDialog dialog;
 	
+	private class Buttons {
+		
+		private Button restoreButton;
+		private Button restoreDefaultsButton;
+		private Button saveAsDefaultButton;
+		private Button deleteButton;
+		private Button createInstanceButton;
+		private Button applyButton;
+		
+	}
+	
+	private Buttons buttons = new Buttons();
+	
+	private class Fields {
+		private StringFieldEditor instanceName;
+		private StringFieldEditor semanticTypes;
+		private BooleanFieldEditor isActive;
+		private BooleanFieldEditor isVisible;
+		private BooleanFieldEditor allSemanticTypes;
+	}
+	
+	private Fields fields = new Fields();
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param cs
 	 */
-	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final BasicOptions basicOptions) {
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.TYPE;
 		this.dialog = dialog;
 		this.cs = spyglass.getConfigStore();
 		this.spyglass = spyglass;
+		this.basicOptions = basicOptions;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -104,7 +165,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @param cs
 	 * @param plugin
 	 */
-	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final PluginClass plugin) {
+	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final PluginClass plugin,
+			final BasicOptions basicOptions) {
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.INSTANCE;
@@ -112,6 +174,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.cs = spyglass.getConfigStore();
 		this.spyglass = spyglass;
 		this.plugin = plugin;
+		this.basicOptions = basicOptions;
+		
 	}
 	
 	@Override
@@ -119,17 +183,94 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		
 		if (type == PrefType.INSTANCE) {
 			
-			deleteButton = createButton(parent, "Delete", buttonSelectionListener);
-			restoreButton = createButton(parent, "Restore", buttonSelectionListener);
-			applyButton = createButton(parent, "Apply", buttonSelectionListener);
+			buttons.deleteButton = createButton(parent, "Delete", buttonSelectionListener);
+			buttons.restoreButton = createButton(parent, "Restore", buttonSelectionListener);
+			buttons.applyButton = createButton(parent, "Apply", buttonSelectionListener);
 			
 		} else {
 			
-			restoreDefaultsButton = createButton(parent, "Restore Defaults", buttonSelectionListener);
-			saveAsDefaultButton = createButton(parent, "Save as Default", buttonSelectionListener);
-			createInstanceButton = createButton(parent, "Create Instance", buttonSelectionListener);
+			buttons.restoreDefaultsButton = createButton(parent, "Restore Defaults", buttonSelectionListener);
+			buttons.saveAsDefaultButton = createButton(parent, "Save as Default", buttonSelectionListener);
+			buttons.createInstanceButton = createButton(parent, "Create Instance", buttonSelectionListener);
 			
 		}
+		
+	}
+	
+	@Override
+	protected Composite createContents(final Composite parent) {
+		
+		final Composite composite = createComposite(parent);
+		
+		final Group basicGroup = createGroup(composite, "Basic");
+		
+		final Composite c1 = new Composite(basicGroup, SWT.NONE);
+		fields.instanceName = new StringFieldEditor(PREF_STORE_NAME, "Instance name", c1);
+		fields.instanceName.setEmptyStringAllowed(false);
+		fields.instanceName.setErrorMessage("You must provide a unique instance name.");
+		fields.instanceName.setPage(this);
+		fields.instanceName.setTextLimit(100);
+		fields.instanceName.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+		fields.instanceName.setPropertyChangeListener(propertyChangeListener);
+		fields.instanceName.setPreferenceStore(prefStore);
+		fields.instanceName.load();
+		
+		final Composite c2 = new Composite(basicGroup, SWT.NONE);
+		c2.setLayout(new GridLayout(2, false));
+		
+		final Composite c2a = new Composite(c2, SWT.NONE);
+		fields.semanticTypes = new StringFieldEditor(PREF_STORE_SEMANTIC_TYPES, "Semantic types", c2a);
+		fields.semanticTypes.setEmptyStringAllowed(false);
+		fields.semanticTypes.setErrorMessage("You must provide a list of semantic types (integers)");
+		fields.semanticTypes.setPage(this);
+		fields.semanticTypes.setTextLimit(100);
+		fields.semanticTypes.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE); // TODO
+		fields.semanticTypes.setPropertyChangeListener(propertyChangeListener);
+		fields.semanticTypes.setPreferenceStore(prefStore);
+		fields.semanticTypes.load();
+		
+		final Composite c2b = new Composite(c2, SWT.NONE);
+		fields.allSemanticTypes = new BooleanFieldEditor(PREF_STORE_ALL_SEMANTIC_TYPES, "All types", c2b);
+		fields.allSemanticTypes.setPreferenceStore(prefStore);
+		fields.allSemanticTypes.load();
+		
+		final Composite c3 = new Composite(basicGroup, SWT.NONE);
+		c3.setLayout(new GridLayout(2, false));
+		
+		final Composite c3a = new Composite(c3, SWT.NONE);
+		fields.isVisible = new BooleanFieldEditor(PREF_STORE_VISIBLE, "Visible", c3a);
+		fields.isVisible.setPreferenceStore(prefStore);
+		fields.isVisible.load();
+		
+		final Composite c3b = new Composite(c3, SWT.NONE);
+		fields.isActive = new BooleanFieldEditor(PREF_STORE_ACTIVE, "Active", c3b);
+		fields.isActive.setPreferenceStore(prefStore);
+		fields.isActive.load();
+		
+		switch (this.basicOptions) {
+			case ALL:
+				fields.semanticTypes.setEnabled(true, c2a);
+				fields.allSemanticTypes.setEnabled(true, c2b);
+				fields.isVisible.setEnabled(true, c3a);
+				break;
+			case ALL_BUT_VISIBLE:
+				fields.semanticTypes.setEnabled(true, c2a);
+				fields.allSemanticTypes.setEnabled(true, c2b);
+				fields.isVisible.setEnabled(false, c3a);
+				break;
+			case ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES:
+				fields.semanticTypes.setEnabled(false, c2a);
+				fields.allSemanticTypes.setEnabled(false, c2b);
+				fields.isVisible.setEnabled(false, c3a);
+				break;
+			case ALL_BUT_SEMANTIC_TYPES:
+				fields.semanticTypes.setEnabled(false, c2a);
+				fields.allSemanticTypes.setEnabled(false, c2b);
+				fields.isVisible.setEnabled(true, c3a);
+				break;
+		}
+		
+		return composite;
 		
 	}
 	
@@ -143,31 +284,58 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		return button;
 	}
 	
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
 	 */
 	public abstract ConfigClass getFormValues();
 	
+	protected void fillInFormValues(final ConfigClass config) {
+		
+		config.setActive(this.prefStore.getBoolean(PREF_STORE_ACTIVE));
+		config.setName(this.prefStore.getString(PREF_STORE_NAME));
+		// config.setSemanticTypes(semanticTypes) TODO
+		config.setVisible(this.prefStore.getBoolean(PREF_STORE_VISIBLE));
+		if (this.prefStore.getBoolean(PREF_STORE_ALL_SEMANTIC_TYPES)) {
+			config.setSemanticTypes(PluginXMLConfig.ALL_SEMANTIC_TYPES); // TODO
+		}
+	}
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
 	 */
-	public abstract boolean hasUnsavedChanges();
+	public final boolean hasUnsavedChanges() {
+		return unsavedChanges;
+	}
+	
+	protected boolean unsavedChanges = false;
+	
+	protected boolean listenForPropertyChanges = true;
+	
+	final IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
+		@Override
+		public void propertyChange(final PropertyChangeEvent event) {
+			if (listenForPropertyChanges && !unsavedChanges) {
+				log.debug("Property change received.");
+				unsavedChanges = !getXMLConfig().equals(getFormValues());
+			}
+		}
+	};
 	
 	@Override
-	public abstract void performApply();
+	public final void performApply() {
+		final ConfigClass formValues = getFormValues();
+		this.plugin.setXMLConfig(formValues);
+		this.config = formValues;
+		this.unsavedChanges = false;
+	}
 	
-	private void performCreateInstance() {
+	private final void performCreateInstance() {
 		spyglass.getPluginManager().createNewPlugin(getPluginClass(), getFormValues());
 	}
 	
-	private void performDelete() {
+	private final void performDelete() {
 		final boolean ok = MessageDialog.openQuestion(getShell(), "Remove plugin instance", "Are you sure you want to remove the plugin instance?");
 		if (ok) {
 			spyglass.getPluginManager().removePlugin(this.plugin);
@@ -179,7 +347,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	protected void performRestore() {
+	protected final void performRestore() {
 		setFormValues((ConfigClass) cs.readPluginInstanceConfig(plugin.getInstanceName()));
 	}
 	
@@ -188,7 +356,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	protected void performRestoreDefaults() {
+	protected final void performRestoreDefaults() {
 		try {
 			
 			final Class<? extends Plugin> pluginClass = (Class<? extends Plugin>) this.getClass().getMethod("getPluginClass").invoke(this);
@@ -200,11 +368,15 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		
 	}
 	
+	protected final ConfigClass getXMLConfig() {
+		return config;
+	}
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
 	 */
-	protected void performSaveAsDefault() {
+	protected final void performSaveAsDefault() {
 		cs.storePluginTypeDefaults(getFormValues());
 	}
 	
@@ -215,7 +387,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @return <code>true</code> if this is a preference page for a plugin instance,
 	 *         <code>false</code> if this is a preference page for an instantiable plugin type.
 	 */
-	public boolean isInstancePage() {
+	public final boolean isInstancePage() {
 		return type == PrefType.INSTANCE;
 	}
 	
@@ -227,7 +399,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 *         page (i.e. not an instance page, also see
 	 *         {@link PluginPreferencePage#isInstancePage()})
 	 */
-	public Plugin getPlugin() {
+	public final Plugin getPlugin() {
 		return plugin;
 	}
 	
@@ -238,7 +410,9 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * 
 	 * @return the class-Object of the plugin this preference page is associated with
 	 */
-	public abstract Class<? extends Plugin> getPluginClass();
+	public final Class<? extends Plugin> getPluginClass() {
+		return this.plugin.getClass();
+	}
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -248,16 +422,40 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @return the class-Object of the plugins' PluginXMLConfig this preference page is associated
 	 *         with
 	 */
-	public abstract Class<? extends PluginXMLConfig> getConfigClass();
+	public final Class<? extends PluginXMLConfig> getConfigClass() {
+		return this.config.getClass();
+	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 */
-	public abstract void setFormValues(ConfigClass config);
+	public void setFormValues(final ConfigClass config) {
+		listenForPropertyChanges = false;
+		
+		this.prefStore.setValue(PREF_STORE_ACTIVE, config.isActive());
+		this.prefStore.setValue(PREF_STORE_VISIBLE, config.isVisible());
+		this.prefStore.setValue(PREF_STORE_NAME, config.getName());
+		// this.prefStore.setValue("semanticTypes", config.getSemanticTypes()); // TODO
+		
+		if (config.isAllSemanticTypes()) {
+			this.prefStore.setValue(PREF_STORE_ALL_SEMANTIC_TYPES, true);
+			this.fields.semanticTypes.setEnabled(false, null);
+		}
+		
+		this.fields.allSemanticTypes.load();
+		this.fields.instanceName.load();
+		this.fields.isActive.load();
+		this.fields.isVisible.load();
+		this.fields.semanticTypes.load();
+		
+		this.config = config;
+		
+		listenForPropertyChanges = true;
+	}
 	
 	protected Composite createComposite(final Composite parent) {
 		final Composite c = new Composite(parent, SWT.NONE);
-		c.setLayout(new GridLayout());
+		c.setLayout(new GridLayout(1, false));
 		final GridData gridData = new GridData(SWT.LEFT, SWT.TOP, true, true);
 		gridData.horizontalSpan = 50;
 		gridData.verticalSpan = 50;
@@ -265,10 +463,10 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		return c;
 	}
 	
-	protected Group createGroup(final Composite parent, final String groupText) {
+	protected final Group createGroup(final Composite parent, final String groupText) {
 		final Group g = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		g.setText(groupText);
-		g.setLayout(new GridLayout());
+		g.setLayout(new GridLayout(1, false));
 		g.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
 		return g;
 	}
