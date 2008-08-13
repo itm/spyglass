@@ -108,10 +108,18 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	private final String PREF_STORE_ACTIVE = "isActive";
 	
 	/**
-	 * 
+	 * The class of the plugin handled by this preference page. guarantied to be set correctly.
+	 */
+	protected Class<? extends Plugin> pluginClass;
+	
+	/**
+	 * Reference to the plugin instance. may be null if PrefType==TYPE.
 	 */
 	protected PluginClass plugin;
 	
+	/**
+	 * The config object used by this preference page. guarantied to be defined.
+	 */
 	protected ConfigClass config;
 	
 	/**
@@ -150,7 +158,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * @param cs
 	 */
-	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final BasicOptions basicOptions) {
+	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final Class<? extends Plugin> clazz,
+			final BasicOptions basicOptions) {
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.TYPE;
@@ -158,6 +167,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.cs = spyglass.getConfigStore();
 		this.spyglass = spyglass;
 		this.basicOptions = basicOptions;
+		this.pluginClass = clazz;
+		
+		// This is fine
+		this.config = (ConfigClass) cs.readPluginTypeDefaults(this.getPluginClass());
+		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -175,6 +189,10 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.spyglass = spyglass;
 		this.plugin = plugin;
 		this.basicOptions = basicOptions;
+		this.pluginClass = plugin.getClass();
+		
+		// This is fine
+		this.config = (ConfigClass) plugin.getXMLConfig();
 		
 	}
 	
@@ -411,7 +429,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @return the class-Object of the plugin this preference page is associated with
 	 */
 	public final Class<? extends Plugin> getPluginClass() {
-		return this.plugin.getClass();
+		return this.pluginClass;
 	}
 	
 	// --------------------------------------------------------------------------------

@@ -12,7 +12,7 @@ public class AbstractPluginTypePreferencePage extends PluginPreferencePage<Plugi
 	private final String pluginName;
 	
 	public AbstractPluginTypePreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final String pluginName) {
-		super(dialog, spyglass, BasicOptions.ALL);
+		super(dialog, spyglass, Plugin.class, BasicOptions.ALL);
 		this.pluginName = pluginName;
 	}
 	

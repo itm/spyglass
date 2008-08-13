@@ -9,7 +9,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> {
 	
 	public LinePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, BasicOptions.ALL);
+		super(dialog, spyglass, LinePainterPlugin.class, BasicOptions.ALL);
 	}
 	
 	public LinePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final LinePainterPlugin plugin) {

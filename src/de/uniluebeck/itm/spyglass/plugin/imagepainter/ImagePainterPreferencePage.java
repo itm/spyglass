@@ -9,7 +9,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 public class ImagePainterPreferencePage extends PluginPreferencePage<ImagePainterPlugin, ImagePainterXMLConfig> {
 	
 	public ImagePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
+		super(dialog, spyglass, ImagePainterPlugin.class, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
 	}
 	
 	public ImagePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final ImagePainterPlugin plugin) {

@@ -18,7 +18,7 @@ public class PositionPacketNodePositionerPreferencePage extends
 	private static Category log = SpyglassLogger.get(PositionPacketNodePositionerPlugin.class);
 	
 	public PositionPacketNodePositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
+		super(dialog, spyglass, PositionPacketNodePositionerPlugin.class, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
 	}
 	
 	public PositionPacketNodePositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,

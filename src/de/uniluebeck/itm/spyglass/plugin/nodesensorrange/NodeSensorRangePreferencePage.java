@@ -9,7 +9,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> {
 	
 	public NodeSensorRangePreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
+		super(dialog, spyglass, NodeSensorRangePlugin.class, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
 	}
 	
 	public NodeSensorRangePreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final NodeSensorRangePlugin plugin) {

@@ -9,7 +9,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> {
 	
 	public SimpleGlobalInformationPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, BasicOptions.ALL);
+		super(dialog, spyglass, SimpleGlobalInformationPlugin.class, BasicOptions.ALL);
 	}
 	
 	public SimpleGlobalInformationPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,

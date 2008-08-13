@@ -9,7 +9,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 public class SpringEmbedderPositionerPreferencePage extends PluginPreferencePage<SpringEmbedderPositionerPlugin, SpringEmbedderPositionerXMLConfig> {
 	
 	public SpringEmbedderPositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
+		super(dialog, spyglass, SpringEmbedderPositionerPlugin.class, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
 	}
 	
 	public SpringEmbedderPositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,

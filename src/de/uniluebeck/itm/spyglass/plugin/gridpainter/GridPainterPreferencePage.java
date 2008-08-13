@@ -9,7 +9,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 public class GridPainterPreferencePage extends PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> {
 	
 	public GridPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
+		super(dialog, spyglass, GridPainterPlugin.class, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
 	}
 	
 	public GridPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final GridPainterPlugin plugin) {

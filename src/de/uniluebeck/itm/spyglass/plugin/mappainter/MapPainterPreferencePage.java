@@ -9,7 +9,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 public class MapPainterPreferencePage extends PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> {
 	
 	public MapPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, BasicOptions.ALL);
+		super(dialog, spyglass, MapPainterPlugin.class, BasicOptions.ALL);
 	}
 	
 	public MapPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final MapPainterPlugin plugin) {

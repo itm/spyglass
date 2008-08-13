@@ -9,7 +9,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 public class ObjectPainterPreferencePage extends PluginPreferencePage<ObjectPainterPlugin, ObjectPainterXMLConfig> {
 	
 	public ObjectPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, BasicOptions.ALL);
+		super(dialog, spyglass, ObjectPainterPlugin.class, BasicOptions.ALL);
 	}
 	
 	public ObjectPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final ObjectPainterPlugin plugin) {

@@ -9,7 +9,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 public class VectorSequencePainterPreferencePage extends PluginPreferencePage<VectorSequencePainterPlugin, VectorSequencePainterXMLConfig> {
 	
 	public VectorSequencePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
-		super(dialog, spyglass, BasicOptions.ALL);
+		super(dialog, spyglass, VectorSequencePainterPlugin.class, BasicOptions.ALL);
 	}
 	
 	public VectorSequencePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final VectorSequencePainterPlugin plugin) {
