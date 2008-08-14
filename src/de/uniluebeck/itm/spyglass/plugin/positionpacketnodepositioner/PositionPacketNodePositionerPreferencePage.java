@@ -16,7 +16,7 @@ public class PositionPacketNodePositionerPreferencePage extends
 	
 	private final String PREF_STORE_TTL = "ttl";
 	
-	private static Category log = SpyglassLogger.get(PositionPacketNodePositionerPlugin.class);
+	private static Category log = SpyglassLogger.get(PositionPacketNodePositionerPreferencePage.class);
 	
 	public PositionPacketNodePositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);

@@ -1,5 +1,7 @@
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
+import java.util.TreeSet;
+
 import org.apache.log4j.Category;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -135,6 +137,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	
 	private class Fields {
 		private StringFieldEditor instanceName;
+		
+		private Composite semanticTypesContainer;
 		private StringFieldEditor semanticTypes;
 		private BooleanFieldEditor isActive;
 		private BooleanFieldEditor isVisible;
@@ -224,7 +228,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		final Composite c2 = new Composite(basicGroup, SWT.NONE);
 		c2.setLayout(new GridLayout(2, false));
 		
-		final Composite c2a = new Composite(c2, SWT.NONE);
+		fields.semanticTypesContainer = new Composite(c2, SWT.NONE);
+		final Composite c2a = fields.semanticTypesContainer;
 		fields.semanticTypes = new StringFieldEditor(PREF_STORE_SEMANTIC_TYPES, "Semantic types", c2a);
 		fields.semanticTypes.setEmptyStringAllowed(false);
 		fields.semanticTypes.setErrorMessage("You must provide a list of semantic types (integers)");
@@ -237,6 +242,19 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		fields.allSemanticTypes = new BooleanFieldEditor(PREF_STORE_ALL_SEMANTIC_TYPES, "All types", c2b);
 		fields.allSemanticTypes.setPreferenceStore(getPreferenceStore());
 		fields.allSemanticTypes.load();
+		fields.allSemanticTypes.setPropertyChangeListener(new IPropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
+				if (fields.allSemanticTypes.getBooleanValue() == true) {
+					fields.semanticTypes.setStringValue("0-255");
+					fields.semanticTypes.setEnabled(false, c2a);
+				} else {
+					fields.semanticTypes.setEnabled(true, c2a);
+				}
+				
+			}
+		});
 		
 		final Composite c3 = new Composite(basicGroup, SWT.NONE);
 		c3.setLayout(new GridLayout(2, false));
@@ -304,11 +322,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		// Now read them out from the preference store
 		config.setActive(getPreferenceStore().getBoolean(PREF_STORE_ACTIVE));
 		config.setName(this.fields.instanceName.getStringValue());
-		// config.setSemanticTypes(semanticTypes) TODO
+		config.setSemanticTypes(PluginPreferencePage.intString2Array(this.fields.semanticTypes.getStringValue()));
 		config.setVisible(getPreferenceStore().getBoolean(PREF_STORE_VISIBLE));
-		if (getPreferenceStore().getBoolean(PREF_STORE_ALL_SEMANTIC_TYPES)) {
-			config.setSemanticTypes(PluginXMLConfig.ALL_SEMANTIC_TYPES); // TODO
-		}
+		// if (getPreferenceStore().getBoolean(PREF_STORE_ALL_SEMANTIC_TYPES)) {
+		// config.setSemanticTypes(PluginXMLConfig.ALL_SEMANTIC_TYPES); // TODO
+		// }
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -326,6 +344,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	final IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
 		@Override
 		public void propertyChange(final PropertyChangeEvent event) {
+			
 			if (listenForPropertyChanges && !unsavedChanges) {
 				log.debug("Property change received.");
 				unsavedChanges = !getXMLConfig().equals(getFormValues());
@@ -446,11 +465,15 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		
 		if (config.isAllSemanticTypes()) {
 			getPreferenceStore().setValue(PREF_STORE_ALL_SEMANTIC_TYPES, true);
-			this.fields.semanticTypes.setEnabled(false, null);
+			this.fields.semanticTypes.setStringValue("0-255");
+			this.fields.semanticTypes.setEnabled(false, fields.semanticTypesContainer);
+		} else {
+			final String semTypes = intArray2String(config.getSemanticTypes());
+			this.fields.semanticTypes.setStringValue(semTypes);
+			
 		}
 		
 		this.fields.instanceName.setStringValue(config.getName());
-		this.fields.semanticTypes.setStringValue("fff"); // TODO
 		this.fields.allSemanticTypes.load();
 		this.fields.isActive.load();
 		this.fields.isVisible.load();
@@ -458,6 +481,85 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.config = config;
 		
 		listenForPropertyChanges = true;
+	}
+	
+	/**
+	 * Converts an array to String representing the array.
+	 * 
+	 * Note, that this method expects the array to be sorted!
+	 */
+	public static String intArray2String(final int[] a) {
+		
+		if (a.length == 0) {
+			return "";
+		} else if (a.length == 1) {
+			return "" + a[0];
+		}
+		
+		String s = "" + a[0];
+		
+		int iMinus = a[0];
+		
+		boolean list = false;
+		// start at 2nd entry
+		for (int i = 1; i < a.length; i++) {
+			
+			final int next = a[i];
+			
+			final boolean last = a.length == i + 1;
+			
+			if (iMinus == next - 1) {
+				list = true;
+			} else if (list) {
+				s += "-" + iMinus + "," + next;
+				list = false;
+			} else {
+				s += "," + next;
+				list = false;
+			}
+			
+			if (list && last) {
+				s += "-" + next;
+			}
+			
+			iMinus = next;
+		}
+		
+		return s;
+	}
+	
+	final static int MAXIMUM_SEMTYPE = 255;
+	
+	public static int[] intString2Array(final String s) {
+		
+		final String[] parts = s.split(",");
+		final TreeSet<Integer> set = new TreeSet<Integer>();
+		
+		for (final String p : parts) {
+			if (p.matches("\\d+")) {
+				final int i = Integer.parseInt(p);
+				if (i <= MAXIMUM_SEMTYPE) {
+					set.add(i);
+				}
+			} else if (p.matches("\\d+-\\d+")) {
+				final String[] q = p.split("-");
+				final int start = Integer.parseInt(q[0]);
+				final int stop = Integer.parseInt(q[1]);
+				for (int j = start; j <= stop; j++) {
+					if (j <= MAXIMUM_SEMTYPE) {
+						set.add(j);
+					}
+				}
+			}
+		}
+		
+		final int[] list = new int[set.size()];
+		int c = 0;
+		for (final Integer integer : set) {
+			list[c++] = integer;
+		}
+		return list;
+		
 	}
 	
 	protected Composite createComposite(final Composite parent) {

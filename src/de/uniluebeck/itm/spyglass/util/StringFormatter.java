@@ -11,9 +11,13 @@ public class StringFormatter {
 	private final String formatExpression;
 	private static final Pattern notNumeric = Pattern.compile("[^0-9]");
 	
+	private final String origFormatExpression;
+	
 	private String resultString = "";
 	
 	public StringFormatter(String pFormatExpression) throws IllegalArgumentException {
+		
+		origFormatExpression = pFormatExpression + "";
 		
 		// temporarily replace "%%" with "percent_twice" to avoid trouble
 		final String tmp = "percent_twice";
@@ -132,6 +136,13 @@ public class StringFormatter {
 		} else {
 			return -1;
 		}
+	}
+	
+	/**
+	 * return the original expression, from which this formatter was build from.
+	 */
+	public String getOrigExpression() {
+		return origFormatExpression;
 	}
 	
 	@Override

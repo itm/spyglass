@@ -172,9 +172,10 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 			return false;
 		}
 		final SimpleNodePainterXMLConfig o = (SimpleNodePainterXMLConfig) other;
-		return defaultStringFormatter.equals(o.defaultStringFormatter) && (isExtendedDefaultValue == o.isExtendedDefaultValue)
-				&& (isExtendenInformationActive == o.isExtendenInformationActive) && equalsRGB(lineColorRGB, o.lineColorRGB)
-				&& (lineWidth == o.lineWidth) && stringFormatters.equals(o.stringFormatters);
+		
+		return (defaultStringFormatter != null) && defaultStringFormatter.equals(o.defaultStringFormatter)
+				&& (isExtendedDefaultValue == o.isExtendedDefaultValue) && (isExtendenInformationActive == o.isExtendenInformationActive)
+				&& equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth) && stringFormatters.equals(o.stringFormatters);
 	}
 	
 }

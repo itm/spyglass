@@ -179,7 +179,9 @@ public class ConfigStore {
 				return plugin.getXMLConfig();
 			}
 		}
+		
 		return null;
+		
 	}
 	
 	// --------------------------------------------------------------------------

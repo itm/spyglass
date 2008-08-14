@@ -160,7 +160,17 @@ public abstract class PluginXMLConfig {
 	}
 	
 	public boolean isAllSemanticTypes() {
-		return false; // TODO
+		
+		// look for every possible semanticType 0..255 in semanticTypes
+		A: for (int i = 0; i < 256; i++) {
+			for (int j = 0; j < semanticTypes.length; j++) {
+				if (semanticTypes[j] == i) {
+					continue A;
+				}
+			}
+			return false;
+		}
+		return true;
 	}
 	
 	// --------------------------------------------------------------------------------
