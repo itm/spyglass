@@ -10,16 +10,33 @@
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/ishell-dev-win32.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/jcommon-1.0.5.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/jfreechart-1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.core.runtime_3.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.jface_3.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.osgi_3.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.ui.forms_3.1.0.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.ui.workbench_3.1.2.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/ostermillerutils_1_05_00_for_java_1_4.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/poi-2.5.1-final-20040804.jar"/>
 	<classpathentry kind="lib" path="lib/ishell-contained-libs/RXTXcomm.jar"/>
-	<classpathentry kind="lib" path="lib/win32/org.eclipse.cdt.core.win32_4.0.0.200709241202.jar"/>
-	<classpathentry kind="lib" path="lib/win32/ishell-win32.jar"/>
-	<classpathentry kind="lib" path="lib/swt_win32.jar"/>
+	<classpathentry kind="lib" path="lib/linux/org.eclipse.cdt.core.linux.x86_4.0.0.200709241202.jar"/>
+	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.cdt.core_4.0.1.200709241202.jar"/>
+	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.core.runtime_3.3.100.v20070530.jar"/>
+	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.equinox.common_3.3.0.v20070426.jar"/>
+	<classpathentry kind="lib" path="lib/linux/swt-3.3.2-gtk-linux-x86.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://help.eclipse.org/stable/nftopic/org.eclipse.platform.doc.isv/reference/api"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.commands_3.4.0.I20080509-2000.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.runtime_3.4.0.v20080512.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jface_3.4.0.I20080606-1300.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://help.eclipse.org/stable/nftopic/org.eclipse.platform.doc.isv/reference/api"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/org.eclipse.osgi_3.4.0.v20080605-1900.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ui.forms_3.3.100.v20080611.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.ui.workbench_3.4.0.I20080606-1300.jar"/>
+	<classpathentry kind="lib" path="lib/com.ibm.icu_3.8.1.v20080530.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/opt/eclipse-3.4/plugins/org.eclipse.swt.gtk.linux.x86_3.4.0.v3448f.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.databinding_1.1.0.I20080527-2000.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.databinding.beans_1.1.0.I20080508-2000a.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jface.databinding_1.2.0.I20080515-2000a.jar"/>
 	<classpathentry kind="output" path="bin/eclipse"/>
 </classpath>
