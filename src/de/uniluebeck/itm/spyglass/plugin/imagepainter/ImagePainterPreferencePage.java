@@ -29,18 +29,6 @@ public class ImagePainterPreferencePage extends PluginPreferencePage<ImagePainte
 	}
 	
 	@Override
-	public ImagePainterXMLConfig getFormValues() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public void setFormValues(final ImagePainterXMLConfig config) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return ImagePainterPlugin.class;
 	}

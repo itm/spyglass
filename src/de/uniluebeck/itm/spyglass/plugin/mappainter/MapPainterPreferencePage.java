@@ -23,18 +23,6 @@ public class MapPainterPreferencePage extends PluginPreferencePage<MapPainterPlu
 	}
 	
 	@Override
-	public MapPainterXMLConfig getFormValues() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public void setFormValues(final MapPainterXMLConfig config) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return MapPainterPlugin.class;
 	}

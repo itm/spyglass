@@ -1,70 +1,100 @@
 package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
 
-import org.apache.log4j.Category;
-import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.core.databinding.UpdateValueStrategy;
+import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.gui.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
-public class PositionPacketNodePositionerPreferencePage extends
+public class PositionPacketNodePositionerPreferencePage
+		extends
 		PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> {
 	
-	private final String PREF_STORE_TTL = "ttl";
+	private boolean somethingChanged = false;
+	private Text fieldName;
 	
-	private static Category log = SpyglassLogger.get(PositionPacketNodePositionerPreferencePage.class);
-	
-	public PositionPacketNodePositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+	public PositionPacketNodePositionerPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
 	}
 	
-	public PositionPacketNodePositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,
-			final PositionPacketNodePositionerPlugin plugin) {
+	public PositionPacketNodePositionerPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass, final PositionPacketNodePositionerPlugin plugin) {
 		super(dialog, spyglass, plugin, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
-		// this.config = (PositionPacketNodePositionerXMLConfig) plugin.getXMLConfig();
 	}
 	
-	private IntegerFieldEditor ttlFieldEditor;
+	// --------------------------------------------------------------------------------
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#hasUnsavedChanges()
+	 */
+	@Override
+	public boolean hasUnsavedChanges() {
+		return super.hasUnsavedChanges() || somethingChanged;
+	}
 	
 	@Override
 	protected Composite createContents(final Composite parent) {
 		
 		final Composite composite = super.createContents(parent);
 		
-		final Group optionsGroup = createGroup(composite, "Options");
+		createOptionsGroup(composite);
 		
-		ttlFieldEditor = new IntegerFieldEditor(PREF_STORE_TTL, "Time to Live (sec)", optionsGroup);
-		ttlFieldEditor.setEmptyStringAllowed(false);
-		ttlFieldEditor.setEnabled(true, optionsGroup);
-		ttlFieldEditor.setErrorMessage("You must provide a TTL parameter.");
-		ttlFieldEditor.setPage(this);
-		ttlFieldEditor.setValidRange(0, Integer.MAX_VALUE);
+		addDatabinding();
 		
 		return composite;
 		
 	}
 	
-	@Override
-	public PositionPacketNodePositionerXMLConfig getFormValues() {
-		final PositionPacketNodePositionerXMLConfig config = new PositionPacketNodePositionerXMLConfig();
-		super.fillInFormValues(config);
+	private void createOptionsGroup(final Composite composite) {
+		final Group optionsGroup = new Group(composite, SWT.SHADOW_ETCHED_IN);
+		optionsGroup.setText("Options");
+		optionsGroup.setLayout(new GridLayout(2, false));
+		optionsGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		
-		this.ttlFieldEditor.store();
-		config.setTimeToLive(ttlFieldEditor.getIntValue());
-		return config;
+		final Label label2 = new Label(optionsGroup, SWT.NONE);
+		label2.setText("Timeout: ");
+		
+		final GridData textData = new GridData();
+		textData.grabExcessHorizontalSpace = true;
+		textData.horizontalAlignment = GridData.FILL;
+		textData.heightHint = 17;
+		fieldName = new Text(optionsGroup, SWT.BORDER);
+		fieldName.setLayoutData(textData);
+		fieldName.addModifyListener(new ModifyListener() {
+			public void modifyText(final ModifyEvent evt) {
+				somethingChanged = true;
+			}
+		});
+		
+		final Label label3 = new Label(optionsGroup, SWT.NONE);
+		label3.setText("(0 means no timeout.)");
+		
 	}
 	
-	@Override
-	public void setFormValues(final PositionPacketNodePositionerXMLConfig config) {
-		super.setFormValues(config);
+	private void addDatabinding() {
+		final IObservableValue modelObservable = BeansObservables.observeValue(getRealm(),
+				this.config, "timeout");
 		
-		listenForPropertyChanges = false;
-		ttlFieldEditor.setStringValue(Integer.toString(config.getTimeToLive()));
-		listenForPropertyChanges = true;
+		dbc.bindValue(SWTObservables.observeText(fieldName, SWT.Modify), modelObservable,
+				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+						.setAfterConvertValidator(new IntegerRangeValidator(0, Integer.MAX_VALUE)),
+				null);
 	}
 	
 	@Override

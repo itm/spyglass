@@ -23,18 +23,6 @@ public class GridPainterPreferencePage extends PluginPreferencePage<GridPainterP
 	}
 	
 	@Override
-	public GridPainterXMLConfig getFormValues() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public void setFormValues(final GridPainterXMLConfig config) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return GridPainterPlugin.class;
 	}

@@ -11,6 +11,7 @@ package de.uniluebeck.itm.spyglass.xmlconfig;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 
+import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 // --------------------------------------------------------------------------------
@@ -20,15 +21,20 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
  * @author Sebastian Ebers
  * 
  */
-public abstract class PluginXMLConfig {
+public abstract class PluginXMLConfig extends PropertyBean {
 	
 	public static final int[] ALL_SEMANTIC_TYPES = new int[256];
+	{
+		for (int i = 0; i < 256; i++) {
+			ALL_SEMANTIC_TYPES[i] = i;
+		}
+	}
 	
 	@Element(name = "isActive")
-	private boolean isActive = true;
+	private boolean active = true;
 	
 	@Element(name = "isVisible", required = false)
-	private boolean isVisible = true;
+	private boolean visible = true;
 	
 	@Element(name = "name")
 	private String name = "default";
@@ -37,61 +43,44 @@ public abstract class PluginXMLConfig {
 	private int timeout = -1;
 	
 	@ElementArray(name = "semanticTypes", required = false)
-	private int[] semanticTypes;
-	
-	static {
-		// Fill static final field
-		for (int i = 0; i < 256; i++) {
-			ALL_SEMANTIC_TYPES[i] = i;
-		}
-	}
+	private int[] semanticTypes = ALL_SEMANTIC_TYPES.clone();
 	
 	// --------------------------------------------------------------------------------
-	/**
-	 * Constructor
-	 */
-	public PluginXMLConfig() {
-		
-	}
-	
-	// --------------------------------------------------------------------------------
-	@Override
-	public void finalize() throws Throwable {
-		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
+	/*
 	 * @return the isActive
 	 */
-	public boolean isActive() {
-		return isActive;
+	public boolean getActive() {
+		return active;
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @param isActive
+	 * @param active
 	 *            the isActive to set
 	 */
-	public void setActive(final boolean isActive) {
-		this.isActive = isActive;
+	public void setActive(final boolean active) {
+		final boolean oldvalue = this.active;
+		this.active = active;
+		firePropertyChange("active", oldvalue, active);
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the isVisible
 	 */
-	public boolean isVisible() {
-		return isVisible;
+	public boolean getVisible() {
+		return visible;
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @param isVisible
+	 * @param visible
 	 *            the isVisible to set
 	 */
-	public void setVisible(final boolean isVisible) {
-		this.isVisible = isVisible;
+	public void setVisible(final boolean visible) {
+		final boolean oldvalue = this.visible;
+		this.visible = visible;
+		firePropertyChange("visible", oldvalue, visible);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -108,27 +97,10 @@ public abstract class PluginXMLConfig {
 	 *            the name to set
 	 */
 	public void setName(final String name) {
+		final String oldValue = this.name;
 		this.name = name;
+		firePropertyChange("name", oldValue, name);
 	}
-	
-	// //
-	// --------------------------------------------------------------------------------
-	// /**
-	// * @return the priority
-	// */
-	// public int getPriority() {
-	// return priority;
-	// }
-	//	
-	// //
-	// --------------------------------------------------------------------------------
-	// /**
-	// * @param priority
-	// * the priority to set
-	// */
-	// public void setPriority(final int priority) {
-	// this.priority = priority;
-	// }
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -148,7 +120,9 @@ public abstract class PluginXMLConfig {
 	 *            the timeout value to set
 	 */
 	public void setTimeout(final int timeout) {
+		final int oldvalue = this.timeout;
 		this.timeout = timeout;
+		firePropertyChange("timeout", oldvalue, timeout);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -156,10 +130,10 @@ public abstract class PluginXMLConfig {
 	 * @return the semanticTypes
 	 */
 	public int[] getSemanticTypes() {
-		return semanticTypes;
+		return semanticTypes.clone();
 	}
 	
-	public boolean isAllSemanticTypes() {
+	public boolean getAllSemanticTypes() {
 		
 		// look for every possible semanticType 0..255 in semanticTypes
 		A: for (int i = 0; i < 256; i++) {
@@ -173,13 +147,28 @@ public abstract class PluginXMLConfig {
 		return true;
 	}
 	
+	public void setAllSemanticTypes(final boolean value) {
+		final boolean oldValueAllSemTypes = this.getAllSemanticTypes();
+		if (value) {
+			this.setSemanticTypes(PluginXMLConfig.ALL_SEMANTIC_TYPES);
+		} else {
+			this.setSemanticTypes(new int[0]);
+		}
+		firePropertyChange("allSemanticTypes", oldValueAllSemTypes, this.getAllSemanticTypes());
+		
+	}
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param semanticTypes
 	 *            the semanticTypes to set
 	 */
 	public void setSemanticTypes(final int[] semanticTypes) {
-		this.semanticTypes = semanticTypes;
+		final int[] oldvalue = this.semanticTypes;
+		final boolean oldValueAllSemTypes = this.getAllSemanticTypes();
+		this.semanticTypes = semanticTypes.clone();
+		firePropertyChange("semanticTypes", oldvalue, semanticTypes);
+		firePropertyChange("allSemanticTypes", oldValueAllSemTypes, this.getAllSemanticTypes());
 	}
 	
 	public abstract boolean equals(final PluginXMLConfig other);
@@ -188,4 +177,28 @@ public abstract class PluginXMLConfig {
 		return (lineColorRGB[0] == otherLineColorRGB[0]) && (lineColorRGB[1] == otherLineColorRGB[1]) && (lineColorRGB[2] == otherLineColorRGB[2]);
 	}
 	
+	/**
+	 * Copy the data from newConfig into this object.
+	 */
+	public void overwriteWith(final PluginXMLConfig newConfig) {
+		this.setName(newConfig.getName());
+		this.setActive(newConfig.getActive());
+		this.setVisible(newConfig.getVisible());
+		this.setSemanticTypes(newConfig.getSemanticTypes());
+		this.setTimeout(newConfig.getTimeout());
+	}
+	
+	@Override
+	public PluginXMLConfig clone() {
+		
+		try {
+			final PluginXMLConfig clone = this.getClass().newInstance();
+			clone.overwriteWith(this);
+			return clone;
+		} catch (final InstantiationException e) {
+			throw new RuntimeException("Error during cloning", e);
+		} catch (final IllegalAccessException e) {
+			throw new RuntimeException("Error during cloning", e);
+		}
+	}
 }

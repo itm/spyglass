@@ -1,16 +1,16 @@
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
-import java.util.TreeSet;
-
 import org.apache.log4j.Category;
+import org.eclipse.core.databinding.AggregateValidationStatus;
+import org.eclipse.core.databinding.DataBindingContext;
+import org.eclipse.core.databinding.observable.Realm;
+import org.eclipse.core.databinding.observable.value.IValueChangeListener;
+import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.preference.PreferenceStore;
-import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -19,22 +19,29 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
-import org.jfree.util.Log;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
+
 /**
- * @author Daniel Bimschas
+ * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free
+ * for non-commercial use. If Jigloo is being used commercially (ie, by a corporation, company or
+ * business for any purpose whatever) then you should purchase a license for each developer using
+ * Jigloo. Please visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these
+ * licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS MACHINE, SO JIGLOO OR THIS
+ * CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
+/**
+ * @author Daniel Bimschas, Dariush Forouher
  * 
  * @param <T>
  */
-public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig> extends PreferencePage {
+public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig>
+		extends PreferencePage {
 	
 	private static Category log = SpyglassLogger.get(PluginPreferencePage.class);
 	
@@ -93,33 +100,41 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	};
 	
 	/**
-	 * 
-	 */
-	protected ConfigStore cs;
-	
-	private final String PREF_STORE_NAME = "instanceName";
-	private final String PREF_STORE_SEMANTIC_TYPES = "semanticTypes";
-	private final String PREF_STORE_ALL_SEMANTIC_TYPES = "allSemanticTypes";
-	private final String PREF_STORE_VISIBLE = "isVisible";
-	private final String PREF_STORE_ACTIVE = "isActive";
-	
-	/**
 	 * Reference to the plugin instance. may be null if PrefType==TYPE.
 	 */
-	protected PluginClass plugin;
+	protected final PluginClass plugin;
 	
 	/**
-	 * The config object used by this preference page. guarantied to be defined.
-	 */
-	protected ConfigClass config;
-	
-	/**
+	 * Temporal config. it contains the current settings on the preference page, before the the user
+	 * pressed "Apply".
 	 * 
+	 * This field is final, since databinding listens to events from this object specifically.
+	 */
+	protected final ConfigClass config;
+	
+	/**
+	 * is this page representing an plugin type or instance?
 	 */
 	protected PrefType type;
 	
-	private final Spyglass spyglass;
+	/**
+	 * reference to spyglass
+	 */
+	protected final Spyglass spyglass;
 	
+	/**
+	 * databindingcontext. may be null before createContents() is called.
+	 */
+	protected DataBindingContext dbc = null;
+	
+	/**
+	 * are there errors present in the form?
+	 */
+	private boolean databindingValidationIsOK;
+	
+	/**
+	 * reference to the dialog
+	 */
 	private final PluginPreferenceDialog dialog;
 	
 	private class Buttons {
@@ -135,63 +150,63 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	
 	private Buttons buttons = new Buttons();
 	
-	private class Fields {
-		private StringFieldEditor instanceName;
-		
-		private Composite semanticTypesContainer;
-		private StringFieldEditor semanticTypes;
-		private BooleanFieldEditor isActive;
-		private BooleanFieldEditor isVisible;
-		private BooleanFieldEditor allSemanticTypes;
-	}
-	
-	private Fields fields = new Fields();
+	private BasicGroupComposite basicGroup;
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Create a preference page for editing the defaultsconfiguration of an plugin type.
+	 * 
 	 * @param cs
 	 */
-	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final BasicOptions basicOptions) {
+	@SuppressWarnings("unchecked")
+	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,
+			final BasicOptions basicOptions) {
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.TYPE;
 		this.dialog = dialog;
-		this.cs = spyglass.getConfigStore();
 		this.spyglass = spyglass;
 		this.basicOptions = basicOptions;
-		
-		this.setPreferenceStore(new PreferenceStore());
+		this.plugin = null;
 		
 		// This is fine
-		this.config = (ConfigClass) cs.readPluginTypeDefaults(this.getPluginClass());
+		config = (ConfigClass) spyglass.getConfigStore().readPluginTypeDefaults(
+				this.getPluginClass());
+		if (config == null) {
+			// this page represents an abstract plugin type. so no config here
+		}
 		
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Create a preference page for editing the configuration of an plugin instance.
+	 * 
 	 * @param cs
 	 * @param plugin
 	 */
-	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final PluginClass plugin,
-			final BasicOptions basicOptions) {
+	@SuppressWarnings("unchecked")
+	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,
+			final PluginClass plugin, final BasicOptions basicOptions) {
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.INSTANCE;
 		this.dialog = dialog;
-		this.cs = spyglass.getConfigStore();
 		this.spyglass = spyglass;
 		this.plugin = plugin;
 		this.basicOptions = basicOptions;
 		
-		this.setPreferenceStore(new PreferenceStore());
-		
-		// This is fine
 		this.config = (ConfigClass) plugin.getXMLConfig();
 		
 	}
 	
 	@Override
 	protected void contributeButtons(final Composite parent) {
+		
+		if (this.config == null) {
+			// this means that the plugin type is abstract
+			return;
+		}
 		
 		if (type == PrefType.INSTANCE) {
 			
@@ -201,102 +216,80 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			
 		} else {
 			
-			buttons.restoreDefaultsButton = createButton(parent, "Restore Defaults", buttonSelectionListener);
-			buttons.saveAsDefaultButton = createButton(parent, "Save as Default", buttonSelectionListener);
-			buttons.createInstanceButton = createButton(parent, "Create Instance", buttonSelectionListener);
+			buttons.restoreDefaultsButton = createButton(parent, "Restore Defaults",
+					buttonSelectionListener);
+			buttons.saveAsDefaultButton = createButton(parent, "Save as Default",
+					buttonSelectionListener);
+			buttons.createInstanceButton = createButton(parent, "Create Instance",
+					buttonSelectionListener);
 			
 		}
 		
 	}
 	
+	protected final Realm getRealm() {
+		return SWTObservables.getRealm(getControl().getDisplay());
+	}
+	
 	@Override
 	protected Composite createContents(final Composite parent) {
-		
 		final Composite composite = createComposite(parent);
 		
-		final Group basicGroup = createGroup(composite, "Basic");
-		
-		final Composite c1 = new Composite(basicGroup, SWT.NONE);
-		fields.instanceName = new StringFieldEditor(PREF_STORE_NAME, "Instance name", c1);
-		fields.instanceName.setEmptyStringAllowed(false);
-		fields.instanceName.setErrorMessage("You must provide a unique instance name.");
-		fields.instanceName.setPage(this);
-		fields.instanceName.setTextLimit(100);
-		fields.instanceName.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
-		fields.instanceName.setPropertyChangeListener(propertyChangeListener);
-		
-		final Composite c2 = new Composite(basicGroup, SWT.NONE);
-		c2.setLayout(new GridLayout(2, false));
-		
-		fields.semanticTypesContainer = new Composite(c2, SWT.NONE);
-		final Composite c2a = fields.semanticTypesContainer;
-		fields.semanticTypes = new StringFieldEditor(PREF_STORE_SEMANTIC_TYPES, "Semantic types", c2a);
-		fields.semanticTypes.setEmptyStringAllowed(false);
-		fields.semanticTypes.setErrorMessage("You must provide a list of semantic types (integers)");
-		fields.semanticTypes.setPage(this);
-		fields.semanticTypes.setTextLimit(100);
-		fields.semanticTypes.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE); // TODO
-		fields.semanticTypes.setPropertyChangeListener(propertyChangeListener);
-		
-		final Composite c2b = new Composite(c2, SWT.NONE);
-		fields.allSemanticTypes = new BooleanFieldEditor(PREF_STORE_ALL_SEMANTIC_TYPES, "All types", c2b);
-		fields.allSemanticTypes.setPreferenceStore(getPreferenceStore());
-		fields.allSemanticTypes.load();
-		fields.allSemanticTypes.setPropertyChangeListener(new IPropertyChangeListener() {
-			
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
-				if (fields.allSemanticTypes.getBooleanValue() == true) {
-					fields.semanticTypes.setStringValue("0-255");
-					fields.semanticTypes.setEnabled(false, c2a);
-				} else {
-					fields.semanticTypes.setEnabled(true, c2a);
-				}
-				
-			}
-		});
-		
-		final Composite c3 = new Composite(basicGroup, SWT.NONE);
-		c3.setLayout(new GridLayout(2, false));
-		
-		final Composite c3a = new Composite(c3, SWT.NONE);
-		fields.isVisible = new BooleanFieldEditor(PREF_STORE_VISIBLE, "Visible", c3a);
-		fields.isVisible.setPreferenceStore(getPreferenceStore());
-		fields.isVisible.load();
-		
-		final Composite c3b = new Composite(c3, SWT.NONE);
-		fields.isActive = new BooleanFieldEditor(PREF_STORE_ACTIVE, "Active", c3b);
-		fields.isActive.setPreferenceStore(getPreferenceStore());
-		fields.isActive.load();
-		
-		switch (this.basicOptions) {
-			case ALL:
-				fields.semanticTypes.setEnabled(true, c2a);
-				fields.allSemanticTypes.setEnabled(true, c2b);
-				fields.isVisible.setEnabled(true, c3a);
-				break;
-			case ALL_BUT_VISIBLE:
-				fields.semanticTypes.setEnabled(true, c2a);
-				fields.allSemanticTypes.setEnabled(true, c2b);
-				fields.isVisible.setEnabled(false, c3a);
-				break;
-			case ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES:
-				fields.semanticTypes.setEnabled(false, c2a);
-				fields.allSemanticTypes.setEnabled(false, c2b);
-				fields.isVisible.setEnabled(false, c3a);
-				break;
-			case ALL_BUT_SEMANTIC_TYPES:
-				fields.semanticTypes.setEnabled(false, c2a);
-				fields.allSemanticTypes.setEnabled(false, c2b);
-				fields.isVisible.setEnabled(true, c3a);
-				break;
+		if (this.config == null) {
+			// this means that the plugin type is abstract
+			return composite;
 		}
+		
+		dbc = new DataBindingContext(getRealm());
+		
+		addErrorBinding();
+		
+		basicGroup = new BasicGroupComposite(composite, SWT.NONE);
+		basicGroup.disableUnwantedElements(basicOptions);
+		basicGroup.setDatabinding(dbc, config);
+		basicGroup.setDatabindingPluginName(dbc, config, this.plugin, this.spyglass
+				.getPluginManager());
 		
 		return composite;
 		
 	}
 	
-	private Button createButton(final Composite parent, final String label, final SelectionListener selectionListener) {
+	/**
+	 * Adds the handler to the ValidationStatus provider of the DataBindingCotext. Whenever the
+	 * validation status changes, the handler will update the errorString displayed to the user and
+	 * set a flag variable.
+	 * 
+	 * the handler will also grey out the apply-Button, if there are errors present.
+	 * 
+	 */
+	private void addErrorBinding() {
+		final AggregateValidationStatus aggregateStatus = new AggregateValidationStatus(getRealm(),
+				dbc.getValidationStatusProviders(), AggregateValidationStatus.MAX_SEVERITY);
+		
+		aggregateStatus.addValueChangeListener(new IValueChangeListener() {
+			public void handleValueChange(final ValueChangeEvent event) {
+				final Status valStatus = (Status) aggregateStatus.getValue();
+				
+				databindingValidationIsOK = valStatus.isOK();
+				
+				if (valStatus.isOK()) {
+					setErrorMessage(null);
+					
+					if (buttons.applyButton != null) {
+						buttons.applyButton.setEnabled(true);
+					}
+				} else {
+					setErrorMessage(valStatus.getMessage());
+					if (buttons.applyButton != null) {
+						buttons.applyButton.setEnabled(false);
+					}
+				}
+			}
+		});
+	}
+	
+	private Button createButton(final Composite parent, final String label,
+			final SelectionListener selectionListener) {
 		((GridLayout) parent.getLayout()).numColumns++;
 		final Button button = new Button(parent, SWT.PUSH);
 		button.setText(label);
@@ -308,64 +301,73 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return
+	 * Does the form contain unsaved data? The return value of this method is only an indicator, IOW
+	 * it may return false-positives.
+	 * 
+	 * Subclasses overriding this method should include the return value of super() in their answer.
+	 * 
+	 * @return true if this page contains unsaved data.
 	 */
-	public abstract ConfigClass getFormValues();
-	
-	protected void fillInFormValues(final ConfigClass config) {
-		
-		// First the values have to be pushed from the Fields into the preference store.
-		this.fields.allSemanticTypes.store();
-		this.fields.isActive.store();
-		this.fields.isVisible.store();
-		
-		// Now read them out from the preference store
-		config.setActive(getPreferenceStore().getBoolean(PREF_STORE_ACTIVE));
-		config.setName(this.fields.instanceName.getStringValue());
-		config.setSemanticTypes(PluginPreferencePage.intString2Array(this.fields.semanticTypes.getStringValue()));
-		config.setVisible(getPreferenceStore().getBoolean(PREF_STORE_VISIBLE));
-		// if (getPreferenceStore().getBoolean(PREF_STORE_ALL_SEMANTIC_TYPES)) {
-		// config.setSemanticTypes(PluginXMLConfig.ALL_SEMANTIC_TYPES); // TODO
-		// }
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return
-	 */
-	public final boolean hasUnsavedChanges() {
-		return unsavedChanges;
-	}
-	
-	protected boolean unsavedChanges = false;
-	
-	protected boolean listenForPropertyChanges = true;
-	
-	final IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
-		@Override
-		public void propertyChange(final PropertyChangeEvent event) {
-			
-			if (listenForPropertyChanges && !unsavedChanges) {
-				log.debug("Property change received.");
-				unsavedChanges = !getXMLConfig().equals(getFormValues());
-			}
+	public boolean hasUnsavedChanges() {
+		if (basicGroup != null) {
+			return basicGroup.isSomethingChanged();
+		} else {
+			return false;
 		}
-	};
+	}
 	
+	/**
+	 * Transfers the formular data into the model.
+	 */
 	@Override
 	public final void performApply() {
-		final ConfigClass formValues = getFormValues();
-		this.plugin.setXMLConfig(formValues);
-		this.config = formValues;
-		this.unsavedChanges = false;
+		log.info("Pressed button Apply");
+		this.storeToModel();
+		spyglass.getConfigStore().store();
+	}
+	
+	/**
+	 * Store the form data into the model
+	 * 
+	 * Subclasses overriding this method must call this method!
+	 */
+	public void storeToModel() {
+		log.info("restoring form from model");
+		if (!this.databindingValidationIsOK) {
+			MessageDialog.openError(this.getShell(), "Can not store changes",
+					"Could not store your changes. There are still errors remaining in the form.");
+		} else {
+			this.dbc.updateModels();
+			this.basicGroup.resetChanged();
+		}
+	}
+	
+	/**
+	 * ReStore the form data from the model
+	 * 
+	 * Subclasses overriding this method must call this method!
+	 */
+	protected void loadFromModel() {
+		log.info("Storing form to model");
+		
+		this.dbc.updateTargets();
+		this.basicGroup.resetChanged();
 	}
 	
 	private final void performCreateInstance() {
-		spyglass.getPluginManager().createNewPlugin(getPluginClass(), getFormValues());
+		log.info("Pressed button create");
+		
+		spyglass.getPluginManager().createNewPlugin(getPluginClass(), config);
 	}
 	
+	/**
+	 * Delete the plugin
+	 */
 	private final void performDelete() {
-		final boolean ok = MessageDialog.openQuestion(getShell(), "Remove plugin instance", "Are you sure you want to remove the plugin instance?");
+		log.info("Pressed button Delete");
+		
+		final boolean ok = MessageDialog.openQuestion(getShell(), "Remove plugin instance",
+				"Are you sure you want to remove the plugin instance?");
 		if (ok) {
 			spyglass.getPluginManager().removePlugin(this.plugin);
 		}
@@ -373,32 +375,28 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	protected final void performRestore() {
-		setFormValues((ConfigClass) cs.readPluginInstanceConfig(plugin.getInstanceName()));
+		log.info("Pressed button restore");
+		loadFromModel();
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	protected final void performRestoreDefaults() {
-		try {
-			
-			final Class<? extends Plugin> pluginClass = (Class<? extends Plugin>) this.getClass().getMethod("getPluginClass").invoke(this);
-			setFormValues((ConfigClass) cs.readPluginTypeDefaults(pluginClass));
-			
-		} catch (final Exception e) {
-			Log.error("", e);
-		}
+		log.info("Pressed button restoreDefaults");
+		// TODO: vorher fragen?
+		final Class<? extends Plugin> pluginClass = this.getPluginClass();
+		final PluginXMLConfig defaults = spyglass.getConfigStore().readPluginTypeDefaults(
+				pluginClass);
+		this.config.overwriteWith(defaults);
 		
-	}
-	
-	protected final ConfigClass getXMLConfig() {
-		return config;
+		this.loadFromModel();
+		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -406,7 +404,9 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @return
 	 */
 	protected final void performSaveAsDefault() {
-		cs.storePluginTypeDefaults(getFormValues());
+		log.info("Pressed button SaveAsDefault");
+		
+		storeToModel();
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -453,130 +453,14 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		return this.config.getClass();
 	}
 	
-	// --------------------------------------------------------------------------------
-	/**
-	 */
-	public void setFormValues(final ConfigClass config) {
-		listenForPropertyChanges = false;
-		
-		getPreferenceStore().setValue(PREF_STORE_ACTIVE, config.isActive());
-		getPreferenceStore().setValue(PREF_STORE_VISIBLE, config.isVisible());
-		getPreferenceStore().setValue(PREF_STORE_NAME, config.getName());
-		
-		if (config.isAllSemanticTypes()) {
-			getPreferenceStore().setValue(PREF_STORE_ALL_SEMANTIC_TYPES, true);
-			this.fields.semanticTypes.setStringValue("0-255");
-			this.fields.semanticTypes.setEnabled(false, fields.semanticTypesContainer);
-		} else {
-			final String semTypes = intArray2String(config.getSemanticTypes());
-			this.fields.semanticTypes.setStringValue(semTypes);
-			
-		}
-		
-		this.fields.instanceName.setStringValue(config.getName());
-		this.fields.allSemanticTypes.load();
-		this.fields.isActive.load();
-		this.fields.isVisible.load();
-		
-		this.config = config;
-		
-		listenForPropertyChanges = true;
-	}
-	
-	/**
-	 * Converts an array to String representing the array.
-	 * 
-	 * Note, that this method expects the array to be sorted!
-	 */
-	public static String intArray2String(final int[] a) {
-		
-		if (a.length == 0) {
-			return "";
-		} else if (a.length == 1) {
-			return "" + a[0];
-		}
-		
-		String s = "" + a[0];
-		
-		int iMinus = a[0];
-		
-		boolean list = false;
-		// start at 2nd entry
-		for (int i = 1; i < a.length; i++) {
-			
-			final int next = a[i];
-			
-			final boolean last = a.length == i + 1;
-			
-			if (iMinus == next - 1) {
-				list = true;
-			} else if (list) {
-				s += "-" + iMinus + "," + next;
-				list = false;
-			} else {
-				s += "," + next;
-				list = false;
-			}
-			
-			if (list && last) {
-				s += "-" + next;
-			}
-			
-			iMinus = next;
-		}
-		
-		return s;
-	}
-	
-	final static int MAXIMUM_SEMTYPE = 255;
-	
-	public static int[] intString2Array(final String s) {
-		
-		final String[] parts = s.split(",");
-		final TreeSet<Integer> set = new TreeSet<Integer>();
-		
-		for (final String p : parts) {
-			if (p.matches("\\d+")) {
-				final int i = Integer.parseInt(p);
-				if (i <= MAXIMUM_SEMTYPE) {
-					set.add(i);
-				}
-			} else if (p.matches("\\d+-\\d+")) {
-				final String[] q = p.split("-");
-				final int start = Integer.parseInt(q[0]);
-				final int stop = Integer.parseInt(q[1]);
-				for (int j = start; j <= stop; j++) {
-					if (j <= MAXIMUM_SEMTYPE) {
-						set.add(j);
-					}
-				}
-			}
-		}
-		
-		final int[] list = new int[set.size()];
-		int c = 0;
-		for (final Integer integer : set) {
-			list[c++] = integer;
-		}
-		return list;
-		
-	}
-	
 	protected Composite createComposite(final Composite parent) {
 		final Composite c = new Composite(parent, SWT.NONE);
-		c.setLayout(new GridLayout(1, false));
+		c.setLayout(new GridLayout(1, true));
 		final GridData gridData = new GridData(SWT.LEFT, SWT.TOP, true, true);
-		gridData.horizontalSpan = 50;
-		gridData.verticalSpan = 50;
+		gridData.horizontalSpan = 80;
+		gridData.verticalSpan = 80;
 		c.setLayoutData(gridData);
 		return c;
 	}
 	
-	protected final Group createGroup(final Composite parent, final String groupText) {
-		final Group g = new Group(parent, SWT.SHADOW_ETCHED_IN);
-		g.setText(groupText);
-		g.setLayout(new GridLayout(1, false));
-		g.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
-		return g;
-	}
 }

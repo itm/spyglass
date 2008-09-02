@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public class GridPainterPlugin extends BackgroundPainterPlugin {
 	
 	@Element(name = "parameters")
-	private GridPainterXMLConfig xmlConfig;
+	private final GridPainterXMLConfig xmlConfig;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -80,12 +80,6 @@ public class GridPainterPlugin extends BackgroundPainterPlugin {
 	@Override
 	public void reset() {
 		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
-		this.xmlConfig = (GridPainterXMLConfig) xmlConfig;
 		
 	}
 	

@@ -79,12 +79,6 @@ public class MapPainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	protected void updateQuadTree() {
 		// TODO Auto-generated method stub
 		

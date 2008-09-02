@@ -75,12 +75,6 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	}
 	
 	@Override
-	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	protected void updateQuadTree() {
 		// TODO Auto-generated method stub
 		

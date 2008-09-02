@@ -24,18 +24,6 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 	}
 	
 	@Override
-	public SimpleGlobalInformationXMLConfig getFormValues() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public void setFormValues(final SimpleGlobalInformationXMLConfig config) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return SimpleGlobalInformationPlugin.class;
 	}

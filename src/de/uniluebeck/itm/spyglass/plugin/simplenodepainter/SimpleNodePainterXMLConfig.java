@@ -9,6 +9,7 @@
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
@@ -39,11 +40,11 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	@Element
 	private int lineWidth = 1;
 	
-	@ElementMap(entry = "stringFormatter", key = "nodeID", attribute = true, valueType = StringFormatter.class, required = false)
-	private HashMap<Integer, StringFormatter> stringFormatters = null;
+	@ElementMap(entry = "stringFormatter", key = "nodeID", attribute = true, valueType = String.class, required = true)
+	private HashMap<Integer, String> stringFormatters = new HashMap<Integer, String>();
 	
 	@Element(name = "defaultStringFormatter", required = false)
-	private StringFormatter defaultStringFormatter = null;
+	private String defaultStringFormatter = null;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -57,7 +58,7 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return the isExtendenInformationActive
 	 */
-	public HashMap<Integer, Boolean> getIsExtendenInformationActive() {
+	public HashMap<Integer, Boolean> getIsExtendedInformationActive() {
 		return isExtendenInformationActive;
 	}
 	
@@ -66,7 +67,8 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	 * @param isExtendenInformationActive
 	 *            the isExtendenInformationActive to set
 	 */
-	public void setIsExtendenInformationActive(final HashMap<Integer, Boolean> isExtendenInformationActive) {
+	public void setIsExtendenInformationActive(
+			final HashMap<Integer, Boolean> isExtendenInformationActive) {
 		this.isExtendenInformationActive = isExtendenInformationActive;
 	}
 	
@@ -75,7 +77,7 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	 * @return the lineColorRGB
 	 */
 	public int[] getLineColorRGB() {
-		return lineColorRGB;
+		return lineColorRGB.clone();
 		
 	}
 	
@@ -85,7 +87,10 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	 *            the lineColorRGB to set
 	 */
 	public void setLineColorRGB(final int[] lineColorRGB) {
+		final int[] oldvalue = this.lineColorRGB.clone();
 		this.lineColorRGB = lineColorRGB;
+		firePropertyChange("lineColor", oldvalue, lineColorRGB);
+		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -102,15 +107,27 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	 *            the lineWidth to set
 	 */
 	public void setLineWidth(final int lineWidth) {
+		final int oldvalue = this.lineWidth;
 		this.lineWidth = lineWidth;
+		firePropertyChange("lineWidth", oldvalue, lineWidth);
+		
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the stringFormatters
 	 */
-	public HashMap<Integer, StringFormatter> getStringFormatters() {
-		return stringFormatters;
+	@SuppressWarnings("unchecked")
+	public HashMap<Integer, String> getStringFormatters() {
+		return (HashMap<Integer, String>) stringFormatters.clone();
+	}
+	
+	public StringFormatter getStringFormatter(final int syntaxType) {
+		if (stringFormatters.containsKey(syntaxType)) {
+			return new StringFormatter(stringFormatters.get(syntaxType));
+		} else {
+			return new StringFormatter(this.defaultStringFormatter);
+		}
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -118,15 +135,19 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	 * @param stringFormatters
 	 *            the stringFormatters to set
 	 */
-	public void setStringFormatters(final HashMap<Integer, StringFormatter> stringFormatters) {
-		this.stringFormatters = stringFormatters;
+	@SuppressWarnings("unchecked")
+	public void setStringFormatters(final HashMap<Integer, String> stringFormatters) {
+		final Map<Integer, String> oldValue = this.stringFormatters;
+		this.stringFormatters = (HashMap<Integer, String>) stringFormatters.clone();
+		firePropertyChange("stringFormatters", oldValue, stringFormatters);
+		
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the isExtendedDefaultValue
+	 * @return the getExtendedDefaultValue
 	 */
-	public boolean isExtendedDefaultValue() {
+	public boolean getExtendedDefaultValue() {
 		return isExtendedDefaultValue;
 	}
 	
@@ -136,14 +157,16 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	 *            the isExtendedDefaultValue to set
 	 */
 	public void setExtendedDefaultValue(final boolean isExtendedDefaultValue) {
+		final boolean oldValue = this.isExtendedDefaultValue;
 		this.isExtendedDefaultValue = isExtendedDefaultValue;
+		firePropertyChange("extendedDefaultValue", oldValue, isExtendedDefaultValue);
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the defaultStringFormatter
 	 */
-	public StringFormatter getDefaultStringFormatter() {
+	public String getDefaultStringFormatter() {
 		return defaultStringFormatter;
 	}
 	
@@ -152,18 +175,27 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	 * @param defaultStringFormatter
 	 *            the defaultStringFormatter to set
 	 */
-	public void setDefaultStringFormatter(final StringFormatter defaultStringFormatter) {
+	public void setDefaultStringFormatter(final String defaultStringFormatter) {
+		final String oldValue = this.defaultStringFormatter;
 		this.defaultStringFormatter = defaultStringFormatter;
+		firePropertyChange("defaultStringFormatter", oldValue, defaultStringFormatter);
 	}
 	
-	// --------------------------------------------------------------------------------
+	/**
+	 * Copy the data from newConfig into this object.
+	 */
 	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-		isExtendenInformationActive.clear();
-		isExtendenInformationActive = null;
-		stringFormatters.clear();
-		stringFormatters = null;
+	public void overwriteWith(final PluginXMLConfig newConfig) {
+		super.overwriteWith(newConfig);
+		final SimpleNodePainterXMLConfig newConfig2 = (SimpleNodePainterXMLConfig) newConfig;
+		
+		this.setIsExtendenInformationActive(newConfig2.getIsExtendedInformationActive());
+		this.setExtendedDefaultValue(newConfig2.getExtendedDefaultValue());
+		this.setLineColorRGB(newConfig2.getLineColorRGB());
+		this.setLineWidth(newConfig2.getLineWidth());
+		this.setStringFormatters(newConfig2.getStringFormatters());
+		this.setDefaultStringFormatter(newConfig2.getDefaultStringFormatter());
+		
 	}
 	
 	@Override
@@ -173,9 +205,12 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		}
 		final SimpleNodePainterXMLConfig o = (SimpleNodePainterXMLConfig) other;
 		
-		return (defaultStringFormatter != null) && defaultStringFormatter.equals(o.defaultStringFormatter)
-				&& (isExtendedDefaultValue == o.isExtendedDefaultValue) && (isExtendenInformationActive == o.isExtendenInformationActive)
-				&& equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth) && stringFormatters.equals(o.stringFormatters);
+		return (defaultStringFormatter != null)
+				&& defaultStringFormatter.equals(o.defaultStringFormatter)
+				&& (isExtendedDefaultValue == o.isExtendedDefaultValue)
+				&& (isExtendenInformationActive == o.isExtendenInformationActive)
+				&& equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth)
+				&& stringFormatters.equals(o.stringFormatters);
 	}
 	
 }

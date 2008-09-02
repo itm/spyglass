@@ -10,7 +10,7 @@ import org.junit.Test;
 
 // --------------------------------------------------------------------------------
 /**
- * @author dariush
+ * @author Dariush Forouher
  * 
  */
 public class PluginXMLConfigTests {
@@ -25,20 +25,20 @@ public class PluginXMLConfigTests {
 	
 	/**
 	 * Test method for
-	 * {@link de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig#isAllSemanticTypes()}.
+	 * {@link de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig#getAllSemanticTypes()}.
 	 */
 	@Test
 	public void testIsAllSemanticTypes() {
 		final PluginXMLConfig config = new PluginXMLConfigStub();
 		config.setSemanticTypes(PluginXMLConfig.ALL_SEMANTIC_TYPES);
-		Assert.isTrue(config.isAllSemanticTypes());
+		Assert.isTrue(config.getAllSemanticTypes());
 	}
 	
 	@Test
 	public void testIsAllSemanticTypes2() {
 		final PluginXMLConfig config = new PluginXMLConfigStub();
 		config.setSemanticTypes(new int[] { 1, 2, 3, 4, 5 });
-		Assert.isTrue(!config.isAllSemanticTypes());
+		Assert.isTrue(!config.getAllSemanticTypes());
 	}
 	
 }

@@ -16,18 +16,18 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Widget;
 
 /**
- * Class to manage SWT resources (Font, Color, Image and Cursor) There are no restrictions on the use of this code. You
- * may change this code and your changes will not be overwritten, but if you change the version number below then this
- * class will be completely overwritten by Jigloo. #SWTResourceManager:version4.0.0#
+ * Class to manage SWT resources (Font, Color, Image and Cursor)
+ * There are no restrictions on the use of this code.
+ *
+ * You may change this code and your changes will not be overwritten,
+ * but if you change the version number below then this class will be
+ * completely overwritten by Jigloo.
+ * #SWTResourceManager:version4.0.0#
  */
 public class SWTResourceManager {
 
-	@SuppressWarnings("unchecked")
 	private static HashMap resources = new HashMap();
-
-	@SuppressWarnings("unchecked")
 	private static Vector users = new Vector();
-
 	private static SWTResourceManager instance = new SWTResourceManager();
 
 	private static DisposeListener disposeListener = new DisposeListener() {
@@ -39,14 +39,15 @@ public class SWTResourceManager {
 	};
 
 	/**
-	 * This method should be called by *all* Widgets which use resources provided by this SWTResourceManager. When
-	 * widgets are disposed, they are removed from the "users" Vector, and when no more registered Widgets are left, all
-	 * resources are disposed.
+	 * This method should be called by *all* Widgets which use resources
+	 * provided by this SWTResourceManager. When widgets are disposed,
+	 * they are removed from the "users" Vector, and when no more
+	 * registered Widgets are left, all resources are disposed.
 	 * <P>
-	 * If this method is not called for all Widgets then it should not be called at all, and the "dispose" method should
-	 * be explicitly called after all resources are no longer being used.
+	 * If this method is not called for all Widgets then it should not be called
+	 * at all, and the "dispose" method should be explicitly called after all
+	 * resources are no longer being used.
 	 */
-	@SuppressWarnings("unchecked")
 	public static void registerResourceUser(Widget widget) {
 		if (users.contains(widget))
 			return;
@@ -54,19 +55,18 @@ public class SWTResourceManager {
 		widget.addDisposeListener(disposeListener);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void dispose() {
 		Iterator it = resources.keySet().iterator();
 		while (it.hasNext()) {
 			Object resource = resources.get(it.next());
 			if (resource instanceof Font)
-				((Font) resource).dispose();
+				 ((Font) resource).dispose();
 			else if (resource instanceof Color)
-				((Color) resource).dispose();
+				 ((Color) resource).dispose();
 			else if (resource instanceof Image)
-				((Image) resource).dispose();
+				 ((Image) resource).dispose();
 			else if (resource instanceof Cursor)
-				((Cursor) resource).dispose();
+				 ((Cursor) resource).dispose();
 		}
 		resources.clear();
 	}
@@ -75,7 +75,6 @@ public class SWTResourceManager {
 		return getFont(name, size, style, false, false);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Font getFont(String name, int size, int style, boolean strikeout, boolean underline) {
 		String fontName = name + "|" + size + "|" + style + "|" + strikeout + "|" + underline;
 		if (resources.containsKey(fontName))
@@ -92,7 +91,8 @@ public class SWTResourceManager {
 						lfCls.getField("lfUnderline").set(lf, new Byte((byte) 1));
 				}
 			} catch (Throwable e) {
-				System.err.println("Unable to set underline or strikeout" + " (probably on a non-Windows platform). " + e);
+				System.err.println(
+					"Unable to set underline or strikeout" + " (probably on a non-Windows platform). " + e);
 			}
 		}
 		Font font = new Font(Display.getDefault(), fd);
@@ -102,12 +102,11 @@ public class SWTResourceManager {
 
 	public static Image getImage(String url, Control widget) {
 		Image img = getImage(url);
-		if (img != null && widget != null)
+		if(img != null && widget != null)
 			img.setBackground(widget.getBackground());
 		return img;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Image getImage(String url) {
 		try {
 			url = url.replace('\\', '/');
@@ -120,12 +119,11 @@ public class SWTResourceManager {
 				resources.put(url, img);
 			return img;
 		} catch (Exception e) {
-			System.err.println("SWTResourceManager.getImage: Error getting image " + url + ", " + e);
+			System.err.println("SWTResourceManager.getImage: Error getting image "+url+", "+e);
 			return null;
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Color getColor(int red, int green, int blue) {
 		String name = "COLOR:" + red + "," + green + "," + blue;
 		if (resources.containsKey(name))
@@ -135,7 +133,6 @@ public class SWTResourceManager {
 		return color;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Cursor getCursor(int type) {
 		String name = "CURSOR:" + type;
 		if (resources.containsKey(name))

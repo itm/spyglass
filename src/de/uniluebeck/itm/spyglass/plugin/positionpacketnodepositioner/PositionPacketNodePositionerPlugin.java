@@ -32,7 +32,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	private static Category log = SpyglassLogger.get(PositionPacketNodePositionerPlugin.class);
 	
 	@Element(name = "parameters")
-	private PositionPacketNodePositionerXMLConfig xmlConfig;
+	private final PositionPacketNodePositionerXMLConfig xmlConfig;
 	
 	/**
 	 * Hashmap containing the position information.
@@ -95,11 +95,6 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	@Override
 	public void reset() {
 		this.positionMap.clear();
-	}
-	
-	@Override
-	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
-		this.xmlConfig = (PositionPacketNodePositionerXMLConfig) xmlConfig;
 	}
 	
 	@Override

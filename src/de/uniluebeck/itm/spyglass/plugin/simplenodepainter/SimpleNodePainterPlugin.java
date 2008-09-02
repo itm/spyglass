@@ -1,10 +1,9 @@
 /*
- * --------------------------------------------------------------------------------
- * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
+ * -------------------------------------------------------------------------------- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
@@ -36,17 +35,15 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class are used create and administer simple visualizations
- * of sensor nodes.<br>
- * The nodes can be visualized in two way's according to the amount of
- * information the user wants to see.
+ * Instances of this class are used create and administer simple visualizations of sensor nodes.<br>
+ * The nodes can be visualized in two way's according to the amount of information the user wants to
+ * see.
  * <ul>
- * <li>In the <tt>non-extended mode</tt>, the nodes are represented by
- * rectangles which only contain the node's identifier.</li>
- * <li>In the <tt>extended mode</tt> the nodes are again represented by
- * rectangles which contain the node's identifier. But additionally, further
- * information which are extracted from the packets of certain semantic types
- * are displayed, too.</li>
+ * <li>In the <tt>non-extended mode</tt>, the nodes are represented by rectangles which only contain
+ * the node's identifier.</li>
+ * <li>In the <tt>extended mode</tt> the nodes are again represented by rectangles which contain the
+ * node's identifier. But additionally, further information which are extracted from the packets of
+ * certain semantic types are displayed, too.</li>
  * </ul>
  * 
  * @author Sebastian Ebers
@@ -59,7 +56,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * The configuration parameters of this plug-in instance
 	 */
 	@Element(name = "parameters")
-	private SimpleNodePainterXMLConfig xmlConfig;
+	private final SimpleNodePainterXMLConfig xmlConfig;
 	
 	/**
 	 * The quad tree containing the drawing objects
@@ -67,9 +64,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	private final Layer layer;
 	
 	/**
-	 * Objects which have recently been updated and which needs to be updated in
-	 * the quad tree as well (which is done in
-	 * {@link SimpleNodePainterPlugin#updateQuadTree()}
+	 * Objects which have recently been updated and which needs to be updated in the quad tree as
+	 * well (which is done in {@link SimpleNodePainterPlugin#updateQuadTree()}
 	 */
 	private final List<DrawingObject> updatedObjects;
 	
@@ -84,6 +80,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		updatedObjects = new LinkedList<DrawingObject>();
 	}
 	
+	// TODO: what is the point of this method? all of this stuff is done automatically by the JVM
+	// anyway.
 	@Override
 	public void finalize() throws Throwable {
 		super.finalize();
@@ -93,13 +91,13 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		synchronized (updatedObjects) {
 			updatedObjects.clear();
 		}
-		xmlConfig.finalize();
+		// xmlConfig.finalize();
 		// TODO: efficiently finalize the member objects
 	}
 	
 	@Override
-	public PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> createPreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new SimpleNodePainterPreferencePage(dialog, spyglass, this);
 	}
 	
@@ -136,7 +134,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		boolean needsUpdate = false;
 		
 		// get the absolute position of the node which sent the packet
-		final AbsolutePosition position = getPluginManager().getNodePositioner().getPosition(nodeID);
+		final AbsolutePosition position = getPluginManager().getNodePositioner()
+				.getPosition(nodeID);
 		
 		// get all drawing objects from the quad tree
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
@@ -173,20 +172,19 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the instance of a node's visualization<br>
-	 * Note that either a matching instance if found in the quad tree or a new
-	 * instance is to be created and initialized as configured by the default
-	 * parameters.<br>
+	 * Note that either a matching instance if found in the quad tree or a new instance is to be
+	 * created and initialized as configured by the default parameters.<br>
 	 * 
 	 * @param nodeID
 	 *            the node's identifier
 	 * @param position
 	 *            the node's position
 	 * @param drawingObjects
-	 *            the drawing objects which are currently available in the quad
-	 *            tree
+	 *            the drawing objects which are currently available in the quad tree
 	 * @return the up to date instance of a node's visualization
 	 */
-	private NodeObject getMatchingNodeObject(final int nodeID, final AbsolutePosition position, final List<DrawingObject> drawingObjects) {
+	private NodeObject getMatchingNodeObject(final int nodeID, final AbsolutePosition position,
+			final List<DrawingObject> drawingObjects) {
 		
 		NodeObject nodeObject = null;
 		
@@ -204,12 +202,12 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 		
 		// if not, create a new object
-		Boolean isExtended = xmlConfig.getIsExtendenInformationActive().get(nodeID);
+		Boolean isExtended = xmlConfig.getIsExtendedInformationActive().get(nodeID);
 		if (isExtended == null) {
-			isExtended = xmlConfig.isExtendedDefaultValue();
+			isExtended = xmlConfig.getExtendedDefaultValue();
 		}
 		
-		final StringFormatter sf = xmlConfig.getStringFormatters().get(nodeID);
+		final StringFormatter sf = xmlConfig.getStringFormatter(nodeID);
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
 		return new NodeObject(nodeID, "Node " + nodeID, sf, isExtended, lineColorRGB, lineWidth);
@@ -217,10 +215,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Resets the configuration parameters of the node visualizations according
-	 * to the node painter's configuration parameters.<br>
-	 * <b>Note:</b> This object updates the quadTree in a synchronized block
-	 * which means that the GUI has to wait for the end of the processing
+	 * Resets the configuration parameters of the node visualizations according to the node
+	 * painter's configuration parameters.<br>
+	 * <b>Note:</b> This object updates the quadTree in a synchronized block which means that the
+	 * GUI has to wait for the end of the processing
 	 */
 	public synchronized void refreshNodeObjectConfiguration() {
 		
@@ -237,8 +235,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if (drawingObject instanceof NodeObject) {
 				final NodeObject nodeObject = (NodeObject) drawingObject;
 				final int nodeID = nodeObject.getNodeID();
-				nodeObject.update("Node " + nodeID, xmlConfig.getStringFormatters().get(nodeID), xmlConfig.getIsExtendenInformationActive().get(
-						nodeID), xmlConfig.getLineColorRGB(), xmlConfig.getLineWidth());
+				nodeObject.update("Node " + nodeID, xmlConfig.getStringFormatter(nodeID), xmlConfig
+						.getIsExtendedInformationActive().get(nodeID), xmlConfig.getLineColorRGB(),
+						xmlConfig.getLineWidth());
 				update.add(nodeObject);
 			}
 		}
@@ -262,11 +261,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			updatedObjects.clear();
 		}
 		
-	}
-	
-	@Override
-	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
-		this.xmlConfig = (SimpleNodePainterXMLConfig) xmlConfig;
 	}
 	
 	@Override
@@ -306,7 +300,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) {
 		
 		// get the objects to draw
-		final List<DrawingObject> dos = new LinkedList<DrawingObject>(layer.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle()));
+		final List<DrawingObject> dos = new LinkedList<DrawingObject>(layer
+				.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle()));
 		
 		// order the elements oppositional to the paint order
 		Collections.sort(dos, new Comparator<DrawingObject>() {
@@ -343,9 +338,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Handles a mouse click event which was actually a double click returns
-	 * <code>true</code> if a drawing object was found which bounding box
-	 * contains the point clicked by the user.
+	 * Handles a mouse click event which was actually a double click returns <code>true</code> if a
+	 * drawing object was found which bounding box contains the point clicked by the user.
 	 * 
 	 * @param drawingObjects
 	 *            the plug-in's drawing objects
@@ -353,7 +347,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 *            the point which was clicked
 	 * @return <code>true</code> if a matching drawing object was found
 	 */
-	private boolean handleDoubleClick(final List<DrawingObject> drawingObjects, final Point clickPoint) {
+	private boolean handleDoubleClick(final List<DrawingObject> drawingObjects,
+			final Point clickPoint) {
 		
 		// check all drawing objects
 		for (final DrawingObject drawingObject : drawingObjects) {
@@ -375,9 +370,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Handles a mouse click event which was not a left click and returns
-	 * <code>true</code> if a drawing object was found which bounding box
-	 * contains the point clicked by the user.
+	 * Handles a mouse click event which was not a left click and returns <code>true</code> if a
+	 * drawing object was found which bounding box contains the point clicked by the user.
 	 * 
 	 * @param drawingObjects
 	 *            the plug-in's drawing objects
@@ -385,7 +379,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 *            the point which was clicked
 	 * @return <code>true</code> if a matching drawing object was found
 	 */
-	private boolean handleRightClick(final List<DrawingObject> drawingObjects, final Point clickPoint) {
+	private boolean handleRightClick(final List<DrawingObject> drawingObjects,
+			final Point clickPoint) {
 		
 		// check all drawing objects
 		for (final DrawingObject drawingObject : drawingObjects) {
@@ -404,9 +399,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Handles a mouse click event which was not a left click and returns
-	 * <code>true</code> if a drawing object was found which bounding box
-	 * contains the point clicked by the user.
+	 * Handles a mouse click event which was not a left click and returns <code>true</code> if a
+	 * drawing object was found which bounding box contains the point clicked by the user.
 	 * 
 	 * @param drawingObjects
 	 *            the plug-in's drawing objects
@@ -414,7 +408,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 *            the point which was clicked
 	 * @return <code>true</code> if a matching drawing object was found
 	 */
-	private boolean handleWheelClick(final List<DrawingObject> drawingObjects, final Point clickPoint) {
+	private boolean handleWheelClick(final List<DrawingObject> drawingObjects,
+			final Point clickPoint) {
 		
 		// check all drawing objects
 		for (final DrawingObject drawingObject : drawingObjects) {

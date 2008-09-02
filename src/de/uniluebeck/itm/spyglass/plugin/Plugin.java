@@ -123,7 +123,7 @@ public abstract class Plugin implements Runnable {
 	 * @return <tt>true</tt> if the plug-in is currently active
 	 */
 	public final boolean isActive() {
-		return getXMLConfig().isActive();
+		return getXMLConfig().getActive();
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -154,7 +154,7 @@ public abstract class Plugin implements Runnable {
 	 * If the plug-in is activated, the thread will be started (and maybe previously created).
 	 * Otherwise, the thread will be stopped.
 	 * 
-	 * @see PluginXMLConfig#isActive()
+	 * @see PluginXMLConfig#getActive()
 	 */
 	public void initializePacketConsumerThread() {
 		
@@ -303,7 +303,7 @@ public abstract class Plugin implements Runnable {
 	 * @return <tt>true</tt> if the plug-in is visible
 	 */
 	public final boolean isVisible() {
-		return getXMLConfig().isVisible();
+		return getXMLConfig().getVisible();
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -329,15 +329,6 @@ public abstract class Plugin implements Runnable {
 	public final void setVisible(final boolean setVisible) {
 		getXMLConfig().setVisible(setVisible);
 	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Sets the plug-in's configuration parameters
-	 * 
-	 * @param xmlConfig
-	 *            the plug-in's configuration parameters
-	 */
-	public abstract void setXMLConfig(PluginXMLConfig xmlConfig);
 	
 	// --------------------------------------------------------------------------------
 	/**

@@ -26,4 +26,10 @@ public class PositionPacketNodePositionerXMLConfig extends NodePositionerXMLConf
 		return other instanceof PositionPacketNodePositionerXMLConfig ? getTimeToLive() == ((NodePositionerXMLConfig) other).getTimeToLive() : false;
 	}
 	
+	@Override
+	public void overwriteWith(final PluginXMLConfig newConfig) {
+		super.overwriteWith(newConfig);
+		final PositionPacketNodePositionerXMLConfig newConfig2 = (PositionPacketNodePositionerXMLConfig) newConfig;
+	}
+	
 }

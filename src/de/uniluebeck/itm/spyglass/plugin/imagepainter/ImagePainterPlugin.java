@@ -25,7 +25,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public class ImagePainterPlugin extends BackgroundPainterPlugin {
 	
 	@Element(name = "parameters")
-	private ImagePainterXMLConfig xmlConfig;
+	private final ImagePainterXMLConfig xmlConfig;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -81,12 +81,6 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin {
 	@Override
 	public void reset() {
 		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
-		this.xmlConfig = (ImagePainterXMLConfig) xmlConfig;
 		
 	}
 	

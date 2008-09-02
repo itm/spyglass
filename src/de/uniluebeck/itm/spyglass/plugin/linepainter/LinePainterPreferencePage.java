@@ -24,18 +24,6 @@ public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterP
 	}
 	
 	@Override
-	public LinePainterXMLConfig getFormValues() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public void setFormValues(final LinePainterXMLConfig config) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return LinePainterPlugin.class;
 	}

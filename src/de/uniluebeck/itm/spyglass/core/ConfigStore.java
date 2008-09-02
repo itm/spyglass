@@ -211,8 +211,8 @@ public class ConfigStore {
 		final List<Plugin> plugins = spyglassConfig.getPluginManager().getPlugins();
 		for (final Plugin plugin : plugins) {
 			final PluginXMLConfig cfg = plugin.getXMLConfig();
-			if ((cfg != null) && config.getClass().equals(cfg.getClass())) {
-				plugin.setXMLConfig(config);
+			if ((cfg != null) && config.getClass().equals(cfg.getClass())) { // TODO ????
+				plugin.getXMLConfig().overwriteWith(config);
 				store();
 				return;
 			}
@@ -236,7 +236,7 @@ public class ConfigStore {
 		for (final Plugin plugin : plugins) {
 			final PluginXMLConfig cfg = plugin.getXMLConfig();
 			if ((cfg != null) && config.getClass().equals(cfg.getClass())) {
-				plugin.setXMLConfig(config);
+				plugin.getXMLConfig().overwriteWith(config);
 				store();
 				return;
 			}

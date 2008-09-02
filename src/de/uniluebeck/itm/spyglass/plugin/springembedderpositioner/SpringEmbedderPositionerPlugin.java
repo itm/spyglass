@@ -71,12 +71,6 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	}
 	
 	@Override
-	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	protected void updateQuadTree() {
 		// TODO Auto-generated method stub
 		

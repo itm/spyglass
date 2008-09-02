@@ -23,18 +23,6 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 	}
 	
 	@Override
-	public NodeSensorRangeXMLConfig getFormValues() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public void setFormValues(final NodeSensorRangeXMLConfig config) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return NodeSensorRangePlugin.class;
 	}

@@ -159,7 +159,7 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 			}
 			
 			@Override
-			public boolean isVisible() {
+			public boolean getVisible() {
 				return false;
 			}
 			
@@ -172,12 +172,6 @@ public class DagstuhlNodePainter extends HistoricalPlugin {
 	
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
 		// TODO Auto-generated method stub
 		
 	}

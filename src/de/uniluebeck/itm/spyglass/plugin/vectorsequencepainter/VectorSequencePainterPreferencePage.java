@@ -23,18 +23,6 @@ public class VectorSequencePainterPreferencePage extends PluginPreferencePage<Ve
 	}
 	
 	@Override
-	public VectorSequencePainterXMLConfig getFormValues() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public void setFormValues(final VectorSequencePainterXMLConfig config) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return VectorSequencePainterPlugin.class;
 	}

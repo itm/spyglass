@@ -24,18 +24,6 @@ public class SpringEmbedderPositionerPreferencePage extends PluginPreferencePage
 	}
 	
 	@Override
-	public SpringEmbedderPositionerXMLConfig getFormValues() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public void setFormValues(final SpringEmbedderPositionerXMLConfig config) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return SpringEmbedderPositionerPlugin.class;
 	}

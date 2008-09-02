@@ -153,7 +153,7 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 			}
 			
 			@Override
-			public boolean isVisible() {
+			public boolean getVisible() {
 				return false;
 			}
 			
@@ -172,12 +172,6 @@ public class DagstuhlRoutePainter extends HistoricalPlugin {
 	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void setXMLConfig(final PluginXMLConfig xmlConfig) {
 		// TODO Auto-generated method stub
 		
 	}
