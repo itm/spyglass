@@ -48,6 +48,30 @@ public class PositionPacketNodePositionerPreferencePage
 		return super.hasUnsavedChanges() || somethingChanged;
 	}
 	
+	// --------------------------------------------------------------------------------
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#storeToModel()
+	 */
+	@Override
+	public void storeToModel() {
+		super.storeToModel();
+		somethingChanged = false;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#loadFromModel()
+	 */
+	@Override
+	protected void loadFromModel() {
+		super.loadFromModel();
+		somethingChanged = false;
+	}
+	
 	@Override
 	protected Composite createContents(final Composite parent) {
 		
