@@ -88,7 +88,7 @@ public class AbsoluteRectangle {
 		this.rectangle = new Rectangle(other.rectangle.x, other.rectangle.y, other.rectangle.width, other.rectangle.height);
 	}
 	
-	public AbsoluteRectangle(final AbsolutePosition upperLeft, final int height, final int width) {
+	public AbsoluteRectangle(final AbsolutePosition upperLeft, final int width, final int height) {
 		this.rectangle = new Rectangle(upperLeft.x, upperLeft.y, width, height);
 	}
 	

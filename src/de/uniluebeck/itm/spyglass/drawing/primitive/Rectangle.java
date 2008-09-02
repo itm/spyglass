@@ -24,6 +24,7 @@ import de.uniluebeck.itm.spyglass.positions.PixelPosition;
  */
 @Root
 public class Rectangle extends DrawingObject {
+	
 	@Attribute
 	private int width = 10;
 	
@@ -146,14 +147,14 @@ public class Rectangle extends DrawingObject {
 	
 	@Override
 	public AbsoluteRectangle getBoundingBox() {
-		// TODO Auto-generated method stub
-		return null;
+		return new AbsoluteRectangle(getPosition(), width, height);
 	}
 	
 	@Override
 	public void setBoundingBox(final AbsoluteRectangle box) {
-		// TODO Auto-generated method stub
-		
+		setPosition(box.getUpperLeft());
+		this.width = box.getWidth();
+		this.height = box.getHeight();
 	}
 	
 }

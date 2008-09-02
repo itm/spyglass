@@ -94,7 +94,7 @@ public abstract class DrawingObject {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
+	 * Sets the position of the upper left point of the <code>DrawingObject</code>.
 	 */
 	public void setPosition(final AbsolutePosition position) {
 		this.position = position;
@@ -242,6 +242,7 @@ public abstract class DrawingObject {
 	 */
 	public abstract void draw(DrawingArea drawingArea, GC gc);
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * Return the bounding box of this drawing object
 	 */
