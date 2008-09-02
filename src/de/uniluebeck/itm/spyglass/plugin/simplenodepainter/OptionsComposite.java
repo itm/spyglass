@@ -56,10 +56,12 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 	private class StringFormatterEditingSupport extends ObservableValueEditingSupport {
 		
 		private CellEditor cellEditor;
+		private DataBindingContext dbc;
 		
 		public StringFormatterEditingSupport(final ColumnViewer viewer, final DataBindingContext dbc) {
 			
 			super(viewer, dbc);
+			this.dbc = dbc;
 			cellEditor = new TextCellEditor((Composite) viewer.getControl());
 		}
 		
@@ -77,7 +79,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 		@Override
 		protected IObservableValue doCreateElementObservable(final Object element,
 				final ViewerCell cell) {
-			return BeansObservables.observeValue(element, "value");
+			return BeansObservables.observeValue(dbc.getValidationRealm(), element, "value");
 		}
 		
 	}
