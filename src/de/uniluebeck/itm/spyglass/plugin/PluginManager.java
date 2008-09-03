@@ -267,9 +267,11 @@ public class PluginManager {
 	 * Disable all NodePositioner Plugins except the given one.
 	 */
 	private void newNodePositioner(final Plugin plugin) {
-		for (final Plugin p : plugins) {
-			if ((p instanceof NodePositionerPlugin) && (p != plugin)) {
-				p.getXMLConfig().setActive(false);
+		synchronized (plugins) {
+			for (final Plugin p : plugins) {
+				if ((p instanceof NodePositionerPlugin) && (p != plugin)) {
+					p.getXMLConfig().setActive(false);
+				}
 			}
 		}
 	}
