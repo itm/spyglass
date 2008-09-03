@@ -224,9 +224,19 @@ public class PluginManager {
 				
 				@Override
 				public void propertyChange(final PropertyChangeEvent evt) {
-					final Boolean active = (Boolean) evt.getNewValue();
-					if (active) {
+					final Boolean activeOld = (Boolean) evt.getOldValue();
+					final Boolean activeNew = (Boolean) evt.getNewValue();
+					if (activeNew && !activeOld) {
+						// the plugin got activated
+						
 						newNodePositioner(plugin);
+						
+					} else if (activeOld && !activeNew) {
+						// the plugin got deactivated
+						
+						// TODO: we have to activate another one, so that the
+						// job doesn't become vacant. but what if there is no other
+						// one?
 					}
 					
 				}
@@ -349,6 +359,8 @@ public class PluginManager {
 	 */
 	public void removePlugin(final Plugin plugin) {
 		plugin.setActive(false);
+		// TODO: what if this is the only NodePositioner?
+		// in this case we would have stop, since we cannot remove it!
 		synchronized (plugins) {
 			plugins.remove(plugin);
 		}
