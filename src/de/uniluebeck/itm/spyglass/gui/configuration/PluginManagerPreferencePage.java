@@ -159,7 +159,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		
 	}
 	
-	private class NodePositionerComboContentProvider implements IStructuredContentProvider, PluginListChangeListener {
+	private class NodePositionerComboContentProvider implements IStructuredContentProvider,
+			PluginListChangeListener {
 		
 		@Override
 		public void dispose() {
@@ -168,7 +169,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		
 		@Override
 		public Object[] getElements(final Object arg0) {
-			final List<Plugin> pluginInstances = spyglass.getPluginManager().getPluginInstances(NodePositionerPlugin.class, true);
+			final List<Plugin> pluginInstances = spyglass.getPluginManager().getPluginInstances(
+					NodePositionerPlugin.class, true);
 			return pluginInstances.toArray(new Object[pluginInstances.size()]);
 		}
 		
@@ -221,7 +223,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		
 	}
 	
-	private class PluginTableContentProvider implements IStructuredContentProvider, PluginListChangeListener {
+	private class PluginTableContentProvider implements IStructuredContentProvider,
+			PluginListChangeListener {
 		
 		private List<Plugin> plugins;
 		
@@ -233,7 +236,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		@SuppressWarnings("unchecked")
 		@Override
 		public Object[] getElements(final Object arg0) {
-			plugins = ((Spyglass) arg0).getPluginManager().getPlugins(true, NodePositionerPlugin.class);
+			plugins = ((Spyglass) arg0).getPluginManager().getPlugins(true,
+					NodePositionerPlugin.class);
 			return plugins.toArray(new Plugin[plugins.size()]);
 		}
 		
@@ -420,7 +424,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		final Label npSelLabel = new Label(npSelGroup, SWT.NONE);
 		npSelLabel.setText("Active Node Positioner");
 		
-		npComboViewer = new NodePositionerComboViewer(npSelGroup, SWT.SIMPLE | SWT.DROP_DOWN | SWT.READ_ONLY);
+		npComboViewer = new NodePositionerComboViewer(npSelGroup, SWT.SIMPLE | SWT.DROP_DOWN
+				| SWT.READ_ONLY);
 		npComboViewer.setContentProvider(npComboContentProvider);
 		npComboViewer.setLabelProvider(npComboLabelProvider);
 		npComboViewer.setInput(spyglass);
@@ -429,9 +434,10 @@ public class PluginManagerPreferencePage extends PreferencePage {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent e) {
 				final IStructuredSelection selection = (IStructuredSelection) e.getSelection();
-				final NodePositionerPlugin selectedPlugin = (NodePositionerPlugin) selection.getFirstElement();
+				final NodePositionerPlugin selectedPlugin = (NodePositionerPlugin) selection
+						.getFirstElement();
 				// TODO warning if switching to node positioner without metric system (!!!)
-				spyglass.getPluginManager().setNodePositioner(selectedPlugin);
+				selectedPlugin.getXMLConfig().setActive(true);
 			}
 			
 		});
@@ -495,7 +501,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	}
 	
 	private void clickedButtonDown() {
-		final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer.getSelection()).getFirstElement();
+		final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer
+				.getSelection()).getFirstElement();
 		final Plugin nextPlugin;
 		final List<Plugin> plugins = pluginTableContentProvider.plugins;
 		nextPlugin = plugins.get(plugins.indexOf(selectedPlugin) + 1);
@@ -505,7 +512,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	}
 	
 	private void clickedButtonUp() {
-		final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer.getSelection()).getFirstElement();
+		final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer
+				.getSelection()).getFirstElement();
 		final Plugin previousPlugin;
 		final List<Plugin> plugins = pluginTableContentProvider.plugins;
 		previousPlugin = plugins.get(plugins.indexOf(selectedPlugin) - 1);
@@ -536,7 +544,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private void createPluginTableViewer(final Composite parent) {
 		
-		final int style = SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION;
+		final int style = SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
+				| SWT.FULL_SELECTION;
 		
 		pluginTableViewer = new TableViewer(parent, style);
 		

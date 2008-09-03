@@ -8,6 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.plugin;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -68,8 +70,6 @@ public class PluginManager {
 		availablePluginsTypes.add(LinePainterPlugin.class);
 		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
 	}
-	
-	private NodePositionerPlugin nodePositioner = null;
 	
 	// --------------------------------------------------------------------------
 	// ------
@@ -143,7 +143,8 @@ public class PluginManager {
 	 * @return a list-copy of plugin instances
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Plugin> getPlugins(final boolean checkHierarchy, final Class<? extends Plugin>... excludes) {
+	public List<Plugin> getPlugins(final boolean checkHierarchy,
+			final Class<? extends Plugin>... excludes) {
 		
 		Class<? extends Plugin> currentClass;
 		final List<Plugin> pluginList = new ArrayList<Plugin>();
@@ -196,16 +197,43 @@ public class PluginManager {
 	/**
 	 * Initializes the instance by setting it as administration instance for all currently available
 	 * plug-ins
+	 * 
+	 * This method is called after the PluginManager got instanciated by the XML Deserializer
 	 */
 	public void init() {
 		// This is a workaround, since simple-xml does not call the setPlugins()
 		// method
 		synchronized (plugins) {
 			for (final Plugin p : plugins) {
-				p.initializePacketConsumerThread();
-				p.setPluginManager(this);
+				connectPlugin(p);
 			}
 		}
+	}
+	
+	/**
+	 * Connect the Plugin with the plugin manager
+	 */
+	private void connectPlugin(final Plugin plugin) {
+		plugin.initializePacketConsumerThread();
+		plugin.setPluginManager(this);
+		
+		// If the plugin is a NodePositioner, we have to act when the plugin is activated
+		// (to disable all other plugins)
+		if (plugin instanceof NodePositionerPlugin) {
+			plugin.getXMLConfig().addPropertyChangeListener("active", new PropertyChangeListener() {
+				
+				@Override
+				public void propertyChange(final PropertyChangeEvent evt) {
+					final Boolean active = (Boolean) evt.getNewValue();
+					if (active) {
+						newNodePositioner(plugin);
+					}
+					
+				}
+				
+			});
+		}
+		
 	}
 	
 	// --------------------------------------------------------------------------
@@ -218,20 +246,32 @@ public class PluginManager {
 	 *            The plugin object to be added.
 	 */
 	public void addPlugin(final Plugin plugin) {
-		plugin.setPluginManager(this);
-		plugin.initializePacketConsumerThread();
+		this.connectPlugin(plugin);
+		
 		synchronized (plugins) {
 			if (!plugins.contains(plugin)) {
 				plugins.add(plugin);
 			}
 		}
 		log.debug("Added plug-in: " + plugin);
+		
 		firePluginListChangedEvent(plugin, ListChangeEvent.NEW_PLUGIN);
 		
 		// TODO: fix!!!
 		// TEAMQUESTION: where should the new plugin be placed? At the beginning
 		// or the end?
 		
+	}
+	
+	/**
+	 * Disable all NodePositioner Plugins except the given one.
+	 */
+	private void newNodePositioner(final Plugin plugin) {
+		for (final Plugin p : plugins) {
+			if ((p instanceof NodePositionerPlugin) && (p != plugin)) {
+				p.getXMLConfig().setActive(false);
+			}
+		}
 	}
 	
 	// --------------------------------------------------------------------------
@@ -293,7 +333,8 @@ public class PluginManager {
 			plugins.set(onePos, theOtherPlugin);
 			plugins.set(otherPos, tmp);
 			
-			log.debug("Toggled the priorities of the plug-ins \"" + onePlugin + "\" and \"" + theOtherPlugin + "\"");
+			log.debug("Toggled the priorities of the plug-ins \"" + onePlugin + "\" and \""
+					+ theOtherPlugin + "\"");
 			
 		}
 		
@@ -368,13 +409,7 @@ public class PluginManager {
 	 *            a node positioner instance
 	 */
 	public void setNodePositioner(final NodePositionerPlugin np) {
-		if (nodePositioner == null) {
-			this.nodePositioner = np;
-		} else {
-			synchronized (nodePositioner) {
-				this.nodePositioner = np;
-			}
-		}
+		np.getXMLConfig().setActive(true);
 		addPlugin(np);
 	}
 	
@@ -386,10 +421,16 @@ public class PluginManager {
 	 * @return the instances which holds information about the nodes' positions
 	 */
 	public NodePositionerPlugin getNodePositioner() {
-		synchronized (nodePositioner) {
-			assert (nodePositioner != null);
-			return nodePositioner;
+		NodePositionerPlugin np = null;
+		synchronized (plugins) {
+			for (final Plugin p : plugins) {
+				if (p instanceof NodePositionerPlugin) {
+					assert (np == null);
+					np = (NodePositionerPlugin) p;
+				}
+			}
 		}
+		return np;
 	}
 	
 	// --------------------------------------------------------------------------
@@ -448,7 +489,8 @@ public class PluginManager {
 	 *            returned, <code>false</code> otherwise
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Plugin> getPluginInstances(final Class<? extends Plugin> clazz, final boolean checkHierarchy) {
+	public List<Plugin> getPluginInstances(final Class<? extends Plugin> clazz,
+			final boolean checkHierarchy) {
 		
 		final List<Plugin> instances = new LinkedList<Plugin>();
 		Class<? extends Plugin> currentClass;

@@ -18,7 +18,6 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
-import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXmlConfig;
 
 // --------------------------------------------------------------------------------
@@ -35,9 +34,6 @@ public class SpyglassConfiguration {
 	
 	@Element(name = "instances")
 	private PluginManager pluginManager = null;
-	
-	@Element
-	private NodePositionerPlugin nodePositioner;
 	
 	@Element
 	private GeneralSettingsXmlConfig generalSettings;
@@ -147,17 +143,6 @@ public class SpyglassConfiguration {
 	// --------------------------------------------------------------------------------
 	public void setPacketReader(final PacketReader packetReader) {
 		this.packetReader = packetReader;
-	}
-	
-	// --------------------------------------------------------------------------------
-	public void setNodePositioner(final NodePositionerPlugin randomNodePositioner) {
-		this.nodePositioner = randomNodePositioner;
-	}
-	
-	// --------------------------------------------------------------------------------
-	public NodePositionerPlugin getNodePositioner() {
-		return nodePositioner;
-		
 	}
 	
 	// --------------------------------------------------------------------------------
