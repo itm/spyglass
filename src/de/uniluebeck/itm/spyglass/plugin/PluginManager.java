@@ -402,20 +402,6 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Sets the instances which holds information about the nodes' positions.<br>
-	 * Note that only one node positioner instance can be active at a time
-	 * 
-	 * @param np
-	 *            a node positioner instance
-	 */
-	public void setNodePositioner(final NodePositionerPlugin np) {
-		np.getXMLConfig().setActive(true);
-		addPlugin(np);
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
 	 * Returns the instances which holds information about the nodes' positions
 	 * 
 	 * @return the instances which holds information about the nodes' positions
