@@ -47,4 +47,13 @@ public class PixelPosition {
 		return new Point2D.Double(x, y);
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "[" + x + ", " + y + "]";
+	}
+	
 }

@@ -87,4 +87,9 @@ public class PixelRectangle {
 		this.upperLeft = upperLeft;
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("PixelRectangle {%s, %d, %d}", this.upperLeft, height, width);
+	}
+	
 }

@@ -85,7 +85,8 @@ public class AbsoluteRectangle {
 	}
 	
 	public AbsoluteRectangle(final AbsoluteRectangle other) {
-		this.rectangle = new Rectangle(other.rectangle.x, other.rectangle.y, other.rectangle.width, other.rectangle.height);
+		this.rectangle = new Rectangle(other.rectangle.x, other.rectangle.y, other.rectangle.width,
+				other.rectangle.height);
 	}
 	
 	public AbsoluteRectangle(final AbsolutePosition upperLeft, final int width, final int height) {
@@ -118,7 +119,8 @@ public class AbsoluteRectangle {
 	
 	public boolean contains(final AbsoluteRectangle rect) {
 		final Rectangle intersection = this.rectangle.intersection(rect.rectangle);
-		return (intersection.x == rect.rectangle.x) && (intersection.y == rect.rectangle.y) && (intersection.width == rect.rectangle.width)
+		return (intersection.x == rect.rectangle.x) && (intersection.y == rect.rectangle.y)
+				&& (intersection.width == rect.rectangle.width)
 				&& (intersection.height == rect.rectangle.height);
 	}
 	
@@ -139,6 +141,11 @@ public class AbsoluteRectangle {
 		this.rectangle.width = width;
 		this.rectangle.height = height;
 		
+	}
+	
+	@Override
+	public String toString() {
+		return this.rectangle.toString();
 	}
 	
 }

@@ -10,6 +10,15 @@ import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.set.ObservableSet;
 import org.junit.Assert;
 
+/**
+ * Wraps a Set into an ObservableSet. The original set is not copied, instead calls to an
+ * WrappedObservableSet are passed through to the original wrapped set.
+ * 
+ * Thus changes to ether the WrappedObservableSet or the origial set reflect on each other.
+ * 
+ * @author Dariush Forouher
+ */
+@SuppressWarnings("unchecked")
 public class WrappedObservableSet extends ObservableSet {
 	
 	public WrappedObservableSet(final Realm realm, final Set set, final Object sample) {
@@ -22,7 +31,6 @@ public class WrappedObservableSet extends ObservableSet {
 	 * 
 	 * @see org.eclipse.core.databinding.observable.set.AbstractObservableSet#add(java.lang.Object)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean add(final Object o) {
 		final boolean ret = wrappedSet.add(o);

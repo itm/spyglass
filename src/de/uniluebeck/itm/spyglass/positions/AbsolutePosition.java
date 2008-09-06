@@ -2,6 +2,7 @@ package de.uniluebeck.itm.spyglass.positions;
 
 import java.awt.geom.Point2D;
 
+import org.eclipse.swt.graphics.Point;
 import org.simpleframework.xml.Attribute;
 
 // --------------------------------------------------------------------------------
@@ -99,6 +100,10 @@ public class AbsolutePosition implements Cloneable {
 	
 	public Point2D toPoint2D() {
 		return new Point2D.Double(x, y);
+	}
+	
+	public Point toPoint() {
+		return new Point(x, y);
 	}
 	
 }

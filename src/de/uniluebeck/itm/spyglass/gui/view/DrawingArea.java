@@ -16,10 +16,10 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 /**
  * The drawing area is the place, where all nodes etc. are painted on. this class contains all
- * information about the dimensions of the draw
+ * information about the dimensions of the drawing area and offers methods to transform between
+ * reference frames.
  * 
  * @author Dariush Forouher
- * 
  */
 @Root
 public class DrawingArea {
@@ -39,11 +39,16 @@ public class DrawingArea {
 	/**
 	 * The transformation matrix. it transforms coordinates from the absolute reference frame to the
 	 * reference frame of the drawing area
+	 * 
+	 * Note: At the moment only modifing calls to this objects are serialized with synchronized().
+	 * Since we are currently redrawing the screen 25 times a second, a messed up transformation
+	 * should not be visible for a noticable time.
 	 */
 	AffineTransform at = new AffineTransform();
 	
 	/**
 	 * Maps a point from the absolute reference frame to the reference frame of the drawing area.
+	 * 
 	 * 
 	 * @param absPoint
 	 *            a point in the absolute reference frame
@@ -56,7 +61,7 @@ public class DrawingArea {
 	}
 	
 	/**
-	 * * Transforms a rectangle from absolute coordinates into a one with pixel coordinates.
+	 * Transforms a rectangle from absolute coordinates into a one with pixel coordinates.
 	 * 
 	 * 
 	 * @param absRect
@@ -73,8 +78,8 @@ public class DrawingArea {
 		lowerRightAbs.y = absRect.getUpperLeft().y - absRect.getHeight();
 		final PixelPosition lowerRight = this.absPoint2PixelPoint(lowerRightAbs);
 		
-		rect.setWidth(lowerRight.x - upperLeft.x);
-		rect.setHeight(upperLeft.y - lowerRight.y);
+		rect.setWidth(Math.abs(upperLeft.x - lowerRight.x));
+		rect.setHeight(Math.abs(upperLeft.y - lowerRight.y));
 		
 		return rect;
 	}
@@ -103,6 +108,7 @@ public class DrawingArea {
 	 */
 	public PixelRectangle getDrawingRectangle() {
 		final PixelRectangle ret = new PixelRectangle();
+		ret.setUpperLeft(new PixelPosition(0, 0));
 		ret.setHeight(getDrawingCanvasRectangle().height);
 		ret.setWidth(getDrawingCanvasRectangle().width);
 		return ret;
@@ -118,13 +124,15 @@ public class DrawingArea {
 		final AbsolutePosition upperLeft = this.getUpperLeft();
 		final AbsolutePosition lowerRight = this.getLowerRight();
 		
-		final int height = upperLeft.y - lowerRight.y;
-		final int width = lowerRight.x - upperLeft.x;
+		final int height = Math.abs(upperLeft.y - lowerRight.y);
+		final int width = Math.abs(lowerRight.x - upperLeft.x);
 		
-		absRect.setHeight((height));
-		absRect.setWidth((width));
+		absRect.setUpperLeft(upperLeft);
+		absRect.setHeight(height);
+		absRect.setWidth(width);
 		
-		// log.debug(String.format("Size of the drawing area in px: %dx%d\n", width, height));
+		// log.debug(String.format("Size of the drawing area in px: %dx%d; Pos=%s", width, height,
+		// upperLeft));
 		
 		return absRect;
 	}
@@ -135,7 +143,8 @@ public class DrawingArea {
 	public AbsolutePosition getLowerRight() {
 		try {
 			
-			final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(), this.getDrawingRectangle().getHeight());
+			final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(),
+					this.getDrawingRectangle().getHeight());
 			final Point2D lowerRight2D = at.inverseTransform(lowerRight, null);
 			return new AbsolutePosition(lowerRight2D);
 			
@@ -166,14 +175,16 @@ public class DrawingArea {
 	 */
 	public void move(final int pixelX, final int pixelY) {
 		
-		log.debug("Moving about " + pixelX + "; " + pixelY);
+		// log.debug("Moving about " + pixelX + "; " + pixelY);
 		
-		// Build the scale matrix
+		// Build the translation matrix
 		final AffineTransform sca = new AffineTransform();
 		sca.translate(pixelX, pixelY);
 		
-		// add the scale matrix to the transformation matrix.
-		at.preConcatenate(sca);
+		synchronized (at) {
+			// add the translation matrix to the transformation matrix.
+			at.preConcatenate(sca);
+		}
 		
 	}
 	
@@ -246,24 +257,10 @@ public class DrawingArea {
 	 * @param py
 	 */
 	public void zoomOut(final int px, final int py) {
-		log.debug("Zooming from " + px + "; " + py);
+		// log.debug("Zooming from " + px + "; " + py);
 		
-		try {
-			
-			// The centerpoint of the zoom (where the user clicked)
-			final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
-			
-			// Build the scale matrix
-			final AffineTransform sca = new AffineTransform();
-			sca.translate(a.getX(), a.getY());
-			sca.scale(1 / ZOOM_FACTOR, 1 / ZOOM_FACTOR);
-			sca.translate(-a.getX(), -a.getY());
-			
-			// add the scale matrix to the transformation matrix.
-			at.concatenate(sca);
-		} catch (final NoninvertibleTransformException e) {
-			throw new RuntimeException("Transformation matrix in illegal state!", e);
-		}
+		zoom(px, py, 1 / ZOOM_FACTOR);
+		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -274,8 +271,20 @@ public class DrawingArea {
 	 * @param py
 	 */
 	public void zoomIn(final int px, final int py) {
-		log.debug("Zooming into " + px + "; " + py);
+		// log.debug("Zooming into " + px + "; " + py);
 		
+		zoom(px, py, ZOOM_FACTOR);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Zoom in or out by the given factor
+	 * 
+	 * @param px
+	 * @param py
+	 * @param factor
+	 */
+	private void zoom(final int px, final int py, final double factor) {
 		try {
 			// The centerpoint of the zoom (where the user clicked)
 			final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
@@ -283,11 +292,14 @@ public class DrawingArea {
 			// Build the scale matrix
 			final AffineTransform sca = new AffineTransform();
 			sca.translate(a.getX(), a.getY());
-			sca.scale(ZOOM_FACTOR, ZOOM_FACTOR);
+			sca.scale(factor, factor);
 			sca.translate(-a.getX(), -a.getY());
 			
 			// add the scale matrix to the transformation matrix.
-			at.concatenate(sca);
+			synchronized (at) {
+				at.concatenate(sca);
+			}
+			
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
 		}
@@ -297,7 +309,8 @@ public class DrawingArea {
 	 * Zoom in and implicitly asume that the center of the drawing area is the scale center.
 	 */
 	public void zoomIn() {
-		this.zoomIn(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle().getHeight() / 2);
+		this.zoomIn(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle()
+				.getHeight() / 2);
 		
 	}
 	
@@ -305,7 +318,8 @@ public class DrawingArea {
 	 * Zoom out and implicitly asume that the center of the drawing area is the scale center.
 	 */
 	public void zoomOut() {
-		this.zoomOut(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle().getHeight() / 2);
+		this.zoomOut(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle()
+				.getHeight() / 2);
 		
 	}
 	
@@ -328,6 +342,9 @@ public class DrawingArea {
 		
 		newAt.translate(rect.getUpperLeft().x, rect.getUpperLeft().y);
 		newAt.scale(scale, scale);
-		this.at = newAt;
+		
+		synchronized (at) {
+			this.at = newAt;
+		}
 	}
 }

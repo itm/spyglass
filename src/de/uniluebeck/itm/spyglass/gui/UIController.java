@@ -33,7 +33,10 @@ import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
+import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 // ------------------------------------------------------------------------------
@@ -56,6 +59,14 @@ public class UIController {
 	/** User events will be dispatched here */
 	private final EventDispatcher eventDispatcher;
 	
+	/**
+	 * This color is used for area outside of the the map
+	 */
+	private final Color canvasOutOfMapColor = new Color(null, 50, 50, 50);
+	
+	/**
+	 * This color is used as the background color
+	 */
 	private final Color canvasBgColor = new Color(null, 255, 255, 255);
 	
 	/**
@@ -96,7 +107,8 @@ public class UIController {
 		
 		this.spyglass = spyglass;
 		this.appWindow = appWindow;
-		this.eventDispatcher = new EventDispatcher(spyglass.getPluginManager(), spyglass.getDrawingArea());
+		this.eventDispatcher = new EventDispatcher(spyglass.getPluginManager(), spyglass
+				.getDrawingArea());
 		
 		display = appWindow.getDisplay();
 		
@@ -254,8 +266,9 @@ public class UIController {
 	 * @see DrawingObject
 	 */
 	private void render(final GC gc) {
-		gc.setBackground(canvasBgColor);
-		gc.fillRectangle(appWindow.getGui().getCanvas().getClientArea());
+		
+		drawBackground(gc);
+		
 		final List<Plugin> plugins = spyglass.getPluginManager().getVisiblePlugins();
 		for (final Plugin plugin : plugins) {
 			if (plugin instanceof Drawable) {
@@ -263,6 +276,78 @@ public class UIController {
 			}
 		}
 		drawDebugMarkers(gc);
+		drawDebugMarkers2(gc);
+	}
+	
+	/**
+	 * Draw the background.
+	 * 
+	 * Space which lies inside the map (-2^15 to 2^15) will be colored in <code>canvasBgColor</code>
+	 * , whereas space outside this area is colored <code>canvasOutOfMapColor</code>.
+	 */
+	private void drawBackground(final GC gc) {
+		gc.setBackground(canvasOutOfMapColor);
+		gc.fillRectangle(appWindow.getGui().getCanvas().getClientArea());
+		
+		// TODO: move this code into DrawingArea
+		
+		final AbsolutePosition absPoint = new AbsolutePosition();
+		absPoint.x = -32768;
+		absPoint.y = -32768;
+		
+		final AbsoluteRectangle completeMap = new AbsoluteRectangle();
+		completeMap.setUpperLeft(absPoint);
+		completeMap.setHeight(2 * 32768);
+		completeMap.setWidth(2 * 32768);
+		
+		PixelRectangle pxRect = null;
+		
+		final AbsoluteRectangle visibleArea = spyglass.getDrawingArea()
+				.getAbsoluteDrawingRectangle();
+		
+		// This is a workaround, since GC has problems with huge negative numbers
+		if (completeMap.contains(visibleArea)) {
+			pxRect = spyglass.getDrawingArea().getDrawingRectangle();
+		} else {
+			pxRect = spyglass.getDrawingArea().absRect2PixelRect(completeMap);
+		}
+		
+		gc.setBackground(canvasBgColor);
+		gc.fillRectangle(pxRect.getUpperLeft().x, pxRect.getUpperLeft().y, pxRect.getWidth(),
+				pxRect.getHeight());
+	}
+	
+	/**
+	 * positioning markers to calibrate the borders
+	 * 
+	 * @param gc
+	 */
+	private void drawDebugMarkers2(final GC gc) {
+		final DrawingArea da = this.spyglass.getDrawingArea();
+		final DrawingObject dob = new de.uniluebeck.itm.spyglass.drawing.primitive.Circle();
+		dob.getPosition().x = -32768;
+		dob.getPosition().y = -32768;
+		dob.draw(da, gc);
+		dob.setColor(0, 0, 255);
+		
+		final DrawingObject dob2 = new de.uniluebeck.itm.spyglass.drawing.primitive.Circle();
+		dob2.getPosition().x = 32768;
+		dob2.getPosition().y = -32768;
+		dob2.draw(da, gc);
+		dob2.setColor(0, 0, 255);
+		
+		final DrawingObject dob3 = new de.uniluebeck.itm.spyglass.drawing.primitive.Circle();
+		dob3.getPosition().x = -32768;
+		dob3.getPosition().y = 32768;
+		dob3.draw(da, gc);
+		dob3.setColor(0, 0, 255);
+		
+		final DrawingObject dob4 = new de.uniluebeck.itm.spyglass.drawing.primitive.Circle();
+		dob4.getPosition().x = 32768;
+		dob4.getPosition().y = 32768;
+		dob4.draw(da, gc);
+		dob4.setColor(0, 0, 255);
+		
 	}
 	
 	/**
@@ -300,7 +385,8 @@ public class UIController {
 	}
 	
 	private void renderPlugin(final GC gc, final Plugin plugin) {
-		final List<DrawingObject> dos = new LinkedList<DrawingObject>(((Drawable) plugin).getDrawingObjects(this.spyglass.getDrawingArea()));
+		final List<DrawingObject> dos = new LinkedList<DrawingObject>(((Drawable) plugin)
+				.getDrawingObjects(this.spyglass.getDrawingArea()));
 		final DrawingArea area = spyglass.getDrawingArea();
 		if (dos != null) {
 			for (final DrawingObject object : dos) {
