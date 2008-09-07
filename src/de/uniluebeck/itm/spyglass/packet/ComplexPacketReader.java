@@ -43,7 +43,8 @@ public class ComplexPacketReader extends PacketReader {
 	public SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException {
 		
 		if (bufferedReader == null) {
-			bufferedReader = new BufferedReader(new InputStreamReader(this.getGateway().getInputStream()));
+			bufferedReader = new BufferedReader(new InputStreamReader(this.getGateway()
+					.getInputStream()));
 		}
 		
 		SpyglassPacket packet = null;
@@ -62,13 +63,13 @@ public class ComplexPacketReader extends PacketReader {
 			log.error("Error while reading a new packet...", e);
 		}
 		
-		// Hold back the packet
+		// Hold back the packet at least for delayMillies
 		final long now = System.currentTimeMillis();
 		final long diff = now - this.lastPacketTimestamp;
 		if (diff < this.delayMillies) {
 			Thread.sleep(this.delayMillies - diff);
 		}
-		this.lastPacketTimestamp = now;
+		this.lastPacketTimestamp = System.currentTimeMillis();
 		return packet;
 	}
 	

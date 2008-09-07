@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.core;
 
@@ -23,12 +21,11 @@ import de.uniluebeck.itm.spyglass.util.Tools;
 // ------------------------------------------------------------------------------
 // --
 /**
- * The InformationDispatch class is responsible for distributing Packet objects
- * to all loaded Spyglass plugins. The distribution process includes iteration
- * over all plugins that the Plugin Manager handles. Please note that the
- * iteration process is not synchronized. That is, if another thread is
- * accessing the plugins list of the Plugin Manager, the distribution of Packets
- * may cause a concurrent modification exception.
+ * The InformationDispatch class is responsible for distributing Packet objects to all loaded
+ * Spyglass plugins. The distribution process includes iteration over all plugins that the Plugin
+ * Manager handles. Please note that the iteration process is not synchronized. That is, if another
+ * thread is accessing the plugins list of the Plugin Manager, the distribution of Packets may cause
+ * a concurrent modification exception.
  */
 public class PacketDispatcher {
 	private static Category log = SpyglassLogger.get(PacketDispatcher.class);
@@ -41,8 +38,7 @@ public class PacketDispatcher {
 	 * Constructor.
 	 * 
 	 * @param pluginManager
-	 *            The plugin manager object that is being used to get all loaded
-	 *            plugins.
+	 *            The plugin manager object that is being used to get all loaded plugins.
 	 */
 	public PacketDispatcher(final PluginManager pluginManager) {
 		if (pluginManager == null) {
@@ -56,8 +52,8 @@ public class PacketDispatcher {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * This method distributes the given Packet object to all loaded plugins by
-	 * invoking the <code>handlePacket</code> method of a plugin.
+	 * This method distributes the given Packet object to all loaded plugins by invoking the
+	 * <code>handlePacket</code> method of a plugin.
 	 * 
 	 * @param packet
 	 *            The packet object to be distributed.
@@ -74,6 +70,7 @@ public class PacketDispatcher {
 		// note positionen which can handle packets all the time!)
 		// An exception like this has to be handled differently
 		final NodePositionerPlugin np = pluginManager.getNodePositioner();
+		log.debug("Dispatching packet[" + packet + "] to NodePositioner " + np);
 		np.handlePacket(packet);
 		
 		//
@@ -82,11 +79,13 @@ public class PacketDispatcher {
 			return;
 		}
 		
-		if (log.isDebugEnabled()) {
-			log.debug("Dispatching packet[" + packet + "] to plugins: " + Tools.toString(plugins));
-		}
+		log.debug("Dispatching packet[" + packet + "] to plugins: " + Tools.toString(plugins));
 		
 		for (final Plugin plugin : plugins) {
+			// We handled the active NodePositioner already
+			if (plugin instanceof NodePositionerPlugin) {
+				continue;
+			}
 			try {
 				plugin.handlePacket(packet);
 			} catch (final Throwable t) {
@@ -94,5 +93,4 @@ public class PacketDispatcher {
 			}
 		}
 	}
-	
 }

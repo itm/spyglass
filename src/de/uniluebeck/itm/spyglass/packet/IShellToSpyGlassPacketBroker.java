@@ -72,7 +72,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 					
 				}
 				
-				packet = queue.getFirst();
+				packet = queue.remove();
 				
 			}
 			
