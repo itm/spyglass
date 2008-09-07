@@ -74,8 +74,8 @@ public class DrawingArea {
 		rect.setUpperLeft(upperLeft);
 		
 		final AbsolutePosition lowerRightAbs = new AbsolutePosition();
-		lowerRightAbs.x = absRect.getUpperLeft().x - absRect.getWidth();
-		lowerRightAbs.y = absRect.getUpperLeft().y - absRect.getHeight();
+		lowerRightAbs.x = absRect.getUpperLeft().x + absRect.getWidth();
+		lowerRightAbs.y = absRect.getUpperLeft().y + absRect.getHeight();
 		final PixelPosition lowerRight = this.absPoint2PixelPoint(lowerRightAbs);
 		
 		rect.setWidth(Math.abs(upperLeft.x - lowerRight.x));
@@ -112,6 +112,7 @@ public class DrawingArea {
 		ret.setHeight(getDrawingCanvasRectangle().height);
 		ret.setWidth(getDrawingCanvasRectangle().width);
 		return ret;
+		// return this.absRect2PixelRect(getAbsoluteDrawingRectangle());
 	}
 	
 	/**
@@ -218,12 +219,12 @@ public class DrawingArea {
 		absRect.setUpperLeft(upperLeftAbs);
 		
 		final PixelPosition lowerRight = new PixelPosition();
-		lowerRight.x = rect.getUpperLeft().x - rect.getWidth();
-		lowerRight.y = rect.getUpperLeft().y - rect.getHeight();
+		lowerRight.x = rect.getUpperLeft().x + rect.getWidth();
+		lowerRight.y = rect.getUpperLeft().y + rect.getHeight();
 		final AbsolutePosition lowerRightAbs = this.pixelPoint2AbsPoint(lowerRight);
 		
-		absRect.setWidth(lowerRightAbs.x - upperLeftAbs.x);
-		absRect.setHeight(upperLeftAbs.y - lowerRightAbs.y);
+		absRect.setWidth(Math.abs(lowerRightAbs.x - upperLeftAbs.x));
+		absRect.setHeight(Math.abs(upperLeftAbs.y - lowerRightAbs.y));
 		
 		return absRect;
 	}
