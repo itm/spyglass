@@ -3,7 +3,7 @@
 <packetGenerator>
 
 	<!-- number of nodes sent per second -->
-	<packetsPerSecond>10</packetsPerSecond>
+	<packetsPerSecond>1</packetsPerSecond>
 
 	<!-- Sinks which will handle each generated packet. -->
 	<sinks>
@@ -14,10 +14,12 @@
 			<iShellSourceNode>1</iShellSourceNode>
 		</sink>
 		<!-- this sink writes the packets into the given file. -->
+		<!--
 		<sink class="de.uniluebeck.itm.spyglass.packetgenerator.sinks.FileSink">
 			<filename>packet-samples/6fixedNodes.txt</filename>
 			<append>false</append>
 		</sink>
+		-->
 
 	</sinks>
 
