@@ -10,6 +10,7 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
+import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 
 // --------------------------------------------------------------------------------
@@ -91,6 +92,7 @@ public class NodeObject extends DrawingObject {
 		this.isExtended = isExtended;
 		this.lineWidth = lineWidth;
 		this.setColor(lineColorRGB[0], lineColorRGB[1], lineColorRGB[2]);
+		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -217,7 +219,10 @@ public class NodeObject extends DrawingObject {
 		// get the node's position in the drawing area
 		final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(this.getPosition());
 		
-		setBoundingBox(new AbsoluteRectangle(upperLeft.x, upperLeft.y, width, height));
+		final PixelRectangle pxRect = new PixelRectangle(upperLeft, height, width);
+		final AbsoluteRectangle absRect = drawingArea.pixelRect2AbsRect(pxRect);
+		setBoundingBox(absRect);
+		
 		gc.fillRectangle(upperLeft.x, upperLeft.y, width, height);
 		gc.drawRectangle(upperLeft.x, upperLeft.y, width, height);
 		gc.drawText(string, upperLeft.x + lineWidth, upperLeft.y + lineWidth);
