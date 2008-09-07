@@ -275,8 +275,8 @@ public class UIController {
 				renderPlugin(gc, plugin);
 			}
 		}
-		drawDebugMarkers(gc);
-		drawDebugMarkers2(gc);
+		// drawDebugMarkers(gc);
+		// drawDebugMarkers2(gc);
 	}
 	
 	/**

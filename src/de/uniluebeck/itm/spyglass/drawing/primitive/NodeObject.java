@@ -29,8 +29,6 @@ public class NodeObject extends DrawingObject {
 	
 	private volatile boolean isExtended;
 	
-	private int[] lineColorRGB;
-	
 	private int lineWidth;
 	
 	private AbsoluteRectangle boundingBox;
@@ -61,7 +59,8 @@ public class NodeObject extends DrawingObject {
 	 * @param isExtended
 	 *            indicates if the extended mode is active
 	 */
-	public NodeObject(final int nodeID, final String denotation, final StringFormatter description, final boolean isExtended) {
+	public NodeObject(final int nodeID, final String denotation, final StringFormatter description,
+			final boolean isExtended) {
 		this(nodeID, denotation, description, isExtended, new int[] { 255, 0, 0 }, 1);
 	}
 	
@@ -82,16 +81,16 @@ public class NodeObject extends DrawingObject {
 	 * @param lineWidth
 	 *            the line's width
 	 */
-	public NodeObject(final int nodeID, final String denotation, final StringFormatter description, final boolean isExtended,
-			final int[] lineColorRGB, final int lineWidth) {
+	public NodeObject(final int nodeID, final String denotation, final StringFormatter description,
+			final boolean isExtended, final int[] lineColorRGB, final int lineWidth) {
 		super();
 		super.setId((int) new Date().getTime());
 		this.nodeID = nodeID;
 		this.denotation = denotation;
 		this.description = description;
 		this.isExtended = isExtended;
-		this.lineColorRGB = lineColorRGB;
 		this.lineWidth = lineWidth;
+		this.setColor(lineColorRGB[0], lineColorRGB[1], lineColorRGB[2]);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -109,13 +108,13 @@ public class NodeObject extends DrawingObject {
 	 * @param lineWidth
 	 *            the line's width
 	 */
-	public void update(final String denotation, final StringFormatter description, final boolean isExtended, final int[] lineColorRGB,
-			final int lineWidth) {
+	public void update(final String denotation, final StringFormatter description,
+			final boolean isExtended, final int[] lineColorRGB, final int lineWidth) {
 		this.denotation = denotation;
 		this.description = description;
 		this.isExtended = isExtended;
-		this.lineColorRGB = lineColorRGB;
 		this.lineWidth = lineWidth;
+		this.setColor(lineColorRGB[0], lineColorRGB[1], lineColorRGB[2]);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -171,23 +170,6 @@ public class NodeObject extends DrawingObject {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the lineColorRGB
-	 */
-	public int[] getLineColorRGB() {
-		return lineColorRGB;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param lineColorRGB
-	 *            the lineColorRGB to set
-	 */
-	public void setLineColorRGB(final int[] lineColorRGB) {
-		this.lineColorRGB = lineColorRGB;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @return the lineWidth
 	 */
 	public int getLineWidth() {
@@ -221,7 +203,8 @@ public class NodeObject extends DrawingObject {
 		gc.setBackground(bg);
 		gc.setLineWidth(lineWidth);
 		
-		final String descriptionString = (description == null) ? "sorry, no additional\r\ninformation available!" : description.toString();
+		final String descriptionString = (description == null) ? "sorry, no additional\r\ninformation available!"
+				: description.toString();
 		
 		// create the string to be displayed
 		final String string = (isExtended) ? denotation + "\r\n" + descriptionString : denotation;
