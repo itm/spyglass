@@ -45,6 +45,9 @@ public class ZoomCompleteMapAction extends Action {
 		
 		for (final DrawingObject drawingObject : dobs) {
 			final AbsoluteRectangle nextRect = drawingObject.getBoundingBox();
+			if (nextRect == null) {
+				continue;
+			}
 			
 			if (maxRect == null) {
 				maxRect = nextRect;

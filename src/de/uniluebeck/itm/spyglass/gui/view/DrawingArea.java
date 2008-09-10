@@ -112,7 +112,6 @@ public class DrawingArea {
 		ret.setHeight(getDrawingCanvasRectangle().height);
 		ret.setWidth(getDrawingCanvasRectangle().width);
 		return ret;
-		// return this.absRect2PixelRect(getAbsoluteDrawingRectangle());
 	}
 	
 	/**
@@ -328,24 +327,43 @@ public class DrawingArea {
 	 * Adjusts the transformation matrix to make the given rectangle fit exactly in the drawing
 	 * area.
 	 * 
-	 * TODO: needs some refinements
+	 * TODO: small detail - works not perfect all the time
 	 */
 	public void autoZoom(final AbsoluteRectangle rect) {
 		log.debug("Auto zooming to " + rect);
+		
+		// create a new matrix from scratch
 		final AffineTransform newAt = new AffineTransform();
 		
-		final int height = rect.getHeight();
-		final int width = rect.getWidth();
+		// dimensions of the drawing area
+		final int DAwidth = this.getDrawingCanvasRectangle().width;
+		final int DAhright = this.getDrawingCanvasRectangle().height;
 		
-		final double scaleX = (double) this.getDrawingCanvasRectangle().width / (double) width;
-		final double scaleY = (double) this.getDrawingCanvasRectangle().height / (double) height;
+		final int BBheight = rect.getHeight();
+		final int BBwidth = rect.getWidth();
+		
+		final double scaleX = (double) DAwidth / (double) BBwidth;
+		final double scaleY = (double) DAhright / (double) BBheight;
 		final double scale = Math.min(scaleX, scaleY);
 		
-		newAt.translate(rect.getUpperLeft().x, rect.getUpperLeft().y);
+		// scale and move to upper left corner
 		newAt.scale(scale, scale);
+		newAt.translate(-rect.getUpperLeft().x, -rect.getUpperLeft().y);
 		
-		synchronized (at) {
-			this.at = newAt;
-		}
+		// finally move the rect to the center of the drawing area
+		
+		final AbsolutePosition lowerRight = rect.getUpperLeft();
+		lowerRight.x += rect.getWidth();
+		lowerRight.y += rect.getHeight();
+		final Point2D lowerRightPx = newAt.transform(lowerRight.toPoint2D(), null);
+		
+		final double deltaX = DAwidth - lowerRightPx.getX();
+		final double deltaY = DAhright - lowerRightPx.getY();
+		
+		newAt.preConcatenate(AffineTransform.getTranslateInstance(deltaX / 2, deltaY / 2));
+		
+		// replace the matrix
+		this.at = newAt;
+		
 	}
 }

@@ -8,6 +8,7 @@
 package de.uniluebeck.itm.spyglass.gui;
 
 import java.awt.Event;
+import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
@@ -270,13 +271,51 @@ public class UIController {
 		drawBackground(gc);
 		
 		final List<Plugin> plugins = spyglass.getPluginManager().getVisiblePlugins();
+		// drawDebugGlobalBoundingBox(gc, plugins);
 		for (final Plugin plugin : plugins) {
 			if (plugin instanceof Drawable) {
 				renderPlugin(gc, plugin);
 			}
 		}
+		
 		// drawDebugMarkers(gc);
 		// drawDebugMarkers2(gc);
+	}
+	
+	/**
+	 * Draws a bounding box around all objects
+	 */
+	private void drawDebugGlobalBoundingBox(final GC gc, final List<Plugin> list) {
+		final List<DrawingObject> dobs = new ArrayList<DrawingObject>();
+		
+		for (final Plugin plugin : list) {
+			if (plugin instanceof Drawable) {
+				final Drawable plugin2 = (Drawable) plugin;
+				
+				dobs.addAll(plugin2.getAutoZoomDrawingObjects());
+			}
+		}
+		
+		AbsoluteRectangle maxRect = null;
+		
+		for (final DrawingObject drawingObject : dobs) {
+			final AbsoluteRectangle nextRect = drawingObject.getBoundingBox();
+			if (nextRect == null) {
+				continue;
+			}
+			
+			if (maxRect == null) {
+				maxRect = nextRect;
+			} else {
+				maxRect = maxRect.union(nextRect);
+			}
+		}
+		if (maxRect != null) {
+			final PixelRectangle pxRect = spyglass.getDrawingArea().absRect2PixelRect(maxRect);
+			gc.setForeground(new Color(null, 0, 255, 0));
+			gc.drawRectangle(pxRect.getUpperLeft().x, pxRect.getUpperLeft().y, pxRect.getWidth(),
+					pxRect.getHeight());
+		}
 	}
 	
 	/**
