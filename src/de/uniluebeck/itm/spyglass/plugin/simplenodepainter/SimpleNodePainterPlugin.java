@@ -29,6 +29,7 @@ import de.uniluebeck.itm.spyglass.layer.SubLayer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.nodepainter.NodePainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
+import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -314,21 +315,21 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		
 		// if the mouse event was a (left) double click
 		if ((e.button == 1)) {
-			if (handleDoubleClick(dos, clickPoint)) {
+			if (handleDoubleClick(dos, clickPoint, drawingArea)) {
 				return true;
 			}
 		}
 
 		// if the mouse event was a wheel click
 		else if (e.button == 2) {
-			if (handleWheelClick(dos, clickPoint)) {
+			if (handleWheelClick(dos, clickPoint, drawingArea)) {
 				return true;
 			}
 		}
 
 		// if the mouse event was a right click
 		else if (e.button == 3) {
-			if (handleRightClick(dos, clickPoint)) {
+			if (handleRightClick(dos, clickPoint, drawingArea)) {
 				return true;
 			}
 		}
@@ -345,17 +346,20 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 *            the plug-in's drawing objects
 	 * @param clickPoint
 	 *            the point which was clicked
+	 * @param drawingArea
+	 *            TODO
 	 * @return <code>true</code> if a matching drawing object was found
 	 */
 	private boolean handleDoubleClick(final List<DrawingObject> drawingObjects,
-			final Point clickPoint) {
+			final Point clickPoint, final DrawingArea drawingArea) {
 		
 		// check all drawing objects
 		for (final DrawingObject drawingObject : drawingObjects) {
-			
+			final PixelRectangle bbox = drawingArea.absRect2PixelRect(drawingObject
+					.getBoundingBox());
 			// check which plug-in's bounding box contains the point which
 			// was clicked (if any)
-			if (drawingObject.getBoundingBox().contains(clickPoint)) {
+			if (bbox.contains(clickPoint)) {
 				// check if the object is representing a node
 				if (drawingObject instanceof NodeObject) {
 					// if so, toggle its extension state
@@ -380,14 +384,16 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * @return <code>true</code> if a matching drawing object was found
 	 */
 	private boolean handleRightClick(final List<DrawingObject> drawingObjects,
-			final Point clickPoint) {
+			final Point clickPoint, final DrawingArea drawingArea) {
 		
 		// check all drawing objects
 		for (final DrawingObject drawingObject : drawingObjects) {
 			
+			final PixelRectangle bbox = drawingArea.absRect2PixelRect(drawingObject
+					.getBoundingBox());
 			// check which plug-in's bounding box contains the point which
 			// was clicked (if any)
-			if (drawingObject.getBoundingBox().contains(clickPoint)) {
+			if (bbox.contains(clickPoint)) {
 				synchronized (layer) {
 					layer.bringToFront(drawingObject);
 				}
@@ -409,14 +415,16 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * @return <code>true</code> if a matching drawing object was found
 	 */
 	private boolean handleWheelClick(final List<DrawingObject> drawingObjects,
-			final Point clickPoint) {
+			final Point clickPoint, final DrawingArea drawingArea) {
 		
 		// check all drawing objects
 		for (final DrawingObject drawingObject : drawingObjects) {
 			
+			final PixelRectangle bbox = drawingArea.absRect2PixelRect(drawingObject
+					.getBoundingBox());
 			// check which plug-in's bounding box contains the point which
 			// was clicked (if any)
-			if (drawingObject.getBoundingBox().contains(clickPoint)) {
+			if (bbox.contains(clickPoint)) {
 				synchronized (layer) {
 					layer.pushBack(drawingObject);
 				}
