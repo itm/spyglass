@@ -8,15 +8,9 @@ import org.eclipse.swt.graphics.Point;
 /**
  * Instances of this class represent the coordinate's of a single point when using pixels
  * 
- * @author Dariush
+ * @author Dariush Forouher
  */
-public class PixelPosition {
-	
-	/** The x-coordinate */
-	public int x = 0;
-	
-	/** The y-coordinate */
-	public int y = 0;
+public class PixelPosition extends AbstractPosition {
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -25,26 +19,19 @@ public class PixelPosition {
 	 * @param point
 	 */
 	public PixelPosition(final Point point) {
-		x = point.x;
-		y = point.y;
+		super(point.x, point.y, 0);
 	}
 	
 	public PixelPosition(final int x, final int y) {
-		this.x = x;
-		this.y = y;
+		super(x, y, 0);
 	}
 	
 	public PixelPosition(final Point2D point) {
-		x = (int) point.getX();
-		y = (int) point.getY();
+		super(point);
 	}
 	
 	public PixelPosition() {
 		//
-	}
-	
-	public Point2D toPoint2D() {
-		return new Point2D.Double(x, y);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -52,8 +39,16 @@ public class PixelPosition {
 	 * 
 	 */
 	@Override
-	public String toString() {
-		return "[" + x + ", " + y + "]";
+	public PixelPosition mult(final double d) {
+		return new PixelPosition((int) (x * d), (int) (y * d));
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public PixelPosition add(final AbsolutePosition p) {
+		return new PixelPosition(x + p.x, y + p.y);
 	}
 	
 }

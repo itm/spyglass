@@ -2,9 +2,6 @@ package de.uniluebeck.itm.spyglass.positions;
 
 import java.awt.geom.Point2D;
 
-import org.eclipse.swt.graphics.Point;
-import org.simpleframework.xml.Attribute;
-
 // --------------------------------------------------------------------------------
 /**
  * Instances of this class represent the coordinate's of a single point when using absolute
@@ -13,19 +10,7 @@ import org.simpleframework.xml.Attribute;
  * @author Sebastian Ebers
  * 
  */
-public class AbsolutePosition implements Cloneable {
-	
-	@Attribute
-	/* The x-coordinate */
-	public int x = 0;
-	
-	@Attribute
-	/* The y-coordinate */
-	public int y = 0;
-	
-	@Attribute
-	/* The z-coordinate */
-	public int z = 0;
+public class AbsolutePosition extends AbstractPosition {
 	
 	public AbsolutePosition() {
 		
@@ -37,15 +22,11 @@ public class AbsolutePosition implements Cloneable {
 	 * The z-coordinate is implicitly set to 0.
 	 */
 	public AbsolutePosition(final Point2D point) {
-		x = (int) point.getX();
-		y = (int) point.getY();
-		z = 0;
+		super((int) point.getX(), (int) point.getY(), 0);
 	}
 	
 	public AbsolutePosition(final int x, final int y, final int z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		super(x, y, z);
 	}
 	
 	@Override
@@ -58,14 +39,6 @@ public class AbsolutePosition implements Cloneable {
 	 * 
 	 */
 	@Override
-	public String toString() {
-		return "[" + x + ", " + y + ", " + z + "]";
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
 	public AbsolutePosition mult(final double d) {
 		return new AbsolutePosition((int) (x * d), (int) (y * d), (int) (z * d));
 	}
@@ -76,34 +49,6 @@ public class AbsolutePosition implements Cloneable {
 	 */
 	public AbsolutePosition add(final AbsolutePosition p) {
 		return new AbsolutePosition(x + p.x, y + p.y, z + p.z);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Indicates whether some other object is "equal to" this one according to their coordinate
-	 * information.
-	 * 
-	 * @param obj
-	 *            the reference object with which to compare.
-	 * @return <code>true</code> if this object is the same as the obj argument; <code>false</code>
-	 *         otherwise.
-	 */
-	@Override
-	public boolean equals(final Object obj) {
-		obj.equals(new Object());
-		if (obj instanceof AbsolutePosition) {
-			final AbsolutePosition other = (AbsolutePosition) obj;
-			return ((other.x == this.x) && (other.y == this.y) && (other.z == this.z));
-		}
-		return false;
-	}
-	
-	public Point2D toPoint2D() {
-		return new Point2D.Double(x, y);
-	}
-	
-	public Point toPoint() {
-		return new Point(x, y);
 	}
 	
 }

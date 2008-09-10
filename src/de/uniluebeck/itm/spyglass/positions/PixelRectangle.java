@@ -1,52 +1,38 @@
 package de.uniluebeck.itm.spyglass.positions;
 
+import org.simpleframework.xml.Element;
+
 /**
- * This class represents an rectangle, messured in absolute pixels.
+ * This class represents an rectangle, messured in pixel coordinates.
  * 
- * @author dariush
+ * @author Dariush Forouher
  * 
  */
-public class PixelRectangle {
+public class PixelRectangle extends AbstractRectangle {
 	
-	/**
-	 * Height of the rectangle
-	 */
-	private int height;
-	
-	/**
-	 * Upper left position (reference point) TODO
-	 */
-	private PixelPosition upperLeft;
-	
-	/**
-	 * Width of the rectangle
-	 */
-	private int width;
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the height of the rectangle
-	 */
-	public int getHeight() {
-		return height;
+	public PixelRectangle() {
+		super();
 	}
 	
-	// --------------------------------------------------------------------------------
-	/**
-	 * set the height
-	 * 
-	 * @param height
-	 */
-	public void setHeight(final int height) {
-		this.height = height;
+	public PixelRectangle(final AbstractRectangle other) {
+		super(other);
+	}
+	
+	public PixelRectangle(final int x, final int y, final int width, final int height) {
+		super(x, y, width, height);
+	}
+	
+	public PixelRectangle(final PixelPosition upperLeft, final int width, final int height) {
+		super(upperLeft.x, upperLeft.y, width, height);
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the upper left point
 	 */
+	@Element(name = "upperLeft")
 	public PixelPosition getUpperLeft() {
-		return upperLeft;
+		return new PixelPosition(rectangle.x, rectangle.y);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -55,41 +41,25 @@ public class PixelRectangle {
 	 * 
 	 * @param upperLeft
 	 */
+	@Element(name = "upperLeft")
 	public void setUpperLeft(final PixelPosition upperLeft) {
-		this.upperLeft = upperLeft;
+		this.rectangle.x = upperLeft.x;
+		this.rectangle.y = upperLeft.y;
 	}
 	
-	// --------------------------------------------------------------------------------
 	/**
-	 * @return the width
-	 */
-	public int getWidth() {
-		return width;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * set the width
+	 * Returns a new rectangle which represents the union of the receiver and the given rectangle.
 	 * 
-	 * @param width
+	 * The union of two rectangles is the smallest single rectangle that completely covers both of
+	 * the areas covered by the two given rectangles.
+	 * 
+	 * @param other
+	 *            the rectangle to perform union with
+	 * @return the union of the receiver and the argument
 	 */
-	public void setWidth(final int width) {
-		this.width = width;
+	public PixelRectangle union(final PixelRectangle other) {
+		final PixelRectangle ret = new PixelRectangle();
+		ret.rectangle = this.rectangle.union(other.rectangle);
+		return ret;
 	}
-	
-	public PixelRectangle() {
-		
-	}
-	
-	public PixelRectangle(final PixelPosition upperLeft, final int height, final int width) {
-		this.height = height;
-		this.width = width;
-		this.upperLeft = upperLeft;
-	}
-	
-	@Override
-	public String toString() {
-		return String.format("PixelRectangle {%s, %d, %d}", this.upperLeft, height, width);
-	}
-	
 }
