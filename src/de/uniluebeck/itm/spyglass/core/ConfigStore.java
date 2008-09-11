@@ -62,7 +62,8 @@ public class ConfigStore {
 	 *            indicates whether or not the application is used as iShell plug-in
 	 */
 	public ConfigStore(final boolean isIShellPlugin) {
-		this(isIShellPlugin, new File((isIShellPlugin) ? DEFAULT_CONFIG_FILE_ISHELL_PLUGIN : DEFAULT_CONFIG_FILE_STANDALONE));
+		this(isIShellPlugin, new File((isIShellPlugin) ? DEFAULT_CONFIG_FILE_ISHELL_PLUGIN
+				: DEFAULT_CONFIG_FILE_STANDALONE));
 	}
 	
 	// --------------------------------------------------------------------------
@@ -77,7 +78,8 @@ public class ConfigStore {
 	 */
 	public ConfigStore(final boolean isIShellPlugin, final SpyglassConfiguration spyglassConfig) {
 		this.isIShellPlugin = isIShellPlugin;
-		this.configFilePath = (isIShellPlugin) ? DEFAULT_CONFIG_FILE_ISHELL_PLUGIN : DEFAULT_CONFIG_FILE_STANDALONE;
+		this.configFilePath = (isIShellPlugin) ? DEFAULT_CONFIG_FILE_ISHELL_PLUGIN
+				: DEFAULT_CONFIG_FILE_STANDALONE;
 		this.spyglassConfig = spyglassConfig;
 	}
 	
@@ -154,7 +156,8 @@ public class ConfigStore {
 	 *            the plug-ins' class
 	 */
 	public List<PluginXMLConfig> readPluginInstanceConfigs(final Class<? extends Plugin> clazz) {
-		final List<Plugin> plugins = spyglassConfig.getPluginManager().getPluginInstances(clazz, false);
+		final List<Plugin> plugins = spyglassConfig.getPluginManager().getPluginInstances(clazz,
+				false);
 		final List<PluginXMLConfig> configs = new LinkedList<PluginXMLConfig>();
 		for (final Plugin plugin : plugins) {
 			configs.add(plugin.getXMLConfig());
@@ -193,7 +196,7 @@ public class ConfigStore {
 	 *            the configuration parameters
 	 */
 	public void storeGeneralSettingsConfig(final GeneralSettingsXmlConfig config) {
-		spyglassConfig.setGeneralSettings(config);
+		// TODO: what should this method do?
 		store();
 	}
 	
@@ -217,7 +220,8 @@ public class ConfigStore {
 				return;
 			}
 		}
-		throw new UnsupportedOperationException("No matching plugin was found! Create a new one first");
+		throw new UnsupportedOperationException(
+				"No matching plugin was found! Create a new one first");
 	}
 	
 	// --------------------------------------------------------------------------
@@ -241,7 +245,8 @@ public class ConfigStore {
 				return;
 			}
 		}
-		throw new UnsupportedOperationException("No matching configuration was found! Create a new one first");
+		throw new UnsupportedOperationException(
+				"No matching configuration was found! Create a new one first");
 	}
 	
 	// --------------------------------------------------------------------------
@@ -332,9 +337,11 @@ public class ConfigStore {
 			if (backup != null) {
 				try {
 					new Persister().write(backup, configFile);
-					log.debug("The old content of the configuration file " + configFile + " was recovered");
+					log.debug("The old content of the configuration file " + configFile
+							+ " was recovered");
 				} catch (final Exception e1) {
-					log.error("Unable to store configuration output! The file" + configFile + " may be corrupted!", e1);
+					log.error("Unable to store configuration output! The file" + configFile
+							+ " may be corrupted!", e1);
 				}
 			}
 			return false;

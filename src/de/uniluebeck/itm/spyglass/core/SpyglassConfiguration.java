@@ -25,6 +25,8 @@ import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXmlConfig;
  * Spyglass configuration file, mainly used by the deserialization process of the Spyglass class.
  * The persistence framework to utilize the serialization and deserialization to/from an XML file is
  * "SimpleXML" (http://simple.sourceforge.net/).
+ * 
+ * @author Sebastian Ebers, Daniel Bimschas, Dariush Forouher
  */
 @Root
 public class SpyglassConfiguration {
@@ -33,16 +35,16 @@ public class SpyglassConfiguration {
 	private PacketReader packetReader = null;
 	
 	@Element(name = "instances")
-	private PluginManager pluginManager = null;
+	private final PluginManager pluginManager = new PluginManager();
 	
 	@Element
-	private GeneralSettingsXmlConfig generalSettings;
+	private final GeneralSettingsXmlConfig generalSettings = new GeneralSettingsXmlConfig();
 	
 	@ElementList
-	private Vector<Plugin> defaults;
+	private final Vector<Plugin> defaults = new Vector<Plugin>();
 	
 	@Element
-	private DrawingArea drawingArea;
+	private final DrawingArea drawingArea = new DrawingArea();
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -54,32 +56,12 @@ public class SpyglassConfiguration {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @param generalSettings
-	 *            the generalSettings to set
-	 */
-	public void setGeneralSettings(final GeneralSettingsXmlConfig generalSettings) {
-		this.generalSettings = generalSettings;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * Returns a collection of plug-ins which are configured by default
 	 * 
 	 * @return the defaults a collection of plug-ins which are configured by default
 	 */
 	public Vector<Plugin> getDefaults() {
 		return defaults;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Sets a collection of plug-ins which are configured by default
-	 * 
-	 * @param defaults
-	 *            a collection of plug-ins which are configured by default
-	 */
-	public void setDefaults(final Vector<Plugin> defaults) {
-		this.defaults = defaults;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -105,34 +87,8 @@ public class SpyglassConfiguration {
 	}
 	
 	// --------------------------------------------------------------------------------
-	/**
-	 * Returns the frames per second
-	 * 
-	 * @return the frames per second
-	 */
-	public long getFps() {
-		return generalSettings.getFps();
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Sets the frames per second
-	 * 
-	 * @param the
-	 *            frames per second
-	 */
-	public void setFps(final long fps) {
-		generalSettings.setFps(fps);
-	}
-	
-	// --------------------------------------------------------------------------------
 	public PluginManager getPluginManager() {
 		return pluginManager;
-	}
-	
-	// --------------------------------------------------------------------------------
-	public void setPluginManager(final PluginManager pluginManager) {
-		this.pluginManager = pluginManager;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -146,30 +102,11 @@ public class SpyglassConfiguration {
 	}
 	
 	// --------------------------------------------------------------------------------
-	public long getPacketDeliveryInitialDelay() {
-		return generalSettings.getPacketDeliveryInitialDelay();
-	}
-	
-	// --------------------------------------------------------------------------------
-	public void setPacketDeliveryInitialDelay(final long packetDeliveryInitialDelay) {
-		generalSettings.setPacketDeliveryInitialDelay(packetDeliveryInitialDelay);
-	}
-	
-	// --------------------------------------------------------------------------------
 	/**
 	 * @return the drawingArea
 	 */
 	public DrawingArea getDrawingArea() {
 		return drawingArea;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param drawingArea
-	 *            the drawingArea to set
-	 */
-	public void setDrawingArea(final DrawingArea drawingArea) {
-		this.drawingArea = drawingArea;
 	}
 	
 }

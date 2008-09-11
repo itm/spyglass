@@ -14,73 +14,54 @@ import org.simpleframework.xml.Element;
 /**
  * Instances of this class contain the configuration parameters of the general settings
  * 
- * @author Sebastian Ebers
+ * @author Sebastian Ebers, Dariush Forouher
  * 
  */
-public class GeneralSettingsXmlConfig {
+public class GeneralSettingsXmlConfig extends XMLConfig {
 	
+	/**
+	 * if <code>true</code> a ruler is shown in the graphical user interface
+	 */
 	@Element
-	private boolean showRuler = false;
+	private boolean showRuler = true;
 	
-	@Element(required = false)
-	private MetricsXMLConfig metrics = null;
+	/**
+	 * defines the metric settings
+	 */
+	@Element
+	final private MetricsXMLConfig metrics = new MetricsXMLConfig();
 	
+	/**
+	 * the time's unit (important when showing the results of received packets on the graphical user
+	 * interface). The unit is just for information purposes. It is not processed in any way.
+	 */
 	@Element
 	private String timeUnit = "s";
 	
+	/**
+	 * the time's scale(important when showing the results of received packets on the graphical user
+	 * interface)
+	 */
 	@Element
 	private float timeScale = 1;
 	
+	/**
+	 * the delay used when processing recorded packets TODO: wrong!
+	 */
 	@Element
 	private long packetDeliveryInitialDelay = 1000;
 	
+	/**
+	 * the number of frames which drawn per second
+	 */
 	@Element(name = "framesPerSecond")
 	private long fps = 25;
-	
-	// --------------------------------------------------------------------------------
-	/** Constructor */
-	public GeneralSettingsXmlConfig() {
-		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Constructor
-	 * 
-	 * @param showRuler
-	 *            if <code>true</code> a ruler is shown in the graphical user interface
-	 * @param metrics
-	 *            defines the metric settings
-	 * @param timeUnit
-	 *            the time's unit (important when showing the results of received packets on the
-	 *            graphical user interface). The unit is just for information purposes. It is not
-	 *            processed in any way.
-	 * @param timeScale
-	 *            the time's scale(important when showing the results of received packets on the
-	 *            graphical user interface)
-	 * @param packetDeliveryDelay
-	 *            the delay used when processing recorded packets
-	 * @param packetDeliveryInitialDelay
-	 *            the delay used when processing recorded packets
-	 * @param fps
-	 *            the number of frames which drawn per second
-	 */
-	public GeneralSettingsXmlConfig(final boolean showRuler, final MetricsXMLConfig metrics, final String timeUnit, final float timeScale,
-			final long packetDeliveryInitialDelay, final long fps) {
-		super();
-		this.showRuler = showRuler;
-		this.metrics = metrics;
-		this.timeUnit = timeUnit;
-		this.timeScale = timeScale;
-		this.packetDeliveryInitialDelay = packetDeliveryInitialDelay;
-		this.fps = fps;
-	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the showRuler
 	 */
-	public boolean isShowRuler() {
+	public boolean getShowRuler() {
 		return showRuler;
 	}
 	
@@ -90,7 +71,9 @@ public class GeneralSettingsXmlConfig {
 	 *            the showRuler to set
 	 */
 	public void setShowRuler(final boolean showRuler) {
+		final boolean oldValue = this.showRuler;
 		this.showRuler = showRuler;
+		firePropertyChange("showRuler", oldValue, showRuler);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -99,15 +82,6 @@ public class GeneralSettingsXmlConfig {
 	 */
 	public MetricsXMLConfig getMetrics() {
 		return metrics;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param metrics
-	 *            the metrics to set
-	 */
-	public void setMetrics(final MetricsXMLConfig metrics) {
-		this.metrics = metrics;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -124,7 +98,9 @@ public class GeneralSettingsXmlConfig {
 	 *            the timeUnit to set
 	 */
 	public void setTimeUnit(final String timeUnit) {
+		final String oldValue = this.timeUnit;
 		this.timeUnit = timeUnit;
+		firePropertyChange("timeUnit", oldValue, timeUnit);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -141,7 +117,9 @@ public class GeneralSettingsXmlConfig {
 	 *            the timeScale to set
 	 */
 	public void setTimeScale(final float timeScale) {
+		final float oldValue = this.timeScale;
 		this.timeScale = timeScale;
+		firePropertyChange("timeScale", oldValue, timeScale);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -158,7 +136,9 @@ public class GeneralSettingsXmlConfig {
 	 *            the packetDeliveryInitialDelay to set
 	 */
 	public void setPacketDeliveryInitialDelay(final long packetDeliveryInitialDelay) {
+		final long oldValue = this.packetDeliveryInitialDelay;
 		this.packetDeliveryInitialDelay = packetDeliveryInitialDelay;
+		firePropertyChange("packetDeliveryInitialDelay", oldValue, packetDeliveryInitialDelay);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -175,7 +155,9 @@ public class GeneralSettingsXmlConfig {
 	 *            the fps to set
 	 */
 	public void setFps(final long fps) {
+		final long oldValue = this.fps;
 		this.fps = fps;
+		firePropertyChange("fps", oldValue, fps);
 	}
 	
 }

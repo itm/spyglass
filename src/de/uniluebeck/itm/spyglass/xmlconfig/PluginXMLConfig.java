@@ -11,7 +11,6 @@ package de.uniluebeck.itm.spyglass.xmlconfig;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 
-import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 // --------------------------------------------------------------------------------
@@ -21,10 +20,10 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
  * @author Sebastian Ebers
  * 
  */
-public abstract class PluginXMLConfig extends PropertyBean {
+public abstract class PluginXMLConfig extends XMLConfig {
 	
 	public static final int[] ALL_SEMANTIC_TYPES = new int[256];
-	{
+	static {
 		for (int i = 0; i < 256; i++) {
 			ALL_SEMANTIC_TYPES[i] = i;
 		}
@@ -46,7 +45,7 @@ public abstract class PluginXMLConfig extends PropertyBean {
 	private int[] semanticTypes = ALL_SEMANTIC_TYPES.clone();
 	
 	// --------------------------------------------------------------------------------
-	/*
+	/**
 	 * @return the isActive
 	 */
 	public boolean getActive() {
@@ -174,7 +173,9 @@ public abstract class PluginXMLConfig extends PropertyBean {
 	public abstract boolean equals(final PluginXMLConfig other);
 	
 	protected boolean equalsRGB(final int[] lineColorRGB, final int[] otherLineColorRGB) {
-		return (lineColorRGB[0] == otherLineColorRGB[0]) && (lineColorRGB[1] == otherLineColorRGB[1]) && (lineColorRGB[2] == otherLineColorRGB[2]);
+		return (lineColorRGB[0] == otherLineColorRGB[0])
+				&& (lineColorRGB[1] == otherLineColorRGB[1])
+				&& (lineColorRGB[2] == otherLineColorRGB[2]);
 	}
 	
 	/**

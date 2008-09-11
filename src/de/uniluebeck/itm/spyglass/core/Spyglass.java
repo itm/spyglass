@@ -129,8 +129,9 @@ public class Spyglass {
 		packetReader = config.getPacketReader();
 		
 		packetDispatcher = new PacketDispatcher(pluginManager);
-		packetProducerTask = new PacketProducerTask(this, config.getPacketDeliveryInitialDelay());
-		visualizationTask = new VisualizationTask(config.getFps(), this);
+		packetProducerTask = new PacketProducerTask(this, config.getGeneralSettings()
+				.getPacketDeliveryInitialDelay());
+		visualizationTask = new VisualizationTask(config.getGeneralSettings().getFps(), this);
 		
 		log.debug("Init done");
 	}
