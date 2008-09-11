@@ -15,42 +15,43 @@ public class PlayPlayPauseAction extends Action {
 	
 	private final ImageDescriptor playImageDescriptor = getImageDescriptor("play_play.png");
 	
-	private boolean isPlaying;
+	private boolean isPaused;
 	
 	private final Spyglass spyglass;
 	
 	public PlayPlayPauseAction(final Spyglass spyglass) {
 		this.spyglass = spyglass;
-		this.isPlaying = spyglass.isVisualizationRunning();
+		this.isPaused = spyglass.getPacketProducerTask().getPaused();
 	}
 	
 	@Override
 	public void run() {
 		
-		isPlaying = !spyglass.isVisualizationRunning();
-		spyglass.setVisualizationRunning(isPlaying);
+		isPaused = !spyglass.getPacketProducerTask().getPaused();
 		
-		log.debug("Set visualization " + (isPlaying ? "" : "not ") + "running.");
+		spyglass.getPacketProducerTask().setPaused(isPaused);
 		
-		setText(isPlaying ? "Pause" : "Play");
-		setToolTipText(isPlaying ? "Pause" : "Play");
-		setImageDescriptor(isPlaying ? pauseImageDescriptor : playImageDescriptor);
+		log.debug("packet reader is " + (isPaused ? "" : "not ") + "paused.");
+		
+		setText(getText());
+		setToolTipText(getToolTipText());
+		setImageDescriptor(getImageDescriptor());
 		
 	};
 	
 	@Override
 	public String getText() {
-		return isPlaying ? "Pause" : "Play";
+		return isPaused ? "Play" : "Pause";
 	}
 	
 	@Override
 	public String getToolTipText() {
-		return isPlaying ? "Pause" : "Play";
+		return isPaused ? "Play" : "Pause";
 	}
 	
 	@Override
 	public ImageDescriptor getImageDescriptor() {
-		return isPlaying ? pauseImageDescriptor : playImageDescriptor;
+		return isPaused ? playImageDescriptor : pauseImageDescriptor;
 	}
 	
 }

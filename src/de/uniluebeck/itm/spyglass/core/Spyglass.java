@@ -8,7 +8,6 @@
 package de.uniluebeck.itm.spyglass.core;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.EventObject;
 import java.util.concurrent.ExecutorService;
@@ -19,7 +18,6 @@ import javax.swing.event.EventListenerList;
 import org.apache.log4j.Category;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.packet.Packet;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
@@ -45,8 +43,6 @@ public class Spyglass {
 	
 	private PacketDispatcher packetDispatcher = null;
 	
-	private ArrayList<Packet> packetCache = new ArrayList<Packet>(250);
-	
 	private PluginManager pluginManager = null;
 	
 	private PacketReader packetReader = null;
@@ -59,6 +55,9 @@ public class Spyglass {
 	
 	private final EventListenerList listeners = new EventListenerList();
 	
+	/**
+	 * TODO: Define exactly what this should do
+	 */
 	private boolean visualizationRunning = true;
 	
 	private DrawingArea drawingArea;
@@ -199,18 +198,6 @@ public class Spyglass {
 	
 	// --------------------------------------------------------------------------
 	// ------
-	public ArrayList<Packet> getPacketCache() {
-		return packetCache;
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	public void setPacketCache(final ArrayList<Packet> packetCache) {
-		this.packetCache = packetCache;
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
 	public PluginManager getPluginManager() {
 		return pluginManager;
 	}
@@ -247,13 +234,6 @@ public class Spyglass {
 	
 	// --------------------------------------------------------------------------
 	// ------
-	private void createPluginInstancesFromConfig() {
-		// TODO: nothing to do here since the plugin manager is persistent
-		// itself?!?
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
 	public ConfigStore getConfigStore() {
 		return configStore;
 	}
@@ -264,6 +244,14 @@ public class Spyglass {
 	 */
 	public DrawingArea getDrawingArea() {
 		return drawingArea;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the packetProducerTask
+	 */
+	public PacketProducerTask getPacketProducerTask() {
+		return packetProducerTask;
 	}
 	
 }

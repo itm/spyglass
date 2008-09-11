@@ -36,6 +36,8 @@ public class PacketProducerTask implements Runnable {
 	
 	private final long initialDelayMs;
 	
+	private Boolean paused = false;
+	
 	// -------------------------------------------------------------------------
 	/**
 	 * Constructor.
@@ -65,7 +67,14 @@ public class PacketProducerTask implements Runnable {
 		Tools.sleep(initialDelayMs);
 		
 		while (spyglass.isVisualizationRunning()) {
+			
 			try {
+				synchronized (paused) {
+					if (paused) {
+						paused.wait();
+					}
+				}
+				
 				packet = packetReader.getNextPacket();
 				
 				if (!spyglass.isVisualizationRunning()) {
@@ -86,5 +95,21 @@ public class PacketProducerTask implements Runnable {
 		}
 		
 		log.debug("PacketProducerTask ended. Done.");
+	}
+	
+	public void setPaused(final boolean paused) {
+		synchronized (this.paused) {
+			this.paused.notifyAll();
+			this.paused = paused;
+			log.debug("Set Paused to " + this.paused);
+		}
+		
+	}
+	
+	public boolean getPaused() {
+		synchronized (paused) {
+			return paused;
+		}
+		
 	}
 }
