@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -324,7 +325,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * Subclasses overriding this method must call this method!
 	 */
 	protected void storeToModel() {
-		log.info("restoring form from model");
+		log.info("Storing form to model");
 		if (!this.databindingValidationIsOK) {
 			MessageDialog.openError(this.getShell(), "Can not store changes",
 					"Could not store your changes. There are still errors remaining in the form.");
@@ -340,7 +341,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * Subclasses overriding this method must call this method!
 	 */
 	protected void loadFromModel() {
-		log.info("Storing form to model");
+		log.info("Restoring form from model");
 		
 		this.dbc.updateTargets();
 		this.basicGroup.resetChanged();
@@ -416,8 +417,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Returns the <code>Plugin</code> instance associated with this page.
 	 * 
-	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a type
-	 *         page (i.e. not an instance page, also see
+	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a
+	 *         type page (i.e. not an instance page, also see
 	 *         {@link PluginPreferencePage#isInstancePage()})
 	 */
 	public final Plugin getPlugin() {

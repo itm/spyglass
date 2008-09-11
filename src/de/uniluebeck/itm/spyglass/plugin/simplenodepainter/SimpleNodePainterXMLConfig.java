@@ -56,10 +56,15 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the isExtendenInformationActive
+	 * Returns if a node's the extended information is to be shown
+	 * 
+	 * @return <code>true</code> if a node's the extended information is to be shown
 	 */
-	public HashMap<Integer, Boolean> getIsExtendedInformationActive() {
-		return isExtendenInformationActive;
+	public boolean isExtendedInformationActive(final int nodeID) {
+		final Boolean isActive = isExtendenInformationActive.get(nodeID);
+		
+		// if there is no entry for a certain node in the map, yet, use the default behavior
+		return (isActive != null) ? isActive : isExtendedDefaultValue;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -90,7 +95,6 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		final int[] oldvalue = this.lineColorRGB.clone();
 		this.lineColorRGB = lineColorRGB;
 		firePropertyChange("lineColor", oldvalue, lineColorRGB);
-		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -110,7 +114,6 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		final int oldvalue = this.lineWidth;
 		this.lineWidth = lineWidth;
 		firePropertyChange("lineWidth", oldvalue, lineWidth);
-		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -122,12 +125,22 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		return (HashMap<Integer, String>) stringFormatters.clone();
 	}
 	
-	public StringFormatter getStringFormatter(final int syntaxType) {
-		if (stringFormatters.containsKey(syntaxType)) {
-			return new StringFormatter(stringFormatters.get(syntaxType));
-		} else {
-			return new StringFormatter(this.defaultStringFormatter);
+	/**
+	 * Returns a string formatting object in respect to a syntax type or <code>null</code> if no
+	 * matching object was created previously and the default expression is undefined.
+	 * 
+	 * @return a string formatting object in respect to a syntax type or <code>null</code> if no
+	 *         matching object was created previously and the default expression is undefined.
+	 */
+	public StringFormatter getStringFormatter(final int semanticType) {
+		// TODO: SE - get all string formatters for complete information ????
+		// or better save HashMap of semantic types and strings
+		if (stringFormatters.containsKey(semanticType)) {
+			return new StringFormatter(stringFormatters.get(semanticType));
+		} else if (defaultStringFormatter != null) {
+			return new StringFormatter(defaultStringFormatter);
 		}
+		return null;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -140,7 +153,6 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		final Map<Integer, String> oldValue = this.stringFormatters;
 		this.stringFormatters = (HashMap<Integer, String>) stringFormatters.clone();
 		firePropertyChange("stringFormatters", oldValue, stringFormatters);
-		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -189,7 +201,7 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		super.overwriteWith(newConfig);
 		final SimpleNodePainterXMLConfig newConfig2 = (SimpleNodePainterXMLConfig) newConfig;
 		
-		this.setIsExtendenInformationActive(newConfig2.getIsExtendedInformationActive());
+		this.setIsExtendenInformationActive(newConfig2.isExtendenInformationActive);
 		this.setExtendedDefaultValue(newConfig2.getExtendedDefaultValue());
 		this.setLineColorRGB(newConfig2.getLineColorRGB());
 		this.setLineWidth(newConfig2.getLineWidth());

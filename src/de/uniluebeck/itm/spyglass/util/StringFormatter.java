@@ -25,8 +25,9 @@ public class StringFormatter {
 		
 		// test if the given expression is valid and throw an exception
 		// otherwise
-		if (pFormatExpression.matches(".*%[^uUif%].*") || pFormatExpression.matches(".*%[uUif][^0-9].*") || pFormatExpression.matches(".*%")
-				|| pFormatExpression.matches("*.%[uUif]")) {
+		if (pFormatExpression.matches(".*%[^uUif%].*")
+				|| pFormatExpression.matches(".*%[uUif][^0-9].*")
+				|| pFormatExpression.matches(".*%") || pFormatExpression.matches(".*%[uUif]")) {
 			final String msg = "StringFormatterExpression is invalid";
 			throw new IllegalArgumentException(msg);
 		}

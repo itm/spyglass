@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.events.MouseEvent;
@@ -40,11 +42,11 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * The nodes can be visualized in two way's according to the amount of information the user wants to
  * see.
  * <ul>
- * <li>In the <tt>non-extended mode</tt>, the nodes are represented by rectangles which only contain
- * the node's identifier.</li>
- * <li>In the <tt>extended mode</tt> the nodes are again represented by rectangles which contain the
- * node's identifier. But additionally, further information which are extracted from the packets of
- * certain semantic types are displayed, too.</li>
+ * <li>In the <tt>non-extended mode</tt>, the nodes are represented by rectangles which only
+ * contain the node's identifier.</li>
+ * <li>In the <tt>extended mode</tt> the nodes are again represented by rectangles which contain
+ * the node's identifier. But additionally, further information which are extracted from the packets
+ * of certain semantic types are displayed, too.</li>
  * </ul>
  * 
  * @author Sebastian Ebers
@@ -70,6 +72,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 */
 	private final List<DrawingObject> updatedObjects;
 	
+	private Map<Integer, String> stringFormatterResults;
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -79,6 +83,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		xmlConfig = new SimpleNodePainterXMLConfig();
 		layer = new SubLayer();
 		updatedObjects = new LinkedList<DrawingObject>();
+		stringFormatterResults = new TreeMap<Integer, String>();
 	}
 	
 	// TODO: what is the point of this method? all of this stuff is done automatically by the JVM
@@ -128,6 +133,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		return xmlConfig;
 	}
 	
+	public void setXMLConfig() {
+		System.out.println("Test");
+	}
+	
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
 		
@@ -154,11 +163,15 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			needsUpdate = true;
 		}
 		
-		// TODO: check if the StringFormatter has changed at all
-		final StringFormatter sf = nodeObject.getDescription();
+		final int packetSemanticType = packet.getSemantic_type();
+		
+		final StringFormatter sf = xmlConfig.getStringFormatter(packetSemanticType);
 		if (sf != null) {
-			sf.parse(packet);
-			needsUpdate = true;
+			final String str = sf.parse(packet);
+			if (str.equals(stringFormatterResults.get(packetSemanticType))) {
+				stringFormatterResults.put(packetSemanticType, str);
+				needsUpdate = true;
+			}
 		}
 		
 		if (needsUpdate) {
@@ -203,15 +216,18 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 		
 		// if not, create a new object
-		Boolean isExtended = xmlConfig.getIsExtendedInformationActive().get(nodeID);
-		if (isExtended == null) {
-			isExtended = xmlConfig.getExtendedDefaultValue();
+		final boolean isExtended = xmlConfig.isExtendedInformationActive(nodeID);
+		
+		// fetch all information provided by the string formatters
+		final StringBuffer stringFormatterResult = new StringBuffer("");
+		for (final String str : stringFormatterResults.values()) {
+			stringFormatterResult.append(str);
 		}
 		
-		final StringFormatter sf = xmlConfig.getStringFormatter(nodeID);
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
-		return new NodeObject(nodeID, "Node " + nodeID, sf, isExtended, lineColorRGB, lineWidth);
+		return new NodeObject(nodeID, "Node " + nodeID, stringFormatterResult.toString(),
+				isExtended, lineColorRGB, lineWidth);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -236,8 +252,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if (drawingObject instanceof NodeObject) {
 				final NodeObject nodeObject = (NodeObject) drawingObject;
 				final int nodeID = nodeObject.getNodeID();
-				nodeObject.update("Node " + nodeID, xmlConfig.getStringFormatter(nodeID), xmlConfig
-						.getIsExtendedInformationActive().get(nodeID), xmlConfig.getLineColorRGB(),
+				
+				final StringBuffer stringFormatterResult = new StringBuffer("");
+				for (final String str : stringFormatterResults.values()) {
+					stringFormatterResult.append(str);
+				}
+				
+				nodeObject.update("Node " + nodeID, stringFormatterResult.toString(), xmlConfig
+						.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(),
 						xmlConfig.getLineWidth());
 				update.add(nodeObject);
 			}
@@ -261,6 +283,27 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		synchronized (updatedObjects) {
 			updatedObjects.clear();
 		}
+		// xmlConfig.addPropertyChangeListener(new PropertyChangeListener() {
+		//			
+		// @Override
+		// public void propertyChange(final PropertyChangeEvent evt) {
+		// // if (evt.getPropertyName().equalsIgnoreCase("isActive")) {
+		// // final Boolean oldValue = (Boolean) evt.getOldValue();
+		// // final Boolean newValue = (Boolean) evt.getNewValue();
+		// // // Note: you cannot assume, that the new value is already stored inside the
+		// // xmlConfig object
+		// //
+		// // // do something wild with it...
+		// // }
+		// //
+		// try {
+		// refreshNodeObjectConfiguration();
+		// } catch (final Throwable e) {
+		// log.error(e,e);
+		// }
+		// }
+		//			
+		// });
 		
 	}
 	
@@ -339,8 +382,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Handles a mouse click event which was actually a double click returns <code>true</code> if a
-	 * drawing object was found which bounding box contains the point clicked by the user.
+	 * Handles a mouse click event which was actually a double click returns <code>true</code> if
+	 * a drawing object was found which bounding box contains the point clicked by the user.
 	 * 
 	 * @param drawingObjects
 	 *            the plug-in's drawing objects
