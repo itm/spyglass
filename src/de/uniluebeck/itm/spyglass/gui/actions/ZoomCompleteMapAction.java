@@ -29,7 +29,7 @@ public class ZoomCompleteMapAction extends Action {
 	@Override
 	public void run() {
 		log.debug("Pressed button ZOOM_COMPLETE_MAP.");
-		final List<Plugin> list = spyglass.getPluginManager().getVisiblePlugins();
+		final List<Plugin> list = spyglass.getPluginManager().getVisibleActivePlugins();
 		
 		final List<DrawingObject> dobs = new ArrayList<DrawingObject>();
 		

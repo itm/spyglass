@@ -232,6 +232,17 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Performs internal refreshments of the configuration parameters.<br>
+	 * This includes the node object amongst others since e.g. the line color etc. could have been
+	 * changed.
+	 */
+	public void refreshConfigurationParameters() {
+		refreshNodeObjectConfiguration();
+		getPluginManager().setPluginStatus(this, isActive());
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
 	 * Resets the configuration parameters of the node visualizations according to the node
 	 * painter's configuration parameters.<br>
 	 * <b>Note:</b> This object updates the quadTree in a synchronized block which means that the

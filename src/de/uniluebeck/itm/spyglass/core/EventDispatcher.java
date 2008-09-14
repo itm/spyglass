@@ -49,7 +49,7 @@ public class EventDispatcher {
 	 *            the event to be forwarded
 	 */
 	public void handleEvent(final EventObject e) {
-		final List<Plugin> plugins = pluginManager.getVisiblePlugins();
+		final List<Plugin> plugins = pluginManager.getVisibleActivePlugins();
 		for (final Plugin p : plugins) {
 			if ((e instanceof MouseEvent) && p.handleEvent((MouseEvent) e, drawingArea)) {
 				return;

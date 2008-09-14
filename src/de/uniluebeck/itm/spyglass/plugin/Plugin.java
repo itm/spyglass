@@ -146,7 +146,8 @@ public abstract class Plugin implements Runnable {
 	}
 	
 	public boolean isThreadRunning() {
-		return ((packetConsumerThread != null) && packetConsumerThread.isAlive() && !packetConsumerThread.isInterrupted());
+		return ((packetConsumerThread != null) && packetConsumerThread.isAlive() && !packetConsumerThread
+				.isInterrupted());
 	}
 	
 	/**
@@ -229,15 +230,15 @@ public abstract class Plugin implements Runnable {
 	 * Creates and returns a widget which can be used to configure the plug-in
 	 * 
 	 * @param dialog
-	 *            the <code>PluginPreferenceDialog</code> instance the preference page is displayed
-	 *            in
+	 *            the <code>PluginPreferenceDialog</code> instance the preference page is
+	 *            displayed in
 	 * @param spyglass
 	 *            the <code>Spyglass</code> instance
 	 * 
 	 * @return a widget which can be used to configure the plug-in
 	 */
-	public abstract PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass);
+	public abstract PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createPreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass);
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -246,8 +247,8 @@ public abstract class Plugin implements Runnable {
 	 * plug-in instance this method can be called in a static way.
 	 * 
 	 * @param dialog
-	 *            the <code>PluginPreferenceDialog</code> instance the preference page is displayed
-	 *            in
+	 *            the <code>PluginPreferenceDialog</code> instance the preference page is
+	 *            displayed in
 	 * @param spyglass
 	 *            the <code>Spyglass</code> instance
 	 * 
@@ -255,8 +256,9 @@ public abstract class Plugin implements Runnable {
 	 * @throws UnsupportedOperationException
 	 *             if this operation is called on an abstract superclass of a plug-in
 	 */
-	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) throws UnsupportedOperationException {
+	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass)
+			throws UnsupportedOperationException {
 		throw new UnsupportedOperationException(
 				"This method must only be called on subclasses and must be implemented in every instantiable subclass.");
 	}
@@ -354,8 +356,11 @@ public abstract class Plugin implements Runnable {
 	public final void run() {
 		
 		while (!Thread.currentThread().isInterrupted()) {
-			processPacket(getPacketFromQueue(true));
-			updateQuadTree();
+			final SpyglassPacket p = getPacketFromQueue(true);
+			if (p != null) {
+				processPacket(p);
+				updateQuadTree();
+			}
 		}
 	}
 	
@@ -379,7 +384,11 @@ public abstract class Plugin implements Runnable {
 	}
 	
 	/**
-	 * Retrieves and removes the head of the packet queue, or returns <tt>null</tt> if it is empty.
+	 * Retrieves and removes the head of the packet queue, or returns <tt>null</tt> if it is
+	 * empty.<br>
+	 * Note that this is done in an extra thread. If an {@link InterruptedException} occurs,
+	 * <code>null</code> might be returned no matter if the parameter <tt>wait</tt> is set or
+	 * not.
 	 * 
 	 * @param wait
 	 *            indicates whether or not the caller wants to wait for a packet if the packet queue
@@ -395,11 +404,12 @@ public abstract class Plugin implements Runnable {
 				try {
 					packetQueue.wait();
 				} catch (final InterruptedException e) {
-					log.error("Error while waiting for a notification of the arrival of a new packet", e);
+					log
+							.info(e.getMessage()
+									+ ": The packet consumer thread was interrupted while waiting for a notification of the arrival of a new packet");
 				}
 			}
 			return packetQueue.poll();
 		}
 	}
-	
 }

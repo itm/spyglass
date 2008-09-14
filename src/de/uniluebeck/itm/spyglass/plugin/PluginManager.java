@@ -134,9 +134,9 @@ public class PluginManager {
 	 * of the plugins that are of a class (or extending a class) contained in the excludes list
 	 * 
 	 * @param checkHierarchy
-	 *            <code>true</code> if the class hierarchy should be checked, such that even plugins
-	 *            derived from a class included in the <code>excludes</code> list will be excluded,
-	 *            <code>false</code> if only plugins of exactly the class contained in
+	 *            <code>true</code> if the class hierarchy should be checked, such that even
+	 *            plugins derived from a class included in the <code>excludes</code> list will be
+	 *            excluded, <code>false</code> if only plugins of exactly the class contained in
 	 *            <code>exclude</code> list shall be excluded
 	 * @param excludes
 	 *            plugin class to exclude from the list
@@ -530,20 +530,20 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Returns all plug-ins which are currently visible
+	 * Returns all active plug-ins which are currently visible
 	 * 
-	 * @return all plug-ins which are currently visible
+	 * @return all active plug-ins which are currently visible
 	 */
-	public List<Plugin> getVisiblePlugins() {
-		final List<Plugin> visiblePlugins = new LinkedList<Plugin>();
+	public List<Plugin> getVisibleActivePlugins() {
+		final List<Plugin> visibleActivePlugins = new LinkedList<Plugin>();
 		synchronized (plugins) {
 			for (final Plugin p : plugins) {
-				if (p.isVisible()) {
-					visiblePlugins.add(p);
+				if (p.isActive() && p.isVisible()) {
+					visibleActivePlugins.add(p);
 				}
 			}
 		}
-		return visiblePlugins;
+		return visibleActivePlugins;
 	}
 	
 	// --------------------------------------------------------------------------

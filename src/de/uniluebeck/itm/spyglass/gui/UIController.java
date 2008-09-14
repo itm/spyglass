@@ -270,7 +270,7 @@ public class UIController {
 		
 		drawBackground(gc);
 		
-		final List<Plugin> plugins = spyglass.getPluginManager().getVisiblePlugins();
+		final List<Plugin> plugins = spyglass.getPluginManager().getVisibleActivePlugins();
 		// drawDebugGlobalBoundingBox(gc, plugins);
 		for (final Plugin plugin : plugins) {
 			if (plugin instanceof Drawable) {
