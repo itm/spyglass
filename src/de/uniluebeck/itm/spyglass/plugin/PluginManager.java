@@ -71,6 +71,14 @@ public class PluginManager {
 		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
 	}
 	
+	/**
+	 * List of plugins that are currently being removed
+	 * 
+	 * (this is currently only used to make sure, that such a plugin wont be elected as new active
+	 * node positioner)
+	 */
+	private final List<Plugin> removePending = new ArrayList<Plugin>();
+	
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -134,9 +142,9 @@ public class PluginManager {
 	 * of the plugins that are of a class (or extending a class) contained in the excludes list
 	 * 
 	 * @param checkHierarchy
-	 *            <code>true</code> if the class hierarchy should be checked, such that even
-	 *            plugins derived from a class included in the <code>excludes</code> list will be
-	 *            excluded, <code>false</code> if only plugins of exactly the class contained in
+	 *            <code>true</code> if the class hierarchy should be checked, such that even plugins
+	 *            derived from a class included in the <code>excludes</code> list will be excluded,
+	 *            <code>false</code> if only plugins of exactly the class contained in
 	 *            <code>exclude</code> list shall be excluded
 	 * @param excludes
 	 *            plugin class to exclude from the list
@@ -231,12 +239,12 @@ public class PluginManager {
 						
 						newNodePositioner(plugin);
 						
+						firePluginListChangedEvent(plugin, ListChangeEvent.NEW_NODE_POSITIONER);
+						
 					} else if (activeOld && !activeNew) {
 						// the plugin got deactivated
 						
-						// TODO: we have to activate another one, so that the
-						// job doesn't become vacant. but what if there is no other
-						// one?
+						findNewNodePositioner();
 					}
 					
 				}
@@ -274,16 +282,52 @@ public class PluginManager {
 	}
 	
 	/**
+	 * Enable another NodePositioner, if the active one got disabled or deleted.
+	 */
+	private void findNewNodePositioner() {
+		log.debug("Finding a new node positioner");
+		
+		synchronized (plugins) {
+			
+			final ArrayList<Plugin> nodePositioner = new ArrayList<Plugin>();
+			for (final Plugin p : plugins) {
+				if ((p instanceof NodePositionerPlugin) && !this.removePending.contains(p)) {
+					nodePositioner.add(p);
+					
+					// If there is already one active, do nothing.
+					if (p.isActive()) {
+						return;
+					}
+					
+				}
+			}
+			
+			assert (nodePositioner.size() > 0);
+			
+			// activate the first one in the list
+			log.debug("Enabling " + nodePositioner.get(0));
+			nodePositioner.get(0).setActive(true);
+			
+		}
+		
+	}
+	
+	/**
 	 * Disable all NodePositioner Plugins except the given one.
 	 */
 	private void newNodePositioner(final Plugin plugin) {
+		log.debug("Disabling old node positioner; new one is " + plugin);
+		
 		synchronized (plugins) {
 			for (final Plugin p : plugins) {
-				if ((p instanceof NodePositionerPlugin) && (p != plugin)) {
+				if ((p instanceof NodePositionerPlugin) && (p != plugin) && p.isActive()) {
 					p.getXMLConfig().setActive(false);
+					log.debug("Disabled " + p);
+					
 				}
 			}
 		}
+		
 	}
 	
 	// --------------------------------------------------------------------------
@@ -357,60 +401,45 @@ public class PluginManager {
 	/**
 	 * Removes a plug-in
 	 */
-	public void removePlugin(final Plugin plugin) {
+	public boolean removePlugin(final Plugin plugin) {
+		
+		log.debug("Removing plugin " + plugin);
+		
+		// We cannot remove the active NodePositioner, if there is no other to replace it.
+		if ((plugin instanceof NodePositionerPlugin) && plugin.getXMLConfig().getActive()) {
+			boolean foundAnotherNP = false;
+			synchronized (plugins) {
+				for (final Plugin p : plugins) {
+					if ((p instanceof NodePositionerPlugin) && (p != plugin)) {
+						foundAnotherNP = true;
+						break;
+					}
+				}
+			}
+			if (!foundAnotherNP) {
+				log.debug("Cannot remove plugin, it is the only node positioner.");
+				return false;
+			}
+		}
+		
+		synchronized (removePending) {
+			removePending.add(plugin);
+		}
+		
+		// first disable the plugin. if it is a NodePositioner, this would also activate another one
+		// as replacement.
 		plugin.setActive(false);
-		// TODO: what if this is the only NodePositioner?
-		// in this case we would have stop, since we cannot remove it!
+		
 		synchronized (plugins) {
 			plugins.remove(plugin);
 		}
+		synchronized (removePending) {
+			removePending.remove(plugin);
+		}
 		log.debug("Removed plug-in: " + plugin);
 		firePluginListChangedEvent(plugin, ListChangeEvent.PLUGIN_REMOVED);
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * Replaces the list of plug-ins
-	 * 
-	 * @param plugins
-	 *            the new list of plug-ins
-	 */
-	public void setPlugins(final List<Plugin> plugins) {
-		// deactivate all plug-ins which are currently available in the list (by
-		// deactivating a plug-in, its thread is stopped)
-		for (final Plugin plugin : plugins) {
-			plugin.setActive(false);
-		}
-		synchronized (plugins) {
-			this.plugins.clear();
-			for (final Plugin p : plugins) {
-				p.initializePacketConsumerThread();
-				addPlugin(p);
-			}
-		}
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * Sets the state of a plug-in
-	 * 
-	 * @param plugin
-	 *            the plug-in which state is to be set
-	 * @param isActive
-	 *            indicates if the provided plug-in is active or not
-	 */
-	public void setPluginStatus(final Plugin plugin, final boolean isActive) {
 		
-		plugin.setActive(isActive);
-		synchronized (plugins) {
-			if (!plugins.contains(plugin)) {
-				addPlugin(plugin);
-			}
-		}
-		firePluginListChangedEvent(plugin, ListChangeEvent.PLUGIN_STATE_CHANGED);
-		
+		return true;
 	}
 	
 	// --------------------------------------------------------------------------
@@ -421,16 +450,14 @@ public class PluginManager {
 	 * @return the instances which holds information about the nodes' positions
 	 */
 	public NodePositionerPlugin getNodePositioner() {
-		NodePositionerPlugin np = null;
 		synchronized (plugins) {
 			for (final Plugin p : plugins) {
-				if (p instanceof NodePositionerPlugin) {
-					assert (np == null);
-					np = (NodePositionerPlugin) p;
+				if ((p instanceof NodePositionerPlugin) && p.isActive()) {
+					return (NodePositionerPlugin) p;
 				}
 			}
 		}
-		return np;
+		throw new IllegalStateException("No active NodePositioner found!");
 	}
 	
 	// --------------------------------------------------------------------------

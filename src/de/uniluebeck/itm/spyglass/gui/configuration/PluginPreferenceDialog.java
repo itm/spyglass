@@ -536,13 +536,14 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 				preferenceManager.remove(instancePreferenceNodes.get(p));
 				preferenceDialog.selectPluginManagerPreferenceNode();
 				break;
-			case PLUGIN_STATE_CHANGED:
-				// TODO
-				break;
 			case PRIORITY_CHANGED:
 				// TODO
 				break;
 		}
+		
+		// XXX: PLUGIN_STATE_CHANGED removed, since the PluginManager should not be responsible for
+		// sending out notifications about changes in the configuration of a plugin. Use instead the
+		// event listener inside the PluginXMLConfig objects. -- Dariush
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
-import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -331,6 +330,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 					"Could not store your changes. There are still errors remaining in the form.");
 		} else {
 			this.dbc.updateModels();
+			this.dbc.updateTargets();
 			this.basicGroup.resetChanged();
 		}
 	}
@@ -362,7 +362,13 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		final boolean ok = MessageDialog.openQuestion(getShell(), "Remove plugin instance",
 				"Are you sure you want to remove the plugin instance?");
 		if (ok) {
-			spyglass.getPluginManager().removePlugin(this.plugin);
+			final boolean ret = spyglass.getPluginManager().removePlugin(this.plugin);
+			if (!ret) {
+				MessageDialog.openError(this.getShell(), "Cannot delete plugin",
+						"Could not delete the plugin.");
+			} else {
+				spyglass.getConfigStore().store();
+			}
 		}
 	}
 	
@@ -417,8 +423,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Returns the <code>Plugin</code> instance associated with this page.
 	 * 
-	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a
-	 *         type page (i.e. not an instance page, also see
+	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a type
+	 *         page (i.e. not an instance page, also see
 	 *         {@link PluginPreferencePage#isInstancePage()})
 	 */
 	public final Plugin getPlugin() {
