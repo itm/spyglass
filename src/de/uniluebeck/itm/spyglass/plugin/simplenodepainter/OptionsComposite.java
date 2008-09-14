@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -98,7 +99,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 	private Text defaultStringFmt;
 	private Label label3;
 	private Button showExtInf;
-	private Label colorExample;
+	private CLabel colorExample;
 	private Button lineColor;
 	private Label label2;
 	private Text lineWidth;
@@ -208,7 +209,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 					final GridData colorExampleLData = new GridData();
 					colorExampleLData.widthHint = 50;
 					colorExampleLData.heightHint = 19;
-					colorExample = new Label(group1, SWT.BORDER);
+					colorExample = new CLabel(group1, SWT.BORDER);
 					colorExample.setLayoutData(colorExampleLData);
 				}
 				{
