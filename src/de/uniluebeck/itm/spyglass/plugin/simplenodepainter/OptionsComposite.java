@@ -331,7 +331,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 		final IObservableValue modelObservable = BeansObservables.observeValue(dbc
 				.getValidationRealm(), config, "lineWidth");
 		dbc.bindValue(SWTObservables.observeText(this.lineWidth, SWT.Modify), modelObservable,
-				null, null);
+				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
 		
 		// extended inf
 		
