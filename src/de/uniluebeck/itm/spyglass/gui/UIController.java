@@ -24,6 +24,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.core.EventDispatcher;
@@ -92,7 +93,16 @@ public class UIController {
 	 */
 	private final Runnable paintRunnable = new Runnable() {
 		public void run() {
-			appWindow.getGui().getCanvas().redraw();
+			try {
+				Canvas c = appWindow.getGui().getCanvas();
+				if (!c.isDisposed()) {
+					c.redraw();
+				} else {
+					log.info("The paintRunnable-thread stopped");
+				}
+			} catch (Exception e) {
+				log.error(e, e);
+			}
 		}
 	};
 	
@@ -321,8 +331,8 @@ public class UIController {
 	/**
 	 * Draw the background.
 	 * 
-	 * Space which lies inside the map (-2^15 to 2^15) will be colored in <code>canvasBgColor</code>
-	 * , whereas space outside this area is colored <code>canvasOutOfMapColor</code>.
+	 * Space which lies inside the map (-2^15 to 2^15) will be colored in <code>canvasBgColor</code> ,
+	 * whereas space outside this area is colored <code>canvasOutOfMapColor</code>.
 	 */
 	private void drawBackground(final GC gc) {
 		gc.setBackground(canvasOutOfMapColor);

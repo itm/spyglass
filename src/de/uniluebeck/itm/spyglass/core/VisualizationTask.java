@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.core;
 
@@ -17,14 +15,13 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.TimeDiff;
 import de.uniluebeck.itm.spyglass.util.Tools;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
- * The visualization task class represents a thread that reads the packet cache
- * and uses a PacketDispatcher object to distribute the packets to the
- * loaded plugins. It then fires an event to notify all listeners for
- * redraw-purposes. This thread stop when the <code>visualizationRunning</code>
- * member of the Spyglass class is set to false.
+ * The visualization task class represents a thread that reads the packet cache and uses a
+ * PacketDispatcher object to distribute the packets to the loaded plugins. It then fires an event
+ * to notify all listeners for redraw-purposes. This thread stop when the
+ * <code>visualizationRunning</code> member of the Spyglass class is set to false.
  */
 public class VisualizationTask implements Runnable {
 	private static Category log = SpyglassLogger.get(VisualizationTask.class);
@@ -35,7 +32,7 @@ public class VisualizationTask implements Runnable {
 	
 	private long fps = 25;
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * @param delay
@@ -50,7 +47,7 @@ public class VisualizationTask implements Runnable {
 		eventObject = new EventObject(spyglass);
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -76,10 +73,10 @@ public class VisualizationTask implements Runnable {
 				Thread.currentThread().interrupt();
 			}
 		}
-		
+		log.info("The Visualization thread stopped");
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -88,7 +85,7 @@ public class VisualizationTask implements Runnable {
 		return fps;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 

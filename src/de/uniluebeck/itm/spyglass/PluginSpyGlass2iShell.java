@@ -107,7 +107,8 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			log.debug("Ich wurde geklickt");
 			
 			if (config != null) {
-				for (final de.uniluebeck.itm.spyglass.plugin.Plugin p : config.getPluginManager().getActivePlugins()) {
+				for (final de.uniluebeck.itm.spyglass.plugin.Plugin p : config.getPluginManager()
+						.getActivePlugins()) {
 					p.reset();
 				}
 				
@@ -207,7 +208,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	 */
 	@Override
 	public void shutdown() {
-		spyglass.setVisualizationRunning(false);
+		spyglass.shutdown();
 		container.dispose();
 		spyglass = null;
 		container = null;
@@ -231,7 +232,8 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	 */
 	@Override
 	public String getDescription() {
-		return getName() + " is a visualization framework for binary data packets arriving from the WSN";
+		return getName()
+				+ " is a visualization framework for binary data packets arriving from the WSN";
 	}
 	
 }

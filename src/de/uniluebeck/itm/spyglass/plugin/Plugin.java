@@ -405,8 +405,8 @@ public abstract class Plugin implements Runnable {
 					packetQueue.wait();
 				} catch (final InterruptedException e) {
 					log
-							.info(e.getMessage()
-									+ ": The packet consumer thread was interrupted while waiting for a notification of the arrival of a new packet");
+							.info("The packet consumer thread was interrupted while waiting for a notification of the arrival of a new packet");
+					packetConsumerThread.interrupt();
 				}
 			}
 			return packetQueue.poll();

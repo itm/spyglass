@@ -61,7 +61,7 @@ public class SpyglassApp {
 			}
 		}
 		
-		spyglass.setVisualizationRunning(false);
+		spyglass.shutdown();
 		log.info("SpyGlass end. Done.");
 	}
 	
