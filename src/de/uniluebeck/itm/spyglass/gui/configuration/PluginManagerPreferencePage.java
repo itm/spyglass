@@ -2,6 +2,8 @@ package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import ishell.util.Logging;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import org.apache.log4j.Category;
@@ -9,9 +11,10 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -19,7 +22,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -42,21 +44,23 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private class ActiveEditing extends EditingSupport {
 		
-		private final ComboBoxCellEditor cellEditor;
+		// private final ComboBoxCellEditor cellEditor;
 		
 		public ActiveEditing(final TableViewer viewer) {
 			super(viewer);
-			cellEditor = new ComboBoxCellEditor(viewer.getTable(), new String[] { "true", "false" });
+			// cellEditor = new ComboBoxCellEditor(viewer.getTable(), new String[] { "true", "false"
+			// });
 		}
 		
 		@Override
 		protected boolean canEdit(final Object arg0) {
-			return true;
+			return false;
 		}
 		
 		@Override
 		protected CellEditor getCellEditor(final Object arg0) {
-			return cellEditor;
+			// return cellEditor;
+			return null;
 		}
 		
 		@Override
@@ -66,9 +70,9 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		
 		@Override
 		protected void setValue(final Object arg0, final Object arg1) {
-			final int selected = ((Integer) arg1);
-			((Plugin) arg0).setActive(selected == 0 ? true : false);
-			pluginTableViewer.update(arg0, new String[] { COLUMN_ACTIVE });
+			// final int selected = ((Integer) arg1);
+			// ((Plugin) arg0).setActive(selected == 0 ? true : false);
+			// pluginTableViewer.update(arg0, new String[] { COLUMN_ACTIVE });
 		}
 		
 	}
@@ -121,11 +125,11 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private class NameEditing extends EditingSupport {
 		
-		private final TextCellEditor cellEditor;
+		// private final TextCellEditor cellEditor;
 		
 		public NameEditing(final TableViewer viewer) {
 			super(viewer);
-			cellEditor = new TextCellEditor(viewer.getTable());
+			// cellEditor = new TextCellEditor(viewer.getTable());
 		}
 		
 		@Override
@@ -135,7 +139,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		
 		@Override
 		protected CellEditor getCellEditor(final Object arg0) {
-			return cellEditor;
+			// return cellEditor;
+			return null;
 		}
 		
 		@Override
@@ -146,8 +151,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		@Override
 		protected void setValue(final Object arg0, final Object arg1) {
 			// TODO unique name validation (!!!)
-			((Plugin) arg0).getXMLConfig().setName((String) arg1);
-			pluginTableViewer.update(arg0, new String[] { COLUMN_NAME });
+			// ((Plugin) arg0).getXMLConfig().setName((String) arg1);
+			// pluginTableViewer.update(arg0, new String[] { COLUMN_NAME });
 		}
 	}
 	
@@ -225,7 +230,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	}
 	
 	private class PluginTableContentProvider implements IStructuredContentProvider,
-			PluginListChangeListener {
+			PluginListChangeListener, PropertyChangeListener {
 		
 		private List<Plugin> plugins;
 		
@@ -234,20 +239,29 @@ public class PluginManagerPreferencePage extends PreferencePage {
 			spyglass.getPluginManager().removePluginListChangeListener(this);
 		}
 		
-		@SuppressWarnings("unchecked")
 		@Override
 		public Object[] getElements(final Object arg0) {
-			plugins = ((Spyglass) arg0).getPluginManager().getPlugins(true,
-					NodePositionerPlugin.class);
+			plugins = getPlugins();
 			return plugins.toArray(new Plugin[plugins.size()]);
+		}
+		
+		@SuppressWarnings("unchecked")
+		private List<Plugin> getPlugins() {
+			return spyglass.getPluginManager().getPlugins(true, NodePositionerPlugin.class);
 		}
 		
 		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
 			if (newInput != null) {
+				for (final Plugin p : getPlugins()) {
+					p.getXMLConfig().addPropertyChangeListener(this);
+				}
 				spyglass.getPluginManager().addPluginListChangeListener(this);
 			}
 			if (oldInput != null) {
+				for (final Plugin p : plugins) {
+					p.getXMLConfig().removePropertyChangeListener(this);
+				}
 				spyglass.getPluginManager().removePluginListChangeListener(this);
 			}
 		}
@@ -285,6 +299,14 @@ public class PluginManagerPreferencePage extends PreferencePage {
 			pluginTableViewer.refresh();
 		}
 		
+		@Override
+		public void propertyChange(final PropertyChangeEvent event) {
+			for (final Plugin p : plugins) {
+				if (p.getXMLConfig() == event.getSource()) {
+					pluginTableViewer.refresh(p);
+				}
+			}
+		}
 	}
 	
 	private class TypeEditing extends EditingSupport {
@@ -326,21 +348,23 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private class VisibleEditing extends EditingSupport {
 		
-		private final ComboBoxCellEditor cellEditor;
+		// private final ComboBoxCellEditor cellEditor;
 		
 		public VisibleEditing(final TableViewer viewer) {
 			super(viewer);
-			cellEditor = new ComboBoxCellEditor(viewer.getTable(), new String[] { "true", "false" });
+			// cellEditor = new ComboBoxCellEditor(viewer.getTable(), new String[] { "true", "false"
+			// });
 		}
 		
 		@Override
 		protected boolean canEdit(final Object arg0) {
-			return true;
+			return false;
 		}
 		
 		@Override
 		protected CellEditor getCellEditor(final Object arg0) {
-			return cellEditor;
+			// return cellEditor;
+			return null;
 		}
 		
 		@Override
@@ -350,9 +374,9 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		
 		@Override
 		protected void setValue(final Object arg0, final Object arg1) {
-			final int selected = ((Integer) arg1);
-			((Plugin) arg0).setVisible(selected == 0 ? true : false);
-			pluginTableViewer.update(arg0, new String[] { COLUMN_VISIBLE });
+			// final int selected = ((Integer) arg1);
+			// ((Plugin) arg0).setVisible(selected == 0 ? true : false);
+			// pluginTableViewer.update(arg0, new String[] { COLUMN_VISIBLE });
 		}
 		
 	}
@@ -411,8 +435,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private final Spyglass spyglass;
 	
-	public PluginManagerPreferencePage(final Spyglass spyglass) {
+	private PluginPreferenceDialog pluginPreferenceDialog;
+	
+	public PluginManagerPreferencePage(final Spyglass spyglass,
+			final PluginPreferenceDialog pluginPreferenceDialog) {
 		this.spyglass = spyglass;
+		this.pluginPreferenceDialog = pluginPreferenceDialog;
 		
 		noDefaultAndApplyButton();
 	}
@@ -450,6 +478,15 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		
 	}
 	
+	private IDoubleClickListener pluginTableDoubleClickListener = new IDoubleClickListener() {
+		@Override
+		public void doubleClick(final DoubleClickEvent event) {
+			final Plugin element = (Plugin) ((IStructuredSelection) event.getSelection())
+					.getFirstElement();
+			pluginPreferenceDialog.selectPreferencePage(element);
+		}
+	};
+	
 	private void addPluginManagerList(final Composite parent) {
 		
 		final GridLayout layout = new GridLayout();
@@ -474,6 +511,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		createPluginTableViewer(pluginsGroup);
 		
 		pluginTableViewer.getTable().setLayoutData(pluginTableData);
+		pluginTableViewer.addDoubleClickListener(pluginTableDoubleClickListener);
 		
 		final GridLayout buttonCompositeLayout = new GridLayout();
 		buttonCompositeLayout.numColumns = 1;

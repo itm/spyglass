@@ -125,24 +125,22 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		}
 		
 		public void selectPluginManagerPreferenceNode() {
-			final IPreferenceNode pluginManagerNode = findNodeMatching(NODE_ID_PLUGINMANAGER);
-			if (pluginManagerNode.getPage() == null) {
-				pluginManagerNode.createPage();
-			}
-			showPage(pluginManagerNode);
-			getTreeViewer()
-					.setSelection(new StructuredSelection(findPluginManagerTreeItem()), true);
-			getTreeViewer().refresh();
+			selectPreferenceNodeInternal(NODE_ID_PLUGINMANAGER);
 		}
 		
-		private IPreferenceNode findPluginManagerTreeItem() {
-			for (final TreeItem item : getTreeViewer().getTree().getItems()) {
-				if (((IPreferenceNode) item.getData()).getId().equals(NODE_ID_PLUGINMANAGER)) {
-					return (IPreferenceNode) item.getData();
-				}
+		public void selectPreferenceNode(final Plugin p) {
+			selectPreferenceNodeInternal(getPreferenceNodeId(p));
+		}
+		
+		private void selectPreferenceNodeInternal(final String nodeId) {
+			final IPreferenceNode node = findNodeMatching(nodeId);
+			if (node.getPage() == null) {
+				node.createPage();
 			}
-			// should never reach here
-			return null;
+			showPage(node);
+			getTreeViewer()
+					.setSelection(new StructuredSelection(preferenceNodes.get(nodeId)), true);
+			getTreeViewer().refresh();
 		}
 		
 	}
@@ -248,19 +246,24 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		final PreferenceNode generalPreferenceNode = new PreferenceNode(NODE_ID_GENERAL_SETTINGS,
 				"General", getImageDescriptor("general.png"), GeneralPreferencePage.class
 						.getCanonicalName());
-		final PreferenceNode pluginsPreferenceNode = new CustomPreferenceNode(
+		final PreferenceNode pluginManagerPreferenceNode = new CustomPreferenceNode(
 				NODE_ID_PLUGINMANAGER, "Plugins", getImageDescriptor("plugin_manager.png"),
-				new PluginManagerPreferencePage(spyglass));
+				new PluginManagerPreferencePage(spyglass, this));
 		
 		preferenceManager.addToRoot(generalPreferenceNode);
-		preferenceManager.addToRoot(pluginsPreferenceNode);
+		preferenceManager.addToRoot(pluginManagerPreferenceNode);
+		
+		preferenceNodes.put(NODE_ID_GENERAL_SETTINGS, generalPreferenceNode);
+		preferenceNodes.put(NODE_ID_PLUGINMANAGER, pluginManagerPreferenceNode);
 		
 		final List<Class<? extends Plugin>> pluginTypes = spyglass.getPluginManager()
 				.getAvailablePluginTypes();
 		
-		addPreferenceNodesRecursive(buildClassTree(pluginTypes), pluginsPreferenceNode);
+		addPreferenceNodesRecursive(buildClassTree(pluginTypes), pluginManagerPreferenceNode);
 		
 	};
+	
+	private HashMap<String, IPreferenceNode> preferenceNodes = new HashMap<String, IPreferenceNode>();
 	
 	private void addPreferenceNodesRecursive(final ClassTree classTree,
 			final PreferenceNode parentPreferenceNode) {
@@ -294,6 +297,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			preferenceNode = new CustomPreferenceNode(preferenceNodeId, preferenceNodeLabel,
 					preferenceNodeImageDescriptor, preferencePage);
 			parentPreferenceNode.add(preferenceNode);
+			preferenceNodes.put(preferenceNodeId, preferenceNode);
 			
 			// add nodes for instantiated plugins
 			for (final Plugin p : spyglass.getPluginManager().getPluginInstances(classTree.clazz,
@@ -308,6 +312,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 				
 				// add to parent tree node
 				preferenceNode.add(instancePreferenceNode);
+				preferenceNodes.put(preferenceNodeId, instancePreferenceNode);
 				
 				// add to hashmap (needed for lookup when removing instances)
 				instancePreferenceNodes.put(p, preferenceNodeId);
@@ -615,6 +620,10 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void selectPreferencePage(final Plugin p) {
+		preferenceDialog.selectPreferenceNode(p);
 	}
 	
 }
