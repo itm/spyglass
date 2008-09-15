@@ -5,6 +5,7 @@ import ishell.util.Logging;
 import java.util.List;
 
 import org.apache.log4j.Category;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -281,7 +282,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		
 		@Override
 		public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
-			pluginTableViewer.update(p, null);
+			pluginTableViewer.refresh();
 		}
 		
 	}
@@ -379,6 +380,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private Button buttonDown;
 	
+	private Button buttonRemoveInstance;
+	
 	private final SelectionListener buttonSelectionListener = new SelectionAdapter() {
 		
 		@Override
@@ -387,6 +390,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 				clickedButtonUp();
 			} else if (e.getSource() == buttonDown) {
 				clickedButtonDown();
+			} else if (e.getSource() == buttonRemoveInstance) {
+				clickedButtonRemoveInstance();
 			}
 		}
 		
@@ -481,10 +486,13 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		buttonComposite.setLayoutData(buttonCompositeData);
 		
 		final GridData buttonUpData = new GridData();
-		buttonUpData.widthHint = 70;
+		buttonUpData.widthHint = 130;
 		
 		final GridData buttonDownData = new GridData();
-		buttonDownData.widthHint = 70;
+		buttonDownData.widthHint = 130;
+		
+		final GridData buttonRemoveInstanceData = new GridData();
+		buttonRemoveInstanceData.widthHint = 130;
 		
 		buttonUp = new Button(buttonComposite, SWT.PUSH);
 		buttonUp.setText("Up");
@@ -498,6 +506,22 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		buttonDown.setEnabled(false);
 		buttonDown.addSelectionListener(buttonSelectionListener);
 		
+		buttonRemoveInstance = new Button(buttonComposite, SWT.PUSH);
+		buttonRemoveInstance.setText("Remove Instance");
+		buttonRemoveInstance.setLayoutData(buttonRemoveInstanceData);
+		buttonRemoveInstance.setEnabled(false);
+		buttonRemoveInstance.addSelectionListener(buttonSelectionListener);
+		
+	}
+	
+	private void clickedButtonRemoveInstance() {
+		final boolean confirm = MessageDialog.openConfirm(getShell(), "Confirm instance removal",
+				"Are you sure you want to remove the plugin instance?");
+		if (confirm) {
+			final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer
+					.getSelection()).getFirstElement();
+			spyglass.getPluginManager().removePlugin(selectedPlugin);
+		}
 	}
 	
 	private void clickedButtonDown() {
@@ -613,6 +637,9 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		buttonDown.dispose();
 		buttonDown = null;
 		
+		buttonRemoveInstance.dispose();
+		buttonRemoveInstance = null;
+		
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -636,6 +663,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	private void updateButtons(final Plugin selectedPlugin) {
 		buttonUp.setEnabled(!pluginTableContentProvider.isFirstInList(selectedPlugin));
 		buttonDown.setEnabled(!pluginTableContentProvider.isLastInList(selectedPlugin));
+		buttonRemoveInstance.setEnabled(!pluginTableViewer.getSelection().isEmpty());
 	}
 	
 }

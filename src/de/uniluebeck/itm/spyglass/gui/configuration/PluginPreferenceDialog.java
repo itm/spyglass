@@ -556,6 +556,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		final String nodeId = getPreferenceNodeId(p);
 		for (final TreeItem ti : t.getItems()) {
 			((PreferenceNode) ti.getData()).remove(nodeId);
+			// TODO
 		}
 	}
 	
