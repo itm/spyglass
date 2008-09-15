@@ -138,23 +138,18 @@ public class Rectangle extends DrawingObject {
 		gc.setForeground(color);
 		gc.setBackground(bg);
 		gc.setLineWidth(this.getLineWidth());
-		gc.fillRectangle((px.x - (this.getWidth() / 2)), (px.y - (this.getHeight() / 2)), this.getWidth(), this.getHeight());
-		gc.drawRectangle((px.x - (this.getWidth() / 2)), (px.y - (this.getHeight() / 2)), this.getWidth(), this.getHeight());
+		gc.fillRectangle((px.x - (this.getWidth() / 2)), (px.y - (this.getHeight() / 2)), this
+				.getWidth(), this.getHeight());
+		gc.drawRectangle((px.x - (this.getWidth() / 2)), (px.y - (this.getHeight() / 2)), this
+				.getWidth(), this.getHeight());
 		
 		color.dispose();
 		bg.dispose();
 	}
 	
 	@Override
-	public AbsoluteRectangle getBoundingBox() {
+	public AbsoluteRectangle calculateBoundingBox() {
 		return new AbsoluteRectangle(getPosition(), width, height);
-	}
-	
-	@Override
-	public void setBoundingBox(final AbsoluteRectangle box) {
-		setPosition(box.getUpperLeft());
-		this.width = box.getWidth();
-		this.height = box.getHeight();
 	}
 	
 }

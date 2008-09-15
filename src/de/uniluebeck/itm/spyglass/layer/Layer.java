@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.layer;
 
@@ -29,9 +27,8 @@ public interface Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Sets the point order parameter of a drawing object to make it the last
-	 * one in the set to be painted. This way, the drawing object will be in
-	 * front of all other ones.
+	 * Sets the point order parameter of a drawing object to make it the last one in the set to be
+	 * painted. This way, the drawing object will be in front of all other ones.
 	 * 
 	 * @param object
 	 *            the drawing object to be brought to the front
@@ -39,9 +36,8 @@ public interface Layer {
 	public void bringToFront(DrawingObject dob);
 	
 	/**
-	 * Sets the point order parameter of a drawing object to make it the first
-	 * one in the set to be painted. This way, the drawing object will be behind
-	 * all other ones.
+	 * Sets the point order parameter of a drawing object to make it the first one in the set to be
+	 * painted. This way, the drawing object will be behind all other ones.
 	 * 
 	 * @param object
 	 *            the drawing object to be brought to the front
@@ -62,18 +58,9 @@ public interface Layer {
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
-	 * @param dob
-	 * @param x
-	 *            absolute coordinate
-	 * @param y
-	 *            absolute coordinate
-	 */
-	public void move(DrawingObject dob, int x, int y);
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
 	 * @param d
+	 * @return <code>true</code> if <code>d</code> was found (and removed), <code>false</code>
+	 *         otherwise
 	 */
-	public void remove(DrawingObject d);
+	public boolean remove(DrawingObject d);
 }

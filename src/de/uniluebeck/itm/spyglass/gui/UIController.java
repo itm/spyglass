@@ -309,7 +309,7 @@ public class UIController {
 		AbsoluteRectangle maxRect = null;
 		
 		for (final DrawingObject drawingObject : dobs) {
-			final AbsoluteRectangle nextRect = drawingObject.getBoundingBox();
+			final AbsoluteRectangle nextRect = drawingObject.calculateBoundingBox();
 			if (nextRect == null) {
 				continue;
 			}

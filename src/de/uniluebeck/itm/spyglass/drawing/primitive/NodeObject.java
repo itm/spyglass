@@ -233,7 +233,7 @@ public class NodeObject extends DrawingObject {
 		
 		final PixelRectangle pxRect = new PixelRectangle(upperLeft, height, width);
 		final AbsoluteRectangle absRect = drawingArea.pixelRect2AbsRect(pxRect);
-		setBoundingBox(absRect);
+		boundingBox = absRect;
 		
 		gc.fillRectangle(upperLeft.x, upperLeft.y, width, height);
 		gc.drawRectangle(upperLeft.x, upperLeft.y, width, height);
@@ -243,13 +243,8 @@ public class NodeObject extends DrawingObject {
 	}
 	
 	@Override
-	public AbsoluteRectangle getBoundingBox() {
+	public AbsoluteRectangle calculateBoundingBox() {
 		return boundingBox;
-	}
-	
-	@Override
-	public void setBoundingBox(final AbsoluteRectangle box) {
-		boundingBox = box;
 	}
 	
 }

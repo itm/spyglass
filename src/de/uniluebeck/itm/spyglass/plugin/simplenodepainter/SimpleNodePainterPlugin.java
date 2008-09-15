@@ -409,7 +409,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		// check all drawing objects
 		for (final DrawingObject drawingObject : drawingObjects) {
 			final PixelRectangle bbox = drawingArea.absRect2PixelRect(drawingObject
-					.getBoundingBox());
+					.calculateBoundingBox());
 			// check which plug-in's bounding box contains the point which
 			// was clicked (if any)
 			if (bbox.contains(clickPoint)) {
@@ -443,7 +443,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		for (final DrawingObject drawingObject : drawingObjects) {
 			
 			final PixelRectangle bbox = drawingArea.absRect2PixelRect(drawingObject
-					.getBoundingBox());
+					.calculateBoundingBox());
 			// check which plug-in's bounding box contains the point which
 			// was clicked (if any)
 			if (bbox.contains(clickPoint)) {
@@ -474,7 +474,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		for (final DrawingObject drawingObject : drawingObjects) {
 			
 			final PixelRectangle bbox = drawingArea.absRect2PixelRect(drawingObject
-					.getBoundingBox());
+					.calculateBoundingBox());
 			// check which plug-in's bounding box contains the point which
 			// was clicked (if any)
 			if (bbox.contains(clickPoint)) {

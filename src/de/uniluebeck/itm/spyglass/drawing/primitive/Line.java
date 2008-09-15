@@ -128,15 +128,9 @@ public class Line extends DrawingObject {
 	}
 	
 	@Override
-	public AbsoluteRectangle getBoundingBox() {
+	public AbsoluteRectangle calculateBoundingBox() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	@Override
-	public void setBoundingBox(final AbsoluteRectangle box) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 }

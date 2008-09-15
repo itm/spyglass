@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -298,7 +299,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			for (final Plugin p : spyglass.getPluginManager().getPluginInstances(classTree.clazz,
 					false)) {
 				
-				preferenceNodeId = p.getClass().getCanonicalName() + "_" + p.hashCode();
+				preferenceNodeId = getPreferenceNodeId(p);
 				preferencePage = getPreferencePage(classTree.clazz, p);
 				preferenceNodeLabel = getInstanceName(classTree.clazz, p);
 				preferenceNodeImageDescriptor = getInstanceImageDescriptor(classTree.clazz, p);
@@ -324,6 +325,10 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			return;
 		}
 		
+	}
+	
+	private String getPreferenceNodeId(final Plugin p) {
+		return p.getClass().getCanonicalName() + "_" + p.hashCode();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -535,6 +540,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			case PLUGIN_REMOVED:
 				preferenceManager.remove(instancePreferenceNodes.get(p));
 				preferenceDialog.selectPluginManagerPreferenceNode();
+				removePluginFromTree(preferenceDialog.getTreeViewer().getTree(), p);
 				break;
 			case PRIORITY_CHANGED:
 				// TODO
@@ -544,6 +550,13 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		// XXX: PLUGIN_STATE_CHANGED removed, since the PluginManager should not be responsible for
 		// sending out notifications about changes in the configuration of a plugin. Use instead the
 		// event listener inside the PluginXMLConfig objects. -- Dariush
+	}
+	
+	private void removePluginFromTree(final Tree t, final Plugin p) {
+		final String nodeId = getPreferenceNodeId(p);
+		for (final TreeItem ti : t.getItems()) {
+			((PreferenceNode) ti.getData()).remove(nodeId);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

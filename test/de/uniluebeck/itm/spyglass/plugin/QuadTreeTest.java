@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +24,7 @@ public class QuadTreeTest {
 	private QuadTree tree;
 	
 	private Rectangle rectangle1;
+	
 	private Rectangle rectangle2;
 	
 	private Rectangle rectangle3;
@@ -34,13 +34,17 @@ public class QuadTreeTest {
 	private static final int upperLeftX = -500;
 	private static final int upperLeftY = -500;
 	
+	@SuppressWarnings("unused")
 	private static final int lowerLeftX = -500;
+	@SuppressWarnings("unused")
 	private static final int lowerLeftY = +500;
 	
 	private static final int lowerRightX = +500;
 	private static final int lowerRightY = +500;
 	
+	@SuppressWarnings("unused")
 	private static final int upperRightX = +500;
+	@SuppressWarnings("unused")
 	private static final int upperRightY = -500;
 	
 	private static final int width = 1000;
@@ -56,8 +60,14 @@ public class QuadTreeTest {
 		
 		rectangle1 = createRect(upperLeftX, upperLeftY);
 		rectangle2 = createRect(lowerRightX - rectWidth, lowerRightY - rectHeight);
-		rectangle3 = createRect(upperLeftX + (width / 2) - rectWidth, upperLeftY + (height / 2) - rectHeight);
+		rectangle3 = createRect(upperLeftX + (width / 2) - rectWidth, upperLeftY + (height / 2)
+				- rectHeight);
 		rectangle4 = createRect(upperLeftX + (width / 2), upperLeftY + (height / 2));
+		
+		rectangle1.setId(111);
+		rectangle2.setId(222);
+		rectangle3.setId(333);
+		rectangle4.setId(444);
 		
 	}
 	
@@ -102,11 +112,14 @@ public class QuadTreeTest {
 		
 	}
 	
-	private static final AbsoluteRectangle upperLeftQuadrant = new AbsoluteRectangle(upperLeftX, upperLeftY, width / 2, height / 2);
-	private static final AbsoluteRectangle upperRightQuadrant = new AbsoluteRectangle(upperLeftX + (width / 2), upperLeftY, width / 2, height / 2);
-	private static final AbsoluteRectangle lowerLeftQuadrant = new AbsoluteRectangle(upperLeftX, upperLeftY + (height / 2), width / 2, height / 2);
-	private static final AbsoluteRectangle lowerRightQuadrant = new AbsoluteRectangle(upperLeftX + (width / 2), upperLeftY + (height / 2), width / 2,
-			height / 2);
+	private static final AbsoluteRectangle upperLeftQuadrant = new AbsoluteRectangle(upperLeftX,
+			upperLeftY, width / 2, height / 2);
+	private static final AbsoluteRectangle upperRightQuadrant = new AbsoluteRectangle(upperLeftX
+			+ (width / 2), upperLeftY, width / 2, height / 2);
+	private static final AbsoluteRectangle lowerLeftQuadrant = new AbsoluteRectangle(upperLeftX,
+			upperLeftY + (height / 2), width / 2, height / 2);
+	private static final AbsoluteRectangle lowerRightQuadrant = new AbsoluteRectangle(upperLeftX
+			+ (width / 2), upperLeftY + (height / 2), width / 2, height / 2);
 	
 	@Test
 	public void testGetCollisionEntities() {
@@ -116,7 +129,8 @@ public class QuadTreeTest {
 		List<DrawingObject> collisionEntities;
 		
 		// get all entities from entire box
-		collisionEntities = tree.getCollisionEntities(new AbsoluteRectangle(upperLeftX, upperLeftY, width, height));
+		collisionEntities = tree.getCollisionEntities(new AbsoluteRectangle(upperLeftX, upperLeftY,
+				width, height));
 		assertTrue(collisionEntities.contains(rectangle1));
 		assertTrue(collisionEntities.contains(rectangle2));
 		assertTrue(collisionEntities.contains(rectangle3));
@@ -213,97 +227,29 @@ public class QuadTreeTest {
 	}
 	
 	@Test
-	public void testMoveDrawingObjectIntInt() {
-		
-		// place into upper left quadrant
-		tree.insert(rectangle1);
-		assertObjectInArea(rectangle1, upperLeftQuadrant);
-		
-		// move to upper right quadrant
-		tree.move(rectangle1, width / 2, 0);
-		assertAreaEmpty(upperLeftQuadrant);
-		assertObjectInArea(rectangle1, upperRightQuadrant);
-		
-		// move to lower right quadrant
-		tree.move(rectangle1, 0, height / 2);
-		assertAreaEmpty(upperRightQuadrant);
-		assertObjectInArea(rectangle1, lowerRightQuadrant);
-		
-		// move to lower left quadrant
-		tree.move(rectangle1, -(width / 2), 0);
-		assertAreaEmpty(lowerRightQuadrant);
-		assertObjectInArea(rectangle1, lowerLeftQuadrant);
-		
-		// move to upper left quadrant
-		tree.move(rectangle1, 0, -(height / 2));
-		assertAreaEmpty(lowerLeftQuadrant);
-		assertObjectInArea(rectangle1, upperLeftQuadrant);
-		
-	}
-	
-	private void assertObjectInArea(final DrawingObject object, final AbsoluteRectangle area) {
-		final List<DrawingObject> list = tree.getCollisionEntities(area);
-		assertTrue(list.contains(object));
-	}
-	
-	private void assertAreaEmpty(final AbsoluteRectangle area) {
-		final List<DrawingObject> list = tree.getCollisionEntities(area);
-		assertTrue(list.size() == 0);
-	}
-	
-	@Test
-	public void testMoveDrawingObjectAbsoluteRectangle() {
-		
-		// place into upper left quadrant
-		tree.insert(rectangle1);
-		assertObjectInArea(rectangle1, upperLeftQuadrant);
-		
-		// move to upper right quadrant
-		tree.move(rectangle1, new AbsoluteRectangle(upperRightQuadrant.getUpperLeft(), 10, 10));
-		assertAreaEmpty(upperLeftQuadrant);
-		assertObjectInArea(rectangle1, upperRightQuadrant);
-		
-		// move to lower right quadrant
-		tree.move(rectangle1, new AbsoluteRectangle(lowerRightQuadrant.getUpperLeft(), 10, 10));
-		assertAreaEmpty(upperRightQuadrant);
-		assertObjectInArea(rectangle1, lowerRightQuadrant);
-		
-		// move to lower left quadrant
-		tree.move(rectangle1, new AbsoluteRectangle(lowerLeftQuadrant.getUpperLeft(), 10, 10));
-		assertAreaEmpty(lowerRightQuadrant);
-		assertObjectInArea(rectangle1, lowerLeftQuadrant);
-		
-		// move to upper left quadrant
-		tree.move(rectangle1, new AbsoluteRectangle(upperLeftQuadrant.getUpperLeft(), 10, 10));
-		assertAreaEmpty(lowerLeftQuadrant);
-		assertObjectInArea(rectangle1, upperLeftQuadrant);
-		
-	}
-	
-	@Test
 	public void testRemove() {
 		
 		addAllRectangles();
 		
-		tree.remove(rectangle1);
+		assertTrue(tree.remove(rectangle1));
 		assertFalse(tree.contains(rectangle1));
 		assertTrue(tree.contains(rectangle2));
 		assertTrue(tree.contains(rectangle3));
 		assertTrue(tree.contains(rectangle4));
 		
-		tree.remove(rectangle2);
+		assertTrue(tree.remove(rectangle2));
 		assertFalse(tree.contains(rectangle1));
 		assertFalse(tree.contains(rectangle2));
 		assertTrue(tree.contains(rectangle3));
 		assertTrue(tree.contains(rectangle4));
 		
-		tree.remove(rectangle3);
+		assertTrue(tree.remove(rectangle3));
 		assertFalse(tree.contains(rectangle1));
 		assertFalse(tree.contains(rectangle2));
 		assertFalse(tree.contains(rectangle3));
 		assertTrue(tree.contains(rectangle4));
 		
-		tree.remove(rectangle4);
+		assertTrue(tree.remove(rectangle4));
 		assertFalse(tree.contains(rectangle1));
 		assertFalse(tree.contains(rectangle2));
 		assertFalse(tree.contains(rectangle3));
@@ -343,79 +289,192 @@ public class QuadTreeTest {
 		Collection<DrawingObject> search;
 		
 		// search for center point of rectangle1
-		search = tree.search(new Point(upperLeftX + (rectWidth / 2), upperLeftY + (rectHeight / 2)));
+		search = tree
+				.search(new Point(upperLeftX + (rectWidth / 2), upperLeftY + (rectHeight / 2)));
 		assertTrue(search.contains(rectangle1));
 		
 		// search for center point of rectangle2
-		search = tree.search(new Point(lowerRightX - (rectWidth / 2), lowerRightY - (rectHeight / 2)));
+		search = tree.search(new Point(lowerRightX - (rectWidth / 2), lowerRightY
+				- (rectHeight / 2)));
 		assertTrue(search.contains(rectangle2));
 		
 		// search for center point of rectangle3
-		search = tree.search(new Point(upperLeftX + (width / 2) - (rectWidth / 2), upperLeftY + (height / 2) - (rectHeight / 2)));
+		search = tree.search(new Point(upperLeftX + (width / 2) - (rectWidth / 2), upperLeftY
+				+ (height / 2) - (rectHeight / 2)));
 		assertTrue(search.contains(rectangle3));
 		
 		// search for center point of rectangle4
-		search = tree.search(new Point(upperLeftX + (width / 2) + (rectWidth / 2), upperLeftY + (height / 2) + (rectHeight / 2)));
+		search = tree.search(new Point(upperLeftX + (width / 2) + (rectWidth / 2), upperLeftY
+				+ (height / 2) + (rectHeight / 2)));
 		assertTrue(search.contains(rectangle4));
 		
 		// search for center point of upper left quadrant
-		search = tree.search(new Point(upperLeftX + (width * 1 / 4), upperLeftY + (height * 1 / 4)));
+		search = tree
+				.search(new Point(upperLeftX + (width * 1 / 4), upperLeftY + (height * 1 / 4)));
 		
 		// search for center point of lower left quadrant
-		search = tree.search(new Point(upperLeftX + (width * 3 / 4), upperLeftY + (height * 1 / 4)));
+		search = tree
+				.search(new Point(upperLeftX + (width * 3 / 4), upperLeftY + (height * 1 / 4)));
 		assertTrue(search.isEmpty());
 		
 		// search for center point of upper right quadrant
-		search = tree.search(new Point(upperLeftX + (width * 1 / 4), upperLeftY + (height * 3 / 4)));
+		search = tree
+				.search(new Point(upperLeftX + (width * 1 / 4), upperLeftY + (height * 3 / 4)));
 		assertTrue(search.isEmpty());
 		
 		// search for center point of lower right quadrant
-		search = tree.search(new Point(upperLeftX + (width * 3 / 4), upperLeftY + (height * 3 / 4)));
+		search = tree
+				.search(new Point(upperLeftX + (width * 3 / 4), upperLeftY + (height * 3 / 4)));
 		assertTrue(search.isEmpty());
-		
-		// set all rectangles on the same spot and see if they are found
-		rectangle2.setBoundingBox(rectangle1.getBoundingBox());
-		rectangle3.setBoundingBox(rectangle1.getBoundingBox());
-		rectangle4.setBoundingBox(rectangle1.getBoundingBox());
-		tree.addOrUpdate(rectangle2);
-		tree.addOrUpdate(rectangle3);
-		tree.addOrUpdate(rectangle4);
-		search = tree.search(new Point(upperLeftX + (rectWidth / 2), upperLeftY + (rectHeight / 2)));
-		assertTrue(search.contains(rectangle1));
-		assertTrue(search.contains(rectangle2));
-		assertTrue(search.contains(rectangle3));
-		assertTrue(search.contains(rectangle4));
 		
 	}
 	
 	@Test
 	public void testAddOrUpdate() {
-		fail("Not yet implemented");
+		
+		List<DrawingObject> list;
+		
+		addAllRectangles();
+		
+		list = tree.getDrawingObjects(upperLeftQuadrant);
+		assertTrue(list.size() == 2);
+		assertTrue(list.contains(rectangle1));
+		
+		// move rect1 to upper right quadrant
+		rectangle1.setPosition(upperRightQuadrant.getUpperLeft());
+		rectangle1.calculateBoundingBox();
+		list = tree.getDrawingObjects(upperLeftQuadrant);
+		assertTrue(list.size() == 2);
+		assertTrue(list.contains(rectangle1));
+		tree.addOrUpdate(rectangle1);
+		list = tree.getDrawingObjects(upperLeftQuadrant);
+		assertTrue(list.size() == 1);
+		assertTrue(!list.contains(rectangle1));
+		list = tree.getDrawingObjects(upperRightQuadrant);
+		assertTrue(list.size() == 1);
+		assertTrue(list.contains(rectangle1));
+		
+		// move rect1 to lower right
+		rectangle1.setPosition(lowerRightQuadrant.getUpperLeft());
+		list = tree.getDrawingObjects(upperRightQuadrant);
+		assertTrue(list.size() == 1);
+		assertTrue(list.contains(rectangle1));
+		tree.addOrUpdate(rectangle1);
+		list = tree.getDrawingObjects(upperRightQuadrant);
+		assertTrue(list.size() == 0);
+		list = tree.getDrawingObjects(lowerRightQuadrant);
+		assertTrue(list.size() == 3);
+		assertTrue(list.contains(rectangle1));
+		assertTrue(list.contains(rectangle2));
+		assertTrue(list.contains(rectangle4));
+		
 	}
 	
 	@Test
 	public void testBringToFront() {
-		fail("Not yet implemented");
+		
+		List<DrawingObject> list;
+		
+		addAllRectangles();
+		
+		list = tree.getDrawingObjects();
+		assertTrue(list.get(3) == rectangle4);
+		assertTrue(list.get(0) == rectangle1);
+		
+		tree.bringToFront(rectangle1);
+		list = tree.getDrawingObjects();
+		assertTrue(list.get(3) == rectangle1);
+		
+		tree.bringToFront(rectangle2);
+		list = tree.getDrawingObjects();
+		assertTrue(list.get(3) == rectangle2);
+		
+		tree.bringToFront(rectangle3);
+		list = tree.getDrawingObjects();
+		assertTrue(list.get(3) == rectangle3);
+		
+		tree.bringToFront(rectangle4);
+		list = tree.getDrawingObjects();
+		assertTrue(list.get(3) == rectangle4);
+		
 	}
 	
 	@Test
 	public void testPushBack() {
-		fail("Not yet implemented");
+		List<DrawingObject> list;
+		
+		addAllRectangles();
+		
+		list = tree.getDrawingObjects();
+		assertTrue(list.get(3) == rectangle4);
+		assertTrue(list.get(0) == rectangle1);
+		
+		tree.pushBack(rectangle1);
+		list = tree.getDrawingObjects();
+		assertTrue(list.get(0) == rectangle1);
+		
+		tree.pushBack(rectangle2);
+		list = tree.getDrawingObjects();
+		assertTrue(list.get(0) == rectangle2);
+		
+		tree.pushBack(rectangle3);
+		list = tree.getDrawingObjects();
+		assertTrue(list.get(0) == rectangle3);
+		
+		tree.pushBack(rectangle4);
+		list = tree.getDrawingObjects();
+		assertTrue(list.get(0) == rectangle4);
+		
 	}
 	
 	@Test
 	public void testClear() {
-		fail("Not yet implemented");
+		addAllRectangles();
+		assertTrue(tree.getObjectCount() == 4);
+		assertTrue(tree.getObjectsRecursive().size() == 4);
+		tree.clear();
+		assertTrue(tree.getObjectCount() == 0);
+		assertTrue(tree.getObjectsRecursive().size() == 0);
 	}
 	
 	@Test
 	public void testGetDrawingObjectsAbsoluteRectangle() {
-		fail("Not yet implemented");
+		
+		List<DrawingObject> list;
+		
+		addAllRectangles();
+		
+		list = tree.getDrawingObjects(upperLeftQuadrant);
+		assertTrue(list.contains(rectangle1));
+		assertTrue(!list.contains(rectangle2));
+		assertTrue(list.contains(rectangle3));
+		assertTrue(!list.contains(rectangle4));
+		
+		list = tree.getDrawingObjects(upperRightQuadrant);
+		assertTrue(list.size() == 0);
+		
+		list = tree.getDrawingObjects(lowerRightQuadrant);
+		assertTrue(!list.contains(rectangle1));
+		assertTrue(list.contains(rectangle2));
+		assertTrue(!list.contains(rectangle3));
+		assertTrue(list.contains(rectangle4));
+		
+		list = tree.getDrawingObjects(lowerLeftQuadrant);
+		assertTrue(list.size() == 0);
+		
 	}
 	
 	@Test
 	public void testGetDrawingObjects() {
-		fail("Not yet implemented");
+		
+		addAllRectangles();
+		final List<DrawingObject> list = tree.getDrawingObjects();
+		assertTrue(list.size() == 4);
+		assertTrue(list.contains(rectangle1));
+		assertTrue(list.contains(rectangle2));
+		assertTrue(list.contains(rectangle3));
+		assertTrue(list.contains(rectangle4));
+		
 	}
 	
 }

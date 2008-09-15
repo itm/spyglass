@@ -118,23 +118,19 @@ public class Circle extends DrawingObject {
 		
 		final PixelPosition px = drawingArea.absPoint2PixelPoint(this.getPosition());
 		
-		gc.fillOval((px.x - (this.getDiameter() / 2)), (px.y - (this.getDiameter() / 2)), this.getDiameter(), this.getDiameter());
-		gc.drawOval((px.x - (this.getDiameter() / 2)), (px.y - (this.getDiameter() / 2)), this.getDiameter(), this.getDiameter());
+		gc.fillOval((px.x - (this.getDiameter() / 2)), (px.y - (this.getDiameter() / 2)), this
+				.getDiameter(), this.getDiameter());
+		gc.drawOval((px.x - (this.getDiameter() / 2)), (px.y - (this.getDiameter() / 2)), this
+				.getDiameter(), this.getDiameter());
 		
 		color.dispose();
 		bg.dispose();
 	}
 	
 	@Override
-	public AbsoluteRectangle getBoundingBox() {
+	public AbsoluteRectangle calculateBoundingBox() {
 		// TODO Auto-generated method stub
 		return null;
-	}
-	
-	@Override
-	public void setBoundingBox(final AbsoluteRectangle box) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 }

@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.layer;
 
@@ -24,8 +22,8 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 // ------------------------------------------------------------------------------
 // --
 /**
- * A Sublayer is usually used by a plugin to store all drawing objects, that
- * must be rendered to visualize the scene.
+ * A Sublayer is usually used by a plugin to store all drawing objects, that must be rendered to
+ * visualize the scene.
  * 
  * @deprecated Use QuadTree instead.
  */
@@ -41,7 +39,8 @@ public class SubLayer implements Layer {
 		}
 	};
 	
-	private final List<DrawingObject> paintOrder = Collections.synchronizedList(new LinkedList<DrawingObject>());
+	private final List<DrawingObject> paintOrder = Collections
+			.synchronizedList(new LinkedList<DrawingObject>());
 	
 	// --------------------------------------------------------------------------
 	public void clear() {
@@ -66,8 +65,8 @@ public class SubLayer implements Layer {
 	}
 	
 	/**
-	 * Adds a DrawingObject to the internal hashmap. If there is already a
-	 * DrawingObject with the same id, that objects gets updated.
+	 * Adds a DrawingObject to the internal hashmap. If there is already a DrawingObject with the
+	 * same id, that objects gets updated.
 	 * 
 	 * @param object
 	 *            The DrawingObject to add or update.
@@ -93,9 +92,8 @@ public class SubLayer implements Layer {
 	}
 	
 	/**
-	 * Sets the point order parameter of a drawing object to make it the last
-	 * one in the set to be painted. This way, the drawing object will be in
-	 * front of all other ones.
+	 * Sets the point order parameter of a drawing object to make it the last one in the set to be
+	 * painted. This way, the drawing object will be in front of all other ones.
 	 * 
 	 * @param object
 	 *            the drawing object to be brought to the front
@@ -123,9 +121,8 @@ public class SubLayer implements Layer {
 	}
 	
 	/**
-	 * Sets the point order parameter of a drawing object to make it the first
-	 * one in the set to be painted. This way, the drawing object will be behind
-	 * all other ones.
+	 * Sets the point order parameter of a drawing object to make it the first one in the set to be
+	 * painted. This way, the drawing object will be behind all other ones.
 	 * 
 	 * @param object
 	 *            the drawing object to be brought to the front
@@ -161,11 +158,12 @@ public class SubLayer implements Layer {
 		
 	}
 	
-	public void remove(final DrawingObject d) {
+	public boolean remove(final DrawingObject d) {
 		drawingObjects.remove(d.getId());
 		synchronized (paintOrder) {
 			paintOrder.remove(d);
 		}
+		return true;
 	}
 	
 }

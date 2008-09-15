@@ -2,6 +2,9 @@ package de.uniluebeck.itm.spyglass.plugin;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.swt.graphics.Point;
@@ -28,6 +31,26 @@ public class QuadTree implements Layer {
 	
 	private QuadTree[] sons = new QuadTree[4];
 	
+	private HashMap<DrawingObject, Long> insertionOrder;
+	
+	private HashMap<DrawingObject, AbsoluteRectangle> boxes;
+	
+	private long insertionOrderLargest;
+	
+	private long insertionOrderSmallest;
+	
+	private class DrawingObjectComparator implements Comparator<DrawingObject> {
+		
+		@Override
+		public int compare(final DrawingObject o1, final DrawingObject o2) {
+			final long long1 = root.insertionOrder.get(o1);
+			final long long2 = root.insertionOrder.get(o2);
+			return (long1 > long2) ? 1 : (long1 < long2) ? -1 : 0;
+		}
+	}
+	
+	private DrawingObjectComparator sorter = new DrawingObjectComparator();
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param parent
@@ -48,6 +71,10 @@ public class QuadTree implements Layer {
 	public QuadTree(final AbsoluteRectangle box) {
 		this.root = this;
 		this.box = box;
+		this.insertionOrder = new HashMap<DrawingObject, Long>();
+		this.boxes = new HashMap<DrawingObject, AbsoluteRectangle>();
+		this.insertionOrderLargest = 0;
+		this.insertionOrderSmallest = 0;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -57,15 +84,14 @@ public class QuadTree implements Layer {
 	 * @param entity
 	 * @return
 	 */
-	public boolean contains(final DrawingObject entity) {
+	boolean contains(final DrawingObject entity) {
 		return search(entity) != null;
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Creates son nodes if the nodes to be created are larger or equal than the
-	 * minimum size of <code>MIN_BOX_SIZE_X</code> x
-	 * <code>MIN_BOX_SIZE_Y</code> .
+	 * Creates son nodes if the nodes to be created are larger or equal than the minimum size of
+	 * <code>MIN_BOX_SIZE_X</code> x <code>MIN_BOX_SIZE_Y</code> .
 	 * 
 	 * @return true, if son nodes were created, false otherwise
 	 */
@@ -115,7 +141,7 @@ public class QuadTree implements Layer {
 	 * 
 	 * @return the bounding box of this QuadTree element
 	 */
-	public AbsoluteRectangle getBoundingBox() {
+	AbsoluteRectangle getBoundingBox() {
 		return box;
 	}
 	
@@ -125,7 +151,7 @@ public class QuadTree implements Layer {
 	 * @param entity
 	 * @return
 	 */
-	public List<DrawingObject> getCollisionEntities(final AbsoluteRectangle box) {
+	List<DrawingObject> getCollisionEntities(final AbsoluteRectangle box) {
 		final List<DrawingObject> list = new ArrayList<DrawingObject>();
 		
 		// search for the quadrant where this entity
@@ -137,7 +163,7 @@ public class QuadTree implements Layer {
 		if ((elem != null) && elem.hasSons) {
 			for (final QuadTree son : sons) {
 				for (final DrawingObject e : son.getObjectsRecursive()) {
-					if (e.getBoundingBox().intersects(box)) {
+					if (root.boxes.get(e).intersects(box)) {
 						list.add(e);
 					}
 				}
@@ -155,7 +181,7 @@ public class QuadTree implements Layer {
 				// check if any of the corners of entity on
 				// position pos would be contained in the box
 				// of e.
-				if (e.getBoundingBox().intersects(box)) {
+				if (root.boxes.get(e).intersects(box)) {
 					list.add(e);
 				}
 				
@@ -175,7 +201,7 @@ public class QuadTree implements Layer {
 	 * 
 	 * @return a list of the objects attached to this quadtree element
 	 */
-	public ArrayList<DrawingObject> getObjects() {
+	ArrayList<DrawingObject> getObjects() {
 		return new ArrayList<DrawingObject>(objects);
 	}
 	
@@ -185,7 +211,7 @@ public class QuadTree implements Layer {
 	 * 
 	 * @return
 	 */
-	public List<DrawingObject> getObjectsRecursive() {
+	List<DrawingObject> getObjectsRecursive() {
 		final ArrayList<DrawingObject> list = new ArrayList<DrawingObject>();
 		getObjectsRecursiveInternal(list);
 		return list;
@@ -193,8 +219,7 @@ public class QuadTree implements Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Adds all objects recursively to the
-	 * <code>ArrayList</code> <code>list</code>.
+	 * Adds all objects recursively to the <code>ArrayList</code> <code>list</code>.
 	 * 
 	 * @param list
 	 *            the <code>ArrayList</code> instance to add the objects to
@@ -214,7 +239,7 @@ public class QuadTree implements Layer {
 	 * 
 	 * @return
 	 */
-	public int getObjectCount() {
+	int getObjectCount() {
 		int cnt = 0;
 		for (int i = 0; i < sons.length; i++) {
 			cnt += (sons[i] != null) ? sons[i].getObjectCount() : 0;
@@ -224,20 +249,8 @@ public class QuadTree implements Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the QuadTree into which the Entity <code>entity</code> can be
-	 * inserted.
-	 * 
-	 * @param entity
-	 * @return
-	 */
-	private QuadTree getInsertionElement(final DrawingObject entity) {
-		return getInsertionElement(entity.getBoundingBox());
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Returns the QuadTree into which an Entity with position <code>pos</code>
-	 * and box <code>box</code> can be inserted.
+	 * Returns the QuadTree into which an Entity with position <code>pos</code> and box
+	 * <code>box</code> can be inserted.
 	 * 
 	 * @param pos
 	 * @param box
@@ -265,10 +278,10 @@ public class QuadTree implements Layer {
 	/**
 	 * Returns the parent element of this <code>QuadTree</code>.
 	 * 
-	 * @return the parent element of this <code>QuadTree</code> or
-	 *         <code>null</code> if this node is the root
+	 * @return the parent element of this <code>QuadTree</code> or <code>null</code> if this node is
+	 *         the root
 	 */
-	public QuadTree getParent() {
+	QuadTree getParent() {
 		return parent;
 	}
 	
@@ -278,7 +291,7 @@ public class QuadTree implements Layer {
 	 * 
 	 * @return the son nodes of this <code>QuadTree</code> element
 	 */
-	public QuadTree[] getSons() {
+	QuadTree[] getSons() {
 		return sons;
 	}
 	
@@ -288,18 +301,25 @@ public class QuadTree implements Layer {
 	 * 
 	 * @param object
 	 */
-	public boolean insert(final DrawingObject object) {
-		
+	boolean insert(final DrawingObject object) {
+		return insertInternal(object, true);
+	}
+	
+	private boolean insertInternal(final DrawingObject object, final boolean updateInsertionTime) {
+		final AbsoluteRectangle bbox = object.calculateBoundingBox();
 		// search for the element to insert the node
-		final QuadTree elem = getInsertionElement(object);
+		final QuadTree elem = getInsertionElement(bbox);
 		if (elem != null) {
 			elem.objects.add(object);
+			root.boxes.put(object, bbox);
+			if (updateInsertionTime) {
+				root.insertionOrder.put(object, ++insertionOrderLargest);
+			}
 			elem.updateSons();
 			return true;
 		}
 		
 		return false;
-		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -308,57 +328,8 @@ public class QuadTree implements Layer {
 	 * 
 	 * @return if this <code>QuadTree</code> element has any son nodes
 	 */
-	public boolean isHasSons() {
+	boolean isHasSons() {
 		return hasSons;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Moves and entity as long as it is inside the root elements bounding box.
-	 * 
-	 * @param object
-	 * @param x
-	 * @param y
-	 * @return
-	 */
-	public void move(final DrawingObject object, final int x, final int y) {
-		final AbsoluteRectangle newBox = new AbsoluteRectangle(object.getBoundingBox());
-		newBox.translate(x, y);
-		move(object, newBox);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Moves and entity from its old position to <code>newPos</code> as long
-	 * as it is inside the root elements bounding box.
-	 * 
-	 * @param object
-	 * @param newPos
-	 * @return true, if entity was moved, false otherwise
-	 */
-	public void move(final DrawingObject object, final AbsoluteRectangle newBox) {
-		
-		// entity tries to move outside the plane
-		if (!root.box.contains(newBox)) {
-			throw new RuntimeException("Trying to move DrawingObject outside of the plane.");
-		}
-		
-		final QuadTree elem = search(object);
-		
-		if (elem != null) {
-			
-			elem.objects.remove(object);
-			
-			if (elem.parent != null) {
-				elem.parent.updateSonsAfterRemove();
-			}
-			
-			object.setBoundingBox(newBox);
-			insert(object);
-			elem.updateSons();
-			
-		}
-		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -367,15 +338,18 @@ public class QuadTree implements Layer {
 	 * 
 	 * @param object
 	 */
-	public void remove(final DrawingObject object) {
+	public boolean remove(final DrawingObject object) {
 		
 		final QuadTree elem = search(object);
 		if (elem != null) {
 			elem.objects.remove(object);
+			root.boxes.remove(object);
 			if (elem.parent != null) {
 				elem.parent.updateSonsAfterRemove();
 			}
+			return true;
 		}
+		return false;
 		
 	}
 	
@@ -387,7 +361,11 @@ public class QuadTree implements Layer {
 	 *            the entity to search for
 	 * @return the QuadTree containing <code>entity</code>.
 	 */
-	public QuadTree search(final DrawingObject entity) {
+	QuadTree search(final DrawingObject entity) {
+		
+		if (root.boxes.get(entity) == null) {
+			return null;
+		}
 		
 		if (objects.contains(entity)) {
 			return this;
@@ -398,7 +376,7 @@ public class QuadTree implements Layer {
 		if (hasSons) {
 			
 			for (int i = 0; i < 4; i++) {
-				if (sons[i].box.contains(entity.getBoundingBox())) {
+				if (sons[i].box.contains(root.boxes.get(entity))) {
 					foundElem = sons[i].search(entity);
 					break;
 				}
@@ -411,13 +389,13 @@ public class QuadTree implements Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Searches for an entity at the given position. Will return an Entity
-	 * instance if <code>position</code> lies within the objects' box.
+	 * Searches for an entity at the given position. Will return an Entity instance if
+	 * <code>position</code> lies within the objects' box.
 	 * 
 	 * @param position
 	 * @return
 	 */
-	public Collection<DrawingObject> search(final Point position) {
+	Collection<DrawingObject> search(final Point position) {
 		return getCollisionEntities(new AbsoluteRectangle(position.x, position.y, 1, 1));
 	}
 	
@@ -449,8 +427,7 @@ public class QuadTree implements Layer {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Checks if there are son nodes to be created or destroyed and executes
-	 * this.
+	 * Checks if there are son nodes to be created or destroyed and executes this.
 	 */
 	private void updateSons() {
 		
@@ -468,7 +445,7 @@ public class QuadTree implements Layer {
 				final ArrayList<DrawingObject> reordered = new ArrayList<DrawingObject>(objects);
 				objects.clear();
 				for (final DrawingObject e : reordered) {
-					insert(e);
+					insertInternal(e, false);
 				}
 				
 			}
@@ -485,7 +462,8 @@ public class QuadTree implements Layer {
 	private void updateSonsAfterRemove() {
 		
 		final int cnt = getObjectCount();
-		final boolean sonsHaveSons = sons[0].hasSons || sons[1].hasSons || sons[2].hasSons || sons[3].hasSons;
+		final boolean sonsHaveSons = sons[0].hasSons || sons[1].hasSons || sons[2].hasSons
+				|| sons[3].hasSons;
 		
 		// if all objects are contained in this
 		// node, son nodes are no longer needed
@@ -510,38 +488,33 @@ public class QuadTree implements Layer {
 	
 	@Override
 	public void addOrUpdate(final DrawingObject d) {
-		final QuadTree element = search(d);
-		// TODO Auto-generated method stub
-		
+		insertInternal(d, !remove(d));
 	}
 	
 	// ------------------------------------------------------------------------------
 	/**
-	 * Sets the point order parameter of a drawing object to make it the first
-	 * one in the set to be painted. This way, the drawing object will be behind
-	 * all other ones.
+	 * Sets the point order parameter of a drawing object to make it the last one in the set to be
+	 * painted. This way, the drawing object will be in front of all other ones.
 	 * 
 	 * @param object
 	 *            the drawing object to be brought to the front
 	 */
 	@Override
 	public void bringToFront(final DrawingObject dob) {
-		// TODO Auto-generated method stub
-		
+		root.insertionOrder.put(dob, ++insertionOrderLargest);
 	}
 	
 	// ------------------------------------------------------------------------------
 	/**
-	 * Sets the point order parameter of a drawing object to make it the first
-	 * one in the set to be painted. This way, the drawing object will be behind
-	 * all other ones.
+	 * Sets the point order parameter of a drawing object to make it the first one in the set to be
+	 * painted. This way, the drawing object will be behind all other ones.
 	 * 
 	 * @param object
-	 *            the drawing object to be brought to the front
+	 *            the drawing object to be pushed to the back
 	 */
 	@Override
 	public void pushBack(final DrawingObject object) {
-		// TODO Auto-generated method stub
+		root.insertionOrder.put(object, --insertionOrderSmallest);
 	}
 	
 	@Override
@@ -552,12 +525,16 @@ public class QuadTree implements Layer {
 	
 	@Override
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle rect) {
-		return getCollisionEntities(rect);
+		final List<DrawingObject> list = getCollisionEntities(rect);
+		Collections.sort(getCollisionEntities(rect), sorter);
+		return list;
 	}
 	
 	@Override
 	public List<DrawingObject> getDrawingObjects() {
-		return getObjectsRecursive();
+		final List<DrawingObject> list = getObjectsRecursive();
+		Collections.sort(list, sorter);
+		return list;
 	}
 	
 }
