@@ -88,10 +88,12 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 		@Override
 		protected void createButtonsForButtonBar(final Composite parent) {
-			buttonSavePreferences = createButton(parent, "Save Preferences...",
+			buttonSavePreferences = createButton(parent, "Save Preferences... (MS 2)",
 					buttonSelectionListener);
-			buttonLoadPreferences = createButton(parent, "Load Preferences...",
+			buttonSavePreferences.setEnabled(false);
+			buttonLoadPreferences = createButton(parent, "Load Preferences... (MS 2)",
 					buttonSelectionListener);
+			buttonLoadPreferences.setEnabled(false);
 			buttonClose = createButton(parent, "Close", buttonSelectionListener);
 		}
 		
@@ -111,7 +113,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		}
 		
 		public void selectPluginManagerPreferenceNode() {
-			selectPreferenceNodeInternal(NODE_ID_PLUGINMANAGER);
+			selectPreferenceNodeInternal(pluginManagerPreferenceNode.getId());
 		}
 		
 		public void selectPreferenceNode(final Plugin p) {
@@ -512,7 +514,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	 */
 	public int open() {
 		spyglass.getPluginManager().addPluginListChangeListener(this);
-		return preferenceDialog.open();
+		final int open = preferenceDialog.open();
+		return open;
 	}
 	
 	@Override

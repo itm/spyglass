@@ -11,6 +11,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
@@ -44,23 +45,21 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private class ActiveEditing extends EditingSupport {
 		
-		// private final ComboBoxCellEditor cellEditor;
+		private final ComboBoxCellEditor cellEditor;
 		
 		public ActiveEditing(final TableViewer viewer) {
 			super(viewer);
-			// cellEditor = new ComboBoxCellEditor(viewer.getTable(), new String[] { "true", "false"
-			// });
+			cellEditor = new ComboBoxCellEditor(viewer.getTable(), new String[] { "true", "false" });
 		}
 		
 		@Override
 		protected boolean canEdit(final Object arg0) {
-			return false;
+			return true;
 		}
 		
 		@Override
 		protected CellEditor getCellEditor(final Object arg0) {
-			// return cellEditor;
-			return null;
+			return cellEditor;
 		}
 		
 		@Override
@@ -70,9 +69,9 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		
 		@Override
 		protected void setValue(final Object arg0, final Object arg1) {
-			// final int selected = ((Integer) arg1);
-			// ((Plugin) arg0).setActive(selected == 0 ? true : false);
-			// pluginTableViewer.update(arg0, new String[] { COLUMN_ACTIVE });
+			final int selected = ((Integer) arg1);
+			((Plugin) arg0).setActive(selected == 0 ? true : false);
+			pluginTableViewer.update(arg0, new String[] { COLUMN_ACTIVE });
 		}
 		
 	}
@@ -348,23 +347,21 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private class VisibleEditing extends EditingSupport {
 		
-		// private final ComboBoxCellEditor cellEditor;
+		private final ComboBoxCellEditor cellEditor;
 		
 		public VisibleEditing(final TableViewer viewer) {
 			super(viewer);
-			// cellEditor = new ComboBoxCellEditor(viewer.getTable(), new String[] { "true", "false"
-			// });
+			cellEditor = new ComboBoxCellEditor(viewer.getTable(), new String[] { "true", "false" });
 		}
 		
 		@Override
 		protected boolean canEdit(final Object arg0) {
-			return false;
+			return true;
 		}
 		
 		@Override
 		protected CellEditor getCellEditor(final Object arg0) {
-			// return cellEditor;
-			return null;
+			return cellEditor;
 		}
 		
 		@Override
@@ -374,9 +371,9 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		
 		@Override
 		protected void setValue(final Object arg0, final Object arg1) {
-			// final int selected = ((Integer) arg1);
-			// ((Plugin) arg0).setVisible(selected == 0 ? true : false);
-			// pluginTableViewer.update(arg0, new String[] { COLUMN_VISIBLE });
+			final int selected = ((Integer) arg1);
+			((Plugin) arg0).setVisible(selected == 0 ? true : false);
+			pluginTableViewer.update(arg0, new String[] { COLUMN_VISIBLE });
 		}
 		
 	}
@@ -404,7 +401,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private Button buttonDown;
 	
-	private Button buttonRemoveInstance;
+	private Button buttonDeleteInstance;
 	
 	private final SelectionListener buttonSelectionListener = new SelectionAdapter() {
 		
@@ -414,7 +411,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 				clickedButtonUp();
 			} else if (e.getSource() == buttonDown) {
 				clickedButtonDown();
-			} else if (e.getSource() == buttonRemoveInstance) {
+			} else if (e.getSource() == buttonDeleteInstance) {
 				clickedButtonRemoveInstance();
 			}
 		}
@@ -544,11 +541,11 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		buttonDown.setEnabled(false);
 		buttonDown.addSelectionListener(buttonSelectionListener);
 		
-		buttonRemoveInstance = new Button(buttonComposite, SWT.PUSH);
-		buttonRemoveInstance.setText("Remove Instance");
-		buttonRemoveInstance.setLayoutData(buttonRemoveInstanceData);
-		buttonRemoveInstance.setEnabled(false);
-		buttonRemoveInstance.addSelectionListener(buttonSelectionListener);
+		buttonDeleteInstance = new Button(buttonComposite, SWT.PUSH);
+		buttonDeleteInstance.setText("Delete Instance");
+		buttonDeleteInstance.setLayoutData(buttonRemoveInstanceData);
+		buttonDeleteInstance.setEnabled(false);
+		buttonDeleteInstance.addSelectionListener(buttonSelectionListener);
 		
 	}
 	
@@ -675,8 +672,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		buttonDown.dispose();
 		buttonDown = null;
 		
-		buttonRemoveInstance.dispose();
-		buttonRemoveInstance = null;
+		buttonDeleteInstance.dispose();
+		buttonDeleteInstance = null;
 		
 	}
 	
@@ -701,7 +698,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	private void updateButtons(final Plugin selectedPlugin) {
 		buttonUp.setEnabled(!pluginTableContentProvider.isFirstInList(selectedPlugin));
 		buttonDown.setEnabled(!pluginTableContentProvider.isLastInList(selectedPlugin));
-		buttonRemoveInstance.setEnabled(!pluginTableViewer.getSelection().isEmpty());
+		buttonDeleteInstance.setEnabled(!pluginTableViewer.getSelection().isEmpty());
 	}
 	
 }

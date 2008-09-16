@@ -202,8 +202,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		
 		if (type == PrefType.INSTANCE) {
 			
-			buttons.deleteButton = createButton(parent, "Delete", buttonSelectionListener);
-			buttons.restoreButton = createButton(parent, "Restore", buttonSelectionListener);
+			buttons.deleteButton = createButton(parent, "Delete Instance", buttonSelectionListener);
+			buttons.restoreButton = createButton(parent, "Restore Values", buttonSelectionListener);
 			buttons.applyButton = createButton(parent, "Apply", buttonSelectionListener);
 			
 		} else {
