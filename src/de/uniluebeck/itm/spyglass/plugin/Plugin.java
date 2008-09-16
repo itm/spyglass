@@ -180,6 +180,8 @@ public abstract class Plugin implements Runnable {
 		if ((packetConsumerThread != null) && !packetConsumerThread.isInterrupted()) {
 			try {
 				packetConsumerThread.interrupt();
+				log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName()
+						+ " stopped successfully.");
 			} catch (final Exception e) {
 				log.error("An error occured while trying to stop the plug-in's thread", e);
 			}
@@ -198,6 +200,9 @@ public abstract class Plugin implements Runnable {
 				packetConsumerThread = new Thread(this);
 				packetConsumerThread.setDaemon(true);
 				packetConsumerThread.start();
+				
+				log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName()
+						+ " started successfully.");
 			} catch (final Exception e) {
 				log.error("An error occured while trying to start the plug-in's thread", e);
 			}

@@ -56,11 +56,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="/opt/eclipse-3.4/plugins/org.eclipse.swt.gtk.linux.x86_3.4.0.v3448f.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://help.eclipse.org/stable/nftopic/org.eclipse.platform.doc.isv/reference/api"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="lib/org.eclipse.core.databinding_1.1.0.I20080527-2000.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="http://help.eclipse.org/stable/nftopic/org.eclipse.platform.doc.isv/reference/api"/>

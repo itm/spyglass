@@ -1,8 +1,5 @@
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -27,6 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage.BasicOptions;
+import de.uniluebeck.itm.spyglass.gui.converter.BooleanInversionConverter;
 import de.uniluebeck.itm.spyglass.gui.converter.IntListToStringConverter;
 import de.uniluebeck.itm.spyglass.gui.converter.StringToIntListConverter;
 import de.uniluebeck.itm.spyglass.gui.validator.IntegerRangeValidator;
@@ -164,17 +162,28 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 		
 		final IObservableValue observableActive = BeansObservables.observeValue(dbc
 				.getValidationRealm(), config, "active");
-		dbc.bindValue(SWTObservables.observeSelection(this.isActive), observableActive,
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		
+		final IObservableValue observableActiveButton = SWTObservables
+				.observeSelection(this.isActive);
+		dbc.bindValue(observableActiveButton, observableActive, new UpdateValueStrategy(
+				UpdateValueStrategy.POLICY_CONVERT), null);
+		
+		// disable the visibility field if plug-in is inactive
+		dbc.bindValue(SWTObservables.observeEnabled(this.isVisible), observableActiveButton, null,
+				null);
 		
 		// TODO
 		// Iff allSemanticTypes == true, deactivate the input field
-		config.addPropertyChangeListener("allSemanticTypes", new PropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent evt) {
-				allTypes.setSelection(config.getAllSemanticTypes());
-			}
-		});
+		dbc.bindValue(SWTObservables.observeEnabled(this.semanticTypes), SWTObservables
+				.observeSelection(this.allTypes), null, new UpdateValueStrategy()
+				.setConverter(new BooleanInversionConverter()));
+		
+		// config.addPropertyChangeListener("allSemanticTypes", new PropertyChangeListener() {
+		// @Override
+		// public void propertyChange(final PropertyChangeEvent evt) {
+		// allTypes.setSelection(config.getAllSemanticTypes());
+		// }
+		// });
 		
 		// TODO
 		// final IObservableValue observableAllTypes = BeansObservables.observeValue(getRealm(),
@@ -259,12 +268,12 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 					allTypes = new Button(group1, SWT.CHECK | SWT.LEFT);
 					allTypes.setText("All Types");
 					allTypes.setBounds(339, 54, 83, 22);
-					allTypes.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(final SelectionEvent evt) {
-							allTypesWidgetSelected(evt);
-						}
-					});
+					// allTypes.addSelectionListener(new SelectionAdapter() {
+					// @Override
+					// public void widgetSelected(final SelectionEvent evt) {
+					// allTypesWidgetSelected(evt);
+					// }
+					// });
 				}
 				{
 					isActive = new Button(group1, SWT.CHECK | SWT.LEFT);
@@ -295,16 +304,16 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 		}
 	}
 	
-	private void allTypesWidgetSelected(final SelectionEvent evt) {
-		System.out.println("allTypes.widgetSelected, event=" + evt);
-		if (allTypes.getSelection()) {
-			semanticTypes.setText("0-255");
-			semanticTypes.setEnabled(false);
-		} else {
-			semanticTypes.setText("");
-			semanticTypes.setEnabled(true);
-		}
-	}
+	// private void allTypesWidgetSelected(final SelectionEvent evt) {
+	// System.out.println("allTypes.widgetSelected, event=" + evt);
+	// if (allTypes.getSelection()) {
+	// semanticTypes.setText("0-255");
+	// semanticTypes.setEnabled(false);
+	// } else {
+	// semanticTypes.setText("");
+	// semanticTypes.setEnabled(true);
+	// }
+	// }
 	
 	private void pluginNameModifyText(final ModifyEvent evt) {
 		somethingChanged = true;

@@ -232,6 +232,10 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			buttons.restoreButton = createButton(parent, "Restore Values", buttonSelectionListener);
 			buttons.applyButton = createButton(parent, "Apply", buttonSelectionListener);
 			
+			if (containsErrors()) {
+				buttons.applyButton.setEnabled(false);
+			}
+			
 		} else {
 			
 			buttons.restoreDefaultsButton = createButton(parent, "Restore Defaults",
@@ -241,6 +245,12 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			buttons.createInstanceButton = createButton(parent, "Create Instance",
 					buttonSelectionListener);
 			
+			if (containsErrors()) {
+				buttons.saveAsDefaultButton.setEnabled(false);
+			}
+			if (containsErrors()) {
+				buttons.createInstanceButton.setEnabled(false);
+			}
 		}
 		
 	}
@@ -296,14 +306,28 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 					if (buttons.applyButton != null) {
 						buttons.applyButton.setEnabled(true);
 					}
+					if (buttons.createInstanceButton != null) {
+						buttons.createInstanceButton.setEnabled(true);
+					}
+					if (buttons.saveAsDefaultButton != null) {
+						buttons.saveAsDefaultButton.setEnabled(true);
+					}
 				} else {
 					setErrorMessage(valStatus.getMessage());
 					if (buttons.applyButton != null) {
 						buttons.applyButton.setEnabled(false);
 					}
+					if (buttons.createInstanceButton != null) {
+						buttons.createInstanceButton.setEnabled(false);
+					}
+					if (buttons.saveAsDefaultButton != null) {
+						buttons.saveAsDefaultButton.setEnabled(false);
+					}
 				}
+				
 			}
 		});
+		
 	}
 	
 	private Button createButton(final Composite parent, final String label,
@@ -335,7 +359,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	}
 	
 	/**
-	 * Transfers the formular data into the model.
+	 * Transfers the form data into the model.
 	 */
 	@Override
 	public final void performApply() {
@@ -374,6 +398,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		log.debug("Restoring form from model");
 		
 		this.dbc.updateTargets();
+		
+		// update the models (with the already existent values)
+		// this is necessary to (re)validate the values in case of erroneous values already existent
+		// in the configuration
+		this.dbc.updateModels();
 		this.basicGroup.resetChanged();
 	}
 	
@@ -450,8 +479,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Returns the <code>Plugin</code> instance associated with this page.
 	 * 
-	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a type
-	 *         page (i.e. not an instance page, also see
+	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a
+	 *         type page (i.e. not an instance page, also see
 	 *         {@link PluginPreferencePage#isInstancePage()})
 	 */
 	public final Plugin getPlugin() {
