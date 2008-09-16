@@ -3,34 +3,9 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/simple-xml-1.6.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/bsh-2.0b4.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/commons-cli-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/ishell-dev-win32.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/jcommon-1.0.5.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/jfreechart-1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/ostermillerutils_1_05_00_for_java_1_4.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/poi-2.5.1-final-20040804.jar"/>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/RXTXcomm.jar"/>
-	<classpathentry kind="lib" path="lib/linux/org.eclipse.cdt.core.linux.x86_4.0.0.200709241202.jar">
+	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="http://help.eclipse.org/stable/nftopic/org.eclipse.platform.doc.isv/reference/api"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.cdt.core_4.0.1.200709241202.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://help.eclipse.org/stable/nftopic/org.eclipse.platform.doc.isv/reference/api"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.core.runtime_3.3.100.v20070530.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://help.eclipse.org/stable/nftopic/org.eclipse.platform.doc.isv/reference/api"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/ishell-contained-libs/org.eclipse.equinox.common_3.3.0.v20070426.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://help.eclipse.org/stable/nftopic/org.eclipse.platform.doc.isv/reference/api"/>
+			<attribute name="javadoc_location" value="http://logging.apache.org/log4j/1.2/apidocs/index.html"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/linux/swt-3.3.2-gtk-linux-x86.jar">
@@ -69,6 +44,17 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/com.ibm.icu_3.8.1.v20080530.jar"/>
+	<classpathentry kind="lib" path="lib/linux/ishell-linux.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common_3.3.0.v20070426.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://help.eclipse.org/stable/nftopic/org.eclipse.platform.doc.isv/reference/api"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/simple-xml-1.7.2.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://simple.sourceforge.net/download/stream/doc/javadoc/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/opt/eclipse-3.4/plugins/org.eclipse.swt.gtk.linux.x86_3.4.0.v3448f.jar">
 		<attributes>

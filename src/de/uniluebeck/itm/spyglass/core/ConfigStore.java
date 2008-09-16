@@ -262,6 +262,7 @@ public class ConfigStore {
 		final SpyglassConfiguration sgc = ConfigStore.loadSpyglassConfig(configFile);
 		if (sgc != null) {
 			spyglassConfig = sgc;
+			
 			return true;
 		}
 		return false;
