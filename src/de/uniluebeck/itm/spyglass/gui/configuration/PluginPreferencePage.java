@@ -18,6 +18,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -131,6 +132,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * reference to the dialog
 	 */
 	private final PluginPreferenceDialog dialog;
+	
+	/**
+	 * Image that is displayed in the top of the window.
+	 */
+	private Image image;
 	
 	private class Buttons {
 		
@@ -497,6 +503,15 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	@Override
 	public void dispose() {
 		removePropertyChangeListeners();
+	}
+	
+	public void setImage(final Image image) {
+		this.image = image;
+	}
+	
+	@Override
+	public Image getImage() {
+		return image;
 	}
 	
 }

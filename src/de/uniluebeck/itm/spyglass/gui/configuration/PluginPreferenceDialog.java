@@ -140,40 +140,122 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 		private Plugin plugin;
 		
-		/**
-		 * Cached image, or <code>null</code> if none.
-		 */
-		private Image image;
+		private PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> preferencePage;
 		
-		public PluginPreferenceNode(final String id, final IPreferencePage preferencePage,
+		private String instanceName;
+		
+		private Image currentImage;
+		
+		private Image imageActiveVisible;
+		
+		private Image imageNotVisible;
+		
+		private Image imageNotActive;
+		
+		private ImageDescriptor currentImageDescriptor;
+		
+		private ImageDescriptor imageDescriptorActiveVisible;
+		
+		private ImageDescriptor imageDescriptorNotVisible;
+		
+		private ImageDescriptor imageDescriptorNotActive;
+		
+		public PluginPreferenceNode(
+				final String id,
+				final PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> preferencePage,
 				final Plugin p) {
+			
 			super(id, preferencePage);
+			
 			this.plugin = p;
+			this.preferencePage = preferencePage;
+			
+			updateTextAndLabels();
+			
+		}
+		
+		private void assureImageInit() {
+			if (imageDescriptorActiveVisible == null) {
+				imageDescriptorActiveVisible = createImageDescriptor("plugin_active_visible.png");
+			}
+			if (imageDescriptorNotActive == null) {
+				imageDescriptorNotActive = createImageDescriptor("plugin_not_visible.png");
+			}
+			if (imageDescriptorNotVisible == null) {
+				imageDescriptorNotVisible = createImageDescriptor("plugin_not_active.png");
+			}
+			if ((imageActiveVisible == null) || imageActiveVisible.isDisposed()) {
+				imageActiveVisible = imageDescriptorActiveVisible.createImage();
+			}
+			if ((imageNotVisible == null) || imageNotVisible.isDisposed()) {
+				imageNotVisible = imageDescriptorNotVisible.createImage();
+			}
+			if ((imageNotActive == null) || imageNotActive.isDisposed()) {
+				imageNotActive = imageDescriptorNotActive.createImage();
+			}
+		}
+		
+		private void updateTextAndLabels() {
+			
+			assureImageInit();
+			
+			if (plugin.isActive() && plugin.isVisible()) {
+				currentImageDescriptor = imageDescriptorActiveVisible;
+				currentImage = imageActiveVisible;
+			} else if (plugin.isActive()) {
+				currentImageDescriptor = imageDescriptorNotVisible;
+				currentImage = imageNotVisible;
+			} else {
+				currentImageDescriptor = imageDescriptorNotActive;
+				currentImage = imageNotActive;
+			}
+			
+			instanceName = plugin.getInstanceName();
+			
+			preferencePage.setTitle(instanceName);
+			preferencePage.setImage(currentImage);
+			
 		}
 		
 		@Override
 		protected ImageDescriptor getImageDescriptor() {
-			return getInstanceImageDescriptor(plugin);
+			updateTextAndLabels();
+			return currentImageDescriptor;
 		}
 		
 		@Override
 		public Image getLabelImage() {
-			image = getInstanceImageDescriptor(plugin).createImage();
-			return image;
+			updateTextAndLabels();
+			return currentImage;
 		}
 		
 		@Override
 		public String getLabelText() {
-			return plugin.getInstanceName();
+			updateTextAndLabels();
+			return instanceName;
 		}
 		
 		@Override
 		public void disposeResources() {
-			if (image != null) {
-				image.dispose();
-				image = null;
-			}
+			
+			currentImage = null;
+			currentImageDescriptor = null;
+			
+			imageActiveVisible.dispose();
+			imageNotActive.dispose();
+			imageNotVisible.dispose();
+			
+			imageActiveVisible = null;
+			imageNotActive = null;
+			imageNotVisible = null;
+			
+			imageDescriptorActiveVisible = null;
+			imageDescriptorNotVisible = null;
+			imageDescriptorNotActive = null;
+			
 			plugin = null;
+			preferencePage = null;
+			instanceName = null;
 			getPage().dispose();
 		}
 		
@@ -284,10 +366,11 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	private void addPreferenceNodes() {
 		
 		generalPreferenceNode = new PreferenceNode(NODE_ID_GENERAL_SETTINGS, "General",
-				getImageDescriptor("general.png"), GeneralPreferencePage.class.getCanonicalName());
+				createImageDescriptor("general.png"), GeneralPreferencePage.class
+						.getCanonicalName());
 		pluginManagerPreferenceNode = new CustomPreferenceNode(NODE_ID_PLUGINMANAGER, "Plugins",
-				getImageDescriptor("plugin_manager.png"), new PluginManagerPreferencePage(spyglass,
-						this));
+				createImageDescriptor("plugin_manager.png"), new PluginManagerPreferencePage(
+						spyglass, this));
 		
 		preferenceManager.addToRoot(generalPreferenceNode);
 		preferenceManager.addToRoot(pluginManagerPreferenceNode);
@@ -439,27 +522,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		// nothing to do
 	}
 	
-	private ImageDescriptor getImageDescriptor(final String fileName) {
-		return ImageDescriptor.createFromURL(getResourceUrl(fileName));
-	}
-	
 	private ImageDescriptor getPluginImageDescriptor() {
-		return getImageDescriptor("plugin.png");
-	}
-	
-	private ImageDescriptor getInstanceImageDescriptor(final Plugin p) {
-		
-		try {
-			
-			return (p.isActive() && p.isVisible()) ? getImageDescriptor("plugin_active_visible.png")
-					: (p.isActive()) ? getImageDescriptor("plugin_not_visible.png")
-							: getImageDescriptor("plugin_not_active.png");
-			
-		} catch (final Exception e) {
-			log.error("", e);
-			return null;
-		}
-		
+		return createImageDescriptor("plugin.png");
 	}
 	
 	private String getPluginName(final Class<? extends Plugin> clazz) {
@@ -493,6 +557,10 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		fd.setFilterExtensions(new String[] { "*.xml" });
 		final String path = fd.open();
 		return path == null ? null : new File(path);
+	}
+	
+	private ImageDescriptor createImageDescriptor(final String fileName) {
+		return ImageDescriptor.createFromURL(getResourceUrl(fileName));
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -165,7 +165,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	}
 	
 	private class NodePositionerComboContentProvider implements IStructuredContentProvider,
-			PluginListChangeListener {
+			PluginListChangeListener, PropertyChangeListener {
 		
 		@Override
 		public void dispose() {
@@ -182,15 +182,28 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
 			if (newInput != null) {
+				for (final Plugin p : spyglass.getPluginManager().getPluginInstances(
+						NodePositionerPlugin.class, true)) {
+					p.getXMLConfig().addPropertyChangeListener(this);
+				}
 				spyglass.getPluginManager().addPluginListChangeListener(this);
 			}
 			if (oldInput != null) {
+				for (final Plugin p : spyglass.getPluginManager().getPluginInstances(
+						NodePositionerPlugin.class, true)) {
+					p.getXMLConfig().removePropertyChangeListener(this);
+				}
 				spyglass.getPluginManager().removePluginListChangeListener(this);
 			}
 		}
 		
 		@Override
 		public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
+			npComboViewer.refresh();
+		}
+		
+		@Override
+		public void propertyChange(final PropertyChangeEvent evt) {
 			npComboViewer.refresh();
 		}
 		
@@ -444,12 +457,16 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private void addNodePositionerSelectionGroup(final Composite composite) {
 		
-		final GridLayout npSelLayout = new GridLayout();
-		npSelLayout.numColumns = 2;
+		final GridLayout npSelLayout = new GridLayout(2, false);
+		
+		final GridData npSelData = new GridData();
+		npSelData.horizontalAlignment = GridData.FILL;
+		npSelData.grabExcessHorizontalSpace = true;
 		
 		final Group npSelGroup = new Group(composite, SWT.SHADOW_ETCHED_IN);
 		npSelGroup.setText("Node Positioner Selection");
 		npSelGroup.setLayout(npSelLayout);
+		npSelGroup.setLayoutData(npSelData);
 		
 		final Label npSelLabel = new Label(npSelGroup, SWT.NONE);
 		npSelLabel.setText("Active Node Positioner");
@@ -486,23 +503,25 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private void addPluginManagerList(final Composite parent) {
 		
-		final GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		layout.makeColumnsEqualWidth = false;
+		final GridLayout pluginsGroupLayout = new GridLayout(2, false);
 		
-		final GridData data = new GridData();
-		data.grabExcessHorizontalSpace = true;
-		data.grabExcessVerticalSpace = true;
+		final GridData pluginsGroupData = new GridData();
+		pluginsGroupData.grabExcessHorizontalSpace = true;
+		pluginsGroupData.grabExcessVerticalSpace = true;
+		pluginsGroupData.horizontalAlignment = GridData.FILL;
+		pluginsGroupData.verticalAlignment = GridData.FILL;
 		
 		final Group pluginsGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
 		pluginsGroup.setText("Plugins");
-		pluginsGroup.setLayout(layout);
-		pluginsGroup.setLayoutData(data);
+		pluginsGroup.setLayout(pluginsGroupLayout);
+		pluginsGroup.setLayoutData(pluginsGroupData);
 		
 		final GridData pluginTableData = new GridData();
 		pluginTableData.grabExcessHorizontalSpace = true;
 		pluginTableData.grabExcessVerticalSpace = true;
-		pluginTableData.heightHint = 300;
+		pluginTableData.horizontalAlignment = GridData.FILL;
+		pluginTableData.verticalAlignment = GridData.FILL;
+		pluginTableData.heightHint = 100;
 		pluginTableData.widthHint = 500;
 		
 		createPluginTableViewer(pluginsGroup);
@@ -584,16 +603,9 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	@Override
 	protected Control createContents(final Composite parent) {
 		
-		final GridLayout layout = new GridLayout();
-		layout.numColumns = 1;
-		
-		final GridData data = new GridData();
-		data.grabExcessHorizontalSpace = true;
-		data.grabExcessVerticalSpace = true;
-		
 		final Composite composite = new Composite(parent, SWT.NONE);
-		composite.setLayout(layout);
-		composite.setLayoutData(data);
+		composite.setLayout(new GridLayout(1, true));
+		composite.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, true));
 		
 		addNodePositionerSelectionGroup(composite);
 		addPluginManagerList(composite);
