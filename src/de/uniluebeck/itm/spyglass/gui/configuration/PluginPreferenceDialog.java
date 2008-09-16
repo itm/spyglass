@@ -37,8 +37,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -99,19 +97,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 		@Override
 		public void pageChanged(final PageChangedEvent event) {
-			try {
-				final IPreferencePage selectedPage = (IPreferencePage) event.getSelectedPage();
-				// final ConfigStore cs = spyglass.getConfigStore();
-				
-				if (selectedPage instanceof PluginPreferencePage<?, ?>) {
-					
-					// nothing to do
-					
-				}
-			} catch (final Exception e) {
-				log.error("", e);
-			}
-			
+			// nothing to do
 		}
 		
 		@Override
@@ -138,8 +124,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 				node.createPage();
 			}
 			showPage(node);
-			getTreeViewer()
-					.setSelection(new StructuredSelection(preferenceNodes.get(nodeId)), true);
+			getTreeViewer().setSelection(new StructuredSelection(node), true);
 			getTreeViewer().refresh();
 		}
 		
@@ -228,7 +213,13 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	
 	private final Spyglass spyglass;
 	
-	private final Map<Plugin, String> instancePreferenceNodes = new HashMap<Plugin, String>();
+	private final Map<Plugin, CustomPreferenceNode> instancePreferenceNodes = new HashMap<Plugin, CustomPreferenceNode>();
+	
+	private final Map<Class<? extends Plugin>, CustomPreferenceNode> typePreferenceNodes = new HashMap<Class<? extends Plugin>, CustomPreferenceNode>();
+	
+	private CustomPreferenceNode pluginManagerPreferenceNode;
+	
+	private PreferenceNode generalPreferenceNode;
 	
 	public PluginPreferenceDialog(final Shell parentShell, final Spyglass spyglass) {
 		
@@ -243,18 +234,14 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	
 	private void addPreferenceNodes() {
 		
-		final PreferenceNode generalPreferenceNode = new PreferenceNode(NODE_ID_GENERAL_SETTINGS,
-				"General", getImageDescriptor("general.png"), GeneralPreferencePage.class
-						.getCanonicalName());
-		final PreferenceNode pluginManagerPreferenceNode = new CustomPreferenceNode(
-				NODE_ID_PLUGINMANAGER, "Plugins", getImageDescriptor("plugin_manager.png"),
-				new PluginManagerPreferencePage(spyglass, this));
+		generalPreferenceNode = new PreferenceNode(NODE_ID_GENERAL_SETTINGS, "General",
+				getImageDescriptor("general.png"), GeneralPreferencePage.class.getCanonicalName());
+		pluginManagerPreferenceNode = new CustomPreferenceNode(NODE_ID_PLUGINMANAGER, "Plugins",
+				getImageDescriptor("plugin_manager.png"), new PluginManagerPreferencePage(spyglass,
+						this));
 		
 		preferenceManager.addToRoot(generalPreferenceNode);
 		preferenceManager.addToRoot(pluginManagerPreferenceNode);
-		
-		preferenceNodes.put(NODE_ID_GENERAL_SETTINGS, generalPreferenceNode);
-		preferenceNodes.put(NODE_ID_PLUGINMANAGER, pluginManagerPreferenceNode);
 		
 		final List<Class<? extends Plugin>> pluginTypes = spyglass.getPluginManager()
 				.getAvailablePluginTypes();
@@ -263,7 +250,22 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 	};
 	
-	private HashMap<String, IPreferenceNode> preferenceNodes = new HashMap<String, IPreferenceNode>();
+	private CustomPreferenceNode createInstancePreferenceNode(final Plugin p) {
+		final CustomPreferenceNode node = new CustomPreferenceNode(getPreferenceNodeId(p),
+				getInstanceName(p.getClass(), p), getInstanceImageDescriptor(p.getClass(), p),
+				getPreferencePage(p.getClass(), p));
+		// add to hashmap (needed for lookup when removing instances)
+		instancePreferenceNodes.put(p, node);
+		return node;
+	}
+	
+	private CustomPreferenceNode createTypePreferenceNode(final Class<? extends Plugin> clazz) {
+		// add to hashmap (needed for lookup when adding instances)
+		final CustomPreferenceNode node = new CustomPreferenceNode(clazz.getCanonicalName(),
+				getPluginName(clazz), getPluginImageDescriptor(), getTypePreferencePage(clazz));
+		typePreferenceNodes.put(clazz, node);
+		return node;
+	}
 	
 	private void addPreferenceNodesRecursive(final ClassTree classTree,
 			final PreferenceNode parentPreferenceNode) {
@@ -280,42 +282,19 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		}
 		
 		final CustomPreferenceNode preferenceNode;
-		CustomPreferenceNode instancePreferenceNode;
-		String preferenceNodeId, preferenceNodeLabel;
-		ImageDescriptor preferenceNodeImageDescriptor;
-		PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> preferencePage;
 		
 		try {
 			
 			// add nodes for abstract and instantiable but not instantiated plugins
-			
-			preferenceNodeId = classTree.clazz.getCanonicalName() + "_"
-					+ System.currentTimeMillis();
-			preferencePage = getTypePreferencePage(classTree.clazz);
-			preferenceNodeLabel = getPluginName(classTree.clazz);
-			preferenceNodeImageDescriptor = getPluginImageDescriptor();
-			preferenceNode = new CustomPreferenceNode(preferenceNodeId, preferenceNodeLabel,
-					preferenceNodeImageDescriptor, preferencePage);
+			preferenceNode = createTypePreferenceNode(classTree.clazz);
 			parentPreferenceNode.add(preferenceNode);
-			preferenceNodes.put(preferenceNodeId, preferenceNode);
 			
 			// add nodes for instantiated plugins
 			for (final Plugin p : spyglass.getPluginManager().getPluginInstances(classTree.clazz,
 					false)) {
 				
-				preferenceNodeId = getPreferenceNodeId(p);
-				preferencePage = getPreferencePage(classTree.clazz, p);
-				preferenceNodeLabel = getInstanceName(classTree.clazz, p);
-				preferenceNodeImageDescriptor = getInstanceImageDescriptor(classTree.clazz, p);
-				instancePreferenceNode = new CustomPreferenceNode(preferenceNodeId,
-						preferenceNodeLabel, preferenceNodeImageDescriptor, preferencePage);
-				
 				// add to parent tree node
-				preferenceNode.add(instancePreferenceNode);
-				preferenceNodes.put(preferenceNodeId, instancePreferenceNode);
-				
-				// add to hashmap (needed for lookup when removing instances)
-				instancePreferenceNodes.put(p, preferenceNodeId);
+				preferenceNode.add(createInstancePreferenceNode(p));
 				
 			}
 			
@@ -540,29 +519,56 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
 		switch (what) {
 			case NEW_PLUGIN:
-				// TODO
+				onPluginAdded(p);
 				break;
 			case PLUGIN_REMOVED:
-				preferenceManager.remove(instancePreferenceNodes.get(p));
-				preferenceDialog.selectPluginManagerPreferenceNode();
-				removePluginFromTree(preferenceDialog.getTreeViewer().getTree(), p);
+				onPluginRemoved(p);
 				break;
 			case PRIORITY_CHANGED:
-				// TODO
+				// nothing to do, since PluginManagerPreferencePage
+				// receives the event itself and refreshes
 				break;
 		}
-		
-		// XXX: PLUGIN_STATE_CHANGED removed, since the PluginManager should not be responsible for
-		// sending out notifications about changes in the configuration of a plugin. Use instead the
-		// event listener inside the PluginXMLConfig objects. -- Dariush
 	}
 	
-	private void removePluginFromTree(final Tree t, final Plugin p) {
-		final String nodeId = getPreferenceNodeId(p);
-		for (final TreeItem ti : t.getItems()) {
-			((PreferenceNode) ti.getData()).remove(nodeId);
-			// TODO
+	private void onPluginAdded(final Plugin p) {
+		typePreferenceNodes.get(p.getClass()).add(createInstancePreferenceNode(p));
+		preferenceDialog.getTreeViewer().refresh();
+	}
+	
+	private void onPluginRemoved(final Plugin p) {
+		removePreferenceNode(instancePreferenceNodes.get(p), preferenceManager.getRootSubNodes());
+		preferenceDialog.selectPluginManagerPreferenceNode();
+	}
+	
+	private boolean removePreferenceNode(final IPreferenceNode node,
+			final IPreferenceNode[] parentNodes) {
+		boolean removed;
+		for (final IPreferenceNode parentNode : parentNodes) {
+			if (parentNode == node) {
+				return preferenceManager.remove(parentNode);
+			}
+			removed = removePreferenceNode(node, parentNode);
+			if (removed) {
+				return true;
+			}
 		}
+		return false;
+	}
+	
+	private boolean removePreferenceNode(final IPreferenceNode node,
+			final IPreferenceNode parentNode) {
+		boolean removed;
+		for (final IPreferenceNode pn : parentNode.getSubNodes()) {
+			if (pn == node) {
+				return parentNode.remove(pn);
+			}
+			removed = removePreferenceNode(node, pn);
+			if (removed) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	@SuppressWarnings("unchecked")
