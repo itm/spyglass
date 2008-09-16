@@ -1,5 +1,8 @@
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.apache.log4j.Category;
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -161,6 +164,10 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.basicOptions = basicOptions;
 		this.plugin = null;
 		
+		// propertyChangeListener not needed since it's used for
+		// instances updating their labels in preference tree
+		this.propertyChangeListener = null;
+		
 		// This is fine
 		config = (ConfigClass) spyglass.getConfigStore().readPluginTypeDefaults(
 				this.getPluginClass());
@@ -190,7 +197,20 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		
 		this.config = (ConfigClass) plugin.getXMLConfig();
 		
+		this.propertyChangeListener = new PropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent evt) {
+				dialog.onPluginInstancePropertyChange();
+			}
+		};
+		
+		this.config.addPropertyChangeListener("active", propertyChangeListener);
+		this.config.addPropertyChangeListener("visible", propertyChangeListener);
+		this.config.addPropertyChangeListener("name", propertyChangeListener);
+		
 	}
+	
+	final PropertyChangeListener propertyChangeListener;
 	
 	@Override
 	protected void contributeButtons(final Composite parent) {
@@ -460,6 +480,19 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		gridData.verticalSpan = 80;
 		c.setLayoutData(gridData);
 		return c;
+	}
+	
+	public void removePropertyChangeListeners() {
+		if (config != null) {
+			config.removePropertyChangeListener("active", propertyChangeListener);
+			config.removePropertyChangeListener("visible", propertyChangeListener);
+			config.removePropertyChangeListener("name", propertyChangeListener);
+		}
+	}
+	
+	@Override
+	public void dispose() {
+		removePropertyChangeListeners();
 	}
 	
 }

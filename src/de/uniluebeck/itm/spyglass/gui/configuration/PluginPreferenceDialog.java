@@ -107,9 +107,13 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			// nothing to do
 		}
 		
+		@SuppressWarnings("unchecked")
 		@Override
 		public void widgetDisposed(final DisposeEvent e) {
 			spyglass.getPluginManager().removePluginListChangeListener(PluginPreferenceDialog.this);
+			for (final PluginPreferenceNode ppn : instancePreferenceNodes.values()) {
+				((PluginPreferencePage) ppn.getPage()).removePropertyChangeListeners();
+			}
 		}
 		
 		public void selectPluginManagerPreferenceNode() {
@@ -128,6 +132,49 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			showPage(node);
 			getTreeViewer().setSelection(new StructuredSelection(node), true);
 			getTreeViewer().refresh();
+		}
+		
+	}
+	
+	private class PluginPreferenceNode extends PreferenceNode {
+		
+		private Plugin plugin;
+		
+		/**
+		 * Cached image, or <code>null</code> if none.
+		 */
+		private Image image;
+		
+		public PluginPreferenceNode(final String id, final IPreferencePage preferencePage,
+				final Plugin p) {
+			super(id, preferencePage);
+			this.plugin = p;
+		}
+		
+		@Override
+		protected ImageDescriptor getImageDescriptor() {
+			return getInstanceImageDescriptor(plugin);
+		}
+		
+		@Override
+		public Image getLabelImage() {
+			image = getInstanceImageDescriptor(plugin).createImage();
+			return image;
+		}
+		
+		@Override
+		public String getLabelText() {
+			return plugin.getInstanceName();
+		}
+		
+		@Override
+		public void disposeResources() {
+			if (image != null) {
+				image.dispose();
+				image = null;
+			}
+			plugin = null;
+			getPage().dispose();
 		}
 		
 	}
@@ -215,7 +262,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	
 	private final Spyglass spyglass;
 	
-	private final Map<Plugin, CustomPreferenceNode> instancePreferenceNodes = new HashMap<Plugin, CustomPreferenceNode>();
+	private final Map<Plugin, PluginPreferenceNode> instancePreferenceNodes = new HashMap<Plugin, PluginPreferenceNode>();
 	
 	private final Map<Class<? extends Plugin>, CustomPreferenceNode> typePreferenceNodes = new HashMap<Class<? extends Plugin>, CustomPreferenceNode>();
 	
@@ -252,10 +299,9 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 	};
 	
-	private CustomPreferenceNode createInstancePreferenceNode(final Plugin p) {
-		final CustomPreferenceNode node = new CustomPreferenceNode(getPreferenceNodeId(p),
-				getInstanceName(p.getClass(), p), getInstanceImageDescriptor(p.getClass(), p),
-				getPreferencePage(p.getClass(), p));
+	private PluginPreferenceNode createInstancePreferenceNode(final Plugin p) {
+		final PluginPreferenceNode node = new PluginPreferenceNode(getPreferenceNodeId(p), p
+				.createPreferencePage(this, spyglass), p);
 		// add to hashmap (needed for lookup when removing instances)
 		instancePreferenceNodes.put(p, node);
 		return node;
@@ -401,34 +447,17 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		return getImageDescriptor("plugin.png");
 	}
 	
-	private ImageDescriptor getInstanceImageDescriptor(final Class<? extends Plugin> clazz,
-			final Plugin p) {
+	private ImageDescriptor getInstanceImageDescriptor(final Plugin p) {
 		
 		try {
 			
-			final boolean isActive = (Boolean) clazz.getMethod("isActive").invoke(p);
-			final boolean isVisible = (Boolean) clazz.getMethod("isVisible").invoke(p);
-			
-			return (isActive && isVisible) ? getImageDescriptor("plugin_active_visible.png")
-					: (isActive) ? getImageDescriptor("plugin_not_visible.png")
+			return (p.isActive() && p.isVisible()) ? getImageDescriptor("plugin_active_visible.png")
+					: (p.isActive()) ? getImageDescriptor("plugin_not_visible.png")
 							: getImageDescriptor("plugin_not_active.png");
 			
 		} catch (final Exception e) {
 			log.error("", e);
 			return null;
-		}
-		
-	}
-	
-	private String getInstanceName(final Class<? extends Plugin> clazz, final Plugin p) {
-		
-		try {
-			
-			return (String) clazz.getMethod("getInstanceName").invoke(p);
-			
-		} catch (final Exception e) {
-			log.error("", e);
-			return "SEE_ERROR_LOG";
 		}
 		
 	}
@@ -452,23 +481,6 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		}
 		
 		return "SEE_ERROR_LOG";
-		
-	}
-	
-	@SuppressWarnings("unchecked")
-	private PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> getPreferencePage(
-			final Class<? extends Plugin> clazz, final Plugin p) {
-		
-		try {
-			
-			return (PluginPreferencePage) clazz.getMethod("createPreferencePage",
-					PluginPreferenceDialog.class, Spyglass.class).invoke(p, this, spyglass);
-			
-		} catch (final Exception e) {
-			log.error("", e);
-		}
-		
-		return null;
 		
 	}
 	
@@ -635,4 +647,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		preferenceDialog.selectPreferenceNode(p);
 	}
 	
+	public void onPluginInstancePropertyChange() {
+		preferenceDialog.getTreeViewer().refresh(true);
+	}
 }
