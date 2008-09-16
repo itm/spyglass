@@ -69,7 +69,9 @@ public class SimpleNodePainterPreferencePage extends
 		// TODO: find a sane way to apply an UpdateSetStrategy to the Table, so we don't have
 		// to do this by hand
 		config.setStringFormatters(this.tempStringFormatterTable);
-		plugin.refreshConfigurationParameters();
+		if (plugin != null) {
+			plugin.refreshConfigurationParameters();
+		}
 		optionsComposite.resetSomethingChanged();
 	}
 	

@@ -338,6 +338,10 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		spyglass.getConfigStore().store();
 	}
 	
+	private boolean containsErrors() {
+		return !this.databindingValidationIsOK;
+	}
+	
 	/**
 	 * Store the form data into the model
 	 * 
@@ -345,7 +349,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 */
 	protected void storeToModel() {
 		log.info("Storing form to model");
-		if (!this.databindingValidationIsOK) {
+		if (containsErrors()) {
 			MessageDialog.openError(this.getShell(), "Can not store changes",
 					"Could not store your changes. There are still errors remaining in the form.");
 		} else {
@@ -370,7 +374,15 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	private final void performCreateInstance() {
 		log.info("Pressed button create");
 		
-		spyglass.getPluginManager().createNewPlugin(getPluginClass(), config);
+		// First save data.
+		this.performApply();
+		
+		if (containsErrors()) {
+			MessageDialog.openError(this.getShell(), "Can not store changes",
+					"Could not store your changes. There are still errors remaining in the form.");
+		} else {
+			spyglass.getPluginManager().createNewPlugin(getPluginClass(), config);
+		}
 	}
 	
 	/**
