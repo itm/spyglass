@@ -209,7 +209,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	@Override
 	public void shutdown() {
 		spyglass.shutdown();
-		container.dispose();
+		
 		spyglass = null;
 		container = null;
 		log.info("SpyGlass end. Done.");
