@@ -115,7 +115,8 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 	}
 	
 	public void setDatabindingPluginName(final DataBindingContext dbc,
-			final PluginXMLConfig config, final Plugin owner, final PluginManager manager) {
+			final PluginXMLConfig config, final Plugin owner, final PluginManager manager,
+			final boolean isInstancePage) {
 		
 		// plugin name
 		
@@ -123,10 +124,17 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 				.getValidationRealm(), config, "name");
 		final ISWTObservableValue fieldObservableText = SWTObservables.observeText(pluginName,
 				SWT.Modify);
-		dbc.bindValue(fieldObservableText, modelObservable, new UpdateValueStrategy(
-				UpdateValueStrategy.POLICY_CONVERT)
-				.setAfterConvertValidator(new PluginNameValidator(manager, owner)), null);
 		
+		if (isInstancePage) {
+			dbc.bindValue(fieldObservableText, modelObservable, new UpdateValueStrategy(
+					UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new PluginNameValidator(manager, owner)), null);
+			
+		} else {
+			dbc.bindValue(fieldObservableText, modelObservable, new UpdateValueStrategy(
+					UpdateValueStrategy.POLICY_CONVERT), null);
+			
+		}
 	}
 	
 	public void setDatabinding(final DataBindingContext dbc, final PluginXMLConfig config) {

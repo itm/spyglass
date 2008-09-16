@@ -87,7 +87,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			} else if (e.getSource() == buttons.restoreDefaultsButton) {
 				performRestoreDefaults();
 			} else if (e.getSource() == buttons.saveAsDefaultButton) {
-				performSaveAsDefault();
+				performApply(); // the same method as Apply
 			} else if (e.getSource() == buttons.createInstanceButton) {
 				performCreateInstance();
 			}
@@ -260,7 +260,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		basicGroup.disableUnwantedElements(basicOptions);
 		basicGroup.setDatabinding(dbc, config);
 		basicGroup.setDatabindingPluginName(dbc, config, this.plugin, this.spyglass
-				.getPluginManager());
+				.getPluginManager(), this.isInstancePage());
 		
 		return composite;
 		
@@ -334,8 +334,14 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	@Override
 	public final void performApply() {
 		log.info("Pressed button Apply");
-		this.storeToModel();
-		spyglass.getConfigStore().store();
+		if (containsErrors()) {
+			MessageDialog.openError(this.getShell(), "Can not store changes",
+					"Could not store your changes. There are still errors remaining in the form.");
+		} else {
+			this.storeToModel();
+			spyglass.getConfigStore().store();
+		}
+		
 	}
 	
 	private boolean containsErrors() {
@@ -348,15 +354,10 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * Subclasses overriding this method must call this method!
 	 */
 	protected void storeToModel() {
-		log.info("Storing form to model");
-		if (containsErrors()) {
-			MessageDialog.openError(this.getShell(), "Can not store changes",
-					"Could not store your changes. There are still errors remaining in the form.");
-		} else {
-			this.dbc.updateModels();
-			this.dbc.updateTargets();
-			this.basicGroup.resetChanged();
-		}
+		log.debug("Storing form to model");
+		this.dbc.updateModels();
+		this.dbc.updateTargets();
+		this.basicGroup.resetChanged();
 	}
 	
 	/**
@@ -365,7 +366,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * Subclasses overriding this method must call this method!
 	 */
 	protected void loadFromModel() {
-		log.info("Restoring form from model");
+		log.debug("Restoring form from model");
 		
 		this.dbc.updateTargets();
 		this.basicGroup.resetChanged();
@@ -381,6 +382,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			MessageDialog.openError(this.getShell(), "Can not store changes",
 					"Could not store your changes. There are still errors remaining in the form.");
 		} else {
+			
 			spyglass.getPluginManager().createNewPlugin(getPluginClass(), config);
 		}
 	}
@@ -428,16 +430,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		
 		this.loadFromModel();
 		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return
-	 */
-	protected final void performSaveAsDefault() {
-		log.info("Pressed button SaveAsDefault");
-		
-		storeToModel();
 	}
 	
 	// --------------------------------------------------------------------------------

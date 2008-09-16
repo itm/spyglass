@@ -472,6 +472,29 @@ public class PluginManager {
 	 */
 	public Plugin createNewPlugin(final Class<? extends Plugin> clazz, final PluginXMLConfig config) {
 		final Plugin plugin = PluginFactory.createInstance(config, clazz);
+		
+		final String baseName = config.getName();
+		int i = 0;
+		String retName = baseName + i;
+		while (true) {
+			boolean found = false;
+			for (final Plugin p : getPlugins()) {
+				if (p.getInstanceName().equals(retName)) {
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found) {
+				break;
+			} else {
+				i++;
+				retName = baseName + i;
+			}
+		}
+		
+		plugin.getXMLConfig().setName(retName);
+		
 		addPlugin(plugin);
 		return plugin;
 	}
