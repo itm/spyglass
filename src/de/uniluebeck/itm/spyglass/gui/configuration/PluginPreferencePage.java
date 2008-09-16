@@ -345,7 +345,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 					"Could not store your changes. There are still errors remaining in the form.");
 		} else {
 			this.storeToModel();
-			spyglass.getConfigStore().store();
 		}
 		
 	}
@@ -406,8 +405,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			if (!ret) {
 				MessageDialog.openError(this.getShell(), "Cannot delete plugin",
 						"Could not delete the plugin.");
-			} else {
-				spyglass.getConfigStore().store();
 			}
 		}
 	}
