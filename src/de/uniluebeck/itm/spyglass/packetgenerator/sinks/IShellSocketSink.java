@@ -17,11 +17,9 @@ import org.simpleframework.xml.Element;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 /**
- * This Sink sends packets over an TCP-Socket via the protocol specified by
- * iShell.
+ * This Sink sends packets over an TCP-Socket via the protocol specified by iShell.
  * 
- * Ishell should be able to receive this packets and forward it to the Spyglass
- * plugin.
+ * Ishell should be able to receive this packets and forward it to the Spyglass plugin.
  * 
  * @author dariush
  * 
@@ -51,6 +49,11 @@ public class IShellSocketSink extends Sink {
 	private final byte ISHELL_PACKET_TYPE_SPYGLASS = (byte) 0x91;
 	
 	/**
+	 * The packet type designated to spyglass packets.
+	 */
+	private final byte PROTOCOL_MAGIC_MESSAGE_TYPE = (byte) 0x0;
+	
+	/**
 	 * 
 	 * The interfaces to bind on (0.0.0.0) for all ifs.
 	 */
@@ -64,8 +67,8 @@ public class IShellSocketSink extends Sink {
 	private int port;
 	
 	/**
-	 * The source node, from which the packet comes from. Note that this node ID
-	 * is only used by iShell is of no interest to Spyglass.
+	 * The source node, from which the packet comes from. Note that this node ID is only used by
+	 * iShell is of no interest to Spyglass.
 	 */
 	@Element
 	private final short iShellSourceNode = 1;
@@ -76,8 +79,8 @@ public class IShellSocketSink extends Sink {
 	private ServerSocket listenSocket;
 	
 	/**
-	 * List of all currently connected clients on the socket. serialized since
-	 * the socketlistener may add new clients to this list asynchronously.
+	 * List of all currently connected clients on the socket. serialized since the socketlistener
+	 * may add new clients to this list asynchronously.
 	 */
 	private final List<Socket> clients = Collections.synchronizedList(new ArrayList<Socket>());
 	
@@ -92,8 +95,7 @@ public class IShellSocketSink extends Sink {
 	private volatile boolean alive = true;
 	
 	/**
-	 * This Thread listens on the socket and opens connections to new clients if
-	 * they arrive.
+	 * This Thread listens on the socket and opens connections to new clients if they arrive.
 	 * 
 	 * @author dariush
 	 * 
@@ -131,7 +133,7 @@ public class IShellSocketSink extends Sink {
 	public void sendPacket(final byte[] packet) throws Exception {
 		
 		if (this.clients.size() > 0) {
-			log.debug("Sending a packet over the socket...");
+			log.debug("Sending a packet...");
 		}
 		
 		// Iterate over all clients and send each the packet.
@@ -142,7 +144,7 @@ public class IShellSocketSink extends Sink {
 				try {
 					sendPacketOverSocket(s, packet);
 				} catch (final IOException e) {
-					log.debug("Client gone.");
+					log.debug("Error, socket closed. Dropping client.");
 					it.remove();
 				}
 			}
@@ -150,8 +152,8 @@ public class IShellSocketSink extends Sink {
 	}
 	
 	/**
-	 * Takes a Paket and sends it over the given Socket. Before sending the
-	 * packet is wrapped in another packet so that iShell can handle it.
+	 * Takes a Paket and sends it over the given Socket. Before sending the packet is wrapped in
+	 * another packet so that iShell can handle it.
 	 * 
 	 * @param s
 	 *            an open socket.
@@ -162,6 +164,8 @@ public class IShellSocketSink extends Sink {
 	 */
 	private void sendPacketOverSocket(final Socket s, final byte[] packet) throws IOException {
 		
+		log.debug("Sending a packet to " + s);
+		
 		// enough for the worstcase, isn't usually needed.
 		final ByteBuffer buf = ByteBuffer.allocate(2 * packet.length + 20);
 		
@@ -170,6 +174,7 @@ public class IShellSocketSink extends Sink {
 		// Introduction
 		buf.put(PROTOCOL_MAGIC_DLE);
 		buf.put(PROTOCOL_MAGIC_STX);
+		buf.put(PROTOCOL_MAGIC_MESSAGE_TYPE);
 		buf.putShort(iShellSourceNode);
 		buf.put(PROTOCOL_MAGIC_DLE);
 		buf.put(PROTOCOL_MAGIC_DLE);
@@ -195,6 +200,15 @@ public class IShellSocketSink extends Sink {
 		buf.put(PROTOCOL_MAGIC_DLE);
 		buf.put(PROTOCOL_MAGIC_DLE);
 		buf.put(PROTOCOL_MAGIC_ETX);
+		buf.put(PROTOCOL_MAGIC_DLE);
+		buf.put(PROTOCOL_MAGIC_ETX);
+		
+		// Heartbeat packet: ishell expects a dedicated heartbeat message about once in three
+		// seconds
+		// for simplicity send it after every real message
+		buf.put(PROTOCOL_MAGIC_DLE);
+		buf.put(PROTOCOL_MAGIC_STX);
+		buf.put((byte) 0x01);
 		buf.put(PROTOCOL_MAGIC_DLE);
 		buf.put(PROTOCOL_MAGIC_ETX);
 		
