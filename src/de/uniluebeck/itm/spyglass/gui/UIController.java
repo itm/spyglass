@@ -64,7 +64,7 @@ public class UIController {
 	/**
 	 * This color is used for area outside of the the map
 	 */
-	private final Color canvasOutOfMapColor = new Color(null, 50, 50, 50);
+	private final Color canvasOutOfMapColor = new Color(null, 255, 255, 255);
 	
 	/**
 	 * This color is used as the background color
@@ -94,13 +94,13 @@ public class UIController {
 	private final Runnable paintRunnable = new Runnable() {
 		public void run() {
 			try {
-				Canvas c = appWindow.getGui().getCanvas();
+				final Canvas c = appWindow.getGui().getCanvas();
 				if (!c.isDisposed()) {
 					c.redraw();
 				} else {
 					log.info("The paintRunnable-thread stopped");
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				log.error(e, e);
 			}
 		}
@@ -331,8 +331,8 @@ public class UIController {
 	/**
 	 * Draw the background.
 	 * 
-	 * Space which lies inside the map (-2^15 to 2^15) will be colored in <code>canvasBgColor</code> ,
-	 * whereas space outside this area is colored <code>canvasOutOfMapColor</code>.
+	 * Space which lies inside the map (-2^15 to 2^15) will be colored in <code>canvasBgColor</code>
+	 * , whereas space outside this area is colored <code>canvasOutOfMapColor</code>.
 	 */
 	private void drawBackground(final GC gc) {
 		gc.setBackground(canvasOutOfMapColor);
