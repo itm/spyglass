@@ -6,15 +6,56 @@ import java.util.regex.Pattern;
 
 import de.uniluebeck.itm.spyglass.packet.Packet;
 
+/**
+ * The StringFormatter generates a String based on a given expression that mostly will contain at
+ * least one placeholder. Each placeholder must be consistent with the scheme. It always starts with
+ * a '%' followed by the type of the value and the offset (bytes) of the data in the packet. Allowed
+ * datatypes are
+ * <ul>
+ * <li>'u' (unsigned 8 Bit integer)</li>
+ * <li>'U' (unsigned 32 Bit integer)</li>
+ * <li>'i' (signed 16 Bit integer)</li>
+ * <li>'f' (signed 32 Bit float).</li>
+ * </ul>
+ * 
+ * Examples:
+ * <ul>
+ * <li>%u0: The first byte of the packets to be parsed contain an uint8 value</li>
+ * <li>%f17: The bytes 18, 19, 20 and 21 contain of the packets contain a float value</li>
+ * <ul>
+ * 
+ * If the character % should not denote the beginning of a placeholder, it must be masked as %% in
+ * the expression.
+ * 
+ * @author Oliver Kleine
+ * @version 1.0
+ * 
+ */
 public class StringFormatter {
 	
-	private final String formatExpression;
 	private static final Pattern notNumeric = Pattern.compile("[^0-9]");
 	
 	private final String origFormatExpression;
-	
+	private final String formatExpression;
 	private String resultString = "";
 	
+	/**
+	 * The parameter of the constructor must be a String containing an expression. If the expression
+	 * is invalid, an IllegalArgumentException will be thrown. An expression is unvalid, if it
+	 * <ul>
+	 * <li>contains a substring % followed by any character expect u,U,i,f or %,</li>
+	 * <li>contains a substring %u, %U, %i or %f followed by a non digit character,</li>
+	 * <li>ends with % or</li>
+	 * <li>ends with %u, %U, %i or %f</li>
+	 * </ul>
+	 * Note, that %% masks a %. Thus an expression may contain e.g. a substring '%%fish', even
+	 * though this strictly spoken breaks rule 2 (it contains '%f').
+	 * 
+	 * @param formatExpression
+	 *            String, that should contain a valid expression
+	 * @throws IllegalArgumentException
+	 *             if the expresseion is unvalid
+	 */
 	public StringFormatter(String pFormatExpression) throws IllegalArgumentException {
 		
 		origFormatExpression = pFormatExpression + "";
@@ -25,6 +66,7 @@ public class StringFormatter {
 		
 		// test if the given expression is valid and throw an exception
 		// otherwise
+		
 		if (pFormatExpression.matches(".*%[^uUif%].*")
 				|| pFormatExpression.matches(".*%[uUif][^0-9].*")
 				|| pFormatExpression.matches(".*%") || pFormatExpression.matches(".*%[uUif]")) {
@@ -36,17 +78,23 @@ public class StringFormatter {
 	}
 	
 	/**
+	 * This method parses the given Packet and returns a String corresponding to the expression
+	 * given to the constructor. The placeholders of the expression are displaced with the values
+	 * from the packet. The positions of these values in the packetdata are declared in the
+	 * placeholders.
 	 * 
 	 * @param packet
+	 * @return A String, where the placeholders of the expression are changed with values from the
+	 *         packet
 	 */
 	public String parse(final Packet packet) throws IllegalArgumentException {
+		String result = "";
 		final byte[] content = packet.getContent();
 		String tmpExp = this.formatExpression;
-		String result = "";
-		
 		// first part of result is given by expression as substring until the
 		// first occurence of "%"
 		int index = tmpExp.indexOf("%");
+		int indexNotNum = 0;
 		while (index != -1) {
 			// write substring until first occurence of "%" to the result string
 			result += tmpExp.substring(0, index);
@@ -55,10 +103,11 @@ public class StringFormatter {
 			tmpExp = tmpExp.substring(index);
 			
 			// identify the offset of the value in the data packet
-			final int indexNotNum = indexOfNonNumeric(tmpExp.substring(2)) + 2;
+			indexNotNum = indexOfNonNumeric(tmpExp.substring(2)) + 2;
+			
 			int offset;
-			if (indexNotNum == -1) {
-				offset = Integer.parseInt(tmpExp.substring(1));
+			if (indexNotNum == 1) {
+				offset = Integer.parseInt(tmpExp.substring(2));
 			} else {
 				offset = Integer.parseInt(tmpExp.substring(2, indexNotNum));
 			}
@@ -68,48 +117,68 @@ public class StringFormatter {
 			byte[] b;
 			ByteBuffer bb;
 			switch (tmpExp.charAt(1)) {
+				
 				// uint8 (1 byte):
 				case 'u':
 					b = new byte[2];
-					b[0] = 0;
-					b[1] = content[offset];
-					bb = ByteBuffer.allocate(2);
-					bb.put(b);
-					result += bb.getShort(0);
+					try {
+						b[0] = 0;
+						b[1] = content[offset];
+						bb = ByteBuffer.allocate(2);
+						bb.put(b);
+						result += bb.getShort(0);
+					} catch (final ArrayIndexOutOfBoundsException e) {
+						result += "<packet to short>";
+					}
 					break;
+				
 				// uint32 (4 bytes):
 				case 'U':
 					b = new byte[8];
-					for (int i = 0; i < 8; i++) {
-						if (i < 4) {
-							b[i] = 0;
-						} else {
-							b[i] = content[offset + i - 4];
+					try {
+						for (int i = 0; i < 8; i++) {
+							if (i < 4) {
+								b[i] = 0;
+							} else {
+								b[i] = content[offset + i - 4];
+							}
 						}
+						bb = ByteBuffer.allocate(8);
+						bb.put(b);
+						result += bb.getLong(0);
+					} catch (final ArrayIndexOutOfBoundsException e) {
+						result += "<packet to short>";
 					}
-					bb = ByteBuffer.allocate(8);
-					bb.put(b);
-					result += bb.getLong(0);
 					break;
+				
 				// int16 (2 bytes in two�s complement):
 				case 'i':
 					b = new byte[2];
-					b[0] = content[offset];
-					b[1] = content[offset + 1];
-					bb = ByteBuffer.allocate(2);
-					bb.put(b);
-					result += bb.getShort(0);
+					try {
+						b[0] = content[offset];
+						b[1] = content[offset + 1];
+						bb = ByteBuffer.allocate(2);
+						bb.put(b);
+						result += bb.getShort(0);
+					} catch (final ArrayIndexOutOfBoundsException e) {
+						result += "<packet to short>";
+					}
 					break;
+				
 				// float (4 bytes as IEEE 754 single precision floating point
 				// value ):
 				case 'f':
 					b = new byte[4];
-					for (int i = 0; i < 4; i++) {
-						b[i] = content[offset + i];
+					try {
+						for (int i = 0; i < 4; i++) {
+							b[i] = content[offset + i];
+						}
+						bb = ByteBuffer.allocate(4);
+						bb.put(b, 0, 4);
+						result += bb.getFloat(0);
+					} catch (final ArrayIndexOutOfBoundsException e) {
+						result += "<packet to short>";
 					}
-					bb = ByteBuffer.allocate(4);
-					bb.put(b, 0, 4);
-					result += bb.getFloat(0);
 					break;
 			}
 			
@@ -123,7 +192,9 @@ public class StringFormatter {
 		
 		// add the text behind the last "%" of the given expression to the
 		// result
-		result += tmpExp;
+		if (indexNotNum != 1) {
+			result += tmpExp;
+		}
 		
 		result = result.replaceAll("percent_twice", "%");
 		resultString = result;
@@ -152,11 +223,23 @@ public class StringFormatter {
 	}
 	
 	public static void main(final String[] args) {
-		final StringFormatter test = new StringFormatter("Temp: %u5\nBattery %U1%%%%");
+		// final StringFormatter test = new StringFormatter("Temp: %u5\nBattery %U1%");
+		// final StringFormatter test = new StringFormatter("Temp: %u5 Battery %u1");
+		final StringFormatter test = new StringFormatter(
+				"Wert 1 (uint8): %u0, Wert 2 (uint32): %U4, Wert 3 (int16): %i8, Wert 4 (float): %f10 und noch Text");
+		// final StringFormatter test = new StringFormatter("");
 		final Packet packet = new Packet();
-		final byte[] content = { 0, -1, -1, -1, -1, -1, 49, 0, 0, 10 };
+		
+		final byte[] content = { -128, 0, 0, 0, -1, -1, -1, -1, -128, 0, 65, -109, 51, 51 };
+		// final byte[] content = { -128, 0, 0, 0, -1, -1, -1, -1, -128, 0, 65 };
+		// final byte[] content = { 0, -2, -1, -1, -1, -1, 49, 0, 0, 10 };
 		packet.setContent(content);
-		System.out.println(test.parse(packet));
+		final String result = test.parse(packet);
+		if (result.equalsIgnoreCase("")) {
+			System.out.println("<leer>");
+		} else {
+			System.out.println(result);
+		}
 	}
 	
 }
