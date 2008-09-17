@@ -240,14 +240,9 @@ public class DrawingArea {
 				return;
 			}
 			
-			log.debug("Moved about " + pixelX + "; " + pixelY);
-			
 			// add the translation matrix to the transformation matrix.
 			at.preConcatenate(sca);
 			
-			if (!isValidTransformation(new AffineTransform())) {
-				log.error("Transformation now illegal!");
-			}
 		}
 		
 	}
@@ -420,12 +415,6 @@ public class DrawingArea {
 			// add the scale matrix to the transformation matrix.
 			synchronized (at) {
 				at.concatenate(sca);
-			}
-			
-			System.out.println("Zoom level: " + at.getScaleX());
-			
-			if (!isValidTransformation(new AffineTransform())) {
-				log.error("Transformation now illegal!");
 			}
 			
 		} catch (final NoninvertibleTransformException e) {

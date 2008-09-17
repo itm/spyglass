@@ -1,6 +1,8 @@
 package de.uniluebeck.itm.spyglass.plugin;
 
-public interface PluginListChangeListener {
+import java.util.EventListener;
+
+public interface PluginListChangeListener extends EventListener {
 	
 	public enum ListChangeEvent {
 		/**

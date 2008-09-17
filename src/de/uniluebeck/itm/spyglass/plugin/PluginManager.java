@@ -143,9 +143,9 @@ public class PluginManager {
 	 * of the plugins that are of a class (or extending a class) contained in the excludes list
 	 * 
 	 * @param checkHierarchy
-	 *            <code>true</code> if the class hierarchy should be checked, such that even
-	 *            plugins derived from a class included in the <code>excludes</code> list will be
-	 *            excluded, <code>false</code> if only plugins of exactly the class contained in
+	 *            <code>true</code> if the class hierarchy should be checked, such that even plugins
+	 *            derived from a class included in the <code>excludes</code> list will be excluded,
+	 *            <code>false</code> if only plugins of exactly the class contained in
 	 *            <code>exclude</code> list shall be excluded
 	 * @param excludes
 	 *            plugin class to exclude from the list
@@ -266,7 +266,7 @@ public class PluginManager {
 	 * @param plugin
 	 *            The plugin object to be added.
 	 */
-	public void addPlugin(final Plugin plugin) {
+	private void addPlugin(final Plugin plugin) {
 		this.connectPlugin(plugin);
 		
 		if (!plugins.contains(plugin)) {
@@ -510,10 +510,15 @@ public class PluginManager {
 	 *            the reason
 	 */
 	private void firePluginListChangedEvent(final Plugin p, final ListChangeEvent what) {
+		
+		// TODO: This is a workaround. The real solution is to make sure the
+		// eventListerList ist multithreading safe.
+		final Set<PluginListChangeListener> copySet;
 		synchronized (pluginListChangeListeners) {
-			for (final PluginListChangeListener listener : pluginListChangeListeners) {
-				listener.pluginListChanged(p, what);
-			}
+			copySet = new HashSet<PluginListChangeListener>(pluginListChangeListeners);
+		}
+		for (final PluginListChangeListener listener : copySet) {
+			listener.pluginListChanged(p, what);
 		}
 	}
 	
