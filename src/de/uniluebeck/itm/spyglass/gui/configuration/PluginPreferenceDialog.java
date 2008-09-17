@@ -92,6 +92,11 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			newShell.addDisposeListener(this);
 		}
 		
+		@Override
+		protected void handleShellCloseEvent() {
+			clickedButtonClose();
+		}
+		
 		private Button createButton(final Composite parent, final String label,
 				final SelectionListener selectionListener) {
 			((GridLayout) parent.getLayout()).numColumns++;
