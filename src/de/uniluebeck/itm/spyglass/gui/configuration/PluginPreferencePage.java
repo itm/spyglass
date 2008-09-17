@@ -479,8 +479,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Returns the <code>Plugin</code> instance associated with this page.
 	 * 
-	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a
-	 *         type page (i.e. not an instance page, also see
+	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a type
+	 *         page (i.e. not an instance page, also see
 	 *         {@link PluginPreferencePage#isInstancePage()})
 	 */
 	public final Plugin getPlugin() {
@@ -538,6 +538,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	@Override
 	public Image getImage() {
 		return image;
+	}
+	
+	@Override
+	public boolean okToLeave() {
+		return databindingValidationIsOK;
 	}
 	
 }
