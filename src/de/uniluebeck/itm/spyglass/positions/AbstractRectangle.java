@@ -71,6 +71,10 @@ public abstract class AbstractRectangle {
 		return this.rectangle.contains(x, y);
 	}
 	
+	public boolean contains(final double x, final double y) {
+		return this.rectangle.contains((int) x, (int) y);
+	}
+	
 	public boolean contains(final Point p) {
 		return this.rectangle.contains(p);
 	}

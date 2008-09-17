@@ -5,6 +5,8 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 
 import org.apache.log4j.Category;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.simpleframework.xml.Root;
 
@@ -32,6 +34,12 @@ public class DrawingArea {
 	private final double ZOOM_FACTOR = 1.1;
 	
 	/**
+	 * Maximum zoom level allowed (since world-coordinates are integer, there is no point in
+	 * infinite zoom)
+	 */
+	private final double ZOOM_MAX = 50;
+	
+	/**
 	 * Reference to the appWindow
 	 */
 	private AppWindow appWindow;
@@ -44,7 +52,52 @@ public class DrawingArea {
 	 * Since we are currently redrawing the screen 25 times a second, a messed up transformation
 	 * should not be visible for a noticable time.
 	 */
-	AffineTransform at = new AffineTransform();
+	private AffineTransform at = new AffineTransform();
+	
+	/**
+	 * x-coordinate of the upper-left point of the world.
+	 */
+	private static final int WORLD_UPPER_LEFT_X = -((int) Math.pow(2, 16));
+	
+	/**
+	 * y-coordinate of the upper-left point of the world.
+	 */
+	private static final int WORLDS_UPPER_LEFT_Y = -((int) Math.pow(2, 16));
+	
+	/**
+	 * width of the world.
+	 */
+	private static final int WORLD_WIDTH = 2 * ((int) Math.pow(2, 16));
+	
+	/**
+	 * height of the world.
+	 */
+	private static final int WORLD_HEIGHT = 2 * ((int) Math.pow(2, 16));
+	
+	private final ControlListener controlListener = new ControlListener() {
+		
+		@Override
+		public void controlMoved(final ControlEvent e) {
+			// not of interest.
+		}
+		
+		@Override
+		public void controlResized(final ControlEvent e) {
+			log.debug("Control resized: " + e);
+			log.debug("New canvas: " + getDrawingCanvasRectangle());
+			
+			synchronized (at) {
+				
+				if (!isValidTransformation(new AffineTransform(at))) {
+					log.error("Resizing resulted in illegal transform. Resetting matrix.");
+					
+					adjustToValidMatrix();
+				}
+			}
+			
+		}
+		
+	};
 	
 	/**
 	 * Maps a point from the absolute reference frame to the reference frame of the drawing area.
@@ -175,17 +228,60 @@ public class DrawingArea {
 	 */
 	public void move(final int pixelX, final int pixelY) {
 		
-		// log.debug("Moving about " + pixelX + "; " + pixelY);
-		
 		// Build the translation matrix
 		final AffineTransform sca = new AffineTransform();
-		sca.translate(pixelX, pixelY);
 		
 		synchronized (at) {
+			sca.translate(pixelX, pixelY);
+			
+			final AffineTransform atTemp = new AffineTransform(at);
+			atTemp.preConcatenate(sca);
+			if (!isValidTransformation(atTemp)) {
+				return;
+			}
+			
+			log.debug("Moved about " + pixelX + "; " + pixelY);
+			
 			// add the translation matrix to the transformation matrix.
 			at.preConcatenate(sca);
+			
+			if (!isValidTransformation(new AffineTransform())) {
+				log.error("Transformation now illegal!");
+			}
 		}
 		
+	}
+	
+	/**
+	 * Checks, if the given Transformation, concatinated to the current <code>at</code>, would
+	 * result in a legal transformation matrix with respect to the global boundingBox (which must
+	 * never be left)
+	 */
+	private boolean isValidTransformation(final AffineTransform at2) {
+		boolean ok = false;
+		log.debug("Canvas: " + getDrawingCanvasRectangle());
+		
+		try {
+			
+			final Point2D upperLeft2D = at2.inverseTransform(new Point2D.Double(0, 0), null);
+			
+			final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(),
+					this.getDrawingRectangle().getHeight());
+			final Point2D lowerRight2D = at2.inverseTransform(lowerRight, null);
+			
+			log.debug(String.format("upperLeft2D=%s, lowerRight2D=%s", upperLeft2D, lowerRight2D));
+			
+			ok = DrawingArea.getGlobalBoundingBox()
+					.contains(upperLeft2D.getX(), upperLeft2D.getY())
+					&& DrawingArea.getGlobalBoundingBox().contains(lowerRight2D.getX(),
+							lowerRight2D.getY());
+			
+		} catch (final NoninvertibleTransformException e) {
+			log.error("Transformation matrix in illegal state!", e);
+		}
+		
+		log.debug("val status: " + ok);
+		return ok;
 	}
 	
 	/**
@@ -238,11 +334,20 @@ public class DrawingArea {
 	 *            the appWindow to set
 	 */
 	public void setAppWindow(final AppWindow appWindow) {
+		
+		// remove old listener
+		if (this.appWindow != null) {
+			this.appWindow.getGui().getCanvas().removeControlListener(this.controlListener);
+		}
+		
 		this.appWindow = appWindow;
+		
+		// add new one
+		this.appWindow.getGui().getCanvas().addControlListener(this.controlListener);
 	}
 	
 	/**
-	 * Returns the current zoom level. The zoom level can take any value in the range (0;\inf)
+	 * Returns the current zoom level. The zoom level can take any value in the range 0-ZOOM_MAX.
 	 * 
 	 */
 	public double getZoom() {
@@ -295,9 +400,32 @@ public class DrawingArea {
 			sca.scale(factor, factor);
 			sca.translate(-a.getX(), -a.getY());
 			
+			final AffineTransform atTemp = new AffineTransform(at);
+			atTemp.concatenate(sca);
+			if (!isValidTransformation(atTemp)) {
+				return;
+			}
+			// Abort if we leave a defined interval of allowed zoom levels
+			// This is partly because the QuadTree cannot handle it if it is asked
+			// to return objects outside its boundingBox.
+			//
+			// TODO: This isn't the perfect solution, as it depends on the size
+			// of the Spyglass Window to be "regular size".
+			final AffineTransform at2 = (AffineTransform) at.clone();
+			at2.concatenate(sca);
+			if ((at2.getScaleX() > ZOOM_MAX)) {
+				return;
+			}
+			
 			// add the scale matrix to the transformation matrix.
 			synchronized (at) {
 				at.concatenate(sca);
+			}
+			
+			System.out.println("Zoom level: " + at.getScaleX());
+			
+			if (!isValidTransformation(new AffineTransform())) {
+				log.error("Transformation now illegal!");
 			}
 			
 		} catch (final NoninvertibleTransformException e) {
@@ -365,5 +493,57 @@ public class DrawingArea {
 		// replace the matrix
 		this.at = newAt;
 		
+	}
+	
+	/**
+	 * Returns the global bounding box describing the whole world. (absolute coordinates outside
+	 * this bounding box can be considered an error.)
+	 */
+	public static AbsoluteRectangle getGlobalBoundingBox() {
+		
+		return new AbsoluteRectangle(WORLD_UPPER_LEFT_X, WORLDS_UPPER_LEFT_Y, WORLD_WIDTH,
+				WORLD_HEIGHT);
+		
+	}
+	
+	/**
+	 * Adjust the Transform ,until it is valid again.
+	 * 
+	 * Note: this method is not thread-safe!
+	 * 
+	 * TODO: adjust heuristic for the case when the drawing area is enlarged for more then 2x
+	 * 
+	 */
+	private void adjustToValidMatrix() {
+		while (!isValidTransformation(new AffineTransform(at))) {
+			log.debug("Zooming in to get back in into the global BBox.");
+			
+			final int px = getDrawingRectangle().getWidth() / 2;
+			final int py = getDrawingRectangle().getHeight() / 2;
+			
+			// The centerpoint of the zoom (where the user clicked)
+			try {
+				final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
+				
+				// Build the scale matrix
+				final AffineTransform sca = new AffineTransform();
+				sca.translate(a.getX(), a.getY());
+				sca.scale(ZOOM_FACTOR, ZOOM_FACTOR);
+				sca.translate(-a.getX(), -a.getY());
+				
+				at.concatenate(sca);
+				
+				if ((at.getScaleX() > ZOOM_MAX)) {
+					log.debug("Giving up, resetting to initial matrix.");
+					at = new AffineTransform();
+					break;
+				}
+				
+			} catch (final NoninvertibleTransformException e1) {
+				log.error("Transformation matrix in illegal state!", e1);
+				break;
+			}
+			
+		}
 	}
 }

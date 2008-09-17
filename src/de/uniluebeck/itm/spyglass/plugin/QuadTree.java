@@ -10,6 +10,7 @@ import java.util.List;
 import org.eclipse.swt.graphics.Point;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
@@ -51,16 +52,8 @@ public class QuadTree implements Layer {
 	
 	private DrawingObjectComparator sorter = new DrawingObjectComparator();
 	
-	private static final int UPPER_LEFT_X = -((int) Math.pow(2, 15));
-	
-	private static final int UPPER_LEFT_Y = -((int) Math.pow(2, 15));
-	
-	private static final int WIDTH = 2 * ((int) Math.pow(2, 15));
-	
-	private static final int HEIGHT = 2 * ((int) Math.pow(2, 15));
-	
 	public QuadTree() {
-		this(new AbsoluteRectangle(UPPER_LEFT_X, UPPER_LEFT_Y, WIDTH, HEIGHT));
+		this(DrawingArea.getGlobalBoundingBox());
 	}
 	
 	// --------------------------------------------------------------------------------
