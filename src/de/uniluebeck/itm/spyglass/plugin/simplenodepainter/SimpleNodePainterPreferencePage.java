@@ -86,7 +86,9 @@ public class SimpleNodePainterPreferencePage extends
 		
 		tempStringFormatterTable = config.getStringFormatters();
 		optionsComposite.connectTableWithData(dbc, tempStringFormatterTable);
-		
+
+		// necessary to prevent the change listerner to react on the initialization
+		optionsComposite.resetSomethingChanged();
 		return composite;
 	}
 	

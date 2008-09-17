@@ -72,17 +72,22 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		}
 		
 		@Override
+		protected boolean showPage(final IPreferenceNode node) {
+			informIfUnsavedChanges();
+			return super.showPage(node);
+		}
+		
+		@Override
 		protected TreeViewer createTreeViewer(final Composite parent) {
-			// TODO Auto-generated method stub
-			final TreeViewer tv = super.createTreeViewer(parent);
-			tv.setComparator(new ViewerComparator() {
+			final TreeViewer treeViewer = super.createTreeViewer(parent);
+			treeViewer.setComparator(new ViewerComparator() {
 				@Override
 				public int compare(final Viewer v, final Object o1, final Object o2) {
 					return ((PreferenceNode) o1).getLabelText().compareToIgnoreCase(
 							((PreferenceNode) o2).getLabelText());
 				}
 			});
-			return tv;
+			return treeViewer;
 		}
 		
 		@Override
@@ -615,8 +620,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	 */
 	public int open() {
 		spyglass.getPluginManager().addPluginListChangeListener(this);
-		final int open = preferenceDialog.open();
-		return open;
+		return preferenceDialog.open();
 	}
 	
 	@Override
@@ -675,22 +679,27 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		return false;
 	}
 	
+	/**
+	 * Returns if the currently visible preference dialog page has unsaved changes
+	 * 
+	 * @return <code>true</code> if the currently visible preference dialog page has unsaved
+	 *         changes
+	 */
 	@SuppressWarnings("unchecked")
-	private boolean proceedIfUnsavedChanges() {
-		
+	private boolean hasUnsavedChanges() {
 		final IPreferencePage selectedPage = (IPreferencePage) preferenceDialog.getSelectedPage();
 		
 		// no page selected so it's ok to continue
 		if (selectedPage == null) {
-			return true;
+			return false;
 		}
 		
-		boolean needToAsk = false;
+		boolean hashUnsavedChanges = false;
 		
-		// check if we're looking at general preference page or plugin preference page
+		// check if we're looking at general preference page or plug-in preference page
 		if ((selectedPage instanceof GeneralPreferencePage)
 				|| (selectedPage instanceof PluginManagerPreferencePage)) {
-			needToAsk = !selectedPage.okToLeave();
+			hashUnsavedChanges = !selectedPage.okToLeave();
 		}
 		
 		if (selectedPage instanceof PluginPreferencePage) {
@@ -698,18 +707,23 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			// check if currently opened preference page contains unsaved values
 			if (((PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig>) selectedPage)
 					.hasUnsavedChanges()) {
-				needToAsk = true;
+				hashUnsavedChanges = true;
 			}
 			
 		} else {
 			
 			if (!(selectedPage).okToLeave()) {
-				needToAsk = true;
+				hashUnsavedChanges = true;
 			}
 			
 		}
+		return hashUnsavedChanges;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private boolean proceedIfUnsavedChanges() {
 		
-		if (needToAsk) {
+		if (hasUnsavedChanges()) {
 			final String message = "The currently opened preference page contains unsaved changes. Are you sure you want to proceed?";
 			final boolean ok = MessageDialog.openQuestion(preferenceDialog.getShell(),
 					"Unsaved changes", message);
@@ -720,6 +734,33 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 	}
 	
+	/**
+	 * Displays an information dialog which reminds the user that there are still unsaved changes at
+	 * a preference page. In respect to the type of the preference page, the user will be offered
+	 * the opportunity to store the changes before leaving the page.
+	 */
+	@SuppressWarnings("unchecked")
+	private void informIfUnsavedChanges() {
+		if (hasUnsavedChanges()) {
+			final String message = "The currently opened preference page contains unsaved changes. Do you want to save now?";
+			
+			final IPreferencePage selectedPage = (IPreferencePage) preferenceDialog
+					.getSelectedPage();
+			if ((selectedPage != null)
+					&& (selectedPage instanceof PluginPreferencePage)
+					&& MessageDialog.openConfirm(preferenceDialog.getShell(), "Unsaved changes",
+							message)) {
+				((PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig>) selectedPage)
+						.performApply();
+			} else {
+				MessageDialog
+						.openInformation(preferenceDialog.getShell(), "Unsaved changes",
+								"The currently opened preference page contains unsaved changes. Make sure you save later!");
+			}
+			
+		}
+	}
+	
 	public static void main(final String[] args) {
 		try {
 			final Display display = Display.getDefault();
@@ -727,8 +768,6 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			final Spyglass sg = new Spyglass(true);
 			final PluginPreferenceDialog inst = new PluginPreferenceDialog(shell, sg);
 			inst.open();
-			
-			System.out.println("1");
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

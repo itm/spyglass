@@ -279,6 +279,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		basicGroup.setDatabindingPluginName(dbc, config, this.plugin, this.spyglass
 				.getPluginManager(), this.isInstancePage());
 		
+		// necessary to prevent the change listerner to react on the initialization
+		basicGroup.resetChanged();
 		return composite;
 	}
 	
@@ -475,8 +477,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Returns the <code>Plugin</code> instance associated with this page.
 	 * 
-	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a type
-	 *         page (i.e. not an instance page, also see
+	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a
+	 *         type page (i.e. not an instance page, also see
 	 *         {@link PluginPreferencePage#isInstancePage()})
 	 */
 	public final Plugin getPlugin() {

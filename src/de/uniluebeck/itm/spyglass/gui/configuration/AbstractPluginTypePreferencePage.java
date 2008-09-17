@@ -34,4 +34,9 @@ public class AbstractPluginTypePreferencePage extends PluginPreferencePage<Plugi
 		return Plugin.class;
 	}
 	
+	@Override
+	public boolean okToLeave() {
+		return true;
+	}
+	
 }

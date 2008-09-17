@@ -80,6 +80,8 @@ public class PositionPacketNodePositionerPreferencePage
 		createOptionsGroup(composite);
 		
 		addDatabinding();
+		// necessary to prevent the change listerner to react on the initialization
+		somethingChanged = false;
 		
 		return composite;
 		
