@@ -33,7 +33,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * @author Sebastian Ebers
  */
 @Root
-public abstract class Plugin implements Runnable {
+public abstract class Plugin implements Runnable, Comparable {
 	
 	/**
 	 * The plug-in's manager (which manages all currently available plug-ins as well)
@@ -352,6 +352,34 @@ public abstract class Plugin implements Runnable {
 	 */
 	@Override
 	public abstract String toString();
+	
+	/**
+	 * Compares the instance names of two plug-ins lexicographically, ignoring case differences.
+	 * This method returns an integer whose sign is that of calling <code>compareTo</code> with
+	 * normalized versions of the strings where case differences have been eliminated by calling
+	 * <code>Character.toLowerCase(Character.toUpperCase(character))</code> on each character.
+	 * <p>
+	 * Note that this method does <em>not</em> take locale into account, and will result in an
+	 * unsatisfactory ordering for certain locales. The java.text package provides
+	 * <em>collators</em> to allow locale-sensitive ordering.
+	 * 
+	 * @param str
+	 *            the <code>String</code> to be compared.
+	 * @return a negative integer, zero, or a positive integer as the specified String is greater
+	 *         than, equal to, or less than this String, ignoring case considerations.
+	 * @see java.text.Collator#compare(String, String)
+	 * @since 1.2
+	 */
+	public int compareTo(final Object o) {
+		
+		if (o instanceof Plugin) {
+			final String s1 = getInstanceName();
+			final String s2 = ((Plugin) o).getInstanceName();
+			final int result = s1.compareToIgnoreCase(s2);
+			return getInstanceName().compareToIgnoreCase(((Plugin) o).getInstanceName());
+		}
+		return 0;
+	}
 	
 	// --------------------------------------------------------------------------------
 	/**

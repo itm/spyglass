@@ -24,6 +24,9 @@ import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -66,6 +69,20 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			super(parentShell, preferenceManager);
 			setShellStyle(SWT.DIALOG_TRIM | SWT.RESIZE | getDefaultOrientation());
 			addPageChangedListener(this);
+		}
+		
+		@Override
+		protected TreeViewer createTreeViewer(final Composite parent) {
+			// TODO Auto-generated method stub
+			final TreeViewer tv = super.createTreeViewer(parent);
+			tv.setComparator(new ViewerComparator() {
+				@Override
+				public int compare(final Viewer v, final Object o1, final Object o2) {
+					return ((PreferenceNode) o1).getLabelText().compareToIgnoreCase(
+							((PreferenceNode) o2).getLabelText());
+				}
+			});
+			return tv;
 		}
 		
 		@Override
@@ -358,7 +375,6 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 		preferenceManager = new PreferenceManager();
 		preferenceDialog = new CustomPreferenceDialog(parentShell, preferenceManager);
-		
 		addPreferenceNodes();
 		
 	}
@@ -706,6 +722,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			final Spyglass sg = new Spyglass(true);
 			final PluginPreferenceDialog inst = new PluginPreferenceDialog(shell, sg);
 			inst.open();
+			
+			System.out.println("1");
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
