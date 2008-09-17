@@ -64,7 +64,7 @@ public class UIController {
 	/**
 	 * This color is used for area outside of the the map
 	 */
-	private final Color canvasOutOfMapColor = new Color(null, 255, 255, 255);
+	private final Color canvasOutOfMapColor = new Color(null, 50, 50, 50);
 	
 	/**
 	 * This color is used as the background color
