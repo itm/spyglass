@@ -55,7 +55,7 @@ public class ConfigStore {
 	}
 	
 	/**
-	 * Listener for changes in the Plugin List
+	 * Listener for changes in the plug-in list
 	 */
 	private final PluginListChangeListener pluginManagerListener = new PluginListChangeListener() {
 		
@@ -65,13 +65,13 @@ public class ConfigStore {
 				case NEW_PLUGIN:
 					p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
 					store();
-					
 					break;
 				case PLUGIN_REMOVED:
 					p.getXMLConfig().removePropertyChangeListener(pluginPropertyListener);
 					store();
-				default:
 					break;
+				default:
+					store();
 			}
 			
 		}

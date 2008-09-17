@@ -143,9 +143,9 @@ public class PluginManager {
 	 * of the plugins that are of a class (or extending a class) contained in the excludes list
 	 * 
 	 * @param checkHierarchy
-	 *            <code>true</code> if the class hierarchy should be checked, such that even plugins
-	 *            derived from a class included in the <code>excludes</code> list will be excluded,
-	 *            <code>false</code> if only plugins of exactly the class contained in
+	 *            <code>true</code> if the class hierarchy should be checked, such that even
+	 *            plugins derived from a class included in the <code>excludes</code> list will be
+	 *            excluded, <code>false</code> if only plugins of exactly the class contained in
 	 *            <code>exclude</code> list shall be excluded
 	 * @param excludes
 	 *            plugin class to exclude from the list
@@ -215,8 +215,10 @@ public class PluginManager {
 		synchronized (plugins) {
 			for (final Plugin p : plugins) {
 				connectPlugin(p);
+				log.debug(p.getInstanceName());
 			}
 		}
+		log.debug("All plug-ins loaded and connected");
 	}
 	
 	/**
@@ -388,6 +390,7 @@ public class PluginManager {
 					+ theOtherPlugin + "\"");
 			
 		}
+		firePluginListChangedEvent(onePlugin, ListChangeEvent.PRIORITY_CHANGED);
 		
 	}
 	
