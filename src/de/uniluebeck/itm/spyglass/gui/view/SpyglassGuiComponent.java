@@ -114,7 +114,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 					canvas1LData.grabExcessHorizontalSpace = true;
 					canvas1LData.verticalAlignment = GridData.FILL;
 					canvas1LData.grabExcessVerticalSpace = true;
-					canvas = new Canvas(composite1, SWT.NONE);
+					canvas = new Canvas(composite1, SWT.DOUBLE_BUFFERED);
 					canvas.setLayoutData(canvas1LData);
 					canvas.setBackground(SWTResourceManager.getColor(255, 255, 255));
 				}
