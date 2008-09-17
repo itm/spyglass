@@ -8,8 +8,9 @@
  */
 package de.uniluebeck.itm.spyglass.core;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Category;
@@ -17,8 +18,8 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.load.Persister;
 
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
-import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXmlConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // ------------------------------------------------------------------------------
@@ -52,6 +53,44 @@ public class ConfigStore {
 	public void finalize() throws Throwable {
 		spyglassConfig = null;
 	}
+	
+	/**
+	 * Listener for changes in the Plugin List
+	 */
+	private final PluginListChangeListener pluginManagerListener = new PluginListChangeListener() {
+		
+		@Override
+		public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
+			switch (what) {
+				case NEW_PLUGIN:
+					p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
+					store();
+					
+					break;
+				case PLUGIN_REMOVED:
+					p.getXMLConfig().removePropertyChangeListener(pluginPropertyListener);
+					store();
+				default:
+					break;
+			}
+			
+		}
+		
+	};
+	
+	/**
+	 * Listener for changes in config of an plugin
+	 */
+	PropertyChangeListener pluginPropertyListener = new PropertyChangeListener() {
+		
+		@Override
+		public void propertyChange(final PropertyChangeEvent evt) {
+			
+			store();
+			
+		}
+		
+	};
 	
 	// --------------------------------------------------------------------------
 	// ------
@@ -111,63 +150,6 @@ public class ConfigStore {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * @param spyglassConfig
-	 *            the spyglassConfig to set
-	 */
-	public void setSpyglassConfig(final SpyglassConfiguration spyglassConfig) {
-		this.spyglassConfig = spyglassConfig;
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * Returns the general settings configuration parameters
-	 * 
-	 * @return the general settings configuration parameters
-	 */
-	public GeneralSettingsXmlConfig readGeneralSettingsConfig() {
-		return spyglassConfig.getGeneralSettings();
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * Returns the configuration parameters of a plug-in
-	 * 
-	 * @param instanceName
-	 *            the plug-in's human readable name
-	 */
-	public PluginXMLConfig readPluginInstanceConfig(final String instanceName) {
-		final List<Plugin> plugins = spyglassConfig.getPluginManager().getPlugins();
-		for (final Plugin plugin : plugins) {
-			if (plugin.getInstanceName().equals(instanceName)) {
-				return plugin.getXMLConfig();
-			}
-		}
-		return null;
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * Returns the configuration parameters of a certain kind of plug-ins
-	 * 
-	 * @param clazz
-	 *            the plug-ins' class
-	 */
-	public List<PluginXMLConfig> readPluginInstanceConfigs(final Class<? extends Plugin> clazz) {
-		final List<Plugin> plugins = spyglassConfig.getPluginManager().getPluginInstances(clazz,
-				false);
-		final List<PluginXMLConfig> configs = new LinkedList<PluginXMLConfig>();
-		for (final Plugin plugin : plugins) {
-			configs.add(plugin.getXMLConfig());
-		}
-		return configs;
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
 	 * Returns the default configuration parameters of a plug-in
 	 * 
 	 * @param clazz
@@ -190,68 +172,6 @@ public class ConfigStore {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * Stores the general settings configuration
-	 * 
-	 * @param config
-	 *            the configuration parameters
-	 */
-	public void storeGeneralSettingsConfig(final GeneralSettingsXmlConfig config) {
-		// TODO: what should this method do?
-		store();
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * Stores the provided configuration parameters of a plug-in persistently.<br>
-	 * The matching plug-in is determined by comparing the provided configuration instance with the
-	 * configuration instance of each plug-in currently administered by the plug-in manager.
-	 * 
-	 * @param config
-	 *            the configuration to be stored
-	 */
-	public void storePluginInstanceConfig(final PluginXMLConfig config) {
-		final List<Plugin> plugins = spyglassConfig.getPluginManager().getPlugins();
-		for (final Plugin plugin : plugins) {
-			final PluginXMLConfig cfg = plugin.getXMLConfig();
-			if ((cfg != null) && config.getClass().equals(cfg.getClass())) { // TODO ????
-				plugin.getXMLConfig().overwriteWith(config);
-				store();
-				return;
-			}
-		}
-		throw new UnsupportedOperationException(
-				"No matching plugin was found! Create a new one first");
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * Stores the provided configuration as default configuration for a plug-in.<br>
-	 * The matching plug-in is determined by comparing the provided configuration's class with the
-	 * configuration classes of each plug-in which configuration parameters are available within the
-	 * configuration file
-	 * 
-	 * @param config
-	 *            the configuration to be stored
-	 */
-	public void storePluginTypeDefaults(final PluginXMLConfig config) {
-		final List<Plugin> plugins = spyglassConfig.getDefaults();
-		for (final Plugin plugin : plugins) {
-			final PluginXMLConfig cfg = plugin.getXMLConfig();
-			if ((cfg != null) && config.getClass().equals(cfg.getClass())) {
-				plugin.getXMLConfig().overwriteWith(config);
-				store();
-				return;
-			}
-		}
-		throw new UnsupportedOperationException(
-				"No matching configuration was found! Create a new one first");
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
 	 * Loads the configuration from a file
 	 * 
 	 * @param configFile
@@ -262,6 +182,17 @@ public class ConfigStore {
 		final SpyglassConfiguration sgc = ConfigStore.loadSpyglassConfig(configFile);
 		if (sgc != null) {
 			spyglassConfig = sgc;
+			
+			spyglassConfig.getPluginManager().addPluginListChangeListener(pluginManagerListener);
+			spyglassConfig.getGeneralSettings().addPropertyChangeListener(pluginPropertyListener);
+			for (final Plugin p : spyglassConfig.getDefaults()) {
+				p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
+			}
+			for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
+				p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
+			}
+			
+			// TODO: for Milestone2: register for events from the PacketReader
 			
 			return true;
 		}
@@ -308,7 +239,7 @@ public class ConfigStore {
 	 * 
 	 * @return <code>true</code> if the configuration was stored successfully
 	 */
-	public boolean store() {
+	private boolean store() {
 		return store(new File(configFilePath));
 	}
 	
@@ -316,6 +247,10 @@ public class ConfigStore {
 	// ------
 	/**
 	 * Stores the configuration persistently into the local file system.
+	 * 
+	 * The given configFile will not be used for subsequent updates. This method is therefor more
+	 * suited for "Exports" of the configuration.
+	 * 
 	 * 
 	 * @param configFile
 	 *            the file which will contain the configuration data afterwards
