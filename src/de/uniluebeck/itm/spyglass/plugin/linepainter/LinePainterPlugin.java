@@ -39,19 +39,19 @@ public class LinePainterPlugin extends RelationPainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> createPreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new LinePainterPreferencePage(dialog, spyglass, this);
 	}
 	
-	public static PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public static PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> createTypePreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new LinePainterPreferencePage(dialog, spyglass);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
 		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<DrawingObject>();
 	}
 	
 	public static String getHumanReadableName() {

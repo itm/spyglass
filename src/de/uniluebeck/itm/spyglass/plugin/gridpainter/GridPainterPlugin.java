@@ -8,6 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.gridpainter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.simpleframework.xml.Element;
@@ -41,19 +42,18 @@ public class GridPainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createPreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new GridPainterPreferencePage(dialog, spyglass, this);
 	}
 	
-	public static PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public static PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createTypePreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new GridPainterPreferencePage(dialog, spyglass);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<DrawingObject>();
 	}
 	
 	public static String getHumanReadableName() {

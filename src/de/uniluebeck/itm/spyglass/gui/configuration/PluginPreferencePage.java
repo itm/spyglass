@@ -23,6 +23,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -261,6 +263,10 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	
 	@Override
 	protected Composite createContents(final Composite parent) {
+		return createContentsInternal(parent);
+	}
+	
+	private Composite createContentsInternal(final Composite parent) {
 		final Composite composite = createComposite(parent);
 		
 		if (this.config == null) {
@@ -279,7 +285,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 				.getPluginManager(), this.isInstancePage());
 		
 		return composite;
-		
 	}
 	
 	/**
@@ -512,8 +517,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		final Composite c = new Composite(parent, SWT.NONE);
 		c.setLayout(new GridLayout(1, true));
 		final GridData gridData = new GridData(SWT.LEFT, SWT.TOP, true, true);
-		gridData.horizontalSpan = 80;
-		gridData.verticalSpan = 80;
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.verticalAlignment = GridData.FILL;
 		c.setLayoutData(gridData);
 		return c;
 	}
@@ -543,6 +548,30 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	@Override
 	public boolean okToLeave() {
 		return databindingValidationIsOK;
+	}
+	
+	public Composite createMS2Warning(final Composite parent) {
+		
+		final Composite composite = createContentsInternal(parent);
+		
+		final GridData groupData = new GridData(SWT.TOP, SWT.LEFT, true, true);
+		groupData.horizontalAlignment = GridData.FILL;
+		groupData.verticalAlignment = GridData.FILL;
+		final Group group = new Group(composite, SWT.NONE);
+		group.setLayoutData(groupData);
+		group.setLayout(new GridLayout());
+		group.setText("More information");
+		
+		final GridData labelData = new GridData();
+		labelData.verticalAlignment = SWT.TOP;
+		labelData.horizontalAlignment = SWT.LEFT;
+		final Label label = new Label(group, SWT.NONE);
+		label.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
+		label.setText("This plugin is to be implemented for Milestone 2 and is not yet working.");
+		label.setLayoutData(labelData);
+		
+		return parent;
+		
 	}
 	
 }

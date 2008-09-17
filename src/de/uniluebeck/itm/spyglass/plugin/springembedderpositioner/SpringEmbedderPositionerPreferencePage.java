@@ -7,20 +7,22 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
-public class SpringEmbedderPositionerPreferencePage extends PluginPreferencePage<SpringEmbedderPositionerPlugin, SpringEmbedderPositionerXMLConfig> {
+public class SpringEmbedderPositionerPreferencePage extends
+		PluginPreferencePage<SpringEmbedderPositionerPlugin, SpringEmbedderPositionerXMLConfig> {
 	
-	public SpringEmbedderPositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+	public SpringEmbedderPositionerPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
 	}
 	
-	public SpringEmbedderPositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,
-			final SpringEmbedderPositionerPlugin plugin) {
+	public SpringEmbedderPositionerPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass, final SpringEmbedderPositionerPlugin plugin) {
 		super(dialog, spyglass, plugin, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
 	}
 	
 	@Override
 	protected Composite createContents(final Composite parent) {
-		return super.createContents(parent); // TODO: plugin-specific options
+		return super.createMS2Warning(parent); // TODO: plugin-specific options
 	}
 	
 	@Override

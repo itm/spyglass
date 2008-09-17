@@ -7,20 +7,22 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
-public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> {
+public class SimpleGlobalInformationPreferencePage extends
+		PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> {
 	
-	public SimpleGlobalInformationPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+	public SimpleGlobalInformationPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL);
 	}
 	
-	public SimpleGlobalInformationPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,
-			final SimpleGlobalInformationPlugin plugin) {
+	public SimpleGlobalInformationPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass, final SimpleGlobalInformationPlugin plugin) {
 		super(dialog, spyglass, plugin, BasicOptions.ALL);
 	}
 	
 	@Override
 	protected Composite createContents(final Composite parent) {
-		return super.createContents(parent); // TODO: plugin-specific options
+		return super.createMS2Warning(parent); // TODO: plugin-specific options
 	}
 	
 	@Override

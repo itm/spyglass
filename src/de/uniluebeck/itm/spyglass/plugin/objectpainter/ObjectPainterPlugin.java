@@ -43,19 +43,19 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	}
 	
 	@Override
-	public PluginPreferencePage<ObjectPainterPlugin, ObjectPainterXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public PluginPreferencePage<ObjectPainterPlugin, ObjectPainterXMLConfig> createPreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new ObjectPainterPreferencePage(dialog, spyglass, this);
 	}
 	
-	public static PluginPreferencePage<ObjectPainterPlugin, ObjectPainterXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public static PluginPreferencePage<ObjectPainterPlugin, ObjectPainterXMLConfig> createTypePreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new ObjectPainterPreferencePage(dialog, spyglass);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
 		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<DrawingObject>();
 	}
 	
 	public static String getHumanReadableName() {

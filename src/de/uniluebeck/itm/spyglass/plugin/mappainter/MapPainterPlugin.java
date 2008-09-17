@@ -42,19 +42,19 @@ public class MapPainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> createPreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new MapPainterPreferencePage(dialog, spyglass, this);
 	}
 	
-	public static PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public static PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> createTypePreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new MapPainterPreferencePage(dialog, spyglass);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
 		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<DrawingObject>();
 	}
 	
 	public static String getHumanReadableName() {

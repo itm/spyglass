@@ -50,7 +50,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
 		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<DrawingObject>();
 	}
 	
 	public static String getHumanReadableName() {

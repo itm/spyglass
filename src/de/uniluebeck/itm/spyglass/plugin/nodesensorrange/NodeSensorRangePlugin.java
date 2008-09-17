@@ -38,19 +38,19 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
-	public PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> createPreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new NodeSensorRangePreferencePage(dialog, spyglass, this);
 	}
 	
-	public static PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public static PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> createTypePreferencePage(
+			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new NodeSensorRangePreferencePage(dialog, spyglass);
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
 		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<DrawingObject>();
 	}
 	
 	public static String getHumanReadableName() {
