@@ -531,7 +531,7 @@ public class QuadTree implements Layer {
 	@Override
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle rect) {
 		final List<DrawingObject> list = getCollisionEntities(rect);
-		Collections.sort(getCollisionEntities(rect), sorter);
+		Collections.sort(list, sorter);
 		return list;
 	}
 	

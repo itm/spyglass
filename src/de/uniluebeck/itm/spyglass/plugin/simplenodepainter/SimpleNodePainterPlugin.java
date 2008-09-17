@@ -8,8 +8,6 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -42,11 +40,11 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * The nodes can be visualized in two way's according to the amount of information the user wants to
  * see.
  * <ul>
- * <li>In the <tt>non-extended mode</tt>, the nodes are represented by rectangles which only
- * contain the node's identifier.</li>
- * <li>In the <tt>extended mode</tt> the nodes are again represented by rectangles which contain
- * the node's identifier. But additionally, further information which are extracted from the packets
- * of certain semantic types are displayed, too.</li>
+ * <li>In the <tt>non-extended mode</tt>, the nodes are represented by rectangles which only contain
+ * the node's identifier.</li>
+ * <li>In the <tt>extended mode</tt> the nodes are again represented by rectangles which contain the
+ * node's identifier. But additionally, further information which are extracted from the packets of
+ * certain semantic types are displayed, too.</li>
  * </ul>
  * 
  * @author Sebastian Ebers
@@ -359,13 +357,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final List<DrawingObject> dos = new LinkedList<DrawingObject>(layer
 				.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle()));
 		
-		// order the elements oppositional to the paint order
-		Collections.sort(dos, new Comparator<DrawingObject>() {
-			public int compare(final DrawingObject o1, final DrawingObject o2) {
-				return (int) (o2.getPaintOrderId() - o1.getPaintOrderId());
-			}
-		});
-		
 		final Point clickPoint = new Point(e.x, e.y);
 		
 		// if the mouse event was a (left) double click
@@ -394,8 +385,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Handles a mouse click event which was actually a double click returns <code>true</code> if
-	 * a drawing object was found which bounding box contains the point clicked by the user.
+	 * Handles a mouse click event which was actually a double click returns <code>true</code> if a
+	 * drawing object was found which bounding box contains the point clicked by the user.
 	 * 
 	 * @param drawingObjects
 	 *            the plug-in's drawing objects

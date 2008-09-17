@@ -253,4 +253,9 @@ public class NodeObject extends DrawingObject {
 		return boundingBox;
 	}
 	
+	@Override
+	public String toString() {
+		return "[Node " + nodeID + "]";
+	}
+	
 }

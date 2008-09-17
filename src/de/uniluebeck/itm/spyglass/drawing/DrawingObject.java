@@ -192,14 +192,6 @@ public abstract class DrawingObject {
 		return buff.toString();
 	}
 	
-	public long getPaintOrderId() {
-		return paintOrderId;
-	}
-	
-	public void setPaintOrderId(final long paintOrderId) {
-		this.paintOrderId = paintOrderId;
-	}
-	
 	public int getBgColorR() {
 		return bgColorR;
 	}
