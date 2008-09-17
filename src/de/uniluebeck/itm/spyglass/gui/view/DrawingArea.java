@@ -218,8 +218,8 @@ public class DrawingArea {
 		absRect.setUpperLeft(upperLeftAbs);
 		
 		final PixelPosition lowerRight = new PixelPosition();
-		lowerRight.x = rect.getUpperLeft().x + rect.getWidth();
-		lowerRight.y = rect.getUpperLeft().y + rect.getHeight();
+		lowerRight.x = rect.getUpperLeft().x + rect.getHeight();
+		lowerRight.y = rect.getUpperLeft().y + rect.getWidth();
 		final AbsolutePosition lowerRightAbs = this.pixelPoint2AbsPoint(lowerRight);
 		
 		absRect.setWidth(Math.abs(lowerRightAbs.x - upperLeftAbs.x));

@@ -104,7 +104,7 @@ public class SubLayer implements Layer {
 		int pos = 0;
 		for (final DrawingObject drawingObject : dos) {
 			
-			// if the current drawing object is not the one which is to be
+			// if the current drawing object is NOT the one which is to be
 			// brought to the front ...
 			if (!drawingObject.equals(object)) {
 				// ... "normalize" it's position parameter
