@@ -126,11 +126,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	protected DataBindingContext dbc = null;
 	
 	/**
-	 * are there errors present in the form?
-	 */
-	private boolean databindingValidationIsOK;
-	
-	/**
 	 * reference to the dialog
 	 */
 	private final PluginPreferenceDialog dialog;
@@ -140,6 +135,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 */
 	private Image image;
 	
+	final PropertyChangeListener propertyChangeListener;
+
 	private class Buttons {
 		
 		private Button restoreButton;
@@ -218,8 +215,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		
 	}
 	
-	final PropertyChangeListener propertyChangeListener;
-	
 	@Override
 	protected void contributeButtons(final Composite parent) {
 		
@@ -234,8 +229,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			buttons.restoreButton = createButton(parent, "Restore Values", buttonSelectionListener);
 			buttons.applyButton = createButton(parent, "Apply", buttonSelectionListener);
 			
-			if (containsErrors()) {
-				buttons.applyButton.setEnabled(false);
+			if (!this.isValid()) {
+				buttons.saveAsDefaultButton.setEnabled(false);
 			}
 			
 		} else {
@@ -247,10 +242,10 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			buttons.createInstanceButton = createButton(parent, "Create Instance",
 					buttonSelectionListener);
 			
-			if (containsErrors()) {
+			if (!this.isValid()) {
 				buttons.saveAsDefaultButton.setEnabled(false);
 			}
-			if (containsErrors()) {
+			if (!this.isValid()) {
 				buttons.createInstanceButton.setEnabled(false);
 			}
 		}
@@ -303,7 +298,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			public void handleValueChange(final ValueChangeEvent event) {
 				final Status valStatus = (Status) aggregateStatus.getValue();
 				
-				databindingValidationIsOK = valStatus.isOK();
+				setValid(valStatus.isOK());
 				
 				if (valStatus.isOK()) {
 					setErrorMessage(null);
@@ -369,17 +364,13 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	@Override
 	public final void performApply() {
 		log.info("Pressed button Apply");
-		if (containsErrors()) {
+		if (!this.isValid()) {
 			MessageDialog.openError(this.getShell(), "Can not store changes",
 					"Could not store your changes. There are still errors remaining in the form.");
 		} else {
 			this.storeToModel();
 		}
 		
-	}
-	
-	private boolean containsErrors() {
-		return !this.databindingValidationIsOK;
 	}
 	
 	/**
@@ -417,7 +408,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		// First save data.
 		this.performApply();
 		
-		if (containsErrors()) {
+		if (!this.isValid()) {
 			MessageDialog.openError(this.getShell(), "Can not store changes",
 					"Could not store your changes. There are still errors remaining in the form.");
 		} else {
@@ -543,11 +534,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	@Override
 	public Image getImage() {
 		return image;
-	}
-	
-	@Override
-	public boolean okToLeave() {
-		return databindingValidationIsOK;
 	}
 	
 	public Composite createMS2Warning(final Composite parent) {
