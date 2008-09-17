@@ -51,13 +51,25 @@ public class QuadTree implements Layer {
 	
 	private DrawingObjectComparator sorter = new DrawingObjectComparator();
 	
+	private static final int UPPER_LEFT_X = -((int) Math.pow(2, 15));
+	
+	private static final int UPPER_LEFT_Y = -((int) Math.pow(2, 15));
+	
+	private static final int WIDTH = 2 * ((int) Math.pow(2, 15));
+	
+	private static final int HEIGHT = 2 * ((int) Math.pow(2, 15));
+	
+	public QuadTree() {
+		this(new AbsoluteRectangle(UPPER_LEFT_X, UPPER_LEFT_Y, WIDTH, HEIGHT));
+	}
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param parent
 	 * @param box
 	 * @param position
 	 */
-	public QuadTree(final QuadTree parent, final AbsoluteRectangle box) {
+	QuadTree(final QuadTree parent, final AbsoluteRectangle box) {
 		this.root = parent.root;
 		this.parent = parent;
 		this.box = box;
@@ -68,7 +80,7 @@ public class QuadTree implements Layer {
 	 * @param box
 	 * @param position
 	 */
-	public QuadTree(final AbsoluteRectangle box) {
+	QuadTree(final AbsoluteRectangle box) {
 		this.root = this;
 		this.box = box;
 		this.insertionOrder = new HashMap<DrawingObject, Long>();

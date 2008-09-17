@@ -244,6 +244,12 @@ public class NodeObject extends DrawingObject {
 	
 	@Override
 	public AbsoluteRectangle calculateBoundingBox() {
+		if (boundingBox == null) {
+			// temporary bugfix, used since draw() was
+			// not yet called when this method is here
+			// is called the first time
+			return new AbsoluteRectangle(getPosition(), 1, 1);
+		}
 		return boundingBox;
 	}
 	

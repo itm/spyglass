@@ -27,8 +27,8 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
-import de.uniluebeck.itm.spyglass.layer.SubLayer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.nodepainter.NodePainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
@@ -81,7 +81,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	public SimpleNodePainterPlugin() {
 		super();
 		xmlConfig = new SimpleNodePainterXMLConfig();
-		layer = new SubLayer();
+		layer = new QuadTree();
 		updatedObjects = new LinkedList<DrawingObject>();
 		stringFormatterResults = new TreeMap<Integer, String>();
 	}

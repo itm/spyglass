@@ -9,6 +9,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collection;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.eclipse.swt.graphics.Point;
 import org.junit.After;
 import org.junit.Before;
@@ -474,6 +476,38 @@ public class QuadTreeTest {
 		assertTrue(list.contains(rectangle2));
 		assertTrue(list.contains(rectangle3));
 		assertTrue(list.contains(rectangle4));
+		
+	}
+	
+	@Test
+	public void zoomingTest() {
+		
+		final QuadTree tree = new QuadTree();
+		
+		final Rectangle r = new Rectangle();
+		r.setPosition(new AbsolutePosition(0, 0, 0));
+		r.setWidth(1);
+		r.setHeight(1);
+		
+		tree.addOrUpdate(r);
+		
+		final AbsoluteRectangle rect = new AbsoluteRectangle();
+		boolean failed = false;
+		final int max = (int) (Math.pow(2, 15));
+		for (int i = 1; i < max; i++) {
+			
+			rect.setSize(2 * i, 2 * i);
+			rect.setUpperLeft(new AbsolutePosition(-1 * i, -1 * i, 0));
+			
+			if (!tree.getDrawingObjects(rect).contains(r)) {
+				failed = true;
+				System.out.println("Failed at " + rect);
+			}
+			
+		}
+		if (failed) {
+			Assert.fail();
+		}
 		
 	}
 	
