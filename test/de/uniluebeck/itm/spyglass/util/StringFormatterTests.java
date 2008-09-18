@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
-import de.uniluebeck.itm.spyglass.util.StringFormatter;
 
 /**
  * Some Testcases for the StringFormatter
@@ -65,6 +64,7 @@ public class StringFormatterTests {
 	private void testString(final String fmt, final SpyglassPacket p, final String res) {
 		final StringFormatter f = new StringFormatter(fmt);
 		final String r = f.parse(p);
+		System.out.println("Ergebnis: " + r);
 		assertEquals(res, r);
 		assertEquals(fmt, f.getOrigExpression());
 		
@@ -234,37 +234,37 @@ public class StringFormatterTests {
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4a() {
-		testString("a: %f3\n", packet4, "a:  9.380918E-8\n");
+		testString("a: %f4\n", packet4, "a:  9.380918E-8\n");
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4NaN() {
-		testString("a: %f7", packet4, "a: " + Float.NaN);
+		testString("a: %f8", packet4, "a: " + Float.NaN);
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4MinInf() {
-		testString("a: %f11", packet4, "a: " + Float.NEGATIVE_INFINITY);
+		testString("a: %f12", packet4, "a: " + Float.NEGATIVE_INFINITY);
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4MaxInf() {
-		testString("a: %f15", packet4, "a: " + Float.POSITIVE_INFINITY);
+		testString("a: %f16", packet4, "a: " + Float.POSITIVE_INFINITY);
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4MinValue() {
-		testString("a: %f19", packet4, "a: " + Float.MIN_VALUE);
+		testString("a: %f20", packet4, "a: " + Float.MIN_VALUE);
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4MaxValue() {
-		testString("a: %f23", packet4, "a: " + Float.MAX_VALUE);
+		testString("a: %f24", packet4, "a: " + Float.MAX_VALUE);
 	}
 	
 }
