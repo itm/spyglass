@@ -274,7 +274,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				for (final String str : stringFormatterResults.values()) {
 					stringFormatterResult.append(str);
 				}
-				
+				System.out.println(xmlConfig.isExtendedInformationActive(nodeID));
 				nodeObject.update("Node " + nodeID, stringFormatterResult.toString(), xmlConfig
 						.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(),
 						xmlConfig.getLineWidth());
@@ -418,6 +418,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					// if so, toggle its extension state
 					final NodeObject no = (NodeObject) drawingObject;
 					no.setExtended(!no.isExtended());
+					xmlConfig.setExtendenInformationActive(no.getNodeID(), no.isExtended());
 				}
 				return true;
 			}

@@ -58,6 +58,9 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * Returns if a node's the extended information is to be shown
 	 * 
+	 * @param nodeID
+	 *            the node's identifier
+	 * 
 	 * @return <code>true</code> if a node's the extended information is to be shown
 	 */
 	public boolean isExtendedInformationActive(final int nodeID) {
@@ -65,6 +68,19 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		
 		// if there is no entry for a certain node in the map, yet, use the default behavior
 		return (isActive != null) ? isActive : isExtendedDefaultValue;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets if a node's the extended information is to be shown
+	 * 
+	 * @param nodeID
+	 *            the node's identifier
+	 * @param isExtendendActive
+	 *            if <code>true</code> the node's the extended information is to be shown
+	 */
+	public void setExtendenInformationActive(final int nodeID, final boolean isExtendendActive) {
+		isExtendenInformationActive.put(nodeID, isExtendendActive);
 	}
 	
 	// --------------------------------------------------------------------------------
