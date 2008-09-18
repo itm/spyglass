@@ -173,6 +173,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			}
 		} catch (final IllegalArgumentException e) {
 			log.error(e);
+		} catch (final Exception e) {
+			log
+					.error(
+							"An error occured while processing a packet's contents using a StringFormatter",
+							e);
 		}
 		if (needsUpdate) {
 			
