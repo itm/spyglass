@@ -39,12 +39,12 @@ public class StringFormatterTests {
 		buf.order(ByteOrder.BIG_ENDIAN);
 		
 		buf.putFloat((float) 14.7); // 0
-		buf.putFloat((float) 9.380918E-8); // 3
-		buf.putFloat(Float.NaN); // 7
-		buf.putFloat(Float.NEGATIVE_INFINITY); // 11
-		buf.putFloat(Float.POSITIVE_INFINITY); // 15
-		buf.putFloat(Float.MIN_VALUE); // 19
-		buf.putFloat(Float.MAX_VALUE); // 23
+		buf.putFloat((float) 9.380918E-8); // 4
+		buf.putFloat(Float.NaN); // 8
+		buf.putFloat(Float.NEGATIVE_INFINITY); // 12
+		buf.putFloat(Float.POSITIVE_INFINITY); // 16
+		buf.putFloat(Float.MIN_VALUE); // 20
+		buf.putFloat(Float.MAX_VALUE); // 24
 		
 		packet4 = new SpyglassPacket();
 		packet4.setContent(buf.array());
