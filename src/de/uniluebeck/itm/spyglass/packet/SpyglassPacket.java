@@ -89,6 +89,12 @@ public class SpyglassPacket extends Packet {
 		final int z = deserializeInt16(buf[17], buf[18]);
 		this.position = new AbsolutePosition(x, y, z);
 		
+		// copy the packets payload (starts at buf[19]) as content
+		// if (length > 17) {
+		// final byte[] tmpContent = new byte[length - 17];
+		// System.arraycopy(buf, 19, tmpContent, 0, length - 17);
+		// setContent(tmpContent);
+		// }
 	}
 	
 	/**
@@ -166,8 +172,8 @@ public class SpyglassPacket extends Packet {
 	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 */
-	protected long deserializeInt64(final byte b0, final byte b1, final byte b2, final byte b3, final byte b4, final byte b5, final byte b6,
-			final byte b7) {
+	protected long deserializeInt64(final byte b0, final byte b1, final byte b2, final byte b3,
+			final byte b4, final byte b5, final byte b6, final byte b7) {
 		final long i0 = b0;
 		final long i1 = (b1 & 0xFF);
 		final long i2 = (b2 & 0xFF);
@@ -177,7 +183,8 @@ public class SpyglassPacket extends Packet {
 		final long i6 = (b6 & 0xFF);
 		final long i7 = (b7 & 0xFF);
 		// Masked because a byte is signed in Java.
-		final long ret = (i7 | (i6 << 8) | (i5 << 16) | (i4 << 24) | (i3 << 32) | (i2 << 40) | (i1 << 48) | (i0 << 56));
+		final long ret = (i7 | (i6 << 8) | (i5 << 16) | (i4 << 24) | (i3 << 32) | (i2 << 40)
+				| (i1 << 48) | (i0 << 56));
 		return ret;
 	}
 	
@@ -202,8 +209,9 @@ public class SpyglassPacket extends Packet {
 	 */
 	@Override
 	public String toString() {
-		return "length:" + length + ", syntax_type:" + syntax_type + ", semantic_type:" + semantic_type + ", sender_id:" + sender_id + ",time: "
-				+ time.toString() + ", Position:" + position;
+		return "length:" + length + ", syntax_type:" + syntax_type + ", semantic_type:"
+				+ semantic_type + ", sender_id:" + sender_id + ",time: " + time.toString()
+				+ ", Position:" + position;
 	}
 	
 	/**
