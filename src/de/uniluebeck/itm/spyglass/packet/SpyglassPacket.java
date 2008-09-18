@@ -90,11 +90,11 @@ public class SpyglassPacket extends Packet {
 		this.position = new AbsolutePosition(x, y, z);
 		
 		// copy the packets payload (starts at buf[19]) as content
-		// if (length > 17) {
-		// final byte[] tmpContent = new byte[length - 17];
-		// System.arraycopy(buf, 19, tmpContent, 0, length - 17);
-		// setContent(tmpContent);
-		// }
+		if (length > 17) {
+			final byte[] tmpContent = new byte[length - 17];
+			System.arraycopy(buf, 19, tmpContent, 0, length - 17);
+			setContent(tmpContent);
+		}
 	}
 	
 	/**
