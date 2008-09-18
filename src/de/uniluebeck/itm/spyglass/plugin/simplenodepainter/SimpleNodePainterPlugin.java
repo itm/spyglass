@@ -140,6 +140,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		
 		final int nodeID = packet.getSender_id();
 		boolean needsUpdate = false;
+		boolean updateAllNodes = false;
 		
 		// get the absolute position of the node which sent the packet
 		final AbsolutePosition position = getPluginManager().getNodePositioner()
@@ -168,7 +169,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				final String str = sf.parse(packet);
 				if (!str.equals(stringFormatterResults.get(packetSemanticType))) {
 					stringFormatterResults.put(packetSemanticType, str);
-					needsUpdate = true;
+					// if the string formatter results changed, all nodes have to be updated
+					updateAllNodes = true;
 				}
 			}
 		} catch (final IllegalArgumentException e) {
@@ -179,7 +181,12 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 							"An error occured while processing a packet's contents using a StringFormatter",
 							e);
 		}
-		if (needsUpdate) {
+		
+		if (updateAllNodes) {
+			synchronized (updatedObjects) {
+				updatedObjects.addAll(drawingObjects);
+			}
+		} else if (needsUpdate) {
 			
 			// add the object to the one which have to be (re)drawn ...
 			synchronized (updatedObjects) {
