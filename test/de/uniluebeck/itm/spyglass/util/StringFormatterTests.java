@@ -234,7 +234,7 @@ public class StringFormatterTests {
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4a() {
-		testString("a: %f4\n", packet4, "a:  9.380918E-8\n");
+		testString("a: %f4", packet4, "a: 9.380918E-8");
 	}
 	
 	// signed test - 16 bit
