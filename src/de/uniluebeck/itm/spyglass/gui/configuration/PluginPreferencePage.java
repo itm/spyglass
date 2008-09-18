@@ -136,7 +136,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	private Image image;
 	
 	final PropertyChangeListener propertyChangeListener;
-
+	
 	private class Buttons {
 		
 		private Button restoreButton;
@@ -230,7 +230,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			buttons.applyButton = createButton(parent, "Apply", buttonSelectionListener);
 			
 			if (!this.isValid()) {
-				buttons.saveAsDefaultButton.setEnabled(false);
+				buttons.applyButton.setEnabled(false);
 			}
 			
 		} else {
@@ -477,8 +477,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Returns the <code>Plugin</code> instance associated with this page.
 	 * 
-	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a
-	 *         type page (i.e. not an instance page, also see
+	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a type
+	 *         page (i.e. not an instance page, also see
 	 *         {@link PluginPreferencePage#isInstancePage()})
 	 */
 	public final Plugin getPlugin() {
