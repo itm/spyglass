@@ -28,7 +28,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	
-	@ElementMap(entry = "isActive", key = "nodeID", attribute = true, name = "extendedInformation")
+	@ElementMap(entry = "isActive", key = "nodeID", attribute = true, name = "extendedInformation", required = false)
 	private HashMap<Integer, Boolean> isExtendenInformationActive = new HashMap<Integer, Boolean>();
 	
 	@Element(name = "isExtendedDefaultValue")

@@ -28,9 +28,9 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * Spyglass is an application for visualizing network packets coming from an arbitrary source,
  * defined by a gateway instance. This class is the core of the Spyglass program. It reads the XML
  * configuration, instantiate objects, injects dependencies and handles the PacketReader and
- * Visualization threads. After instantiating of this class, call the <code>start()</code> method to
- * start the visualization. An arbitrary GUI can be used with Spyglass, since the visualization is
- * handled by a SpyglassCanvas, which can be easily adopted to other GUI libraries. Use the
+ * Visualization threads. After instantiating of this class, call the <code>start()</code> method
+ * to start the visualization. An arbitrary GUI can be used with Spyglass, since the visualization
+ * is handled by a SpyglassCanvas, which can be easily adopted to other GUI libraries. Use the
  * <code>addSpyglassListener(...)</code> method to get informed when a redraw of the scene is
  * needed.
  */
@@ -149,6 +149,7 @@ public class Spyglass {
 	
 	public void shutdown() {
 		setVisualizationRunning(false);
+		configStore.store();
 		log.info("All plugin-threads stopped");
 	}
 	

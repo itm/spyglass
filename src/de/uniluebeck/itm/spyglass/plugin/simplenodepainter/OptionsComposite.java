@@ -227,7 +227,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 					final GridData showExtInfLData = new GridData();
 					showExtInfLData.horizontalSpan = 3;
 					showExtInf.setLayoutData(showExtInfLData);
-					showExtInf.setText("Show extended information");
+					showExtInf.setText("Show extended information by default");
 					showExtInf.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(final SelectionEvent evt) {

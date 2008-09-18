@@ -208,7 +208,11 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	 */
 	@Override
 	public void shutdown() {
-		spyglass.shutdown();
+		
+		// if SpyGlass was not started correctly it migt still be null
+		if (spyglass != null) {
+			spyglass.shutdown();
+		}
 		
 		spyglass = null;
 		container = null;

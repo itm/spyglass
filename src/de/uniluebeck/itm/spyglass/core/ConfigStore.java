@@ -14,6 +14,8 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.log4j.Category;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.load.Persister;
 
@@ -226,6 +228,9 @@ public class ConfigStore {
 			return config;
 			
 		} catch (final Exception e) {
+			MessageDialog.openError(Display.getDefault().getActiveShell(),
+					"Unable to load the SpyGlass configuration", "The configuration file '"
+							+ configFile.getName() + "' is invalid!\r\n" + e.getLocalizedMessage());
 			log.error("Unable to load configuration input: " + e, e);
 			return null;
 		}
@@ -239,7 +244,7 @@ public class ConfigStore {
 	 * 
 	 * @return <code>true</code> if the configuration was stored successfully
 	 */
-	private boolean store() {
+	public boolean store() {
 		return store(new File(configFilePath));
 	}
 	
