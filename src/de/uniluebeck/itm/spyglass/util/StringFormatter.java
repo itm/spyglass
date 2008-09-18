@@ -129,6 +129,8 @@ public class StringFormatter {
 						result += bb.getShort(0);
 					} catch (final ArrayIndexOutOfBoundsException e) {
 						result += "<packet to short>";
+					} catch (final NullPointerException e) {
+						result += "<packet without payload>";
 					}
 					break;
 				
@@ -148,6 +150,8 @@ public class StringFormatter {
 						result += bb.getLong(0);
 					} catch (final ArrayIndexOutOfBoundsException e) {
 						result += "<packet to short>";
+					} catch (final NullPointerException e) {
+						result += "<packet without payload>";
 					}
 					break;
 				
@@ -162,6 +166,8 @@ public class StringFormatter {
 						result += bb.getShort(0);
 					} catch (final ArrayIndexOutOfBoundsException e) {
 						result += "<packet to short>";
+					} catch (final NullPointerException e) {
+						result += "<packet without payload>";
 					}
 					break;
 				
@@ -178,6 +184,8 @@ public class StringFormatter {
 						result += bb.getFloat(0);
 					} catch (final ArrayIndexOutOfBoundsException e) {
 						result += "<packet to short>";
+					} catch (final NullPointerException e) {
+						result += "<packet without payload>";
 					}
 					break;
 			}
