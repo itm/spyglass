@@ -748,7 +748,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 					.getSelectedPage();
 			if ((selectedPage != null)
 					&& (selectedPage instanceof PluginPreferencePage)
-					&& MessageDialog.openConfirm(preferenceDialog.getShell(), "Unsaved changes",
+					&& MessageDialog.openQuestion(preferenceDialog.getShell(), "Unsaved changes",
 							message)) {
 				((PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig>) selectedPage)
 						.performApply();
