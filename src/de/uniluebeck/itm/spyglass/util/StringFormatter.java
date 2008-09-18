@@ -70,7 +70,7 @@ public class StringFormatter {
 		if (pFormatExpression.matches(".*%[^uUif%].*")
 				|| pFormatExpression.matches(".*%[uUif][^0-9].*")
 				|| pFormatExpression.matches(".*%") || pFormatExpression.matches(".*%[uUif]")) {
-			final String msg = "StringFormatterExpression is invalid";
+			final String msg = "StringFormatterExpression '" + pFormatExpression + "' is invalid";
 			throw new IllegalArgumentException(msg);
 		}
 		

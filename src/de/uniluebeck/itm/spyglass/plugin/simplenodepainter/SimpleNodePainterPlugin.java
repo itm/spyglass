@@ -40,11 +40,11 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * The nodes can be visualized in two way's according to the amount of information the user wants to
  * see.
  * <ul>
- * <li>In the <tt>non-extended mode</tt>, the nodes are represented by rectangles which only contain
- * the node's identifier.</li>
- * <li>In the <tt>extended mode</tt> the nodes are again represented by rectangles which contain the
- * node's identifier. But additionally, further information which are extracted from the packets of
- * certain semantic types are displayed, too.</li>
+ * <li>In the <tt>non-extended mode</tt>, the nodes are represented by rectangles which only
+ * contain the node's identifier.</li>
+ * <li>In the <tt>extended mode</tt> the nodes are again represented by rectangles which contain
+ * the node's identifier. But additionally, further information which are extracted from the packets
+ * of certain semantic types are displayed, too.</li>
  * </ul>
  * 
  * @author Sebastian Ebers
@@ -162,16 +162,18 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 		
 		final int packetSemanticType = packet.getSemantic_type();
-		
-		final StringFormatter sf = xmlConfig.getStringFormatter(packetSemanticType);
-		if (sf != null) {
-			final String str = sf.parse(packet);
-			if (str.equals(stringFormatterResults.get(packetSemanticType))) {
-				stringFormatterResults.put(packetSemanticType, str);
-				needsUpdate = true;
+		try {
+			final StringFormatter sf = xmlConfig.getStringFormatter(packetSemanticType);
+			if (sf != null) {
+				final String str = sf.parse(packet);
+				if (!str.equals(stringFormatterResults.get(packetSemanticType))) {
+					stringFormatterResults.put(packetSemanticType, str);
+					needsUpdate = true;
+				}
 			}
+		} catch (final IllegalArgumentException e) {
+			log.error(e);
 		}
-		
 		if (needsUpdate) {
 			
 			// add the object to the one which have to be (re)drawn ...
@@ -385,8 +387,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Handles a mouse click event which was actually a double click returns <code>true</code> if a
-	 * drawing object was found which bounding box contains the point clicked by the user.
+	 * Handles a mouse click event which was actually a double click returns <code>true</code> if
+	 * a drawing object was found which bounding box contains the point clicked by the user.
 	 * 
 	 * @param drawingObjects
 	 *            the plug-in's drawing objects

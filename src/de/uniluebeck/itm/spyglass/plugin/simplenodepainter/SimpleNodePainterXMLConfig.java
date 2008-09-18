@@ -133,8 +133,6 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	 *         matching object was created previously and the default expression is undefined.
 	 */
 	public StringFormatter getStringFormatter(final int semanticType) {
-		// TODO: SE - get all string formatters for complete information ????
-		// or better save HashMap of semantic types and strings
 		if (stringFormatters.containsKey(semanticType)) {
 			return new StringFormatter(stringFormatters.get(semanticType));
 		} else if (defaultStringFormatter != null) {
