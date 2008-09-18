@@ -1,5 +1,6 @@
 package de.uniluebeck.itm.spyglass.positions;
 
+import org.eclipse.swt.graphics.Rectangle;
 import org.simpleframework.xml.Element;
 
 /**
@@ -61,5 +62,9 @@ public class PixelRectangle extends AbstractRectangle {
 		final PixelRectangle ret = new PixelRectangle();
 		ret.rectangle = this.rectangle.union(other.rectangle);
 		return ret;
+	}
+	
+	public Rectangle toSWTRectangle() {
+		return rectangle;
 	}
 }

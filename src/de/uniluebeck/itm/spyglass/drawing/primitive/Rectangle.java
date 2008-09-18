@@ -148,7 +148,7 @@ public class Rectangle extends DrawingObject {
 	}
 	
 	@Override
-	public AbsoluteRectangle calculateBoundingBox() {
+	public AbsoluteRectangle getBoundingBox() {
 		return new AbsoluteRectangle(getPosition(), width, height);
 	}
 	

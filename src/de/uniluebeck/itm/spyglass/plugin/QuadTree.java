@@ -311,7 +311,7 @@ public class QuadTree implements Layer {
 	}
 	
 	private boolean insertInternal(final DrawingObject object, final boolean updateInsertionTime) {
-		final AbsoluteRectangle bbox = object.calculateBoundingBox();
+		final AbsoluteRectangle bbox = object.getBoundingBox();
 		// search for the element to insert the node
 		final QuadTree elem = getInsertionElement(bbox);
 		if (elem != null) {

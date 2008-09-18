@@ -344,7 +344,7 @@ public class QuadTreeTest {
 		
 		// move rect1 to upper right quadrant
 		rectangle1.setPosition(upperRightQuadrant.getUpperLeft());
-		rectangle1.calculateBoundingBox();
+		rectangle1.getBoundingBox();
 		list = tree.getDrawingObjects(upperLeftQuadrant);
 		assertTrue(list.size() == 2);
 		assertTrue(list.contains(rectangle1));

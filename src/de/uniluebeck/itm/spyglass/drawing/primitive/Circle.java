@@ -128,7 +128,7 @@ public class Circle extends DrawingObject {
 	}
 	
 	@Override
-	public AbsoluteRectangle calculateBoundingBox() {
+	public AbsoluteRectangle getBoundingBox() {
 		// TODO Auto-generated method stub
 		return null;
 	}

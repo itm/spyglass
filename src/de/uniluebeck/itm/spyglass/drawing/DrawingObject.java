@@ -238,6 +238,6 @@ public abstract class DrawingObject {
 	/**
 	 * Return the bounding box of this drawing object
 	 */
-	public abstract AbsoluteRectangle calculateBoundingBox();
+	public abstract AbsoluteRectangle getBoundingBox();
 	
 }

@@ -15,7 +15,7 @@ import de.uniluebeck.itm.spyglass.util.StringFormatter;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class represent a node.
+ * Instances of this class represent a sensor node.
  * 
  * @author Sebastian Ebers
  * 
@@ -210,40 +210,98 @@ public class NodeObject extends DrawingObject {
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 		
-		// set the colors and the with of the rectangle's line
+		// set the colors and the width of the rectangle's line
 		final Color color = new Color(null, this.getColorR(), this.getColorG(), this.getColorB());
 		final Color bg = new Color(null, this.getBgColorR(), this.getBgColorG(), this.getBgColorB());
 		gc.setForeground(color);
 		gc.setBackground(bg);
 		gc.setLineWidth(lineWidth);
 		
+		// get the information to be displayed
+		final String string = getInformationString();
+		
+		// determine the size parameters of the rectangle which represents the node in respect to
+		// the sting to be displayed
+		final Point size = gc.textExtent(string);
+		final int width = size.x + lineWidth + 1; // +1 for correct display with uneven line width
+		final int height = size.y + lineWidth + 1;
+		
+		// get the node's position in the drawing area
+		final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(this.getPosition());
+		
+		// determine the bounding box
+		boundingBox = determineBoundingBox(drawingArea, upperLeft, lineWidth, width, height);
+		
+		// the new rectangle starts at the determined upper left position. Its with and height was
+		// determined in respect to the text which is to be displayed
+		final PixelRectangle pxRect = new PixelRectangle(upperLeft, width, height);
+		gc.fillRectangle(pxRect.toSWTRectangle());
+		gc.drawRectangle(pxRect.toSWTRectangle());
+		
+		// place the string inside the rectangle with respect to the side effects of the line width
+		// (see above)
+		gc.drawText(string, 1 + upperLeft.x + lineWidth / 2, 1 + upperLeft.y + lineWidth / 2);
+		
+		// dispose the no longer used colors
+		color.dispose();
+		bg.dispose();
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns a string which is to be displayed in the node object.<br>
+	 * This string contains information like e.g. the node's identifier and - in respect to the
+	 * extended information status - the information of the available {@link StringFormatter}
+	 * instances as well.
+	 * 
+	 * @return a string which is to be displayed in the node object
+	 */
+	private String getInformationString() {
+		// get the detailed information by querying the string formatter
 		final String descriptionString = (stringFormatterResult == null) ? ""
 				: stringFormatterResult.toString();
 		
 		// create the string to be displayed
 		final String string = (isExtended) ? denotation + "\r\n" + descriptionString : denotation;
+		return string;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the object's bounding box in absolute coordinate values
+	 * 
+	 * @param drawingArea
+	 *            the current drawing area
+	 * @param upperLeft
+	 *            the upper left pixel position
+	 * @param lineWidth
+	 *            the object's line width (in pixel)
+	 * @param width
+	 *            the object's width (in pixel)
+	 * @param height
+	 *            the object's height (in pixel)
+	 * @return the object's bounding box in absolute coordinate values
+	 */
+	public static AbsoluteRectangle determineBoundingBox(final DrawingArea drawingArea,
+			final PixelPosition upperLeft, final int lineWidth, final int width, final int height) {
 		
-		// determine the size of the rectangle which represents the node
-		final Point size = gc.textExtent(string);
-		final int width = size.x + lineWidth;
-		final int height = size.y + lineWidth;
+		// since the rectangle's line is spread according to its width with the actual position in
+		// it's center, the upper left position of the bounding box has to adapt to this
+		final int bbUpperLeftX = upperLeft.x - lineWidth / 2 + 1;
+		final int bbUpperLeftY = upperLeft.y - lineWidth / 2 + 1;
 		
-		// get the node's position in the drawing area
-		final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(this.getPosition());
+		// the line width has to be counted twice because two lines with the same width are drawn on
+		// the drawing area
+		final int bbWidht = width + lineWidth;
+		final int bbHeight = height + lineWidth;
+		final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht,
+				bbHeight);
 		
-		final PixelRectangle pxRect = new PixelRectangle(upperLeft, height, width);
-		final AbsoluteRectangle absRect = drawingArea.pixelRect2AbsRect(pxRect);
-		boundingBox = absRect;
-		
-		gc.fillRectangle(upperLeft.x, upperLeft.y, width, height);
-		gc.drawRectangle(upperLeft.x, upperLeft.y, width, height);
-		gc.drawText(string, upperLeft.x + lineWidth, upperLeft.y + lineWidth);
-		color.dispose();
-		bg.dispose();
+		return drawingArea.pixelRect2AbsRect(bbArea);
 	}
 	
 	@Override
-	public AbsoluteRectangle calculateBoundingBox() {
+	public AbsoluteRectangle getBoundingBox() {
 		if (boundingBox == null) {
 			// temporary bugfix, used since draw() was
 			// not yet called when this method is here
