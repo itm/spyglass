@@ -74,9 +74,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 */
 	private final Set<DrawingObject> updatedObjects;
 	
-	private Map<Integer, String> stringFormatterResults;
-	
-	private int cntTmp = 0;
+	private Map<Integer, Map<Integer, String>> stringFormatterResults;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -87,7 +85,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		xmlConfig = new SimpleNodePainterXMLConfig();
 		layer = new QuadTree();
 		updatedObjects = new HashSet<DrawingObject>();
-		stringFormatterResults = new TreeMap<Integer, String>();
+		stringFormatterResults = new TreeMap<Integer, Map<Integer, String>>();
 	}
 	
 	@Override
@@ -148,6 +146,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final AbsolutePosition position = getPluginManager().getNodePositioner()
 				.getPosition(nodeID);
 		
+		boolean needsUpdate = false;
+		
 		// get all drawing objects from the quad tree
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
 		synchronized (layer) {
@@ -161,10 +161,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		// position or the position has changed, update the node object
 		if ((nodeObject.getPosition() == null) || !position.equals(nodeObject.getPosition())) {
 			nodeObject.setPosition(position);
-			// add the object to the one which have to be (re)drawn ...
-			synchronized (updatedObjects) {
-				updatedObjects.add(nodeObject);
-			}
+			needsUpdate = true;
 		}
 		
 		final int packetSemanticType = packet.getSemantic_type();
@@ -172,10 +169,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			final StringFormatter sf = xmlConfig.getStringFormatter(packetSemanticType);
 			if (sf != null) {
 				final String str = sf.parse(packet);
-				updateStringFormatterResults(packetSemanticType, str, drawingObjects);
-				synchronized (updatedObjects) {
-					updatedObjects.addAll(drawingObjects);
-				}
+				updateStringFormatterResults(packetSemanticType, str, nodeID);
+				nodeObject.setDescription(getStringFormatterResultString(nodeID));
+				needsUpdate = true;
 			}
 		} catch (final IllegalArgumentException e) {
 			log.error(e);
@@ -184,6 +180,13 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					.error(
 							"An error occured while processing a packet's contents using a StringFormatter",
 							e);
+		}
+		
+		if (needsUpdate) {
+			// add the object to the one which have to be (re)drawn ...
+			synchronized (updatedObjects) {
+				updatedObjects.add(nodeObject);
+			}
 		}
 	}
 	
@@ -194,26 +197,25 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 *            the semantic type
 	 * @param str
 	 *            the semantic type's new string
-	 * @param drawingObjects
+	 * @param nodeObject
 	 *            the drawing objects to be updated in order to display the new information
 	 */
 	private void updateStringFormatterResults(final int packetSemanticType, final String str,
-			final List<DrawingObject> drawingObjects) {
+			final int nodeID) {
 		
 		// actually update the part of the string formatter results corresponding to the semantic
 		// type
 		synchronized (stringFormatterResults) {
-			if (str != null) {
-				stringFormatterResults.put(packetSemanticType, str);
-			} else {
-				stringFormatterResults.remove(packetSemanticType);
+			Map<Integer, String> nodeResults = stringFormatterResults.get(nodeID);
+			if (nodeResults == null) {
+				nodeResults = new TreeMap<Integer, String>();
+				stringFormatterResults.put(nodeID, nodeResults);
 			}
-		}
-		
-		// update the drawing objects
-		final String sfResult = getStringFormatterResultString();
-		for (final DrawingObject drawingObject : drawingObjects) {
-			((NodeObject) drawingObject).setDescription(sfResult);
+			if (str != null) {
+				nodeResults.put(packetSemanticType, packetSemanticType + ": " + str);
+			} else {
+				nodeResults.remove(packetSemanticType);
+			}
 		}
 		
 	}
@@ -255,7 +257,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		
 		// fetch all information provided by the string formatters
 		
-		final String stringFormatterResult = getStringFormatterResultString();
+		final String stringFormatterResult = getStringFormatterResultString(nodeID);
 		
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
@@ -269,11 +271,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * 
 	 * @return a string containing all information provided by the various {@link StringFormatter}s
 	 */
-	private String getStringFormatterResultString() {
+	private String getStringFormatterResultString(final int nodeID) {
 		final StringBuffer stringFormatterResult = new StringBuffer("");
 		final Collection<String> sfResults = new Vector<String>();
 		synchronized (stringFormatterResults) {
-			sfResults.addAll(stringFormatterResults.values());
+			final Map<Integer, String> nodeResults = stringFormatterResults.get(nodeID);
+			if (nodeResults != null) {
+				sfResults.addAll(nodeResults.values());
+			}
 		}
 		for (final String str : sfResults) {
 			stringFormatterResult.append("\r\n" + str);
@@ -320,7 +325,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				final NodeObject nodeObject = (NodeObject) drawingObject;
 				final int nodeID = nodeObject.getNodeID();
 				
-				final String stringFormatterResult = getStringFormatterResultString();
+				final String stringFormatterResult = getStringFormatterResultString(nodeID);
 				System.out.println(xmlConfig.isExtendedInformationActive(nodeID));
 				nodeObject.update("Node " + nodeID, stringFormatterResult, xmlConfig
 						.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(),
@@ -347,27 +352,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		synchronized (updatedObjects) {
 			updatedObjects.clear();
 		}
-		// xmlConfig.addPropertyChangeListener(new PropertyChangeListener() {
-		//			
-		// @Override
-		// public void propertyChange(final PropertyChangeEvent evt) {
-		// // if (evt.getPropertyName().equalsIgnoreCase("isActive")) {
-		// // final Boolean oldValue = (Boolean) evt.getOldValue();
-		// // final Boolean newValue = (Boolean) evt.getNewValue();
-		// // // Note: you cannot assume, that the new value is already stored inside the
-		// // xmlConfig object
-		// //
-		// // // do something wild with it...
-		// // }
-		// //
-		// try {
-		// refreshNodeObjectConfiguration();
-		// } catch (final Throwable e) {
-		// log.error(e,e);
-		// }
-		// }
-		//			
-		// });
 		
 	}
 	
