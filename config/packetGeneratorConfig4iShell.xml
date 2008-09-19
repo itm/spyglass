@@ -46,7 +46,7 @@
 				
 				<!-- the position of the packets. as with the nodeIDs and the semanticTypes,
 				 ! lists or ranges can be given. -->
-				<position x="140-200" y="106-110" z="0"/>
+				<position x="100" y="100" z="0"/>
 				
 				<!-- the payload in hexadecimal -->
 				<payload>10AABBCCDDEEFF</payload>
@@ -60,8 +60,8 @@
 				<nodeIDs>2</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>10,12</semanticTypes>
-				<position x="3" y="6" z="52"/>
-				<payload>AABBFF</payload>
+				<position x="200" y="100" z="0"/>
+				<payload>20BBFF</payload>
 			</sample>
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>demo sample3</name>
@@ -69,18 +69,20 @@
 				<nodeIDs>3</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>10-20</semanticTypes>
-				<position x="3" y="6" z="52"/>
-				<payload>AABBFF</payload>
+				<position x="300" y="100" z="0"/>
+				<payload>30BBFF</payload>
 			</sample>
 			
 			<!-- this is a raw sample. the bytes contained in this sample will be
 			 ! sent out as a packet, without adding a header or doing anything else.
 			 -->
+			 <!--
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.RawSample">
 				<name>demo Raw sample</name>
 				<probability>0.1</probability>
 			    <packet>0018020109000C4887328701B6003A0009000010AABBCCDDEEFF</packet>
 			</sample>
+			-->
 
 		</samples>
 	</sampleChooser>
