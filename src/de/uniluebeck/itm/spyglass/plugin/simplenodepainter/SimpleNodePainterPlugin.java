@@ -8,10 +8,14 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.events.MouseEvent;
@@ -68,9 +72,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * Objects which have recently been updated and which needs to be updated in the quad tree as
 	 * well (which is done in {@link SimpleNodePainterPlugin#updateQuadTree()}
 	 */
-	private final List<DrawingObject> updatedObjects;
+	private final Set<DrawingObject> updatedObjects;
 	
 	private Map<Integer, String> stringFormatterResults;
+	
+	private int cntTmp = 0;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -80,12 +86,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		super();
 		xmlConfig = new SimpleNodePainterXMLConfig();
 		layer = new QuadTree();
-		updatedObjects = new LinkedList<DrawingObject>();
+		updatedObjects = new HashSet<DrawingObject>();
 		stringFormatterResults = new TreeMap<Integer, String>();
 	}
 	
-	// TODO: what is the point of this method? all of this stuff is done automatically by the JVM
-	// anyway.
 	@Override
 	public void finalize() throws Throwable {
 		super.finalize();
@@ -139,8 +143,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	protected void processPacket(final SpyglassPacket packet) {
 		
 		final int nodeID = packet.getSender_id();
-		boolean needsUpdate = false;
-		boolean updateAllNodes = false;
 		
 		// get the absolute position of the node which sent the packet
 		final AbsolutePosition position = getPluginManager().getNodePositioner()
@@ -159,7 +161,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		// position or the position has changed, update the node object
 		if ((nodeObject.getPosition() == null) || !position.equals(nodeObject.getPosition())) {
 			nodeObject.setPosition(position);
-			needsUpdate = true;
+			// add the object to the one which have to be (re)drawn ...
+			synchronized (updatedObjects) {
+				updatedObjects.add(nodeObject);
+			}
 		}
 		
 		final int packetSemanticType = packet.getSemantic_type();
@@ -167,10 +172,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			final StringFormatter sf = xmlConfig.getStringFormatter(packetSemanticType);
 			if (sf != null) {
 				final String str = sf.parse(packet);
-				if (!str.equals(stringFormatterResults.get(packetSemanticType))) {
-					stringFormatterResults.put(packetSemanticType, str);
-					// if the string formatter results changed, all nodes have to be updated
-					updateAllNodes = true;
+				updateStringFormatterResults(packetSemanticType, str, drawingObjects);
+				synchronized (updatedObjects) {
+					updatedObjects.addAll(drawingObjects);
 				}
 			}
 		} catch (final IllegalArgumentException e) {
@@ -181,18 +185,37 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 							"An error occured while processing a packet's contents using a StringFormatter",
 							e);
 		}
+	}
+	
+	/**
+	 * Updates the the part of the string formatter results corresponding to the semantic type
+	 * 
+	 * @param packetSemanticType
+	 *            the semantic type
+	 * @param str
+	 *            the semantic type's new string
+	 * @param drawingObjects
+	 *            the drawing objects to be updated in order to display the new information
+	 */
+	private void updateStringFormatterResults(final int packetSemanticType, final String str,
+			final List<DrawingObject> drawingObjects) {
 		
-		if (updateAllNodes) {
-			synchronized (updatedObjects) {
-				updatedObjects.addAll(drawingObjects);
-			}
-		} else if (needsUpdate) {
-			
-			// add the object to the one which have to be (re)drawn ...
-			synchronized (updatedObjects) {
-				updatedObjects.add(nodeObject);
+		// actually update the part of the string formatter results corresponding to the semantic
+		// type
+		synchronized (stringFormatterResults) {
+			if (str != null) {
+				stringFormatterResults.put(packetSemanticType, str);
+			} else {
+				stringFormatterResults.remove(packetSemanticType);
 			}
 		}
+		
+		// update the drawing objects
+		final String sfResult = getStringFormatterResultString();
+		for (final DrawingObject drawingObject : drawingObjects) {
+			((NodeObject) drawingObject).setDescription(sfResult);
+		}
+		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -231,15 +254,35 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final boolean isExtended = xmlConfig.isExtendedInformationActive(nodeID);
 		
 		// fetch all information provided by the string formatters
-		final StringBuffer stringFormatterResult = new StringBuffer("");
-		for (final String str : stringFormatterResults.values()) {
-			stringFormatterResult.append(str);
-		}
+		
+		final String stringFormatterResult = getStringFormatterResultString();
 		
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
-		return new NodeObject(nodeID, "Node " + nodeID, stringFormatterResult.toString(),
-				isExtended, lineColorRGB, lineWidth);
+		return new NodeObject(nodeID, "Node " + nodeID, stringFormatterResult, isExtended,
+				lineColorRGB, lineWidth);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the result of all {@link StringFormatter}s
+	 * 
+	 * @return a string containing all information provided by the various {@link StringFormatter}s
+	 */
+	private String getStringFormatterResultString() {
+		final StringBuffer stringFormatterResult = new StringBuffer("");
+		final Collection<String> sfResults = new Vector<String>();
+		synchronized (stringFormatterResults) {
+			sfResults.addAll(stringFormatterResults.values());
+		}
+		for (final String str : sfResults) {
+			stringFormatterResult.append("\r\n" + str);
+		}
+		String str = stringFormatterResult.toString();
+		if (str.length() > 4) {
+			str = str.substring(2);
+		}
+		return str;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -277,12 +320,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				final NodeObject nodeObject = (NodeObject) drawingObject;
 				final int nodeID = nodeObject.getNodeID();
 				
-				final StringBuffer stringFormatterResult = new StringBuffer("");
-				for (final String str : stringFormatterResults.values()) {
-					stringFormatterResult.append(str);
-				}
+				final String stringFormatterResult = getStringFormatterResultString();
 				System.out.println(xmlConfig.isExtendedInformationActive(nodeID));
-				nodeObject.update("Node " + nodeID, stringFormatterResult.toString(), xmlConfig
+				nodeObject.update("Node " + nodeID, stringFormatterResult, xmlConfig
 						.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(),
 						xmlConfig.getLineWidth());
 				update.add(nodeObject);
@@ -407,7 +447,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * @param clickPoint
 	 *            the point which was clicked
 	 * @param drawingArea
-	 *            TODO
+	 *            the place where all nodes are painted
 	 * @return <code>true</code> if a matching drawing object was found
 	 */
 	private boolean handleDoubleClick(final List<DrawingObject> drawingObjects,
