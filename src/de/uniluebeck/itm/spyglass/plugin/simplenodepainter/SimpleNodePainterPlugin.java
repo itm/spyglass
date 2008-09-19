@@ -212,7 +212,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				stringFormatterResults.put(nodeID, nodeResults);
 			}
 			if (str != null) {
-				nodeResults.put(packetSemanticType, packetSemanticType + ": " + str);
+				nodeResults.put(packetSemanticType, str);
 			} else {
 				nodeResults.remove(packetSemanticType);
 			}
