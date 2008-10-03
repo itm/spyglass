@@ -449,7 +449,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					// if so, toggle its extension state
 					final NodeObject no = (NodeObject) drawingObject;
 					no.setExtended(!no.isExtended());
-					xmlConfig.setExtendenInformationActive(no.getNodeID(), no.isExtended());
+					xmlConfig.putExtendedInformationActive(no.getNodeID(), no.isExtended());
 				}
 				return true;
 			}

@@ -48,14 +48,6 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Constructor
-	 */
-	public SimpleNodePainterXMLConfig() {
-		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * Returns if a node's the extended information is to be shown
 	 * 
 	 * @param nodeID
@@ -79,18 +71,8 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	 * @param isExtendendActive
 	 *            if <code>true</code> the node's the extended information is to be shown
 	 */
-	public void setExtendenInformationActive(final int nodeID, final boolean isExtendendActive) {
+	public void putExtendedInformationActive(final int nodeID, final boolean isExtendendActive) {
 		isExtendenInformationActive.put(nodeID, isExtendendActive);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param isExtendenInformationActive
-	 *            the isExtendenInformationActive to set
-	 */
-	public void setIsExtendenInformationActive(
-			final HashMap<Integer, Boolean> isExtendenInformationActive) {
-		this.isExtendenInformationActive = isExtendenInformationActive;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -207,29 +189,10 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		firePropertyChange("defaultStringFormatter", oldValue, defaultStringFormatter);
 	}
 	
-	/**
-	 * Copy the data from newConfig into this object.
-	 */
-	@Override
-	public void overwriteWith(final PluginXMLConfig newConfig) {
-		super.overwriteWith(newConfig);
-		final SimpleNodePainterXMLConfig newConfig2 = (SimpleNodePainterXMLConfig) newConfig;
-		
-		this.setIsExtendenInformationActive(newConfig2.isExtendenInformationActive);
-		this.setExtendedDefaultValue(newConfig2.getExtendedDefaultValue());
-		this.setLineColorRGB(newConfig2.getLineColorRGB());
-		this.setLineWidth(newConfig2.getLineWidth());
-		this.setStringFormatters(newConfig2.getStringFormatters());
-		this.setDefaultStringFormatter(newConfig2.getDefaultStringFormatter());
-		
-	}
-	
-	@Override
-	public boolean equals(final PluginXMLConfig other) {
-		if (!(other instanceof SimpleNodePainterXMLConfig)) {
+	public boolean equals(final SimpleNodePainterXMLConfig o) {
+		if (!super.equals(o)) {
 			return false;
 		}
-		final SimpleNodePainterXMLConfig o = (SimpleNodePainterXMLConfig) other;
 		
 		return (defaultStringFormatter != null)
 				&& defaultStringFormatter.equals(o.defaultStringFormatter)

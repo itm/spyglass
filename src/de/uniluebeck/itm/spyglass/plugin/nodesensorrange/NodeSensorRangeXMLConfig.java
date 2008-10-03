@@ -30,14 +30,6 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
 	@ElementMap(entry = "ranges", key = "nodeID", attribute = true, valueType = NodeSensorRange.class)
 	private HashMap<Integer, NodeSensorRange> nodeRanges = new HashMap<Integer, NodeSensorRange>();
 	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Constructor
-	 */
-	public NodeSensorRangeXMLConfig() {
-		
-	}
-	
 	// //
 	// --------------------------------------------------------------------------------
 	// /**
@@ -72,21 +64,16 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
 	 *            the nodeRanges to set
 	 */
 	public void setNodeRanges(final HashMap<Integer, NodeSensorRange> nodeRanges) {
-		this.nodeRanges = nodeRanges;
+		
+		firePropertyChange("nodeRanges", this.nodeRanges, this.nodeRanges = nodeRanges);
+		
 	}
 	
-	// --------------------------------------------------------------------------------
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-	
-	@Override
-	public boolean equals(final PluginXMLConfig other) {
-		if (!(other instanceof NodeSensorRangeXMLConfig)) {
+	public boolean equals(final NodeSensorRangeXMLConfig o) {
+		if (!super.equals(o)) {
 			return false;
 		}
-		return nodeRanges.equals(((NodeSensorRangeXMLConfig) other).nodeRanges);
+		return nodeRanges.equals((o).nodeRanges);
 	}
 	
 }

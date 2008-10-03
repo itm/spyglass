@@ -11,6 +11,7 @@ import org.apache.log4j.Category;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.gateway.Gateway;
+import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 // ------------------------------------------------------------------------------
@@ -21,7 +22,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * 
  * @author Timo Rumland
  */
-public abstract class PacketReader {
+public abstract class PacketReader extends PropertyBean {
 	private static Category log = SpyglassLogger.get(PacketReader.class);
 	
 	@Element(name = "gateway", required = false)
@@ -43,7 +44,8 @@ public abstract class PacketReader {
 	 * @throws {@link InterruptedException} if the method was interrupted while waiting on a packet.
 	 * 
 	 */
-	public abstract SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException;
+	public abstract SpyglassPacket getNextPacket() throws SpyglassPacketException,
+			InterruptedException;
 	
 	// --------------------------------------------------------------------------
 	// ------
@@ -77,7 +79,9 @@ public abstract class PacketReader {
 	 *            the delayMillies to set
 	 */
 	public void setDelayMillies(final int delayMillies) {
+		final int oldMillies = this.delayMillies;
 		this.delayMillies = delayMillies;
+		firePropertyChange("delayMillies", oldMillies, delayMillies);
 	}
 	
 }

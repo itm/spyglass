@@ -34,14 +34,6 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Constructor
-	 */
-	public VectorSequencePainterXMLConfig() {
-		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @return the dimension
 	 */
 	public byte getDimension() {
@@ -54,7 +46,9 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	 *            the dimension to set
 	 */
 	public void setDimension(final byte dimension) {
-		this.dimension = dimension;
+		
+		firePropertyChange("dimension", this.dimension, this.dimension = dimension);
+		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -71,7 +65,9 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	 *            the lineColorRGB to set
 	 */
 	public void setLineColorRGB(final int[] lineColorRGB) {
-		this.lineColorRGB = lineColorRGB;
+		
+		firePropertyChange("lineColorRGB", this.lineColorRGB, this.lineColorRGB = lineColorRGB);
+		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -88,22 +84,16 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	 *            the lineWidth to set
 	 */
 	public void setLineWidth(final int lineWidth) {
-		this.lineWidth = lineWidth;
+		
+		firePropertyChange("lineWidth", this.lineWidth, this.lineWidth = lineWidth);
 	}
 	
-	// --------------------------------------------------------------------------------
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-	
-	@Override
-	public boolean equals(final PluginXMLConfig other) {
-		if (!(other instanceof VectorSequencePainterXMLConfig)) {
+	public boolean equals(final VectorSequencePainterXMLConfig o) {
+		if (!super.equals(o)) {
 			return false;
 		}
-		final VectorSequencePainterXMLConfig o = (VectorSequencePainterXMLConfig) other;
-		return (dimension == o.dimension) && equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth);
+		return (dimension == o.dimension) && equalsRGB(lineColorRGB, o.lineColorRGB)
+				&& (lineWidth == o.lineWidth);
 	}
 	
 }

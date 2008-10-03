@@ -290,7 +290,7 @@
                <isActive>true</isActive>
                <isVisible>true</isVisible>
                <name>MainNodePositioner</name>
-               <timeout>0</timeout>
+               <timeout>10</timeout>
                <semanticTypes length="256">
                   <int>0</int>
                   <int>1</int>
@@ -549,7 +549,6 @@
                   <int>254</int>
                   <int>255</int>
                </semanticTypes>
-               <timeToLive>10</timeToLive>
             </parameters>
          </plugin>
       </plugins>
@@ -2218,6 +2217,7 @@
             </lineColorRGB>
             <lineWidth>1</lineWidth>
             <stringFormatters>
+               <stringFormatter nodeID="3"></stringFormatter>
                <stringFormatter nodeID="5">ffsfwer %d</stringFormatter>
             </stringFormatters>
             <defaultStringFormatter>fdsfsfsfs</defaultStringFormatter>
@@ -2487,7 +2487,6 @@
                <int>254</int>
                <int>255</int>
             </semanticTypes>
-            <timeToLive>200</timeToLive>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.springembedderpositioner.SpringEmbedderPositionerPlugin">
@@ -2754,7 +2753,6 @@
                <int>254</int>
                <int>255</int>
             </semanticTypes>
-            <timeToLive>10</timeToLive>
             <edgeSemanticTypes class="java.util.LinkedList"/>
          </parameters>
       </plugin>

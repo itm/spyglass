@@ -8,8 +8,6 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.nodepositioner;
 
-import org.simpleframework.xml.Element;
-
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -20,42 +18,5 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public abstract class NodePositionerXMLConfig extends PluginXMLConfig {
-	
-	@Element
-	private int timeToLive = 10;
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Constructor
-	 */
-	public NodePositionerXMLConfig() {
-		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the timeToLive
-	 */
-	public int getTimeToLive() {
-		return timeToLive;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param timeToLive
-	 *            the timeToLive to set
-	 */
-	public void setTimeToLive(final int timeToLive) {
-		this.timeToLive = timeToLive;
-	}
-	
-	// --------------------------------------------------------------------------------
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-	
-	@Override
-	public abstract boolean equals(final PluginXMLConfig other);
 	
 }

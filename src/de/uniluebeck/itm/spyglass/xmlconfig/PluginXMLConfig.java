@@ -8,10 +8,13 @@
  */
 package de.uniluebeck.itm.spyglass.xmlconfig;
 
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 // --------------------------------------------------------------------------------
 /**
@@ -21,6 +24,8 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
  * 
  */
 public abstract class PluginXMLConfig extends XMLConfig {
+	
+	private static Logger log = SpyglassLogger.get(PluginManager.class);
 	
 	public static final int[] ALL_SEMANTIC_TYPES = new int[256];
 	static {
@@ -170,7 +175,21 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		firePropertyChange("allSemanticTypes", oldValueAllSemTypes, this.getAllSemanticTypes());
 	}
 	
-	public abstract boolean equals(final PluginXMLConfig other);
+	public boolean equals(final PluginXMLConfig other) {
+		
+		// needed, since invocations on implementing subclasses may fall back
+		// to this method
+		if (!this.getClass().equals(other.getClass())) {
+			return false;
+		}
+		
+		return (this.getActive() == other.getActive())
+				&& (this.getAllSemanticTypes() == other.getAllSemanticTypes())
+				&& (this.getVisible() == other.getVisible())
+				&& this.getName().equals(other.getName())
+				&& this.getSemanticTypes().equals(other.getSemanticTypes()) // TODO: array check?
+				&& (this.getTimeout() == other.getTimeout());
+	}
 	
 	protected boolean equalsRGB(final int[] lineColorRGB, final int[] otherLineColorRGB) {
 		return (lineColorRGB[0] == otherLineColorRGB[0])
@@ -178,19 +197,8 @@ public abstract class PluginXMLConfig extends XMLConfig {
 				&& (lineColorRGB[2] == otherLineColorRGB[2]);
 	}
 	
-	/**
-	 * Copy the data from newConfig into this object.
-	 */
-	public void overwriteWith(final PluginXMLConfig newConfig) {
-		this.setName(newConfig.getName());
-		this.setActive(newConfig.getActive());
-		this.setVisible(newConfig.getVisible());
-		this.setSemanticTypes(newConfig.getSemanticTypes());
-		this.setTimeout(newConfig.getTimeout());
-	}
-	
 	@Override
-	public PluginXMLConfig clone() {
+	public final PluginXMLConfig clone() {
 		
 		try {
 			final PluginXMLConfig clone = this.getClass().newInstance();

@@ -41,14 +41,6 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Constructor
-	 */
-	public SimpleGlobalInformationXMLConfig() {
-		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @return the semanticTypes4Neighborhoods
 	 */
 	public List<Integer> getSemanticTypes4Neighborhoods() {
@@ -61,7 +53,8 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 *            the semanticTypes4Neighborhoods to set
 	 */
 	public void setSemanticTypes4Neighborhoods(final List<Integer> semanticTypes4Neighborhoods) {
-		this.semanticTypes4Neighborhoods = semanticTypes4Neighborhoods;
+		firePropertyChange("semanticTypes4Neighborhoods", this.semanticTypes4Neighborhoods,
+				this.semanticTypes4Neighborhoods = semanticTypes4Neighborhoods);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -78,7 +71,9 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 *            the showNodeDegree to set
 	 */
 	public void setShowNodeDegree(final boolean showNodeDegree) {
-		this.showNodeDegree = showNodeDegree;
+		
+		firePropertyChange("showNodeDegree", this.showNodeDegree,
+				this.showNodeDegree = showNodeDegree);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -95,7 +90,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 *            the showNumNodes to set
 	 */
 	public void setShowNumNodes(final boolean showNumNodes) {
-		this.showNumNodes = showNumNodes;
+		firePropertyChange("showNumNodes", this.showNumNodes, this.showNumNodes = showNumNodes);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -111,24 +106,20 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 * @param stringFormatterSettings
 	 *            the stringFormatterSettings to set
 	 */
-	public void setStringFormatterSettings(final List<StringFormatterSettings> stringFormatterSettings) {
-		this.stringFormatterSettings = stringFormatterSettings;
+	public void setStringFormatterSettings(
+			final List<StringFormatterSettings> stringFormatterSettings) {
+		firePropertyChange("stringFormatterSettings", this.stringFormatterSettings,
+				this.stringFormatterSettings = stringFormatterSettings);
 	}
 	
-	// --------------------------------------------------------------------------------
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-	
-	@Override
-	public boolean equals(final PluginXMLConfig other) {
-		if (!(other instanceof SimpleGlobalInformationXMLConfig)) {
+	public boolean equals(final SimpleGlobalInformationXMLConfig o) {
+		if (!super.equals(o)) {
 			return false;
 		}
-		final SimpleGlobalInformationXMLConfig o = (SimpleGlobalInformationXMLConfig) other;
-		return semanticTypes4Neighborhoods.equals(o.semanticTypes4Neighborhoods) && (showNodeDegree == o.showNodeDegree)
-				&& (showNumNodes == o.showNumNodes) && stringFormatterSettings.equals(o.stringFormatterSettings);
+		
+		return semanticTypes4Neighborhoods.equals(o.semanticTypes4Neighborhoods)
+				&& (showNodeDegree == o.showNodeDegree) && (showNumNodes == o.showNumNodes)
+				&& stringFormatterSettings.equals(o.stringFormatterSettings);
 	}
 	
 }

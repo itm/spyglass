@@ -21,7 +21,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * Instances of this class contain the configuration parameters of a {@link LinePainterPlugin}
  * 
- * @author Sebastian Ebers
+ * @author Sebastian Ebers, Dariush Forouher
  * 
  */
 public class LinePainterXMLConfig extends PluginXMLConfig {
@@ -37,18 +37,10 @@ public class LinePainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Constructor
-	 */
-	public LinePainterXMLConfig() {
-		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @return the lineColorRGB
 	 */
 	public int[] getLineColorRGB() {
-		return lineColorRGB;
+		return lineColorRGB.clone();
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -57,7 +49,9 @@ public class LinePainterXMLConfig extends PluginXMLConfig {
 	 *            the lineColorRGB to set
 	 */
 	public void setLineColorRGB(final int[] lineColorRGB) {
+		final int[] oldValue = this.lineColorRGB;
 		this.lineColorRGB = lineColorRGB;
+		firePropertyChange("lineColorRGB", oldValue, lineColorRGB);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -74,7 +68,9 @@ public class LinePainterXMLConfig extends PluginXMLConfig {
 	 *            the lineWidth to set
 	 */
 	public void setLineWidth(final int lineWidth) {
+		final int oldValue = this.lineWidth;
 		this.lineWidth = lineWidth;
+		firePropertyChange("lineWidth", oldValue, lineWidth);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -82,7 +78,7 @@ public class LinePainterXMLConfig extends PluginXMLConfig {
 	 * @return the stringFormatters
 	 */
 	public HashMap<Integer, StringFormatter> getStringFormatters() {
-		return stringFormatters;
+		return (HashMap<Integer, StringFormatter>) stringFormatters.clone();
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -91,21 +87,18 @@ public class LinePainterXMLConfig extends PluginXMLConfig {
 	 *            the stringFormatters to set
 	 */
 	public void setStringFormatters(final HashMap<Integer, StringFormatter> stringFormatters) {
+		final HashMap<Integer, StringFormatter> oldValue = this.stringFormatters;
 		this.stringFormatters = stringFormatters;
+		firePropertyChange("stringFormatters", oldValue, stringFormatters);
 	}
 	
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-	
-	@Override
-	public boolean equals(final PluginXMLConfig other) {
-		if (!(other instanceof LinePainterXMLConfig)) {
+	public boolean equals(final LinePainterXMLConfig o) {
+		if (!super.equals(o)) {
 			return false;
 		}
-		final LinePainterXMLConfig o = (LinePainterXMLConfig) other;
-		return equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth) && stringFormatters.equals(o.stringFormatters);
+		
+		return equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth)
+				&& stringFormatters.equals(o.stringFormatters);
 	}
 	
 }

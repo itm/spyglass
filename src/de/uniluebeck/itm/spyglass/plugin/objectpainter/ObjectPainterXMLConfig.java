@@ -30,14 +30,6 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Constrcutor
-	 */
-	public ObjectPainterXMLConfig() {
-		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @return the imageFileName
 	 */
 	public String getImageFileName() {
@@ -50,7 +42,8 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	 *            the imageFileName to set
 	 */
 	public void setImageFileName(final String imageFileName) {
-		this.imageFileName = imageFileName;
+		
+		firePropertyChange("imageFileName", this.imageFileName, this.imageFileName = imageFileName);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -67,20 +60,16 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	 *            the size to set
 	 */
 	public void setSize(final AbsoluteRectangle size) {
-		this.size = size;
+		firePropertyChange("size", this.size, this.size = size);
+		
 	}
 	
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-	
-	@Override
-	public boolean equals(final PluginXMLConfig other) {
-		if (!(other instanceof ObjectPainterXMLConfig)) {
+	public boolean equals(final ObjectPainterXMLConfig o) {
+		
+		if (!super.equals(o)) {
 			return false;
 		}
-		final ObjectPainterXMLConfig o = (ObjectPainterXMLConfig) other;
+		
 		return imageFileName.equals(o.imageFileName) && (size == o.size);
 	}
 	

@@ -160,4 +160,12 @@ public class GeneralSettingsXmlConfig extends XMLConfig {
 		firePropertyChange("fps", oldValue, fps);
 	}
 	
+	public void overwriteWith(final GeneralSettingsXmlConfig o) {
+		this.setFps(o.getFps());
+		this.setPacketDeliveryInitialDelay(o.getPacketDeliveryInitialDelay());
+		this.setShowRuler(o.getShowRuler());
+		this.setTimeScale(o.getTimeScale());
+		this.setTimeUnit(o.getTimeUnit());
+	}
+	
 }

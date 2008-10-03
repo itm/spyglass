@@ -19,7 +19,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * Instances of this class contain the configuration parameters of a {@link MapPainterPlugin}
  * 
- * @author Sebastian Ebers
+ * @author Sebastian Ebers, Dariush Forouher
  * 
  */
 public class MapPainterXMLConfig extends PluginXMLConfig {
@@ -71,14 +71,6 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Constructor
-	 */
-	public MapPainterXMLConfig() {
-		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @return the framePointDefaultValue
 	 */
 	public float getFramePointDefaultValue() {
@@ -91,7 +83,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the framePointDefaultValue to set
 	 */
 	public void setFramePointDefaultValue(final float framePointDefaultValue) {
-		this.framePointDefaultValue = framePointDefaultValue;
+		firePropertyChange("framePointDefaultValue", this.framePointDefaultValue,
+				this.framePointDefaultValue = framePointDefaultValue);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -108,7 +101,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the gridElementHeight to set
 	 */
 	public void setGridElementHeight(final int gridElementHeight) {
-		this.gridElementHeight = gridElementHeight;
+		firePropertyChange("gridElementHeight", this.gridElementHeight,
+				this.gridElementHeight = gridElementHeight);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -125,7 +119,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the gridElementWidth to set
 	 */
 	public void setGridElementWidth(final int gridElementWidth) {
-		this.gridElementWidth = gridElementWidth;
+		firePropertyChange("gridElementWidth", this.gridElementWidth,
+				this.gridElementWidth = gridElementWidth);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -142,14 +137,16 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the gridLowerLeftPoint to set
 	 */
 	public void setGridLowerLeftPoint(final AbsolutePosition gridLowerLeftPoint) {
-		this.gridLowerLeftPoint = gridLowerLeftPoint;
+		
+		firePropertyChange("gridLowerLeftPoint", this.gridLowerLeftPoint,
+				this.gridLowerLeftPoint = gridLowerLeftPoint);
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lockGridElementSquare
 	 */
-	public boolean isLockGridElementSquare() {
+	public boolean getLockGridElementSquare() {
 		return lockGridElementSquare;
 	}
 	
@@ -159,14 +156,16 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the lockGridElementSquare to set
 	 */
 	public void setLockGridElementSquare(final boolean lockGridElementSquare) {
-		this.lockGridElementSquare = lockGridElementSquare;
+		
+		firePropertyChange("lockGridElementSquare", this.lockGridElementSquare,
+				this.lockGridElementSquare = lockGridElementSquare);
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lockNumberOfRowsNCols
 	 */
-	public boolean isLockNumberOfRowsNCols() {
+	public boolean getLockNumberOfRowsNCols() {
 		return lockNumberOfRowsNCols;
 	}
 	
@@ -176,7 +175,9 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the lockNumberOfRowsNCols to set
 	 */
 	public void setLockNumberOfRowsNCols(final boolean lockNumberOfRowsNCols) {
-		this.lockNumberOfRowsNCols = lockNumberOfRowsNCols;
+		
+		firePropertyChange("lockNumberOfRowsNCols", this.lockNumberOfRowsNCols,
+				this.lockNumberOfRowsNCols = lockNumberOfRowsNCols);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -193,7 +194,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the maxColorRGB to set
 	 */
 	public void setMaxColorRGB(final int[] maxColorRGB) {
-		this.maxColorRGB = maxColorRGB;
+		
+		firePropertyChange("maxColorRGB", this.maxColorRGB, this.maxColorRGB = maxColorRGB);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -210,7 +212,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the maxValue to set
 	 */
 	public void setMaxValue(final float maxValue) {
-		this.maxValue = maxValue;
+		
+		firePropertyChange("maxValue", this.maxValue, this.maxValue = maxValue);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -227,7 +230,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the minColorRGB to set
 	 */
 	public void setMinColorRGB(final int[] minColorRGB) {
-		this.minColorRGB = minColorRGB;
+		
+		firePropertyChange("minColorRGB", this.minColorRGB, this.minColorRGB = minColorRGB);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -244,7 +248,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the minValue to set
 	 */
 	public void setMinValue(final float minValue) {
-		this.minValue = minValue;
+		;
+		firePropertyChange("minValue", this.minValue, this.minValue = minValue);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -261,7 +266,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the numCols to set
 	 */
 	public void setNumCols(final int numCols) {
-		this.numCols = numCols;
+		
+		firePropertyChange("numCols", this.numCols, this.numCols = numCols);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -278,7 +284,9 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the numFramePointsHorizontal to set
 	 */
 	public void setNumFramePointsHorizontal(final int numFramePointsHorizontal) {
-		this.numFramePointsHorizontal = numFramePointsHorizontal;
+		
+		firePropertyChange("numFramePointsHorizontal", this.numFramePointsHorizontal,
+				this.numFramePointsHorizontal = numFramePointsHorizontal);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -295,7 +303,9 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the numFramePointsVertical to set
 	 */
 	public void setNumFramePointsVertical(final int numFramePointsVertical) {
-		this.numFramePointsVertical = numFramePointsVertical;
+		
+		firePropertyChange("numFramePointsVertical", this.numFramePointsVertical,
+				this.numFramePointsVertical = numFramePointsVertical);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -312,7 +322,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the numRows to set
 	 */
 	public void setNumRows(final int numRows) {
-		this.numRows = numRows;
+		
+		firePropertyChange("numRows", this.numRows, this.numRows = numRows);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -329,26 +340,28 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the refreshInterval to set
 	 */
 	public void setRefreshInterval(final int refreshInterval) {
-		this.refreshInterval = refreshInterval;
+		
+		firePropertyChange("refreshInterval", this.refreshInterval,
+				this.refreshInterval = refreshInterval);
 	}
 	
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-	
-	@Override
-	public boolean equals(final PluginXMLConfig other) {
-		if (!(other instanceof MapPainterXMLConfig)) {
+	public boolean equals(final MapPainterXMLConfig o) {
+		if (!super.equals(o)) {
 			return false;
 		}
-		final MapPainterXMLConfig o = (MapPainterXMLConfig) other;
-		return (framePointDefaultValue == o.framePointDefaultValue) && (gridElementHeight == o.gridElementHeight)
-				&& (gridElementWidth == o.gridElementWidth) && gridLowerLeftPoint.equals(o.gridLowerLeftPoint)
-				&& (lockGridElementSquare == o.lockGridElementSquare) && (lockNumberOfRowsNCols == o.lockNumberOfRowsNCols)
-				&& equalsRGB(maxColorRGB, o.maxColorRGB) && (maxValue == o.maxValue) && equalsRGB(minColorRGB, o.minColorRGB)
-				&& (minValue == o.minValue) && (numCols == o.numCols) && (numFramePointsHorizontal == o.numFramePointsHorizontal)
-				&& (numFramePointsVertical == o.numFramePointsVertical) && (numRows == o.numRows) && (refreshInterval == o.refreshInterval);
+		
+		return (framePointDefaultValue == o.framePointDefaultValue)
+				&& (gridElementHeight == o.gridElementHeight)
+				&& (gridElementWidth == o.gridElementWidth)
+				&& gridLowerLeftPoint.equals(o.gridLowerLeftPoint)
+				&& (lockGridElementSquare == o.lockGridElementSquare)
+				&& (lockNumberOfRowsNCols == o.lockNumberOfRowsNCols)
+				&& equalsRGB(maxColorRGB, o.maxColorRGB) && (maxValue == o.maxValue)
+				&& equalsRGB(minColorRGB, o.minColorRGB) && (minValue == o.minValue)
+				&& (numCols == o.numCols)
+				&& (numFramePointsHorizontal == o.numFramePointsHorizontal)
+				&& (numFramePointsVertical == o.numFramePointsVertical) && (numRows == o.numRows)
+				&& (refreshInterval == o.refreshInterval);
 	}
 	
 }

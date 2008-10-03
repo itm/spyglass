@@ -16,21 +16,13 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * Instances of this class contain the configuration parameters of a {@link ImagePainterPlugin}
  * 
- * @author Sebastian Ebers
+ * @author Sebastian Ebers, Dariush Forouher
  * 
  */
 public class ImagePainterXMLConfig extends PluginXMLConfig {
 	
 	@Element(name = "image")
 	private String imageFileName = "images/icons/brokenImageLink.png";
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Constructor
-	 */
-	public ImagePainterXMLConfig() {
-		
-	}
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -46,21 +38,17 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	 *            the imageFileName to set
 	 */
 	public void setImageFileName(final String imageFileName) {
+		final String oldValue = this.imageFileName;
 		this.imageFileName = imageFileName;
+		firePropertyChange("imageFileName", oldValue, this.imageFileName);
 	}
 	
-	// --------------------------------------------------------------------------------
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-	
-	@Override
-	public boolean equals(final PluginXMLConfig other) {
-		if (!(other instanceof ImagePainterXMLConfig)) {
+	public boolean equals(final ImagePainterXMLConfig o) {
+		if (!super.equals(o)) {
 			return false;
 		}
-		return imageFileName.equals(((ImagePainterXMLConfig) other).imageFileName);
+		
+		return imageFileName.equals((o).imageFileName);
 	}
 	
 }

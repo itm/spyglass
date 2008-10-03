@@ -41,4 +41,16 @@ public class PluginXMLConfigTests {
 		Assert.isTrue(!config.getAllSemanticTypes());
 	}
 	
+	@Test
+	public void testOverwriteWith() {
+		final PluginXMLConfigStub config = new PluginXMLConfigStub();
+		final PluginXMLConfigStub config2 = new PluginXMLConfigStub();
+		
+		config.setParameterX(10);
+		config2.overwriteWith(config);
+		
+		org.junit.Assert.assertEquals(config.getParameterX(), config2.getParameterX());
+		
+	}
+	
 }

@@ -14,7 +14,6 @@ import java.util.List;
 import org.simpleframework.xml.ElementList;
 
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerXMLConfig;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
@@ -31,14 +30,6 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Cosntructor
-	 */
-	public SpringEmbedderPositionerXMLConfig() {
-		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @return the edgeSemanticTypes
 	 */
 	public List<Integer> getEdgeSemanticTypes() {
@@ -51,21 +42,16 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 	 *            the edgeSemanticTypes to set
 	 */
 	public void setEdgeSemanticTypes(final List<Integer> edgeSemanticTypes) {
-		this.edgeSemanticTypes = edgeSemanticTypes;
+		firePropertyChange("edgeSemanticTypes", this.edgeSemanticTypes,
+				this.edgeSemanticTypes = edgeSemanticTypes);
+		
 	}
 	
-	// --------------------------------------------------------------------------------
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-	
-	@Override
-	public boolean equals(final PluginXMLConfig other) {
-		if (!(other instanceof SpringEmbedderPositionerXMLConfig)) {
+	public boolean equals(final SpringEmbedderPositionerXMLConfig o) {
+		if (!super.equals(o)) {
 			return false;
 		}
-		final SpringEmbedderPositionerXMLConfig o = (SpringEmbedderPositionerXMLConfig) other;
+		
 		return edgeSemanticTypes.equals(o.edgeSemanticTypes);
 	}
 	

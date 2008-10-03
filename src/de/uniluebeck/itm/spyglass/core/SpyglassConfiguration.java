@@ -19,6 +19,7 @@ import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXmlConfig;
+import de.uniluebeck.itm.spyglass.xmlconfig.XMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
@@ -29,7 +30,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXmlConfig;
  * @author Sebastian Ebers, Daniel Bimschas, Dariush Forouher
  */
 @Root
-public class SpyglassConfiguration {
+public class SpyglassConfiguration extends XMLConfig {
 	
 	@Element
 	private PacketReader packetReader = null;
@@ -40,6 +41,7 @@ public class SpyglassConfiguration {
 	@Element
 	private final GeneralSettingsXmlConfig generalSettings = new GeneralSettingsXmlConfig();
 	
+	// TODO: property change events
 	@ElementList
 	private final Vector<Plugin> defaults = new Vector<Plugin>();
 	
@@ -98,7 +100,9 @@ public class SpyglassConfiguration {
 	
 	// --------------------------------------------------------------------------------
 	public void setPacketReader(final PacketReader packetReader) {
+		final PacketReader oldReader = this.packetReader;
 		this.packetReader = packetReader;
+		firePropertyChange("packetReader", oldReader, packetReader);
 	}
 	
 	// --------------------------------------------------------------------------------
