@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
@@ -26,7 +26,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public class IShellSocketSink extends Sink {
 	
-	private static Category log = SpyglassLogger.getLogger(IShellSocketSink.class);
+	private static Logger log = SpyglassLogger.getLogger(IShellSocketSink.class);
 	
 	/**
 	 * Magic byte for the iShell communication protocol.

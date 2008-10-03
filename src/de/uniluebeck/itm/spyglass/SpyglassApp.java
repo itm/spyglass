@@ -7,7 +7,7 @@
  */
 package de.uniluebeck.itm.spyglass;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * instantiate and injects the core classes that are needed to run the application.
  */
 public class SpyglassApp {
-	private static Category log = SpyglassLogger.getLogger(SpyglassApp.class);
+	private static Logger log = SpyglassLogger.getLogger(SpyglassApp.class);
 	
 	// -------------------------------------------------------------------------
 	/**

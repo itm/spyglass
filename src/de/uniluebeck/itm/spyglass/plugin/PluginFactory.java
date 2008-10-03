@@ -8,7 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.plugin;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
@@ -26,7 +26,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class PluginFactory {
 	
-	private static Category log = SpyglassLogger.get(PluginFactory.class);
+	private static Logger log = SpyglassLogger.get(PluginFactory.class);
 	
 	private final ConfigStore configStore;
 	
@@ -55,7 +55,8 @@ public class PluginFactory {
 	 * @param clazz
 	 *            the plug-in's class
 	 */
-	public static Plugin createInstance(final PluginXMLConfig config, final Class<? extends Plugin> clazz) {
+	public static Plugin createInstance(final PluginXMLConfig config,
+			final Class<? extends Plugin> clazz) {
 		
 		try {
 			final Plugin plugin = clazz.newInstance();

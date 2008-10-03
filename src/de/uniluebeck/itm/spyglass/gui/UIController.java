@@ -13,7 +13,7 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -50,7 +50,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public class UIController {
 	
-	private static Category log = SpyglassLogger.get(UIController.class);
+	private static Logger log = SpyglassLogger.get(UIController.class);
 	
 	private AppWindow appWindow = null;
 	

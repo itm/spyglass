@@ -3,7 +3,7 @@ package de.uniluebeck.itm.spyglass.packetgenerator;
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
@@ -11,8 +11,7 @@ import de.uniluebeck.itm.spyglass.packetgenerator.samples.Sample;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 /**
- * This is a class selects a random sample based on the probabilities of the
- * samples.
+ * This is a class selects a random sample based on the probabilities of the samples.
  * 
  * @author dariush
  * 
@@ -20,7 +19,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 @Root
 public class SampleChooser {
 	
-	private static Category log = SpyglassLogger.get(SampleChooser.class);
+	private static Logger log = SpyglassLogger.get(SampleChooser.class);
 	
 	/**
 	 * List of Samples.
@@ -29,8 +28,7 @@ public class SampleChooser {
 	private final ArrayList<Sample> samples = new ArrayList<Sample>();
 	
 	/**
-	 * Return a random sample based on the probabilities given inside the sample
-	 * objects.
+	 * Return a random sample based on the probabilities given inside the sample objects.
 	 * 
 	 * @return
 	 */
@@ -39,8 +37,7 @@ public class SampleChooser {
 		log.debug("Generating new packet.");
 		
 		/*
-		 * Put the probabilities of the samples in an array, for more convinient
-		 * access.
+		 * Put the probabilities of the samples in an array, for more convinient access.
 		 */
 		final double[] pr = new double[samples.size()];
 		for (int i = 0; i < samples.size() - 1; i++) {

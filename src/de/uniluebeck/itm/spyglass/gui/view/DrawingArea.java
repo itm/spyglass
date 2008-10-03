@@ -4,7 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Rectangle;
@@ -26,7 +26,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 @Root
 public class DrawingArea {
 	
-	private static Category log = SpyglassLogger.get(DrawingArea.class);
+	private static Logger log = SpyglassLogger.get(DrawingArea.class);
 	
 	/**
 	 * Scale factor applied while zooming.

@@ -3,7 +3,7 @@ package de.uniluebeck.itm.spyglass.gui.configuration;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.observable.Realm;
@@ -41,7 +41,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig>
 		extends PreferencePage {
 	
-	private static Category log = SpyglassLogger.get(PluginPreferencePage.class);
+	private static Logger log = SpyglassLogger.get(PluginPreferencePage.class);
 	
 	// --------------------------------------------------------------------------------
 	/**

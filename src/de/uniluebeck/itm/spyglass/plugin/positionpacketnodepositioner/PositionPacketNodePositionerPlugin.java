@@ -10,7 +10,7 @@ package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -29,7 +29,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
-	private static Category log = SpyglassLogger.get(PositionPacketNodePositionerPlugin.class);
+	private static Logger log = SpyglassLogger.get(PositionPacketNodePositionerPlugin.class);
 	
 	@Element(name = "parameters")
 	private final PositionPacketNodePositionerXMLConfig xmlConfig;

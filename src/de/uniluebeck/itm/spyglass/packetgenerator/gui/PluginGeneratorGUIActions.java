@@ -2,7 +2,7 @@ package de.uniluebeck.itm.spyglass.packetgenerator.gui;
 
 import java.net.URL;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -11,7 +11,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 public class PluginGeneratorGUIActions {
 	
-	private static final Category log = SpyglassLogger.get(PluginGeneratorGUIActions.class);
+	private static final Logger log = SpyglassLogger.get(PluginGeneratorGUIActions.class);
 	
 	private final PacketGeneratorIShellPlugin gen;
 	
@@ -25,9 +25,11 @@ public class PluginGeneratorGUIActions {
 	
 	public final IAction PLAY_PLAY_PAUSE = new Action() {
 		
-		private final ImageDescriptor pauseImageDescriptor = ImageDescriptor.createFromURL(getResourceUrl("play_pause.png"));
+		private final ImageDescriptor pauseImageDescriptor = ImageDescriptor
+				.createFromURL(getResourceUrl("play_pause.png"));
 		
-		private final ImageDescriptor playImageDescriptor = ImageDescriptor.createFromURL(getResourceUrl("play_play.png"));
+		private final ImageDescriptor playImageDescriptor = ImageDescriptor
+				.createFromURL(getResourceUrl("play_play.png"));
 		
 		private boolean isPlaying = true;
 		

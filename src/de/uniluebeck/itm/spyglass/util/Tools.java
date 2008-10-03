@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.util;
 
@@ -20,15 +18,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
  * Convenience tools
  */
 public class Tools {
-	private static Category log = SpyglassLogger.get(Tools.class);
+	private static Logger log = SpyglassLogger.get(Tools.class);
 	
 	// -------------------------------------------------------------------------
 	/**
@@ -43,9 +41,11 @@ public class Tools {
 			InetAddress i;
 			NetworkInterface iface = null;
 			
-			for (final Enumeration ifaces = NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements();) {
+			for (final Enumeration ifaces = NetworkInterface.getNetworkInterfaces(); ifaces
+					.hasMoreElements();) {
 				iface = (NetworkInterface) ifaces.nextElement();
-				for (final Enumeration ifaceips = iface.getInetAddresses(); ifaceips.hasMoreElements();) {
+				for (final Enumeration ifaceips = iface.getInetAddresses(); ifaceips
+						.hasMoreElements();) {
 					i = (InetAddress) ifaceips.nextElement();
 					if (i instanceof Inet4Address) {
 						ips.add(i.getHostAddress());

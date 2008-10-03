@@ -1,13 +1,13 @@
 package de.uniluebeck.itm.spyglass.gui.actions;
 
-import ishell.util.Logging;
-
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.ImageDescriptor;
+
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 public class RecordSelectOutputAction extends Action {
 	
-	private static final Category log = Logging.get(RecordSelectOutputAction.class);
+	private static final Logger log = SpyglassLogger.get(RecordSelectOutputAction.class);
 	
 	private final ImageDescriptor imageDescriptor = getImageDescriptor("record_select_output.png");
 	

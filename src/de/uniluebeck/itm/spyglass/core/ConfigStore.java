@@ -13,7 +13,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.List;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.simpleframework.xml.Serializer;
@@ -47,7 +47,7 @@ public class ConfigStore {
 	private SpyglassConfiguration spyglassConfig;
 	
 	/** An object which is used for logging errors and other events */
-	private static Category log = SpyglassLogger.get(ConfigStore.class);
+	private static Logger log = SpyglassLogger.get(ConfigStore.class);
 	
 	private final boolean isIShellPlugin;
 	

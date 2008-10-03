@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 import javax.swing.event.EventListenerList;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
@@ -28,14 +28,14 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * Spyglass is an application for visualizing network packets coming from an arbitrary source,
  * defined by a gateway instance. This class is the core of the Spyglass program. It reads the XML
  * configuration, instantiate objects, injects dependencies and handles the PacketReader and
- * Visualization threads. After instantiating of this class, call the <code>start()</code> method
- * to start the visualization. An arbitrary GUI can be used with Spyglass, since the visualization
- * is handled by a SpyglassCanvas, which can be easily adopted to other GUI libraries. Use the
+ * Visualization threads. After instantiating of this class, call the <code>start()</code> method to
+ * start the visualization. An arbitrary GUI can be used with Spyglass, since the visualization is
+ * handled by a SpyglassCanvas, which can be easily adopted to other GUI libraries. Use the
  * <code>addSpyglassListener(...)</code> method to get informed when a redraw of the scene is
  * needed.
  */
 public class Spyglass {
-	private static Category log = SpyglassLogger.get(Spyglass.class);
+	private static Logger log = SpyglassLogger.get(Spyglass.class);
 	
 	// private static final String CONFIG_FILE = "config.xml";
 	

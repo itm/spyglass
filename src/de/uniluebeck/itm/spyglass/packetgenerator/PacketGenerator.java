@@ -2,7 +2,7 @@ package de.uniluebeck.itm.spyglass.packetgenerator;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
@@ -20,7 +20,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 @Root
 public class PacketGenerator {
 	
-	private static Category log = SpyglassLogger.get(PacketGenerator.class);
+	private static Logger log = SpyglassLogger.get(PacketGenerator.class);
 	
 	/**
 	 * The generator.

@@ -11,7 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
@@ -26,7 +26,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public class ComplexPacketReader extends PacketReader {
 	
-	private static Category log = SpyglassLogger.get(ComplexPacketReader.class);
+	private static Logger log = SpyglassLogger.get(ComplexPacketReader.class);
 	
 	private BufferedReader bufferedReader = null;
 	

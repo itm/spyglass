@@ -11,7 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
@@ -25,7 +25,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 @Root
 public class SimplePacketReader extends PacketReader {
 	
-	private static Category log = SpyglassLogger.get(SimplePacketReader.class);
+	private static Logger log = SpyglassLogger.get(SimplePacketReader.class);
 	
 	private BufferedReader bufferedReader = null;
 	
@@ -40,7 +40,8 @@ public class SimplePacketReader extends PacketReader {
 	@Override
 	public SpyglassPacket getNextPacket() throws InterruptedException {
 		if (bufferedReader == null) {
-			bufferedReader = new BufferedReader(new InputStreamReader(this.getGateway().getInputStream()));
+			bufferedReader = new BufferedReader(new InputStreamReader(this.getGateway()
+					.getInputStream()));
 		}
 		
 		SpyglassPacket packet = null;

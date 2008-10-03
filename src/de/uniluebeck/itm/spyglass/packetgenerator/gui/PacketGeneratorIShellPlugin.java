@@ -6,7 +6,7 @@ import ishell.util.IconTheme;
 
 import java.io.File;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -21,15 +21,14 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 /**
  * This is an iShell Plugin which wraps the Spyglass PacketGenerator.
  * 
- * Currently it has no GUI and reads the configfile from a fixed position (see
- * below). Otherwise it behaves exactly like if it was run from the command
- * line.
+ * Currently it has no GUI and reads the configfile from a fixed position (see below). Otherwise it
+ * behaves exactly like if it was run from the command line.
  * 
  * @author dariush
  * 
  */
 public class PacketGeneratorIShellPlugin extends Plugin {
-	private static Category log = SpyglassLogger.get(PacketGeneratorIShellPlugin.class);
+	private static Logger log = SpyglassLogger.get(PacketGeneratorIShellPlugin.class);
 	
 	/**
 	 * The packet generator
@@ -47,8 +46,8 @@ public class PacketGeneratorIShellPlugin extends Plugin {
 	IShellTab gui;
 	
 	/**
-	 * This thread runs in the background and creates packets and sends them
-	 * over the socket to ishell.
+	 * This thread runs in the background and creates packets and sends them over the socket to
+	 * ishell.
 	 * 
 	 * 
 	 * @author dariush
@@ -68,7 +67,7 @@ public class PacketGeneratorIShellPlugin extends Plugin {
 		}
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/*
 	 * (non-Javadoc)
@@ -132,7 +131,7 @@ public class PacketGeneratorIShellPlugin extends Plugin {
 		generatorThread.start();
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/*
 	 * (non-Javadoc)
@@ -149,7 +148,7 @@ public class PacketGeneratorIShellPlugin extends Plugin {
 		this.generator.shutdown();
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/*
 	 * (non-Javadoc)
@@ -161,7 +160,7 @@ public class PacketGeneratorIShellPlugin extends Plugin {
 		return "SpyGlassPacketGenerator";
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/*
 	 * (non-Javadoc)
@@ -173,14 +172,12 @@ public class PacketGeneratorIShellPlugin extends Plugin {
 		return getName() + " is a generator for spyglass packets.";
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * ishell.device.iSenseDeviceListenerAdapter#receivePacket(ishell.device
-	 * .MessagePacket)
+	 * @see ishell.device.iSenseDeviceListenerAdapter#receivePacket(ishell.device .MessagePacket)
 	 */
 	@Override
 	public void receivePacket(final MessagePacket arg0) {

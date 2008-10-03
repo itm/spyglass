@@ -1,15 +1,14 @@
 package de.uniluebeck.itm.spyglass.gui.actions;
 
-import ishell.util.Logging;
-
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 public class PlayPlayPauseAction extends Action {
 	
-	private static final Category log = Logging.get(PlayPlayPauseAction.class);
+	private static final Logger log = SpyglassLogger.get(PlayPlayPauseAction.class);
 	
 	private final ImageDescriptor pauseImageDescriptor = getImageDescriptor("play_pause.png");
 	

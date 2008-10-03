@@ -10,7 +10,7 @@ package de.uniluebeck.itm.spyglass;
 import ishell.device.MessagePacket;
 import ishell.util.IconTheme;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.ControlEvent;
@@ -61,7 +61,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * For further information, please refer to the iShell manual.
  */
 public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
-	private static Category log = SpyglassLogger.get(PluginSpyGlass2iShell.class);
+	private static Logger log = SpyglassLogger.get(PluginSpyGlass2iShell.class);
 	
 	private static final int SPYGLASS_PACKET_TYPE = 0x91;
 	

@@ -1,6 +1,6 @@
 package de.uniluebeck.itm.spyglass.packetgenerator.gui;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -20,7 +20,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * @author dariush
  */
 public class IShellTab extends org.eclipse.swt.widgets.Composite {
-	private static Category log = SpyglassLogger.get(IShellTab.class);
+	private static Logger log = SpyglassLogger.get(IShellTab.class);
 	
 	Label label;
 	Text text;
@@ -31,7 +31,8 @@ public class IShellTab extends org.eclipse.swt.widgets.Composite {
 	 */
 	private final String CONFIG_DEFAULT_PATH = "config/packetGeneratorConfig4iShell.xml";
 	
-	public IShellTab(final org.eclipse.swt.widgets.Composite parent, final PacketGeneratorIShellPlugin plugin) {
+	public IShellTab(final org.eclipse.swt.widgets.Composite parent,
+			final PacketGeneratorIShellPlugin plugin) {
 		super(parent, SWT.NULL);
 		
 		final GridLayout l = new GridLayout();
@@ -54,8 +55,8 @@ public class IShellTab extends org.eclipse.swt.widgets.Composite {
 		//
 		
 		/*
-		 * this button stopps the generator, creates a new one based on the
-		 * given config, and starts the generator again.
+		 * this button stopps the generator, creates a new one based on the given config, and starts
+		 * the generator again.
 		 */
 		button.addSelectionListener(new SelectionAdapter() {
 			@Override

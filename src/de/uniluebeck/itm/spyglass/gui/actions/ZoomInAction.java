@@ -1,6 +1,6 @@
 package de.uniluebeck.itm.spyglass.gui.actions;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
@@ -8,7 +8,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 public class ZoomInAction extends Action {
 	
-	private static final Category log = SpyglassLogger.get(ZoomInAction.class);
+	private static final Logger log = SpyglassLogger.get(ZoomInAction.class);
 	
 	private final ImageDescriptor imageDescriptor = getImageDescriptor("zoom_in.png");
 	

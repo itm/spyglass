@@ -1,11 +1,9 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gateway;
 
@@ -14,26 +12,26 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // --
 /**
  * A gateway implementation that offers access to a file.
  */
 @Root
 public class FileReaderGateway implements Gateway {
-	private static Category log = SpyglassLogger.get(FileReaderGateway.class);
+	private static Logger log = SpyglassLogger.get(FileReaderGateway.class);
 	
 	private File file = null;
 	
 	private InputStream inputStream = null;
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -43,7 +41,7 @@ public class FileReaderGateway implements Gateway {
 		return inputStream;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
@@ -53,7 +51,7 @@ public class FileReaderGateway implements Gateway {
 		return file;
 	}
 	
-	//--------------------------------------------------------------------------
+	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 

@@ -5,14 +5,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 /**
- * File sink. Writes all packets in a file. Each line consists of a timestamp
- * and the packet in hex, seperated by a colon.
+ * File sink. Writes all packets in a file. Each line consists of a timestamp and the packet in hex,
+ * seperated by a colon.
  * 
  * example:
  * 
@@ -23,7 +23,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public class FileSink extends Sink {
 	
-	private static Category log = SpyglassLogger.get(FileSink.class);
+	private static Logger log = SpyglassLogger.get(FileSink.class);
 	
 	/**
 	 * The filename

@@ -7,7 +7,7 @@
  */
 package de.uniluebeck.itm.spyglass.core;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
@@ -26,7 +26,7 @@ import de.uniluebeck.itm.spyglass.util.Tools;
  * <code>visualizationRunning</code> member of the Spyglass class is set to false.
  */
 public class PacketProducerTask implements Runnable {
-	private final Category log = SpyglassLogger.get(PacketProducerTask.class);
+	private final Logger log = SpyglassLogger.get(PacketProducerTask.class);
 	
 	// private Deque<Packet> packetCache = null;
 	

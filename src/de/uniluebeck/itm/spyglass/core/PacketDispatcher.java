@@ -9,7 +9,7 @@ package de.uniluebeck.itm.spyglass.core;
 
 import java.util.List;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -28,7 +28,7 @@ import de.uniluebeck.itm.spyglass.util.Tools;
  * a concurrent modification exception.
  */
 public class PacketDispatcher {
-	private static Category log = SpyglassLogger.get(PacketDispatcher.class);
+	private static Logger log = SpyglassLogger.get(PacketDispatcher.class);
 	
 	private PluginManager pluginManager = null;
 	

@@ -1,7 +1,5 @@
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
-import ishell.util.Logging;
-
 import java.io.File;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -12,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangedEvent;
@@ -44,6 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class PluginPreferenceDialog implements PluginListChangeListener {
@@ -340,7 +339,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 	}
 	
-	private static final Category log = Logging.get(PluginPreferenceDialog.class);
+	private static final Logger log = SpyglassLogger.get(PluginPreferenceDialog.class);
 	
 	private static final String NODE_ID_PLUGINMANAGER = "NodeIdPluginManager";
 	
@@ -682,8 +681,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	/**
 	 * Returns if the currently visible preference dialog page has unsaved changes
 	 * 
-	 * @return <code>true</code> if the currently visible preference dialog page has unsaved
-	 *         changes
+	 * @return <code>true</code> if the currently visible preference dialog page has unsaved changes
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean hasUnsavedChanges() {

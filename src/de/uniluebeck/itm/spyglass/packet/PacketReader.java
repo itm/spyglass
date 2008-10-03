@@ -7,7 +7,7 @@
  */
 package de.uniluebeck.itm.spyglass.packet;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.gateway.Gateway;
@@ -23,7 +23,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * @author Timo Rumland
  */
 public abstract class PacketReader extends PropertyBean {
-	private static Category log = SpyglassLogger.get(PacketReader.class);
+	private static Logger log = SpyglassLogger.get(PacketReader.class);
 	
 	@Element(name = "gateway", required = false)
 	private Gateway gateway = null;

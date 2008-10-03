@@ -17,7 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
@@ -47,7 +47,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 @Root
 public class PluginManager {
 	
-	private static Category log = SpyglassLogger.get(PluginManager.class);
+	private static Logger log = SpyglassLogger.get(PluginManager.class);
 	
 	@ElementList
 	private final List<Plugin> plugins = Collections.synchronizedList(new ArrayList<Plugin>());

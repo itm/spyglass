@@ -1,11 +1,9 @@
 package de.uniluebeck.itm.spyglass.gui.actions;
 
-import ishell.util.Logging;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -13,10 +11,11 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 public class ZoomCompleteMapAction extends Action {
 	
-	private static final Category log = Logging.get(ZoomCompleteMapAction.class);
+	private static final Logger log = SpyglassLogger.get(ZoomCompleteMapAction.class);
 	
 	private final ImageDescriptor imageDescriptor = getImageDescriptor("zoom_complete_map.png");
 	

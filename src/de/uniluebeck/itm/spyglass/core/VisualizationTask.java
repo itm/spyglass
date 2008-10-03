@@ -9,7 +9,7 @@ package de.uniluebeck.itm.spyglass.core;
 
 import java.util.EventObject;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.TimeDiff;
@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.util.Tools;
  * <code>visualizationRunning</code> member of the Spyglass class is set to false.
  */
 public class VisualizationTask implements Runnable {
-	private static Category log = SpyglassLogger.get(VisualizationTask.class);
+	private static Logger log = SpyglassLogger.get(VisualizationTask.class);
 	
 	private Spyglass spyglass = null;
 	

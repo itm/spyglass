@@ -1,12 +1,10 @@
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
-import ishell.util.Logging;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CellEditor;
@@ -40,6 +38,7 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 public class PluginManagerPreferencePage extends PreferencePage {
 	
@@ -410,7 +409,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private static final String COLUMN_VISIBLE = "Visible";
 	
-	private static final Category log = Logging.get(PluginManagerPreferencePage.class);
+	private static final Logger log = SpyglassLogger.get(PluginManagerPreferencePage.class);
 	
 	private Button buttonDown;
 	
