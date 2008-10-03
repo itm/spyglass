@@ -33,6 +33,7 @@ import de.uniluebeck.itm.spyglass.gui.actions.ZoomInAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomOutAction;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketBroker;
+import de.uniluebeck.itm.spyglass.packet.PacketFactory;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
@@ -187,9 +188,9 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		if (isPaused()) {
 			return;
 		}
-		final SpyglassPacket spyglassPacket = new SpyglassPacket();
+		SpyglassPacket spyglassPacket = null;
 		try {
-			spyglassPacket.deserialize(packet.getContent());
+			spyglassPacket = PacketFactory.createInstance(packet.getContent());
 		} catch (final SpyglassPacketException e) {
 			log.error("Illegal Packet, could not deserialize it.", e);
 			return;

@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uniluebeck.itm.spyglass.packet.Packet;
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 
 /**
  * The StringFormatter generates a String based on a given expression that mostly will contain at
@@ -87,9 +87,9 @@ public class StringFormatter {
 	 * @return A String, where the placeholders of the expression are changed with values from the
 	 *         packet
 	 */
-	public String parse(final Packet packet) throws IllegalArgumentException {
+	public String parse(final SpyglassPacket packet) throws IllegalArgumentException {
 		String result = "";
-		final byte[] content = packet.getContent();
+		final byte[] content = packet.getPayload();
 		String tmpExp = this.formatExpression;
 		// first part of result is given by expression as substring until the
 		// first occurence of "%"
@@ -236,12 +236,12 @@ public class StringFormatter {
 		final StringFormatter test = new StringFormatter(
 				"Wert 1 (uint8): %u0, Wert 2 (uint32): %U4, Wert 3 (int16): %i8, Wert 4 (float): %f10 und noch Text");
 		// final StringFormatter test = new StringFormatter("");
-		final Packet packet = new Packet();
+		final SpyglassPacket packet = new SpyglassPacket();
 		
 		final byte[] content = { -128, 0, 0, 0, -1, -1, -1, -1, -128, 0, 65, -109, 51, 51 };
 		// final byte[] content = { -128, 0, 0, 0, -1, -1, -1, -1, -128, 0, 65 };
 		// final byte[] content = { 0, -2, -1, -1, -1, -1, 49, 0, 0, 10 };
-		packet.setContent(content);
+		packet.setPayload(content);
 		final String result = test.parse(packet);
 		if (result.equalsIgnoreCase("")) {
 			System.out.println("<leer>");

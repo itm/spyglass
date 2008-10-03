@@ -569,7 +569,6 @@
       <framesPerSecond>25</framesPerSecond>
    </generalSettings>
    <defaults>
-      <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin"/>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
          <parameters>
             <isActive>true</isActive>
@@ -2217,7 +2216,7 @@
             </lineColorRGB>
             <lineWidth>1</lineWidth>
             <stringFormatters>
-               <stringFormatter nodeID="3"></stringFormatter>
+               <stringFormatter nodeID="3"/>
                <stringFormatter nodeID="5">ffsfwer %d</stringFormatter>
             </stringFormatters>
             <defaultStringFormatter>fdsfsfsfs</defaultStringFormatter>
@@ -2756,7 +2755,6 @@
             <edgeSemanticTypes class="java.util.LinkedList"/>
          </parameters>
       </plugin>
-      <plugin class="de.bsi.flegsens.RandomNodePositioner"/>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin">
          <parameters>
             <isActive>true</isActive>

@@ -97,8 +97,6 @@ public class ComplexPacketReader extends PacketReader {
 		
 		final String[] tokens = line.split(":\\s*");
 		
-		final SpyglassPacket packet = new SpyglassPacket();
-		
 		final String hexPacket = tokens[1];
 		final int length = hexPacket.length() / 2;
 		final byte[] array = new byte[length];
@@ -108,7 +106,7 @@ public class ComplexPacketReader extends PacketReader {
 			array[i / 2] = (byte) Integer.parseInt(byteString, 16);
 		}
 		
-		packet.deserialize(array);
+		final SpyglassPacket packet = PacketFactory.createInstance(array);
 		
 		return packet;
 	}

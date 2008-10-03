@@ -27,13 +27,13 @@ public class StringFormatterTests {
 	@Before
 	public void setUp() throws Exception {
 		packet1 = new SpyglassPacket();
-		packet1.setContent(new byte[] { 0x00, 0x01, 0x02 });
+		packet1.setPayload(new byte[] { 0x00, 0x01, 0x02 });
 		
 		packet2 = new SpyglassPacket();
-		packet2.setContent(new byte[] { 0x00, 0x00, 0x00, 0x04 });
+		packet2.setPayload(new byte[] { 0x00, 0x00, 0x00, 0x04 });
 		
 		packet3 = new SpyglassPacket();
-		packet3.setContent(new byte[] { (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFE });
+		packet3.setPayload(new byte[] { (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFE });
 		
 		final ByteBuffer buf = ByteBuffer.allocate(7 * 4);
 		buf.order(ByteOrder.BIG_ENDIAN);
@@ -47,7 +47,7 @@ public class StringFormatterTests {
 		buf.putFloat(Float.MAX_VALUE); // 24
 		
 		packet4 = new SpyglassPacket();
-		packet4.setContent(buf.array());
+		packet4.setPayload(buf.array());
 	}
 	
 	// --------------------------------------------------------------------------------

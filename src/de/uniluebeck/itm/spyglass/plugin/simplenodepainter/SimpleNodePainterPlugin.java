@@ -140,7 +140,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
 		
-		final int nodeID = packet.getSender_id();
+		final int nodeID = packet.getSenderId();
 		
 		// get the absolute position of the node which sent the packet
 		final AbsolutePosition position = getPluginManager().getNodePositioner()
@@ -164,7 +164,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			needsUpdate = true;
 		}
 		
-		final int packetSemanticType = packet.getSemantic_type();
+		final int packetSemanticType = packet.getSemanticType();
 		try {
 			final StringFormatter sf = xmlConfig.getStringFormatter(packetSemanticType);
 			if (sf != null) {

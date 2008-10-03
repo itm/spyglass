@@ -6,29 +6,27 @@ package de.uniluebeck.itm.spyglass.packet;
  * @author Nils Glombitza, ITM Uni Luebeck
  * 
  */
-public class Uint32ListPacket extends LongListPacket
-{
+public class Uint32ListPacket extends LongListPacket {
 	/**
 	 * Syntaxtype of this Packet
 	 */
-	public static final int SYNTAXTYPE = 4;
-
+	public static final SyntaxTypes SYNTAXTYPE = SyntaxTypes.ISENSE_SPYGLASS_PACKET_UINT32;
+	
 	/**
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @see SpyglassPacket#deserialize(byte[])
 	 */
 	@Override
-	public void deserialize(byte[] buf) throws SpyglassPacketException
-	{
+	public void deserialize(final byte[] buf) throws SpyglassPacketException {
 		super.deserialize(buf);
-		if (syntax_type != Uint32ListPacket.SYNTAXTYPE)
+		if (syntaxType != Uint32ListPacket.SYNTAXTYPE) {
 			throw new SpyglassPacketException("Wrong Syntaxtype");
+		}
 		values = new long[(buf.length - SpyglassPacket.EXPECTED_PACKET_SIZE) / 4];
-		for (int i = 0; (i * 4 + SpyglassPacket.EXPECTED_PACKET_SIZE) < buf.length; i++)
-		{
-			int pos = i * 4 + SpyglassPacket.EXPECTED_PACKET_SIZE;
+		for (int i = 0; (i * 4 + SpyglassPacket.EXPECTED_PACKET_SIZE) < buf.length; i++) {
+			final int pos = i * 4 + SpyglassPacket.EXPECTED_PACKET_SIZE;
 			values[i] = deserializeUint32(buf[pos], buf[pos + 1], buf[pos + 2], buf[pos + 3]);
 		}
 	}
-
+	
 }

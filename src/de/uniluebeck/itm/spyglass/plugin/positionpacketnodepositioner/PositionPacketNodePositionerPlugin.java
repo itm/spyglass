@@ -81,7 +81,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	 */
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
-		final int id = packet.getSender_id();
+		final int id = packet.getSenderId();
 		final AbsolutePosition pos = packet.getPosition().clone();
 		this.positionMap.put(id, pos);
 		log.debug("Memorized position " + pos + " for node id " + id);

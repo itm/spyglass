@@ -33,7 +33,6 @@
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin">
             <parameters>
-               <timeToLive>60</timeToLive>
                <isActive>true</isActive>
                <isVisible>true</isVisible>
                <name>default</name>
@@ -317,7 +316,6 @@
       <framesPerSecond>25</framesPerSecond>
    </generalSettings>
    <defaults>
-      <plugin class="de.bsi.flegsens.FlegsensNodePainterPlugin"/>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
          <parameters>
             <gridElementHeight>1</gridElementHeight>
@@ -1969,7 +1967,6 @@
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin">
          <parameters>
-            <timeToLive>10</timeToLive>
             <isActive>true</isActive>
             <isVisible>true</isVisible>
             <name>default</name>
@@ -2237,11 +2234,9 @@
       <plugin class="de.uniluebeck.itm.spyglass.plugin.springembedderpositioner.SpringEmbedderPositionerPlugin">
          <parameters>
             <edgeSemanticTypes class="java.util.LinkedList"/>
-            <timeToLive>10</timeToLive>
             <isActive>true</isActive>
             <isVisible>true</isVisible>
             <name>default</name>
-            <timeout>-1</timeout>
             <semanticTypes length="256">
                <int>0</int>
                <int>1</int>
@@ -2500,9 +2495,8 @@
                <int>254</int>
                <int>255</int>
             </semanticTypes>
-         </parameters>
+            <timeout>10</timeout></parameters>
       </plugin>
-      <plugin class="de.bsi.flegsens.RandomNodePositioner"/>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin">
          <parameters>
             <lineColorRGB length="3">

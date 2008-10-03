@@ -90,7 +90,7 @@ public abstract class Plugin implements Runnable, Comparable {
 		// those, the plug-in is interested in
 		if ((packet != null) && isActive()) {
 			final int[] mySemanticTypes = getXMLConfig().getSemanticTypes();
-			final int packetSemanticType = packet.getSemantic_type();
+			final int packetSemanticType = packet.getSemanticType();
 			for (int i = 0; i < mySemanticTypes.length; i++) {
 				// if the packets semantic type matches ...
 				// (note that the value "-1" in the plug-ins semantic type list

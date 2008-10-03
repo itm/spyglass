@@ -5,18 +5,11 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 /**
  * Generic Spyglass packet.
  */
-public class SpyglassPacket extends Packet {
+public class SpyglassPacket {
 	
-	// Spyglass Packet Types
-	public static final int ISENSE_SPYGLASS_PACKET_STD = 0;
-	public static final int ISENSE_SPYGLASS_PACKET_UINT8 = 1;
-	public static final int ISENSE_SPYGLASS_PACKET_UINT16 = 2;
-	public static final int ISENSE_SPYGLASS_PACKET_INT16 = 3;
-	public static final int ISENSE_SPYGLASS_PACKET_UINT32 = 4;
-	public static final int ISENSE_SPYGLASS_PACKET_INT64 = 5;
-	public static final int ISENSE_SPYGLASS_PACKET_FLOAT = 6;
-	public static final int ISENSE_SPYGLASS_PACKET_VARIABLE = 7;
-	
+	/**
+	 * 
+	 */
 	public static final int EXPECTED_PACKET_SIZE = 18;
 	
 	/**
@@ -32,17 +25,17 @@ public class SpyglassPacket extends Packet {
 	/**
 	 * Syntax type of this spyglass packet.
 	 */
-	protected int syntax_type;
+	protected SyntaxTypes syntaxType;
 	
 	/**
 	 * Semantic type of this spyglass packet.
 	 */
-	protected int semantic_type;
+	protected int semanticType;
 	
 	/**
 	 * Sender ID of this spyglass packet.
 	 */
-	protected int sender_id;
+	protected int senderId;
 	
 	/**
 	 * Timestamp of this spyglass packet.
@@ -52,7 +45,12 @@ public class SpyglassPacket extends Packet {
 	/**
 	 * positon of this spyglass packet.
 	 */
-	AbsolutePosition position;
+	private AbsolutePosition position;
+	
+	/**
+	 * The payload
+	 */
+	private byte[] payload;
 	
 	/**
 	 * Deserializes a Spyglass Packet.
@@ -60,8 +58,8 @@ public class SpyglassPacket extends Packet {
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @throws SpyglassPacketException
 	 */
-	public void deserialize() throws SpyglassPacketException {
-		deserialize(getContent());
+	void deserialize() throws SpyglassPacketException {
+		deserialize(getPayload());
 	}
 	
 	/**
@@ -72,15 +70,15 @@ public class SpyglassPacket extends Packet {
 	 *            Byte Array of the Packet
 	 * @throws SpyglassPacketException
 	 */
-	public void deserialize(final byte[] buf) throws SpyglassPacketException {
+	void deserialize(final byte[] buf) throws SpyglassPacketException {
 		length = deserializeUint16(buf[0], buf[1]);
 		if (length + 2 != buf.length) {
 			throw new SpyglassPacketException("Wrong SpyglassPacket-Size");
 		}
 		version = deserializeUint8(buf[2]);
-		syntax_type = deserializeUint8(buf[3]);
-		semantic_type = deserializeUint8(buf[4]);
-		sender_id = deserializeUint16(buf[5], buf[6]);
+		syntaxType = SyntaxTypes.toEnum(deserializeUint8(buf[3]));
+		semanticType = deserializeUint8(buf[4]);
+		senderId = deserializeUint16(buf[5], buf[6]);
 		time = new Time();
 		time.sec_ = deserializeUint32(buf[7], buf[8], buf[9], buf[10]);
 		time.ms_ = deserializeUint16(buf[11], buf[12]);
@@ -93,7 +91,7 @@ public class SpyglassPacket extends Packet {
 		if (length > 17) {
 			final byte[] tmpContent = new byte[length - 17];
 			System.arraycopy(buf, 19, tmpContent, 0, length - 17);
-			setContent(tmpContent);
+			setPayload(tmpContent);
 		}
 	}
 	
@@ -209,8 +207,8 @@ public class SpyglassPacket extends Packet {
 	 */
 	@Override
 	public String toString() {
-		return "length:" + length + ", syntax_type:" + syntax_type + ", semantic_type:"
-				+ semantic_type + ", sender_id:" + sender_id + ",time: " + time.toString()
+		return "length:" + length + ", syntax_type:" + syntaxType + ", semantic_type:"
+				+ semanticType + ", sender_id:" + senderId + ",time: " + time.toString()
 				+ ", Position:" + position;
 	}
 	
@@ -241,19 +239,19 @@ public class SpyglassPacket extends Packet {
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return the syntax_type
 	 */
-	public int getSyntax_type() {
-		return syntax_type;
+	public SyntaxTypes getSyntaxType() {
+		return syntaxType;
 	}
 	
 	/**
 	 * Property setter
 	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param syntax_type
+	 * @param syntaxType
 	 *            the syntax_type to set
 	 */
-	public void setSyntax_type(final int syntax_type) {
-		this.syntax_type = syntax_type;
+	public void setSyntaxType(final SyntaxTypes syntaxType) {
+		this.syntaxType = syntaxType;
 	}
 	
 	/**
@@ -262,40 +260,40 @@ public class SpyglassPacket extends Packet {
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return the semantic_type
 	 */
-	public int getSemantic_type() {
-		return semantic_type;
+	public int getSemanticType() {
+		return semanticType;
 	}
 	
 	/**
 	 * Property setter
 	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param semantic_type
-	 *            the semantic_type to set
+	 * @param semanticType
+	 *            the semanticType to set
 	 */
-	public void setSemantic_type(final int semantic_type) {
-		this.semantic_type = semantic_type;
+	public void setSemanticType(final int semanticType) {
+		this.semanticType = semanticType;
 	}
 	
 	/**
 	 * Property getter
 	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @return the sender_id
+	 * @return the senderId
 	 */
-	public int getSender_id() {
-		return sender_id;
+	public int getSenderId() {
+		return senderId;
 	}
 	
 	/**
 	 * Property setter
 	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param sender_id
+	 * @param senderId
 	 *            the sender_id to set
 	 */
-	public void setSender_id(final int sender_id) {
-		this.sender_id = sender_id;
+	public void setSenderId(final int senderId) {
+		this.senderId = senderId;
 	}
 	
 	/**
@@ -325,6 +323,24 @@ public class SpyglassPacket extends Packet {
 	 */
 	public AbsolutePosition getPosition() {
 		return position;
+	}
+	
+	// --------------------------------------------------------------------------
+	// ------
+	/**
+	 * Return the payload of the packet
+	 */
+	public byte[] getPayload() {
+		return payload;
+	}
+	
+	// --------------------------------------------------------------------------
+	// ------
+	/**
+	 * Set the payload of the packet
+	 */
+	public void setPayload(final byte[] content) {
+		this.payload = content;
 	}
 	
 }
