@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-import de.bsi.flegsens.RandomNodePositioner;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener.ListChangeEvent;
 import de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin;
@@ -66,7 +65,6 @@ public class PluginManager {
 		availablePluginsTypes.add(SimpleGlobalInformationPlugin.class);
 		availablePluginsTypes.add(SimpleNodePainterPlugin.class);
 		availablePluginsTypes.add(PositionPacketNodePositionerPlugin.class);
-		availablePluginsTypes.add(RandomNodePositioner.class);
 		availablePluginsTypes.add(SpringEmbedderPositionerPlugin.class);
 		availablePluginsTypes.add(LinePainterPlugin.class);
 		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
