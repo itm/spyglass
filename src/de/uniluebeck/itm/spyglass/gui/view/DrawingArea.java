@@ -74,6 +74,11 @@ public class DrawingArea {
 	 */
 	private static final int WORLD_HEIGHT = 2 * ((int) Math.pow(2, 16));
 	
+	/**
+	 * The canvas of the drawingArea
+	 */
+	private Rectangle canvasRect = null;
+	
 	private final ControlListener controlListener = new ControlListener() {
 		
 		@Override
@@ -84,7 +89,9 @@ public class DrawingArea {
 		@Override
 		public void controlResized(final ControlEvent e) {
 			log.debug("Control resized: " + e);
-			log.debug("New canvas: " + getDrawingCanvasRectangle());
+			
+			canvasRect = appWindow.getGui().getCanvas().getClientArea();
+			log.debug("New canvas: " + canvasRect);
 			
 			synchronized (at) {
 				
@@ -150,20 +157,13 @@ public class DrawingArea {
 	}
 	
 	/**
-	 * Returns the Rectangle describing the drawing area (short-cut method)
-	 */
-	private Rectangle getDrawingCanvasRectangle() {
-		return this.appWindow.getGui().getCanvas().getClientArea();
-	}
-	
-	/**
 	 * return a rectangle descrbing the dimensions of the drawing area.
 	 */
 	public PixelRectangle getDrawingRectangle() {
 		final PixelRectangle ret = new PixelRectangle();
 		ret.setUpperLeft(new PixelPosition(0, 0));
-		ret.setHeight(getDrawingCanvasRectangle().height);
-		ret.setWidth(getDrawingCanvasRectangle().width);
+		ret.setHeight(this.canvasRect.height);
+		ret.setWidth(this.canvasRect.width);
 		return ret;
 	}
 	
@@ -254,7 +254,7 @@ public class DrawingArea {
 	 */
 	private boolean isValidTransformation(final AffineTransform at2) {
 		boolean ok = false;
-		log.debug("Canvas: " + getDrawingCanvasRectangle());
+		log.debug("Canvas: " + this.canvasRect);
 		
 		try {
 			
@@ -339,6 +339,9 @@ public class DrawingArea {
 		
 		// add new one
 		this.appWindow.getGui().getCanvas().addControlListener(this.controlListener);
+		
+		canvasRect = appWindow.getGui().getCanvas().getClientArea();
+		
 	}
 	
 	/**
@@ -444,7 +447,6 @@ public class DrawingArea {
 	 * Adjusts the transformation matrix to make the given rectangle fit exactly in the drawing
 	 * area.
 	 * 
-	 * TODO: small detail - works not perfect all the time
 	 */
 	public void autoZoom(final AbsoluteRectangle rect) {
 		log.debug("Auto zooming to " + rect);
@@ -453,8 +455,8 @@ public class DrawingArea {
 		final AffineTransform newAt = new AffineTransform();
 		
 		// dimensions of the drawing area
-		final int DAwidth = this.getDrawingCanvasRectangle().width;
-		final int DAhright = this.getDrawingCanvasRectangle().height;
+		final int DAwidth = this.canvasRect.width;
+		final int DAhright = this.canvasRect.height;
 		
 		final int BBheight = rect.getHeight();
 		final int BBwidth = rect.getWidth();
