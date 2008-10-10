@@ -8,6 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -44,18 +45,18 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * The nodes can be visualized in two way's according to the amount of information the user wants to
  * see.
  * <ul>
- * <li>In the <tt>non-extended mode</tt>, the nodes are represented by rectangles which only
- * contain the node's identifier.</li>
- * <li>In the <tt>extended mode</tt> the nodes are again represented by rectangles which contain
- * the node's identifier. But additionally, further information which are extracted from the packets
- * of certain semantic types are displayed, too.</li>
+ * <li>In the <tt>non-extended mode</tt>, the nodes are represented by rectangles which only contain
+ * the node's identifier.</li>
+ * <li>In the <tt>extended mode</tt> the nodes are again represented by rectangles which contain the
+ * node's identifier. But additionally, further information which are extracted from the packets of
+ * certain semantic types are displayed, too.</li>
  * </ul>
  * 
  * @author Sebastian Ebers
  */
 public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
-	public static final Logger log = SpyglassLogger.getLogger(SimpleNodePainterPlugin.class);
+	private static final Logger log = SpyglassLogger.getLogger(SimpleNodePainterPlugin.class);
 	
 	/**
 	 * The configuration parameters of this plug-in instance
@@ -92,13 +93,13 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	public void finalize() throws Throwable {
 		super.finalize();
 		synchronized (layer) {
-			
+			layer.clear();
 		}
 		synchronized (updatedObjects) {
 			updatedObjects.clear();
 		}
-		// xmlConfig.finalize();
-		// TODO: efficiently finalize the member objects
+		stringFormatterResults.clear();
+		xmlConfig.finalize();
 	}
 	
 	@Override
@@ -133,10 +134,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		return xmlConfig;
 	}
 	
-	public void setXMLConfig() {
-		System.out.println("Test");
-	}
-	
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
 		
@@ -164,15 +161,58 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			needsUpdate = true;
 		}
 		
+		needsUpdate = parsePayloadByStringFormatters(packet, nodeObject) || needsUpdate;
+		
+		if (needsUpdate) {
+			nodeObject.setDescription(getStringFormatterResultString(nodeID));
+			// add the object to the one which have to be (re)drawn ...
+			synchronized (updatedObjects) {
+				updatedObjects.add(nodeObject);
+			}
+		}
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Parses the packets payload using the defined {@link StringFormatter}s.<br>
+	 * If a string formatter exists which gains information from the payload, the {@link NodeObject}
+	 * corresponding to the node which sent the packet will be updated.
+	 * 
+	 * @param packet
+	 *            the packet containing the payload
+	 * @param nodeObject
+	 *            the graphical object which corresponds to the physical node which sent the packet-
+	 * @return <code>true</code> if a StringFormatter gained information from the payload
+	 */
+	private boolean parsePayloadByStringFormatters(final SpyglassPacket packet,
+			final NodeObject nodeObject) {
+		
+		boolean needsUpdate = false;
+		final int nodeID = packet.getSenderId();
 		final int packetSemanticType = packet.getSemanticType();
 		try {
-			final StringFormatter sf = xmlConfig.getStringFormatter(packetSemanticType);
-			if (sf != null) {
-				final String str = sf.parse(packet);
+			StringFormatter stringFormatter = null;
+			
+			// check if a default StringFormatter exists. If so, use to parse the packet
+			final String strinFormatterString = xmlConfig.getDefaultStringFormatter();
+			if ((strinFormatterString != null) && !strinFormatterString.equals("")) {
+				stringFormatter = new StringFormatter(strinFormatterString);
+				if (stringFormatter != null) {
+					// parses the packet. The resulting string will be stored separately
+					final String str = stringFormatter.parse(packet);
+					updateStringFormatterResults(-1, packetSemanticType + ": " + str, nodeID);
+					needsUpdate = true;
+				}
+			}
+			// check if a StringFormatter exists which was designed to process the semantic type of
+			// the packet. If so, use it to parse the packet
+			stringFormatter = xmlConfig.getStringFormatter(packetSemanticType);
+			if (stringFormatter != null) {
+				final String str = stringFormatter.parse(packet);
 				updateStringFormatterResults(packetSemanticType, str, nodeID);
-				nodeObject.setDescription(getStringFormatterResultString(nodeID));
 				needsUpdate = true;
 			}
+			
 		} catch (final IllegalArgumentException e) {
 			log.error(e);
 		} catch (final Exception e) {
@@ -181,13 +221,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 							"An error occured while processing a packet's contents using a StringFormatter",
 							e);
 		}
-		
-		if (needsUpdate) {
-			// add the object to the one which have to be (re)drawn ...
-			synchronized (updatedObjects) {
-				updatedObjects.add(nodeObject);
-			}
-		}
+		return needsUpdate;
 	}
 	
 	/**
@@ -292,13 +326,33 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Removes cached {@link StringFormatter} result strings which are no longer needed because the
+	 * corresponding semantic type is no longer listened to.
+	 */
+	private void purgeStringFormatterResults() {
+		final List<?> l = Arrays.asList(xmlConfig.getSemanticTypes());
+		synchronized (stringFormatterResults) {
+			final Collection<Map<Integer, String>> nodeResults = stringFormatterResults.values();
+			
+			for (final Map<Integer, String> results : nodeResults) {
+				for (final Integer key : results.keySet()) {
+					if ((key >= 0) && !l.contains(key)) {
+						results.remove(key);
+					}
+				}
+			}
+		}
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
 	 * Performs internal refreshments of the configuration parameters.<br>
 	 * This includes the node object amongst others since e.g. the line color etc. could have been
 	 * changed.
 	 */
 	public void refreshConfigurationParameters() {
 		refreshNodeObjectConfiguration();
-		// this has to be done to start or stop the packet consumer thread when needed
+		// this has to be done to start or stop the packet consumer thread
 		setActive(isActive());
 	}
 	
@@ -311,13 +365,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 */
 	public synchronized void refreshNodeObjectConfiguration() {
 		
+		purgeStringFormatterResults();
 		// get all drawing objects from the quad tree
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
 		synchronized (layer) {
 			drawingObjects.addAll(layer.getDrawingObjects());
 		}
 		
-		// update all objects o which represent nodes and store them in a list
+		// update all objects which represent nodes and store them in a list
 		// of objects to be updated in the quad tree
 		final List<DrawingObject> update = new LinkedList<DrawingObject>();
 		for (final DrawingObject drawingObject : drawingObjects) {
@@ -344,15 +399,15 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		synchronized (layer) {
-			
+			layer.clear();
 		}
 		
 		synchronized (updatedObjects) {
 			updatedObjects.clear();
 		}
-		
+		stringFormatterResults.clear();
+		refreshConfigurationParameters();
 	}
 	
 	@Override
@@ -423,8 +478,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Handles a mouse click event which was actually a double click returns <code>true</code> if
-	 * a drawing object was found which bounding box contains the point clicked by the user.
+	 * Handles a mouse click event which was actually a double click returns <code>true</code> if a
+	 * drawing object was found which bounding box contains the point clicked by the user.
 	 * 
 	 * @param drawingObjects
 	 *            the plug-in's drawing objects

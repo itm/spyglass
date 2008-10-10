@@ -237,7 +237,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 				}
 				{
 					label3 = new Label(group1, SWT.NONE);
-					label3.setText("Default string formatter");
+					label3.setText("Common string formatter");
 				}
 				{
 					final GridData defaultStringFmtLData = new GridData();

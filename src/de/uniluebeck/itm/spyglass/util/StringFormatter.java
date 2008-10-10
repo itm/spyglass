@@ -10,7 +10,7 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
  * The StringFormatter generates a String based on a given expression that mostly will contain at
  * least one placeholder. Each placeholder must be consistent with the scheme. It always starts with
  * a '%' followed by the type of the value and the offset (bytes) of the data in the packet. Allowed
- * datatypes are
+ * data types are
  * <ul>
  * <li>'u' (unsigned 8 Bit integer)</li>
  * <li>'U' (unsigned 32 Bit integer)</li>
@@ -51,10 +51,10 @@ public class StringFormatter {
 	 * Note, that %% masks a %. Thus an expression may contain e.g. a substring '%%fish', even
 	 * though this strictly spoken breaks rule 2 (it contains '%f').
 	 * 
-	 * @param formatExpression
+	 * @param pFormatExpression
 	 *            String, that should contain a valid expression
 	 * @throws IllegalArgumentException
-	 *             if the expresseion is unvalid
+	 *             if the expression is invalid
 	 */
 	public StringFormatter(String pFormatExpression) throws IllegalArgumentException {
 		
@@ -74,18 +74,21 @@ public class StringFormatter {
 			throw new IllegalArgumentException(msg);
 		}
 		
-		this.formatExpression = pFormatExpression;
+		this.formatExpression = convertLineBreaks(pFormatExpression);
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * This method parses the given Packet and returns a String corresponding to the expression
 	 * given to the constructor. The placeholders of the expression are displaced with the values
-	 * from the packet. The positions of these values in the packetdata are declared in the
+	 * from the packet. The positions of these values in the packet's data are declared in the
 	 * placeholders.
 	 * 
 	 * @param packet
 	 * @return A String, where the placeholders of the expression are changed with values from the
 	 *         packet
+	 * @exception IllegalArgumentException
+	 *                if the packet cannot be parsed because of a faulty payload or header
 	 */
 	public String parse(final SpyglassPacket packet) throws IllegalArgumentException {
 		String result = "";
@@ -218,11 +221,30 @@ public class StringFormatter {
 		}
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
-	 * return the original expression, from which this formatter was build from.
+	 * Returns the original expression, from which this formatter was build from.
+	 * 
+	 * @return the original expression, from which this formatter was build from.
 	 */
 	public String getOrigExpression() {
 		return origFormatExpression;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Converts the line breaks the user intended to create in the created to "real" ones which are
+	 * interpreted correctly by the parser
+	 * 
+	 * @param str
+	 *            the string which line breaks are to be converted
+	 * @return the provided strings with correctly interpretable line break commands
+	 */
+	public static String convertLineBreaks(String str) {
+		str = str.replace("\\r\\n", "<br>");
+		str = str.replace("\\n", "<br>");
+		str = str.replace("\\r", "<br>");
+		return str.replace("<br>", "\r\n");
 	}
 	
 	@Override
@@ -230,6 +252,12 @@ public class StringFormatter {
 		return resultString;
 	}
 	
+	/**
+	 * Main method for testing
+	 * 
+	 * @param args
+	 *            an array of arguments
+	 */
 	public static void main(final String[] args) {
 		// final StringFormatter test = new StringFormatter("Temp: %u5\nBattery %U1%");
 		// final StringFormatter test = new StringFormatter("Temp: %u5 Battery %u1");

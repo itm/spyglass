@@ -125,16 +125,14 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	
 	/**
 	 * Returns a string formatting object in respect to a syntax type or <code>null</code> if no
-	 * matching object was created previously and the default expression is undefined.
+	 * matching object was created previously.
 	 * 
 	 * @return a string formatting object in respect to a syntax type or <code>null</code> if no
-	 *         matching object was created previously and the default expression is undefined.
+	 *         matching object was created previously.
 	 */
 	public StringFormatter getStringFormatter(final int semanticType) {
 		if (stringFormatters.containsKey(semanticType)) {
 			return new StringFormatter(stringFormatters.get(semanticType));
-		} else if (defaultStringFormatter != null) {
-			return new StringFormatter(defaultStringFormatter);
 		}
 		return null;
 	}
@@ -200,6 +198,13 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 				&& (isExtendenInformationActive == o.isExtendenInformationActive)
 				&& equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth)
 				&& stringFormatters.equals(o.stringFormatters);
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		isExtendenInformationActive.clear();
+		stringFormatters.clear();
+		super.finalize();
 	}
 	
 }
