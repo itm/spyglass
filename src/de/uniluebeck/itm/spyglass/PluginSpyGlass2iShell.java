@@ -149,6 +149,8 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		final ConfigStore cs = new ConfigStore(true);
 		// Create the configuration for SpyGlass
 		config = cs.getSpyglassConfig();
+		
+		// TODO: SE - an error will occur if the configuration file was corrupted
 		packetBroker = (IShellToSpyGlassPacketBroker) config.getPacketReader();
 		
 		// TODO

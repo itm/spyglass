@@ -43,19 +43,20 @@ public class ConfigStore {
 	
 	private String configFilePath = "config/DefaultSpyglassConfigStandalone.xml";
 	
-	/** An instance of a spyglass configuration object */
+	/** An instance of a SpyGlass configuration object */
 	private SpyglassConfiguration spyglassConfig;
 	
 	/** An object which is used for logging errors and other events */
 	private static Logger log = SpyglassLogger.get(ConfigStore.class);
 	
-	private final boolean isIShellPlugin;
+	// private final boolean isIShellPlugin;
 	
 	@Override
 	public void finalize() throws Throwable {
 		spyglassConfig = null;
 	}
 	
+	// --------------------------------------------------------------------------
 	/**
 	 * Listener for changes in the plug-in list
 	 */
@@ -80,24 +81,26 @@ public class ConfigStore {
 		
 	};
 	
+	// --------------------------------------------------------------------------
 	/**
-	 * Listener for changes in config of an plugin
+	 * Listener for changes in the configuration of an plug-in.<br>
+	 * If an event names "all" occurs, the configuration will be stored. All other events will be
+	 * ignored.
 	 */
 	PropertyChangeListener pluginPropertyListener = new PropertyChangeListener() {
 		
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
-			
-			store();
-			
+			if (evt.getPropertyName().equals("all")) {
+				store();
+			}
 		}
-		
 	};
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
-	 * Reads the config from an hardcoded standard-path (which is stored internally in this class)
+	 * Reads the configuration from an hard-coded standard-path (which is stored internally in this
+	 * class)
 	 * 
 	 * @param isIShellPlugin
 	 *            indicates whether or not the application is used as iShell plug-in
@@ -108,9 +111,9 @@ public class ConfigStore {
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
-	 * Reads the config from an hardcoded standard-path (which is stored internally in this class)
+	 * Reads the configuration from an hard-coded standard-path (which is stored internally in this
+	 * class)
 	 * 
 	 * @param isIShellPlugin
 	 *            indicates whether or not the application is used as iShell plug-in
@@ -118,30 +121,28 @@ public class ConfigStore {
 	 *            the configuration parameters
 	 */
 	public ConfigStore(final boolean isIShellPlugin, final SpyglassConfiguration spyglassConfig) {
-		this.isIShellPlugin = isIShellPlugin;
+		// this.isIShellPlugin = isIShellPlugin;
 		this.configFilePath = (isIShellPlugin) ? DEFAULT_CONFIG_FILE_ISHELL_PLUGIN
 				: DEFAULT_CONFIG_FILE_STANDALONE;
 		this.spyglassConfig = spyglassConfig;
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
-	 * creates a new configStore for the given File.
+	 * Creates a new configStore for the given file.
 	 * 
 	 * @param isIShellPlugin
 	 *            indicates whether or not the application is used as iShell plug-in
-	 * @param file
+	 * @param configFile
 	 *            the file which contains the configuration parameters
 	 */
 	public ConfigStore(final boolean isIShellPlugin, final File configFile) {
-		this.isIShellPlugin = isIShellPlugin;
+		// this.isIShellPlugin = isIShellPlugin;
 		this.configFilePath = configFile.getPath();
 		load(configFile);
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * @return the spyglassConfig
 	 */
@@ -150,7 +151,6 @@ public class ConfigStore {
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * Returns the default configuration parameters of a plug-in
 	 * 
@@ -172,7 +172,6 @@ public class ConfigStore {
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * Loads the configuration from a file
 	 * 
@@ -202,7 +201,6 @@ public class ConfigStore {
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * Loads and returns the configuration from a file
 	 * 
@@ -237,23 +235,34 @@ public class ConfigStore {
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
-	 * Stores the configuration persistently into the local file system.<br>
-	 * Since no file is provided the file {@link ConfigStore#defaultFileName} is used.
-	 * 
-	 * @return <code>true</code> if the configuration was stored successfully
+	 * Stores the configuration persistently into the local file system using an extra
+	 * {@link Thread}
 	 */
-	public boolean store() {
-		return store(new File(configFilePath));
+	public void store() {
+		store(false);
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * Stores the configuration persistently into the local file system.
 	 * 
-	 * The given configFile will not be used for subsequent updates. This method is therefor more
+	 * @param blocking
+	 *            if <code>false</code> an extra {@link Thread} will be used
+	 */
+	public void store(final boolean blocking) {
+		if (blocking) {
+			store(new File(configFilePath));
+		} else {
+			storeInExtraThread(new File(configFilePath));
+		}
+	}
+	
+	// --------------------------------------------------------------------------
+	/**
+	 * Stores the configuration persistently into the local file system.
+	 * 
+	 * The given configFile will not be used for subsequent updates. This method is therefore more
 	 * suited for "Exports" of the configuration.
 	 * 
 	 * 
@@ -261,7 +270,7 @@ public class ConfigStore {
 	 *            the file which will contain the configuration data afterwards
 	 * @return <code>true</code> if the configuration was stored successfully
 	 */
-	public boolean store(final File configFile) {
+	public synchronized boolean store(final File configFile) {
 		
 		log.debug("Initializing. Storing config to file: " + configFile);
 		
@@ -272,6 +281,7 @@ public class ConfigStore {
 		try {
 			purgeDefaults();
 			new Persister().write(spyglassConfig, configFile);
+			log.debug("Storing config to file: " + configFile + " completed");
 			return true;
 		} catch (final Exception e) {
 			log.error("Unable to store configuration output: " + e, e);
@@ -287,6 +297,26 @@ public class ConfigStore {
 			}
 			return false;
 		}
+	}
+	
+	/**
+	 * Stores the configuration in an extra {@link Thread} to improve the performance.<br>
+	 */
+	private void storeInExtraThread(final File configFile) {
+		
+		final Thread t = new Thread() {
+			@Override
+			public void run() {
+				store(configFile);
+			}
+		};
+		
+		// this Thread must not be a Daemon! Otherwise a running storing process would be
+		// interrupted when the program terminates.
+		// This would result in a corrupted configuration file.
+		t.setDaemon(false);
+		t.start();
+		
 	}
 	
 	// --------------------------------------------------------------------------

@@ -381,7 +381,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				final int nodeID = nodeObject.getNodeID();
 				
 				final String stringFormatterResult = getStringFormatterResultString(nodeID);
-				System.out.println(xmlConfig.isExtendedInformationActive(nodeID));
 				nodeObject.update("Node " + nodeID, stringFormatterResult, xmlConfig
 						.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(),
 						xmlConfig.getLineWidth());

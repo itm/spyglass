@@ -3,6 +3,7 @@ package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -50,6 +51,7 @@ import com.cloudgarden.resource.SWTResourceManager;
 import de.uniluebeck.itm.spyglass.gui.converter.ArrayToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.converter.ColorToArrayConverter;
 import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.WrappedSet.ObservableEntry;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
@@ -91,6 +93,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 		SWTResourceManager.registerResourceUser(this);
 	}
 	
+	private static final Logger log = SpyglassLogger.getLogger(OptionsComposite.class);
 	private Group group1;
 	private Label label1;
 	private Button delEntry;
@@ -315,7 +318,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 	}
 	
 	private void lineColorWidgetSelected(final SelectionEvent evt) {
-		System.out.println("lineColor.widgetSelected, event=" + evt);
+		log.debug("lineColor.widgetSelected, event=" + evt);
 		final ColorDialog dlg = new ColorDialog(this.getShell());
 		dlg.setRGB(colorExample.getBackground().getRGB());
 		final RGB color = dlg.open();

@@ -149,7 +149,7 @@ public class Spyglass {
 	
 	public void shutdown() {
 		setVisualizationRunning(false);
-		configStore.store();
+		configStore.store(true);
 		log.info("All plugin-threads stopped");
 	}
 	

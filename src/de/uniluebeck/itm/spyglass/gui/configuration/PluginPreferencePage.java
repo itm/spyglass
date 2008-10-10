@@ -385,6 +385,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.dbc.updateModels();
 		this.dbc.updateTargets();
 		this.basicGroup.resetChanged();
+		config.indicateApplyButtonPressed();
 	}
 	
 	/**
