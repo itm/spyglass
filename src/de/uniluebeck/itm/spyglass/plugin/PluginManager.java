@@ -12,6 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -348,6 +349,71 @@ public class PluginManager {
 		plugins.add(0, plugin);
 		log.debug("The plug-in: " + plugin + " is now the one with the highest priority");
 		firePluginListChangedEvent(plugin, ListChangeEvent.PRIORITY_CHANGED);
+	}
+	
+	public void increasePluginPriorities(final List<Plugin> list) {
+		
+		final HashMap<Plugin, Integer> newPrios = new HashMap<Plugin, Integer>();
+		
+		synchronized (this.plugins) {
+			
+			int currentIndex;
+			
+			for (final Plugin p : list) {
+				currentIndex = plugins.indexOf(p);
+				if (currentIndex == -1) {
+					throw new RuntimeException("The plugin was not yet managed.");
+				}
+				newPrios.put(p, currentIndex == 0 ? 0 : currentIndex - 1);
+			}
+			
+			for (final Plugin p : list) {
+				plugins.remove(p);
+				plugins.add(newPrios.get(p), p);
+			}
+			
+		}
+		
+		for (final Plugin p : plugins) {
+			log.debug("Gave plugin " + p + " priority number " + plugins.indexOf(p));
+			firePluginListChangedEvent(p, ListChangeEvent.PRIORITY_CHANGED);
+		}
+		
+	}
+	
+	public void decreasePluginPriorities(final List<Plugin> list) {
+		
+		final HashMap<Integer, Plugin> newPrios = new HashMap<Integer, Plugin>();
+		
+		synchronized (this.plugins) {
+			
+			int currentIndex, moveCount = 0;
+			boolean move;
+			
+			for (final Plugin p : plugins) {
+				
+				move = list.contains(p);
+				currentIndex = plugins.indexOf(p);
+				newPrios.put(move ? (currentIndex + 1) : (currentIndex + (-1 * moveCount)), p);
+				moveCount = move ? (moveCount + 1) : 0;
+				
+			}
+			
+			for (final Plugin p : newPrios.values()) {
+				plugins.remove(p);
+			}
+			
+			for (int i = 0; i < newPrios.size(); i++) {
+				plugins.add(i, newPrios.get(i));
+			}
+			
+		}
+		
+		for (final Plugin p : plugins) {
+			log.debug("Gave plugin " + p + " priority number " + plugins.indexOf(p));
+			firePluginListChangedEvent(p, ListChangeEvent.PRIORITY_CHANGED);
+		}
+		
 	}
 	
 	// --------------------------------------------------------------------------------
