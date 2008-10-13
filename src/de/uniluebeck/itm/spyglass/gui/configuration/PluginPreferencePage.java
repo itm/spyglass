@@ -261,7 +261,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		return createContentsInternal(parent);
 	}
 	
-	private Composite createContentsInternal(final Composite parent) {
+	protected Composite createContentsInternal(final Composite parent) {
 		final Composite composite = createComposite(parent);
 		
 		if (this.config == null) {

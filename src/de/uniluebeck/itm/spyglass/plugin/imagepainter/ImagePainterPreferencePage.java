@@ -21,7 +21,9 @@ public class ImagePainterPreferencePage extends
 	
 	@Override
 	protected Composite createContents(final Composite parent) {
-		return super.createMS2Warning(parent); // TODO: plugin-specific options
+		final Composite composite = createContentsInternal(parent);
+		new ImageOptionsComposite(composite);
+		return composite;
 		/*
 		 * String msg = "ImagePainterPlugin Preference Page\n"; msg += (type == PrefType.INSTANCE ?
 		 * "Instance Name: " + plugin.getInstanceName() + "\n" + "IsActive: " + plugin.isActive() +
