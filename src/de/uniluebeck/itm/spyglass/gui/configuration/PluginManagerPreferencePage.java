@@ -2,6 +2,8 @@ package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -280,7 +282,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		public boolean isFirstInList(final Plugin selectedPlugin) {
 			
 			if (selectedPlugin == null) {
-				return true;
+				return false;
 			}
 			
 			if (plugins.size() > 0) {
@@ -294,7 +296,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		public boolean isLastInList(final Plugin selectedPlugin) {
 			
 			if (selectedPlugin == null) {
-				return true;
+				return false;
 			}
 			
 			if (plugins.size() > 0) {
@@ -425,6 +427,10 @@ public class PluginManagerPreferencePage extends PreferencePage {
 				clickedButtonDown();
 			} else if (e.getSource() == buttonDeleteInstance) {
 				clickedButtonRemoveInstance();
+			} else if (e.getSource() == buttonDeActivate) {
+				clickedButtonDeActivate();
+			} else if (e.getSource() == buttonInVisible) {
+				clickedButtonInVisible();
 			}
 		}
 		
@@ -500,6 +506,10 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		}
 	};
 	
+	private Button buttonDeActivate;
+	
+	private Button buttonInVisible;
+	
 	private void addPluginManagerList(final Composite parent) {
 		
 		final GridLayout pluginsGroupLayout = new GridLayout(2, false);
@@ -547,6 +557,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		final GridData buttonRemoveInstanceData = new GridData();
 		buttonRemoveInstanceData.widthHint = 130;
 		
+		final GridData buttonDeActivateInstanceData = new GridData();
+		buttonDeActivateInstanceData.widthHint = 130;
+		
+		final GridData buttonInVisibleInstanceData = new GridData();
+		buttonInVisibleInstanceData.widthHint = 130;
+		
 		buttonUp = new Button(buttonComposite, SWT.PUSH);
 		buttonUp.setText("Up");
 		buttonUp.setLayoutData(buttonUpData);
@@ -565,38 +581,82 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		buttonDeleteInstance.setEnabled(false);
 		buttonDeleteInstance.addSelectionListener(buttonSelectionListener);
 		
+		buttonDeActivate = new Button(buttonComposite, SWT.PUSH);
+		buttonDeActivate.setText("Make Inactive");
+		buttonDeActivate.setLayoutData(buttonDeActivateInstanceData);
+		buttonDeActivate.setEnabled(false);
+		buttonDeActivate.addSelectionListener(buttonSelectionListener);
+		
+		buttonInVisible = new Button(buttonComposite, SWT.PUSH);
+		buttonInVisible.setText("Make Invisible");
+		buttonInVisible.setLayoutData(buttonInVisibleInstanceData);
+		buttonInVisible.setEnabled(false);
+		buttonInVisible.addSelectionListener(buttonSelectionListener);
+		
+	}
+	
+	private void clickedButtonInVisible() {
+		final IStructuredSelection selection = (IStructuredSelection) pluginTableViewer
+				.getSelection();
+		final boolean visible = !getFirstSelectedPlugin(selection).isVisible();
+		final List<Plugin> list = getSelectedPlugins(selection);
+		for (final Plugin p : list) {
+			p.setVisible(visible);
+		}
+		pluginTableViewer.refresh();
+		updateButtons((IStructuredSelection) pluginTableViewer.getSelection());
+	}
+	
+	private void clickedButtonDeActivate() {
+		final IStructuredSelection selection = (IStructuredSelection) pluginTableViewer
+				.getSelection();
+		final boolean active = !getFirstSelectedPlugin(selection).isActive();
+		final List<Plugin> list = getSelectedPlugins(selection);
+		for (final Plugin p : list) {
+			p.setActive(active);
+		}
+		pluginTableViewer.refresh();
+		updateButtons((IStructuredSelection) pluginTableViewer.getSelection());
 	}
 	
 	private void clickedButtonRemoveInstance() {
+		final List<Plugin> list = getSelectedPlugins((IStructuredSelection) pluginTableViewer
+				.getSelection());
 		final boolean confirm = MessageDialog.openConfirm(getShell(), "Confirm instance removal",
-				"Are you sure you want to remove the plugin instance?");
+				"Are you sure you want to remove " + list.size() + " plugin instance(s)?");
 		if (confirm) {
-			final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer
-					.getSelection()).getFirstElement();
-			spyglass.getPluginManager().removePlugin(selectedPlugin);
+			for (final Plugin p : list) {
+				spyglass.getPluginManager().removePlugin(p);
+			}
 		}
 	}
 	
 	private void clickedButtonDown() {
-		final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer
-				.getSelection()).getFirstElement();
-		final Plugin nextPlugin;
-		final List<Plugin> plugins = pluginTableContentProvider.plugins;
-		nextPlugin = plugins.get(plugins.indexOf(selectedPlugin) + 1);
-		spyglass.getPluginManager().togglePluginPriorities(selectedPlugin, nextPlugin);
+		// final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer
+		// .getSelection()).getFirstElement();
+		// final Plugin nextPlugin;
+		// final List<Plugin> plugins = pluginTableContentProvider.plugins;
+		// nextPlugin = plugins.get(plugins.indexOf(selectedPlugin) + 1);
+		// spyglass.getPluginManager().togglePluginPriorities(selectedPlugin, nextPlugin);
+		final List<Plugin> list = getSelectedPlugins((IStructuredSelection) pluginTableViewer
+				.getSelection());
+		spyglass.getPluginManager().decreasePluginPriorities(list);
 		pluginTableViewer.refresh();
-		updateButtons(selectedPlugin);
+		updateButtons((IStructuredSelection) pluginTableViewer.getSelection());
 	}
 	
 	private void clickedButtonUp() {
-		final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer
-				.getSelection()).getFirstElement();
-		final Plugin previousPlugin;
-		final List<Plugin> plugins = pluginTableContentProvider.plugins;
-		previousPlugin = plugins.get(plugins.indexOf(selectedPlugin) - 1);
-		spyglass.getPluginManager().togglePluginPriorities(selectedPlugin, previousPlugin);
+		// final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer
+		// .getSelection()).getFirstElement();
+		// final Plugin previousPlugin;
+		// final List<Plugin> plugins = pluginTableContentProvider.plugins;
+		// previousPlugin = plugins.get(plugins.indexOf(selectedPlugin) - 1);
+		// spyglass.getPluginManager().togglePluginPriorities(selectedPlugin, previousPlugin);
+		final List<Plugin> list = getSelectedPlugins((IStructuredSelection) pluginTableViewer
+				.getSelection());
+		spyglass.getPluginManager().increasePluginPriorities(list);
 		pluginTableViewer.refresh();
-		updateButtons(selectedPlugin);
+		updateButtons((IStructuredSelection) pluginTableViewer.getSelection());
 	}
 	
 	@Override
@@ -614,8 +674,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private void createPluginTableViewer(final Composite parent) {
 		
-		final int style = SWT.SINGLE | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL
-				| SWT.FULL_SELECTION;
+		final int style = SWT.MULTI | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION;
 		
 		pluginTableViewer = new TableViewer(parent, style);
 		
@@ -658,7 +717,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 			@Override
 			public void selectionChanged(final SelectionChangedEvent e) {
 				final IStructuredSelection selection = (IStructuredSelection) e.getSelection();
-				updateButtons((Plugin) selection.getFirstElement());
+				updateButtons(selection);
 			}
 			
 		});
@@ -669,6 +728,15 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		pluginTableViewer.setContentProvider(pluginTableContentProvider);
 		pluginTableViewer.setInput(spyglass);
 		
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<Plugin> getSelectedPlugins(final IStructuredSelection selection) {
+		final List<Plugin> list = new ArrayList<Plugin>();
+		for (final Iterator it = selection.iterator(); it.hasNext();) {
+			list.add((Plugin) it.next());
+		}
+		return list;
 	}
 	
 	@Override
@@ -706,10 +774,42 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		}
 	}
 	
-	private void updateButtons(final Plugin selectedPlugin) {
-		buttonUp.setEnabled(!pluginTableContentProvider.isFirstInList(selectedPlugin));
-		buttonDown.setEnabled(!pluginTableContentProvider.isLastInList(selectedPlugin));
-		buttonDeleteInstance.setEnabled(!pluginTableViewer.getSelection().isEmpty());
+	private void updateButtons(final IStructuredSelection selection) {
+		
+		final Plugin first = getFirstSelectedPlugin(selection);
+		final Plugin last = getLastSelectedPlugin(selection);
+		final boolean enableUp = !pluginTableContentProvider.isFirstInList(first);
+		final boolean enableDown = !pluginTableContentProvider.isLastInList(last);
+		final boolean notEmpty = !pluginTableViewer.getSelection().isEmpty();
+		
+		buttonUp.setEnabled(enableUp);
+		buttonDown.setEnabled(enableDown);
+		buttonDeleteInstance.setEnabled(notEmpty);
+		buttonDeActivate.setEnabled(notEmpty);
+		buttonInVisible.setEnabled(notEmpty);
+		
+		if (notEmpty) {
+			buttonDeActivate.setText(first.isActive() ? "Make Inactive" : "Make Active");
+			buttonInVisible.setText(first.isVisible() ? "Make Invisible" : "Make Visible");
+		}
+		
+	}
+	
+	private Plugin getFirstSelectedPlugin(final IStructuredSelection selection) {
+		if (selection.isEmpty()) {
+			return null;
+		}
+		return (Plugin) selection.getFirstElement();
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Plugin getLastSelectedPlugin(final IStructuredSelection selection) {
+		Object o = null;
+		final Iterator it = selection.iterator();
+		while (it.hasNext()) {
+			o = it.next();
+		}
+		return (Plugin) o;
 	}
 	
 }
