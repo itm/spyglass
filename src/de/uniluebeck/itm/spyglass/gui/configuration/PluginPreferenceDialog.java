@@ -32,6 +32,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -73,6 +74,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		@Override
 		protected boolean showPage(final IPreferenceNode node) {
 			informIfUnsavedChanges();
+			final GridData data = (GridData) getTreeViewer().getControl().getLayoutData();
+			data.widthHint = 220;
 			return super.showPage(node);
 		}
 		
