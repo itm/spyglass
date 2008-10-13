@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,11 +17,14 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.IPreferencePage;
+import org.eclipse.jface.preference.PreferenceContentProvider;
 import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.jface.preference.PreferenceLabelProvider;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -28,6 +32,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -38,6 +44,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -79,17 +87,140 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			return super.showPage(node);
 		}
 		
+		private SelectionListener menuSelectionListener = new SelectionListener() {
+			
+			@Override
+			public void widgetDefaultSelected(final SelectionEvent e) {
+				widgetSelected(e);
+			}
+			
+			@Override
+			@SuppressWarnings("unchecked")
+			public void widgetSelected(final SelectionEvent e) {
+				
+				final IStructuredSelection selection = (IStructuredSelection) getTreeViewer()
+						.getSelection();
+				Object o = null;
+				final List<Plugin> plugins = new ArrayList<Plugin>();
+				
+				for (final Iterator it = selection.iterator(); it.hasNext();) {
+					o = it.next();
+					plugins.add(((PluginPreferenceNode) o).plugin);
+				}
+				
+				if (e.getSource() == menuItemDeleteInstance) {
+					final boolean b = MessageDialog.openConfirm(getShell(),
+							"Confirm plugin instance removal", "Are you sure you want to remove "
+									+ plugins.size() + " plugin instances?");
+					if (b) {
+						for (final Plugin p : plugins) {
+							spyglass.getPluginManager().removePlugin(p);
+						}
+					}
+				} else {
+					
+					for (final Plugin p : plugins) {
+						if (e.getSource() == menuItemActivate) {
+							p.setActive(true);
+						} else if (e.getSource() == menuItemDeactivate) {
+							p.setActive(false);
+						} else if (e.getSource() == menuItemVisible) {
+							p.setVisible(true);
+						} else if (e.getSource() == menuItemInvisible) {
+							p.setVisible(false);
+						}
+					}
+					
+				}
+				
+				getTreeViewer().refresh();
+				
+			}
+			
+		};
+		
+		private MenuItem menuItemActivate;
+		private MenuItem menuItemVisible;
+		private MenuItem menuItemDeactivate;
+		private MenuItem menuItemInvisible;
+		
+		private MenuItem menuItemDeleteInstance;
+		
 		@Override
 		protected TreeViewer createTreeViewer(final Composite parent) {
-			final TreeViewer treeViewer = super.createTreeViewer(parent);
-			treeViewer.setComparator(new ViewerComparator() {
+			
+			final TreeViewer viewer = new TreeViewer(parent, SWT.MULTI);
+			addListeners(viewer);
+			viewer.setLabelProvider(new PreferenceLabelProvider());
+			viewer.setContentProvider(new PreferenceContentProvider());
+			viewer.setComparator(new ViewerComparator() {
 				@Override
 				public int compare(final Viewer v, final Object o1, final Object o2) {
 					return ((PreferenceNode) o1).getLabelText().compareToIgnoreCase(
 							((PreferenceNode) o2).getLabelText());
 				}
 			});
-			return treeViewer;
+			
+			final Menu menu = new Menu(viewer.getControl());
+			
+			menuItemActivate = new MenuItem(menu, SWT.NONE);
+			menuItemActivate.setText("Activate");
+			menuItemActivate.addSelectionListener(menuSelectionListener);
+			
+			menuItemDeactivate = new MenuItem(menu, SWT.NONE);
+			menuItemDeactivate.setText("Deactivate");
+			menuItemDeactivate.addSelectionListener(menuSelectionListener);
+			
+			new MenuItem(menu, SWT.SEPARATOR);
+			
+			menuItemVisible = new MenuItem(menu, SWT.NONE);
+			menuItemVisible.setText("Set Visible");
+			menuItemVisible.addSelectionListener(menuSelectionListener);
+			
+			menuItemInvisible = new MenuItem(menu, SWT.NONE);
+			menuItemInvisible.setText("Set Invisible");
+			menuItemInvisible.addSelectionListener(menuSelectionListener);
+			
+			new MenuItem(menu, SWT.SEPARATOR);
+			
+			menuItemDeleteInstance = new MenuItem(menu, SWT.NONE);
+			menuItemDeleteInstance.setText("Delete Instance");
+			menuItemDeleteInstance.addSelectionListener(menuSelectionListener);
+			
+			viewer.getTree().setMenu(menu);
+			viewer.getTree().addMenuDetectListener(new MenuDetectListener() {
+				@Override
+				@SuppressWarnings("unchecked")
+				public void menuDetected(final MenuDetectEvent e) {
+					
+					final IStructuredSelection selection = (IStructuredSelection) viewer
+							.getSelection();
+					
+					if (selection.isEmpty()) {
+						e.doit = false;
+						return;
+					}
+					
+					boolean onlyInstancesSelected = true;
+					Object o = null;
+					
+					for (final Iterator it = selection.iterator(); it.hasNext();) {
+						o = it.next();
+						if (!(o instanceof PluginPreferenceNode)) {
+							onlyInstancesSelected = false;
+						}
+					}
+					
+					menuItemActivate.setEnabled(onlyInstancesSelected);
+					menuItemDeactivate.setEnabled(onlyInstancesSelected);
+					menuItemVisible.setEnabled(onlyInstancesSelected);
+					menuItemInvisible.setEnabled(onlyInstancesSelected);
+					menuItemDeleteInstance.setEnabled(onlyInstancesSelected);
+					
+				}
+			});
+			
+			return viewer;
 		}
 		
 		@Override
@@ -151,6 +282,10 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 		public void selectPreferenceNode(final Plugin p) {
 			selectPreferenceNodeInternal(getPreferenceNodeId(p));
+		}
+		
+		public void selectPreferenceNode(final Class<? extends Plugin> clazz) {
+			selectPreferenceNodeInternal(clazz.getCanonicalName());
 		}
 		
 		private void selectPreferenceNodeInternal(final String nodeId) {
@@ -648,7 +783,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	
 	private void onPluginRemoved(final Plugin p) {
 		removePreferenceNode(instancePreferenceNodes.get(p), preferenceManager.getRootSubNodes());
-		preferenceDialog.selectPluginManagerPreferenceNode();
+		preferenceDialog.selectPreferenceNode(p.getClass());
 	}
 	
 	private boolean removePreferenceNode(final IPreferenceNode node,
@@ -721,7 +856,6 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		return hashUnsavedChanges;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private boolean proceedIfUnsavedChanges() {
 		
 		if (hasUnsavedChanges()) {
