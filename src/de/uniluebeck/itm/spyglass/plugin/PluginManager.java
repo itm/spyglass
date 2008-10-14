@@ -224,9 +224,6 @@ public class PluginManager {
 	 * Connect the Plugin with the plugin manager
 	 */
 	private void connectPlugin(final Plugin plugin) {
-		plugin.initializePacketConsumerThread();
-		plugin.setPluginManager(this);
-		
 		// If the plugin is a NodePositioner, we have to act when the plugin is activated
 		// (to disable all other plugins)
 		if (plugin instanceof NodePositionerPlugin) {
@@ -253,6 +250,8 @@ public class PluginManager {
 				
 			});
 		}
+		
+		plugin.init(this);
 		
 	}
 	
@@ -342,7 +341,7 @@ public class PluginManager {
 	 *             <code>PluginManager</code>.
 	 */
 	public void increasePluginPriorityToTop(final Plugin plugin) {
-		plugin.setPluginManager(this);
+		
 		if (!plugins.remove(plugin)) {
 			throw new RuntimeException("The plugin was not yet managed.");
 		}

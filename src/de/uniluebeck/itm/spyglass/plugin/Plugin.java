@@ -59,9 +59,8 @@ public abstract class Plugin implements Runnable, Comparable {
 	 * Constructor<br>
 	 * If the plug-in has to administer a packet queue a thread to consume packets from the queue
 	 * will be started when the plug-in is activated and stopped when the plug-in is deactivated.<br>
-	 * When a new plug-in is created, the Method {@link Plugin#initializePacketConsumerThread()} has
-	 * to be called which is usually done in the {@link PluginManager} when the plug-in is added to
-	 * the list.
+	 * When a new plug-in is created, the Method {@link Plugin#init(PluginManager)} has to be called
+	 * which is usually done in the {@link PluginManager} when the plug-in is added to the list.
 	 * 
 	 * @param needsPacketQueue
 	 *            indicates whether or not the plug-in has to administer a packet queue
@@ -142,7 +141,18 @@ public abstract class Plugin implements Runnable, Comparable {
 	 */
 	public final void setActive(final boolean isActive) {
 		getXMLConfig().setActive(isActive);
-		initializePacketConsumerThread();
+		
+		// TODO: Should be done via Events
+		
+		if (packetQueue != null) {
+			// if the plug-in is deactivated, stop the thread if it is currenrly
+			// running. Otherwise, start it
+			if (!isActive()) {
+				stopPacketConsumerThread();
+			} else {
+				startPacketConsumerThread();
+			}
+		}
 	}
 	
 	public boolean isThreadRunning() {
@@ -151,13 +161,19 @@ public abstract class Plugin implements Runnable, Comparable {
 	}
 	
 	/**
-	 * Initializes the packet consumer thread.<br>
-	 * If the plug-in is activated, the thread will be started (and maybe previously created).
-	 * Otherwise, the thread will be stopped.
+	 * Initializes the plugin. It is called right after the plugin has been instanciated and the
+	 * configuration of the plugin is set.
+	 * 
+	 * This methods starts the consumer thread, if necessary.
+	 * 
+	 * @param pluginManager
+	 *            reference to the parent PluginManager
 	 * 
 	 * @see PluginXMLConfig#getActive()
 	 */
-	public void initializePacketConsumerThread() {
+	public void init(final PluginManager pluginManager) {
+		
+		this.pluginManager = pluginManager;
 		
 		// if the plug-in has a packet queue, it is maintained by a separate
 		// thread. This thread has to be started on activation and stopped on
@@ -211,22 +227,11 @@ public abstract class Plugin implements Runnable, Comparable {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Sets the facility which administers this plug-in along with others
-	 * 
-	 * @param pluginManager
-	 *            the plug-in's manager
-	 */
-	public final void setPluginManager(final PluginManager pluginManager) {
-		this.pluginManager = pluginManager;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * Returns the facility which administers this plug-in along with others
 	 * 
 	 * @return the plug-in's manager
 	 */
-	public final PluginManager getPluginManager() {
+	protected final PluginManager getPluginManager() {
 		return pluginManager;
 	}
 	
@@ -235,8 +240,8 @@ public abstract class Plugin implements Runnable, Comparable {
 	 * Creates and returns a widget which can be used to configure the plug-in
 	 * 
 	 * @param dialog
-	 *            the <code>PluginPreferenceDialog</code> instance the preference page is
-	 *            displayed in
+	 *            the <code>PluginPreferenceDialog</code> instance the preference page is displayed
+	 *            in
 	 * @param spyglass
 	 *            the <code>Spyglass</code> instance
 	 * 
@@ -252,8 +257,8 @@ public abstract class Plugin implements Runnable, Comparable {
 	 * plug-in instance this method can be called in a static way.
 	 * 
 	 * @param dialog
-	 *            the <code>PluginPreferenceDialog</code> instance the preference page is
-	 *            displayed in
+	 *            the <code>PluginPreferenceDialog</code> instance the preference page is displayed
+	 *            in
 	 * @param spyglass
 	 *            the <code>Spyglass</code> instance
 	 * 
@@ -417,11 +422,9 @@ public abstract class Plugin implements Runnable, Comparable {
 	}
 	
 	/**
-	 * Retrieves and removes the head of the packet queue, or returns <tt>null</tt> if it is
-	 * empty.<br>
+	 * Retrieves and removes the head of the packet queue, or returns <tt>null</tt> if it is empty.<br>
 	 * Note that this is done in an extra thread. If an {@link InterruptedException} occurs,
-	 * <code>null</code> might be returned no matter if the parameter <tt>wait</tt> is set or
-	 * not.
+	 * <code>null</code> might be returned no matter if the parameter <tt>wait</tt> is set or not.
 	 * 
 	 * @param wait
 	 *            indicates whether or not the caller wants to wait for a packet if the packet queue
