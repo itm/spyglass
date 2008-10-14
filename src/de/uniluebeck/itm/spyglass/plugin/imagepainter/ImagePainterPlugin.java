@@ -22,6 +22,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
@@ -111,25 +112,38 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	}
 	
 	@Override
-	public void propertyChange(final PropertyChangeEvent e) {
-		if (e.getPropertyName().equals("imageFileName")) {
-			synchronized (layer) {
-				layer.remove(image);
-			}
-			final String imageFileName = (String) e.getNewValue();
-			image = new Image(imageFileName);
-			final int sizeX = xmlConfig.getImageSizeX();
-			final int sizeY = xmlConfig.getImageSizeY();
-			final int ulX = xmlConfig.getLowerLeftX() - sizeX;
-			final int ulY = sizeY;
-			final AbsolutePosition position = new AbsolutePosition(ulX, ulY, 0);
-			image.setPosition(position);
-			image.setImageSizeX(sizeX);
-			image.setImageSizeY(sizeY);
-			synchronized (layer) {
-				layer.addOrUpdate(image);
-			}
+	public void init(final PluginManager pluginManager) {
+		super.init(pluginManager);
+		loadImage();
+	}
+	
+	private void loadImage() {
+		
+		synchronized (layer) {
+			layer.remove(image);
 		}
+		
+		image = new Image(xmlConfig.getImageFileName());
+		
+		final int sizeX = xmlConfig.getImageSizeX();
+		final int sizeY = xmlConfig.getImageSizeY();
+		final int llX = xmlConfig.getLowerLeftX();
+		final int llY = xmlConfig.getLowerLeftY();
+		
+		final AbsolutePosition position = new AbsolutePosition(llX, llY, 0);
+		image.setPosition(position);
+		image.setImageSizeX(sizeX);
+		image.setImageSizeY(sizeY);
+		
+		synchronized (layer) {
+			layer.addOrUpdate(image);
+		}
+		
+	}
+	
+	@Override
+	public void propertyChange(final PropertyChangeEvent e) {
+		loadImage();
 	}
 	
 }

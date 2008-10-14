@@ -52,7 +52,9 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	 * @param lowerLeftX
 	 */
 	public void setLowerLeftX(final int lowerLeftX) {
+		final int oldValue = this.lowerLeftX;
 		this.lowerLeftX = lowerLeftX;
+		firePropertyChange("lowerLeftX", oldValue, lowerLeftX);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -68,7 +70,9 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	 * @param lowerLeftY
 	 */
 	public void setLowerLeftY(final int lowerLeftY) {
+		final int oldValue = this.lowerLeftY;
 		this.lowerLeftY = lowerLeftY;
+		firePropertyChange("lowerLeftY", oldValue, lowerLeftY);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -84,7 +88,9 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	 * @param imageSizeX
 	 */
 	public void setImageSizeX(final int imageSizeX) {
+		final int oldValue = this.imageSizeX;
 		this.imageSizeX = imageSizeX;
+		firePropertyChange("imageSizeX", oldValue, this.imageSizeX);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -100,7 +106,9 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	 * @param imageSizeY
 	 */
 	public void setImageSizeY(final int imageSizeY) {
+		final int oldValue = this.imageSizeY;
 		this.imageSizeY = imageSizeY;
+		firePropertyChange("imageSizeY", oldValue, this.imageSizeY);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -116,7 +124,9 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	 * @param keepProportions
 	 */
 	public void setKeepProportions(final boolean keepProportions) {
+		final boolean oldValue = this.keepProportions;
 		this.keepProportions = keepProportions;
+		firePropertyChange("keepProportions", oldValue, keepProportions);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -143,7 +153,9 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 			return false;
 		}
 		
-		return imageFileName.equals((o).imageFileName);
+		return imageFileName.equals((o).imageFileName) && (imageSizeX == o.imageSizeX)
+				&& (imageSizeY == o.imageSizeY) && (lowerLeftX == o.lowerLeftX)
+				&& (lowerLeftY == o.lowerLeftY);
 	}
 	
 }
