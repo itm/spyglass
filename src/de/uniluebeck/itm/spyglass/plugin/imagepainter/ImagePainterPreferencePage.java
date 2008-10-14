@@ -27,12 +27,6 @@ public class ImagePainterPreferencePage extends
 		optionsComposite.setDatabinding(dbc, config);
 		
 		return composite;
-		/*
-		 * String msg = "ImagePainterPlugin Preference Page\n"; msg += (type == PrefType.INSTANCE ?
-		 * "Instance Name: " + plugin.getInstanceName() + "\n" + "IsActive: " + plugin.isActive() +
-		 * "\n" + "IsVisible: " + plugin.isVisible() : ""); final Label label = new Label(parent,
-		 * SWT.NONE); label.setText(msg); return null;
-		 */
 	}
 	
 	@Override

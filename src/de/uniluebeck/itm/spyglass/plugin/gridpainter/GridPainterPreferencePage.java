@@ -21,7 +21,13 @@ public class GridPainterPreferencePage extends
 	
 	@Override
 	protected Composite createContents(final Composite parent) {
-		return super.createMS2Warning(parent); // TODO: plugin-specific options
+		final Composite composite = createContentsInternal(parent);
+		final GridPainterOptionsComposite optionsComposite = new GridPainterOptionsComposite(
+				composite);
+		
+		optionsComposite.setDatabinding(dbc, config);
+		
+		return composite;
 	}
 	
 	@Override

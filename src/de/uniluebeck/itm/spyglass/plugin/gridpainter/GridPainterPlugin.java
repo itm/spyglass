@@ -8,24 +8,32 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.gridpainter;
 
-import java.util.ArrayList;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.drawing.Grid;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
+import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class GridPainterPlugin extends BackgroundPainterPlugin {
+public class GridPainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener {
 	
 	@Element(name = "parameters")
 	private final GridPainterXMLConfig xmlConfig;
+	
+	private Grid grid;
+	
+	private QuadTree layer;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -34,6 +42,8 @@ public class GridPainterPlugin extends BackgroundPainterPlugin {
 	public GridPainterPlugin() {
 		super(false);
 		xmlConfig = new GridPainterXMLConfig();
+		xmlConfig.addPropertyChangeListener(this);
+		layer = new QuadTree();
 	}
 	
 	@Override
@@ -53,7 +63,7 @@ public class GridPainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
-		return new ArrayList<DrawingObject>();
+		return layer.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle());
 	}
 	
 	public static String getHumanReadableName() {
@@ -90,9 +100,41 @@ public class GridPainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	@Override
+	public void init(final PluginManager pluginManager) {
+		super.init(pluginManager);
+		updateGrid();
+	}
+	
+	@Override
 	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		// TODO Auto-generated method stub
-		return null;
+		return layer.getDrawingObjects();
+	}
+	
+	@Override
+	public void propertyChange(final PropertyChangeEvent arg0) {
+		updateGrid();
+	}
+	
+	private void updateGrid() {
+		
+		synchronized (layer) {
+			layer.remove(grid);
+		}
+		
+		grid = new Grid();
+		final int[] lineColor = xmlConfig.getLineColorRGB();
+		grid.setColor(lineColor[0], lineColor[1], lineColor[1]);
+		grid.setGridElementHeight(xmlConfig.getGridElementHeight());
+		grid.setGridElementWidth(xmlConfig.getGridElementWidth());
+		grid.setPosition(xmlConfig.getGridLowerLeftPoint());
+		grid.setLineWidth(xmlConfig.getLineWidth());
+		grid.setNumCols(xmlConfig.getNumCols());
+		grid.setNumRows(xmlConfig.getNumRows());
+		
+		synchronized (layer) {
+			layer.addOrUpdate(grid);
+		}
+		
 	}
 	
 }
