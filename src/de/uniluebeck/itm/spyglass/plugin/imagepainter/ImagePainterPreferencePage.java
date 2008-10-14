@@ -22,7 +22,10 @@ public class ImagePainterPreferencePage extends
 	@Override
 	protected Composite createContents(final Composite parent) {
 		final Composite composite = createContentsInternal(parent);
-		new ImageOptionsComposite(composite);
+		final ImageOptionsComposite optionsComposite = new ImageOptionsComposite(composite);
+		
+		optionsComposite.setDatabinding(dbc, config);
+		
 		return composite;
 		/*
 		 * String msg = "ImagePainterPlugin Preference Page\n"; msg += (type == PrefType.INSTANCE ?

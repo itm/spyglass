@@ -75,10 +75,17 @@ public abstract class XMLConfig extends PropertyBean {
 		
 		final String propertyName = setter.getName().substring(3);
 		
+		boolean getGetter, isGetter;
+		
 		for (final Method getter : clazz.getMethods()) {
-			if (getter.getName().equalsIgnoreCase("get" + propertyName)) {
+			
+			getGetter = getter.getName().equalsIgnoreCase("get" + propertyName);
+			isGetter = getter.getName().equalsIgnoreCase("is" + propertyName);
+			
+			if (getGetter || isGetter) {
 				return getter;
 			}
+			
 		}
 		throw new NoSuchMethodException("Could not find a corresponding getter for "
 				+ setter.getName() + ".");

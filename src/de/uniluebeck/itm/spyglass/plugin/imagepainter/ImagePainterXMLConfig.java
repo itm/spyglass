@@ -16,13 +16,108 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * Instances of this class contain the configuration parameters of a {@link ImagePainterPlugin}
  * 
- * @author Sebastian Ebers, Dariush Forouher
+ * @author Sebastian Ebers, Dariush Forouher, Daniel Bimschas
  * 
  */
 public class ImagePainterXMLConfig extends PluginXMLConfig {
 	
 	@Element(name = "image")
 	private String imageFileName = "images/icons/brokenImageLink.png";
+	
+	@Element(name = "lowerLeftX")
+	private int lowerLeftX = 0;
+	
+	@Element(name = "lowerLeftY")
+	private int lowerLeftY = 0;
+	
+	@Element(name = "imageSizeX")
+	private int imageSizeX = 0;
+	
+	@Element(name = "imageSizeY")
+	private int imageSizeY = 0;
+	
+	@Element(name = "keepProportions")
+	private boolean keepProportions = true;
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getLowerLeftX() {
+		return lowerLeftX;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param lowerLeftX
+	 */
+	public void setLowerLeftX(final int lowerLeftX) {
+		this.lowerLeftX = lowerLeftX;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getLowerLeftY() {
+		return lowerLeftY;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param lowerLeftY
+	 */
+	public void setLowerLeftY(final int lowerLeftY) {
+		this.lowerLeftY = lowerLeftY;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getImageSizeX() {
+		return imageSizeX;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param imageSizeX
+	 */
+	public void setImageSizeX(final int imageSizeX) {
+		this.imageSizeX = imageSizeX;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getImageSizeY() {
+		return imageSizeY;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param imageSizeY
+	 */
+	public void setImageSizeY(final int imageSizeY) {
+		this.imageSizeY = imageSizeY;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public boolean isKeepProportions() {
+		return keepProportions;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param keepProportions
+	 */
+	public void setKeepProportions(final boolean keepProportions) {
+		this.keepProportions = keepProportions;
+	}
 	
 	// --------------------------------------------------------------------------------
 	/**
