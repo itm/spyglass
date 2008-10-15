@@ -26,8 +26,6 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -109,20 +107,6 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 	private TableViewerColumn columnFormatString;
 	private TableViewerColumn columnTypes;
 	
-	private boolean somethingChanged = false;
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the somethingChanged
-	 */
-	public boolean isSomethingChanged() {
-		return somethingChanged;
-	}
-	
-	public void resetSomethingChanged() {
-		somethingChanged = false;
-	}
-	
 	/**
 	 * Reference to the set backing the table. All edits have to go through this set, so that
 	 * changeListeners are being noticed.
@@ -198,11 +182,6 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 					lineWidthLData.heightHint = 17;
 					lineWidth = new Text(group1, SWT.BORDER);
 					lineWidth.setLayoutData(lineWidthLData);
-					lineWidth.addModifyListener(new ModifyListener() {
-						public void modifyText(final ModifyEvent evt) {
-							somethingChanged = true;
-						}
-					});
 				}
 				{
 					label2 = new Label(group1, SWT.NONE);
@@ -231,12 +210,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 					showExtInfLData.horizontalSpan = 3;
 					showExtInf.setLayoutData(showExtInfLData);
 					showExtInf.setText("Show extended information by default");
-					showExtInf.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(final SelectionEvent evt) {
-							somethingChanged = true;
-						}
-					});
+					
 				}
 				{
 					label3 = new Label(group1, SWT.NONE);
@@ -250,11 +224,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 					defaultStringFmtLData.grabExcessHorizontalSpace = true;
 					defaultStringFmt = new Text(group1, SWT.BORDER);
 					defaultStringFmt.setLayoutData(defaultStringFmtLData);
-					defaultStringFmt.addModifyListener(new ModifyListener() {
-						public void modifyText(final ModifyEvent evt) {
-							somethingChanged = true;
-						}
-					});
+					
 				}
 				{
 					final GridData tableLData = new GridData();
@@ -324,7 +294,6 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 		final RGB color = dlg.open();
 		if (color != null) {
 			colorExample.setBackground(new Color(this.getDisplay(), color));
-			somethingChanged = true;
 		}
 	}
 	
@@ -406,7 +375,6 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 			final ObservableEntry<Integer, String> ne = new WrappedSet.ObservableEntry<Integer, String>(
 					type, "");
 			tableData.add(ne);
-			somethingChanged = true;
 			
 		}
 		
@@ -431,7 +399,6 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 		final IStructuredSelection selection = (IStructuredSelection) table.getSelection();
 		for (final Object o : selection.toList()) {
 			tableData.remove(o);
-			somethingChanged = true;
 		}
 	}
 }

@@ -161,7 +161,7 @@ public class MetricsXMLConfig extends XMLConfig {
 	/**
 	 * @return the lockAbs2metricFactor
 	 */
-	public boolean isLockAbs2metricFactor() {
+	public boolean getLockAbs2metricFactor() {
 		return lockAbs2metricFactor;
 	}
 	

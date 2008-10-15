@@ -5,8 +5,14 @@ import java.beans.PropertyChangeListener;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.AggregateValidationStatus;
+import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
+import org.eclipse.core.databinding.observable.ChangeEvent;
+import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.Realm;
+import org.eclipse.core.databinding.observable.list.IListChangeListener;
+import org.eclipse.core.databinding.observable.list.ListChangeEvent;
+import org.eclipse.core.databinding.observable.list.ListDiffEntry;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.Status;
@@ -96,6 +102,41 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			}
 		}
 	};
+	
+	/**
+	 * This listener is called whenever someone modifies a field, which is observed by databinding
+	 */
+	private final IChangeListener formGotDirtyListener = new IChangeListener() {
+		
+		@Override
+		public void handleChange(final ChangeEvent event) {
+			formIsDirty = true;
+			
+			if ((config == null) || !isValid()) {
+				// this means that the plugin type is abstractor contains errors
+				return;
+			}
+			
+			if (isInstancePage()) {
+				buttons.applyButton.setEnabled(true);
+				buttons.restoreButton.setEnabled(true);
+			} else {
+				buttons.restoreDefaultsButton.setEnabled(true);
+				buttons.saveAsDefaultButton.setEnabled(true);
+			}
+			
+		}
+	};
+	
+	/**
+	 * This flag indicates if the page contains unsaved changes (or, correcty, has been touched in
+	 * some way).
+	 * 
+	 * This flag will automatically be set to true if a field connected to the <code>dbc</code> are
+	 * modified. Subclasses, which don't use Databinding must set this flag to true themselves when
+	 * appropriate.
+	 */
+	protected boolean formIsDirty = false;
 	
 	/**
 	 * Reference to the plugin instance. may be null if PrefType==TYPE.
@@ -261,6 +302,12 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		return createContentsInternal(parent);
 	}
 	
+	@Override
+	public void createControl(final Composite parent) {
+		super.createControl(parent);
+		resetDirtyFlag();
+	}
+	
 	protected Composite createContentsInternal(final Composite parent) {
 		final Composite composite = createComposite(parent);
 		
@@ -271,6 +318,23 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		
 		dbc = new DataBindingContext(getRealm());
 		
+		// Add a Listener to each binding, so we get informed if the user modifies a field.
+		dbc.getBindings().addListChangeListener(new IListChangeListener() {
+			
+			@Override
+			public void handleListChange(final ListChangeEvent event) {
+				for (final ListDiffEntry e : event.diff.getDifferences()) {
+					final Binding b = (Binding) e.getElement();
+					if (e.isAddition()) {
+						b.getTarget().addChangeListener(formGotDirtyListener);
+					} else {
+						b.getTarget().removeChangeListener(formGotDirtyListener);
+					}
+				}
+			}
+			
+		});
+		
 		addErrorBinding();
 		
 		basicGroup = new BasicGroupComposite(composite, SWT.NONE);
@@ -279,8 +343,12 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		basicGroup.setDatabindingPluginName(dbc, config, this.plugin, this.spyglass
 				.getPluginManager(), this.isInstancePage());
 		
-		// necessary to prevent the change listerner to react on the initialization
-		basicGroup.resetChanged();
+		// Add a Listener to each binding, so we get informed if someone modifies something.
+		// for (final Object o : dbc.getBindings()) {
+		// final Binding b = (Binding) o;
+		// b.getTarget().addChangeListener(formGotDirtyListener);
+		// }
+		
 		return composite;
 	}
 	
@@ -353,10 +421,23 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @return true if this page contains unsaved data.
 	 */
 	public boolean hasUnsavedChanges() {
-		if (basicGroup != null) {
-			return basicGroup.isSomethingChanged();
+		return formIsDirty;
+	}
+	
+	private void resetDirtyFlag() {
+		formIsDirty = false;
+		
+		if (this.config == null) {
+			// this means that the plugin type is abstract
+			return;
+		}
+		
+		if (this.isInstancePage()) {
+			buttons.applyButton.setEnabled(false);
+			buttons.restoreButton.setEnabled(false);
 		} else {
-			return false;
+			buttons.restoreDefaultsButton.setEnabled(false);
+			buttons.saveAsDefaultButton.setEnabled(false);
 		}
 	}
 	
@@ -384,7 +465,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		log.debug("Storing form to model");
 		this.dbc.updateModels();
 		this.dbc.updateTargets();
-		this.basicGroup.resetChanged();
+		resetDirtyFlag();
 		config.indicateApplyButtonPressed();
 	}
 	
@@ -402,7 +483,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		// this is necessary to (re)validate the values in case of erroneous values already existent
 		// in the configuration
 		this.dbc.updateModels();
-		this.basicGroup.resetChanged();
+		resetDirtyFlag();
 	}
 	
 	private final void performCreateInstance() {

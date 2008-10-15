@@ -51,9 +51,6 @@ public class SimpleNodePainterPreferencePage extends
 		// to do this by hand
 		tempStringFormatterTable = config.getStringFormatters();
 		optionsComposite.connectTableWithData(dbc, tempStringFormatterTable);
-		
-		optionsComposite.resetSomethingChanged();
-		
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -72,7 +69,6 @@ public class SimpleNodePainterPreferencePage extends
 		if (plugin != null) {
 			plugin.refreshConfigurationParameters();
 		}
-		optionsComposite.resetSomethingChanged();
 	}
 	
 	@Override
@@ -86,22 +82,9 @@ public class SimpleNodePainterPreferencePage extends
 		
 		tempStringFormatterTable = config.getStringFormatters();
 		optionsComposite.connectTableWithData(dbc, tempStringFormatterTable);
-
+		
 		// necessary to prevent the change listerner to react on the initialization
-		optionsComposite.resetSomethingChanged();
 		return composite;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#hasUnsavedChanges()
-	 */
-	@Override
-	public boolean hasUnsavedChanges() {
-		// TODO Auto-generated method stub
-		return super.hasUnsavedChanges() || optionsComposite.isSomethingChanged();
 	}
 	
 }

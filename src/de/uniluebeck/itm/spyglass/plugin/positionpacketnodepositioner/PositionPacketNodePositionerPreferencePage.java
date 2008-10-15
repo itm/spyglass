@@ -5,8 +5,6 @@ import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -24,7 +22,6 @@ public class PositionPacketNodePositionerPreferencePage
 		extends
 		PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> {
 	
-	private boolean somethingChanged = false;
 	private Text fieldName;
 	
 	public PositionPacketNodePositionerPreferencePage(final PluginPreferenceDialog dialog,
@@ -37,41 +34,6 @@ public class PositionPacketNodePositionerPreferencePage
 		super(dialog, spyglass, plugin, BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES);
 	}
 	
-	// --------------------------------------------------------------------------------
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#hasUnsavedChanges()
-	 */
-	@Override
-	public boolean hasUnsavedChanges() {
-		return super.hasUnsavedChanges() || somethingChanged;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#storeToModel()
-	 */
-	@Override
-	public void storeToModel() {
-		super.storeToModel();
-		somethingChanged = false;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#loadFromModel()
-	 */
-	@Override
-	protected void loadFromModel() {
-		super.loadFromModel();
-		somethingChanged = false;
-	}
-	
 	@Override
 	protected Composite createContents(final Composite parent) {
 		
@@ -80,8 +42,6 @@ public class PositionPacketNodePositionerPreferencePage
 		createOptionsGroup(composite);
 		
 		addDatabinding();
-		// necessary to prevent the change listerner to react on the initialization
-		somethingChanged = false;
 		
 		return composite;
 		
@@ -102,11 +62,6 @@ public class PositionPacketNodePositionerPreferencePage
 		textData.heightHint = 17;
 		fieldName = new Text(optionsGroup, SWT.BORDER);
 		fieldName.setLayoutData(textData);
-		fieldName.addModifyListener(new ModifyListener() {
-			public void modifyText(final ModifyEvent evt) {
-				somethingChanged = true;
-			}
-		});
 		
 		final Label label3 = new Label(optionsGroup, SWT.NONE);
 		label3.setText("(0 means no timeout.)");

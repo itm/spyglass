@@ -528,9 +528,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	
 	private void addPreferenceNodes() {
 		
-		generalPreferenceNode = new PreferenceNode(NODE_ID_GENERAL_SETTINGS, "General",
-				createImageDescriptor("general.png"), GeneralPreferencePage.class
-						.getCanonicalName());
+		generalPreferenceNode = new CustomPreferenceNode(NODE_ID_GENERAL_SETTINGS, "General",
+				createImageDescriptor("general.png"), new GeneralPreferencePage(spyglass));
 		pluginManagerPreferenceNode = new CustomPreferenceNode(NODE_ID_PLUGINMANAGER, "Plugins",
 				createImageDescriptor("plugin_manager.png"), new PluginManagerPreferencePage(
 						spyglass, this));

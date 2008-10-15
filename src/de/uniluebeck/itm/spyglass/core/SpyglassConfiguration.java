@@ -18,7 +18,7 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
-import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXmlConfig;
+import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.XMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ public class SpyglassConfiguration extends XMLConfig {
 	private final PluginManager pluginManager = new PluginManager();
 	
 	@Element
-	private final GeneralSettingsXmlConfig generalSettings = new GeneralSettingsXmlConfig();
+	private final GeneralSettingsXMLConfig generalSettings = new GeneralSettingsXMLConfig();
 	
 	// TODO: property change events
 	@ElementList
@@ -52,7 +52,7 @@ public class SpyglassConfiguration extends XMLConfig {
 	/**
 	 * @return the generalSettings
 	 */
-	public GeneralSettingsXmlConfig getGeneralSettings() {
+	public GeneralSettingsXMLConfig getGeneralSettings() {
 		return generalSettings;
 	}
 	

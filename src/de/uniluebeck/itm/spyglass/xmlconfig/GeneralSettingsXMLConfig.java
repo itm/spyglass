@@ -17,7 +17,7 @@ import org.simpleframework.xml.Element;
  * @author Sebastian Ebers, Dariush Forouher
  * 
  */
-public class GeneralSettingsXmlConfig extends XMLConfig {
+public class GeneralSettingsXMLConfig extends XMLConfig {
 	
 	/**
 	 * if <code>true</code> a ruler is shown in the graphical user interface
@@ -160,12 +160,9 @@ public class GeneralSettingsXmlConfig extends XMLConfig {
 		firePropertyChange("fps", oldValue, fps);
 	}
 	
-	public void overwriteWith(final GeneralSettingsXmlConfig o) {
-		this.setFps(o.getFps());
-		this.setPacketDeliveryInitialDelay(o.getPacketDeliveryInitialDelay());
-		this.setShowRuler(o.getShowRuler());
-		this.setTimeScale(o.getTimeScale());
-		this.setTimeUnit(o.getTimeUnit());
+	public void overwriteWith(final GeneralSettingsXMLConfig o) {
+		super.overwriteWith(o);
+		this.metrics.overwriteWith(o.getMetrics());
 	}
 	
 }
