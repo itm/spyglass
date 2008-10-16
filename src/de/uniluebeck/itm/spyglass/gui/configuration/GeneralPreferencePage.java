@@ -126,9 +126,6 @@ public class GeneralPreferencePage extends PreferencePage {
 		log.debug("Storing form to model");
 		this.dbc.updateModels();
 		this.dbc.updateTargets();
-		
-		config.indicateApplyButtonPressed();
-		
 		resetDirtyFlag();
 	}
 	

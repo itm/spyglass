@@ -54,15 +54,6 @@ public abstract class XMLConfig extends PropertyBean {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Fires a property change event to indicate the listeners that the apply button was pressed and
-	 * new parameter values might be available
-	 */
-	public void indicateApplyButtonPressed() {
-		firePropertyChange("all", null, null);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * Finds the corresponding getter-Method of the given setter.
 	 * 
 	 * @param clazz

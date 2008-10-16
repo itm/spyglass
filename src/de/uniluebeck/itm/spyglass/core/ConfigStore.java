@@ -49,6 +49,8 @@ public class ConfigStore {
 	/** An object which is used for logging errors and other events */
 	private static Logger log = SpyglassLogger.get(ConfigStore.class);
 	
+	private volatile Boolean isStoringInvoked = false;
+	
 	// private final boolean isIShellPlugin;
 	
 	@Override
@@ -84,16 +86,12 @@ public class ConfigStore {
 	// --------------------------------------------------------------------------
 	/**
 	 * Listener for changes in the configuration of an plug-in.<br>
-	 * If an event names "all" occurs, the configuration will be stored. All other events will be
-	 * ignored.
 	 */
 	PropertyChangeListener pluginPropertyListener = new PropertyChangeListener() {
 		
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
-			if (evt.getPropertyName().equals("all")) {
-				store();
-			}
+			store();
 		}
 	};
 	
@@ -301,12 +299,37 @@ public class ConfigStore {
 	
 	/**
 	 * Stores the configuration in an extra {@link Thread} to improve the performance.<br>
+	 * The storing operation will be delayed for one second. Every call received within this second
+	 * will be ignored.
 	 */
 	private void storeInExtraThread(final File configFile) {
 		
+		// check if there is already a storing operation in progress
+		synchronized (isStoringInvoked) {
+			// if so, return
+			if (isStoringInvoked) {
+				return;
+			}
+			// otherwise proceed
+			isStoringInvoked = true;
+		}
+		
+		// create the thread to store
 		final Thread t = new Thread() {
 			@Override
 			public void run() {
+				try {
+					// sleep for one second to wait for other calls which have not to be
+					// processed for that reason
+					sleep(1000);
+				} catch (final InterruptedException e) {
+					log.error(e, e);
+				} finally {
+					// the next successive call will no longer be ignored
+					synchronized (isStoringInvoked) {
+						isStoringInvoked = false;
+					}
+				}
 				store(configFile);
 			}
 		};
