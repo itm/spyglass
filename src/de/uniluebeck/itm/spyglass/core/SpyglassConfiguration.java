@@ -8,6 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.core;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Vector;
 
 import org.simpleframework.xml.Element;
@@ -43,7 +45,8 @@ public class SpyglassConfiguration extends XMLConfig {
 	
 	// TODO: property change events
 	@ElementList
-	private final Vector<Plugin> defaults = new Vector<Plugin>();
+	private final Collection<Plugin> defaults = Collections
+			.synchronizedCollection(new Vector<Plugin>());
 	
 	@Element
 	private final DrawingArea drawingArea = new DrawingArea();
@@ -62,7 +65,7 @@ public class SpyglassConfiguration extends XMLConfig {
 	 * 
 	 * @return the defaults a collection of plug-ins which are configured by default
 	 */
-	public Vector<Plugin> getDefaults() {
+	public Collection<Plugin> getDefaults() {
 		return defaults;
 	}
 	

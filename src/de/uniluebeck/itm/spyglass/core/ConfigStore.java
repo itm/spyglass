@@ -11,7 +11,7 @@ package de.uniluebeck.itm.spyglass.core;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -158,7 +158,7 @@ public class ConfigStore {
 	 */
 	public PluginXMLConfig readPluginTypeDefaults(final Class<? extends Plugin> clazz) {
 		
-		final List<Plugin> plugins = spyglassConfig.getDefaults();
+		final Collection<Plugin> plugins = spyglassConfig.getDefaults();
 		for (final Plugin plugin : plugins) {
 			if (plugin.getClass().equals(clazz)) {
 				return plugin.getXMLConfig();
