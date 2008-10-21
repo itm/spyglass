@@ -44,7 +44,6 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	public ImagePainterPlugin() {
 		super(false);
 		xmlConfig = new ImagePainterXMLConfig();
-		xmlConfig.addPropertyChangeListener(this);
 		layer = new QuadTree();
 	}
 	
@@ -93,8 +92,8 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
-		
+		// nothing to do since this plugin doesn't keep any data
+		// in memory to reset
 	}
 	
 	@Override
@@ -105,7 +104,6 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	
 	@Override
 	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		// TODO Auto-generated method stub
 		synchronized (layer) {
 			return layer.getDrawingObjects();
 		}
@@ -113,8 +111,16 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	
 	@Override
 	public void init(final PluginManager pluginManager) {
+		
 		super.init(pluginManager);
+		
+		// adding this listener here so it is called
+		// on programm startup (doesn't work in constructor!)
+		xmlConfig.addPropertyChangeListener(this);
+		
+		// dito
 		loadImage();
+		
 	}
 	
 	private void loadImage() {
@@ -123,7 +129,11 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 			layer.remove(image);
 		}
 		
-		image = new Image(xmlConfig.getImageFileName());
+		try {
+			image = new Image(xmlConfig.getImageFileName());
+		} catch (final RuntimeException e) {
+			image = new Image("images/icons/brokenImageLink.png");
+		}
 		
 		final int sizeX = xmlConfig.getImageSizeX();
 		final int sizeY = xmlConfig.getImageSizeY();

@@ -1,12 +1,13 @@
 package de.uniluebeck.itm.spyglass.drawing;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
-import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
+import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
 public class Grid extends DrawingObject {
 	
@@ -14,33 +15,52 @@ public class Grid extends DrawingObject {
 	
 	private int gridElementHeight;
 	private int numCols;
-	private float lineWidth;
+	private int lineWidth;
 	private int gridElementWidth;
 	private int numRows;
 	
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 		
-		AbsolutePosition origin;
-		AbsoluteRectangle absRect;
-		PixelRectangle pxRect;
-		int originX, originY;
+		gc.setLineWidth(lineWidth);
+		gc.setForeground(new Color(gc.getDevice(), getColorR(), getColorG(), getColorB()));
 		
-		for (int row = 0; row < numRows; row++) {
+		final AbsolutePosition pos = getPosition();
+		AbsolutePosition origin, dest;
+		PixelPosition pxOrigin, pxDest;
+		int originX, originY, destX, destY;
+		
+		originX = pos.x;
+		destX = originX + (gridElementWidth * numCols);
+		
+		for (int row = 0; row <= numRows; row++) {
 			
-			for (int col = 0; col < numCols; col++) {
-				
-				originX = getPosition().x + (col * gridElementWidth);
-				originY = getPosition().y + (row * gridElementHeight);
-				origin = new AbsolutePosition(originX, originY, 0);
-				
-				absRect = new AbsoluteRectangle(origin, gridElementWidth, gridElementHeight);
-				pxRect = drawingArea.absRect2PixelRect(absRect);
-				
-				gc.drawRectangle(pxRect.getUpperLeft().x, pxRect.getUpperLeft().y, pxRect
-						.getWidth(), pxRect.getHeight());
-				
-			}
+			originY = destY = pos.y + (row * gridElementHeight);
+			
+			origin = new AbsolutePosition(originX, originY, 0);
+			dest = new AbsolutePosition(destX, destY, 0);
+			
+			pxOrigin = drawingArea.absPoint2PixelPoint(origin);
+			pxDest = drawingArea.absPoint2PixelPoint(dest);
+			
+			gc.drawLine(pxOrigin.x, pxOrigin.y, pxDest.x, pxDest.y);
+			
+		}
+		
+		originY = pos.y;
+		destY = originY + (gridElementHeight * numRows);
+		
+		for (int col = 0; col <= numCols; col++) {
+			
+			originX = destX = pos.x + (col * gridElementWidth);
+			
+			origin = new AbsolutePosition(originX, originY, 0);
+			dest = new AbsolutePosition(destX, destY, 0);
+			
+			pxOrigin = drawingArea.absPoint2PixelPoint(origin);
+			pxDest = drawingArea.absPoint2PixelPoint(dest);
+			
+			gc.drawLine(pxOrigin.x, pxOrigin.y, pxDest.x, pxDest.y);
 			
 		}
 		
@@ -60,7 +80,7 @@ public class Grid extends DrawingObject {
 		this.gridElementWidth = gridElementWidth;
 	}
 	
-	public void setLineWidth(final float lineWidth) {
+	public void setLineWidth(final int lineWidth) {
 		this.lineWidth = lineWidth;
 	}
 	

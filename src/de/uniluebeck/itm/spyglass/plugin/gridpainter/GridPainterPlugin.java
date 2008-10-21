@@ -31,9 +31,9 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 	@Element(name = "parameters")
 	private final GridPainterXMLConfig xmlConfig;
 	
-	private Grid grid;
+	private final QuadTree layer;
 	
-	private QuadTree layer;
+	private Grid grid;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -42,7 +42,6 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 	public GridPainterPlugin() {
 		super(false);
 		xmlConfig = new GridPainterXMLConfig();
-		xmlConfig.addPropertyChangeListener(this);
 		layer = new QuadTree();
 	}
 	
@@ -101,13 +100,23 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 	
 	@Override
 	public void init(final PluginManager pluginManager) {
+		
 		super.init(pluginManager);
+		
+		// adding this listener here so it is called
+		// on programm startup (doesn't work in constructor!)
+		xmlConfig.addPropertyChangeListener(this);
+		
+		// dito
 		updateGrid();
+		
 	}
 	
 	@Override
 	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		return layer.getDrawingObjects();
+		synchronized (layer) {
+			return layer.getDrawingObjects();
+		}
 	}
 	
 	@Override
@@ -127,7 +136,7 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 		grid.setGridElementHeight(xmlConfig.getGridElementHeight());
 		grid.setGridElementWidth(xmlConfig.getGridElementWidth());
 		grid.setPosition(xmlConfig.getGridLowerLeftPoint());
-		grid.setLineWidth(xmlConfig.getLineWidth());
+		grid.setLineWidth((int) xmlConfig.getLineWidth());
 		grid.setNumCols(xmlConfig.getNumCols());
 		grid.setNumRows(xmlConfig.getNumRows());
 		
