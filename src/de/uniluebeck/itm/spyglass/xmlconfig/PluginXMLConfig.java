@@ -137,31 +137,6 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		return semanticTypes.clone();
 	}
 	
-	public boolean getAllSemanticTypes() {
-		
-		// look for every possible semanticType 0..255 in semanticTypes
-		A: for (int i = 0; i < 256; i++) {
-			for (int j = 0; j < semanticTypes.length; j++) {
-				if (semanticTypes[j] == i) {
-					continue A;
-				}
-			}
-			return false;
-		}
-		return true;
-	}
-	
-	public void setAllSemanticTypes(final boolean value) {
-		final boolean oldValueAllSemTypes = this.getAllSemanticTypes();
-		if (value) {
-			this.setSemanticTypes(PluginXMLConfig.ALL_SEMANTIC_TYPES);
-		} else {
-			this.setSemanticTypes(new int[0]);
-		}
-		firePropertyChange("allSemanticTypes", oldValueAllSemTypes, this.getAllSemanticTypes());
-		
-	}
-	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param semanticTypes
@@ -169,10 +144,8 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 */
 	public void setSemanticTypes(final int[] semanticTypes) {
 		final int[] oldvalue = this.semanticTypes;
-		final boolean oldValueAllSemTypes = this.getAllSemanticTypes();
 		this.semanticTypes = semanticTypes.clone();
 		firePropertyChange("semanticTypes", oldvalue, semanticTypes);
-		firePropertyChange("allSemanticTypes", oldValueAllSemTypes, this.getAllSemanticTypes());
 	}
 	
 	public boolean equals(final PluginXMLConfig other) {
@@ -183,9 +156,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 			return false;
 		}
 		
-		return (this.getActive() == other.getActive())
-				&& (this.getAllSemanticTypes() == other.getAllSemanticTypes())
-				&& (this.getVisible() == other.getVisible())
+		return (this.getActive() == other.getActive()) && (this.getVisible() == other.getVisible())
 				&& this.getName().equals(other.getName())
 				&& this.getSemanticTypes().equals(other.getSemanticTypes()) // TODO: array check?
 				&& (this.getTimeout() == other.getTimeout());

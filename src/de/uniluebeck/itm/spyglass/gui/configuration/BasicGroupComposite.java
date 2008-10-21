@@ -7,6 +7,8 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -20,7 +22,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage.BasicOptions;
-import de.uniluebeck.itm.spyglass.gui.converter.BooleanInversionConverter;
 import de.uniluebeck.itm.spyglass.gui.converter.IntListToStringConverter;
 import de.uniluebeck.itm.spyglass.gui.converter.StringToIntListConverter;
 import de.uniluebeck.itm.spyglass.gui.validator.IntegerRangeValidator;
@@ -158,24 +159,6 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 		dbc.bindValue(SWTObservables.observeEnabled(this.isVisible), observableActiveButton, null,
 				null);
 		
-		// TODO
-		// Iff allSemanticTypes == true, deactivate the input field
-		dbc.bindValue(SWTObservables.observeEnabled(this.semanticTypes), SWTObservables
-				.observeSelection(this.allTypes), null, new UpdateValueStrategy()
-				.setConverter(new BooleanInversionConverter()));
-		
-		// config.addPropertyChangeListener("allSemanticTypes", new PropertyChangeListener() {
-		// @Override
-		// public void propertyChange(final PropertyChangeEvent evt) {
-		// allTypes.setSelection(config.getAllSemanticTypes());
-		// }
-		// });
-		
-		// TODO
-		// final IObservableValue observableAllTypes = BeansObservables.observeValue(getRealm(),
-		// this.config, "allSemanticTypes");
-		// dbc.bindValue(SWTObservables.observeSelection(fieldAllSemTypes), observableAllTypes,
-		// new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
 	}
 	
 	public BasicGroupComposite(final org.eclipse.swt.widgets.Composite parent, final int style) {
@@ -239,9 +222,18 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 					
 				}
 				{
-					allTypes = new Button(group1, SWT.CHECK | SWT.LEFT);
+					allTypes = new Button(group1, SWT.PUSH | SWT.LEFT);
 					allTypes.setText("All Types");
-					allTypes.setBounds(339, 54, 83, 22);
+					final GridData allTypesLData = new GridData();
+					allTypesLData.widthHint = 73;
+					allTypesLData.heightHint = 28;
+					allTypes.setLayoutData(allTypesLData);
+					allTypes.addSelectionListener(new SelectionAdapter() {
+						@Override
+						public void widgetSelected(final SelectionEvent evt) {
+							allTypesWidgetSelected(evt);
+						}
+					});
 					
 				}
 				{
@@ -260,6 +252,10 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void allTypesWidgetSelected(final SelectionEvent evt) {
+		this.semanticTypes.setText("0-255");
 	}
 	
 }
