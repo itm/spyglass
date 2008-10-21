@@ -22,7 +22,7 @@ public class ImagePainterPreferencePage extends
 	@Override
 	protected Composite createContents(final Composite parent) {
 		final Composite composite = createContentsInternal(parent);
-		final ImageOptionsComposite optionsComposite = new ImageOptionsComposite(composite);
+		final ImagePainterOptionsComposite optionsComposite = new ImagePainterOptionsComposite(composite);
 		
 		optionsComposite.setDatabinding(dbc, config);
 		

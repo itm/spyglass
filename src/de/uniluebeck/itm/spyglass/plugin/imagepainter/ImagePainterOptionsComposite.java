@@ -1,14 +1,12 @@
 package de.uniluebeck.itm.spyglass.plugin.imagepainter;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -22,9 +20,13 @@ import org.eclipse.swt.widgets.Text;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
-
-public class ImageOptionsComposite extends Composite {
+public class ImagePainterOptionsComposite extends Composite {
+	
+	{
+		// Register as a resource user - SWTResourceManager will
+		// handle the obtaining and disposing of resources
+		SWTResourceManager.registerResourceUser(this);
+	}
 	
 	private Text imageFileText;
 	private Text lowerLeftXText;
@@ -33,22 +35,11 @@ public class ImageOptionsComposite extends Composite {
 	private Text imageSizeHeightText;
 	private Button keepProportionsButton;
 	
-	{
-		// Register as a resource user - SWTResourceManager will
-		// handle the obtaining and disposing of resources
-		SWTResourceManager.registerResourceUser(this);
-	}
-	
-	/**
-	 * 
-	 */
-	private static final Logger log = SpyglassLogger.getLogger(ImageOptionsComposite.class);
-	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param parent
 	 */
-	public ImageOptionsComposite(final Composite parent) {
+	public ImagePainterOptionsComposite(final Composite parent) {
 		super(parent, SWT.NONE);
 		initGUI();
 	}
@@ -93,12 +84,6 @@ public class ImageOptionsComposite extends Composite {
 					final GridData imageFileTextData = new GridData();
 					imageFileTextData.widthHint = 300;
 					imageFileText = new Text(imageFileComposite, SWT.BORDER);
-					imageFileText.addModifyListener(new ModifyListener() {
-						@Override
-						public void modifyText(final ModifyEvent e) {
-							somethingChanged = true;
-						}
-					});
 					imageFileText.setLayoutData(imageFileTextData);
 					
 					final GridData imageFileButtonData = new GridData();
@@ -138,12 +123,6 @@ public class ImageOptionsComposite extends Composite {
 				lowerLeftXTextData.widthHint = 40;
 				lowerLeftXText = new Text(group, SWT.BORDER);
 				lowerLeftXText.setLayoutData(lowerLeftXTextData);
-				lowerLeftXText.addModifyListener(new ModifyListener() {
-					@Override
-					public void modifyText(final ModifyEvent e) {
-						somethingChanged = true;
-					}
-				});
 				
 				label = new Label(group, SWT.NONE);
 				label.setText("m (TODO!)");
@@ -155,12 +134,6 @@ public class ImageOptionsComposite extends Composite {
 				lowerLeftYTextData.widthHint = 40;
 				lowerLeftYText = new Text(group, SWT.BORDER);
 				lowerLeftYText.setLayoutData(lowerLeftYTextData);
-				lowerLeftYText.addModifyListener(new ModifyListener() {
-					@Override
-					public void modifyText(final ModifyEvent e) {
-						somethingChanged = true;
-					}
-				});
 				
 				label = new Label(group, SWT.NONE);
 				label.setText("m (TODO!)");
@@ -179,12 +152,6 @@ public class ImageOptionsComposite extends Composite {
 				imageSizeWidthTextData.widthHint = 40;
 				imageSizeWidthText = new Text(group, SWT.BORDER);
 				imageSizeWidthText.setLayoutData(imageSizeWidthTextData);
-				imageSizeWidthText.addModifyListener(new ModifyListener() {
-					@Override
-					public void modifyText(final ModifyEvent e) {
-						somethingChanged = true;
-					}
-				});
 				
 				label = new Label(group, SWT.NONE);
 				label.setText("m (TODO!)");
@@ -196,12 +163,6 @@ public class ImageOptionsComposite extends Composite {
 				imageSizeHeightTextData.widthHint = 40;
 				imageSizeHeightText = new Text(group, SWT.BORDER);
 				imageSizeHeightText.setLayoutData(imageSizeHeightTextData);
-				imageSizeHeightText.addModifyListener(new ModifyListener() {
-					@Override
-					public void modifyText(final ModifyEvent e) {
-						somethingChanged = true;
-					}
-				});
 				
 				label = new Label(group, SWT.NONE);
 				label.setText("m (TODO!)");
@@ -221,56 +182,52 @@ public class ImageOptionsComposite extends Composite {
 	
 	public void setDatabinding(final DataBindingContext dbc, final ImagePainterXMLConfig config) {
 		
-		final IObservableValue observableImageFileName = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "imageFileName");
-		dbc.bindValue(SWTObservables.observeText(imageFileText, SWT.Modify),
-				observableImageFileName,
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		IObservableValue obsModel;
+		ISWTObservableValue obsWidget;
+		UpdateValueStrategy usTargetToModel;
 		
-		final IObservableValue observableLowerLeftX = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "lowerLeftX");
-		dbc.bindValue(SWTObservables.observeText(lowerLeftXText, SWT.Modify), observableLowerLeftX,
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		{
+			obsWidget = SWTObservables.observeText(imageFileText, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					"imageFileName");
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+		}
+		{
+			obsWidget = SWTObservables.observeText(lowerLeftXText, SWT.Modify);
+			obsModel = BeansObservables
+					.observeValue(dbc.getValidationRealm(), config, "lowerLeftX");
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+		}
+		{
+			obsWidget = SWTObservables.observeText(lowerLeftYText, SWT.Modify);
+			obsModel = BeansObservables
+					.observeValue(dbc.getValidationRealm(), config, "lowerLeftY");
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+		}
+		{
+			obsWidget = SWTObservables.observeText(imageSizeWidthText, SWT.Modify);
+			obsModel = BeansObservables
+					.observeValue(dbc.getValidationRealm(), config, "imageSizeX");
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+		}
+		{
+			obsWidget = SWTObservables.observeText(imageSizeHeightText, SWT.Modify);
+			obsModel = BeansObservables
+					.observeValue(dbc.getValidationRealm(), config, "imageSizeY");
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+		}
+		{
+			obsWidget = SWTObservables.observeSelection(keepProportionsButton);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					"keepProportions");
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+		}
 		
-		final IObservableValue observableLowerLeftY = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "lowerLeftY");
-		dbc.bindValue(SWTObservables.observeText(lowerLeftYText, SWT.Modify), observableLowerLeftY,
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
-		
-		final IObservableValue observableImageSizeX = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "imageSizeX");
-		dbc.bindValue(SWTObservables.observeText(imageSizeWidthText, SWT.Modify),
-				observableImageSizeX, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT),
-				null);
-		
-		final IObservableValue observableImageSizeY = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "imageSizeY");
-		dbc.bindValue(SWTObservables.observeText(imageSizeHeightText, SWT.Modify),
-				observableImageSizeY, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT),
-				null);
-		
-		final IObservableValue observableKeepProportions = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "keepProportions");
-		dbc.bindValue(SWTObservables.observeSelection(keepProportionsButton),
-				observableKeepProportions, new UpdateValueStrategy(
-						UpdateValueStrategy.POLICY_CONVERT), null);
 	}
-	
-	/**
-	 * 
-	 */
-	private boolean somethingChanged = false;
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the somethingChanged
-	 */
-	public boolean isSomethingChanged() {
-		return somethingChanged;
-	}
-	
-	public void resetSomethingChanged() {
-		somethingChanged = false;
-	}
-	
 }

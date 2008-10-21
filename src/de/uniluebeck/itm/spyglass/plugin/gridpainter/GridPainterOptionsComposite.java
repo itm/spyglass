@@ -21,17 +21,20 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.cloudgarden.resource.SWTResourceManager;
+
 import de.uniluebeck.itm.spyglass.gui.converter.ArrayToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.converter.ColorToArrayConverter;
 
 public class GridPainterOptionsComposite extends Composite {
 	
-	private Text lowerLeftPointXText;
-	
-	public GridPainterOptionsComposite(final Composite parent) {
-		super(parent, SWT.NONE);
-		initGUI();
+	{
+		// Register as a resource user - SWTResourceManager will
+		// handle the obtaining and disposing of resources
+		SWTResourceManager.registerResourceUser(this);
 	}
+	
+	private Text lowerLeftPointXText;
 	
 	private Text lowerLeftPointYText;
 	
@@ -52,6 +55,11 @@ public class GridPainterOptionsComposite extends Composite {
 	private Button lineColor;
 	
 	private Text lineWidth;
+	
+	public GridPainterOptionsComposite(final Composite parent) {
+		super(parent, SWT.NONE);
+		initGUI();
+	}
 	
 	private void initGUI() {
 		
@@ -221,81 +229,80 @@ public class GridPainterOptionsComposite extends Composite {
 	
 	public void setDatabinding(final DataBindingContext dbc, final GridPainterXMLConfig config) {
 		
-		IObservableValue observable;
-		ISWTObservableValue observeValue;
-		UpdateValueStrategy targetToModel;
-		UpdateValueStrategy modelToTarget;
+		IObservableValue obsModel;
+		ISWTObservableValue obsWidget;
+		UpdateValueStrategy usTargetToModel;
+		UpdateValueStrategy usModelToTarget;
 		
 		{
-			observable = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-					"lowerLeftX");
-			observeValue = SWTObservables.observeText(lowerLeftPointXText, SWT.Modify);
-			targetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			dbc.bindValue(observeValue, observable, targetToModel, null);
+			obsWidget = SWTObservables.observeText(lowerLeftPointXText, SWT.Modify);
+			obsModel = BeansObservables
+					.observeValue(dbc.getValidationRealm(), config, "lowerLeftX");
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
-			observable = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-					"lowerLeftY");
-			observeValue = SWTObservables.observeText(lowerLeftPointYText, SWT.Modify);
-			targetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			dbc.bindValue(observeValue, observable, targetToModel, null);
+			obsWidget = SWTObservables.observeText(lowerLeftPointYText, SWT.Modify);
+			obsModel = BeansObservables
+					.observeValue(dbc.getValidationRealm(), config, "lowerLeftY");
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
-			observable = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+			obsWidget = SWTObservables.observeText(gridElementHeightText, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					"gridElementHeight");
-			observeValue = SWTObservables.observeText(gridElementHeightText, SWT.Modify);
-			targetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			dbc.bindValue(observeValue, observable, targetToModel, null);
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
-			observable = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+			obsWidget = SWTObservables.observeText(gridElementWidthText, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					"gridElementWidth");
-			observeValue = SWTObservables.observeText(gridElementWidthText, SWT.Modify);
-			targetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			dbc.bindValue(observeValue, observable, targetToModel, null);
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
-			observable = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-					"lineWidth");
-			observeValue = SWTObservables.observeText(this.lineWidth, SWT.Modify);
-			targetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			dbc.bindValue(observeValue, observable, targetToModel, null);
+			obsWidget = SWTObservables.observeText(this.lineWidth, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, "lineWidth");
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
-			observable = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+			obsWidget = SWTObservables.observeBackground(colorExample);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					"lineColorRGB");
-			observeValue = SWTObservables.observeBackground(colorExample);
-			targetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			targetToModel.setConverter(new ColorToArrayConverter());
-			modelToTarget = new UpdateValueStrategy();
-			modelToTarget.setConverter(new ArrayToColorConverter(this.getDisplay()));
-			dbc.bindValue(observeValue, observable, targetToModel, modelToTarget);
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			usTargetToModel.setConverter(new ColorToArrayConverter());
+			usModelToTarget = new UpdateValueStrategy();
+			usModelToTarget.setConverter(new ArrayToColorConverter(this.getDisplay()));
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
 		}
 		{
-			observable = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+			obsWidget = SWTObservables.observeSelection(lockGridElementsSquareCheckbox);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					"lockGridElementsSquare");
-			observeValue = SWTObservables.observeSelection(lockGridElementsSquareCheckbox);
-			targetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			dbc.bindValue(observeValue, observable, targetToModel, null);
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
-			observable = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+			obsWidget = SWTObservables.observeSelection(lockNumberOfRowsNColsCheckbox);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					"lockNumberOfRowsNCols");
-			observeValue = SWTObservables.observeSelection(lockNumberOfRowsNColsCheckbox);
-			targetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			dbc.bindValue(observeValue, observable, targetToModel, null);
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
-			observable = BeansObservables.observeValue(dbc.getValidationRealm(), config, "numCols");
-			observeValue = SWTObservables.observeText(numColsText, SWT.Modify);
-			targetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			dbc.bindValue(observeValue, observable, targetToModel, null);
+			obsWidget = SWTObservables.observeText(numColsText, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, "numCols");
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
-			observable = BeansObservables.observeValue(dbc.getValidationRealm(), config, "numRows");
-			observeValue = SWTObservables.observeText(numRowsText, SWT.Modify);
-			targetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			dbc.bindValue(observeValue, observable, targetToModel, null);
+			obsWidget = SWTObservables.observeText(numRowsText, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, "numRows");
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		
 	}
