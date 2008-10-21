@@ -113,6 +113,8 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 	 */
 	private IObservableSet tableData;
 	
+	SimpleNodePainterPreferencePage page;
+	
 	/**
 	 * Auto-generated main method to display this org.eclipse.swt.widgets.Composite inside a new
 	 * Shell.
@@ -294,10 +296,14 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 		final RGB color = dlg.open();
 		if (color != null) {
 			colorExample.setBackground(new Color(this.getDisplay(), color));
+			this.page.markFormDirty();
 		}
 	}
 	
-	public void setDatabinding(final DataBindingContext dbc, final PluginXMLConfig config) {
+	public void setDatabinding(final DataBindingContext dbc, final PluginXMLConfig config,
+			final SimpleNodePainterPreferencePage page) {
+		
+		this.page = page;
 		
 		// line width
 		

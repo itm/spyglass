@@ -78,7 +78,7 @@ public class SimpleNodePainterPreferencePage extends
 		
 		optionsComposite = new OptionsComposite(composite, SWT.NONE);
 		
-		optionsComposite.setDatabinding(dbc, config);
+		optionsComposite.setDatabinding(dbc, config, this);
 		
 		tempStringFormatterTable = config.getStringFormatters();
 		optionsComposite.connectTableWithData(dbc, tempStringFormatterTable);

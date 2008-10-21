@@ -25,7 +25,7 @@ public class GridPainterPreferencePage extends
 		final GridPainterOptionsComposite optionsComposite = new GridPainterOptionsComposite(
 				composite);
 		
-		optionsComposite.setDatabinding(dbc, config);
+		optionsComposite.setDatabinding(dbc, config, this);
 		
 		return composite;
 	}

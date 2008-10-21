@@ -58,6 +58,8 @@ public class GridPainterOptionsComposite extends Composite {
 	
 	private Group group;
 	
+	GridPainterPreferencePage page;
+	
 	public GridPainterOptionsComposite(final Composite parent) {
 		super(parent, SWT.NONE);
 		initGUI();
@@ -221,6 +223,7 @@ public class GridPainterOptionsComposite extends Composite {
 						final RGB color = dlg.open();
 						if (color != null) {
 							colorExample.setBackground(new Color(getDisplay(), color));
+							page.markFormDirty();
 						}
 					}
 				});
@@ -230,7 +233,10 @@ public class GridPainterOptionsComposite extends Composite {
 		}
 	}
 	
-	public void setDatabinding(final DataBindingContext dbc, final GridPainterXMLConfig config) {
+	public void setDatabinding(final DataBindingContext dbc, final GridPainterXMLConfig config,
+			final GridPainterPreferencePage page) {
+		
+		this.page = page;
 		
 		IObservableValue obsModel;
 		ISWTObservableValue obsWidget;

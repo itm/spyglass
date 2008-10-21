@@ -110,20 +110,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		
 		@Override
 		public void handleChange(final ChangeEvent event) {
-			formIsDirty = true;
 			
-			if ((config == null) || !isValid()) {
-				// this means that the plugin type is abstractor contains errors
-				return;
-			}
-			
-			if (isInstancePage()) {
-				buttons.applyButton.setEnabled(true);
-				buttons.restoreButton.setEnabled(true);
-			} else {
-				buttons.restoreDefaultsButton.setEnabled(true);
-				buttons.saveAsDefaultButton.setEnabled(true);
-			}
+			markFormDirty();
 			
 		}
 	};
@@ -136,7 +124,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * modified. Subclasses, which don't use Databinding must set this flag to true themselves when
 	 * appropriate.
 	 */
-	protected boolean formIsDirty = false;
+	private boolean formIsDirty = false;
 	
 	/**
 	 * Reference to the plugin instance. may be null if PrefType==TYPE.
@@ -342,12 +330,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		basicGroup.setDatabinding(dbc, config);
 		basicGroup.setDatabindingPluginName(dbc, config, this.plugin, this.spyglass
 				.getPluginManager(), this.isInstancePage());
-		
-		// Add a Listener to each binding, so we get informed if someone modifies something.
-		// for (final Object o : dbc.getBindings()) {
-		// final Binding b = (Binding) o;
-		// b.getTarget().addChangeListener(formGotDirtyListener);
-		// }
 		
 		return composite;
 	}
@@ -640,6 +622,27 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		label.setLayoutData(labelData);
 		
 		return parent;
+		
+	}
+	
+	/**
+	 * Calling this method marks the form dirty (and thus enables the "Apply" button)
+	 */
+	public void markFormDirty() {
+		formIsDirty = true;
+		
+		if ((config == null) || !isValid()) {
+			// this means that the plugin type is abstractor contains errors
+			return;
+		}
+		
+		if (isInstancePage()) {
+			buttons.applyButton.setEnabled(true);
+			buttons.restoreButton.setEnabled(true);
+		} else {
+			buttons.restoreDefaultsButton.setEnabled(true);
+			buttons.saveAsDefaultButton.setEnabled(true);
+		}
 		
 	}
 	
