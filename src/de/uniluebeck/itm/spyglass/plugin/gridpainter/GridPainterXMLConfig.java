@@ -11,7 +11,6 @@ package de.uniluebeck.itm.spyglass.plugin.gridpainter;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 
-import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -30,7 +29,10 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 	private int gridElementWidth = 1;
 	
 	@Element
-	private AbsolutePosition gridLowerLeftPoint = new AbsolutePosition();
+	private int lowerLeftX = 0;
+	
+	@Element
+	private int lowerLeftY = 0;
 	
 	@ElementArray
 	private int[] lineColorRGB = { 0, 0, 0 };
@@ -50,12 +52,98 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 	@Element
 	private int numRows = 1;
 	
+	public boolean equals(final GridPainterXMLConfig o) {
+		if (!super.equals(o)) {
+			return false;
+		}
+		
+		return (gridElementHeight == o.gridElementHeight)
+				&& (gridElementWidth == o.gridElementWidth) && (lowerLeftX == o.lowerLeftX)
+				&& (lowerLeftY == o.lowerLeftY) && equalsRGB(lineColorRGB, o.lineColorRGB)
+				&& (lineWidth == o.lineWidth)
+				&& (lockGridElementsSquare == o.lockGridElementsSquare)
+				&& (lockNumberOfRowsNCols == o.lockNumberOfRowsNCols) && (numCols == o.numCols)
+				&& (numRows == o.numRows);
+	}
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the gridElementHeight
 	 */
 	public int getGridElementHeight() {
 		return gridElementHeight;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the gridElementWidth
+	 */
+	public int getGridElementWidth() {
+		return gridElementWidth;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getLowerLeftX() {
+		return lowerLeftX;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getLowerLeftY() {
+		return lowerLeftY;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the lineColorRGB
+	 */
+	public int[] getLineColorRGB() {
+		return lineColorRGB.clone();
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the lineWidth
+	 */
+	public float getLineWidth() {
+		return lineWidth;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the lockGridElementsSquare
+	 */
+	public boolean getLockGridElementsSquare() {
+		return lockGridElementsSquare;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the lockNumberOfRowsNCols
+	 */
+	public boolean getLockNumberOfRowsNCols() {
+		return lockNumberOfRowsNCols;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the numCols
+	 */
+	public int getNumCols() {
+		return numCols;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the numRows
+	 */
+	public int getNumRows() {
+		return numRows;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -71,14 +159,6 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the gridElementWidth
-	 */
-	public int getGridElementWidth() {
-		return gridElementWidth;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @param gridElementWidth
 	 *            the gridElementWidth to set
 	 */
@@ -90,29 +170,22 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the gridLowerLeftPoint
+	 * @param gridLowerLeftPointX
 	 */
-	public AbsolutePosition getGridLowerLeftPoint() {
-		return gridLowerLeftPoint;
+	public void setLowerLeftX(final int gridLowerLeftPointX) {
+		final int oldValue = this.lowerLeftX;
+		this.lowerLeftX = gridLowerLeftPointX;
+		firePropertyChange("gridLowerLeftPointX", oldValue, gridLowerLeftPointX);
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @param gridLowerLeftPoint
-	 *            the gridLowerLeftPoint to set
+	 * @param gridLowerLeftPointY
 	 */
-	public void setGridLowerLeftPoint(final AbsolutePosition gridLowerLeftPoint) {
-		final AbsolutePosition oldValue = this.gridLowerLeftPoint;
-		this.gridLowerLeftPoint = gridLowerLeftPoint;
-		firePropertyChange("gridLowerLeftPoint", oldValue, gridLowerLeftPoint);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the lineColorRGB
-	 */
-	public int[] getLineColorRGB() {
-		return lineColorRGB.clone();
+	public void setLowerLeftY(final int gridLowerLeftPointY) {
+		final int oldValue = this.lowerLeftY;
+		this.lowerLeftY = gridLowerLeftPointY;
+		firePropertyChange("gridLowerLeftPointY", oldValue, gridLowerLeftPointY);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -128,14 +201,6 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the lineWidth
-	 */
-	public float getLineWidth() {
-		return lineWidth;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @param lineWidth
 	 *            the lineWidth to set
 	 */
@@ -143,14 +208,6 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 		final float oldValue = this.lineWidth;
 		this.lineWidth = lineWidth;
 		firePropertyChange("lineWidth", oldValue, lineWidth);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the lockGridElementsSquare
-	 */
-	public boolean getLockGridElementsSquare() {
-		return lockGridElementsSquare;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -166,14 +223,6 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the lockNumberOfRowsNCols
-	 */
-	public boolean getLockNumberOfRowsNCols() {
-		return lockNumberOfRowsNCols;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @param lockNumberOfRowsNCols
 	 *            the lockNumberOfRowsNCols to set
 	 */
@@ -181,14 +230,6 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 		final boolean oldValue = this.lockNumberOfRowsNCols;
 		this.lockNumberOfRowsNCols = lockNumberOfRowsNCols;
 		firePropertyChange("lockNumberOfRowsNCols", oldValue, lockNumberOfRowsNCols);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the numCols
-	 */
-	public int getNumCols() {
-		return numCols;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -204,14 +245,6 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the numRows
-	 */
-	public int getNumRows() {
-		return numRows;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @param numRows
 	 *            the numRows to set
 	 */
@@ -219,20 +252,6 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 		final int oldValue = this.numRows;
 		this.numRows = numRows;
 		firePropertyChange("numRows", oldValue, numRows);
-	}
-	
-	public boolean equals(final GridPainterXMLConfig o) {
-		if (!super.equals(o)) {
-			return false;
-		}
-		
-		return (gridElementHeight == o.gridElementHeight)
-				&& (gridElementWidth == o.gridElementWidth)
-				&& gridLowerLeftPoint.equals(o.gridLowerLeftPoint)
-				&& equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth)
-				&& (lockGridElementsSquare == o.lockGridElementsSquare)
-				&& (lockNumberOfRowsNCols == o.lockNumberOfRowsNCols) && (numCols == o.numCols)
-				&& (numRows == o.numRows);
 	}
 	
 }

@@ -24,6 +24,7 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class GridPainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener {
@@ -135,7 +136,8 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 		grid.setColor(lineColor[0], lineColor[1], lineColor[1]);
 		grid.setGridElementHeight(xmlConfig.getGridElementHeight());
 		grid.setGridElementWidth(xmlConfig.getGridElementWidth());
-		grid.setPosition(xmlConfig.getGridLowerLeftPoint());
+		grid.setPosition(new AbsolutePosition(xmlConfig.getLowerLeftX(), xmlConfig.getLowerLeftY(),
+				0));
 		grid.setLineWidth((int) xmlConfig.getLineWidth());
 		grid.setNumCols(xmlConfig.getNumCols());
 		grid.setNumRows(xmlConfig.getNumRows());

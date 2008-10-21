@@ -12,7 +12,6 @@ package de.uniluebeck.itm.spyglass.plugin.mappainter;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 
-import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -34,7 +33,10 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	private int gridElementWidth = 1;
 	
 	@Element
-	private AbsolutePosition gridLowerLeftPoint = new AbsolutePosition();
+	private int lowerLeftX = 0;
+	
+	@Element
+	private int lowerLeftY = 0;
 	
 	@Element
 	private boolean lockGridElementSquare = true;
@@ -125,21 +127,34 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the gridLowerLeftPoint
+	 * @return
 	 */
-	public AbsolutePosition getGridLowerLeftPoint() {
-		return gridLowerLeftPoint;
+	public int getLowerLeftX() {
+		return lowerLeftX;
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @param gridLowerLeftPoint
-	 *            the gridLowerLeftPoint to set
+	 * @param lowerLeftX
 	 */
-	public void setGridLowerLeftPoint(final AbsolutePosition gridLowerLeftPoint) {
-		
-		firePropertyChange("gridLowerLeftPoint", this.gridLowerLeftPoint,
-				this.gridLowerLeftPoint = gridLowerLeftPoint);
+	public void setLowerLeftX(final int lowerLeftX) {
+		firePropertyChange("lowerLeftX", this.lowerLeftX, this.lowerLeftX = lowerLeftX);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getLowerLeftY() {
+		return lowerLeftY;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param lowerLeftY
+	 */
+	public void setLowerLeftY(final int lowerLeftY) {
+		firePropertyChange("lowerLeftY", this.lowerLeftY, this.lowerLeftY = lowerLeftY);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -352,8 +367,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 		
 		return (framePointDefaultValue == o.framePointDefaultValue)
 				&& (gridElementHeight == o.gridElementHeight)
-				&& (gridElementWidth == o.gridElementWidth)
-				&& gridLowerLeftPoint.equals(o.gridLowerLeftPoint)
+				&& (gridElementWidth == o.gridElementWidth) && (lowerLeftX == o.lowerLeftX)
+				&& (lowerLeftY == o.lowerLeftY)
 				&& (lockGridElementSquare == o.lockGridElementSquare)
 				&& (lockNumberOfRowsNCols == o.lockNumberOfRowsNCols)
 				&& equalsRGB(maxColorRGB, o.maxColorRGB) && (maxValue == o.maxValue)
