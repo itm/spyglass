@@ -25,27 +25,8 @@ import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 public class Line extends DrawingObject {
 	
 	private AbsolutePosition lineEnd;
+	
 	private int width;
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public Line(final AbsolutePosition p, final AbsolutePosition d) {
-		this();
-		setPosition(p);
-		setLineWidth(1);
-		setEnd(d);
-	}
-	
-	@Override
-	public void update(final DrawingObject other) {
-		if (other instanceof Line) {
-			super.update(other);
-			final Line l = (Line) other;
-			setEnd(l.getEnd());
-		}
-	}
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -53,30 +34,6 @@ public class Line extends DrawingObject {
 	 */
 	public Line() {
 		super();
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public Line(final int id) {
-		super(id);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public void setEnd(final AbsolutePosition end) {
-		lineEnd = end;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public AbsolutePosition getEnd() {
-		return lineEnd;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -95,6 +52,59 @@ public class Line extends DrawingObject {
 		return clone;
 	}
 	
+	@Override
+	public void draw(final DrawingArea drawingArea, final GC gc) {
+		
+		final Color color = new Color(gc.getDevice(), this.getColorR(), this.getColorG(), this
+				.getColorB());
+		gc.setForeground(color);
+		gc.setLineWidth(this.getLineWidth());
+		
+		final PixelPosition start = drawingArea.absPoint2PixelPoint(this.getPosition());
+		final PixelPosition end = drawingArea.absPoint2PixelPoint(this.getEnd());
+		
+		gc.drawLine(start.x, start.y, end.x, end.y);
+		color.dispose();
+		
+		drawBoundingBox(drawingArea, gc);
+	}
+	
+	@Override
+	public AbsoluteRectangle getBoundingBox() {
+		final AbsolutePosition pos = getPosition();
+		final int lowerLeftX = lineEnd.x < pos.x ? lineEnd.x : pos.x;
+		final int lowerLeftY = lineEnd.y < pos.y ? lineEnd.y : pos.y;
+		final int upperRightX = lineEnd.x > pos.x ? lineEnd.x : pos.x;
+		final int upperRightY = lineEnd.y > pos.y ? lineEnd.x : pos.y;
+		final int width = Math.abs(upperRightX - lowerLeftX);
+		final int height = Math.abs(upperRightY - lowerLeftY);
+		return new AbsoluteRectangle(new AbsolutePosition(lowerLeftX, lowerLeftY, 0), width, height);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public AbsolutePosition getEnd() {
+		return lineEnd;
+	}
+	
+	public int getLineWidth() {
+		return width;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * 
+	 */
+	public void setEnd(final AbsolutePosition end) {
+		lineEnd = end;
+	}
+	
+	public void setLineWidth(final int width) {
+		this.width = width;
+	}
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -105,32 +115,13 @@ public class Line extends DrawingObject {
 		return super.toString();
 	}
 	
-	public int getLineWidth() {
-		return width;
-	}
-	
-	public void setLineWidth(final int width) {
-		this.width = width;
-	}
-	
 	@Override
-	public void draw(final DrawingArea drawingArea, final GC gc) {
-		final Color color = new Color(null, this.getColorR(), this.getColorG(), this.getColorB());
-		gc.setForeground(color);
-		gc.setLineWidth(this.getLineWidth());
-		
-		final PixelPosition start = drawingArea.absPoint2PixelPoint(this.getPosition());
-		final PixelPosition end = drawingArea.absPoint2PixelPoint(this.getEnd());
-		
-		gc.drawLine((start.x), (start.y), (end.x), (end.y));
-		// TODO: Implement the drawing of the line primitive
-		color.dispose();
-	}
-	
-	@Override
-	public AbsoluteRectangle getBoundingBox() {
-		// TODO Auto-generated method stub
-		return null;
+	public void update(final DrawingObject other) {
+		if (other instanceof Line) {
+			super.update(other);
+			final Line l = (Line) other;
+			setEnd(l.getEnd());
+		}
 	}
 	
 }

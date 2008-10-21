@@ -56,6 +56,8 @@ public class GridPainterOptionsComposite extends Composite {
 	
 	private Text lineWidth;
 	
+	private Group group;
+	
 	public GridPainterOptionsComposite(final Composite parent) {
 		super(parent, SWT.NONE);
 		initGUI();
@@ -66,20 +68,21 @@ public class GridPainterOptionsComposite extends Composite {
 		GridData data;
 		Label label;
 		
-		this.setLayout(new GridLayout());
-		final GridData gridData = new GridData();
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.verticalAlignment = GridData.FILL;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.grabExcessVerticalSpace = true;
-		this.setLayoutData(gridData);
+		setLayout(new GridLayout());
+		data = new GridData();
+		data.horizontalAlignment = GridData.FILL;
+		data.verticalAlignment = GridData.FILL;
+		data.grabExcessHorizontalSpace = true;
+		data.grabExcessVerticalSpace = true;
+		setLayoutData(data);
 		
 		{
-			final GridData groupData = new GridData(SWT.TOP, SWT.LEFT, true, true);
-			groupData.horizontalAlignment = GridData.FILL;
-			groupData.verticalAlignment = GridData.FILL;
-			final Group group = new Group(this, SWT.NONE);
-			group.setLayoutData(groupData);
+			data = new GridData(SWT.TOP, SWT.LEFT, true, true);
+			data.horizontalAlignment = GridData.FILL;
+			data.verticalAlignment = GridData.FILL;
+			
+			group = new Group(this, SWT.NONE);
+			group.setLayoutData(data);
 			group.setLayout(new GridLayout(8, false));
 			group.setText("Grid");
 			

@@ -20,6 +20,7 @@ import de.uniluebeck.itm.spyglass.drawing.Grid;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
@@ -32,7 +33,7 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 	@Element(name = "parameters")
 	private final GridPainterXMLConfig xmlConfig;
 	
-	private final QuadTree layer;
+	private final Layer layer;
 	
 	private Grid grid;
 	

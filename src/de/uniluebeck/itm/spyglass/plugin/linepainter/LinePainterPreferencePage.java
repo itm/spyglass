@@ -21,8 +21,13 @@ public class LinePainterPreferencePage extends
 	
 	@Override
 	protected Composite createContents(final Composite parent) {
-		return super.createMS2Warning(parent); // TODO: plugin-specific options
+		final Composite composite = createContentsInternal(parent);
+		final LinePainterOptionsComposite optionsComposite = new LinePainterOptionsComposite(
+				composite);
 		
+		optionsComposite.setDatabinding(dbc, config);
+		
+		return composite;
 	}
 	
 	@Override

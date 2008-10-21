@@ -22,8 +22,10 @@ public class Grid extends DrawingObject {
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 		
+		final Color color = new Color(gc.getDevice(), getColorR(), getColorG(), getColorB());
+		
 		gc.setLineWidth(lineWidth);
-		gc.setForeground(new Color(gc.getDevice(), getColorR(), getColorG(), getColorB()));
+		gc.setForeground(color);
 		
 		final AbsolutePosition pos = getPosition();
 		AbsolutePosition origin, dest;
@@ -63,6 +65,8 @@ public class Grid extends DrawingObject {
 			gc.drawLine(pxOrigin.x, pxOrigin.y, pxDest.x, pxDest.y);
 			
 		}
+		
+		color.dispose();
 		
 	}
 	

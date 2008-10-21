@@ -7,6 +7,7 @@
  */
 package de.uniluebeck.itm.spyglass.drawing;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
@@ -14,6 +15,7 @@ import org.simpleframework.xml.Root;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
+import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 
 // --------------------------------------------------------------------------------
 /**
@@ -239,5 +241,20 @@ public abstract class DrawingObject {
 	 * Return the bounding box of this drawing object
 	 */
 	public abstract AbsoluteRectangle getBoundingBox();
+	
+	protected void drawBoundingBox(final DrawingArea drawingArea, final GC gc) {
+		
+		final PixelRectangle rect = drawingArea.absRect2PixelRect(getBoundingBox());
+		final int x = rect.getUpperLeft().x;
+		final int y = rect.getUpperLeft().y;
+		final int width = rect.getWidth();
+		final int height = rect.getHeight();
+		final Color color = new Color(gc.getDevice(), 255, 0, 0);
+		gc.setLineWidth(1);
+		gc.setForeground(color);
+		gc.drawRectangle(x, y, width, height);
+		color.dispose();
+		
+	}
 	
 }
