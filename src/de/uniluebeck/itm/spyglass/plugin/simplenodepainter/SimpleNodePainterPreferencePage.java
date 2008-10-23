@@ -50,7 +50,7 @@ public class SimpleNodePainterPreferencePage extends
 		// TODO: find a sane way to apply an UpdateSetStrategy to the Table, so we don't have
 		// to do this by hand
 		tempStringFormatterTable = config.getStringFormatters();
-		optionsComposite.connectTableWithData(dbc, tempStringFormatterTable);
+		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatterTable);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ public class SimpleNodePainterPreferencePage extends
 		optionsComposite.setDatabinding(dbc, config, this);
 		
 		tempStringFormatterTable = config.getStringFormatters();
-		optionsComposite.connectTableWithData(dbc, tempStringFormatterTable);
+		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatterTable);
 		
 		// necessary to prevent the change listerner to react on the initialization
 		return composite;

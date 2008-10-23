@@ -41,19 +41,32 @@ public class Image extends DrawingObject {
 	
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
-		final PixelRectangle rect = drawingArea.absRect2PixelRect(this.getBoundingBox());
+		
+		final PixelRectangle rect = drawingArea.absRect2PixelRect(getBoundingBox());
 		final Rectangle bounds = image.getBounds();
+		
 		try {
+			
 			gc.drawImage(image, 0, 0, bounds.width, bounds.height, rect.getUpperLeft().x, rect
 					.getUpperLeft().y, rect.getWidth(), rect.getHeight());
+			
 		} catch (final Exception e) {
 			log.error("Error while painting Image: " + e, e);
 		}
+		
 	}
 	
 	@Override
 	public AbsoluteRectangle getBoundingBox() {
 		return new AbsoluteRectangle(this.getPosition(), imageSizeX, imageSizeY);
+	}
+	
+	public void dispose() {
+		
+		if (image != null) {
+			image.dispose();
+		}
+		
 	}
 	
 }

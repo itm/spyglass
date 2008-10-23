@@ -8,14 +8,10 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.linepainter;
 
-import java.util.HashMap;
-
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
-import org.simpleframework.xml.ElementMap;
 
-import de.uniluebeck.itm.spyglass.util.StringFormatter;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
@@ -24,16 +20,13 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * @author Sebastian Ebers, Dariush Forouher
  * 
  */
-public class LinePainterXMLConfig extends PluginXMLConfig {
+public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 	
 	@ElementArray
 	private int[] lineColorRGB = { 0, 0, 0 };
 	
 	@Element
 	private int lineWidth = 1;
-	
-	@ElementMap(entry = "stringFormatter", key = "nodeID", attribute = true, valueType = StringFormatter.class)
-	private HashMap<Integer, StringFormatter> stringFormatters = new HashMap<Integer, StringFormatter>();
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -73,32 +66,13 @@ public class LinePainterXMLConfig extends PluginXMLConfig {
 		firePropertyChange("lineWidth", oldValue, lineWidth);
 	}
 	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the stringFormatters
-	 */
-	public HashMap<Integer, StringFormatter> getStringFormatters() {
-		return (HashMap<Integer, StringFormatter>) stringFormatters.clone();
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param stringFormatters
-	 *            the stringFormatters to set
-	 */
-	public void setStringFormatters(final HashMap<Integer, StringFormatter> stringFormatters) {
-		final HashMap<Integer, StringFormatter> oldValue = this.stringFormatters;
-		this.stringFormatters = stringFormatters;
-		firePropertyChange("stringFormatters", oldValue, stringFormatters);
-	}
-	
 	public boolean equals(final LinePainterXMLConfig o) {
+		
 		if (!super.equals(o)) {
 			return false;
 		}
 		
-		return equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth)
-				&& stringFormatters.equals(o.stringFormatters);
+		return equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth);
 	}
 	
 }

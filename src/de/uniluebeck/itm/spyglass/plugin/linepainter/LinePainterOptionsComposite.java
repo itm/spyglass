@@ -25,6 +25,7 @@ import com.cloudgarden.resource.SWTResourceManager;
 
 import de.uniluebeck.itm.spyglass.gui.converter.ArrayToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.converter.ColorToArrayConverter;
+import de.uniluebeck.itm.spyglass.gui.databinding.StringFormatter;
 
 public class LinePainterOptionsComposite extends Composite {
 	
@@ -32,6 +33,7 @@ public class LinePainterOptionsComposite extends Composite {
 	private Text lineWidth;
 	private CLabel lineColor;
 	private Button buttonLineColor;
+	StringFormatter stringFormatter = new StringFormatter();
 	
 	{
 		// Register as a resource user - SWTResourceManager will
@@ -105,6 +107,8 @@ public class LinePainterOptionsComposite extends Composite {
 					}
 				});
 			}
+			
+			stringFormatter.addStringFormatterFields(group, 3);
 			
 		}
 		

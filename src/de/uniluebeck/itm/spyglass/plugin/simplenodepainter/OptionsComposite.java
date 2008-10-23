@@ -1,29 +1,11 @@
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
-import java.util.HashMap;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.observable.map.IObservableMap;
-import org.eclipse.core.databinding.observable.set.IObservableSet;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
-import org.eclipse.jface.databinding.viewers.ObservableSetContentProvider;
-import org.eclipse.jface.databinding.viewers.ObservableValueEditingSupport;
-import org.eclipse.jface.dialogs.IInputValidator;
-import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TextCellEditor;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -37,7 +19,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.ColorDialog;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -48,42 +29,11 @@ import com.cloudgarden.resource.SWTResourceManager;
 
 import de.uniluebeck.itm.spyglass.gui.converter.ArrayToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.converter.ColorToArrayConverter;
-import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.WrappedSet.ObservableEntry;
+import de.uniluebeck.itm.spyglass.gui.databinding.StringFormatter;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
-	
-	private class StringFormatterEditingSupport extends ObservableValueEditingSupport {
-		
-		private CellEditor cellEditor;
-		private DataBindingContext dbc;
-		
-		public StringFormatterEditingSupport(final ColumnViewer viewer, final DataBindingContext dbc) {
-			
-			super(viewer, dbc);
-			this.dbc = dbc;
-			cellEditor = new TextCellEditor((Composite) viewer.getControl());
-		}
-		
-		@Override
-		protected CellEditor getCellEditor(final Object element) {
-			return cellEditor;
-		}
-		
-		@Override
-		protected IObservableValue doCreateCellEditorObservable(final CellEditor cellEditor) {
-			
-			return SWTObservables.observeText(cellEditor.getControl(), SWT.Modify);
-		}
-		
-		@Override
-		protected IObservableValue doCreateElementObservable(final Object element,
-				final ViewerCell cell) {
-			return BeansObservables.observeValue(dbc.getValidationRealm(), element, "value");
-		}
-		
-	}
 	
 	{
 		// Register as a resource user - SWTResourceManager will
@@ -94,24 +44,13 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 	private static final Logger log = SpyglassLogger.getLogger(OptionsComposite.class);
 	private Group group1;
 	private Label label1;
-	private Button delEntry;
-	private Button addEntry;
-	private TableViewer table;
-	private Text defaultStringFmt;
-	private Label label3;
 	private Button showExtInf;
 	private CLabel colorExample;
 	private Button lineColor;
 	private Label label2;
 	private Text lineWidth;
-	private TableViewerColumn columnFormatString;
-	private TableViewerColumn columnTypes;
 	
-	/**
-	 * Reference to the set backing the table. All edits have to go through this set, so that
-	 * changeListeners are being noticed.
-	 */
-	private IObservableSet tableData;
+	StringFormatter stringFormatter = new StringFormatter();
 	
 	SimpleNodePainterPreferencePage page;
 	
@@ -214,74 +153,9 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 					showExtInf.setText("Show extended information by default");
 					
 				}
-				{
-					label3 = new Label(group1, SWT.NONE);
-					label3.setText("Common string formatter");
-				}
-				{
-					final GridData defaultStringFmtLData = new GridData();
-					defaultStringFmtLData.horizontalSpan = 2;
-					defaultStringFmtLData.horizontalAlignment = GridData.FILL;
-					defaultStringFmtLData.verticalAlignment = GridData.BEGINNING;
-					defaultStringFmtLData.grabExcessHorizontalSpace = true;
-					defaultStringFmt = new Text(group1, SWT.BORDER);
-					defaultStringFmt.setLayoutData(defaultStringFmtLData);
-					
-				}
-				{
-					final GridData tableLData = new GridData();
-					tableLData.horizontalSpan = 3;
-					tableLData.grabExcessHorizontalSpace = true;
-					tableLData.horizontalAlignment = GridData.FILL;
-					tableLData.verticalAlignment = GridData.FILL;
-					tableLData.grabExcessVerticalSpace = true;
-					tableLData.heightHint = 27;
-					table = new TableViewer(group1, SWT.FULL_SELECTION);
-					table.getControl().setLayoutData(tableLData);
-					
-				}
-				{
-					columnTypes = new TableViewerColumn(table, SWT.NONE);
-					columnTypes.getColumn().setWidth(50);
-					columnTypes.getColumn().setText("Type");
-					
-					// Sort by semantic tyoe
-					table.getTable().setSortColumn(columnTypes.getColumn());
-					table.getTable().setSortDirection(SWT.DOWN);
-					table.getTable().setLinesVisible(true);
-					table.getTable().setHeaderVisible(true);
-					
-				}
-				{
-					columnFormatString = new TableViewerColumn(table, SWT.NONE);
-					columnFormatString.getColumn().setWidth(200);
-					columnFormatString.getColumn().setText("Format string");
-					
-				}
-				{
-					addEntry = new Button(group1, SWT.PUSH | SWT.CENTER);
-					final GridData addEntryLData = new GridData();
-					addEntryLData.verticalAlignment = GridData.BEGINNING;
-					addEntryLData.horizontalAlignment = GridData.END;
-					addEntry.setLayoutData(addEntryLData);
-					addEntry.setText("Add");
-					addEntry.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(final SelectionEvent evt) {
-							addEntryWidgetSelected(evt);
-						}
-					});
-				}
-				{
-					delEntry = new Button(group1, SWT.PUSH | SWT.CENTER);
-					delEntry.setText("Delete");
-					delEntry.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(final SelectionEvent evt) {
-							delEntryWidgetSelected(evt);
-						}
-					});
-				}
+				
+				stringFormatter.addStringFormatterFields(group1, 2);
+				
 			}
 			this.layout();
 		} catch (final Exception e) {
@@ -328,83 +202,8 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 						.setConverter(new ColorToArrayConverter()), new UpdateValueStrategy()
 						.setConverter(new ArrayToColorConverter(this.getDisplay())));
 		
-		// default string fmt
-		
-		final IObservableValue modelDefStrFmt = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "defaultStringFormatter");
-		dbc.bindValue(SWTObservables.observeText(this.defaultStringFmt, SWT.Modify),
-				modelDefStrFmt, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
-		
-		// table
-		
-		columnFormatString.setEditingSupport(new StringFormatterEditingSupport(table, dbc));
-		
-		final ObservableSetContentProvider contentProvider = new ObservableSetContentProvider();
-		table.setContentProvider(contentProvider);
-		
-		final IObservableMap typeMap = BeansObservables.observeMap(contentProvider
-				.getKnownElements(), ObservableEntry.class, "key");
-		final IObservableMap fmtStringMap = BeansObservables.observeMap(contentProvider
-				.getKnownElements(), ObservableEntry.class, "value");
-		
-		final IObservableMap[] columnMaps = new IObservableMap[] { typeMap, fmtStringMap };
-		table.setLabelProvider(new ObservableMapLabelProvider(columnMaps));
+		stringFormatter.setDataBinding(dbc, config, page);
 		
 	}
 	
-	private void addEntryWidgetSelected(final SelectionEvent evt) {
-		final InputDialog dlg = new InputDialog(this.getShell(), "Enter a semantic type",
-				"Please enter a semantic type (0-255)", "", new IInputValidator() {
-					
-					@Override
-					public String isValid(final String newText) {
-						try {
-							final int i = Integer.parseInt(newText);
-							
-							if ((i < 0) || (i > 255)) {
-								return "Please enter a number between 0 and 255";
-							} else {
-								return null;
-							}
-						} catch (final NumberFormatException e) {
-							return "Please enter an integer";
-						}
-						
-					}
-					
-				});
-		dlg.setBlockOnOpen(true);
-		final int ret = dlg.open();
-		if (ret == Window.OK) {
-			final int type = Integer.parseInt(dlg.getValue());
-			
-			final ObservableEntry<Integer, String> ne = new WrappedSet.ObservableEntry<Integer, String>(
-					type, "");
-			tableData.add(ne);
-			
-		}
-		
-		// this is a hack and will probably not work every time.
-		table.refresh();
-	}
-	
-	public void connectTableWithData(final DataBindingContext dbc,
-			final HashMap<Integer, String> tempStringFormatterTable) {
-		
-		// the hashmap is cloned inside the getter-method.
-		// tempStringFormatterTable = config.getStringFormatters();
-		
-		// Wrap Hashmap into an Set, so that JFace Databinding can handle it.
-		final Set<ObservableEntry<Integer, String>> entrySet = new WrappedSet<Integer, String>(
-				tempStringFormatterTable);
-		tableData = new WrappedObservableSet(dbc.getValidationRealm(), entrySet, null);
-		table.setInput(tableData);
-	}
-	
-	private void delEntryWidgetSelected(final SelectionEvent evt) {
-		final IStructuredSelection selection = (IStructuredSelection) table.getSelection();
-		for (final Object o : selection.toList()) {
-			tableData.remove(o);
-		}
-	}
 }

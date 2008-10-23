@@ -9,14 +9,12 @@
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 import org.simpleframework.xml.ElementMap;
 
-import de.uniluebeck.itm.spyglass.util.StringFormatter;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
@@ -26,7 +24,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * @author Sebastian Ebers
  * 
  */
-public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
+public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 	
 	@ElementMap(entry = "isActive", key = "nodeID", attribute = true, name = "extendedInformation", required = false)
 	private HashMap<Integer, Boolean> isExtendenInformationActive = new HashMap<Integer, Boolean>();
@@ -39,12 +37,6 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	
 	@Element
 	private int lineWidth = 1;
-	
-	@ElementMap(entry = "stringFormatter", key = "nodeID", attribute = true, valueType = String.class, required = true)
-	private HashMap<Integer, String> stringFormatters = new HashMap<Integer, String>();
-	
-	@Element(name = "defaultStringFormatter", required = false)
-	private String defaultStringFormatter = null;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -116,41 +108,6 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the stringFormatters
-	 */
-	@SuppressWarnings("unchecked")
-	public HashMap<Integer, String> getStringFormatters() {
-		return (HashMap<Integer, String>) stringFormatters.clone();
-	}
-	
-	/**
-	 * Returns a string formatting object in respect to a syntax type or <code>null</code> if no
-	 * matching object was created previously.
-	 * 
-	 * @return a string formatting object in respect to a syntax type or <code>null</code> if no
-	 *         matching object was created previously.
-	 */
-	public StringFormatter getStringFormatter(final int semanticType) {
-		if (stringFormatters.containsKey(semanticType)) {
-			return new StringFormatter(stringFormatters.get(semanticType));
-		}
-		return null;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param stringFormatters
-	 *            the stringFormatters to set
-	 */
-	@SuppressWarnings("unchecked")
-	public void setStringFormatters(final HashMap<Integer, String> stringFormatters) {
-		final Map<Integer, String> oldValue = this.stringFormatters;
-		this.stringFormatters = (HashMap<Integer, String>) stringFormatters.clone();
-		firePropertyChange("stringFormatters", oldValue, stringFormatters);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @return the getExtendedDefaultValue
 	 */
 	public boolean getExtendedDefaultValue() {
@@ -168,42 +125,19 @@ public class SimpleNodePainterXMLConfig extends PluginXMLConfig {
 		firePropertyChange("extendedDefaultValue", oldValue, isExtendedDefaultValue);
 	}
 	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the defaultStringFormatter
-	 */
-	public String getDefaultStringFormatter() {
-		return defaultStringFormatter;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param defaultStringFormatter
-	 *            the defaultStringFormatter to set
-	 */
-	public void setDefaultStringFormatter(final String defaultStringFormatter) {
-		final String oldValue = this.defaultStringFormatter;
-		this.defaultStringFormatter = defaultStringFormatter;
-		firePropertyChange("defaultStringFormatter", oldValue, defaultStringFormatter);
-	}
-	
 	public boolean equals(final SimpleNodePainterXMLConfig o) {
 		if (!super.equals(o)) {
 			return false;
 		}
 		
-		return (defaultStringFormatter != null)
-				&& defaultStringFormatter.equals(o.defaultStringFormatter)
-				&& (isExtendedDefaultValue == o.isExtendedDefaultValue)
+		return super.equals(o) && (isExtendedDefaultValue == o.isExtendedDefaultValue)
 				&& (isExtendenInformationActive == o.isExtendenInformationActive)
-				&& equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth)
-				&& stringFormatters.equals(o.stringFormatters);
+				&& equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth);
 	}
 	
 	@Override
 	protected void finalize() throws Throwable {
 		isExtendenInformationActive.clear();
-		stringFormatters.clear();
 		super.finalize();
 	}
 	

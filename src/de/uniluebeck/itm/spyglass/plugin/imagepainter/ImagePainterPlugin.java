@@ -125,8 +125,11 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	
 	private void loadImage() {
 		
-		synchronized (layer) {
-			layer.remove(image);
+		if (image != null) {
+			synchronized (layer) {
+				layer.remove(image);
+				image.dispose();
+			}
 		}
 		
 		try {
