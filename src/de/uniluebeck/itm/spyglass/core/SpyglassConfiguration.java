@@ -43,10 +43,8 @@ public class SpyglassConfiguration extends XMLConfig {
 	@Element
 	private final GeneralSettingsXMLConfig generalSettings = new GeneralSettingsXMLConfig();
 	
-	// TODO: property change events
 	@ElementList
-	private final Collection<Plugin> defaults = Collections
-			.synchronizedCollection(new Vector<Plugin>());
+	private final Collection<Plugin> defaults = new Vector<Plugin>();
 	
 	@Element
 	private final DrawingArea drawingArea = new DrawingArea();
@@ -61,34 +59,14 @@ public class SpyglassConfiguration extends XMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns a collection of plug-ins which are configured by default
+	 * Returns a read-only collection of plug-ins which are configured by default
+	 * 
+	 * Note that this collection is immutable, entries cannot be added or removed.
 	 * 
 	 * @return the defaults a collection of plug-ins which are configured by default
 	 */
 	public Collection<Plugin> getDefaults() {
-		return defaults;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Replaces a plug-in in the list of default plug-ins
-	 * 
-	 * @param plugin
-	 *            the new plug-in
-	 * @return the previous plug-in of the same class or <code>null</code> if no plug-in of the same
-	 *         class existet previously
-	 */
-	public Plugin replaceInDefaults(final Plugin plugin) {
-		final Class<? extends Plugin> clazz = plugin.getClass();
-		for (final Plugin p : defaults) {
-			if (p.getClass().equals(clazz)) {
-				defaults.remove(p);
-				defaults.add(plugin);
-				return p;
-			}
-		}
-		defaults.add(plugin);
-		return null;
+		return Collections.unmodifiableCollection(defaults);
 	}
 	
 	// --------------------------------------------------------------------------------

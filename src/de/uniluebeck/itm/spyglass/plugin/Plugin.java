@@ -33,7 +33,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * @author Sebastian Ebers
  */
 @Root
-public abstract class Plugin implements Runnable, Comparable {
+public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	
 	/**
 	 * The plug-in's manager (which manages all currently available plug-ins as well)
@@ -71,6 +71,9 @@ public abstract class Plugin implements Runnable, Comparable {
 		}
 	}
 	
+	/**
+	 * Constructor creating a temporal storage for incoming packages
+	 */
 	public Plugin() {
 		this(true);
 	}
@@ -88,19 +91,21 @@ public abstract class Plugin implements Runnable, Comparable {
 		// if the packet is not null, check if its semantic type is one of
 		// those, the plug-in is interested in
 		if ((packet != null) && isActive()) {
-			final int[] mySemanticTypes = getXMLConfig().getSemanticTypes();
-			final int packetSemanticType = packet.getSemanticType();
-			for (int i = 0; i < mySemanticTypes.length; i++) {
-				// if the packets semantic type matches ...
-				// (note that the value "-1" in the plug-ins semantic type list
-				// indicates that the plug-in in interested in all semantic
-				// types)
-				if ((mySemanticTypes[i] == -1) || (mySemanticTypes[i] == packetSemanticType)) {
-					// put it into the packet queue (the process which fetches
-					// from the queue afterwards will be notified automatically)
-					enqueuePacket(packet);
-					break;
+			
+			if (!getXMLConfig().isAllSemanticTypes()) {
+				final int[] mySemanticTypes = getXMLConfig().getSemanticTypes();
+				final int packetSemanticType = packet.getSemanticType();
+				for (int i = 0; i < mySemanticTypes.length; i++) {
+					// if the packets semantic type matches ...
+					if (mySemanticTypes[i] == packetSemanticType) {
+						// put it into the packet queue (the process which fetches
+						// from the queue afterwards will be notified automatically)
+						enqueuePacket(packet);
+						break;
+					}
 				}
+			} else {
+				enqueuePacket(packet);
 			}
 		}
 	}
@@ -155,11 +160,18 @@ public abstract class Plugin implements Runnable, Comparable {
 		}
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns whether the plug-ins packet consumer thread is currently running
+	 * 
+	 * @return whether the plug-ins packet consumer thread is currently running
+	 */
 	public boolean isThreadRunning() {
 		return ((packetConsumerThread != null) && packetConsumerThread.isAlive() && !packetConsumerThread
 				.isInterrupted());
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * Initializes the plugin. It is called right after the plugin has been instanciated and the
 	 * configuration of the plugin is set.
@@ -303,6 +315,7 @@ public abstract class Plugin implements Runnable, Comparable {
 	 *            the mouse event
 	 * @param drawingArea
 	 *            the drawing area in which the event occured
+	 * @return <code>true</code> if the plug-in could handle the event, <code>false</code> otherwise
 	 */
 	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) {
 		return false;
@@ -368,22 +381,22 @@ public abstract class Plugin implements Runnable, Comparable {
 	 * unsatisfactory ordering for certain locales. The java.text package provides
 	 * <em>collators</em> to allow locale-sensitive ordering.
 	 * 
-	 * @param str
-	 *            the <code>String</code> to be compared.
+	 * @param p
+	 *            the other plug-in to be compared.
 	 * @return a negative integer, zero, or a positive integer as the specified String is greater
 	 *         than, equal to, or less than this String, ignoring case considerations.
 	 * @see java.text.Collator#compare(String, String)
 	 * @since 1.2
 	 */
-	public int compareTo(final Object o) {
+	public int compareTo(final Plugin p) {
 		
-		if (o instanceof Plugin) {
-			final String s1 = getInstanceName();
-			final String s2 = ((Plugin) o).getInstanceName();
-			final int result = s1.compareToIgnoreCase(s2);
-			return getInstanceName().compareToIgnoreCase(((Plugin) o).getInstanceName());
-		}
-		return 0;
+		// if (p instanceof Plugin) {
+		// final String s1 = getInstanceName();
+		// final String s2 = (p).getInstanceName();
+		// final int result = s1.compareToIgnoreCase(s2);
+		return getInstanceName().compareToIgnoreCase(p.getInstanceName());
+		// }
+		// return 0;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -406,6 +419,8 @@ public abstract class Plugin implements Runnable, Comparable {
 	/**
 	 * Inserts the specified packet at the tail of the packet queue.
 	 * 
+	 * @param packet
+	 *            a packet
 	 * @return <tt>true</tt> (as specified by {@link Queue#offer})
 	 * @throws NullPointerException
 	 *             if the specified packet is null

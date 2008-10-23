@@ -174,15 +174,15 @@ public class StringFormatter {
 	
 	private void addEntryWidgetSelected(final SelectionEvent evt) {
 		final InputDialog dlg = new InputDialog(parent.getShell(), "Enter a semantic type",
-				"Please enter a semantic type (0-255)", "", new IInputValidator() {
+				"Please enter a semantic type (-1 - 255)", "", new IInputValidator() {
 					
 					@Override
 					public String isValid(final String newText) {
 						try {
 							final int i = Integer.parseInt(newText);
 							
-							if ((i < 0) || (i > 255)) {
-								return "Please enter a number between 0 and 255";
+							if ((i < -1) || (i > 255)) {
+								return "Please enter a number between -1 and 255";
 							} else {
 								return null;
 							}

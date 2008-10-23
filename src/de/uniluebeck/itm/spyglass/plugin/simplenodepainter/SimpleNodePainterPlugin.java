@@ -330,12 +330,24 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * corresponding semantic type is no longer listened to.
 	 */
 	private void purgeStringFormatterResults() {
+		
+		// if the plug-in is configured to evaluate packages of any semantic type, purging is not
+		// necessary
+		if (xmlConfig.isAllSemanticTypes()) {
+			return;
+		}
+		
 		final List<?> l = Arrays.asList(xmlConfig.getSemanticTypes());
+		
 		synchronized (stringFormatterResults) {
 			final Collection<Map<Integer, String>> nodeResults = stringFormatterResults.values();
 			
 			for (final Map<Integer, String> results : nodeResults) {
 				for (final Integer key : results.keySet()) {
+					// if a positive key on behalf of a semantic type is found which is no longer to
+					// be evaluated, delete the buffered result
+					// The key has to be positive since the default string formatter string will be
+					// stored as value of the key '-1'.
 					if ((key >= 0) && !l.contains(key)) {
 						results.remove(key);
 					}

@@ -8,13 +8,12 @@
  */
 package de.uniluebeck.itm.spyglass.xmlconfig;
 
-import org.apache.log4j.Logger;
+import java.util.Arrays;
+
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
-import de.uniluebeck.itm.spyglass.plugin.PluginManager;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 // --------------------------------------------------------------------------------
 /**
@@ -25,14 +24,14 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public abstract class PluginXMLConfig extends XMLConfig {
 	
-	private static Logger log = SpyglassLogger.get(PluginManager.class);
+	// private static final Logger log = SpyglassLogger.get(PluginXMLConfig.class);
 	
-	public static final int[] ALL_SEMANTIC_TYPES = new int[256];
-	static {
-		for (int i = 0; i < 256; i++) {
-			ALL_SEMANTIC_TYPES[i] = i;
-		}
-	}
+	// public static final int[] ALL_SEMANTIC_TYPES = new int[256];
+	// static {
+	// for (int i = 0; i < 256; i++) {
+	// ALL_SEMANTIC_TYPES[i] = i;
+	// }
+	// }
 	
 	@Element(name = "isActive")
 	private boolean active = true;
@@ -47,7 +46,9 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	private int timeout = -1;
 	
 	@ElementArray(name = "semanticTypes", required = false)
-	private int[] semanticTypes = ALL_SEMANTIC_TYPES.clone();
+	private int[] semanticTypes = new int[] { -1 };
+	
+	// private int[] semanticTypes = ALL_SEMANTIC_TYPES.clone();
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -148,6 +149,34 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		firePropertyChange("semanticTypes", oldvalue, semanticTypes);
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns <code>true</code> if the plug-in is interested all packages independent of the
+	 * packet's semantic type
+	 * 
+	 * @return <code>true</code> if the plug-in is interested all packages independent of the
+	 *         packet's semantic type
+	 */
+	public boolean isAllSemanticTypes() {
+		return (semanticTypes != null) && (semanticTypes.length == 1) && (semanticTypes[0] == -1);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets a flag which indicates whether the plug-in using this configuration is interested all
+	 * packages independent of the packet's semantic type
+	 */
+	public void setAllSemanticTypes() {
+		semanticTypes = new int[] { -1 };
+	}
+	
+	/**
+	 * Returns <code>true</code> if the configuration is equal to certain other configuration
+	 * 
+	 * @param other
+	 *            the configuration this one is compared to
+	 * @return <code>true</code> if the configuration is equal to certain other configuration
+	 */
 	public boolean equals(final PluginXMLConfig other) {
 		
 		// needed, since invocations on implementing subclasses may fall back
@@ -158,10 +187,19 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		
 		return (this.getActive() == other.getActive()) && (this.getVisible() == other.getVisible())
 				&& this.getName().equals(other.getName())
-				&& this.getSemanticTypes().equals(other.getSemanticTypes()) // TODO: array check?
+				&& Arrays.equals(this.getSemanticTypes(), other.getSemanticTypes())
 				&& (this.getTimeout() == other.getTimeout());
 	}
 	
+	/**
+	 * Returns if two color settings equal one another
+	 * 
+	 * @param lineColorRGB
+	 *            the first color setting
+	 * @param otherLineColorRGB
+	 *            the second color setting
+	 * @return <code>true</code> if two color settings equal one another
+	 */
 	protected boolean equalsRGB(final int[] lineColorRGB, final int[] otherLineColorRGB) {
 		return (lineColorRGB[0] == otherLineColorRGB[0])
 				&& (lineColorRGB[1] == otherLineColorRGB[1])

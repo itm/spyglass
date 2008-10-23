@@ -24,7 +24,7 @@ public class StringToIntListValidator implements IValidator {
 		if (value instanceof String) {
 			final String s = (String) value;
 			
-			if (s.matches("((\\d+)|(\\d+-\\d+)(,((\\d+)|(\\d+-\\d+)))*)?")) {
+			if (s.matches("(-1)|((\\d+)|(\\d+-\\d+)(,((\\d+)|(\\d+-\\d+)))*)?")) {
 				return ValidationStatus.ok();
 			} else {
 				return ValidationStatus

@@ -133,7 +133,7 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 		final UpdateValueStrategy strFromModel = new UpdateValueStrategy();
 		strFromModel.setConverter(new IntListToStringConverter());
 		strToModel.setConverter(new StringToIntListConverter());
-		strToModel.setAfterConvertValidator(new IntegerRangeValidator(0, 255));
+		strToModel.setAfterConvertValidator(new IntegerRangeValidator(-1, 255));
 		strToModel.setAfterGetValidator(new StringToIntListValidator());
 		dbc.bindValue(SWTObservables.observeText(this.semanticTypes, SWT.Modify), modelObservable2,
 				strToModel, strFromModel);
@@ -255,7 +255,7 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 	}
 	
 	private void allTypesWidgetSelected(final SelectionEvent evt) {
-		this.semanticTypes.setText("0-255");
+		this.semanticTypes.setText("-1");
 	}
 	
 }

@@ -17,6 +17,11 @@ public class StringToIntListConverter implements IConverter {
 		
 		final String s = (String) fromObject;
 		
+		// "-1" is a placeholder for "all plug-ins" so it has to be handled separately
+		if (s.equals("-1")) {
+			return new int[] { -1 };
+		}
+		
 		final String[] parts = s.split(",");
 		final TreeSet<Integer> set = new TreeSet<Integer>();
 		
