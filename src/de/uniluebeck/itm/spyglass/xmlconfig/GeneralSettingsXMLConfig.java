@@ -78,6 +78,15 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * @param metrics
+	 *            the metrics to set
+	 */
+	public void setMetrics(final MetricsXMLConfig metrics) {
+		this.metrics.overwriteWith(metrics);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
 	 * @return the metrics
 	 */
 	public MetricsXMLConfig getMetrics() {

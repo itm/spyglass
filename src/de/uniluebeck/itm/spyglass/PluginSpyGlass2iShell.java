@@ -10,6 +10,8 @@ package de.uniluebeck.itm.spyglass;
 import ishell.device.MessagePacket;
 import ishell.util.IconTheme;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.custom.CTabItem;
@@ -22,12 +24,14 @@ import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.core.SpyglassConfiguration;
 import de.uniluebeck.itm.spyglass.gui.UIController;
+import de.uniluebeck.itm.spyglass.gui.actions.LoadConfigurationAction;
 import de.uniluebeck.itm.spyglass.gui.actions.OpenPreferencesAction;
 import de.uniluebeck.itm.spyglass.gui.actions.PlayPlayPauseAction;
 import de.uniluebeck.itm.spyglass.gui.actions.PlayResetAction;
 import de.uniluebeck.itm.spyglass.gui.actions.PlaySelectInputAction;
 import de.uniluebeck.itm.spyglass.gui.actions.RecordRecordAction;
 import de.uniluebeck.itm.spyglass.gui.actions.RecordSelectOutputAction;
+import de.uniluebeck.itm.spyglass.gui.actions.StoreConfigurationAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomCompleteMapAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomInAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomOutAction;
@@ -146,9 +150,26 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			}
 		});
 		
-		final ConfigStore cs = new ConfigStore(true);
-		// Create the configuration for SpyGlass
-		config = cs.getSpyglassConfig();
+		ConfigStore cs = null;
+		try {
+			cs = new ConfigStore(true);
+			// Create the configuration for SpyGlass
+			config = cs.getSpyglassConfig();
+		} catch (final Exception e) {
+			// TODO: SE - show a message
+			log.error(e, e);
+		}
+		
+		if (config == null) {
+			try {
+				ConfigStore.resetDefaultFile(true);
+			} catch (final IOException e1) {
+				log.fatal("The configuration could not be loaded", e1);
+			}
+			cs = new ConfigStore(true);
+			// Create the configuration for SpyGlass
+			config = cs.getSpyglassConfig();
+		}
 		
 		// TODO: SE - an error will occur if the configuration file was corrupted
 		packetBroker = (IShellToSpyGlassPacketBroker) config.getPacketReader();
@@ -170,6 +191,8 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		addToolBarAction(new ZoomOutAction(spyglass.getDrawingArea()));
 		addToolBarAction(new ZoomCompleteMapAction(spyglass));
 		addToolBarAction(new OpenPreferencesAction(container.getShell(), spyglass));
+		addToolBarAction(new LoadConfigurationAction(container.getShell(), spyglass));
+		addToolBarAction(new StoreConfigurationAction(container.getShell(), spyglass));
 		
 		// Start visualization
 		spyglass.setVisualizationRunning(true);

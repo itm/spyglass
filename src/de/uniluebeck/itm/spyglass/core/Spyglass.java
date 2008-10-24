@@ -7,6 +7,8 @@
  */
 package de.uniluebeck.itm.spyglass.core;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.EventListener;
 import java.util.EventObject;
@@ -51,7 +53,7 @@ public class Spyglass {
 	
 	private VisualizationTask visualizationTask = null;
 	
-	private final ExecutorService executor = Executors.newFixedThreadPool(2);
+	private ExecutorService executor = Executors.newFixedThreadPool(2);
 	
 	private final EventListenerList listeners = new EventListenerList();
 	
@@ -63,6 +65,28 @@ public class Spyglass {
 	private DrawingArea drawingArea;
 	
 	private final ConfigStore configStore;
+	
+	// --------------------------------------------------------------------------
+	/**
+	 * Listener for changes in the plug-in list
+	 */
+	private final PropertyChangeListener configStoreListener = new PropertyChangeListener() {
+		
+		@Override
+		public void propertyChange(final PropertyChangeEvent evt) {
+			try {
+				if (evt.getPropertyName().equals("replaceConfiguration")) {
+					init((SpyglassConfiguration) evt.getNewValue());
+					executor = Executors.newFixedThreadPool(2);
+					start();
+				}
+			} catch (final Exception e) {
+				log.error(e, e);
+			}
+			
+		}
+		
+	};
 	
 	// --------------------------------------------------------------------------
 	// ------
@@ -77,6 +101,7 @@ public class Spyglass {
 	public Spyglass(final boolean isIShellPlugin) {
 		this.isIShellPlugin = isIShellPlugin;
 		configStore = new ConfigStore(isIShellPlugin);
+		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
 	}
 	
@@ -93,6 +118,7 @@ public class Spyglass {
 	public Spyglass(final boolean isIShellPlugin, final SpyglassConfiguration config) {
 		this.isIShellPlugin = isIShellPlugin;
 		configStore = new ConfigStore(isIShellPlugin, config);
+		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
 	}
 	
@@ -109,6 +135,7 @@ public class Spyglass {
 	public Spyglass(final boolean isIShellPlugin, final File configFile) {
 		this.isIShellPlugin = isIShellPlugin;
 		configStore = new ConfigStore(isIShellPlugin, configFile);
+		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
 	}
 	

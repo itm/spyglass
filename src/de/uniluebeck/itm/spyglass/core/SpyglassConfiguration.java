@@ -10,7 +10,7 @@ package de.uniluebeck.itm.spyglass.core;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Vector;
+import java.util.LinkedList;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
@@ -34,20 +34,29 @@ import de.uniluebeck.itm.spyglass.xmlconfig.XMLConfig;
 @Root
 public class SpyglassConfiguration extends XMLConfig {
 	
-	@Element
+	@Element(name = "packetReader")
 	private PacketReader packetReader = null;
 	
 	@Element(name = "instances")
-	private final PluginManager pluginManager = new PluginManager();
+	private PluginManager pluginManager = new PluginManager();
 	
-	@Element
-	private final GeneralSettingsXMLConfig generalSettings = new GeneralSettingsXMLConfig();
+	@Element(name = "generalSettings")
+	private GeneralSettingsXMLConfig generalSettings = new GeneralSettingsXMLConfig();
 	
-	@ElementList
-	private final Collection<Plugin> defaults = new Vector<Plugin>();
+	@ElementList(name = "defaults")
+	private Collection<Plugin> defaults = new LinkedList<Plugin>();
 	
-	@Element
+	@Element(name = "drawingArea")
 	private final DrawingArea drawingArea = new DrawingArea();
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param generalSettings
+	 *            the generalSettings to set
+	 */
+	public void setGeneralSettings(final GeneralSettingsXMLConfig generalSettings) {
+		this.generalSettings = generalSettings;
+	}
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -59,17 +68,44 @@ public class SpyglassConfiguration extends XMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * @param defaults
+	 *            the defaults to set
+	 */
+	public void setDefaultPlugins(final Collection<Plugin> defaults) {
+		// this is necessary in case of getting an unmodifiable list from a plug-in which is to be
+		// copied
+		this.defaults = new LinkedList<Plugin>(defaults);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
 	 * Returns a read-only collection of plug-ins which are configured by default
 	 * 
 	 * Note that this collection is immutable, entries cannot be added or removed.
 	 * 
 	 * @return the defaults a collection of plug-ins which are configured by default
 	 */
-	public Collection<Plugin> getDefaults() {
+	public Collection<Plugin> getDefaultPlugins() {
 		return Collections.unmodifiableCollection(defaults);
 	}
 	
 	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the instance which manages the plug-ins
+	 * 
+	 * @param pluginManager
+	 *            the instance which manages the plug-ins
+	 */
+	public void setPluginManager(final PluginManager pluginManager) {
+		this.pluginManager = pluginManager;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the instance which manages the plug-ins
+	 * 
+	 * @return the instance which manages the plug-ins
+	 */
 	public PluginManager getPluginManager() {
 		return pluginManager;
 	}
