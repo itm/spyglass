@@ -1,6 +1,6 @@
-package de.uniluebeck.itm.spyglass.gui.converter;
+package de.uniluebeck.itm.spyglass.gui.databinding.converter;
 
-import org.eclipse.core.databinding.conversion.IConverter;
+import org.eclipse.core.databinding.conversion.Converter;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
@@ -10,12 +10,12 @@ import org.eclipse.swt.widgets.Display;
  * @author Dariush Forouher
  * 
  */
-public class ArrayToColorConverter implements IConverter {
+public class ArrayToColorConverter extends Converter {
 	
 	private Display device;
 	
 	public ArrayToColorConverter(final Display device) {
-		super();
+		super(new int[3], new Color(null, 0, 0, 0));
 		this.device = device;
 	}
 	
@@ -23,16 +23,6 @@ public class ArrayToColorConverter implements IConverter {
 	public Object convert(final Object fromObject) {
 		final int[] color = (int[]) fromObject;
 		return new Color(device, color[0], color[1], color[2]);
-	}
-	
-	@Override
-	public Object getFromType() {
-		return new int[3];
-	}
-	
-	@Override
-	public Object getToType() {
-		return new Color(null, 0, 0, 0);
 	}
 	
 }

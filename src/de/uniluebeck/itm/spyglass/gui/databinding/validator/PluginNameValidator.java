@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.gui.validator;
+package de.uniluebeck.itm.spyglass.gui.databinding.validator;
 
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;

@@ -22,11 +22,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage.BasicOptions;
-import de.uniluebeck.itm.spyglass.gui.converter.IntListToStringConverter;
-import de.uniluebeck.itm.spyglass.gui.converter.StringToIntListConverter;
-import de.uniluebeck.itm.spyglass.gui.validator.IntegerRangeValidator;
-import de.uniluebeck.itm.spyglass.gui.validator.PluginNameValidator;
-import de.uniluebeck.itm.spyglass.gui.validator.StringToIntListValidator;
+import de.uniluebeck.itm.spyglass.gui.databinding.converter.IntListToStringConverter;
+import de.uniluebeck.itm.spyglass.gui.databinding.converter.StringToIntListConverter;
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.PluginNameValidator;
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.StringToIntListValidator;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;

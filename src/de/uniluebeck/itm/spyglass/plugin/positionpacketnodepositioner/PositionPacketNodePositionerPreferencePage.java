@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Text;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.gui.validator.IntegerRangeValidator;
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 public class PositionPacketNodePositionerPreferencePage

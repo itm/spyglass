@@ -8,7 +8,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.WrappedSet;
+import de.uniluebeck.itm.spyglass.gui.databinding.WrappedSet;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 
 /**

@@ -1,8 +1,8 @@
-package de.uniluebeck.itm.spyglass.gui.converter;
+package de.uniluebeck.itm.spyglass.gui.databinding.converter;
 
 import java.util.TreeSet;
 
-import org.eclipse.core.databinding.conversion.IConverter;
+import org.eclipse.core.databinding.conversion.Converter;
 
 /**
  * Converts a String representing a list of integers into an actual array.
@@ -10,7 +10,11 @@ import org.eclipse.core.databinding.conversion.IConverter;
  * @author Dariush Forouher
  * 
  */
-public class StringToIntListConverter implements IConverter {
+public class StringToIntListConverter extends Converter {
+	
+	public StringToIntListConverter() {
+		super("", new int[0]);
+	}
 	
 	@Override
 	public Object convert(final Object fromObject) {
@@ -45,16 +49,6 @@ public class StringToIntListConverter implements IConverter {
 			list[c++] = integer;
 		}
 		return list;
-	}
-	
-	@Override
-	public Object getFromType() {
-		return "";
-	}
-	
-	@Override
-	public Object getToType() {
-		return new int[0];
 	}
 	
 }

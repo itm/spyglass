@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
+package de.uniluebeck.itm.spyglass.gui.databinding;
 
 import java.util.Collection;
 import java.util.Collections;

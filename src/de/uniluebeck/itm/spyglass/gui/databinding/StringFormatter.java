@@ -28,10 +28,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import de.uniluebeck.itm.spyglass.gui.databinding.WrappedSet.ObservableEntry;
 import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPreferencePage;
-import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.WrappedObservableSet;
-import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.WrappedSet;
-import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.WrappedSet.ObservableEntry;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class StringFormatter {

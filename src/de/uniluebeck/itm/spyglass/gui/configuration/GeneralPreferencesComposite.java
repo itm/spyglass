@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
-import de.uniluebeck.itm.spyglass.gui.validator.StringRegExValidator;
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.StringRegExValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 
 public class GeneralPreferencesComposite extends org.eclipse.swt.widgets.Composite {

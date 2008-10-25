@@ -1,7 +1,7 @@
-package de.uniluebeck.itm.spyglass.gui.converter;
+package de.uniluebeck.itm.spyglass.gui.databinding.converter;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.databinding.conversion.IConverter;
+import org.eclipse.core.databinding.conversion.Converter;
 
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
@@ -12,7 +12,11 @@ import de.uniluebeck.itm.spyglass.util.StringFormatter;
  * @author Dariush Forouher
  * 
  */
-public class StringToStringFormatterConverter implements IConverter {
+public class StringToStringFormatterConverter extends Converter {
+	
+	public StringToStringFormatterConverter() {
+		super("", new StringFormatter(""));
+	}
 	
 	private static final Logger log = SpyglassLogger.get(StringToStringFormatterConverter.class);
 	
@@ -29,16 +33,6 @@ public class StringToStringFormatterConverter implements IConverter {
 							e);
 		}
 		return null;
-	}
-	
-	@Override
-	public Object getFromType() {
-		return "";
-	}
-	
-	@Override
-	public Object getToType() {
-		return new StringFormatter("");
 	}
 	
 }

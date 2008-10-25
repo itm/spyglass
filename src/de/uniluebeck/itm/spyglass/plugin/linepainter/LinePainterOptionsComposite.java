@@ -23,9 +23,9 @@ import org.eclipse.swt.widgets.Text;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
-import de.uniluebeck.itm.spyglass.gui.converter.ArrayToColorConverter;
-import de.uniluebeck.itm.spyglass.gui.converter.ColorToArrayConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.StringFormatter;
+import de.uniluebeck.itm.spyglass.gui.databinding.converter.ArrayToColorConverter;
+import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverter;
 
 public class LinePainterOptionsComposite extends Composite {
 	

@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.gui.converter;
+package de.uniluebeck.itm.spyglass.gui.databinding.converter;
 
 import org.eclipse.core.databinding.conversion.Converter;
 
