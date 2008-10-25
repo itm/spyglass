@@ -5,11 +5,17 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.simpleframework.xml.Root;
 
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
@@ -45,14 +51,26 @@ public class DrawingArea {
 	private AppWindow appWindow;
 	
 	/**
+	 * Reference to spyglass
+	 */
+	private Spyglass spyglass;
+	
+	/**
 	 * The transformation matrix. it transforms coordinates from the absolute reference frame to the
 	 * reference frame of the drawing area
 	 * 
-	 * Note: At the moment only modifing calls to this objects are serialized with synchronized().
-	 * Since we are currently redrawing the screen 25 times a second, a messed up transformation
-	 * should not be visible for a noticable time.
+	 * Note: Only modifing calls to this object are serialized with synchronized(). By replacing the
+	 * transform with a new instance in one single step, reading the transform can be lock-free.
+	 * 
 	 */
 	private AffineTransform at = new AffineTransform();
+	
+	/**
+	 * Mutex to serialize modifing calls
+	 * 
+	 * (to ensure that <code>at</code> is not modified concurrently.
+	 */
+	private Object mutex = new Object();
 	
 	/**
 	 * x-coordinate of the upper-left point of the world.
@@ -79,12 +97,24 @@ public class DrawingArea {
 	 */
 	private Rectangle canvasRect = null;
 	
-	private final ControlListener controlListener = new ControlListener() {
+	private final SelectionListener scrollListenerH = new SelectionAdapter() {
 		
 		@Override
-		public void controlMoved(final ControlEvent e) {
-			// not of interest.
+		public void widgetSelected(final SelectionEvent e) {
+			scrollHorizontally((ScrollBar) e.widget);
 		}
+		
+	};
+	private final SelectionListener scrollListenerV = new SelectionAdapter() {
+		
+		@Override
+		public void widgetSelected(final SelectionEvent e) {
+			scrollVertically((ScrollBar) e.widget);
+		}
+		
+	};
+	
+	private final ControlListener controlListener = new ControlAdapter() {
 		
 		@Override
 		public void controlResized(final ControlEvent e) {
@@ -93,14 +123,13 @@ public class DrawingArea {
 			canvasRect = appWindow.getGui().getCanvas().getClientArea();
 			log.debug("New canvas: " + canvasRect);
 			
-			synchronized (at) {
+			if (!isValidTransformation(new AffineTransform(at))) {
+				log.error("Resizing resulted in illegal transform. Resetting matrix.");
 				
-				if (!isValidTransformation(new AffineTransform(at))) {
-					log.error("Resizing resulted in illegal transform. Resetting matrix.");
-					
-					adjustToValidMatrix();
-				}
+				adjustToValidMatrix();
 			}
+			
+			syncScrollBars();
 			
 		}
 		
@@ -228,23 +257,25 @@ public class DrawingArea {
 	 */
 	public void move(final int pixelX, final int pixelY) {
 		
-		// Build the translation matrix
-		final AffineTransform sca = new AffineTransform();
-		
-		synchronized (at) {
-			sca.translate(pixelX, pixelY);
+		synchronized (mutex) {
 			
-			final AffineTransform atTemp = new AffineTransform(at);
-			atTemp.preConcatenate(sca);
-			if (!isValidTransformation(atTemp)) {
+			final AffineTransform atCopy = new AffineTransform(at);
+			
+			// Build the translation matrix
+			final AffineTransform sca = AffineTransform.getTranslateInstance(pixelX, pixelY);
+			
+			atCopy.preConcatenate(sca);
+			
+			if (!isValidTransformation(atCopy)) {
 				return;
 			}
 			
 			// add the translation matrix to the transformation matrix.
-			at.preConcatenate(sca);
+			at = atCopy;
 			
 		}
 		
+		syncScrollBars();
 	}
 	
 	/**
@@ -337,10 +368,14 @@ public class DrawingArea {
 		
 		this.appWindow = appWindow;
 		
+		canvasRect = appWindow.getGui().getCanvas().getClientArea();
+		
 		// add new one
 		this.appWindow.getGui().getCanvas().addControlListener(this.controlListener);
-		
-		canvasRect = appWindow.getGui().getCanvas().getClientArea();
+		this.appWindow.getGui().getCanvas().getHorizontalBar()
+				.addSelectionListener(scrollListenerH);
+		this.appWindow.getGui().getCanvas().getVerticalBar().addSelectionListener(scrollListenerV);
+		syncScrollBars();
 		
 	}
 	
@@ -388,40 +423,44 @@ public class DrawingArea {
 	 * @param factor
 	 */
 	private void zoom(final int px, final int py, final double factor) {
-		try {
-			// The centerpoint of the zoom (where the user clicked)
-			final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
+		
+		synchronized (mutex) {
 			
-			// Build the scale matrix
-			final AffineTransform sca = new AffineTransform();
-			sca.translate(a.getX(), a.getY());
-			sca.scale(factor, factor);
-			sca.translate(-a.getX(), -a.getY());
-			
-			final AffineTransform atTemp = new AffineTransform(at);
-			atTemp.concatenate(sca);
-			if (!isValidTransformation(atTemp)) {
-				return;
-			}
-			// Abort if we leave a defined interval of allowed zoom levels
-			// This is partly because the QuadTree cannot handle it if it is asked
-			// to return objects outside its boundingBox.
-			//
-			// TODO: This isn't the perfect solution, as it depends on the size
-			// of the Spyglass Window to be "regular size".
-			final AffineTransform at2 = (AffineTransform) at.clone();
-			at2.concatenate(sca);
-			if ((at2.getScaleX() > ZOOM_MAX)) {
-				return;
-			}
-			
-			// add the scale matrix to the transformation matrix.
-			synchronized (at) {
+			try {
+				// The centerpoint of the zoom (where the user clicked)
+				final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
+				
+				// Build the scale matrix
+				final AffineTransform sca = new AffineTransform();
+				sca.translate(a.getX(), a.getY());
+				sca.scale(factor, factor);
+				sca.translate(-a.getX(), -a.getY());
+				
+				final AffineTransform atTemp = new AffineTransform(at);
+				atTemp.concatenate(sca);
+				if (!isValidTransformation(atTemp)) {
+					return;
+				}
+				// Abort if we leave a defined interval of allowed zoom levels
+				// This is partly because the QuadTree cannot handle it if it is asked
+				// to return objects outside its boundingBox.
+				//
+				// TODO: This isn't the perfect solution, as it depends on the size
+				// of the Spyglass Window to be "regular size".
+				final AffineTransform at2 = (AffineTransform) at.clone();
+				at2.concatenate(sca);
+				if ((at2.getScaleX() > ZOOM_MAX)) {
+					return;
+				}
+				
+				// add the scale matrix to the transformation matrix.
 				at.concatenate(sca);
+				
+				syncScrollBars();
+				
+			} catch (final NoninvertibleTransformException e) {
+				throw new RuntimeException("Transformation matrix in illegal state!", e);
 			}
-			
-		} catch (final NoninvertibleTransformException e) {
-			throw new RuntimeException("Transformation matrix in illegal state!", e);
 		}
 	}
 	
@@ -451,39 +490,44 @@ public class DrawingArea {
 	public void autoZoom(final AbsoluteRectangle rect) {
 		log.debug("Auto zooming to " + rect);
 		
-		// create a new matrix from scratch
-		final AffineTransform newAt = new AffineTransform();
+		synchronized (mutex) {
+			
+			// create a new matrix from scratch
+			final AffineTransform newAt = new AffineTransform();
+			
+			// dimensions of the drawing area
+			final int DAwidth = this.canvasRect.width;
+			final int DAhright = this.canvasRect.height;
+			
+			final int BBheight = rect.getHeight();
+			final int BBwidth = rect.getWidth();
+			
+			final double scaleX = (double) DAwidth / (double) BBwidth;
+			final double scaleY = (double) DAhright / (double) BBheight;
+			final double scale = Math.min(scaleX, scaleY);
+			
+			// scale and move to upper left corner
+			newAt.scale(scale, scale);
+			newAt.translate(-rect.getUpperLeft().x, -rect.getUpperLeft().y);
+			
+			// finally move the rect to the center of the drawing area
+			
+			final AbsolutePosition lowerRight = rect.getUpperLeft();
+			lowerRight.x += rect.getWidth();
+			lowerRight.y += rect.getHeight();
+			final Point2D lowerRightPx = newAt.transform(lowerRight.toPoint2D(), null);
+			
+			final double deltaX = DAwidth - lowerRightPx.getX();
+			final double deltaY = DAhright - lowerRightPx.getY();
+			
+			newAt.preConcatenate(AffineTransform.getTranslateInstance(deltaX / 2, deltaY / 2));
+			
+			// replace the matrix
+			this.at = newAt;
+			
+		}
 		
-		// dimensions of the drawing area
-		final int DAwidth = this.canvasRect.width;
-		final int DAhright = this.canvasRect.height;
-		
-		final int BBheight = rect.getHeight();
-		final int BBwidth = rect.getWidth();
-		
-		final double scaleX = (double) DAwidth / (double) BBwidth;
-		final double scaleY = (double) DAhright / (double) BBheight;
-		final double scale = Math.min(scaleX, scaleY);
-		
-		// scale and move to upper left corner
-		newAt.scale(scale, scale);
-		newAt.translate(-rect.getUpperLeft().x, -rect.getUpperLeft().y);
-		
-		// finally move the rect to the center of the drawing area
-		
-		final AbsolutePosition lowerRight = rect.getUpperLeft();
-		lowerRight.x += rect.getWidth();
-		lowerRight.y += rect.getHeight();
-		final Point2D lowerRightPx = newAt.transform(lowerRight.toPoint2D(), null);
-		
-		final double deltaX = DAwidth - lowerRightPx.getX();
-		final double deltaY = DAhright - lowerRightPx.getY();
-		
-		newAt.preConcatenate(AffineTransform.getTranslateInstance(deltaX / 2, deltaY / 2));
-		
-		// replace the matrix
-		this.at = newAt;
-		
+		syncScrollBars();
 	}
 	
 	/**
@@ -506,35 +550,123 @@ public class DrawingArea {
 	 * 
 	 */
 	private void adjustToValidMatrix() {
-		while (!isValidTransformation(new AffineTransform(at))) {
-			log.debug("Zooming in to get back in into the global BBox.");
+		synchronized (mutex) {
 			
-			final int px = getDrawingRectangle().getWidth() / 2;
-			final int py = getDrawingRectangle().getHeight() / 2;
+			AffineTransform atCopy = new AffineTransform(at);
 			
-			// The centerpoint of the zoom (where the user clicked)
-			try {
-				final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
+			while (!isValidTransformation(atCopy)) {
+				log.debug("Zooming in to get back in into the global BBox.");
 				
-				// Build the scale matrix
-				final AffineTransform sca = new AffineTransform();
-				sca.translate(a.getX(), a.getY());
-				sca.scale(ZOOM_FACTOR, ZOOM_FACTOR);
-				sca.translate(-a.getX(), -a.getY());
+				final int px = getDrawingRectangle().getWidth() / 2;
+				final int py = getDrawingRectangle().getHeight() / 2;
 				
-				at.concatenate(sca);
-				
-				if ((at.getScaleX() > ZOOM_MAX)) {
-					log.debug("Giving up, resetting to initial matrix.");
-					at = new AffineTransform();
+				// The centerpoint of the zoom (where the user clicked)
+				try {
+					final Point2D a = atCopy.inverseTransform(new Point2D.Float(px, py), null);
+					
+					// Build the scale matrix
+					final AffineTransform sca = new AffineTransform();
+					sca.translate(a.getX(), a.getY());
+					sca.scale(ZOOM_FACTOR, ZOOM_FACTOR);
+					sca.translate(-a.getX(), -a.getY());
+					
+					atCopy.concatenate(sca);
+					
+					if ((atCopy.getScaleX() > ZOOM_MAX)) {
+						log.debug("Giving up, resetting to initial matrix.");
+						atCopy = new AffineTransform();
+						break;
+					}
+					
+				} catch (final NoninvertibleTransformException e1) {
+					log.error("Transformation matrix in illegal state!", e1);
 					break;
 				}
 				
-			} catch (final NoninvertibleTransformException e1) {
-				log.error("Transformation matrix in illegal state!", e1);
-				break;
 			}
 			
+			at = atCopy;
+		}
+		
+		syncScrollBars();
+	}
+	
+	/**
+	 * Handle a vertical scroll on the given scroll bar
+	 */
+	private void scrollVertically(final ScrollBar scrollBar) {
+		
+		final double ty = at.getTranslateY() / at.getScaleY();
+		final double select = scrollBar.getSelection();
+		final double diff = -select - ty;
+		
+		synchronized (mutex) {
+			
+			final AffineTransform atCopy = new AffineTransform(at);
+			atCopy.concatenate(AffineTransform.getTranslateInstance(0, diff));
+			at = atCopy;
+		}
+		
+		syncScrollBars();
+	}
+	
+	/**
+	 * Handle a horizontal scroll on the given scroll bar
+	 */
+	private void scrollHorizontally(final ScrollBar scrollBar) {
+		
+		final double tx = at.getTranslateX() / at.getScaleX();
+		final double select = scrollBar.getSelection();
+		final double diff = -select - tx;
+		
+		synchronized (mutex) {
+			
+			final AffineTransform atCopy = new AffineTransform(at);
+			atCopy.concatenate(AffineTransform.getTranslateInstance(diff, 0));
+			at = atCopy;
+		}
+		syncScrollBars();
+	}
+	
+	/**
+	 * Readjust the scrollbars to the current position
+	 */
+	private void syncScrollBars() {
+		
+		final AbsoluteRectangle bboxVisible = spyglass.getBoundingBox();
+		final AbsoluteRectangle bboxCurrent = getAbsoluteDrawingRectangle();
+		final AbsoluteRectangle bbox = bboxCurrent.union(bboxVisible);
+		
+		appWindow.getGui().getCanvas().getHorizontalBar().setMinimum(bbox.getUpperLeft().x);
+		appWindow.getGui().getCanvas().getHorizontalBar().setMaximum(
+				bbox.getWidth() + bbox.getUpperLeft().x - bboxCurrent.getWidth());
+		appWindow.getGui().getCanvas().getHorizontalBar().setSelection(getUpperLeft().x);
+		
+		appWindow.getGui().getCanvas().getVerticalBar().setMinimum(bbox.getUpperLeft().y);
+		appWindow.getGui().getCanvas().getVerticalBar().setMaximum(
+				bbox.getHeight() + bbox.getUpperLeft().y - bboxCurrent.getHeight());
+		appWindow.getGui().getCanvas().getVerticalBar().setSelection(getUpperLeft().y);
+		
+		// Enlarge thumbs (disabled, since this screws up the math)
+		// appWindow.getGui().getCanvas().getHorizontalBar().setThumb(this.canvasRect.width);
+		// appWindow.getGui().getCanvas().getVerticalBar().setThumb(this.canvasRect.height);
+		
+		// Disable scroll bars when appropriate
+		if (bboxVisible.intersection(bboxCurrent).getWidth() == bboxVisible.getWidth()) {
+			appWindow.getGui().getCanvas().getHorizontalBar().setEnabled(false);
+		} else {
+			appWindow.getGui().getCanvas().getHorizontalBar().setEnabled(true);
+		}
+		
+		if (bboxVisible.intersection(bboxCurrent).getHeight() == bboxVisible.getHeight()) {
+			appWindow.getGui().getCanvas().getVerticalBar().setEnabled(false);
+		} else {
+			appWindow.getGui().getCanvas().getVerticalBar().setEnabled(true);
 		}
 	}
+	
+	public void setSpyglass(final Spyglass spyglass) {
+		this.spyglass = spyglass;
+	}
+	
 }

@@ -179,6 +179,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		final AppWindow appWindow = new AppWindow(container.getDisplay(), container);
 		spyglass = new Spyglass(true, config);
 		new UIController(spyglass, appWindow);
+		spyglass.getDrawingArea().setSpyglass(spyglass); // XXX: hack!
 		spyglass.getDrawingArea().setAppWindow(appWindow);
 		
 		// Add Toolbar Actions

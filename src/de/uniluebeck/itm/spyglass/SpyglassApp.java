@@ -8,6 +8,7 @@
 package de.uniluebeck.itm.spyglass;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swt.graphics.DeviceData;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -34,7 +35,11 @@ public class SpyglassApp {
 		log.info("New SpyGlass instance.");
 		
 		// GUI
-		final Display display = Display.getDefault();
+		final DeviceData data = new DeviceData();
+		data.tracking = true;
+		final Display display = new Display(data);
+		final Sleak sleak = new Sleak();
+		sleak.open();
 		
 		final Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
@@ -45,11 +50,12 @@ public class SpyglassApp {
 		
 		// Application objects
 		final AppWindow appWindow = new AppWindow(display, shell);
-		final Spyglass spyglass = new Spyglass(false);
+		final Spyglass spyglass = new Spyglass(true);
 		
 		@SuppressWarnings("unused")
 		final UIController uiController = new UIController(spyglass, appWindow);
 		
+		spyglass.getDrawingArea().setSpyglass(spyglass); // XXX: hack!
 		spyglass.getDrawingArea().setAppWindow(appWindow);
 		// Start visualization
 		spyglass.start();

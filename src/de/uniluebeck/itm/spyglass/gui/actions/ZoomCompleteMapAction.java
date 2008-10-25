@@ -1,17 +1,12 @@
 package de.uniluebeck.itm.spyglass.gui.actions;
 
-import java.util.ArrayList;
 import java.util.EventObject;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.core.SpyglassListener;
-import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.plugin.Drawable;
-import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
@@ -82,7 +77,10 @@ public class ZoomCompleteMapAction extends Action {
 			// 10 seems a good value for now.
 			for (int i = 0; i < 10; i++) {
 				
-				recalculateDrawingArea();
+				final AbsoluteRectangle maxRect = spyglass.getBoundingBox();
+				if (maxRect != null) {
+					spyglass.getDrawingArea().autoZoom(maxRect);
+				}
 				
 				// Wait until the next screen redraw happes.
 				try {
@@ -113,44 +111,6 @@ public class ZoomCompleteMapAction extends Action {
 			t.start();
 		}
 	}
-	
-	/**
-	 * This algorithm recalculates zoom level and position.
-	 * 
-	 * first it gets the bounding boxes of all visible drawingObjects and merges then. Thenn it
-	 * gives the resultung bounding box to the DrawingArea.
-	 */
-	private void recalculateDrawingArea() {
-		final List<Plugin> list = spyglass.getPluginManager().getVisibleActivePlugins();
-		
-		final List<DrawingObject> dobs = new ArrayList<DrawingObject>();
-		
-		for (final Plugin plugin : list) {
-			if (plugin instanceof Drawable) {
-				final Drawable plugin2 = (Drawable) plugin;
-				
-				dobs.addAll(plugin2.getAutoZoomDrawingObjects());
-			}
-		}
-		
-		AbsoluteRectangle maxRect = null;
-		
-		for (final DrawingObject drawingObject : dobs) {
-			final AbsoluteRectangle nextRect = drawingObject.getBoundingBox();
-			if (nextRect == null) {
-				continue;
-			}
-			
-			if (maxRect == null) {
-				maxRect = nextRect;
-			} else {
-				maxRect = maxRect.union(nextRect);
-			}
-		}
-		if (maxRect != null) {
-			spyglass.getDrawingArea().autoZoom(maxRect);
-		}
-	};
 	
 	@Override
 	public String getText() {

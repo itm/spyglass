@@ -67,4 +67,21 @@ public class PixelRectangle extends AbstractRectangle {
 	public Rectangle toSWTRectangle() {
 		return rectangle;
 	}
+	
+	/**
+	 * Returns a new rectangle which represents the intersection of the receiver and the given
+	 * rectangle.
+	 * 
+	 * The intersection of two rectangles is the rectangle that covers the area which is contained
+	 * within both rectangles.
+	 * 
+	 * @param other
+	 *            the rectangle to perform the intersect with
+	 * @return the intersection of the receiver and the argument
+	 */
+	public PixelRectangle intersection(final PixelRectangle other) {
+		final PixelRectangle ret = new PixelRectangle();
+		ret.rectangle = this.rectangle.intersection(other.rectangle);
+		return ret;
+	}
 }

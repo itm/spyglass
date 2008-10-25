@@ -16,6 +16,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import com.cloudgarden.resource.SWTResourceManager;
@@ -114,9 +116,21 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 					canvas1LData.grabExcessHorizontalSpace = true;
 					canvas1LData.verticalAlignment = GridData.FILL;
 					canvas1LData.grabExcessVerticalSpace = true;
-					canvas = new Canvas(composite1, SWT.DOUBLE_BUFFERED);
+					canvas = new Canvas(composite1, SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND
+							| SWT.H_SCROLL | SWT.V_SCROLL);
 					canvas.setLayoutData(canvas1LData);
 					canvas.setBackground(SWTResourceManager.getColor(255, 255, 255));
+					
+					// The canvas must not act on mouse wheel events (normally it would move the
+					// scroll bars)
+					// since the mouse wheel already controls the zoom.
+					canvas.addListener(SWT.MouseWheel, new Listener() {
+						
+						@Override
+						public void handleEvent(final Event event) {
+							event.doit = false;
+						}
+					});
 				}
 			}
 			this.layout();

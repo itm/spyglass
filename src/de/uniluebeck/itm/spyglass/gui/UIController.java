@@ -135,6 +135,7 @@ public class UIController {
 		// Add listeners
 		appWindow.getGui().getCanvas().addPaintListener(new PaintListener() {
 			public void paintControl(final PaintEvent e) {
+				// log.debug("Redraw of " + new PixelRectangle(e.x, e.y, e.width, e.height));
 				render(e.gc);
 			}
 		});
@@ -180,7 +181,6 @@ public class UIController {
 				} else {
 					spyglass.getDrawingArea().zoomOut(arg0.x, arg0.y);
 				}
-				
 			}
 		}));
 		

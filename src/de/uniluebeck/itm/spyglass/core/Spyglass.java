@@ -10,8 +10,10 @@ package de.uniluebeck.itm.spyglass.core;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.EventObject;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,9 +21,13 @@ import javax.swing.event.EventListenerList;
 
 import org.apache.log4j.Logger;
 
+import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
+import de.uniluebeck.itm.spyglass.plugin.Drawable;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 // ------------------------------------------------------------------------------
@@ -286,5 +292,38 @@ public class Spyglass {
 	public PacketProducerTask getPacketProducerTask() {
 		return packetProducerTask;
 	}
+	
+	/**
+	 * This method gets the bounding boxes of all visible drawingObjects and merges them.
+	 */
+	public AbsoluteRectangle getBoundingBox() {
+		final List<Plugin> list = getPluginManager().getVisibleActivePlugins();
+		
+		final List<DrawingObject> dobs = new ArrayList<DrawingObject>();
+		
+		for (final Plugin plugin : list) {
+			if (plugin instanceof Drawable) {
+				final Drawable plugin2 = (Drawable) plugin;
+				
+				dobs.addAll(plugin2.getAutoZoomDrawingObjects());
+			}
+		}
+		
+		AbsoluteRectangle maxRect = null;
+		
+		for (final DrawingObject drawingObject : dobs) {
+			final AbsoluteRectangle nextRect = drawingObject.getBoundingBox();
+			if (nextRect == null) {
+				continue;
+			}
+			
+			if (maxRect == null) {
+				maxRect = nextRect;
+			} else {
+				maxRect = maxRect.union(nextRect);
+			}
+		}
+		return maxRect;
+	};
 	
 }
