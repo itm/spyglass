@@ -36,10 +36,10 @@ public class SpyglassApp {
 		
 		// GUI
 		final DeviceData data = new DeviceData();
-		data.tracking = true;
+		// data.tracking = true;
 		final Display display = new Display(data);
-		final Sleak sleak = new Sleak();
-		sleak.open();
+		// final Sleak sleak = new Sleak();
+		// sleak.open();
 		
 		final Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
