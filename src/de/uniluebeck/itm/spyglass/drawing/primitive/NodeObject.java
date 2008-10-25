@@ -8,6 +8,8 @@ import org.eclipse.swt.graphics.Point;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformEvent;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformListener;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
@@ -33,6 +35,51 @@ public class NodeObject extends DrawingObject {
 	private int lineWidth;
 	
 	private AbsoluteRectangle boundingBox;
+	
+	/**
+	 * True, if this nodeobject has registered <code>drawingAreaListener</code> with the drawing
+	 * area.
+	 */
+	private boolean listenerConnected = false;
+	
+	/**
+	 * The boundingbox (in Absolute coordinates) depends on the current zoom level. to make sure
+	 * that we always return a correct bounding box, we listen for changes in the drawing area and
+	 * update the bounding box accordingly.
+	 * 
+	 * Note: this hack is only neccessary, since a NodeObject "doesn't zoom". Most other
+	 * DrawingObjects don't have to bother.
+	 * 
+	 * TODO: there is a lot of code duplication between this method and draw().
+	 */
+	private DrawingAreaTransformListener drawingAreaListener = new DrawingAreaTransformListener() {
+		
+		@Override
+		public void handleEvent(final DrawingAreaTransformEvent e) {
+			// get the information to be displayed
+			final String string = getInformationString();
+			
+			// determine the size parameters of the rectangle which represents the node in respect
+			// to
+			// the sting to be displayed
+			final org.eclipse.swt.graphics.Image temp = new org.eclipse.swt.graphics.Image(
+					e.drawingArea.getDisplay(), 500, 500);
+			final GC tempGC = new GC(temp);
+			final Point size = tempGC.textExtent(string == null ? "" : string);
+			final int width = size.x + lineWidth + 1; // +1 for correct display with uneven line
+			// width
+			final int height = size.y + lineWidth + 1;
+			
+			// get the node's position in the drawing area
+			final PixelPosition upperLeft = e.drawingArea.absPoint2PixelPoint(getPosition());
+			
+			// determine the bounding box
+			boundingBox = determineBoundingBox(e.drawingArea, upperLeft, lineWidth, width, height);
+			
+			tempGC.dispose();
+			temp.dispose();
+		}
+	};
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -209,6 +256,11 @@ public class NodeObject extends DrawingObject {
 	
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
+		
+		if (!listenerConnected) {
+			listenerConnected = true;
+			drawingArea.addDrawingAreaTransformListener(this.drawingAreaListener);
+		}
 		
 		// set the colors and the width of the rectangle's line
 		final Color color = new Color(null, this.getColorR(), this.getColorG(), this.getColorB());

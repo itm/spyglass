@@ -11,6 +11,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
+import de.uniluebeck.itm.spyglass.core.Spyglass;
+
 // --------------------------------------------------------------------------------
 /**
  * 
@@ -25,9 +27,9 @@ public class AppWindow {
 	/**
 	 * 
 	 */
-	public AppWindow(final Display display, final Composite parent) {
+	public AppWindow(final Display display, final Composite parent, final Spyglass spyglass) {
 		this.display = display;
-		gui = new SpyglassGuiComponent(parent, SWT.NULL);
+		gui = new SpyglassGuiComponent(parent, SWT.NULL, spyglass);
 	}
 	
 	// --------------------------------------------------------------------------------

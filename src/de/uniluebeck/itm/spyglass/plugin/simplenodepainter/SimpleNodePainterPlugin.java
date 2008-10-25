@@ -34,6 +34,7 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.nodepainter.NodePainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
@@ -113,9 +114,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		return new SimpleNodePainterPreferencePage(dialog, spyglass);
 	}
 	
-	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
+	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		synchronized (layer) {
-			return layer.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle());
+			return layer.getDrawingObjects(area);
 		}
 	}
 	
@@ -410,6 +411,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	@Override
 	public void reset() {
+		for (final DrawingObject d : layer.getDrawingObjects()) {
+			fireDrawingObjectRemoved(d);
+		}
+		
 		synchronized (layer) {
 			layer.clear();
 		}
@@ -442,13 +447,13 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		synchronized (layer) {
 			for (final DrawingObject drawingObject : update) {
 				layer.addOrUpdate(drawingObject);
+				fireDrawingObjectAdded(drawingObject); // TODO
 			}
 		}
 	}
 	
 	@Override
 	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		// TODO Auto-generated method stub
 		synchronized (layer) {
 			return layer.getDrawingObjects();
 		}
@@ -514,8 +519,13 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				if (drawingObject instanceof NodeObject) {
 					// if so, toggle its extension state
 					final NodeObject no = (NodeObject) drawingObject;
+					final AbsoluteRectangle oldBBox = no.getBoundingBox();
 					no.setExtended(!no.isExtended());
 					xmlConfig.putExtendedInformationActive(no.getNodeID(), no.isExtended());
+					// TODO: the quadtree must be updated, since the dimensions of the NodeObject
+					// may have changed.
+					// TODO: BUG! the new BoundingBox in no is not yet updated! --> display error
+					fireDrawingObjectChanged(no, oldBBox);
 				}
 				return true;
 			}
@@ -547,6 +557,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if (bbox.contains(clickPoint)) {
 				synchronized (layer) {
 					layer.bringToFront(drawingObject);
+					fireDrawingObjectAdded(drawingObject); // TODO
 				}
 				return true;
 			}
@@ -578,6 +589,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if (bbox.contains(clickPoint)) {
 				synchronized (layer) {
 					layer.pushBack(drawingObject);
+					fireDrawingObjectAdded(drawingObject); // TODO
 				}
 				return true;
 			}

@@ -49,14 +49,12 @@ public class SpyglassApp {
 		shell.open();
 		
 		// Application objects
-		final AppWindow appWindow = new AppWindow(display, shell);
 		final Spyglass spyglass = new Spyglass(true);
+		final AppWindow appWindow = new AppWindow(display, shell, spyglass);
 		
 		@SuppressWarnings("unused")
 		final UIController uiController = new UIController(spyglass, appWindow);
 		
-		spyglass.getDrawingArea().setSpyglass(spyglass); // XXX: hack!
-		spyglass.getDrawingArea().setAppWindow(appWindow);
 		// Start visualization
 		spyglass.start();
 		

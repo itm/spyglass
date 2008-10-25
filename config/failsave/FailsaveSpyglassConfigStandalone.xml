@@ -34,7 +34,6 @@
 		<timeUnit>s</timeUnit>
 		<timeScale>1.0</timeScale>
 		<packetDeliveryInitialDelay>1000</packetDeliveryInitialDelay>
-		<framesPerSecond>25</framesPerSecond>
 	</generalSettings>
 	<defaults>
 		<plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
@@ -2765,5 +2764,4 @@
 			</parameters>
 		</plugin>
 	</defaults>
-	<drawingArea/>
 </spyglassConfiguration>

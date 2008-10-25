@@ -51,12 +51,6 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 	@Element
 	private long packetDeliveryInitialDelay = 1000;
 	
-	/**
-	 * the number of frames which drawn per second
-	 */
-	@Element(name = "framesPerSecond")
-	private long fps = 25;
-	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the showRuler
@@ -148,25 +142,6 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 		final long oldValue = this.packetDeliveryInitialDelay;
 		this.packetDeliveryInitialDelay = packetDeliveryInitialDelay;
 		firePropertyChange("packetDeliveryInitialDelay", oldValue, packetDeliveryInitialDelay);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the fps
-	 */
-	public long getFps() {
-		return fps;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param fps
-	 *            the fps to set
-	 */
-	public void setFps(final long fps) {
-		final long oldValue = this.fps;
-		this.fps = fps;
-		firePropertyChange("fps", oldValue, fps);
 	}
 	
 	public void overwriteWith(final GeneralSettingsXMLConfig o) {

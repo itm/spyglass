@@ -1,12 +1,12 @@
 package de.uniluebeck.itm.spyglass.gui.actions;
 
-import java.util.EventObject;
-
 import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
-import de.uniluebeck.itm.spyglass.core.SpyglassListener;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
@@ -27,13 +27,15 @@ public class ZoomCompleteMapAction extends Action {
 	
 	private final Spyglass spyglass;
 	
+	private final DrawingArea drawingArea;
+	
 	/**
 	 * This Listener is called when the drawingArea is redrawn.
 	 */
-	private final SpyglassListener spyglassListener = new SpyglassListener() {
+	private final PaintListener spyglassListener = new PaintListener() {
 		
 		@Override
-		public void redraw(final EventObject e) {
+		public void paintControl(final PaintEvent e) {
 			if (t != null) {
 				synchronized (t) {
 					t.notify();
@@ -43,10 +45,10 @@ public class ZoomCompleteMapAction extends Action {
 		
 	};
 	
-	public ZoomCompleteMapAction(final Spyglass spyglass) {
+	public ZoomCompleteMapAction(final Spyglass spyglass, final DrawingArea drawingArea) {
 		this.spyglass = spyglass;
-		
-		spyglass.addSpyglassListener(spyglassListener);
+		this.drawingArea = drawingArea;
+		drawingArea.addPaintListener(spyglassListener);
 	}
 	
 	/**
@@ -79,7 +81,15 @@ public class ZoomCompleteMapAction extends Action {
 				
 				final AbsoluteRectangle maxRect = spyglass.getBoundingBox();
 				if (maxRect != null) {
-					spyglass.getDrawingArea().autoZoom(maxRect);
+					drawingArea.getDisplay().syncExec(new Runnable() {
+						
+						@Override
+						public void run() {
+							drawingArea.autoZoom(maxRect);
+							
+						}
+					});
+					
 				}
 				
 				// Wait until the next screen redraw happes.

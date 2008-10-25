@@ -18,13 +18,13 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.relationpainter.RelationPainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class LinePainterPlugin extends RelationPainterPlugin implements PropertyChangeListener {
@@ -60,9 +60,9 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		return new LinePainterPreferencePage(dialog, spyglass);
 	}
 	
-	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
+	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		synchronized (layer) {
-			return layer.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle());
+			return layer.getDrawingObjects(area);
 		}
 	}
 	
@@ -94,8 +94,8 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	}
 	
 	@Override
-	public void init(final PluginManager pluginManager) {
-		super.init(pluginManager);
+	public void init(final PluginManager manager) {
+		super.init(manager);
 		xmlConfig.addPropertyChangeListener(this);
 	}
 	

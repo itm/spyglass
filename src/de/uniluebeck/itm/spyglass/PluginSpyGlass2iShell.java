@@ -176,11 +176,9 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		
 		// TODO
 		// Application objects
-		final AppWindow appWindow = new AppWindow(container.getDisplay(), container);
 		spyglass = new Spyglass(true, config);
+		final AppWindow appWindow = new AppWindow(container.getDisplay(), container, spyglass);
 		new UIController(spyglass, appWindow);
-		spyglass.getDrawingArea().setSpyglass(spyglass); // XXX: hack!
-		spyglass.getDrawingArea().setAppWindow(appWindow);
 		
 		// Add Toolbar Actions
 		addToolBarAction(new PlaySelectInputAction());
@@ -188,9 +186,9 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		addToolBarAction(new PlayResetAction());
 		addToolBarAction(new RecordSelectOutputAction());
 		addToolBarAction(new RecordRecordAction());
-		addToolBarAction(new ZoomInAction(spyglass.getDrawingArea()));
-		addToolBarAction(new ZoomOutAction(spyglass.getDrawingArea()));
-		addToolBarAction(new ZoomCompleteMapAction(spyglass));
+		addToolBarAction(new ZoomInAction(appWindow.getGui().getDrawingArea()));
+		addToolBarAction(new ZoomOutAction(appWindow.getGui().getDrawingArea()));
+		addToolBarAction(new ZoomCompleteMapAction(spyglass, appWindow.getGui().getDrawingArea()));
 		addToolBarAction(new OpenPreferencesAction(container.getShell(), spyglass));
 		addToolBarAction(new LoadConfigurationAction(container.getShell(), spyglass));
 		addToolBarAction(new StoreConfigurationAction(container.getShell(), spyglass));

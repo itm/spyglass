@@ -10,6 +10,7 @@ package de.uniluebeck.itm.spyglass.plugin.imagepainter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.List;
 
 import org.simpleframework.xml.Element;
@@ -19,13 +20,13 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Image;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class ImagePainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener {
@@ -63,9 +64,9 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 		return new ImagePainterPreferencePage(dialog, spyglass);
 	}
 	
-	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
+	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		synchronized (layer) {
-			return layer.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle());
+			return layer.getDrawingObjects(area);
 		}
 	}
 	
@@ -104,15 +105,14 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	
 	@Override
 	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		synchronized (layer) {
-			return layer.getDrawingObjects();
-		}
+		// auto-zoom should ignore images for convenience
+		return Collections.emptyList();
 	}
 	
 	@Override
-	public void init(final PluginManager pluginManager) {
+	public void init(final PluginManager manager) {
 		
-		super.init(pluginManager);
+		super.init(manager);
 		
 		// adding this listener here so it is called
 		// on programm startup (doesn't work in constructor!)
@@ -131,6 +131,7 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 				image.dispose();
 			}
 		}
+		fireDrawingObjectRemoved(image);
 		
 		try {
 			image = new Image(xmlConfig.getImageFileName());
@@ -151,6 +152,7 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 		synchronized (layer) {
 			layer.addOrUpdate(image);
 		}
+		fireDrawingObjectAdded(image);
 		
 	}
 	

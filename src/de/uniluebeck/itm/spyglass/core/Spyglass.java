@@ -11,18 +11,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.EventListener;
-import java.util.EventObject;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.event.EventListenerList;
-
 import org.apache.log4j.Logger;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -47,8 +42,6 @@ public class Spyglass {
 	
 	// private static final String CONFIG_FILE = "config.xml";
 	
-	private final boolean isIShellPlugin;
-	
 	private PacketDispatcher packetDispatcher = null;
 	
 	private PluginManager pluginManager = null;
@@ -57,18 +50,12 @@ public class Spyglass {
 	
 	private PacketProducerTask packetProducerTask = null;
 	
-	private VisualizationTask visualizationTask = null;
-	
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
-	
-	private final EventListenerList listeners = new EventListenerList();
 	
 	/**
 	 * TODO: Define exactly what this should do
 	 */
 	private boolean visualizationRunning = true;
-	
-	private DrawingArea drawingArea;
 	
 	private final ConfigStore configStore;
 	
@@ -105,7 +92,6 @@ public class Spyglass {
 	 *            indicates whether or not the application is used as iShell plug-in
 	 */
 	public Spyglass(final boolean isIShellPlugin) {
-		this.isIShellPlugin = isIShellPlugin;
 		configStore = new ConfigStore(isIShellPlugin);
 		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
@@ -122,7 +108,6 @@ public class Spyglass {
 	 *            the configuration parameters
 	 */
 	public Spyglass(final boolean isIShellPlugin, final SpyglassConfiguration config) {
-		this.isIShellPlugin = isIShellPlugin;
 		configStore = new ConfigStore(isIShellPlugin, config);
 		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
@@ -139,7 +124,6 @@ public class Spyglass {
 	 *            the file which contains the configuration parameters
 	 */
 	public Spyglass(final boolean isIShellPlugin, final File configFile) {
-		this.isIShellPlugin = isIShellPlugin;
 		configStore = new ConfigStore(isIShellPlugin, configFile);
 		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
@@ -152,18 +136,15 @@ public class Spyglass {
 	 */
 	private void init(final SpyglassConfiguration config) {
 		// Create and inject objects
-		// configFilePath = config.get
+		
 		pluginManager = config.getPluginManager();
 		pluginManager.init();
-		
-		drawingArea = config.getDrawingArea();
 		
 		packetReader = config.getPacketReader();
 		
 		packetDispatcher = new PacketDispatcher(pluginManager);
 		packetProducerTask = new PacketProducerTask(this, config.getGeneralSettings()
 				.getPacketDeliveryInitialDelay());
-		visualizationTask = new VisualizationTask(config.getGeneralSettings().getFps(), this);
 		
 		log.debug("Init done");
 	}
@@ -176,7 +157,6 @@ public class Spyglass {
 	public void start() {
 		log.debug("Starting visualization and packetProducer Task");
 		executor.execute(packetProducerTask);
-		executor.execute(visualizationTask);
 		executor.shutdown();
 	}
 	
@@ -184,43 +164,6 @@ public class Spyglass {
 		setVisualizationRunning(false);
 		configStore.store(true);
 		log.info("All plugin-threads stopped");
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * Adds a SpyglassListener object that gets notified of a Spyglass event (e.g. to know when a
-	 * redraw must be done).
-	 * 
-	 * @param listener
-	 *            The SpyglassListener object to add.
-	 */
-	public void addSpyglassListener(final SpyglassListener listener) {
-		if (listener == null) {
-			return;
-		}
-		
-		log.debug("Added new listener: " + listener);
-		listeners.add(SpyglassListener.class, listener);
-	}
-	
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * 
-	 */
-	public void fireRedrawEvent(final EventObject e) {
-		// Get listeners
-		final EventListener[] list = listeners.getListeners(SpyglassListener.class);
-		
-		// if (log.isDebugEnabled()) {
-		// log.debug("Fire redraw event");
-		// }
-		
-		// Fire the event (call-back method)
-		for (int i = list.length - 1; i >= 0; i -= 1) {
-			((SpyglassListener) list[i]).redraw(e);
-		}
 	}
 	
 	// --------------------------------------------------------------------------
@@ -279,14 +222,6 @@ public class Spyglass {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the drawingArea
-	 */
-	public DrawingArea getDrawingArea() {
-		return drawingArea;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
 	 * @return the packetProducerTask
 	 */
 	public PacketProducerTask getPacketProducerTask() {
@@ -294,7 +229,8 @@ public class Spyglass {
 	}
 	
 	/**
-	 * This method gets the bounding boxes of all visible drawingObjects and merges them.
+	 * This method gets the bounding boxes of all visible drawingObjects (which are applicable for
+	 * AutoZoom and scrollbars) and merges them.
 	 */
 	public AbsoluteRectangle getBoundingBox() {
 		final List<Plugin> list = getPluginManager().getVisibleActivePlugins();
@@ -309,7 +245,7 @@ public class Spyglass {
 			}
 		}
 		
-		AbsoluteRectangle maxRect = null;
+		AbsoluteRectangle maxRect = new AbsoluteRectangle();
 		
 		for (final DrawingObject drawingObject : dobs) {
 			final AbsoluteRectangle nextRect = drawingObject.getBoundingBox();

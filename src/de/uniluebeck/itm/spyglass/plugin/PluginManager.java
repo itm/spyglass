@@ -209,6 +209,7 @@ public class PluginManager {
 	 * This method is called after the PluginManager got instanciated by the XML Deserializer
 	 */
 	public void init() {
+		
 		// This is a workaround, since simple-xml does not call the setPlugins()
 		// method
 		synchronized (plugins) {

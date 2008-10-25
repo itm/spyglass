@@ -16,7 +16,6 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
@@ -45,9 +44,6 @@ public class SpyglassConfiguration extends XMLConfig {
 	
 	@ElementList(name = "defaults")
 	private Collection<Plugin> defaults = new LinkedList<Plugin>();
-	
-	@Element(name = "drawingArea")
-	private final DrawingArea drawingArea = new DrawingArea();
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -120,14 +116,6 @@ public class SpyglassConfiguration extends XMLConfig {
 		final PacketReader oldReader = this.packetReader;
 		this.packetReader = packetReader;
 		firePropertyChange("packetReader", oldReader, packetReader);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the drawingArea
-	 */
-	public DrawingArea getDrawingArea() {
-		return drawingArea;
 	}
 	
 }

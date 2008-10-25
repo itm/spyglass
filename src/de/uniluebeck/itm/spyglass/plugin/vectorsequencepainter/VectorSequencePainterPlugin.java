@@ -17,10 +17,10 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.NeedsMetric;
 import de.uniluebeck.itm.spyglass.plugin.relationpainter.RelationPainterPlugin;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class VectorSequencePainterPlugin extends RelationPainterPlugin implements NeedsMetric {
@@ -48,7 +48,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 		return new VectorSequencePainterPreferencePage(dialog, spyglass);
 	}
 	
-	public List<DrawingObject> getDrawingObjects(final DrawingArea drawingArea) {
+	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		// TODO Auto-generated method stub
 		return new ArrayList<DrawingObject>();
 	}

@@ -13,14 +13,13 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import com.cloudgarden.resource.SWTResourceManager;
+
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 
 // --------------------------------------------------------------------------------
 /**
@@ -34,7 +33,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 		SWTResourceManager.registerResourceUser(this);
 	}
 	
-	private Canvas canvas;
+	private DrawingArea canvas;
 	
 	private Composite composite1;
 	
@@ -53,7 +52,8 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	public static void showGUI() {
 		final Display display = Display.getDefault();
 		final Shell shell = new Shell(display);
-		final SpyglassGuiComponent inst = new SpyglassGuiComponent(shell, SWT.NULL);
+		final SpyglassGuiComponent inst = new SpyglassGuiComponent(shell, SWT.NULL, new Spyglass(
+				false));
 		final Point size = inst.getSize();
 		shell.setLayout(new FillLayout());
 		shell.layout();
@@ -81,16 +81,17 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	 * @param parent
 	 * @param style
 	 */
-	public SpyglassGuiComponent(final org.eclipse.swt.widgets.Composite parent, final int style) {
+	public SpyglassGuiComponent(final org.eclipse.swt.widgets.Composite parent, final int style,
+			final Spyglass spyglass) {
 		super(parent, style);
-		initGUI();
+		initGUI(spyglass);
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	private void initGUI() {
+	private void initGUI(final Spyglass spyglass) {
 		try {
 			final GridLayout thisLayout = new GridLayout();
 			thisLayout.makeColumnsEqualWidth = true;
@@ -116,21 +117,9 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 					canvas1LData.grabExcessHorizontalSpace = true;
 					canvas1LData.verticalAlignment = GridData.FILL;
 					canvas1LData.grabExcessVerticalSpace = true;
-					canvas = new Canvas(composite1, SWT.DOUBLE_BUFFERED | SWT.NO_BACKGROUND
-							| SWT.H_SCROLL | SWT.V_SCROLL);
+					canvas = new DrawingArea(composite1, SWT.None, spyglass);
 					canvas.setLayoutData(canvas1LData);
-					canvas.setBackground(SWTResourceManager.getColor(255, 255, 255));
 					
-					// The canvas must not act on mouse wheel events (normally it would move the
-					// scroll bars)
-					// since the mouse wheel already controls the zoom.
-					canvas.addListener(SWT.MouseWheel, new Listener() {
-						
-						@Override
-						public void handleEvent(final Event event) {
-							event.doit = false;
-						}
-					});
 				}
 			}
 			this.layout();
@@ -143,7 +132,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	/**
 	 * 
 	 */
-	public Canvas getCanvas() {
+	public DrawingArea getDrawingArea() {
 		return canvas;
 	}
 	

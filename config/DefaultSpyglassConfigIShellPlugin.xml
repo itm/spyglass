@@ -8,56 +8,11 @@
             <parameters>
                <isActive>true</isActive>
                <isVisible>true</isVisible>
-               <name>default8hh</name>
+               <name>default</name>
                <timeout>0</timeout>
                <semanticTypes length="1">
                   <int>-1</int>
                </semanticTypes>
-            </parameters>
-         </plugin>
-         <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
-            <parameters>
-               <isActive>true</isActive>
-               <isVisible>true</isVisible>
-               <name>default4</name>
-               <timeout>-1</timeout>
-               <semanticTypes length="1">
-                  <int>-1</int>
-               </semanticTypes>
-               <stringFormatters>
-                  <stringFormatter nodeID="3">zuozhuo</stringFormatter>
-                  <stringFormatter nodeID="5">ffsfwer %ds</stringFormatter>
-               </stringFormatters>
-               <defaultStringFormatter>fdsfsfsfs</defaultStringFormatter>
-               <extendedInformation>
-                  <isActive nodeID="1">true</isActive>
-                  <isActive nodeID="2">true</isActive>
-                  <isActive nodeID="3">true</isActive>
-               </extendedInformation>
-               <isExtendedDefaultValue>false</isExtendedDefaultValue>
-               <lineColorRGB length="3">
-                  <int>255</int>
-                  <int>0</int>
-                  <int>0</int>
-               </lineColorRGB>
-               <lineWidth>1</lineWidth>
-            </parameters>
-         </plugin>
-         <plugin class="de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin">
-            <parameters>
-               <isActive>true</isActive>
-               <isVisible>true</isVisible>
-               <name>default3</name>
-               <timeout>0</timeout>
-               <semanticTypes length="1">
-                  <int>-1</int>
-               </semanticTypes>
-               <image>Z:\Pictures\20050215\Bild000.jpg</image>
-               <lowerLeftX>-32000</lowerLeftX>
-               <lowerLeftY>-32000</lowerLeftY>
-               <imageSizeX>32000</imageSizeX>
-               <imageSizeY>32000</imageSizeY>
-               <keepProportions>true</keepProportions>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
@@ -74,15 +29,42 @@
                <lowerLeftX>0</lowerLeftX>
                <lowerLeftY>0</lowerLeftY>
                <lineColorRGB length="3">
-                  <int>192</int>
-                  <int>192</int>
-                  <int>192</int>
+                  <int>139</int>
+                  <int>105</int>
+                  <int>20</int>
                </lineColorRGB>
-               <lineWidth>1.0</lineWidth>
+               <lineWidth>3.0</lineWidth>
                <lockGridElementsSquare>true</lockGridElementsSquare>
                <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
                <numCols>100</numCols>
                <numRows>100</numRows>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
+            <parameters>
+               <isActive>true</isActive>
+               <isVisible>true</isVisible>
+               <name>default (3)</name>
+               <timeout>-1</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <stringFormatters>
+                  <stringFormatter nodeID="3">trtew</stringFormatter>
+               </stringFormatters>
+               <defaultStringFormatter>fdsfsfsfs</defaultStringFormatter>
+               <extendedInformation>
+                  <isActive nodeID="1">true</isActive>
+                  <isActive nodeID="2">false</isActive>
+                  <isActive nodeID="3">false</isActive>
+               </extendedInformation>
+               <isExtendedDefaultValue>false</isExtendedDefaultValue>
+               <lineColorRGB length="3">
+                  <int>255</int>
+                  <int>0</int>
+                  <int>0</int>
+               </lineColorRGB>
+               <lineWidth>1</lineWidth>
             </parameters>
          </plugin>
       </plugins>
@@ -100,7 +82,6 @@
       <timeUnit>s</timeUnit>
       <timeScale>1.0</timeScale>
       <packetDeliveryInitialDelay>1000</packetDeliveryInitialDelay>
-      <framesPerSecond>25</framesPerSecond>
    </generalSettings>
    <defaults class="java.util.LinkedList">
       <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
@@ -190,7 +171,7 @@
                <int>-1</int>
             </semanticTypes>
             <image>images/icons/brokenImageLink.png</image>
-            <size height="1" width="1">
+            <size width="1" height="1">
                <upperLeft x="0" y="0" z="0"/>
             </size>
          </parameters>
@@ -293,5 +274,4 @@
          </parameters>
       </plugin>
    </defaults>
-   <drawingArea/>
 </spyglassConfiguration>

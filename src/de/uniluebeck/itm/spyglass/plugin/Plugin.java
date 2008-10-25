@@ -7,18 +7,23 @@
  */
 package de.uniluebeck.itm.spyglass.plugin;
 
+import java.util.EventListener;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.swing.event.EventListenerList;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.events.MouseEvent;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -36,9 +41,9 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	
 	/**
-	 * The plug-in's manager (which manages all currently available plug-ins as well)
+	 * Reference to the plugin manager
 	 */
-	private PluginManager pluginManager;
+	protected PluginManager pluginManager;
 	
 	/**
 	 * The queue where packets are dropped by the packet dispatcher and which is maintained
@@ -53,6 +58,11 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * Object which is used to log different kinds of messages
 	 */
 	private static final Logger log = SpyglassLogger.getLogger(Plugin.class);
+	
+	/**
+	 * This list contains the DrawingObjectListeners.
+	 */
+	private final EventListenerList listeners = new EventListenerList();
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -178,14 +188,14 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * 
 	 * This methods starts the consumer thread, if necessary.
 	 * 
-	 * @param pluginManager
+	 * @param manager
 	 *            reference to the parent PluginManager
 	 * 
 	 * @see PluginXMLConfig#getActive()
 	 */
-	public void init(final PluginManager pluginManager) {
+	public void init(final PluginManager manager) {
 		
-		this.pluginManager = pluginManager;
+		this.pluginManager = manager;
 		
 		// if the plug-in has a packet queue, it is maintained by a separate
 		// thread. This thread has to be started on activation and stopped on
@@ -235,16 +245,6 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 				log.error("An error occured while trying to start the plug-in's thread", e);
 			}
 		}
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Returns the facility which administers this plug-in along with others
-	 * 
-	 * @return the plug-in's manager
-	 */
-	protected final PluginManager getPluginManager() {
-		return pluginManager;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -463,4 +463,82 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			return packetQueue.poll();
 		}
 	}
+	
+	/**
+	 * Register a new DrawingObjectListener.
+	 * 
+	 * The listener will be called everytime a new drawing object is added to the layer, removed
+	 * from it, or modified.
+	 */
+	public void addDrawingObjectListener(final DrawingObjectListener listener) {
+		listeners.add(DrawingObjectListener.class, listener);
+	}
+	
+	/**
+	 * Unregister an existing DrawingObjectListener.
+	 */
+	public void removeDrawingObjectListener(final DrawingObjectListener listener) {
+		listeners.remove(DrawingObjectListener.class, listener);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Fire a DrawingObjectChanged event.
+	 * 
+	 * @param dob
+	 *            The DrawingObject, which has been modified
+	 * @param oldBoundingBox
+	 *            The original boundingBox before the modification (may be null if the modified
+	 *            drawing object occupies (at least) the same space as before the modification).
+	 */
+	protected final void fireDrawingObjectChanged(final DrawingObject dob,
+			final AbsoluteRectangle oldBoundingBox) {
+		// Get listeners
+		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+		
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
+			((DrawingObjectListener) list[i]).drawingObjectChanged(dob, oldBoundingBox);
+		}
+	}
+	
+	/**
+	 * Fire a DrawingObjectAdded event.
+	 * 
+	 * @param dob
+	 *            The DrawingObject, which has been added
+	 */
+	protected final void fireDrawingObjectAdded(final DrawingObject dob) {
+		// Get listeners
+		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+		
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
+			((DrawingObjectListener) list[i]).drawingObjectAdded(dob);
+		}
+	}
+	
+	/**
+	 * Fire a DrawingObjectRemoved event.
+	 * 
+	 * @param dob
+	 *            The DrawingObject, which has been removed
+	 */
+	protected final void fireDrawingObjectRemoved(final DrawingObject dob) {
+		// Get listeners
+		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+		
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
+			((DrawingObjectListener) list[i]).drawingObjectRemoved(dob);
+		}
+	}
+	
+	/**
+	 * Return the responsible plugin manager
+	 */
+	protected PluginManager getPluginManager() {
+		return pluginManager;
+	}
+	
 }

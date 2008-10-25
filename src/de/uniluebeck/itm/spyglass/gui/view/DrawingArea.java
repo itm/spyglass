@@ -3,17 +3,27 @@ package de.uniluebeck.itm.spyglass.gui.view;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.util.EventListener;
+
+import javax.swing.event.EventListenerList;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
-import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
@@ -27,12 +37,19 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * information about the dimensions of the drawing area and offers methods to transform between
  * reference frames.
  * 
+ * Note: As this is an SWT-widget you should be careful when calling methods on this object from
+ * other threads than the SWT GUI thread.
+ * 
  * @author Dariush Forouher
  */
-@Root
-public class DrawingArea {
+public class DrawingArea extends Canvas {
 	
 	private static Logger log = SpyglassLogger.get(DrawingArea.class);
+	
+	/**
+	 * Reference to UI-Thread
+	 */
+	private Spyglass spyglass;
 	
 	/**
 	 * Scale factor applied while zooming.
@@ -44,16 +61,6 @@ public class DrawingArea {
 	 * infinite zoom)
 	 */
 	private final double ZOOM_MAX = 50;
-	
-	/**
-	 * Reference to the appWindow
-	 */
-	private AppWindow appWindow;
-	
-	/**
-	 * Reference to spyglass
-	 */
-	private Spyglass spyglass;
 	
 	/**
 	 * The transformation matrix. it transforms coordinates from the absolute reference frame to the
@@ -93,9 +100,73 @@ public class DrawingArea {
 	private static final int WORLD_HEIGHT = 2 * ((int) Math.pow(2, 16));
 	
 	/**
-	 * The canvas of the drawingArea
+	 * Listerers for the DrawingAreaTransformEvent.
 	 */
-	private Rectangle canvasRect = null;
+	private final EventListenerList listeners = new EventListenerList();
+	
+	/**
+	 * This color is used for area outside of the the map
+	 */
+	private final Color canvasOutOfMapColor = new Color(getDisplay(), 50, 50, 50);
+	
+	/**
+	 * This color is used as the background color
+	 */
+	private final Color canvasBgColor = new Color(getDisplay(), 255, 255, 255);
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Create a new DrawingArea.
+	 * 
+	 * @param parent
+	 * @param style
+	 * @param spyglass
+	 *            Reference to spyglass.
+	 */
+	public DrawingArea(final Composite parent, final int style, final Spyglass spyglass) {
+		super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_BACKGROUND
+				| SWT.DOUBLE_BUFFERED);
+		
+		this.spyglass = spyglass;
+		
+		setBackground(canvasBgColor);
+		
+		addPaintListener(new PaintListener() {
+			
+			@Override
+			public void paintControl(final PaintEvent e) {
+				// TODO: draw the gray borders
+				// drawBackground(e.gc);
+			}
+		});
+		
+		addControlListener(this.controlListener);
+		getHorizontalBar().addSelectionListener(scrollListenerH);
+		getVerticalBar().addSelectionListener(scrollListenerV);
+		syncScrollBars();
+		
+		// The canvas must not act on mouse wheel events (normally it would move the
+		// scroll bars)
+		// since the mouse wheel already controls the zoom.
+		addListener(SWT.MouseWheel, new Listener() {
+			
+			@Override
+			public void handleEvent(final Event event) {
+				event.doit = false;
+			}
+		});
+		
+		// Redraw the canvas, if the transform has been modified.
+		addDrawingAreaTransformListener(new DrawingAreaTransformListener() {
+			
+			@Override
+			public void handleEvent(final DrawingAreaTransformEvent e) {
+				redraw();
+				
+			}
+		});
+		
+	}
 	
 	private final SelectionListener scrollListenerH = new SelectionAdapter() {
 		
@@ -120,8 +191,7 @@ public class DrawingArea {
 		public void controlResized(final ControlEvent e) {
 			log.debug("Control resized: " + e);
 			
-			canvasRect = appWindow.getGui().getCanvas().getClientArea();
-			log.debug("New canvas: " + canvasRect);
+			log.debug("New canvas: " + getClientArea());
 			
 			if (!isValidTransformation(new AffineTransform(at))) {
 				log.error("Resizing resulted in illegal transform. Resetting matrix.");
@@ -134,6 +204,41 @@ public class DrawingArea {
 		}
 		
 	};
+	
+	/**
+	 * Draw the background.
+	 * 
+	 * Space which lies inside the map (-2^15 to 2^15) will be colored in <code>canvasBgColor</code>
+	 * , whereas space outside this area is colored <code>canvasOutOfMapColor</code>.
+	 */
+	private void drawBackground(final GC gc) {
+		gc.setBackground(canvasOutOfMapColor);
+		gc.fillRectangle(getClientArea());
+		
+		final AbsolutePosition absPoint = new AbsolutePosition();
+		absPoint.x = -32768;
+		absPoint.y = -32768;
+		
+		final AbsoluteRectangle completeMap = new AbsoluteRectangle();
+		completeMap.setUpperLeft(absPoint);
+		completeMap.setHeight(2 * 32768);
+		completeMap.setWidth(2 * 32768);
+		
+		PixelRectangle pxRect = null;
+		
+		final AbsoluteRectangle visibleArea = getAbsoluteDrawingRectangle();
+		
+		// This is a workaround, since GC has problems with huge negative numbers
+		if (completeMap.contains(visibleArea)) {
+			pxRect = getDrawingRectangle();
+		} else {
+			pxRect = absRect2PixelRect(completeMap);
+		}
+		
+		gc.setBackground(canvasBgColor);
+		gc.fillRectangle(pxRect.getUpperLeft().x, pxRect.getUpperLeft().y, pxRect.getWidth(),
+				pxRect.getHeight());
+	}
 	
 	/**
 	 * Maps a point from the absolute reference frame to the reference frame of the drawing area.
@@ -191,8 +296,8 @@ public class DrawingArea {
 	public PixelRectangle getDrawingRectangle() {
 		final PixelRectangle ret = new PixelRectangle();
 		ret.setUpperLeft(new PixelPosition(0, 0));
-		ret.setHeight(this.canvasRect.height);
-		ret.setWidth(this.canvasRect.width);
+		ret.setHeight(getClientArea().height);
+		ret.setWidth(getClientArea().width);
 		return ret;
 	}
 	
@@ -272,8 +377,8 @@ public class DrawingArea {
 			
 			// add the translation matrix to the transformation matrix.
 			at = atCopy;
-			
 		}
+		fireDrawingAreaTransformEvent();
 		
 		syncScrollBars();
 	}
@@ -285,7 +390,7 @@ public class DrawingArea {
 	 */
 	private boolean isValidTransformation(final AffineTransform at2) {
 		boolean ok = false;
-		log.debug("Canvas: " + this.canvasRect);
+		// log.debug("Canvas: " + this.canvasRect);
 		
 		try {
 			
@@ -295,7 +400,8 @@ public class DrawingArea {
 					this.getDrawingRectangle().getHeight());
 			final Point2D lowerRight2D = at2.inverseTransform(lowerRight, null);
 			
-			log.debug(String.format("upperLeft2D=%s, lowerRight2D=%s", upperLeft2D, lowerRight2D));
+			// log.debug(String.format("upperLeft2D=%s, lowerRight2D=%s", upperLeft2D,
+			// lowerRight2D));
 			
 			ok = DrawingArea.getGlobalBoundingBox()
 					.contains(upperLeft2D.getX(), upperLeft2D.getY())
@@ -306,7 +412,7 @@ public class DrawingArea {
 			log.error("Transformation matrix in illegal state!", e);
 		}
 		
-		log.debug("val status: " + ok);
+		// log.debug("val status: " + ok);
 		return ok;
 	}
 	
@@ -348,35 +454,6 @@ public class DrawingArea {
 		absRect.setHeight(Math.abs(upperLeftAbs.y - lowerRightAbs.y));
 		
 		return absRect;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Sets the object reference to the given object.
-	 * 
-	 * note that this method should only be called during start up.
-	 * 
-	 * @param appWindow
-	 *            the appWindow to set
-	 */
-	public void setAppWindow(final AppWindow appWindow) {
-		
-		// remove old listener
-		if (this.appWindow != null) {
-			this.appWindow.getGui().getCanvas().removeControlListener(this.controlListener);
-		}
-		
-		this.appWindow = appWindow;
-		
-		canvasRect = appWindow.getGui().getCanvas().getClientArea();
-		
-		// add new one
-		this.appWindow.getGui().getCanvas().addControlListener(this.controlListener);
-		this.appWindow.getGui().getCanvas().getHorizontalBar()
-				.addSelectionListener(scrollListenerH);
-		this.appWindow.getGui().getCanvas().getVerticalBar().addSelectionListener(scrollListenerV);
-		syncScrollBars();
-		
 	}
 	
 	/**
@@ -456,12 +533,15 @@ public class DrawingArea {
 				// add the scale matrix to the transformation matrix.
 				at.concatenate(sca);
 				
-				syncScrollBars();
-				
 			} catch (final NoninvertibleTransformException e) {
 				throw new RuntimeException("Transformation matrix in illegal state!", e);
 			}
 		}
+		
+		fireDrawingAreaTransformEvent();
+		
+		syncScrollBars();
+		
 	}
 	
 	/**
@@ -496,8 +576,8 @@ public class DrawingArea {
 			final AffineTransform newAt = new AffineTransform();
 			
 			// dimensions of the drawing area
-			final int DAwidth = this.canvasRect.width;
-			final int DAhright = this.canvasRect.height;
+			final int DAwidth = getClientArea().width;
+			final int DAhright = getClientArea().height;
 			
 			final int BBheight = rect.getHeight();
 			final int BBwidth = rect.getWidth();
@@ -526,7 +606,7 @@ public class DrawingArea {
 			this.at = newAt;
 			
 		}
-		
+		fireDrawingAreaTransformEvent();
 		syncScrollBars();
 	}
 	
@@ -587,6 +667,7 @@ public class DrawingArea {
 			
 			at = atCopy;
 		}
+		fireDrawingAreaTransformEvent();
 		
 		syncScrollBars();
 	}
@@ -606,6 +687,7 @@ public class DrawingArea {
 			atCopy.concatenate(AffineTransform.getTranslateInstance(0, diff));
 			at = atCopy;
 		}
+		fireDrawingAreaTransformEvent();
 		
 		syncScrollBars();
 	}
@@ -625,6 +707,8 @@ public class DrawingArea {
 			atCopy.concatenate(AffineTransform.getTranslateInstance(diff, 0));
 			at = atCopy;
 		}
+		fireDrawingAreaTransformEvent();
+		
 		syncScrollBars();
 	}
 	
@@ -637,15 +721,15 @@ public class DrawingArea {
 		final AbsoluteRectangle bboxCurrent = getAbsoluteDrawingRectangle();
 		final AbsoluteRectangle bbox = bboxCurrent.union(bboxVisible);
 		
-		appWindow.getGui().getCanvas().getHorizontalBar().setMinimum(bbox.getUpperLeft().x);
-		appWindow.getGui().getCanvas().getHorizontalBar().setMaximum(
+		getHorizontalBar().setMinimum(bbox.getUpperLeft().x);
+		getHorizontalBar().setMaximum(
 				bbox.getWidth() + bbox.getUpperLeft().x - bboxCurrent.getWidth());
-		appWindow.getGui().getCanvas().getHorizontalBar().setSelection(getUpperLeft().x);
+		getHorizontalBar().setSelection(getUpperLeft().x);
 		
-		appWindow.getGui().getCanvas().getVerticalBar().setMinimum(bbox.getUpperLeft().y);
-		appWindow.getGui().getCanvas().getVerticalBar().setMaximum(
+		getVerticalBar().setMinimum(bbox.getUpperLeft().y);
+		getVerticalBar().setMaximum(
 				bbox.getHeight() + bbox.getUpperLeft().y - bboxCurrent.getHeight());
-		appWindow.getGui().getCanvas().getVerticalBar().setSelection(getUpperLeft().y);
+		getVerticalBar().setSelection(getUpperLeft().y);
 		
 		// Enlarge thumbs (disabled, since this screws up the math)
 		// appWindow.getGui().getCanvas().getHorizontalBar().setThumb(this.canvasRect.width);
@@ -653,20 +737,66 @@ public class DrawingArea {
 		
 		// Disable scroll bars when appropriate
 		if (bboxVisible.intersection(bboxCurrent).getWidth() == bboxVisible.getWidth()) {
-			appWindow.getGui().getCanvas().getHorizontalBar().setEnabled(false);
+			getHorizontalBar().setEnabled(false);
 		} else {
-			appWindow.getGui().getCanvas().getHorizontalBar().setEnabled(true);
+			getHorizontalBar().setEnabled(true);
 		}
 		
 		if (bboxVisible.intersection(bboxCurrent).getHeight() == bboxVisible.getHeight()) {
-			appWindow.getGui().getCanvas().getVerticalBar().setEnabled(false);
+			getVerticalBar().setEnabled(false);
 		} else {
-			appWindow.getGui().getCanvas().getVerticalBar().setEnabled(true);
+			getVerticalBar().setEnabled(true);
+		}
+		
+	}
+	
+	/**
+	 * Add a new Listener for changes in the transform of this drawing area.
+	 * 
+	 * This listener can be used to listen for changes in zoom or movement of the drawing area.
+	 * 
+	 */
+	public void addDrawingAreaTransformListener(final DrawingAreaTransformListener listener) {
+		if (listener == null) {
+			return;
+		}
+		
+		log.debug("Added new listener: " + listener);
+		listeners.add(DrawingAreaTransformListener.class, listener);
+	}
+	
+	/**
+	 * Remove the given listener.
+	 */
+	public void removeDrawingAreaTransformListener(final DrawingAreaTransformListener listener) {
+		if (listener == null) {
+			return;
+		}
+		
+		log.debug("Removing listener: " + listener);
+		listeners.remove(DrawingAreaTransformListener.class, listener);
+	}
+	
+	/**
+	 * Fires a DrawingAreaTransformEvent.
+	 */
+	private void fireDrawingAreaTransformEvent() {
+		// Get listeners
+		final EventListener[] list = listeners.getListeners(DrawingAreaTransformListener.class);
+		
+		log.debug("Fire redraw event");
+		
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
+			((DrawingAreaTransformListener) list[i])
+					.handleEvent(new DrawingAreaTransformEvent(this));
 		}
 	}
 	
-	public void setSpyglass(final Spyglass spyglass) {
-		this.spyglass = spyglass;
+	@Override
+	public void dispose() {
+		this.canvasBgColor.dispose();
+		this.canvasOutOfMapColor.dispose();
 	}
 	
 }

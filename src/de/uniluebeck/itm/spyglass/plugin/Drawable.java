@@ -11,7 +11,7 @@ package de.uniluebeck.itm.spyglass.plugin;
 import java.util.List;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 /**
  * Plugins which implement this interface want to draw on the drawingArea. They will be called on
@@ -40,11 +40,11 @@ public interface Drawable {
 	/**
 	 * Returns the objects the plug-in wants to be drawn on the GUI
 	 * 
-	 * @param drawingArea
+	 * @param area
 	 *            the description of the currently visible part of the area where the sensor nodes
 	 *            are placed
 	 */
-	public abstract List<DrawingObject> getDrawingObjects(DrawingArea drawingArea);
+	public abstract List<DrawingObject> getDrawingObjects(AbsoluteRectangle area);
 	
 	/**
 	 * Returns all drawing objects, which shall be considered when doing auto-zoom.
