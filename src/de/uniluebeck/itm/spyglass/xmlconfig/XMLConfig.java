@@ -31,7 +31,8 @@ public abstract class XMLConfig extends PropertyBean {
 		for (final Method setter : clazz.getMethods()) {
 			
 			// iterate through all setter methods
-			if (setter.getName().startsWith("set")) {
+			if (setter.getName().startsWith("set")
+					&& (setter.getAnnotation(Transient.class) == null)) {
 				try {
 					
 					final Method getter = findCorrespondingGetterMethod(clazz, setter);
@@ -44,8 +45,10 @@ public abstract class XMLConfig extends PropertyBean {
 							+ setter.getName() + " in class " + clazz.getName(), e);
 				} catch (final Exception e) {
 					throw new RuntimeException(
-							"Something wicked happened during reflection. Maybe there is something wrong with the getter/setter methods of class "
-									+ clazz.getName(), e);
+							String
+									.format(
+											"Something wicked happened during reflection. Maybe there is something wrong with the getter/setter method %s of class %s",
+											setter.getName(), clazz.getName()), e);
 				}
 				
 			}

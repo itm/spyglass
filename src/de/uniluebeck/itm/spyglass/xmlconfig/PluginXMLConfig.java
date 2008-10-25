@@ -166,6 +166,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 * Sets a flag which indicates whether the plug-in using this configuration is interested all
 	 * packages independent of the packet's semantic type
 	 */
+	@Transient
 	public void setAllSemanticTypes() {
 		semanticTypes = new int[] { -1 };
 	}
