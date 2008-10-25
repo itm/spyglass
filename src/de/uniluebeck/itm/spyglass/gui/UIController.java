@@ -299,15 +299,16 @@ public class UIController {
 				@Override
 				public void run() {
 					// the old area of the drawing object
-					final PixelRectangle pxBBoxOld = getAppWindow().getGui().getDrawingArea()
-							.absRect2PixelRect(oldBoundingBox);
-					
+					if (oldBoundingBox != null) {
+						final PixelRectangle pxBBoxOld = getAppWindow().getGui().getDrawingArea()
+								.absRect2PixelRect(oldBoundingBox);
+						redraw(pxBBoxOld);
+					}
 					// the new area of the drawing object
 					final AbsoluteRectangle absBBox = dob.getBoundingBox();
 					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea()
 							.absRect2PixelRect(absBBox);
 					
-					redraw(pxBBoxOld);
 					redraw(pxBBox);
 					
 				}
