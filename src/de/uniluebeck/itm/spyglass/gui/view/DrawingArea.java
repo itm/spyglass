@@ -246,6 +246,7 @@ public class DrawingArea extends Canvas {
 	 * 
 	 * @param absPoint
 	 *            a point in the absolute reference frame
+	 * @return the determined reference frame of the drawing area
 	 */
 	public PixelPosition absPoint2PixelPoint(final AbsolutePosition absPoint) {
 		

@@ -5,6 +5,7 @@ import java.util.Date;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
@@ -60,8 +61,7 @@ public class NodeObject extends DrawingObject {
 			final String string = getInformationString();
 			
 			// determine the size parameters of the rectangle which represents the node in respect
-			// to
-			// the sting to be displayed
+			// to the sting to be displayed
 			final org.eclipse.swt.graphics.Image temp = new org.eclipse.swt.graphics.Image(
 					e.drawingArea.getDisplay(), 500, 500);
 			final GC tempGC = new GC(temp);
@@ -222,11 +222,16 @@ public class NodeObject extends DrawingObject {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Activates or deactivates the display of additional information
+	 * 
 	 * @param isExtended
-	 *            the isExtended to set
+	 *            if <code>true</code> the information will be displayed
+	 * @param drawingArea
+	 *            the current drawing area
 	 */
-	public void setExtended(final boolean isExtended) {
+	public void setExtended(final boolean isExtended, final DrawingArea drawingArea) {
 		this.isExtended = isExtended;
+		boundingBox = determineBoundingBox(drawingArea);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -350,6 +355,32 @@ public class NodeObject extends DrawingObject {
 				bbHeight);
 		
 		return drawingArea.pixelRect2AbsRect(bbArea);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the object's bounding box in absolute coordinate values
+	 * 
+	 * @param drawingArea
+	 *            the current drawing area
+	 * @return the object's bounding box in absolute coordinate values
+	 */
+	public AbsoluteRectangle determineBoundingBox(final DrawingArea drawingArea) {
+		
+		// get the information to be displayed
+		final String string = getInformationString();
+		
+		// determine the size parameters of the rectangle which represents the node in respect to
+		// the sting to be displayed
+		final Point size = new GC(Display.getCurrent()).textExtent(string);
+		final int width = size.x + lineWidth + 1; // +1 for correct display with uneven line width
+		final int height = size.y + lineWidth + 1;
+		
+		final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(this.getPosition());
+		
+		// determine the bounding box
+		return determineBoundingBox(drawingArea, upperLeft, lineWidth, width, height);
+		
 	}
 	
 	@Override

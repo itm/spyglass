@@ -509,7 +509,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			final Point clickPoint, final DrawingArea drawingArea) {
 		
 		// check all drawing objects
-		for (final DrawingObject drawingObject : drawingObjects) {
+		// this has to be done in reverse order since the "normal" order is used for painting which
+		// means that the topmost element is actually the last element in the list
+		for (int i = drawingObjects.size() - 1; i >= 0; i--) {
+			final DrawingObject drawingObject = drawingObjects.get(i);
 			final PixelRectangle bbox = drawingArea.absRect2PixelRect(drawingObject
 					.getBoundingBox());
 			// check which plug-in's bounding box contains the point which
@@ -520,7 +523,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					// if so, toggle its extension state
 					final NodeObject no = (NodeObject) drawingObject;
 					final AbsoluteRectangle oldBBox = no.getBoundingBox();
-					no.setExtended(!no.isExtended());
+					no.setExtended(!no.isExtended(), drawingArea);
 					xmlConfig.putExtendedInformationActive(no.getNodeID(), no.isExtended());
 					// TODO: the quadtree must be updated, since the dimensions of the NodeObject
 					// may have changed.
