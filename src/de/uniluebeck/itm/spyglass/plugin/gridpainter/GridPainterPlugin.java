@@ -130,7 +130,7 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 		
 		grid = new Grid();
 		final int[] lineColor = xmlConfig.getLineColorRGB();
-		grid.setColor(lineColor[0], lineColor[1], lineColor[1]);
+		grid.setColor(lineColor[0], lineColor[1], lineColor[2]);
 		grid.setGridElementHeight(xmlConfig.getGridElementHeight());
 		grid.setGridElementWidth(xmlConfig.getGridElementWidth());
 		grid.setPosition(new AbsolutePosition(xmlConfig.getLowerLeftX(), xmlConfig.getLowerLeftY(),
