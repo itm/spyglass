@@ -12,8 +12,13 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -37,8 +42,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * information about the dimensions of the drawing area and offers methods to transform between
  * reference frames.
  * 
- * Note: As this is an SWT-widget you should be careful when calling methods on this object from
- * other threads than the SWT GUI thread.
+ * Attention: Methods of this class MUST only be invoked from the SWT-GUI thread!
  * 
  * @author Dariush Forouher
  */
@@ -47,7 +51,7 @@ public class DrawingArea extends Canvas {
 	private static Logger log = SpyglassLogger.get(DrawingArea.class);
 	
 	/**
-	 * Reference to UI-Thread
+	 * Reference to model
 	 */
 	private Spyglass spyglass;
 	
@@ -66,18 +70,9 @@ public class DrawingArea extends Canvas {
 	 * The transformation matrix. it transforms coordinates from the absolute reference frame to the
 	 * reference frame of the drawing area
 	 * 
-	 * Note: Only modifing calls to this object are serialized with synchronized(). By replacing the
-	 * transform with a new instance in one single step, reading the transform can be lock-free.
-	 * 
+	 * Note: Access to the transform is not protected since the class is not thread-safe.
 	 */
 	private AffineTransform at = new AffineTransform();
-	
-	/**
-	 * Mutex to serialize modifing calls
-	 * 
-	 * (to ensure that <code>at</code> is not modified concurrently.
-	 */
-	private Object mutex = new Object();
 	
 	/**
 	 * x-coordinate of the upper-left point of the world.
@@ -114,6 +109,21 @@ public class DrawingArea extends Canvas {
 	 */
 	private final Color canvasBgColor = new Color(getDisplay(), 255, 255, 255);
 	
+	/**
+	 * Number of pixels to be moved when Up/Down/Left/right is pressed.
+	 */
+	private final int MOVE_OFFSET = 20;
+	
+	/**
+	 * True, while the user moves the map via mouse
+	 */
+	private volatile boolean mouseDragInProgress = false;
+	
+	/**
+	 * the starting point of the movement buisness.
+	 */
+	private volatile PixelPosition mouseDragStartPosition = null;
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * Create a new DrawingArea.
@@ -124,30 +134,34 @@ public class DrawingArea extends Canvas {
 	 *            Reference to spyglass.
 	 */
 	public DrawingArea(final Composite parent, final int style, final Spyglass spyglass) {
+		// 
 		super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_BACKGROUND
 				| SWT.DOUBLE_BUFFERED);
 		
 		this.spyglass = spyglass;
 		
+		init();
+		
+	}
+	
+	private void init() {
 		setBackground(canvasBgColor);
 		
-		addPaintListener(new PaintListener() {
-			
-			@Override
-			public void paintControl(final PaintEvent e) {
-				// TODO: draw the gray borders
-				// drawBackground(e.gc);
-			}
-		});
+		// handle user events on the canvas (moving, zoom)
+		addMouseListener(mouseListener);
+		addMouseMoveListener(mouseMoveListener);
+		addMouseWheelListener(mouseWheelListener);
+		addKeyListener(keyListener);
 		
-		addControlListener(this.controlListener);
+		// handle ScrollBar events
 		getHorizontalBar().addSelectionListener(scrollListenerH);
 		getVerticalBar().addSelectionListener(scrollListenerV);
+		
+		addControlListener(this.controlListener);
 		syncScrollBars();
 		
 		// The canvas must not act on mouse wheel events (normally it would move the
-		// scroll bars)
-		// since the mouse wheel already controls the zoom.
+		// scroll bars) since the mouse wheel already controls the zoom.
 		addListener(SWT.MouseWheel, new Listener() {
 			
 			@Override
@@ -155,19 +169,80 @@ public class DrawingArea extends Canvas {
 				event.doit = false;
 			}
 		});
-		
-		// Redraw the canvas, if the transform has been modified.
-		addDrawingAreaTransformListener(new DrawingAreaTransformListener() {
-			
-			@Override
-			public void handleEvent(final DrawingAreaTransformEvent e) {
-				redraw();
-				
-			}
-		});
-		
 	}
 	
+	/**
+	 * 
+	 * mouse drag and drop: used for moving the drawing area.
+	 */
+	private MouseListener mouseListener = new org.eclipse.swt.events.MouseAdapter() {
+		
+		@Override
+		public void mouseDown(final MouseEvent e) {
+			mouseDragInProgress = true;
+			mouseDragStartPosition = new PixelPosition(e.x, e.y);
+		}
+		
+		@Override
+		public void mouseUp(final MouseEvent arg0) {
+			mouseDragInProgress = false;
+		}
+		
+	};
+	
+	/**
+	 * move listener: redraw the canvas while movement is in progress
+	 */
+	private MouseMoveListener mouseMoveListener = new MouseMoveListener() {
+		
+		@Override
+		public void mouseMove(final MouseEvent arg0) {
+			
+			// if a movement is in progress, update the drawing area by
+			// appling the current
+			// delta.
+			if (mouseDragInProgress) {
+				
+				final PixelPosition mouseDragStopPosition = new PixelPosition(arg0.x, arg0.y);
+				
+				final int deltaX = mouseDragStopPosition.x - mouseDragStartPosition.x;
+				final int deltaY = mouseDragStopPosition.y - mouseDragStartPosition.y;
+				
+				move(deltaX, deltaY);
+				
+				mouseDragStartPosition = mouseDragStopPosition;
+			}
+			
+		}
+	};
+	
+	/**
+	 * Key listener: for moving
+	 */
+	private KeyListener keyListener = new KeyAdapter() {
+		
+		@Override
+		public void keyPressed(final KeyEvent arg0) {
+			log.debug("pressed" + arg0);
+			if (arg0.keyCode == 16777219) {
+				move(-MOVE_OFFSET, 0);
+			}
+			if (arg0.keyCode == 16777220) {
+				move(MOVE_OFFSET, 0);
+			}
+			if (arg0.keyCode == 16777217) {
+				move(0, -MOVE_OFFSET);
+			}
+			if (arg0.keyCode == 16777218) {
+				move(0, MOVE_OFFSET);
+			}
+		}
+		
+	};
+	
+	/**
+	 * handle changes on the horizontal scrollbar
+	 */
 	private final SelectionListener scrollListenerH = new SelectionAdapter() {
 		
 		@Override
@@ -176,6 +251,10 @@ public class DrawingArea extends Canvas {
 		}
 		
 	};
+	
+	/**
+	 * handle changes on the vertical scrollbar
+	 */
 	private final SelectionListener scrollListenerV = new SelectionAdapter() {
 		
 		@Override
@@ -185,6 +264,9 @@ public class DrawingArea extends Canvas {
 		
 	};
 	
+	/**
+	 * We have to react when the canvas is resized.
+	 */
 	private final ControlListener controlListener = new ControlAdapter() {
 		
 		@Override
@@ -196,6 +278,7 @@ public class DrawingArea extends Canvas {
 			if (!isValidTransformation(new AffineTransform(at))) {
 				log.error("Resizing resulted in illegal transform. Resetting matrix.");
 				
+				// there is a redraw() in here
 				adjustToValidMatrix();
 			}
 			
@@ -203,6 +286,22 @@ public class DrawingArea extends Canvas {
 			
 		}
 		
+	};
+	
+	/**
+	 * Mouse wheel: used for zooming
+	 */
+	private MouseWheelListener mouseWheelListener = new MouseWheelListener() {
+		
+		@Override
+		public void mouseScrolled(final MouseEvent arg0) {
+			if (arg0.count > 0) {
+				zoomIn(arg0.x, arg0.y);
+			} else {
+				zoomOut(arg0.x, arg0.y);
+			}
+			
+		}
 	};
 	
 	/**
@@ -249,6 +348,7 @@ public class DrawingArea extends Canvas {
 	 * @return the determined reference frame of the drawing area
 	 */
 	public PixelPosition absPoint2PixelPoint(final AbsolutePosition absPoint) {
+		this.checkWidget();
 		
 		final Point2D pxPoint = at.transform(absPoint.toPoint2D(), null);
 		
@@ -262,6 +362,7 @@ public class DrawingArea extends Canvas {
 	 * @param absRect
 	 */
 	public PixelRectangle absRect2PixelRect(final AbsoluteRectangle absRect) {
+		this.checkWidget();
 		
 		final PixelRectangle rect = new PixelRectangle();
 		
@@ -280,21 +381,11 @@ public class DrawingArea extends Canvas {
 	}
 	
 	/**
-	 * Returns the transformation matrix.
-	 * 
-	 * this matrix maps points from the absolute reference frame to the reference frame of the
-	 * drawing area.
-	 * 
-	 * @param absRect
-	 */
-	public AffineTransform getTransform() {
-		return (AffineTransform) at.clone();
-	}
-	
-	/**
 	 * return a rectangle descrbing the dimensions of the drawing area.
 	 */
 	public PixelRectangle getDrawingRectangle() {
+		this.checkWidget();
+		
 		final PixelRectangle ret = new PixelRectangle();
 		ret.setUpperLeft(new PixelPosition(0, 0));
 		ret.setHeight(getClientArea().height);
@@ -307,6 +398,8 @@ public class DrawingArea extends Canvas {
 	 * absolute frame of reference.
 	 */
 	public AbsoluteRectangle getAbsoluteDrawingRectangle() {
+		this.checkWidget();
+		
 		final AbsoluteRectangle absRect = new AbsoluteRectangle();
 		
 		final AbsolutePosition upperLeft = this.getUpperLeft();
@@ -329,6 +422,8 @@ public class DrawingArea extends Canvas {
 	 * return the absolute point represented by the lower right point of the drawing area.
 	 */
 	public AbsolutePosition getLowerRight() {
+		this.checkWidget();
+		
 		try {
 			
 			final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(),
@@ -345,6 +440,8 @@ public class DrawingArea extends Canvas {
 	 * return the absolute point represented by the upper left point of the drawing area.
 	 */
 	public AbsolutePosition getUpperLeft() {
+		this.checkWidget();
+		
 		try {
 			
 			final Point2D upperLeft2D = at.inverseTransform(new Point2D.Double(0, 0), null);
@@ -362,24 +459,28 @@ public class DrawingArea extends Canvas {
 	 * @param pixelY
 	 */
 	public void move(final int pixelX, final int pixelY) {
+		this.checkWidget();
 		
-		synchronized (mutex) {
-			
-			final AffineTransform atCopy = new AffineTransform(at);
-			
-			// Build the translation matrix
-			final AffineTransform sca = AffineTransform.getTranslateInstance(pixelX, pixelY);
-			
-			atCopy.preConcatenate(sca);
-			
-			if (!isValidTransformation(atCopy)) {
-				return;
-			}
-			
-			// add the translation matrix to the transformation matrix.
-			at = atCopy;
+		final AffineTransform atCopy = new AffineTransform(at);
+		
+		// Build the translation matrix
+		final AffineTransform sca = AffineTransform.getTranslateInstance(pixelX, pixelY);
+		
+		atCopy.preConcatenate(sca);
+		
+		if (!isValidTransformation(atCopy)) {
+			return;
 		}
+		
+		// add the translation matrix to the transformation matrix.
+		at = atCopy;
+		
 		fireDrawingAreaTransformEvent();
+		
+		// redraw the canvas
+		// TODO: find a way to call gc.copyArea(srcX, srcY, width, height, destX, destY, paint)
+		// instead
+		redraw();
 		
 		syncScrollBars();
 	}
@@ -424,6 +525,7 @@ public class DrawingArea extends Canvas {
 	 *            a point in the reference frame of the drawing area
 	 */
 	public AbsolutePosition pixelPoint2AbsPoint(final PixelPosition point) {
+		this.checkWidget();
 		
 		try {
 			
@@ -441,6 +543,8 @@ public class DrawingArea extends Canvas {
 	 * @param rect
 	 */
 	public AbsoluteRectangle pixelRect2AbsRect(final PixelRectangle rect) {
+		this.checkWidget();
+		
 		final AbsoluteRectangle absRect = new AbsoluteRectangle();
 		
 		final AbsolutePosition upperLeftAbs = this.pixelPoint2AbsPoint(rect.getUpperLeft());
@@ -462,6 +566,8 @@ public class DrawingArea extends Canvas {
 	 * 
 	 */
 	public double getZoom() {
+		this.checkWidget();
+		
 		return at.getScaleX();
 	}
 	
@@ -473,6 +579,8 @@ public class DrawingArea extends Canvas {
 	 * @param py
 	 */
 	public void zoomOut(final int px, final int py) {
+		this.checkWidget();
+		
 		// log.debug("Zooming from " + px + "; " + py);
 		
 		zoom(px, py, 1 / ZOOM_FACTOR);
@@ -487,6 +595,8 @@ public class DrawingArea extends Canvas {
 	 * @param py
 	 */
 	public void zoomIn(final int px, final int py) {
+		this.checkWidget();
+		
 		// log.debug("Zooming into " + px + "; " + py);
 		
 		zoom(px, py, ZOOM_FACTOR);
@@ -502,44 +612,44 @@ public class DrawingArea extends Canvas {
 	 */
 	private void zoom(final int px, final int py, final double factor) {
 		
-		synchronized (mutex) {
+		try {
+			// The centerpoint of the zoom (where the user clicked)
+			final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
 			
-			try {
-				// The centerpoint of the zoom (where the user clicked)
-				final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
-				
-				// Build the scale matrix
-				final AffineTransform sca = new AffineTransform();
-				sca.translate(a.getX(), a.getY());
-				sca.scale(factor, factor);
-				sca.translate(-a.getX(), -a.getY());
-				
-				final AffineTransform atTemp = new AffineTransform(at);
-				atTemp.concatenate(sca);
-				if (!isValidTransformation(atTemp)) {
-					return;
-				}
-				// Abort if we leave a defined interval of allowed zoom levels
-				// This is partly because the QuadTree cannot handle it if it is asked
-				// to return objects outside its boundingBox.
-				//
-				// TODO: This isn't the perfect solution, as it depends on the size
-				// of the Spyglass Window to be "regular size".
-				final AffineTransform at2 = (AffineTransform) at.clone();
-				at2.concatenate(sca);
-				if ((at2.getScaleX() > ZOOM_MAX)) {
-					return;
-				}
-				
-				// add the scale matrix to the transformation matrix.
-				at.concatenate(sca);
-				
-			} catch (final NoninvertibleTransformException e) {
-				throw new RuntimeException("Transformation matrix in illegal state!", e);
+			// Build the scale matrix
+			final AffineTransform sca = new AffineTransform();
+			sca.translate(a.getX(), a.getY());
+			sca.scale(factor, factor);
+			sca.translate(-a.getX(), -a.getY());
+			
+			final AffineTransform atTemp = new AffineTransform(at);
+			atTemp.concatenate(sca);
+			if (!isValidTransformation(atTemp)) {
+				return;
 			}
+			// Abort if we leave a defined interval of allowed zoom levels
+			// This is partly because the QuadTree cannot handle it if it is asked
+			// to return objects outside its boundingBox.
+			//
+			// TODO: This isn't the perfect solution, as it depends on the size
+			// of the Spyglass Window to be "regular size".
+			final AffineTransform at2 = (AffineTransform) at.clone();
+			at2.concatenate(sca);
+			if ((at2.getScaleX() > ZOOM_MAX)) {
+				return;
+			}
+			
+			// add the scale matrix to the transformation matrix.
+			at.concatenate(sca);
+			
+		} catch (final NoninvertibleTransformException e) {
+			throw new RuntimeException("Transformation matrix in illegal state!", e);
 		}
 		
 		fireDrawingAreaTransformEvent();
+		
+		// redraw the canvas
+		redraw();
 		
 		syncScrollBars();
 		
@@ -549,6 +659,8 @@ public class DrawingArea extends Canvas {
 	 * Zoom in and implicitly asume that the center of the drawing area is the scale center.
 	 */
 	public void zoomIn() {
+		this.checkWidget();
+		
 		this.zoomIn(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle()
 				.getHeight() / 2);
 		
@@ -558,6 +670,8 @@ public class DrawingArea extends Canvas {
 	 * Zoom out and implicitly asume that the center of the drawing area is the scale center.
 	 */
 	public void zoomOut() {
+		this.checkWidget();
+		
 		this.zoomOut(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle()
 				.getHeight() / 2);
 		
@@ -569,45 +683,48 @@ public class DrawingArea extends Canvas {
 	 * 
 	 */
 	public void autoZoom(final AbsoluteRectangle rect) {
+		this.checkWidget();
+		
 		log.debug("Auto zooming to " + rect);
 		
-		synchronized (mutex) {
-			
-			// create a new matrix from scratch
-			final AffineTransform newAt = new AffineTransform();
-			
-			// dimensions of the drawing area
-			final int DAwidth = getClientArea().width;
-			final int DAhright = getClientArea().height;
-			
-			final int BBheight = rect.getHeight();
-			final int BBwidth = rect.getWidth();
-			
-			final double scaleX = (double) DAwidth / (double) BBwidth;
-			final double scaleY = (double) DAhright / (double) BBheight;
-			final double scale = Math.min(scaleX, scaleY);
-			
-			// scale and move to upper left corner
-			newAt.scale(scale, scale);
-			newAt.translate(-rect.getUpperLeft().x, -rect.getUpperLeft().y);
-			
-			// finally move the rect to the center of the drawing area
-			
-			final AbsolutePosition lowerRight = rect.getUpperLeft();
-			lowerRight.x += rect.getWidth();
-			lowerRight.y += rect.getHeight();
-			final Point2D lowerRightPx = newAt.transform(lowerRight.toPoint2D(), null);
-			
-			final double deltaX = DAwidth - lowerRightPx.getX();
-			final double deltaY = DAhright - lowerRightPx.getY();
-			
-			newAt.preConcatenate(AffineTransform.getTranslateInstance(deltaX / 2, deltaY / 2));
-			
-			// replace the matrix
-			this.at = newAt;
-			
-		}
+		// create a new matrix from scratch
+		final AffineTransform newAt = new AffineTransform();
+		
+		// dimensions of the drawing area
+		final int DAwidth = getClientArea().width;
+		final int DAhright = getClientArea().height;
+		
+		final int BBheight = rect.getHeight();
+		final int BBwidth = rect.getWidth();
+		
+		final double scaleX = (double) DAwidth / (double) BBwidth;
+		final double scaleY = (double) DAhright / (double) BBheight;
+		final double scale = Math.min(scaleX, scaleY);
+		
+		// scale and move to upper left corner
+		newAt.scale(scale, scale);
+		newAt.translate(-rect.getUpperLeft().x, -rect.getUpperLeft().y);
+		
+		// finally move the rect to the center of the drawing area
+		
+		final AbsolutePosition lowerRight = rect.getUpperLeft();
+		lowerRight.x += rect.getWidth();
+		lowerRight.y += rect.getHeight();
+		final Point2D lowerRightPx = newAt.transform(lowerRight.toPoint2D(), null);
+		
+		final double deltaX = DAwidth - lowerRightPx.getX();
+		final double deltaY = DAhright - lowerRightPx.getY();
+		
+		newAt.preConcatenate(AffineTransform.getTranslateInstance(deltaX / 2, deltaY / 2));
+		
+		// replace the matrix
+		this.at = newAt;
+		
 		fireDrawingAreaTransformEvent();
+		
+		// redraw the canvas
+		redraw();
+		
 		syncScrollBars();
 	}
 	
@@ -631,44 +748,46 @@ public class DrawingArea extends Canvas {
 	 * 
 	 */
 	private void adjustToValidMatrix() {
-		synchronized (mutex) {
+		
+		AffineTransform atCopy = new AffineTransform(at);
+		
+		while (!isValidTransformation(atCopy)) {
+			log.debug("Zooming in to get back in into the global BBox.");
 			
-			AffineTransform atCopy = new AffineTransform(at);
+			final int px = getDrawingRectangle().getWidth() / 2;
+			final int py = getDrawingRectangle().getHeight() / 2;
 			
-			while (!isValidTransformation(atCopy)) {
-				log.debug("Zooming in to get back in into the global BBox.");
+			// The centerpoint of the zoom (where the user clicked)
+			try {
+				final Point2D a = atCopy.inverseTransform(new Point2D.Float(px, py), null);
 				
-				final int px = getDrawingRectangle().getWidth() / 2;
-				final int py = getDrawingRectangle().getHeight() / 2;
+				// Build the scale matrix
+				final AffineTransform sca = new AffineTransform();
+				sca.translate(a.getX(), a.getY());
+				sca.scale(ZOOM_FACTOR, ZOOM_FACTOR);
+				sca.translate(-a.getX(), -a.getY());
 				
-				// The centerpoint of the zoom (where the user clicked)
-				try {
-					final Point2D a = atCopy.inverseTransform(new Point2D.Float(px, py), null);
-					
-					// Build the scale matrix
-					final AffineTransform sca = new AffineTransform();
-					sca.translate(a.getX(), a.getY());
-					sca.scale(ZOOM_FACTOR, ZOOM_FACTOR);
-					sca.translate(-a.getX(), -a.getY());
-					
-					atCopy.concatenate(sca);
-					
-					if ((atCopy.getScaleX() > ZOOM_MAX)) {
-						log.debug("Giving up, resetting to initial matrix.");
-						atCopy = new AffineTransform();
-						break;
-					}
-					
-				} catch (final NoninvertibleTransformException e1) {
-					log.error("Transformation matrix in illegal state!", e1);
+				atCopy.concatenate(sca);
+				
+				if ((atCopy.getScaleX() > ZOOM_MAX)) {
+					log.debug("Giving up, resetting to initial matrix.");
+					atCopy = new AffineTransform();
 					break;
 				}
 				
+			} catch (final NoninvertibleTransformException e1) {
+				log.error("Transformation matrix in illegal state!", e1);
+				break;
 			}
 			
-			at = atCopy;
 		}
+		
+		at = atCopy;
+		
 		fireDrawingAreaTransformEvent();
+		
+		// redraw the canvas
+		redraw();
 		
 		syncScrollBars();
 	}
@@ -682,13 +801,14 @@ public class DrawingArea extends Canvas {
 		final double select = scrollBar.getSelection();
 		final double diff = -select - ty;
 		
-		synchronized (mutex) {
-			
-			final AffineTransform atCopy = new AffineTransform(at);
-			atCopy.concatenate(AffineTransform.getTranslateInstance(0, diff));
-			at = atCopy;
-		}
+		final AffineTransform atCopy = new AffineTransform(at);
+		atCopy.concatenate(AffineTransform.getTranslateInstance(0, diff));
+		at = atCopy;
+		
 		fireDrawingAreaTransformEvent();
+		
+		// redraw the canvas
+		redraw();
 		
 		syncScrollBars();
 	}
@@ -702,13 +822,14 @@ public class DrawingArea extends Canvas {
 		final double select = scrollBar.getSelection();
 		final double diff = -select - tx;
 		
-		synchronized (mutex) {
-			
-			final AffineTransform atCopy = new AffineTransform(at);
-			atCopy.concatenate(AffineTransform.getTranslateInstance(diff, 0));
-			at = atCopy;
-		}
+		final AffineTransform atCopy = new AffineTransform(at);
+		atCopy.concatenate(AffineTransform.getTranslateInstance(diff, 0));
+		at = atCopy;
+		
 		fireDrawingAreaTransformEvent();
+		
+		// redraw the canvas
+		redraw();
 		
 		syncScrollBars();
 	}
@@ -796,6 +917,7 @@ public class DrawingArea extends Canvas {
 	
 	@Override
 	public void dispose() {
+		super.dispose();
 		this.canvasBgColor.dispose();
 		this.canvasOutOfMapColor.dispose();
 	}

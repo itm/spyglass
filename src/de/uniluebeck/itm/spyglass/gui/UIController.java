@@ -11,13 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
@@ -32,7 +28,6 @@ import de.uniluebeck.itm.spyglass.plugin.DrawingObjectListener;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
-import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
@@ -55,21 +50,6 @@ public class UIController {
 	
 	/** User events will be dispatched here */
 	private final EventDispatcher eventDispatcher;
-	
-	/**
-	 * Number of pixels to be moved when Up/Down/Left/right is pressed.
-	 */
-	private final int MOVE_OFFSET = 20;
-	
-	/**
-	 * True, while the user moves the map via mouse
-	 */
-	private volatile boolean mouseDragInProgress = false;
-	
-	/**
-	 * the starting point of the movement buisness.
-	 */
-	private volatile PixelPosition mouseDragStartPosition = null;
 	
 	// --------------------------------------------------------------------------
 	// ------
@@ -102,24 +82,9 @@ public class UIController {
 		appWindow.getGui().getDrawingArea().addPaintListener(paintListener);
 		
 		/*
-		 * Key listener: for moving
-		 */
-		appWindow.getGui().getDrawingArea().addKeyListener(keyListener);
-		
-		/*
-		 * Mouse wheel: used for zooming
-		 */
-		appWindow.getGui().getDrawingArea().addMouseWheelListener(mouseWheelListener);
-		
-		/*
-		 * mouse drag and drop: used for moving the drawing area.
+		 * mouse button events - are forwarded to plugins
 		 */
 		appWindow.getGui().getDrawingArea().addMouseListener(mouseListener);
-		
-		/*
-		 * move listener: this helps to make moving more smooth
-		 */
-		appWindow.getGui().getDrawingArea().addMouseMoveListener(mouseMoveListener);
 		
 		/*
 		 * Add DrawingObjectListeners to all current and future plugins (used for knowing when to
@@ -169,41 +134,7 @@ public class UIController {
 	
 	// ----------------------------------------------------------------------------
 	
-	private KeyListener keyListener = new KeyAdapter() {
-		
-		@Override
-		public void keyPressed(final KeyEvent arg0) {
-			log.debug("pressed" + arg0);
-			if (arg0.keyCode == 16777219) {
-				appWindow.getGui().getDrawingArea().move(-MOVE_OFFSET, 0);
-			}
-			if (arg0.keyCode == 16777220) {
-				appWindow.getGui().getDrawingArea().move(MOVE_OFFSET, 0);
-			}
-			if (arg0.keyCode == 16777217) {
-				appWindow.getGui().getDrawingArea().move(0, -MOVE_OFFSET);
-			}
-			if (arg0.keyCode == 16777218) {
-				appWindow.getGui().getDrawingArea().move(0, MOVE_OFFSET);
-			}
-		}
-		
-	};
-	
-	private MouseWheelListener mouseWheelListener = new MouseWheelListener() {
-		
-		@Override
-		public void mouseScrolled(final MouseEvent arg0) {
-			if (arg0.count > 0) {
-				appWindow.getGui().getDrawingArea().zoomIn(arg0.x, arg0.y);
-			} else {
-				appWindow.getGui().getDrawingArea().zoomOut(arg0.x, arg0.y);
-			}
-			
-		}
-	};
-	
-	private MouseListener mouseListener = new MouseListener() {
+	private MouseListener mouseListener = new MouseAdapter() {
 		
 		@Override
 		public void mouseDoubleClick(final MouseEvent e) {
@@ -217,38 +148,8 @@ public class UIController {
 			if (e.button > 1) {
 				eventDispatcher.handleEvent(e);
 			}
-			mouseDragInProgress = true;
-			mouseDragStartPosition = new PixelPosition(e.x, e.y);
 		}
 		
-		@Override
-		public void mouseUp(final MouseEvent arg0) {
-			mouseDragInProgress = false;
-		}
-		
-	};
-	
-	private MouseMoveListener mouseMoveListener = new MouseMoveListener() {
-		
-		@Override
-		public void mouseMove(final MouseEvent arg0) {
-			
-			// if a movement is in progress, update the drawing area by
-			// appling the current
-			// delta.
-			if (mouseDragInProgress) {
-				
-				final PixelPosition mouseDragStopPosition = new PixelPosition(arg0.x, arg0.y);
-				
-				final int deltaX = mouseDragStopPosition.x - mouseDragStartPosition.x;
-				final int deltaY = mouseDragStopPosition.y - mouseDragStartPosition.y;
-				
-				appWindow.getGui().getDrawingArea().move(deltaX, deltaY);
-				
-				mouseDragStartPosition = mouseDragStopPosition;
-			}
-			
-		}
 	};
 	
 	private PluginListChangeListener pluginListChangeListener = new PluginListChangeListener() {
