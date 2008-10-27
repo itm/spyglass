@@ -1,5 +1,6 @@
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -7,6 +8,8 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -29,9 +32,13 @@ import de.uniluebeck.itm.spyglass.gui.databinding.validator.PluginNameValidator;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.StringToIntListValidator;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
+	
+	private static final Logger log = SpyglassLogger.getLogger(BasicGroupComposite.class);
+	
 	private Label label1;
 	private Button isActive;
 	private Button isVisible;
@@ -99,66 +106,79 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 		}
 	}
 	
-	public void setDatabindingPluginName(final DataBindingContext dbc,
-			final PluginXMLConfig config, final Plugin owner, final PluginManager manager,
-			final boolean isInstancePage) {
+	public void setDatabinding(final DataBindingContext dbc, final PluginXMLConfig config,
+			final Plugin owner, final PluginManager manager, final boolean isInstancePage) {
 		
 		// plugin name
-		
-		final IObservableValue modelObservable = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "name");
-		final ISWTObservableValue fieldObservableText = SWTObservables.observeText(pluginName,
-				SWT.Modify);
-		
-		if (isInstancePage) {
-			dbc.bindValue(fieldObservableText, modelObservable, new UpdateValueStrategy(
-					UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new PluginNameValidator(manager, owner)), null);
+		{
+			final IObservableValue modelObservable = BeansObservables.observeValue(dbc
+					.getValidationRealm(), config, "name");
+			final ISWTObservableValue fieldObservableText = SWTObservables.observeText(pluginName,
+					SWT.Modify);
 			
-		} else {
-			dbc.bindValue(fieldObservableText, modelObservable, new UpdateValueStrategy(
-					UpdateValueStrategy.POLICY_CONVERT), null);
-			
+			if (isInstancePage) {
+				dbc.bindValue(fieldObservableText, modelObservable, new UpdateValueStrategy(
+						UpdateValueStrategy.POLICY_CONVERT)
+						.setAfterConvertValidator(new PluginNameValidator(manager, owner)), null);
+				
+			} else {
+				dbc.bindValue(fieldObservableText, modelObservable, new UpdateValueStrategy(
+						UpdateValueStrategy.POLICY_CONVERT), null);
+				
+			}
 		}
-	}
-	
-	public void setDatabinding(final DataBindingContext dbc, final PluginXMLConfig config) {
 		
 		// semantic types
+		{
+			final IObservableValue modelObservable2 = BeansObservables.observeValue(dbc
+					.getValidationRealm(), config, "semanticTypes");
+			final UpdateValueStrategy strToModel = new UpdateValueStrategy(
+					UpdateValueStrategy.POLICY_CONVERT);
+			final UpdateValueStrategy strFromModel = new UpdateValueStrategy();
+			strFromModel.setConverter(new IntListToStringConverter());
+			strToModel.setConverter(new StringToIntListConverter());
+			strToModel.setAfterConvertValidator(new IntegerRangeValidator(-1, 255));
+			strToModel.setAfterGetValidator(new StringToIntListValidator());
+			dbc.bindValue(SWTObservables.observeText(this.semanticTypes, SWT.Modify),
+					modelObservable2, strToModel, strFromModel);
+		}
 		
-		final IObservableValue modelObservable2 = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "semanticTypes");
-		final UpdateValueStrategy strToModel = new UpdateValueStrategy(
-				UpdateValueStrategy.POLICY_CONVERT);
-		final UpdateValueStrategy strFromModel = new UpdateValueStrategy();
-		strFromModel.setConverter(new IntListToStringConverter());
-		strToModel.setConverter(new StringToIntListConverter());
-		strToModel.setAfterConvertValidator(new IntegerRangeValidator(-1, 255));
-		strToModel.setAfterGetValidator(new StringToIntListValidator());
-		dbc.bindValue(SWTObservables.observeText(this.semanticTypes, SWT.Modify), modelObservable2,
-				strToModel, strFromModel);
+		// all semTypes
+		{
+			final IObservableValue observableAllSemTypes = BeansObservables.observeValue(dbc
+					.getValidationRealm(), config, "allSemanticTypes");
+			final IObservableValue observableAllSemTypesCheckbox = SWTObservables
+					.observeSelection(this.allTypes);
+			dbc.bindValue(observableAllSemTypesCheckbox, observableAllSemTypes,
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		}
 		
 		// is visible
-		
-		final IObservableValue observableVisible = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "visible");
-		dbc.bindValue(SWTObservables.observeSelection(this.isVisible), observableVisible,
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		{
+			final IObservableValue observableVisible = BeansObservables.observeValue(dbc
+					.getValidationRealm(), config, "visible");
+			dbc.bindValue(SWTObservables.observeSelection(this.isVisible), observableVisible,
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		}
 		
 		// is active
-		
-		final IObservableValue observableActive = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "active");
-		
-		final IObservableValue observableActiveButton = SWTObservables
-				.observeSelection(this.isActive);
-		dbc.bindValue(observableActiveButton, observableActive, new UpdateValueStrategy(
-				UpdateValueStrategy.POLICY_CONVERT), null);
+		{
+			final IObservableValue observableActive = BeansObservables.observeValue(dbc
+					.getValidationRealm(), config, "active");
+			
+			final IObservableValue observableActiveButton = SWTObservables
+					.observeSelection(this.isActive);
+			dbc.bindValue(observableActiveButton, observableActive, new UpdateValueStrategy(
+					UpdateValueStrategy.POLICY_CONVERT), null);
+		}
 		
 		// disable the visibility field if plug-in is inactive
-		dbc.bindValue(SWTObservables.observeEnabled(this.isVisible), observableActiveButton, null,
-				null);
-		
+		// XXX: disabled since this produces strange errors.
+		{
+			// dbc.bindValue(SWTObservables.observeEnabled(this.isVisible), SWTObservables
+			// .observeSelection(this.isActive), new UpdateValueStrategy(
+			// UpdateValueStrategy.POLICY_NEVER), null);
+		}
 	}
 	
 	public BasicGroupComposite(final org.eclipse.swt.widgets.Composite parent, final int style) {
@@ -219,10 +239,24 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 					semanticTypesLData.grabExcessHorizontalSpace = true;
 					semanticTypesLData.horizontalAlignment = GridData.FILL;
 					semanticTypes.setLayoutData(semanticTypesLData);
+					semanticTypes.addModifyListener(new ModifyListener() {
+						
+						@Override
+						public void modifyText(final ModifyEvent e) {
+							if (semanticTypes.getText().equals("-1")) {
+								semanticTypes.setEnabled(false);
+								allTypes.setSelection(true);
+							} else {
+								semanticTypes.setEnabled(true);
+								allTypes.setSelection(false);
+							}
+							
+						}
+					});
 					
 				}
 				{
-					allTypes = new Button(group1, SWT.PUSH | SWT.LEFT);
+					allTypes = new Button(group1, SWT.LEFT | SWT.CHECK);
 					allTypes.setText("All Types");
 					final GridData allTypesLData = new GridData();
 					allTypesLData.widthHint = 73;
@@ -231,7 +265,11 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 					allTypes.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(final SelectionEvent evt) {
-							allTypesWidgetSelected(evt);
+							if (allTypes.getSelection()) {
+								semanticTypes.setText("-1");
+							} else {
+								semanticTypes.setText("1");
+							}
 						}
 					});
 					
@@ -250,12 +288,8 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 			}
 			this.layout();
 		} catch (final Exception e) {
-			e.printStackTrace();
+			log.error("Problem while building the basicGroup composite.", e);
 		}
-	}
-	
-	private void allTypesWidgetSelected(final SelectionEvent evt) {
-		this.semanticTypes.setText("-1");
 	}
 	
 }

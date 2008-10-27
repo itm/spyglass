@@ -380,7 +380,7 @@ public class NodeObject extends DrawingObject {
 		
 		// determine the bounding box
 		return determineBoundingBox(drawingArea, upperLeft, lineWidth, width, height);
-		
+		// TODO: GC not disposed
 	}
 	
 	@Override

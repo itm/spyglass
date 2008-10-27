@@ -31,7 +31,7 @@ public class PluginXMLConfigTests {
 	public void testIsAllSemanticTypes() {
 		final PluginXMLConfig config = new PluginXMLConfigStub();
 		// config.setSemanticTypes(PluginXMLConfig.ALL_SEMANTIC_TYPES);
-		config.setAllSemanticTypes();
+		config.setSemanticTypes(new int[] { -1, 0, 10 });
 		Assert.assertTrue(config.isAllSemanticTypes());
 	}
 	

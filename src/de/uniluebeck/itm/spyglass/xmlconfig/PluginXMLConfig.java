@@ -132,6 +132,10 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Returns the list of semantic types.
+	 * 
+	 * Note that this method returns "-1" when "all semantic types" are selected.
+	 * 
 	 * @return the semanticTypes
 	 */
 	public int[] getSemanticTypes() {
@@ -145,7 +149,14 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 */
 	public void setSemanticTypes(final int[] semanticTypes) {
 		final int[] oldvalue = this.semanticTypes;
-		this.semanticTypes = semanticTypes.clone();
+		
+		// If "-1" is in the list, reduce it to that number
+		Arrays.sort(semanticTypes);
+		if (Arrays.binarySearch(semanticTypes, -1) >= 0) {
+			this.semanticTypes = new int[] { -1 };
+		} else {
+			this.semanticTypes = semanticTypes;
+		}
 		firePropertyChange("semanticTypes", oldvalue, semanticTypes);
 	}
 	
@@ -158,17 +169,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 *         packet's semantic type
 	 */
 	public boolean isAllSemanticTypes() {
-		return (semanticTypes != null) && (semanticTypes.length == 1) && (semanticTypes[0] == -1);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Sets a flag which indicates whether the plug-in using this configuration is interested all
-	 * packages independent of the packet's semantic type
-	 */
-	@Transient
-	public void setAllSemanticTypes() {
-		semanticTypes = new int[] { -1 };
+		return (semanticTypes.length == 1) && (semanticTypes[0] == -1);
 	}
 	
 	/**

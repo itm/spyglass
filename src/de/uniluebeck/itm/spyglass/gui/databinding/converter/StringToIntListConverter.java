@@ -7,6 +7,8 @@ import org.eclipse.core.databinding.conversion.Converter;
 /**
  * Converts a String representing a list of integers into an actual array.
  * 
+ * Be warned: The case of ranges with negative integers is totally untested!
+ * 
  * @author Dariush Forouher
  * 
  */
@@ -30,11 +32,19 @@ public class StringToIntListConverter extends Converter {
 		final TreeSet<Integer> set = new TreeSet<Integer>();
 		
 		for (final String p : parts) {
-			if (p.matches("\\d+")) {
+			if (p.matches("-?\\d+")) {
 				final int i = Integer.parseInt(p);
 				set.add(i);
-			} else if (p.matches("\\d+-\\d+")) {
-				final String[] q = p.split("-");
+			} else if (p.matches("-?\\d+--?\\d+")) {
+				final String[] q;
+				if (p.charAt(0) == '-') {
+					q = p.substring(1).split("-", 2);
+					// put the removed "-" back
+					q[0] = "-" + q[0];
+					q[1] = "-" + q[1];
+				} else {
+					q = p.split("-", 2);
+				}
 				final int start = Integer.parseInt(q[0]);
 				final int stop = Integer.parseInt(q[1]);
 				for (int j = start; j <= stop; j++) {
@@ -50,5 +60,4 @@ public class StringToIntListConverter extends Converter {
 		}
 		return list;
 	}
-	
 }

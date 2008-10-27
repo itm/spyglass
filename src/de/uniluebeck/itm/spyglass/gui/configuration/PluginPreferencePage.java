@@ -327,9 +327,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		
 		basicGroup = new BasicGroupComposite(composite, SWT.NONE);
 		basicGroup.disableUnwantedElements(basicOptions);
-		basicGroup.setDatabinding(dbc, config);
-		basicGroup.setDatabindingPluginName(dbc, config, this.plugin, this.spyglass
-				.getPluginManager(), this.isInstancePage());
+		basicGroup.setDatabinding(dbc, config, this.plugin, this.spyglass.getPluginManager(), this
+				.isInstancePage());
 		
 		return composite;
 	}
