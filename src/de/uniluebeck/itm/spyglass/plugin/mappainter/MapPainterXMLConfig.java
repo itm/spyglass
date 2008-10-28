@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public class MapPainterXMLConfig extends PluginXMLConfig {
 	
 	@Element
-	private float framePointDefaultValue = 3;
+	private float defaultValue = 3;
 	
 	@Element
 	private int gridElementHeight = 1;
@@ -57,7 +57,7 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	private float minValue = 0;
 	
 	@Element
-	private int numCols = 1;
+	private int width = 1;
 	
 	@Element
 	private int numFramePointsHorizontal = 3;
@@ -66,27 +66,27 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	private int numFramePointsVertical = 3;
 	
 	@Element
-	private int numRows = 1;
+	private int height = 1;
 	
 	@Element
 	private int refreshInterval = 10;
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the framePointDefaultValue
+	 * @return the defaultValue
 	 */
-	public float getFramePointDefaultValue() {
-		return framePointDefaultValue;
+	public float getDefaultValue() {
+		return defaultValue;
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @param framePointDefaultValue
-	 *            the framePointDefaultValue to set
+	 * @param defaultValue
+	 *            the defaultValue to set
 	 */
-	public void setFramePointDefaultValue(final float framePointDefaultValue) {
-		firePropertyChange("framePointDefaultValue", this.framePointDefaultValue,
-				this.framePointDefaultValue = framePointDefaultValue);
+	public void setDefaultValue(final float framePointDefaultValue) {
+		firePropertyChange("defaultValue", this.defaultValue,
+				this.defaultValue = framePointDefaultValue);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -271,18 +271,18 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return the numCols
 	 */
-	public int getNumCols() {
-		return numCols;
+	public int getWidth() {
+		return width;
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @param numCols
+	 * @param width
 	 *            the numCols to set
 	 */
-	public void setNumCols(final int numCols) {
+	public void setWidth(final int width) {
 		
-		firePropertyChange("numCols", this.numCols, this.numCols = numCols);
+		firePropertyChange("width", this.width, this.width = width);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -327,18 +327,18 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return the numRows
 	 */
-	public int getNumRows() {
-		return numRows;
+	public int getHeight() {
+		return height;
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * @param numRows
+	 * @param height
 	 *            the numRows to set
 	 */
-	public void setNumRows(final int numRows) {
+	public void setHeight(final int height) {
 		
-		firePropertyChange("numRows", this.numRows, this.numRows = numRows);
+		firePropertyChange("height", this.height, this.height = height);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -365,17 +365,15 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 			return false;
 		}
 		
-		return (framePointDefaultValue == o.framePointDefaultValue)
-				&& (gridElementHeight == o.gridElementHeight)
+		return (defaultValue == o.defaultValue) && (gridElementHeight == o.gridElementHeight)
 				&& (gridElementWidth == o.gridElementWidth) && (lowerLeftX == o.lowerLeftX)
 				&& (lowerLeftY == o.lowerLeftY)
 				&& (lockGridElementSquare == o.lockGridElementSquare)
 				&& (lockNumberOfRowsNCols == o.lockNumberOfRowsNCols)
 				&& equalsRGB(maxColorRGB, o.maxColorRGB) && (maxValue == o.maxValue)
 				&& equalsRGB(minColorRGB, o.minColorRGB) && (minValue == o.minValue)
-				&& (numCols == o.numCols)
-				&& (numFramePointsHorizontal == o.numFramePointsHorizontal)
-				&& (numFramePointsVertical == o.numFramePointsVertical) && (numRows == o.numRows)
+				&& (width == o.width) && (numFramePointsHorizontal == o.numFramePointsHorizontal)
+				&& (numFramePointsVertical == o.numFramePointsVertical) && (height == o.height)
 				&& (refreshInterval == o.refreshInterval);
 	}
 	

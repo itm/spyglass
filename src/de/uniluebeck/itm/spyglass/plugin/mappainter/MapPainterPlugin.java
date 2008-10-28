@@ -17,7 +17,9 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
+import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -27,6 +29,8 @@ public class MapPainterPlugin extends BackgroundPainterPlugin {
 	@Element(name = "parameters")
 	private final MapPainterXMLConfig xmlConfig;
 	
+	private final Layer layer = new QuadTree();
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -34,11 +38,6 @@ public class MapPainterPlugin extends BackgroundPainterPlugin {
 	public MapPainterPlugin() {
 		super(true);
 		xmlConfig = new MapPainterXMLConfig();
-	}
-	
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
 	}
 	
 	@Override
@@ -53,8 +52,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin {
 	}
 	
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
-		// TODO Auto-generated method stub
-		return new ArrayList<DrawingObject>();
+		return layer.getDrawingObjects(area);
 	}
 	
 	public static String getHumanReadableName() {

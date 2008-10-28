@@ -8,55 +8,31 @@
             <parameters>
                <isActive>true</isActive>
                <isVisible>true</isVisible>
-               <name>default</name>
+               <name>default8hh</name>
                <timeout>0</timeout>
                <semanticTypes length="1">
-                  <int>-1</int>
+                  <int>4</int>
                </semanticTypes>
-            </parameters>
-         </plugin>
-         <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
-            <parameters>
-               <isActive>true</isActive>
-               <isVisible>true</isVisible>
-               <name>default (2)</name>
-               <timeout>0</timeout>
-               <semanticTypes length="1">
-                  <int>-1</int>
-               </semanticTypes>
-               <gridElementHeight>100</gridElementHeight>
-               <gridElementWidth>100</gridElementWidth>
-               <lowerLeftX>0</lowerLeftX>
-               <lowerLeftY>0</lowerLeftY>
-               <lineColorRGB length="3">
-                  <int>139</int>
-                  <int>105</int>
-                  <int>20</int>
-               </lineColorRGB>
-               <lineWidth>3.0</lineWidth>
-               <lockGridElementsSquare>true</lockGridElementsSquare>
-               <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
-               <numCols>100</numCols>
-               <numRows>100</numRows>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
             <parameters>
                <isActive>true</isActive>
                <isVisible>true</isVisible>
-               <name>default (3)</name>
+               <name>default4</name>
                <timeout>-1</timeout>
                <semanticTypes length="1">
                   <int>-1</int>
                </semanticTypes>
                <stringFormatters>
-                  <stringFormatter nodeID="3">trtew</stringFormatter>
+                  <stringFormatter nodeID="3">zuozhuo</stringFormatter>
+                  <stringFormatter nodeID="5">ffsfwer %ds</stringFormatter>
                </stringFormatters>
                <defaultStringFormatter>fdsfsfsfs</defaultStringFormatter>
                <extendedInformation>
                   <isActive nodeID="1">true</isActive>
-                  <isActive nodeID="2">false</isActive>
-                  <isActive nodeID="3">false</isActive>
+                  <isActive nodeID="2">true</isActive>
+                  <isActive nodeID="3">true</isActive>
                </extendedInformation>
                <isExtendedDefaultValue>false</isExtendedDefaultValue>
                <lineColorRGB length="3">
@@ -72,7 +48,7 @@
    <generalSettings>
       <showRuler>true</showRuler>
       <metrics>
-         <unit>m</unit>
+         <unit>cm</unit>
          <abs2metricFactorX>1.0</abs2metricFactorX>
          <abs2metricFactorY>1.0</abs2metricFactorY>
          <abs2metricOffsetX>0.0</abs2metricOffsetX>
@@ -135,7 +111,7 @@
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
-            <framePointDefaultValue>3.0</framePointDefaultValue>
+            <defaultValue>3.0</defaultValue>
             <gridElementHeight>1</gridElementHeight>
             <gridElementWidth>1</gridElementWidth>
             <lowerLeftX>0</lowerLeftX>
@@ -147,17 +123,17 @@
                <int>0</int>
                <int>0</int>
             </maxColorRGB>
-            <maxValue>1.0</maxValue>
+            <maxValue>5.0</maxValue>
             <minColorRGB length="3">
                <int>255</int>
-               <int>255</int>
-               <int>255</int>
+               <int>0</int>
+               <int>0</int>
             </minColorRGB>
-            <minValue>0.0</minValue>
-            <numCols>1</numCols>
+            <minValue>1.0</minValue>
+            <width>1</width>
             <numFramePointsHorizontal>3</numFramePointsHorizontal>
             <numFramePointsVertical>3</numFramePointsVertical>
-            <numRows>1</numRows>
+            <height>1</height>
             <refreshInterval>10</refreshInterval>
          </parameters>
       </plugin>
@@ -192,7 +168,7 @@
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
          <parameters>
-            <isActive>true</isActive>
+            <isActive>false</isActive>
             <isVisible>true</isVisible>
             <name>default</name>
             <timeout>-1</timeout>

@@ -1,5 +1,6 @@
 package de.uniluebeck.itm.spyglass.plugin.mappainter;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -9,6 +10,8 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 public class MapPainterPreferencePage extends
 		PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> {
+	
+	private MapPainterPrefComposite optionsComposite;
 	
 	public MapPainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL);
@@ -21,7 +24,14 @@ public class MapPainterPreferencePage extends
 	
 	@Override
 	protected Composite createContents(final Composite parent) {
-		return super.createMS2Warning(parent); // TODO: plugin-specific options
+		
+		final Composite composite = super.createContents(parent);
+		
+		optionsComposite = new MapPainterPrefComposite(composite, SWT.NONE);
+		
+		optionsComposite.setDatabinding(dbc, config, spyglass, this);
+		
+		return composite;
 	}
 	
 	@Override
