@@ -19,7 +19,7 @@ public class Uint16ListPacket extends IntListPacket {
 	@Override
 	public void deserialize(final byte[] buf) throws SpyglassPacketException {
 		super.deserialize(buf);
-		if (syntaxType != Uint16ListPacket.SYNTAXTYPE) {
+		if (getSyntaxType() != Uint16ListPacket.SYNTAXTYPE) {
 			throw new SpyglassPacketException("Wrong Syntaxtype");
 		}
 		values = new int[(buf.length - SpyglassPacket.EXPECTED_PACKET_SIZE) / 2];

@@ -20,7 +20,7 @@ public class Uint8ListPacket extends IntListPacket {
 	public void deserialize(final byte[] buf) throws SpyglassPacketException {
 		
 		super.deserialize(buf);
-		if (syntaxType != Uint8ListPacket.SYNTAXTYPE) {
+		if (getSyntaxType() != Uint8ListPacket.SYNTAXTYPE) {
 			throw new SpyglassPacketException("Wrong Syntaxtype");
 		}
 		values = new int[buf.length - SpyglassPacket.EXPECTED_PACKET_SIZE];

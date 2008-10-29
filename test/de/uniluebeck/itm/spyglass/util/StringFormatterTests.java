@@ -6,10 +6,12 @@ import static org.junit.Assert.fail;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 
 /**
  * Some Testcases for the StringFormatter
@@ -19,6 +21,7 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
  */
 public class StringFormatterTests {
 	
+	private static final Logger log = SpyglassLogger.getLogger(StringFormatterTests.class);
 	private SpyglassPacket packet1 = null;
 	private SpyglassPacket packet2 = null;
 	private SpyglassPacket packet3 = null;
@@ -26,14 +29,26 @@ public class StringFormatterTests {
 	
 	@Before
 	public void setUp() throws Exception {
-		packet1 = new SpyglassPacket();
-		packet1.setPayload(new byte[] { 0x00, 0x01, 0x02 });
 		
-		packet2 = new SpyglassPacket();
-		packet2.setPayload(new byte[] { 0x00, 0x00, 0x00, 0x04 });
+		byte[] data = new byte[22];
+		System.arraycopy(new byte[] { 0x00, 0x01, 0x02 }, 0, data, 19, 3);
+		packet1 = new SpyglassPacketStub(data);
+		// packet1 = new SpyglassPacket();
+		// packet1.setPayload();
 		
-		packet3 = new SpyglassPacket();
-		packet3.setPayload(new byte[] { (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFE });
+		data = new byte[23];
+		System.arraycopy(new byte[] { 0x00, 0x00, 0x00, 0x04 }, 0, data, 19, 4);
+		packet2 = new SpyglassPacketStub(data);
+		// packet2 = new SpyglassPacket();
+		// packet2.setPayload(new byte[] { 0x00, 0x00, 0x00, 0x04 });
+		
+		data = new byte[23];
+		System.arraycopy(new byte[] { (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFE }, 0,
+				data, 19, 4);
+		packet3 = new SpyglassPacketStub(data);
+		
+		// packet3 = new SpyglassPacket();
+		// packet3.setPayload(new byte[] { (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFE });
 		
 		final ByteBuffer buf = ByteBuffer.allocate(7 * 4);
 		buf.order(ByteOrder.BIG_ENDIAN);
@@ -46,8 +61,11 @@ public class StringFormatterTests {
 		buf.putFloat(Float.MIN_VALUE); // 20
 		buf.putFloat(Float.MAX_VALUE); // 24
 		
-		packet4 = new SpyglassPacket();
-		packet4.setPayload(buf.array());
+		data = new byte[19 + buf.array().length];
+		System.arraycopy(buf.array(), 0, data, 19, buf.array().length);
+		packet4 = new SpyglassPacketStub(data);
+		// packet4 = new SpyglassPacket();
+		// packet4.setPayload(buf.array());
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -265,6 +283,31 @@ public class StringFormatterTests {
 	@Test
 	public void testParsePacket4MaxValue() {
 		testString("a: %f24", packet4, "a: " + Float.MAX_VALUE);
+	}
+	
+	private class SpyglassPacketStub extends SpyglassPacket {
+		
+		public SpyglassPacketStub(final byte[] buf) {
+			try {
+				setRawData(buf);
+			} catch (final SpyglassPacketException e) {
+				// TODO Auto-generated catch block
+				log.error("", e);
+			}
+		}
+		
+		@Override
+		public byte[] getPayload() {
+			final byte[] buf = serialize();
+			// since the length provided by the packet is not available it has to be determined
+			final int length = buf.length - 2;
+			if (length > 17) {
+				final byte[] tmpContent = new byte[length - 17];
+				System.arraycopy(buf, 19, tmpContent, 0, length - 17);
+				return tmpContent;
+			}
+			return null;
+		}
 	}
 	
 }

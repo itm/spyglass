@@ -48,6 +48,8 @@ public class Spyglass {
 	
 	private PacketReader packetReader = null;
 	
+	private PacketRecorder packetRecorder;
+	
 	private PacketProducerTask packetProducerTask = null;
 	
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
@@ -141,8 +143,9 @@ public class Spyglass {
 		pluginManager.init();
 		
 		packetReader = config.getPacketReader();
+		packetRecorder = new PacketRecorder();
 		
-		packetDispatcher = new PacketDispatcher(pluginManager);
+		packetDispatcher = new PacketDispatcher(pluginManager, packetRecorder);
 		packetProducerTask = new PacketProducerTask(this, config.getGeneralSettings()
 				.getPacketDeliveryInitialDelay());
 		
@@ -206,6 +209,14 @@ public class Spyglass {
 	// ------
 	public PacketReader getPacketReader() {
 		return packetReader;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the packetRecorder
+	 */
+	public PacketRecorder getPacketRecorder() {
+		return packetRecorder;
 	}
 	
 	// --------------------------------------------------------------------------

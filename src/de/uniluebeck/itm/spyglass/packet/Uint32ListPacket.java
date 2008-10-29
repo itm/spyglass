@@ -19,7 +19,7 @@ public class Uint32ListPacket extends LongListPacket {
 	@Override
 	public void deserialize(final byte[] buf) throws SpyglassPacketException {
 		super.deserialize(buf);
-		if (syntaxType != Uint32ListPacket.SYNTAXTYPE) {
+		if (getSyntaxType() != Uint32ListPacket.SYNTAXTYPE) {
 			throw new SpyglassPacketException("Wrong Syntaxtype");
 		}
 		values = new long[(buf.length - SpyglassPacket.EXPECTED_PACKET_SIZE) / 4];

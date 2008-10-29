@@ -20,7 +20,7 @@ public class FloatListPacket extends SpyglassPacket {
 	@Override
 	public void deserialize(final byte[] buf) throws SpyglassPacketException {
 		super.deserialize(buf);
-		if (syntaxType != FloatListPacket.SYNTAXTYPE) {
+		if (getSyntaxType() != FloatListPacket.SYNTAXTYPE) {
 			throw new SpyglassPacketException("Wrong Syntaxtype");
 		}
 		values = new float[(buf.length - SpyglassPacket.EXPECTED_PACKET_SIZE) / 4];

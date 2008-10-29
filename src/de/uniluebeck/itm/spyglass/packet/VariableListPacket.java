@@ -26,7 +26,7 @@ public class VariableListPacket extends SpyglassPacket {
 	public void deserialize(final byte[] buf) throws SpyglassPacketException {
 		values.clear();
 		super.deserialize(buf);
-		if (syntaxType != VariableListPacket.SYNTAXTYPE) {
+		if (getSyntaxType() != VariableListPacket.SYNTAXTYPE) {
 			throw new SpyglassPacketException("Wrong Syntaxtype");
 		}
 		for (int i = SpyglassPacket.EXPECTED_PACKET_SIZE; i < buf.length; i++) {

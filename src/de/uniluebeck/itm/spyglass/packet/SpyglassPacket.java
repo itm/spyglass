@@ -12,45 +12,8 @@ public class SpyglassPacket {
 	 */
 	public static final int EXPECTED_PACKET_SIZE = 18;
 	
-	/**
-	 * Number of bytes in this packet (excluding this field).
-	 */
-	protected int length;
-	
-	/**
-	 * Version if this packet. should always be 02.
-	 */
-	protected int version;
-	
-	/**
-	 * Syntax type of this spyglass packet.
-	 */
-	protected SyntaxTypes syntaxType;
-	
-	/**
-	 * Semantic type of this spyglass packet.
-	 */
-	protected int semanticType;
-	
-	/**
-	 * Sender ID of this spyglass packet.
-	 */
-	protected int senderId;
-	
-	/**
-	 * Timestamp of this spyglass packet.
-	 */
-	protected Time time;
-	
-	/**
-	 * positon of this spyglass packet.
-	 */
-	private AbsolutePosition position;
-	
-	/**
-	 * The payload
-	 */
-	private byte[] payload;
+	/** The packets raw data */
+	private byte[] rawData;
 	
 	/**
 	 * Deserializes a Spyglass Packet.
@@ -59,40 +22,24 @@ public class SpyglassPacket {
 	 * @throws SpyglassPacketException
 	 */
 	void deserialize() throws SpyglassPacketException {
-		deserialize(getPayload());
+		deserialize(rawData);
 	}
 	
 	/**
 	 * Deserializes a Spyglass Packet
 	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param buf
+	 * @param rawData
 	 *            Byte Array of the Packet
 	 * @throws SpyglassPacketException
 	 */
 	void deserialize(final byte[] buf) throws SpyglassPacketException {
-		length = deserializeUint16(buf[0], buf[1]);
-		if (length + 2 != buf.length) {
+		rawData = buf;
+		
+		if (deserializeUint16(rawData[0], rawData[1]) + 2 != rawData.length) {
 			throw new SpyglassPacketException("Wrong SpyglassPacket-Size");
 		}
-		version = deserializeUint8(buf[2]);
-		syntaxType = SyntaxTypes.toEnum(deserializeUint8(buf[3]));
-		semanticType = deserializeUint8(buf[4]);
-		senderId = deserializeUint16(buf[5], buf[6]);
-		time = new Time();
-		time.sec_ = deserializeUint32(buf[7], buf[8], buf[9], buf[10]);
-		time.ms_ = deserializeUint16(buf[11], buf[12]);
-		final int x = deserializeInt16(buf[13], buf[14]);
-		final int y = deserializeInt16(buf[15], buf[16]);
-		final int z = deserializeInt16(buf[17], buf[18]);
-		this.position = new AbsolutePosition(x, y, z);
 		
-		// copy the packets payload (starts at buf[19]) as content
-		if (length > 17) {
-			final byte[] tmpContent = new byte[length - 17];
-			System.arraycopy(buf, 19, tmpContent, 0, length - 17);
-			setPayload(tmpContent);
-		}
 	}
 	
 	/**
@@ -207,9 +154,24 @@ public class SpyglassPacket {
 	 */
 	@Override
 	public String toString() {
-		return "length:" + length + ", syntax_type:" + syntaxType + ", semantic_type:"
-				+ semanticType + ", sender_id:" + senderId + ",time: " + time.toString()
-				+ ", Position:" + position;
+		return "length:" + getLength() + ", syntax_type:" + getSyntaxType() + ", semantic_type:"
+				+ getSemanticType() + ", sender_id:" + getSenderId() + ",time: "
+				+ getTime().toString() + ", Position:" + getPosition();
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param rawData
+	 *            the rawData to set
+	 * @exception SpyglassPacketException
+	 *                will be thrown if the data was already set previously
+	 */
+	protected void setRawData(final byte[] rawData) throws SpyglassPacketException {
+		if (this.rawData == null) {
+			this.rawData = rawData;
+		} else {
+			throw new SpyglassPacketException("Resetting the packets contents is not allowed");
+		}
 	}
 	
 	/**
@@ -219,18 +181,7 @@ public class SpyglassPacket {
 	 * @return the length
 	 */
 	public int getLength() {
-		return length;
-	}
-	
-	/**
-	 * Property setter
-	 * 
-	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param length
-	 *            the length to set
-	 */
-	public void setLength(final int length) {
-		this.length = length;
+		return deserializeUint16(rawData[0], rawData[1]);
 	}
 	
 	/**
@@ -240,18 +191,7 @@ public class SpyglassPacket {
 	 * @return the syntax_type
 	 */
 	public SyntaxTypes getSyntaxType() {
-		return syntaxType;
-	}
-	
-	/**
-	 * Property setter
-	 * 
-	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param syntaxType
-	 *            the syntax_type to set
-	 */
-	public void setSyntaxType(final SyntaxTypes syntaxType) {
-		this.syntaxType = syntaxType;
+		return SyntaxTypes.toEnum(deserializeUint8(rawData[3]));
 	}
 	
 	/**
@@ -261,18 +201,7 @@ public class SpyglassPacket {
 	 * @return the semantic_type
 	 */
 	public int getSemanticType() {
-		return semanticType;
-	}
-	
-	/**
-	 * Property setter
-	 * 
-	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param semanticType
-	 *            the semanticType to set
-	 */
-	public void setSemanticType(final int semanticType) {
-		this.semanticType = semanticType;
+		return deserializeUint8(rawData[4]);
 	}
 	
 	/**
@@ -282,18 +211,7 @@ public class SpyglassPacket {
 	 * @return the senderId
 	 */
 	public int getSenderId() {
-		return senderId;
-	}
-	
-	/**
-	 * Property setter
-	 * 
-	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param senderId
-	 *            the sender_id to set
-	 */
-	public void setSenderId(final int senderId) {
-		this.senderId = senderId;
+		return deserializeUint16(rawData[5], rawData[6]);
 	}
 	
 	/**
@@ -303,18 +221,20 @@ public class SpyglassPacket {
 	 * @return the time
 	 */
 	public Time getTime() {
+		final Time time = new Time();
+		time.sec_ = deserializeUint32(rawData[7], rawData[8], rawData[9], rawData[10]);
+		time.ms_ = deserializeUint16(rawData[11], rawData[12]);
 		return time;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
-	 * Property setter
+	 * Property getter
 	 * 
-	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param time
-	 *            the time to set
+	 * @return the version
 	 */
-	public void setTime(final Time time) {
-		this.time = time;
+	public int getVersion() {
+		return deserializeUint8(rawData[2]);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -322,7 +242,10 @@ public class SpyglassPacket {
 	 * @return the position
 	 */
 	public AbsolutePosition getPosition() {
-		return position;
+		final int x = deserializeInt16(rawData[13], rawData[14]);
+		final int y = deserializeInt16(rawData[15], rawData[16]);
+		final int z = deserializeInt16(rawData[17], rawData[18]);
+		return new AbsolutePosition(x, y, z);
 	}
 	
 	// --------------------------------------------------------------------------
@@ -331,16 +254,39 @@ public class SpyglassPacket {
 	 * Return the payload of the packet
 	 */
 	public byte[] getPayload() {
-		return payload;
+		final int length = getLength();
+		if (length > 17) {
+			final byte[] tmpContent = new byte[length - 17];
+			System.arraycopy(rawData, 19, tmpContent, 0, length - 17);
+			return tmpContent;
+		}
+		return null;
 	}
 	
-	// --------------------------------------------------------------------------
-	// ------
+	// --------------------------------------------------------------------------------
 	/**
-	 * Set the payload of the packet
+	 * @return the header
 	 */
-	public void setPayload(final byte[] content) {
-		this.payload = content;
+	public byte[] getHeader() {
+		if (getLength() > 17) {
+			final byte[] headerContent = new byte[18];
+			System.arraycopy(rawData, 0, headerContent, 0, 18);
+			return headerContent;
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns the serialized the packet
+	 * 
+	 * @return the serialized packet
+	 */
+	public byte[] serialize() {
+		// final byte[] buffer = new byte[header.length + payload.length + 1];
+		// System.arraycopy(header, 0, buffer, 0, header.length);
+		// System.arraycopy(payload, 0, buffer, header.length + 1, payload.length);
+		// return buffer;
+		return rawData;
 	}
 	
 }

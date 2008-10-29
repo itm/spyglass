@@ -80,8 +80,14 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	
 	private IShellToSpyGlassPacketBroker packetBroker;
 	
+	/**
+	 * Indicates whether the system is in playback mode or not.<br>
+	 * If the system is in playback mode, the packets which are received via
+	 * {@link PluginSpyGlass2iShell#receivePacket(MessagePacket)} will be ignored.
+	 */
+	private boolean playbackMode = false;
+	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * 
 	 */
@@ -89,7 +95,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		private final de.uniluebeck.itm.spyglass.plugin.Plugin plugin;
 		
 		// ----------------------------------------------------------------------
-		// ----------
 		/**
 		 * 
 		 */
@@ -103,7 +108,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		}
 		
 		// ----------------------------------------------------------------------
-		// ----------
 		/**
 		 * 
 		 */
@@ -122,7 +126,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * 
 	 */
@@ -185,7 +188,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		addToolBarAction(new PlayPlayPauseAction(spyglass));
 		addToolBarAction(new PlayResetAction());
 		addToolBarAction(new RecordSelectOutputAction());
-		addToolBarAction(new RecordRecordAction());
+		addToolBarAction(new RecordRecordAction(spyglass));
 		addToolBarAction(new ZoomInAction(appWindow.getGui().getDrawingArea()));
 		addToolBarAction(new ZoomOutAction(appWindow.getGui().getDrawingArea()));
 		addToolBarAction(new ZoomCompleteMapAction(spyglass, appWindow.getGui().getDrawingArea()));
@@ -201,7 +204,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * 
 	 */
@@ -209,32 +211,34 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	public void receivePacket(final MessagePacket packet) {
 		log.debug("receivePacket called from iShell");
 		
-		if (isPaused()) {
-			return;
+		// if the system is in playback mode, packets send by iShell will be ignored
+		if (!playbackMode) {
+			
+			if (isPaused()) {
+				return;
+			}
+			SpyglassPacket spyglassPacket = null;
+			try {
+				spyglassPacket = PacketFactory.createInstance(packet.getContent());
+			} catch (final SpyglassPacketException e) {
+				log.error("Illegal Packet, could not deserialize it.", e);
+				return;
+			}
+			
+			log.debug("Received Packet in Spyglass from iShell: " + spyglassPacket);
+			
+			packetBroker.push(spyglassPacket);
 		}
-		SpyglassPacket spyglassPacket = null;
-		try {
-			spyglassPacket = PacketFactory.createInstance(packet.getContent());
-		} catch (final SpyglassPacketException e) {
-			log.error("Illegal Packet, could not deserialize it.", e);
-			return;
-		}
-		
-		log.debug("Received Packet in spyglass from ishell: " + spyglassPacket);
-		
-		packetBroker.push(spyglassPacket);
-		
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
-	 * TODO: shutdown of the other thread doesn't work correcty...
+	 * TODO: shutdown of the other thread doesn't work correctly...
 	 */
 	@Override
 	public void shutdown() {
 		
-		// if SpyGlass was not started correctly it migt still be null
+		// if SpyGlass was not started correctly it might still be null
 		if (spyglass != null) {
 			spyglass.shutdown();
 		}
@@ -245,7 +249,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * 
 	 */
@@ -255,7 +258,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	}
 	
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * 
 	 */
