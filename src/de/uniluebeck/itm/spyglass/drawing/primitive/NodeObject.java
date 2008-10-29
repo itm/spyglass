@@ -344,13 +344,13 @@ public class NodeObject extends DrawingObject {
 		
 		// since the rectangle's line is spread according to its width with the actual position in
 		// it's center, the upper left position of the bounding box has to adapt to this
-		final int bbUpperLeftX = upperLeft.x - lineWidth / 2 + 1;
-		final int bbUpperLeftY = upperLeft.y - lineWidth / 2 + 1;
+		final int bbUpperLeftX = upperLeft.x - lineWidth / 2 - 1;
+		final int bbUpperLeftY = upperLeft.y - lineWidth / 2 - 1;
 		
 		// the line width has to be counted twice because two lines with the same width are drawn on
 		// the drawing area
-		final int bbWidht = width + lineWidth;
-		final int bbHeight = height + lineWidth;
+		final int bbWidht = width + 2 * lineWidth;
+		final int bbHeight = height + 2 * lineWidth;
 		final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht,
 				bbHeight);
 		

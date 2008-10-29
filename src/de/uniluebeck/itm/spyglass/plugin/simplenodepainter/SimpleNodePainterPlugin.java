@@ -411,12 +411,13 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	@Override
 	public void reset() {
-		for (final DrawingObject d : layer.getDrawingObjects()) {
-			fireDrawingObjectRemoved(d);
-		}
 		
 		synchronized (layer) {
 			layer.clear();
+		}
+		
+		for (final DrawingObject d : layer.getDrawingObjects()) {
+			fireDrawingObjectRemoved(d);
 		}
 		
 		synchronized (updatedObjects) {
