@@ -10,6 +10,7 @@ package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -76,7 +77,12 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 */
 	private final Set<DrawingObject> updatedObjects;
 	
+	/** Objects which are not needed any longer */
+	private final Set<DrawingObject> obsoleteObjects;
+	
 	private Map<Integer, Map<Integer, String>> stringFormatterResults;
+	
+	private Map<Integer, AbsoluteRectangle> boundingBoxes;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -87,7 +93,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		xmlConfig = new SimpleNodePainterXMLConfig();
 		layer = new QuadTree();
 		updatedObjects = new HashSet<DrawingObject>();
+		obsoleteObjects = new HashSet<DrawingObject>();
 		stringFormatterResults = new TreeMap<Integer, Map<Integer, String>>();
+		boundingBoxes = new HashMap<Integer, AbsoluteRectangle>();
 	}
 	
 	@Override
@@ -100,6 +108,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			updatedObjects.clear();
 		}
 		stringFormatterResults.clear();
+		boundingBoxes.clear();
 		xmlConfig.finalize();
 	}
 	
@@ -198,12 +207,12 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			final String strinFormatterString = xmlConfig.getDefaultStringFormatter();
 			if ((strinFormatterString != null) && !strinFormatterString.equals("")) {
 				stringFormatter = new StringFormatter(strinFormatterString);
-				if (stringFormatter != null) {
-					// parses the packet. The resulting string will be stored separately
-					final String str = stringFormatter.parse(packet);
-					updateStringFormatterResults(-1, packetSemanticType + ": " + str, nodeID);
-					needsUpdate = true;
-				}
+				
+				// parses the packet. The resulting string will be stored separately
+				final String str = stringFormatter.parse(packet);
+				updateStringFormatterResults(-1, packetSemanticType + ": " + str, nodeID);
+				needsUpdate = true;
+				
 			}
 			// check if a StringFormatter exists which was designed to process the semantic type of
 			// the packet. If so, use it to parse the packet
@@ -273,12 +282,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			final List<DrawingObject> drawingObjects) {
 		
 		NodeObject nodeObject = null;
+		DrawingArea drawingArea = null;
 		
 		// if there is already an instance of the node's visualization
 		// available in the quadTree it has to be updated
 		for (final DrawingObject drawingObject : drawingObjects) {
 			if (drawingObject instanceof NodeObject) {
 				nodeObject = (NodeObject) drawingObject;
+				drawingArea = nodeObject.getDrawingArea();
 				
 				// if the matching node is found ...
 				if (nodeObject.getNodeID() == nodeID) {
@@ -296,8 +307,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
-		return new NodeObject(nodeID, "Node " + nodeID, stringFormatterResult, isExtended,
-				lineColorRGB, lineWidth);
+		final NodeObject no = new NodeObject(nodeID, "Node " + nodeID, stringFormatterResult,
+				isExtended, lineColorRGB, lineWidth, drawingArea);
+		boundingBoxes.put(no.getId(), new AbsoluteRectangle(no.getBoundingBox()));
+		return no;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -438,19 +451,47 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			updatedObjects.clear();
 		}
 		
-		// if no drawing objects are available, there is no need to get the
-		// layer's lock
-		if (update.size() == 0) {
-			return;
+		final List<DrawingObject> obsolete = new LinkedList<DrawingObject>();
+		synchronized (obsoleteObjects) {
+			obsolete.addAll(obsoleteObjects);
+			obsoleteObjects.clear();
 		}
 		
+		// if no drawing objects are available, there is no need to get the
+		// layer's lock
+		if ((update.size() == 0) && (obsolete.size() == 0)) {
+			return;
+		}
+		AbsoluteRectangle oldBB;
 		// catch the layer's lock and update the objects
 		synchronized (layer) {
 			for (final DrawingObject drawingObject : update) {
 				layer.addOrUpdate(drawingObject);
-				fireDrawingObjectAdded(drawingObject); // TODO
+			}
+			
+			for (final DrawingObject drawingObject : obsolete) {
+				layer.remove(drawingObject);
 			}
 		}
+		
+		// after the lock was returned it is time to update the display ...
+		for (final DrawingObject drawingObject : update) {
+			if ((oldBB = boundingBoxes.get(drawingObject.getId())) != null) {
+				fireDrawingObjectChanged(drawingObject, oldBB);
+				boundingBoxes.put(drawingObject.getId(), new AbsoluteRectangle(drawingObject
+						.getBoundingBox()));
+			} else {
+				fireDrawingObjectAdded(drawingObject);
+				boundingBoxes.put(drawingObject.getId(), new AbsoluteRectangle(drawingObject
+						.getBoundingBox()));
+			}
+		}
+		
+		for (final DrawingObject drawingObject : obsolete) {
+			fireDrawingObjectRemoved(drawingObject);
+			boundingBoxes.remove(drawingObject.getId());
+		}
+		
 	}
 	
 	@Override
@@ -464,8 +505,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) {
 		
 		// get the objects to draw
-		final List<DrawingObject> dos = new LinkedList<DrawingObject>(layer
-				.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle()));
+		final List<DrawingObject> dos = new LinkedList<DrawingObject>();
+		synchronized (layer) {
+			dos.addAll(layer.getDrawingObjects(drawingArea.getAbsoluteDrawingRectangle()));
+		}
 		
 		final Point clickPoint = new Point(e.x, e.y);
 		
@@ -491,6 +534,38 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 		
 		return false;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Handles the timeout of a node.<br>
+	 * That means that the node will not be painted any longer.
+	 * 
+	 * @param nodeID
+	 *            the node's identifier
+	 */
+	public void handleNodeTimeout(final int nodeID) {
+		
+		// get all the layer's drawing objects
+		final List<DrawingObject> dos = new LinkedList<DrawingObject>();
+		synchronized (layer) {
+			dos.addAll(layer.getDrawingObjects());
+		}
+		
+		// look for the node object with the matching identifier
+		for (final DrawingObject drawingObject : dos) {
+			if ((drawingObject instanceof NodeObject)
+					&& (((NodeObject) drawingObject).getNodeID() == nodeID)) {
+				
+				// if the object was found, put it into the set of objects to be removed
+				synchronized (obsoleteObjects) {
+					obsoleteObjects.add(drawingObject);
+				}
+				// remove the object by calling updateQuadTree() and return
+				updateQuadTree();
+				return;
+			}
+		}
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -523,13 +598,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				if (drawingObject instanceof NodeObject) {
 					// if so, toggle its extension state
 					final NodeObject no = (NodeObject) drawingObject;
-					final AbsoluteRectangle oldBBox = no.getBoundingBox();
-					no.setExtended(!no.isExtended(), drawingArea);
+					no.setExtended(!no.isExtended());
 					xmlConfig.putExtendedInformationActive(no.getNodeID(), no.isExtended());
-					// TODO: the quadtree must be updated, since the dimensions of the NodeObject
-					// may have changed.
-					// TODO: BUG! the new BoundingBox in no is not yet updated! --> display error
-					fireDrawingObjectChanged(no, oldBBox);
+					updatedObjects.add(no);
+					updateQuadTree();
 				}
 				return true;
 			}
@@ -561,7 +633,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if (bbox.contains(clickPoint)) {
 				synchronized (layer) {
 					layer.bringToFront(drawingObject);
-					fireDrawingObjectAdded(drawingObject); // TODO
+					// since the old and the new bounding box are equal, the map needs no update
+					fireDrawingObjectChanged(drawingObject, boundingBoxes
+							.get(drawingObject.getId()));
 				}
 				return true;
 			}
@@ -593,7 +667,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if (bbox.contains(clickPoint)) {
 				synchronized (layer) {
 					layer.pushBack(drawingObject);
-					fireDrawingObjectAdded(drawingObject); // TODO
+					// since the old and the new bounding box are equal, the map needs no update
+					fireDrawingObjectChanged(drawingObject, boundingBoxes
+							.get(drawingObject.getId()));
 				}
 				return true;
 			}

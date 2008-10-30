@@ -37,6 +37,10 @@ public class NodeObject extends DrawingObject {
 	
 	private AbsoluteRectangle boundingBox;
 	
+	private Object drawingAreaMutex = new Object();
+	
+	private DrawingArea drawingArea;
+	
 	/**
 	 * True, if this nodeobject has registered <code>drawingAreaListener</code> with the drawing
 	 * area.
@@ -48,36 +52,14 @@ public class NodeObject extends DrawingObject {
 	 * that we always return a correct bounding box, we listen for changes in the drawing area and
 	 * update the bounding box accordingly.
 	 * 
-	 * Note: this hack is only neccessary, since a NodeObject "doesn't zoom". Most other
+	 * Note: this hack is only necessary, since a NodeObject "doesn't zoom". Most other
 	 * DrawingObjects don't have to bother.
-	 * 
-	 * TODO: there is a lot of code duplication between this method and draw().
 	 */
 	private DrawingAreaTransformListener drawingAreaListener = new DrawingAreaTransformListener() {
 		
 		@Override
 		public void handleEvent(final DrawingAreaTransformEvent e) {
-			// get the information to be displayed
-			final String string = getInformationString();
-			
-			// determine the size parameters of the rectangle which represents the node in respect
-			// to the sting to be displayed
-			final org.eclipse.swt.graphics.Image temp = new org.eclipse.swt.graphics.Image(
-					e.drawingArea.getDisplay(), 500, 500);
-			final GC tempGC = new GC(temp);
-			final Point size = tempGC.textExtent(string == null ? "" : string);
-			final int width = size.x + lineWidth + 1; // +1 for correct display with uneven line
-			// width
-			final int height = size.y + lineWidth + 1;
-			
-			// get the node's position in the drawing area
-			final PixelPosition upperLeft = e.drawingArea.absPoint2PixelPoint(getPosition());
-			
-			// determine the bounding box
-			boundingBox = determineBoundingBox(e.drawingArea, upperLeft, lineWidth, width, height);
-			
-			tempGC.dispose();
-			temp.dispose();
+			setDrawingArea(e.drawingArea);
 		}
 	};
 	
@@ -91,7 +73,7 @@ public class NodeObject extends DrawingObject {
 	 *            the denotation of the visualization
 	 */
 	public NodeObject(final int nodeID, final String denotation) {
-		this(nodeID, denotation, null, false);
+		this(nodeID, denotation, null, false, null);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -107,10 +89,14 @@ public class NodeObject extends DrawingObject {
 	 *            in extended mode)
 	 * @param isExtended
 	 *            indicates if the extended mode is active
+	 * @param drawingArea
+	 *            the currently active drawing area
 	 */
 	public NodeObject(final int nodeID, final String denotation,
-			final String stringFormatterResult, final boolean isExtended) {
-		this(nodeID, denotation, stringFormatterResult, isExtended, new int[] { 255, 0, 0 }, 1);
+			final String stringFormatterResult, final boolean isExtended,
+			final DrawingArea drawingArea) {
+		this(nodeID, denotation, stringFormatterResult, isExtended, new int[] { 255, 0, 0 }, 1,
+				drawingArea);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -130,10 +116,12 @@ public class NodeObject extends DrawingObject {
 	 *            the line colo's RGB values
 	 * @param lineWidth
 	 *            the line's width
+	 * @param drawingArea
+	 *            the currently active drawing area
 	 */
 	public NodeObject(final int nodeID, final String denotation,
 			final String stringFormatterResult, final boolean isExtended, final int[] lineColorRGB,
-			final int lineWidth) {
+			final int lineWidth, final DrawingArea drawingArea) {
 		super();
 		super.setId((int) new Date().getTime());
 		this.nodeID = nodeID;
@@ -142,7 +130,39 @@ public class NodeObject extends DrawingObject {
 		this.isExtended = isExtended;
 		this.lineWidth = lineWidth;
 		this.setColor(lineColorRGB[0], lineColorRGB[1], lineColorRGB[2]);
+		setDrawingArea(drawingArea);
 		
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the drawingArea
+	 */
+	public DrawingArea getDrawingArea() {
+		synchronized (drawingAreaMutex) {
+			return drawingArea;
+		}
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param drawingArea
+	 *            the drawingArea to set
+	 */
+	void setDrawingArea(final DrawingArea drawingArea) {
+		synchronized (drawingAreaMutex) {
+			this.drawingArea = drawingArea;
+		}
+		updateBoundingBox();
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param boundingBox
+	 *            the boundingBox to set
+	 */
+	private void setBoundingBox(final AbsoluteRectangle boundingBox) {
+		this.boundingBox = boundingBox;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -168,6 +188,7 @@ public class NodeObject extends DrawingObject {
 		this.isExtended = isExtended;
 		this.lineWidth = lineWidth;
 		this.setColor(lineColorRGB[0], lineColorRGB[1], lineColorRGB[2]);
+		updateBoundingBox();
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -184,7 +205,10 @@ public class NodeObject extends DrawingObject {
 	 *            the denotation to set
 	 */
 	public void setDenotation(final String denotation) {
-		this.denotation = denotation;
+		if ((this.denotation == null) || !this.denotation.equals(denotation)) {
+			this.denotation = denotation;
+			updateBoundingBox();
+		}
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -210,6 +234,7 @@ public class NodeObject extends DrawingObject {
 	 */
 	public void setDescription(final String stringFormatterResult) {
 		this.stringFormatterResult = stringFormatterResult;
+		updateBoundingBox();
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -226,12 +251,11 @@ public class NodeObject extends DrawingObject {
 	 * 
 	 * @param isExtended
 	 *            if <code>true</code> the information will be displayed
-	 * @param drawingArea
-	 *            the current drawing area
 	 */
-	public void setExtended(final boolean isExtended, final DrawingArea drawingArea) {
+	public void setExtended(final boolean isExtended) {
 		this.isExtended = isExtended;
-		boundingBox = determineBoundingBox(drawingArea);
+		updateBoundingBox();
+		// boundingBox = determineBoundingBox(drawingArea);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -249,6 +273,7 @@ public class NodeObject extends DrawingObject {
 	 */
 	public void setLineWidth(final int lineWidth) {
 		this.lineWidth = lineWidth;
+		updateBoundingBox();
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -280,28 +305,47 @@ public class NodeObject extends DrawingObject {
 		// determine the size parameters of the rectangle which represents the node in respect to
 		// the sting to be displayed
 		final Point size = gc.textExtent(string);
-		final int width = size.x + lineWidth + 1; // +1 for correct display with uneven line width
-		final int height = size.y + lineWidth + 1;
+		final int width = size.x + lineWidth + 3; // +1 for correct display with uneven line width
+		final int height = size.y + lineWidth + 3; // and +2 for the oval to be drawn
 		
 		// get the node's position in the drawing area
 		final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(this.getPosition());
 		
-		// determine the bounding box
-		boundingBox = determineBoundingBox(drawingArea, upperLeft, lineWidth, width, height);
+		// the rectangles upper left pint will be in the middle of the surrounding line. Since the
+		// rectangle's upper left edge represents the object location, it has to be adapted
+		final PixelPosition upperLeftRect = new PixelPosition(upperLeft.x + lineWidth / 2,
+				upperLeft.y + lineWidth / 2);
+		
+		// determine the bounding box (this time use the objects upper left point and not the
+		// adapted one
+		// boundingBox = determineBoundingBox(drawingArea, upperLeft, lineWidth, width, height);
+		updateBoundingBox();
 		
 		// the new rectangle starts at the determined upper left position. Its with and height was
 		// determined in respect to the text which is to be displayed
-		final PixelRectangle pxRect = new PixelRectangle(upperLeft, width, height);
+		final PixelRectangle pxRect = new PixelRectangle(upperLeftRect, width, height);
 		gc.fillRectangle(pxRect.toSWTRectangle());
 		gc.drawRectangle(pxRect.toSWTRectangle());
 		
 		// place the string inside the rectangle with respect to the side effects of the line width
 		// (see above)
-		gc.drawText(string, 1 + upperLeft.x + lineWidth / 2, 1 + upperLeft.y + lineWidth / 2);
+		gc.drawText(string, 3 + upperLeftRect.x + lineWidth / 2, 3 + upperLeftRect.y + lineWidth
+				/ 2);
+		
+		// draw an oval to indicate that the objects location is the rectangles upper left edge
+		gc.setLineWidth(lineWidth + 1);
+		gc.drawOval(upperLeftRect.x, upperLeftRect.y, 3, 3);
+		// gc.setLineWidth(4);
+		// final Color black = new Color(null, 0, 0, 0);
+		// gc.setForeground(black);
+		// draw an oval to indicate that the objects location is the rectangles upper left edge
+		// gc.drawOval(upperLeft.x, upperLeft.y, 3, 3);
+		// black.dispose();
 		
 		// dispose the no longer used colors
 		color.dispose();
 		bg.dispose();
+		setDrawingArea(drawingArea);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -313,7 +357,7 @@ public class NodeObject extends DrawingObject {
 	 * 
 	 * @return a string which is to be displayed in the node object
 	 */
-	private String getInformationString() {
+	String getInformationString() {
 		// get the detailed information by querying the string formatter
 		final String descriptionString = (stringFormatterResult == null) ? ""
 				: stringFormatterResult.toString();
@@ -323,64 +367,107 @@ public class NodeObject extends DrawingObject {
 		return string;
 	}
 	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Returns the object's bounding box in absolute coordinate values
-	 * 
-	 * @param drawingArea
-	 *            the current drawing area
-	 * @param upperLeft
-	 *            the upper left pixel position
-	 * @param lineWidth
-	 *            the object's line width (in pixel)
-	 * @param width
-	 *            the object's width (in pixel)
-	 * @param height
-	 *            the object's height (in pixel)
-	 * @return the object's bounding box in absolute coordinate values
-	 */
-	public static AbsoluteRectangle determineBoundingBox(final DrawingArea drawingArea,
-			final PixelPosition upperLeft, final int lineWidth, final int width, final int height) {
-		
-		// since the rectangle's line is spread according to its width with the actual position in
-		// it's center, the upper left position of the bounding box has to adapt to this
-		final int bbUpperLeftX = upperLeft.x - lineWidth / 2 - 1;
-		final int bbUpperLeftY = upperLeft.y - lineWidth / 2 - 1;
-		
-		// the line width has to be counted twice because two lines with the same width are drawn on
-		// the drawing area
-		final int bbWidht = width + 2 * lineWidth;
-		final int bbHeight = height + 2 * lineWidth;
-		final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht,
-				bbHeight);
-		
-		return drawingArea.pixelRect2AbsRect(bbArea);
-	}
+	// // --------------------------------------------------------------------------------
+	// /**
+	// * Returns the object's bounding box in absolute coordinate values
+	// *
+	// * @param drawingArea
+	// * the current drawing area
+	// * @param upperLeft
+	// * the upper left pixel position
+	// * @param lineWidth
+	// * the object's line width (in pixel)
+	// * @param width
+	// * the object's width (in pixel)
+	// * @param height
+	// * the object's height (in pixel)
+	// * @return the object's bounding box in absolute coordinate values
+	// */
+	// public static AbsoluteRectangle determineBoundingBox(final DrawingArea drawingArea,
+	// final PixelPosition upperLeft, final int lineWidth, final int width, final int height) {
+	//		
+	// // since the rectangle's line is spread according to its width with the actual position in
+	// // it's center, the upper left position of the bounding box has to adapt to this
+	// final int bbUpperLeftX = upperLeft.x - lineWidth / 2 - 1;
+	// final int bbUpperLeftY = upperLeft.y - lineWidth / 2 - 1;
+	//		
+	// // the line width has to be counted twice because two lines with the same width are drawn on
+	// // the drawing area
+	// final int bbWidht = width + 2 * lineWidth;
+	// final int bbHeight = height + 2 * lineWidth;
+	// final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht,
+	// bbHeight);
+	//		
+	// return drawingArea.pixelRect2AbsRect(bbArea);
+	// }
+	//	
+	// // --------------------------------------------------------------------------------
+	// /**
+	// * Returns the object's bounding box in absolute coordinate values
+	// *
+	// * @param drawingArea
+	// * the current drawing area
+	// * @return the object's bounding box in absolute coordinate values
+	// */
+	// public AbsoluteRectangle determineBoundingBox(final DrawingArea drawingArea) {
+	//		
+	// // get the information to be displayed
+	// final String string = getInformationString();
+	//		
+	// // determine the size parameters of the rectangle which represents the node in respect to
+	// // the sting to be displayed
+	// final Point size = new GC(Display.getCurrent()).textExtent(string);
+	// final int width = size.x + lineWidth + 1; // +1 for correct display with uneven line width
+	// final int height = size.y + lineWidth + 1;
+	//		
+	// final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(this.getPosition());
+	//		
+	// // determine the bounding box
+	// return determineBoundingBox(drawingArea, upperLeft, lineWidth, width, height);
+	// }
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the object's bounding box in absolute coordinate values
-	 * 
-	 * @param drawingArea
-	 *            the current drawing area
-	 * @return the object's bounding box in absolute coordinate values
+	 * Updates the object's boundingBox
 	 */
-	public AbsoluteRectangle determineBoundingBox(final DrawingArea drawingArea) {
+	public void updateBoundingBox() {
 		
-		// get the information to be displayed
-		final String string = getInformationString();
-		
-		// determine the size parameters of the rectangle which represents the node in respect to
-		// the sting to be displayed
-		final Point size = new GC(Display.getCurrent()).textExtent(string);
-		final int width = size.x + lineWidth + 1; // +1 for correct display with uneven line width
-		final int height = size.y + lineWidth + 1;
-		
-		final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(this.getPosition());
-		
-		// determine the bounding box
-		return determineBoundingBox(drawingArea, upperLeft, lineWidth, width, height);
-		// TODO: GC not disposed
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				final DrawingArea drawingArea = getDrawingArea();
+				if (drawingArea == null) {
+					return;
+				}
+				// get the information to be displayed
+				final String string = getInformationString();
+				final int lineWidth = getLineWidth();
+				// determine the size parameters of the rectangle which represents the node in
+				// respect to
+				// the sting to be displayed
+				final Point size = new GC(Display.getCurrent()).textExtent(string);
+				final int width = size.x + lineWidth + 3; // +3: see above
+				final int height = size.y + lineWidth + 3;
+				
+				final PixelPosition upperLeft = getDrawingArea().absPoint2PixelPoint(getPosition());
+				
+				// since the rectangle's line is spread according to its width with the actual
+				// position in
+				// it's center, the upper left position of the bounding box has to adapt to this
+				final int bbUpperLeftX = upperLeft.x; // - lineWidth / 2 - 1;
+				final int bbUpperLeftY = upperLeft.y; // - lineWidth / 2 - 1;
+				
+				// the line width has to be counted twice because two lines with the same width are
+				// drawn on
+				// the drawing area
+				final int bbWidht = width + 2 * lineWidth;
+				final int bbHeight = height + 2 * lineWidth;
+				final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY,
+						bbWidht + 1, bbHeight + 1);
+				
+				setBoundingBox(getDrawingArea().pixelRect2AbsRect(bbArea));
+				
+			}
+		});
 	}
 	
 	@Override

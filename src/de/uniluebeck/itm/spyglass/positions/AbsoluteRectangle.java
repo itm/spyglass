@@ -80,4 +80,17 @@ public class AbsoluteRectangle extends AbstractRectangle {
 		return ret;
 	}
 	
+	/**
+	 * Inherits the values of another rectangle
+	 * 
+	 * @param other
+	 *            the tectangle which values are to be inherited
+	 */
+	public void inherit(final AbsoluteRectangle other) {
+		this.rectangle.x = other.rectangle.x;
+		this.rectangle.y = other.rectangle.y;
+		this.rectangle.height = other.rectangle.height;
+		this.rectangle.width = other.rectangle.width;
+	}
+	
 }

@@ -41,7 +41,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	
 	/**
-	 * Reference to the plugin manager
+	 * Reference to the plug-in manager
 	 */
 	protected PluginManager pluginManager;
 	
