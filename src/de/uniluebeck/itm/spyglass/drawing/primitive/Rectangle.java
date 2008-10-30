@@ -68,9 +68,7 @@ public class Rectangle extends DrawingObject {
 		clone.setId(getId());
 		clone.setWidth(width);
 		clone.setHeight(height);
-		clone.setColorR(getColorR());
-		clone.setColorG(getColorG());
-		clone.setColorB(getColorB());
+		clone.setColor(getColorR(), getColorG(), getColorB());
 		clone.setPosition(new AbsolutePosition(getPosition().x, getPosition().y, 0));
 		
 		return clone;

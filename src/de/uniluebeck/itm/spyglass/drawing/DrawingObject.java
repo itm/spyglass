@@ -51,7 +51,7 @@ public abstract class DrawingObject {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
+	 * Constructor setting the objects identifier to <tt>-1</tt>
 	 */
 	public DrawingObject() {
 		this.id = -1;
@@ -59,7 +59,10 @@ public abstract class DrawingObject {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Constructor
 	 * 
+	 * @param id
+	 *            the object's identifier
 	 */
 	public DrawingObject(final int id) {
 		this.id = id;
@@ -67,7 +70,10 @@ public abstract class DrawingObject {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Inherits the parameters of another drawing object
 	 * 
+	 * @param other
+	 *            the other drawing object
 	 */
 	public void update(final DrawingObject other) {
 		this.id = other.id;
@@ -88,7 +94,9 @@ public abstract class DrawingObject {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Returns the position of the upper left point of the <code>DrawingObject</code>.
 	 * 
+	 * @return the position of the upper left point of the <code>DrawingObject</code>
 	 */
 	public AbsolutePosition getPosition() {
 		return position;
@@ -96,7 +104,10 @@ public abstract class DrawingObject {
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Sets the position of the upper left point of the <code>DrawingObject</code>.
+	 * Sets the position of the upper left point of the <code>DrawingObject</code>
+	 * 
+	 * @param position
+	 *            the position of the upper left point of the <code>DrawingObject</code>.
 	 */
 	public void setPosition(final AbsolutePosition position) {
 		this.position = position;
@@ -104,7 +115,9 @@ public abstract class DrawingObject {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Returns the objects identifier
 	 * 
+	 * @return the objects identifier
 	 */
 	public int getId() {
 		return id;
@@ -112,7 +125,10 @@ public abstract class DrawingObject {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Sets the objects identifier
 	 * 
+	 * @param id
+	 *            the objects identifier
 	 */
 	public void setId(final int id) {
 		this.id = id;
@@ -168,23 +184,30 @@ public abstract class DrawingObject {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * Sets the objects color
 	 * 
+	 * @param r
+	 *            red
+	 * @param g
+	 *            green
+	 * @param b
+	 *            blue
 	 */
-	public void setColor(final int R, final int G, final int B) {
-		this.colorR = R;
-		this.colorG = G;
-		this.colorB = B;
+	public void setColor(final int r, final int g, final int b) {
+		this.colorR = r;
+		this.colorG = g;
+		this.colorB = b;
+	}
+	
+	@Override
+	public String toString() {
+		return "paintOrderId: " + paintOrderId + ", id: " + id + ", " + super.toString();
 	}
 	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	@Override
-	public String toString() {
-		return "paintOrderId: " + paintOrderId + ", id: " + id + ", " + super.toString();
-	}
-	
 	public String toString(final int tabCount) {
 		final StringBuffer buff = new StringBuffer();
 		for (int i = 0; i < tabCount; i++) {
@@ -218,6 +241,17 @@ public abstract class DrawingObject {
 		this.bgColorB = bgColorB;
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the objects background color
+	 * 
+	 * @param r
+	 *            red
+	 * @param b
+	 *            blue
+	 * @param g
+	 *            green
+	 */
 	public void setBgColor(final int r, final int b, final int g) {
 		this.bgColorR = r;
 		this.bgColorB = b;
@@ -228,20 +262,34 @@ public abstract class DrawingObject {
 	/**
 	 * Forces this DrawingObject to paint itself on the given GC.
 	 * 
-	 * Optionally the DrawingObject can inform itself about the current zoom level by queriing the
-	 * additonally given drawingArea.
+	 * Optionally the DrawingObject can inform itself about the current zoom level by querying the
+	 * given drawingArea.
 	 * 
 	 * @param drawingArea
+	 *            the currently used drawing area
 	 * @param gc
+	 *            the currently used graphics context
 	 */
 	public abstract void draw(DrawingArea drawingArea, GC gc);
 	
 	// --------------------------------------------------------------------------------
 	/**
-	 * Return the bounding box of this drawing object
+	 * Returns the bounding box of this drawing object.<br>
+	 * The bounding box is recalculated every time the drawing object itself is changed. Hence, it
+	 * is always up to date.
+	 * 
+	 * @return the bounding box of this drawing object
 	 */
 	public abstract AbsoluteRectangle getBoundingBox();
 	
+	/**
+	 * Draws a line which indicates the object's bounding box
+	 * 
+	 * @param drawingArea
+	 *            the currently used drawing area
+	 * @param gc
+	 *            the currently used graphics context
+	 */
 	protected void drawBoundingBox(final DrawingArea drawingArea, final GC gc) {
 		
 		final PixelRectangle rect = drawingArea.absRect2PixelRect(getBoundingBox());

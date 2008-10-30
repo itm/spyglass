@@ -44,9 +44,7 @@ public class Line extends DrawingObject {
 	public DrawingObject clone() throws CloneNotSupportedException {
 		final Line clone = new Line();
 		clone.setId(getId());
-		clone.setColorR(getColorR());
-		clone.setColorG(getColorG());
-		clone.setColorB(getColorB());
+		clone.setColor(getColorR(), getColorG(), getColorB());
 		clone.setPosition(new AbsolutePosition(getPosition().x, getPosition().y, 0));
 		clone.setLineWidth(getLineWidth());
 		return clone;

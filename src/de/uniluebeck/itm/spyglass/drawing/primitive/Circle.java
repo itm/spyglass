@@ -52,9 +52,7 @@ public class Circle extends DrawingObject {
 		final Circle clone = new Circle();
 		clone.setId(getId());
 		clone.setDiameter(diameter);
-		clone.setColorR(getColorR());
-		clone.setColorG(getColorG());
-		clone.setColorB(getColorB());
+		clone.setColor(getColorR(), getColorG(), getColorB());
 		clone.setPosition(new AbsolutePosition(getPosition().x, getPosition().y, 0));
 		
 		return clone;
