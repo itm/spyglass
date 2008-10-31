@@ -46,16 +46,6 @@ public class Text extends DrawingObject {
 	}
 	
 	@Override
-	public void update(final DrawingObject other) {
-		if (other instanceof Text) {
-			super.update(other);
-			final Text t = (Text) other;
-			setJustification(t.getJustification());
-			setText(t.getText());
-		}
-	}
-	
-	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 		final Color color = new Color(null, getColorR(), getColorG(), getColorB());
 		final Color bgColor = new Color(null, getBgColorR(), getBgColorG(), getBgColorB());

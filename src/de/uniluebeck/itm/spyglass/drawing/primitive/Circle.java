@@ -84,19 +84,6 @@ public class Circle extends DrawingObject {
 		return super.toString();
 	}
 	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	@Override
-	public void update(final DrawingObject other) {
-		if (other instanceof Circle) {
-			super.update(other);
-			final Circle c = (Circle) other;
-			setDiameter(c.getDiameter());
-		}
-	}
-	
 	public short getLineWidth() {
 		return lineWidth;
 	}

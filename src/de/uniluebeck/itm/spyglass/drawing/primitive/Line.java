@@ -113,13 +113,4 @@ public class Line extends DrawingObject {
 		return super.toString();
 	}
 	
-	@Override
-	public void update(final DrawingObject other) {
-		if (other instanceof Line) {
-			super.update(other);
-			final Line l = (Line) other;
-			setEnd(l.getEnd());
-		}
-	}
-	
 }

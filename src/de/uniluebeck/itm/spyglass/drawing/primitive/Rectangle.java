@@ -117,16 +117,6 @@ public class Rectangle extends DrawingObject {
 	}
 	
 	@Override
-	public void update(final DrawingObject other) {
-		if (other instanceof Rectangle) {
-			super.update(other);
-			final Rectangle r = (Rectangle) other;
-			setWidth(r.getWidth());
-			setWidth(r.getWidth());
-		}
-	}
-	
-	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 		final Color color = new Color(null, this.getColorR(), this.getColorG(), this.getColorB());
 		final Color bg = new Color(null, this.getBgColorR(), this.getBgColorG(), this.getBgColorB());
