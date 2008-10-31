@@ -39,18 +39,9 @@ public class Circle extends DrawingObject {
 	/**
 	 * 
 	 */
-	public Circle(final int id) {
-		super(id);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
 	@Override
 	public DrawingObject clone() throws CloneNotSupportedException {
 		final Circle clone = new Circle();
-		clone.setId(getId());
 		clone.setDiameter(diameter);
 		clone.setColor(getColorR(), getColorG(), getColorB());
 		clone.setPosition(new AbsolutePosition(getPosition().x, getPosition().y, 0));

@@ -23,7 +23,6 @@ public class Text extends DrawingObject {
 	public TextJustification justification;
 	
 	public Text(final String s, final AbsolutePosition p, final int id) {
-		super(id);
 		setPosition(p);
 		text = s;
 		justification = TextJustification.left;

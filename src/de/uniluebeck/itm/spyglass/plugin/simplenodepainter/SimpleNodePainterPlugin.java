@@ -82,7 +82,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
 	private Map<Integer, Map<Integer, String>> stringFormatterResults;
 	
-	private Map<Integer, AbsoluteRectangle> boundingBoxes;
+	private Map<DrawingObject, AbsoluteRectangle> boundingBoxes;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -95,7 +95,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		updatedObjects = new HashSet<DrawingObject>();
 		obsoleteObjects = new HashSet<DrawingObject>();
 		stringFormatterResults = new TreeMap<Integer, Map<Integer, String>>();
-		boundingBoxes = new HashMap<Integer, AbsoluteRectangle>();
+		boundingBoxes = new HashMap<DrawingObject, AbsoluteRectangle>();
 	}
 	
 	@Override
@@ -309,7 +309,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final int lineWidth = xmlConfig.getLineWidth();
 		final NodeObject no = new NodeObject(nodeID, "Node " + nodeID, stringFormatterResult,
 				isExtended, lineColorRGB, lineWidth, drawingArea);
-		boundingBoxes.put(no.getId(), new AbsoluteRectangle(no.getBoundingBox()));
+		boundingBoxes.put(no, new AbsoluteRectangle(no.getBoundingBox()));
 		return no;
 	}
 	
@@ -476,20 +476,20 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		
 		// after the lock was returned it is time to update the display ...
 		for (final DrawingObject drawingObject : update) {
-			if ((oldBB = boundingBoxes.get(drawingObject.getId())) != null) {
+			if ((oldBB = boundingBoxes.get(drawingObject)) != null) {
 				fireDrawingObjectChanged(drawingObject, oldBB);
-				boundingBoxes.put(drawingObject.getId(), new AbsoluteRectangle(drawingObject
+				boundingBoxes.put(drawingObject, new AbsoluteRectangle(drawingObject
 						.getBoundingBox()));
 			} else {
 				fireDrawingObjectAdded(drawingObject);
-				boundingBoxes.put(drawingObject.getId(), new AbsoluteRectangle(drawingObject
+				boundingBoxes.put(drawingObject, new AbsoluteRectangle(drawingObject
 						.getBoundingBox()));
 			}
 		}
 		
 		for (final DrawingObject drawingObject : obsolete) {
 			fireDrawingObjectRemoved(drawingObject);
-			boundingBoxes.remove(drawingObject.getId());
+			boundingBoxes.remove(drawingObject);
 		}
 		
 	}
@@ -634,8 +634,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				synchronized (layer) {
 					layer.bringToFront(drawingObject);
 					// since the old and the new bounding box are equal, the map needs no update
-					fireDrawingObjectChanged(drawingObject, boundingBoxes
-							.get(drawingObject.getId()));
+					fireDrawingObjectChanged(drawingObject, boundingBoxes.get(drawingObject));
 				}
 				return true;
 			}
@@ -668,8 +667,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				synchronized (layer) {
 					layer.pushBack(drawingObject);
 					// since the old and the new bounding box are equal, the map needs no update
-					fireDrawingObjectChanged(drawingObject, boundingBoxes
-							.get(drawingObject.getId()));
+					fireDrawingObjectChanged(drawingObject, boundingBoxes.get(drawingObject));
 				}
 				return true;
 			}

@@ -1,7 +1,5 @@
 package de.uniluebeck.itm.spyglass.drawing.primitive;
 
-import java.util.Date;
-
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -123,7 +121,6 @@ public class NodeObject extends DrawingObject {
 			final String stringFormatterResult, final boolean isExtended, final int[] lineColorRGB,
 			final int lineWidth, final DrawingArea drawingArea) {
 		super();
-		super.setId((int) new Date().getTime());
 		this.nodeID = nodeID;
 		this.denotation = denotation;
 		this.stringFormatterResult = stringFormatterResult;

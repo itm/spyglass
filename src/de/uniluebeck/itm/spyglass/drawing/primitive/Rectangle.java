@@ -54,18 +54,9 @@ public class Rectangle extends DrawingObject {
 	/**
 	 * 
 	 */
-	public Rectangle(final int id) {
-		super(id);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
 	@Override
 	public DrawingObject clone() throws CloneNotSupportedException {
 		final Rectangle clone = new Rectangle();
-		clone.setId(getId());
 		clone.setWidth(width);
 		clone.setHeight(height);
 		clone.setColor(getColorR(), getColorG(), getColorB());

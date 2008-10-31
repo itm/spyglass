@@ -18,6 +18,8 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * iShell can push packets for Spyglass in a queue and Spyglass can read them afterwards.<br>
  * By extending the abstract class {@link PacketReader} Spyglass can use this broker as an ordinary
  * packet reader.
+ * 
+ * @author Sebastian Ebers
  */
 @Root
 public class IShellToSpyGlassPacketBroker extends PacketReader {
@@ -34,7 +36,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	 * Constructor
 	 */
 	public IShellToSpyGlassPacketBroker() {
-		
+		super();
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -54,9 +56,13 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	 * packet queue is empty.
 	 * 
 	 * @return the tail of the packet queue, or <tt>null</tt> if the packet queue is empty
+	 * @exception SpyglassPacketException
+	 *                if the packet to return is invalid
+	 * @exception InterruptedException
+	 *                if the method was interrupted while waiting on a packet.
 	 */
 	@Override
-	public SpyglassPacket getNextPacket() throws InterruptedException {
+	public SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException {
 		
 		synchronized (queue) {
 			

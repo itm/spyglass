@@ -31,7 +31,6 @@ public class PacketDispatcher {
 	private static Logger log = SpyglassLogger.get(PacketDispatcher.class);
 	
 	private PluginManager pluginManager = null;
-	private PacketRecorder packetRecorder = null;
 	
 	// --------------------------------------------------------------------------
 	// ------
@@ -43,14 +42,13 @@ public class PacketDispatcher {
 	 * @param packetRecorder
 	 *            object which records incoming packets
 	 */
-	public PacketDispatcher(final PluginManager pluginManager, final PacketRecorder packetRecorder) {
+	public PacketDispatcher(final PluginManager pluginManager) {
 		if (pluginManager == null) {
 			log.error("Supplied plug-in manager is null");
 			throw new IllegalArgumentException("pluginManager must not be null.");
 		}
 		
 		this.pluginManager = pluginManager;
-		this.packetRecorder = packetRecorder;
 	}
 	
 	// --------------------------------------------------------------------------
@@ -76,8 +74,7 @@ public class PacketDispatcher {
 		final NodePositionerPlugin np = pluginManager.getNodePositioner();
 		log.debug("Dispatching packet[" + packet + "] to NodePositioner " + np);
 		np.handlePacket(packet);
-		packetRecorder.handlePacket(packet);
-		//
+		
 		final List<Plugin> plugins = pluginManager.getActivePlugins();
 		if (plugins == null) {
 			return;

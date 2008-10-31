@@ -66,11 +66,6 @@ public class QuadTreeTest {
 				- rectHeight);
 		rectangle4 = createRect(upperLeftX + (width / 2), upperLeftY + (height / 2));
 		
-		rectangle1.setId(111);
-		rectangle2.setId(222);
-		rectangle3.setId(333);
-		rectangle4.setId(444);
-		
 	}
 	
 	private Rectangle createRect(final int upperLeftX, final int upperLeftY) {

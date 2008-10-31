@@ -1,6 +1,7 @@
 package de.uniluebeck.itm.spyglass.gui.actions;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -25,8 +26,13 @@ public class RecordRecordAction extends Action {
 	@Override
 	public void run() {
 		
-		isRecording = spyglass.getPacketRecorder().setRecord(!isRecording);
-		
+		if (spyglass.getPacketRecorder() == null) {
+			MessageDialog.openError(null, "No recorder available",
+					"The input type you selected does not support recording");
+			isRecording = false;
+		} else {
+			isRecording = spyglass.getPacketRecorder().setRecord(!isRecording);
+		}
 		setText(isRecording ? "Pause" : "Record");
 		setToolTipText(isRecording ? "Pause" : "Record");
 		setImageDescriptor(isRecording ? imageDescriptorPausing : imageDescriptorRecording);

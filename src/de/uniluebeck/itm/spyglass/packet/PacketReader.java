@@ -38,10 +38,13 @@ public abstract class PacketReader extends PropertyBean {
 	// ------
 	/**
 	 * Returns a new packet, once it arrives. It will never return null, but block until it has
-	 * simething to return.
+	 * something to return.
 	 * 
-	 * @throws SpyglassPacketException
-	 * @throws {@link InterruptedException} if the method was interrupted while waiting on a packet.
+	 * @exception SpyglassPacketException
+	 *                if the packet to return is invalid
+	 * @exception InterruptedException
+	 *                if the method was interrupted while waiting on a packet.
+	 * @return a new SpyGlass packet
 	 * 
 	 */
 	public abstract SpyglassPacket getNextPacket() throws SpyglassPacketException,

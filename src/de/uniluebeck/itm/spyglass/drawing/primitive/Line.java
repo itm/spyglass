@@ -43,7 +43,6 @@ public class Line extends DrawingObject {
 	@Override
 	public DrawingObject clone() throws CloneNotSupportedException {
 		final Line clone = new Line();
-		clone.setId(getId());
 		clone.setColor(getColorR(), getColorG(), getColorB());
 		clone.setPosition(new AbsolutePosition(getPosition().x, getPosition().y, 0));
 		clone.setLineWidth(getLineWidth());

@@ -1,5 +1,5 @@
 <spyglassConfiguration>
-   <packetReader class="de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketBroker">
+   <packetReader class="de.uniluebeck.itm.spyglass.core.PacketRecorder">
       <delayMillies>1000</delayMillies>
    </packetReader>
    <instances>
@@ -147,7 +147,7 @@
                <int>-1</int>
             </semanticTypes>
             <image>images/icons/brokenImageLink.png</image>
-            <size width="1" height="1">
+            <size height="1" width="1">
                <upperLeft x="0" y="0" z="0"/>
             </size>
          </parameters>

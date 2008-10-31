@@ -80,12 +80,12 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	
 	private IShellToSpyGlassPacketBroker packetBroker;
 	
-	/**
-	 * Indicates whether the system is in playback mode or not.<br>
-	 * If the system is in playback mode, the packets which are received via
-	 * {@link PluginSpyGlass2iShell#receivePacket(MessagePacket)} will be ignored.
-	 */
-	private boolean playbackMode = false;
+	// /**
+	// * Indicates whether the system is in playback mode or not.<br>
+	// * If the system is in playback mode, the packets which are received via
+	// * {@link PluginSpyGlass2iShell#receivePacket(MessagePacket)} will be ignored.
+	// */
+	// private boolean playbackMode = false;
 	
 	// --------------------------------------------------------------------------
 	/**
@@ -187,7 +187,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		addToolBarAction(new PlaySelectInputAction());
 		addToolBarAction(new PlayPlayPauseAction(spyglass));
 		addToolBarAction(new PlayResetAction());
-		addToolBarAction(new RecordSelectOutputAction());
+		addToolBarAction(new RecordSelectOutputAction(spyglass));
 		addToolBarAction(new RecordRecordAction(spyglass));
 		addToolBarAction(new ZoomInAction(appWindow.getGui().getDrawingArea()));
 		addToolBarAction(new ZoomOutAction(appWindow.getGui().getDrawingArea()));
@@ -211,24 +211,21 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	public void receivePacket(final MessagePacket packet) {
 		log.debug("receivePacket called from iShell");
 		
-		// if the system is in playback mode, packets send by iShell will be ignored
-		if (!playbackMode) {
-			
-			if (isPaused()) {
-				return;
-			}
-			SpyglassPacket spyglassPacket = null;
-			try {
-				spyglassPacket = PacketFactory.createInstance(packet.getContent());
-			} catch (final SpyglassPacketException e) {
-				log.error("Illegal Packet, could not deserialize it.", e);
-				return;
-			}
-			
-			log.debug("Received Packet in Spyglass from iShell: " + spyglassPacket);
-			
-			packetBroker.push(spyglassPacket);
+		if (isPaused()) {
+			return;
 		}
+		SpyglassPacket spyglassPacket = null;
+		try {
+			spyglassPacket = PacketFactory.createInstance(packet.getContent());
+		} catch (final SpyglassPacketException e) {
+			log.error("Illegal Packet, could not deserialize it.", e);
+			return;
+		}
+		
+		log.debug("Received Packet in Spyglass from iShell: " + spyglassPacket);
+		// spyglass.getPacketRecorder().handlePacket(spyglassPacket);
+		packetBroker.push(spyglassPacket);
+		
 	}
 	
 	// --------------------------------------------------------------------------
