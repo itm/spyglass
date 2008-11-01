@@ -71,83 +71,10 @@ public class ComplexPacketReader extends PacketReader {
 		return packet;
 	}
 	
-	// // --------------------------------------------------------------------------------
-	// /**
-	// *
-	// * @throws InterruptedException
-	// * @throws Exception
-	// *
-	// */
-	// @Override
-	// public SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException {
-	//		
-	// if (bufferedReader == null) {
-	// bufferedReader = new BufferedReader(new InputStreamReader(this.getGateway()
-	// .getInputStream()));
-	// }
-	//		
-	// SpyglassPacket packet = null;
-	//		
-	// try {
-	//			
-	// String line = null;
-	// while ((line = bufferedReader.readLine()) != null) {
-	// packet = parsePacketLine(line);
-	// if (packet != null) {
-	// break;
-	// }
-	// }
-	//			
-	// } catch (final IOException e) {
-	// log.error("Error while reading a new packet...", e);
-	// }
-	//		
-	// // Hold back the packet at least for delayMillies
-	// final long now = System.currentTimeMillis();
-	// final long diff = now - this.lastPacketTimestamp;
-	// if (diff < this.delayMillies) {
-	// Thread.sleep(this.delayMillies - diff);
-	// }
-	// this.lastPacketTimestamp = System.currentTimeMillis();
-	// return packet;
-	// }
-	//	
-	// // --------------------------------------------------------------------------
-	// // ------
-	//	
-	// /**
-	// * each line is made up by a timestamp and a packet in hex, seperated by a colon.
-	// *
-	// * @param line
-	// * A String containing the packet format.
-	// * @return A packet object or null, if the line could be parsed.
-	// * @throws SpyglassPacketException
-	// */
-	// private SpyglassPacket parsePacketLine(String line) throws SpyglassPacketException {
-	// if ((line == null) || line.trim().equals("")) {
-	// return null;
-	// }
-	//		
-	// line = line.trim();
-	//		
-	// if (line.startsWith("//")) {
-	// return null;
-	// }
-	//		
-	// final String[] tokens = line.split(":\\s*");
-	//		
-	// final String hexPacket = tokens[1];
-	// final int length = hexPacket.length() / 2;
-	// final byte[] array = new byte[length];
-	//		
-	// for (int i = 0; i < hexPacket.length(); i += 2) {
-	// final String byteString = hexPacket.substring(i, i + 2);
-	// array[i / 2] = (byte) Integer.parseInt(byteString, 16);
-	// }
-	//		
-	// final SpyglassPacket packet = PacketFactory.createInstance(array);
-	//		
-	// return packet;
-	// }
+	@Override
+	public void reset() throws IOException {
+		lastPacketTimestamp = -1;
+		playbackFileReader.reset();
+	}
 	
 }

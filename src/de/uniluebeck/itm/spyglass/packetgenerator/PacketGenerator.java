@@ -119,7 +119,6 @@ public class PacketGenerator {
 			sink.shutdown();
 		}
 		log.info("PacketGenerator shutted down.");
-		
 	}
 	
 }

@@ -7,6 +7,8 @@
  */
 package de.uniluebeck.itm.spyglass.packet;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 
@@ -86,5 +88,15 @@ public abstract class PacketReader extends PropertyBean {
 		this.delayMillies = delayMillies;
 		firePropertyChange("delayMillies", oldMillies, delayMillies);
 	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Performs a reset of all transient settings. The configuration of this object is not affected
+	 * at all
+	 * 
+	 * @throws IOException
+	 *             thrown if the resetting of the input fails
+	 */
+	public abstract void reset() throws IOException;
 	
 }

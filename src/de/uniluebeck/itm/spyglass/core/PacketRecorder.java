@@ -60,7 +60,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	private String recordFileString = null;
 	
 	/** The path to the directory where the record files are located */
-	private String recordDirectory = new File("./record/").getAbsoluteFile().toString();
+	private final String recordDirectory = new File("./record/").getAbsoluteFile().toString();
 	
 	/** The time stamp of the last packed read from the playback file */
 	private long lastPlaybackPacketTimestamp = -1;
@@ -416,6 +416,9 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	 * @return <code>true</code> if the playback mode is enabled, <code>false</code> otherwise
 	 */
 	public boolean setPlayback(final boolean enable) {
+		// TODO: If the user switches during an active recording process, playback and live packages
+		// will be mixed up in the same file. Either a message has to be shown to the user or the
+		// recording has to be aborted or sth. else has to happen
 		if (enable && (getPlaybackFile() == null)) {
 			setPlayBackFile();
 		} else {
@@ -544,6 +547,18 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 			playback = false;
 		}
 		return playback;
+	}
+	
+	@Override
+	public void reset() throws IOException {
+		log.info("Reset requested");
+		super.reset();
+		setRecord(false);
+		setPlayback(false);
+		recordFileString = null;
+		getGateway().getInputStream().close();
+		lastPlaybackPacketTimestamp = -1;
+		previousRecordFile = null;
 	}
 	
 	// --------------------------------------------------------------------------------

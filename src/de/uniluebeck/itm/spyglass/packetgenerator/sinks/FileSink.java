@@ -1,7 +1,7 @@
 package de.uniluebeck.itm.spyglass.packetgenerator.sinks;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 
@@ -11,15 +11,10 @@ import org.simpleframework.xml.Element;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 
 /**
- * File sink. Writes all packets in a file. Each line consists of a timestamp and the packet in hex,
- * seperated by a colon.
+ * File sink. Writes all packets in a file.
  * 
- * example:
- * 
- * 15435354311:04A21264265632365232FFAABB
- * 
- * @author dariush
- * 
+ * @author Dariush Forouher
+ * @author Sebastian Ebers
  */
 public class FileSink extends Sink {
 	
@@ -40,29 +35,22 @@ public class FileSink extends Sink {
 	/**
 	 * The writer. Will be assigned when the first packet is transmitted.
 	 */
-	private FileWriter writer;
+	private FileOutputStream writer;
 	
 	@Override
 	public void sendPacket(final byte[] packet) throws IOException, ParseException {
 		
-		final long timestamp = System.currentTimeMillis();
-		
-		final StringBuffer buf = new StringBuffer();
-		buf.append(timestamp);
-		buf.append(": ");
-		for (int i = 0; i < packet.length; i++) {
-			buf.append(String.format("%02X", packet[i]));
+		if (packet != null) {
+			writer.write(packet.length);
+			writer.write(packet);
+			writer.flush();
 		}
-		buf.append("\n");
-		
-		writer.append(buf);
-		writer.flush();
 		
 	}
 	
 	@Override
 	public void init() throws Exception {
-		writer = new FileWriter(filename, append);
+		writer = new FileOutputStream(filename, append);
 		log.debug("Opened file " + this.filename);
 	}
 	
@@ -70,10 +58,11 @@ public class FileSink extends Sink {
 	public void shutdown() {
 		try {
 			writer.flush();
-			this.writer.close();
-			log.debug("Closed file " + this.filename);
+			writer.close();
+			writer = null;
+			log.debug("Closed file " + filename);
 		} catch (final IOException e) {
-			//
+			log.error(e, e);
 		}
 	}
 	

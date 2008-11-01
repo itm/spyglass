@@ -4,6 +4,7 @@
  */
 package de.uniluebeck.itm.spyglass.packet;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -102,6 +103,13 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 			log.debug("Push packet into the queue");
 			queue.push(packet);
 			queue.notifyAll(); // wake up all waiting threads
+		}
+	}
+	
+	@Override
+	public void reset() throws IOException {
+		synchronized (queue) {
+			queue.clear();
 		}
 	}
 }
