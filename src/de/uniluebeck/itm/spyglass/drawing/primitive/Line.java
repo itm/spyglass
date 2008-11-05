@@ -66,18 +66,6 @@ public class Line extends DrawingObject {
 		drawBoundingBox(drawingArea, gc);
 	}
 	
-	@Override
-	public AbsoluteRectangle getBoundingBox() {
-		final AbsolutePosition pos = getPosition();
-		final int lowerLeftX = lineEnd.x < pos.x ? lineEnd.x : pos.x;
-		final int lowerLeftY = lineEnd.y < pos.y ? lineEnd.y : pos.y;
-		final int upperRightX = lineEnd.x > pos.x ? lineEnd.x : pos.x;
-		final int upperRightY = lineEnd.y > pos.y ? lineEnd.x : pos.y;
-		final int width = Math.abs(upperRightX - lowerLeftX);
-		final int height = Math.abs(upperRightY - lowerLeftY);
-		return new AbsoluteRectangle(new AbsolutePosition(lowerLeftX, lowerLeftY, 0), width, height);
-	}
-	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -90,16 +78,26 @@ public class Line extends DrawingObject {
 		return width;
 	}
 	
+	public void setEnd(final AbsolutePosition end) {
+		setEnd(end, true);
+	}
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public void setEnd(final AbsolutePosition end) {
+	public void setEnd(final AbsolutePosition end, final boolean fireBoundingBoxChangeEvent) {
 		lineEnd = end;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 	
 	public void setLineWidth(final int width) {
+		setLineWidth(width, true);
+	}
+	
+	public void setLineWidth(final int width, final boolean fireBoundingBoxChangeEvent) {
 		this.width = width;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -110,6 +108,18 @@ public class Line extends DrawingObject {
 	public String toString() {
 		// TODO Implement
 		return super.toString();
+	}
+	
+	@Override
+	protected AbsoluteRectangle calculateBoundingBox() {
+		final AbsolutePosition pos = getPosition();
+		final int lowerLeftX = lineEnd.x < pos.x ? lineEnd.x : pos.x;
+		final int lowerLeftY = lineEnd.y < pos.y ? lineEnd.y : pos.y;
+		final int upperRightX = lineEnd.x > pos.x ? lineEnd.x : pos.x;
+		final int upperRightY = lineEnd.y > pos.y ? lineEnd.x : pos.y;
+		final int width = Math.abs(upperRightX - lowerLeftX);
+		final int height = Math.abs(upperRightY - lowerLeftY);
+		return new AbsoluteRectangle(new AbsolutePosition(lowerLeftX, lowerLeftY, 0), width, height);
 	}
 	
 }

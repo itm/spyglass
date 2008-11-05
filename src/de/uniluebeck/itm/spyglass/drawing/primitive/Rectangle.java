@@ -78,7 +78,12 @@ public class Rectangle extends DrawingObject {
 	 * 
 	 */
 	public void setWidth(final int width) {
+		setWidth(width, true);
+	}
+	
+	public void setWidth(final int width, final boolean fireBoundingBoxChangeEvent) {
 		this.width = width;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -94,7 +99,12 @@ public class Rectangle extends DrawingObject {
 	 * 
 	 */
 	public void setHeight(final int height) {
+		setHeight(height, true);
+	}
+	
+	public void setHeight(final int height, final boolean fireBoundingBoxChangeEvent) {
 		this.height = height;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -127,7 +137,7 @@ public class Rectangle extends DrawingObject {
 	}
 	
 	@Override
-	public AbsoluteRectangle getBoundingBox() {
+	protected AbsoluteRectangle calculateBoundingBox() {
 		return new AbsoluteRectangle(getPosition(), width, height);
 	}
 	

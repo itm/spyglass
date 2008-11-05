@@ -57,12 +57,17 @@ public class Circle extends DrawingObject {
 		return diameter;
 	}
 	
+	public void setDiameter(final int diameter) {
+		setDiameter(diameter, true);
+	}
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public void setDiameter(final int diameter) {
+	public void setDiameter(final int diameter, final boolean fireBoundingBoxChangeEvent) {
 		this.diameter = diameter;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -104,7 +109,7 @@ public class Circle extends DrawingObject {
 	}
 	
 	@Override
-	public AbsoluteRectangle getBoundingBox() {
+	protected AbsoluteRectangle calculateBoundingBox() {
 		// TODO Auto-generated method stub
 		return null;
 	}

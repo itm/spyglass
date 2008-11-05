@@ -7,6 +7,9 @@
  */
 package de.uniluebeck.itm.spyglass.drawing;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.simpleframework.xml.Element;
@@ -26,6 +29,10 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 public abstract class DrawingObject {
 	
 	private AbsolutePosition position = new AbsolutePosition(0, 0, 0);
+	
+	private Set<BoundingBoxChangeListener> changeListeners = new HashSet<BoundingBoxChangeListener>();
+	
+	protected AbsoluteRectangle boundingBox;
 	
 	@Element
 	private int colorR = 200;
@@ -80,7 +87,23 @@ public abstract class DrawingObject {
 	 *            the position of the upper left point of the <code>DrawingObject</code>.
 	 */
 	public void setPosition(final AbsolutePosition position) {
+		setPosition(position, true);
+	}
+	
+	public void setPosition(final AbsolutePosition position,
+			final boolean fireBoundingBoxChangeEvent) {
+		
 		this.position = position;
+		updateBoundingBox();
+		if (fireBoundingBoxChangeEvent) {
+			fireBoundingBoxChangeEvent();
+		}
+	}
+	
+	public void fireBoundingBoxChangeEvent() {
+		for (final BoundingBoxChangeListener listener : changeListeners) {
+			listener.onBoundingBoxChanged(this);
+		}
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -229,7 +252,12 @@ public abstract class DrawingObject {
 	 * 
 	 * @return the bounding box of this drawing object
 	 */
-	public abstract AbsoluteRectangle getBoundingBox();
+	public AbsoluteRectangle getBoundingBox() {
+		if (boundingBox == null) {
+			updateBoundingBox();
+		}
+		return boundingBox;
+	}
 	
 	/**
 	 * Draws a line which indicates the object's bounding box
@@ -253,5 +281,27 @@ public abstract class DrawingObject {
 		color.dispose();
 		
 	}
+	
+	public void addBoundingBoxChangedListener(final BoundingBoxChangeListener listener) {
+		this.changeListeners.add(listener);
+	}
+	
+	public void removeBoundingBoxChangeListener(final BoundingBoxChangeListener listener) {
+		this.changeListeners.remove(listener);
+	}
+	
+	protected void updateBoundingBox() {
+		updateBoundingBox(true);
+	}
+	
+	protected void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
+		final AbsoluteRectangle oldBox = this.boundingBox;
+		boundingBox = calculateBoundingBox();
+		if (fireBoundingBoxChangeEvent && ((oldBox != null) || !boundingBox.equals(oldBox))) {
+			fireBoundingBoxChangeEvent();
+		}
+	}
+	
+	protected abstract AbsoluteRectangle calculateBoundingBox();
 	
 }

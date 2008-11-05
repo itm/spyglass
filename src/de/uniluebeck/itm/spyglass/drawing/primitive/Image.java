@@ -28,7 +28,12 @@ public class Image extends DrawingObject {
 	}
 	
 	public void setImageSizeX(final int imageSizeX) {
+		setImageSizeX(imageSizeX, true);
+	}
+	
+	public void setImageSizeX(final int imageSizeX, final boolean fireBoundingBoxChangeEvent) {
 		this.imageSizeX = imageSizeX;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 	
 	public int getImageSizeY() {
@@ -36,7 +41,12 @@ public class Image extends DrawingObject {
 	}
 	
 	public void setImageSizeY(final int imageSizeY) {
+		setImageSizeY(imageSizeY, true);
+	}
+	
+	public void setImageSizeY(final int imageSizeY, final boolean fireBoundingBoxChangeEvent) {
 		this.imageSizeY = imageSizeY;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 	
 	@Override
@@ -56,17 +66,17 @@ public class Image extends DrawingObject {
 		
 	}
 	
-	@Override
-	public AbsoluteRectangle getBoundingBox() {
-		return new AbsoluteRectangle(this.getPosition(), imageSizeX, imageSizeY);
-	}
-	
 	public void dispose() {
 		
 		if (image != null) {
 			image.dispose();
 		}
 		
+	}
+	
+	@Override
+	protected AbsoluteRectangle calculateBoundingBox() {
+		return new AbsoluteRectangle(this.getPosition(), imageSizeX, imageSizeY);
 	}
 	
 }

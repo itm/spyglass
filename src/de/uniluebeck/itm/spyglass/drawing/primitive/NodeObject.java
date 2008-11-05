@@ -33,8 +33,6 @@ public class NodeObject extends DrawingObject {
 	
 	private int lineWidth;
 	
-	private AbsoluteRectangle boundingBox;
-	
 	private Object drawingAreaMutex = new Object();
 	
 	private DrawingArea drawingArea;
@@ -151,15 +149,6 @@ public class NodeObject extends DrawingObject {
 			this.drawingArea = drawingArea;
 		}
 		updateBoundingBox();
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param boundingBox
-	 *            the boundingBox to set
-	 */
-	private void setBoundingBox(final AbsoluteRectangle boundingBox) {
-		this.boundingBox = boundingBox;
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -357,16 +346,19 @@ public class NodeObject extends DrawingObject {
 		return string;
 	}
 	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Updates the object's boundingBox
-	 */
-	public void updateBoundingBox() {
+	@Override
+	public String toString() {
+		return "[Node " + nodeID + "]";
+	}
+	
+	@Override
+	protected AbsoluteRectangle calculateBoundingBox() {
 		
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
 				final DrawingArea drawingArea = getDrawingArea();
 				if (drawingArea == null) {
+					boundingBox = new AbsoluteRectangle(getPosition(), 1, 1);
 					return;
 				}
 				// get the information to be displayed
@@ -394,25 +386,13 @@ public class NodeObject extends DrawingObject {
 				final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY,
 						bbWidht + 1, bbHeight + 1);
 				
-				setBoundingBox(getDrawingArea().pixelRect2AbsRect(bbArea));
+				boundingBox = getDrawingArea().pixelRect2AbsRect(bbArea);
 				
 			}
 		});
-	}
-	
-	@Override
-	public AbsoluteRectangle getBoundingBox() {
-		if (boundingBox == null) {
-			// temporary bugfix, used since draw() was not yet called when this method is here is
-			// called the first time
-			return new AbsoluteRectangle(getPosition(), 1, 1);
-		}
+		
 		return boundingBox;
-	}
-	
-	@Override
-	public String toString() {
-		return "[Node " + nodeID + "]";
+		
 	}
 	
 }

@@ -1,6 +1,5 @@
 package de.uniluebeck.itm.spyglass.drawing;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 
@@ -10,8 +9,6 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
 public class Grid extends DrawingObject {
-	
-	private static final Logger log = Logger.getLogger(Grid.class);
 	
 	private int gridElementHeight;
 	private int numCols;
@@ -70,18 +67,24 @@ public class Grid extends DrawingObject {
 		
 	}
 	
-	@Override
-	public AbsoluteRectangle getBoundingBox() {
-		return new AbsoluteRectangle(getPosition(), gridElementWidth * numCols, gridElementHeight
-				* numRows);
+	public void setGridElementHeight(final int gridElementHeight) {
+		setGridElementHeight(gridElementHeight, true);
 	}
 	
-	public void setGridElementHeight(final int gridElementHeight) {
+	public void setGridElementHeight(final int gridElementHeight,
+			final boolean fireBoundBoxChangeEvent) {
 		this.gridElementHeight = gridElementHeight;
+		updateBoundingBox(fireBoundBoxChangeEvent);
 	}
 	
 	public void setGridElementWidth(final int gridElementWidth) {
+		setGridElementWidth(gridElementWidth, true);
+	}
+	
+	public void setGridElementWidth(final int gridElementWidth,
+			final boolean fireBoundingBoxChangeEvent) {
 		this.gridElementWidth = gridElementWidth;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 	
 	public void setLineWidth(final int lineWidth) {
@@ -89,11 +92,27 @@ public class Grid extends DrawingObject {
 	}
 	
 	public void setNumCols(final int numCols) {
+		setNumCols(numCols, true);
+	}
+	
+	public void setNumCols(final int numCols, final boolean fireBoundingBoxChangeEvent) {
 		this.numCols = numCols;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 	
 	public void setNumRows(final int numRows) {
+		setNumRows(numRows, true);
+	}
+	
+	public void setNumRows(final int numRows, final boolean fireBoundingBoxChangeEvent) {
 		this.numRows = numRows;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
+	}
+	
+	@Override
+	protected AbsoluteRectangle calculateBoundingBox() {
+		return new AbsoluteRectangle(getPosition(), gridElementWidth * numCols, gridElementHeight
+				* numRows);
 	}
 	
 }

@@ -9,12 +9,13 @@ import java.util.List;
 
 import org.eclipse.swt.graphics.Point;
 
+import de.uniluebeck.itm.spyglass.drawing.BoundingBoxChangeListener;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
-public class QuadTree implements Layer {
+public class QuadTree implements Layer, BoundingBoxChangeListener {
 	
 	private static final int MIN_BOX_SIZE_X = 20;
 	
@@ -347,6 +348,7 @@ public class QuadTree implements Layer {
 		
 		final QuadTree elem = search(object);
 		if (elem != null) {
+			object.removeBoundingBoxChangeListener(this);
 			elem.objects.remove(object);
 			root.boxes.remove(object);
 			if (elem.parent != null) {
@@ -494,6 +496,7 @@ public class QuadTree implements Layer {
 	@Override
 	public void addOrUpdate(final DrawingObject d) {
 		insertInternal(d, !remove(d));
+		d.addBoundingBoxChangedListener(this);
 	}
 	
 	// ------------------------------------------------------------------------------
@@ -524,8 +527,18 @@ public class QuadTree implements Layer {
 	
 	@Override
 	public void clear() {
+		removeBoundingBoxListenersRecursive();
 		destroySons();
 		objects.clear();
+	}
+	
+	private void removeBoundingBoxListenersRecursive() {
+		for (final DrawingObject dobj : objects) {
+			dobj.removeBoundingBoxChangeListener(this);
+		}
+		for (final QuadTree son : sons) {
+			son.removeBoundingBoxListenersRecursive();
+		}
 	}
 	
 	@Override
@@ -540,6 +553,11 @@ public class QuadTree implements Layer {
 		final List<DrawingObject> list = getObjectsRecursive();
 		Collections.sort(list, sorter);
 		return list;
+	}
+	
+	@Override
+	public void onBoundingBoxChanged(final DrawingObject updatedDrawingObject) {
+		addOrUpdate(updatedDrawingObject);
 	}
 	
 }

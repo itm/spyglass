@@ -93,4 +93,8 @@ public class AbsoluteRectangle extends AbstractRectangle {
 		this.rectangle.width = other.rectangle.width;
 	}
 	
+	public boolean equals(final AbsoluteRectangle other) {
+		return other == null ? false : rectangle.equals(other.rectangle);
+	}
+	
 }
