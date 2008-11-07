@@ -18,12 +18,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 
 public class GeneralPreferencePage extends PreferencePage {
 	
-	private static Logger log = SpyglassLogger.get(GeneralPreferencePage.class);
+	private static Logger log = SpyglassLoggerFactory.get(GeneralPreferencePage.class);
 	
 	/**
 	 * databinding context. may be null before createContents() is called.

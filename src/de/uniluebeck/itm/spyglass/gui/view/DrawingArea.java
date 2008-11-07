@@ -35,7 +35,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * The drawing area is the place, where all nodes etc. are painted on. this class contains all
@@ -48,7 +48,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public class DrawingArea extends Canvas {
 	
-	private static Logger log = SpyglassLogger.get(DrawingArea.class);
+	private static Logger log = SpyglassLoggerFactory.get(DrawingArea.class);
 	
 	/**
 	 * Reference to model

@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public abstract class NodePainterPlugin extends Plugin implements Drawable {
 	
-	private final Logger log = SpyglassLogger.getLogger(NodePainterPlugin.class);
+	private final Logger log = SpyglassLoggerFactory.getLogger(NodePainterPlugin.class);
 	
 	// --------------------------------------------------------------------------------
 	/**

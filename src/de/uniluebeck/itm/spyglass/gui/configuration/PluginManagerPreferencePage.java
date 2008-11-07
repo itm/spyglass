@@ -40,7 +40,7 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class PluginManagerPreferencePage extends PreferencePage {
 	
@@ -411,7 +411,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private static final String COLUMN_VISIBLE = "Visible";
 	
-	private static final Logger log = SpyglassLogger.get(PluginManagerPreferencePage.class);
+	private static final Logger log = SpyglassLoggerFactory.get(PluginManagerPreferencePage.class);
 	
 	private Button buttonDown;
 	

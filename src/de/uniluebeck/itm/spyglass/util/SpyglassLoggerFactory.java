@@ -12,19 +12,22 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.net.SocketAppender;
 
 /**
- * Static wrapper class for accessing log4j
+ * Instances of this class create and provide instances of classes which can to be used for logging
+ * different kinds of events and message types.
  * 
  * @author Sebastian Ebers
  */
-public class SpyglassLogger {
+public class SpyglassLoggerFactory {
 	
 	private static long timestamp = new Date().getTime();
-	private static final String fileNameLog = "." + File.separator + "logs" + File.separator + timestamp + "_messages.log";
-	private static PatternLayout patternLayout = new PatternLayout("%-9d{HH:mm:ss} [%t] %-8p %-20c{1} - %m%n");
+	private static final String fileNameLog = "." + File.separator + "logs" + File.separator
+			+ timestamp + "_messages.log";
+	private static PatternLayout patternLayout = new PatternLayout(
+			"%-9d{HH:mm:ss} [%t] %-8p %-20c{1} - %m%n");
 	private static PatternLayout fileLoggerLayout = patternLayout;
 	
-	private static Logger standardLogger = Logger.getLogger(SpyglassLogger.class);
-	private static Logger newline = Logger.getLogger(SpyglassLogger.class);
+	private static Logger standardLogger = Logger.getLogger(SpyglassLoggerFactory.class);
+	private static Logger newline = Logger.getLogger(SpyglassLoggerFactory.class);
 	private static Map<String, Logger> loggerMap = new HashMap<String, Logger>();
 	private static Level loglevel = Level.DEBUG;
 	public static boolean writeLogfile = false;

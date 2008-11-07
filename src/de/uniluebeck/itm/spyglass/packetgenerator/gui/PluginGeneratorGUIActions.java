@@ -7,11 +7,11 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class PluginGeneratorGUIActions {
 	
-	private static final Logger log = SpyglassLogger.get(PluginGeneratorGUIActions.class);
+	private static final Logger log = SpyglassLoggerFactory.get(PluginGeneratorGUIActions.class);
 	
 	private final PacketGeneratorIShellPlugin gen;
 	

@@ -10,6 +10,7 @@ package de.uniluebeck.itm.spyglass.core;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -23,7 +24,7 @@ import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
 // --
@@ -38,7 +39,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * needed.
  */
 public class Spyglass {
-	private static Logger log = SpyglassLogger.get(Spyglass.class);
+	private static Logger log = SpyglassLoggerFactory.get(Spyglass.class);
 	
 	// private static final String CONFIG_FILE = "config.xml";
 	
@@ -238,6 +239,7 @@ public class Spyglass {
 		return packetProducerTask;
 	}
 	
+	// --------------------------------------------------------------------------------
 	/**
 	 * This method gets the bounding boxes of all visible drawingObjects (which are applicable for
 	 * AutoZoom and scrollbars) and merges them.
@@ -271,5 +273,21 @@ public class Spyglass {
 		}
 		return maxRect;
 	};
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Resets the application
+	 */
+	public void reset() {
+		try {
+			packetReader.reset();
+		} catch (final IOException e) {
+			log.error("Error while trying to reset the packet reader", e);
+		}
+		final List<Plugin> plugins = pluginManager.getPlugins();
+		for (final Plugin plugin : plugins) {
+			plugin.reset();
+		}
+	}
 	
 }

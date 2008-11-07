@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
@@ -57,7 +57,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	/**
 	 * Object which is used to log different kinds of messages
 	 */
-	private static final Logger log = SpyglassLogger.getLogger(Plugin.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(Plugin.class);
 	
 	/**
 	 * This list contains the DrawingObjectListeners.

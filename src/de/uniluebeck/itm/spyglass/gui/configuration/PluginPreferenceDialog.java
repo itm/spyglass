@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Shell;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class PluginPreferenceDialog implements PluginListChangeListener {
@@ -477,7 +477,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 	}
 	
-	private static final Logger log = SpyglassLogger.get(PluginPreferenceDialog.class);
+	private static final Logger log = SpyglassLoggerFactory.get(PluginPreferenceDialog.class);
 	
 	private static final String NODE_ID_PLUGINMANAGER = "NodeIdPluginManager";
 	

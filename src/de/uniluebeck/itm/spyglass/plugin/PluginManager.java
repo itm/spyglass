@@ -35,7 +35,7 @@ import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInf
 import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.springembedderpositioner.SpringEmbedderPositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter.VectorSequencePainterPlugin;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // ------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 @Root
 public class PluginManager {
 	
-	private static Logger log = SpyglassLogger.get(PluginManager.class);
+	private static Logger log = SpyglassLoggerFactory.get(PluginManager.class);
 	
 	@ElementList
 	private final List<Plugin> plugins = Collections.synchronizedList(new ArrayList<Plugin>());

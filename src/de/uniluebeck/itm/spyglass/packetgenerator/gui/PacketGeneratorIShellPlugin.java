@@ -16,7 +16,7 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.load.Persister;
 
 import de.uniluebeck.itm.spyglass.packetgenerator.PacketGenerator;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * This is an iShell Plugin which wraps the Spyglass PacketGenerator.
@@ -28,7 +28,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * 
  */
 public class PacketGeneratorIShellPlugin extends Plugin {
-	private static Logger log = SpyglassLogger.get(PacketGeneratorIShellPlugin.class);
+	private static Logger log = SpyglassLoggerFactory.get(PacketGeneratorIShellPlugin.class);
 	
 	/**
 	 * The packet generator

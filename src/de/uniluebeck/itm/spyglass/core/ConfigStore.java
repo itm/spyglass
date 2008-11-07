@@ -28,7 +28,7 @@ import org.simpleframework.xml.load.Persister;
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // ------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ public class ConfigStore extends PropertyBean {
 	private SpyglassConfiguration spyglassConfig;
 	
 	/** An object which is used for logging errors and other events */
-	private static Logger log = SpyglassLogger.get(ConfigStore.class);
+	private static Logger log = SpyglassLoggerFactory.get(ConfigStore.class);
 	
 	private volatile Boolean isStoringInvoked = false;
 	

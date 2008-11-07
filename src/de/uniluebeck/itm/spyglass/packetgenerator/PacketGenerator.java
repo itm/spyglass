@@ -9,7 +9,7 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.packetgenerator.samples.Sample;
 import de.uniluebeck.itm.spyglass.packetgenerator.sinks.Sink;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * The Main Generator class. it runs in a loop and creates and distributes packets.
@@ -20,7 +20,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 @Root
 public class PacketGenerator {
 	
-	private static Logger log = SpyglassLogger.get(PacketGenerator.class);
+	private static Logger log = SpyglassLoggerFactory.get(PacketGenerator.class);
 	
 	/**
 	 * The generator.

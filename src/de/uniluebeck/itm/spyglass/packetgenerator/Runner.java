@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.load.Persister;
 
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * Main Class.
@@ -15,7 +15,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * 
  */
 public class Runner {
-	private static Logger log = SpyglassLogger.get(Runner.class);
+	private static Logger log = SpyglassLoggerFactory.get(Runner.class);
 	
 	/**
 	 * Start this generator.

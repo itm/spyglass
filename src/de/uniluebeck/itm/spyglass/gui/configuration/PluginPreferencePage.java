@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig>
 		extends PreferencePage {
 	
-	private static Logger log = SpyglassLogger.get(PluginPreferencePage.class);
+	private static Logger log = SpyglassLoggerFactory.get(PluginPreferencePage.class);
 	
 	// --------------------------------------------------------------------------------
 	/**

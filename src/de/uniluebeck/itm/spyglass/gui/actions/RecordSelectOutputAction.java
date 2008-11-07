@@ -6,11 +6,11 @@ import org.eclipse.jface.resource.ImageDescriptor;
 
 import de.uniluebeck.itm.spyglass.core.PacketRecorder;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class RecordSelectOutputAction extends Action {
 	
-	private static final Logger log = SpyglassLogger.get(RecordSelectOutputAction.class);
+	private static final Logger log = SpyglassLoggerFactory.get(RecordSelectOutputAction.class);
 	
 	private Spyglass spyglass;
 	

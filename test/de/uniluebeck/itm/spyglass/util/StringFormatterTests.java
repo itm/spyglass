@@ -21,7 +21,7 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
  */
 public class StringFormatterTests {
 	
-	private static final Logger log = SpyglassLogger.getLogger(StringFormatterTests.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(StringFormatterTests.class);
 	private SpyglassPacket packet1 = null;
 	private SpyglassPacket packet2 = null;
 	private SpyglassPacket packet3 = null;

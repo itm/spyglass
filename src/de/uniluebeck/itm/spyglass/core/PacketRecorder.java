@@ -19,7 +19,7 @@ import de.uniluebeck.itm.spyglass.packet.PacketFactory;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
@@ -34,7 +34,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	
 	/** Object to log status and error messages within the PacketRecorder */
-	static final Logger log = SpyglassLogger.getLogger(PacketRecorder.class);
+	static final Logger log = SpyglassLoggerFactory.getLogger(PacketRecorder.class);
 	
 	/**
 	 * Indicates whether the incoming packages are currently recorded
@@ -117,7 +117,9 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 		} else {
 			
 			this.record = false;
-			packetConsumerThread.interrupt();
+			if ((packetConsumerThread != null) && !packetConsumerThread.isInterrupted()) {
+				packetConsumerThread.interrupt();
+			}
 			recordingQueue.clear();
 			packetConsumerThread = null;
 		}
@@ -178,7 +180,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 									queue.wait();
 								} catch (final InterruptedException e) {
 									log
-											.info("The packet recorder's packet consumer thread was interrupted while waiting for a notification of the arrival of a new packet");
+											.debug("The packet recorder's packet consumer thread was interrupted while waiting for a notification of the arrival of a new packet");
 									interrupt();
 								}
 							}
@@ -553,12 +555,35 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	public void reset() throws IOException {
 		log.info("Reset requested");
 		super.reset();
-		setRecord(false);
-		setPlayback(false);
+		
+		if (isPlayback() && !isRecord()) {
+			MessageDialog.openInformation(null, "Reset playback",
+					"The playback will be restarted from the beginning of the file.");
+		}
+
+		else if (isPlayback() && isRecord()) {
+			setRecord(!MessageDialog.openConfirm(null, "Reset Recorder",
+					"The playback will be restarted from the beginning of the file.\r\n"
+							+ "Do you want to disable recording?"));
+		}
+
+		else if (isRecord()) {
+			setRecord(!MessageDialog.openConfirm(null, "Reset Recorder",
+					"Do you want to disable recording?"));
+		}
+		
+		// setPlayback(false);
 		recordFileString = null;
-		getGateway().getInputStream().close();
 		lastPlaybackPacketTimestamp = -1;
 		previousRecordFile = null;
+		if ((getGateway() != null) && (getGateway().getInputStream() != null)) {
+			getGateway().getInputStream().reset();
+			// getGateway().getInputStream().close();
+			// if (getGateway() instanceof FileReaderGateway) {
+			// ((FileReaderGateway) getGateway()).setFile(null);
+			// }
+		}
+		
 	}
 	
 	// --------------------------------------------------------------------------------

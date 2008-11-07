@@ -32,12 +32,12 @@ import de.uniluebeck.itm.spyglass.gui.databinding.validator.PluginNameValidator;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.StringToIntListValidator;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 	
-	private static final Logger log = SpyglassLogger.getLogger(BasicGroupComposite.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(BasicGroupComposite.class);
 	
 	private Label label1;
 	private Button isActive;

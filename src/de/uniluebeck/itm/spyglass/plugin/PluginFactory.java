@@ -11,7 +11,7 @@ package de.uniluebeck.itm.spyglass.plugin;
 import org.apache.log4j.Logger;
 
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // ------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class PluginFactory {
 	
-	private static Logger log = SpyglassLogger.get(PluginFactory.class);
+	private static Logger log = SpyglassLoggerFactory.get(PluginFactory.class);
 	
 	private final ConfigStore configStore;
 	

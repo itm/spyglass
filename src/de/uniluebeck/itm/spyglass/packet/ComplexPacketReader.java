@@ -12,7 +12,7 @@ import java.io.InputStream;
 
 import org.apache.log4j.Logger;
 
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
@@ -25,7 +25,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public class ComplexPacketReader extends PacketReader {
 	
-	private static Logger log = SpyglassLogger.get(ComplexPacketReader.class);
+	private static Logger log = SpyglassLoggerFactory.get(ComplexPacketReader.class);
 	
 	private InputStream playbackFileReader = null;
 	

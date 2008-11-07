@@ -29,7 +29,7 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
 // --
@@ -40,7 +40,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public class UIController {
 	
-	private static Logger log = SpyglassLogger.get(UIController.class);
+	private static Logger log = SpyglassLoggerFactory.get(UIController.class);
 	
 	private AppWindow appWindow = null;
 	

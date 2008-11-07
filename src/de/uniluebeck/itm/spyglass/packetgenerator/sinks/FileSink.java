@@ -8,7 +8,7 @@ import java.text.ParseException;
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * File sink. Writes all packets in a file.
@@ -18,7 +18,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public class FileSink extends Sink {
 	
-	private static Logger log = SpyglassLogger.get(FileSink.class);
+	private static Logger log = SpyglassLoggerFactory.get(FileSink.class);
 	
 	/**
 	 * The filename

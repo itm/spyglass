@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
 // --
@@ -25,7 +25,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 @Root
 public class NetworkGateway implements Gateway {
-	private static Logger log = SpyglassLogger.get(NetworkGateway.class);
+	private static Logger log = SpyglassLoggerFactory.get(NetworkGateway.class);
 	
 	@Element
 	private String hostname = "server";

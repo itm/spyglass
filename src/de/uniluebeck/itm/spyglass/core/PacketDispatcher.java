@@ -15,7 +15,7 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.Tools;
 
 // ------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ import de.uniluebeck.itm.spyglass.util.Tools;
  * a concurrent modification exception.
  */
 public class PacketDispatcher {
-	private static Logger log = SpyglassLogger.get(PacketDispatcher.class);
+	private static Logger log = SpyglassLoggerFactory.get(PacketDispatcher.class);
 	
 	private PluginManager pluginManager = null;
 	

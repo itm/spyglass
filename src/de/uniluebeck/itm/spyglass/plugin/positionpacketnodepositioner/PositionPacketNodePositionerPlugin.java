@@ -19,7 +19,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
@@ -29,7 +29,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
-	private static Logger log = SpyglassLogger.get(PositionPacketNodePositionerPlugin.class);
+	private static Logger log = SpyglassLoggerFactory.get(PositionPacketNodePositionerPlugin.class);
 	
 	@Element(name = "parameters")
 	private final PositionPacketNodePositionerXMLConfig xmlConfig;

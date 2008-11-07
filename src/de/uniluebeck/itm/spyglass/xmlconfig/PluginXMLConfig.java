@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
  */
 public abstract class PluginXMLConfig extends XMLConfig {
 	
-	// private static final Logger log = SpyglassLogger.get(PluginXMLConfig.class);
+	// private static final Logger log = SpyglassLoggerFactory.get(PluginXMLConfig.class);
 	
 	// public static final int[] ALL_SEMANTIC_TYPES = new int[256];
 	// static {

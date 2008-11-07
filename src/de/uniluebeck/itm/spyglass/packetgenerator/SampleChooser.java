@@ -8,7 +8,7 @@ import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.packetgenerator.samples.Sample;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * This is a class selects a random sample based on the probabilities of the samples.
@@ -19,7 +19,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 @Root
 public class SampleChooser {
 	
-	private static Logger log = SpyglassLogger.get(SampleChooser.class);
+	private static Logger log = SpyglassLoggerFactory.get(SampleChooser.class);
 	
 	/**
 	 * List of Samples.

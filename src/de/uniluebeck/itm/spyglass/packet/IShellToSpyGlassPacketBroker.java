@@ -11,7 +11,7 @@ import java.util.Deque;
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Root;
 
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
@@ -30,7 +30,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	 */
 	private Deque<SpyglassPacket> queue = new ArrayDeque<SpyglassPacket>(50);
 	
-	private static final Logger log = SpyglassLogger.getLogger(IShellToSpyGlassPacketBroker.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(IShellToSpyGlassPacketBroker.class);
 	
 	// --------------------------------------------------------------------------------
 	/**

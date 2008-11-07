@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * Window to set the config path fpr the Plugingenerator.
@@ -20,7 +20,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * @author dariush
  */
 public class IShellTab extends org.eclipse.swt.widgets.Composite {
-	private static Logger log = SpyglassLogger.get(IShellTab.class);
+	private static Logger log = SpyglassLoggerFactory.get(IShellTab.class);
 	
 	Label label;
 	Text text;

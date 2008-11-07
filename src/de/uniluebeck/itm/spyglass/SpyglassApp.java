@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Shell;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.UIController;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
 // --
@@ -25,7 +25,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  * instantiate and injects the core classes that are needed to run the application.
  */
 public class SpyglassApp {
-	private static Logger log = SpyglassLogger.getLogger(SpyglassApp.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(SpyglassApp.class);
 	
 	// -------------------------------------------------------------------------
 	/**

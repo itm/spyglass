@@ -14,7 +14,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * This Sink sends packets over an TCP-Socket via the protocol specified by iShell.
@@ -26,7 +26,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
  */
 public class IShellSocketSink extends Sink {
 	
-	private static Logger log = SpyglassLogger.getLogger(IShellSocketSink.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(IShellSocketSink.class);
 	
 	/**
 	 * Magic byte for the iShell communication protocol.

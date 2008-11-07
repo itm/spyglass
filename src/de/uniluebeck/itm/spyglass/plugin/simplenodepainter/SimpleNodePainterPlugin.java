@@ -37,7 +37,7 @@ import de.uniluebeck.itm.spyglass.plugin.nodepainter.NodePainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -58,7 +58,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	
-	private static final Logger log = SpyglassLogger.getLogger(SimpleNodePainterPlugin.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(SimpleNodePainterPlugin.class);
 	
 	/**
 	 * The configuration parameters of this plug-in instance
@@ -426,11 +426,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	public void reset() {
 		
 		synchronized (layer) {
+			for (final DrawingObject d : layer.getDrawingObjects()) {
+				fireDrawingObjectRemoved(d);
+			}
 			layer.clear();
-		}
-		
-		for (final DrawingObject d : layer.getDrawingObjects()) {
-			fireDrawingObjectRemoved(d);
 		}
 		
 		synchronized (updatedObjects) {

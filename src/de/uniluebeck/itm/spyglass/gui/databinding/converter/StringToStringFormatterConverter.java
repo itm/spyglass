@@ -3,7 +3,7 @@ package de.uniluebeck.itm.spyglass.gui.databinding.converter;
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.conversion.Converter;
 
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 
 /**
@@ -18,7 +18,7 @@ public class StringToStringFormatterConverter extends Converter {
 		super("", new StringFormatter(""));
 	}
 	
-	private static final Logger log = SpyglassLogger.get(StringToStringFormatterConverter.class);
+	private static final Logger log = SpyglassLoggerFactory.get(StringToStringFormatterConverter.class);
 	
 	@Override
 	public Object convert(final Object fromObject) {

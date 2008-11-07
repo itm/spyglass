@@ -30,7 +30,7 @@ import com.cloudgarden.resource.SWTResourceManager;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ArrayToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverter;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
 public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
@@ -41,7 +41,7 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 		SWTResourceManager.registerResourceUser(this);
 	}
 	
-	private static final Logger log = SpyglassLogger.getLogger(MapPainterPrefComposite.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(MapPainterPrefComposite.class);
 	private Group group1;
 	private Label label1;
 	private Label label11space;
