@@ -25,7 +25,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 @Root
 public class FileReaderGateway implements Gateway {
-	private static Logger log = SpyglassLoggerFactory.get(FileReaderGateway.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(FileReaderGateway.class);
 	
 	private File file = null;
 	

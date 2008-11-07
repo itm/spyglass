@@ -411,7 +411,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	
 	private static final String COLUMN_VISIBLE = "Visible";
 	
-	private static final Logger log = SpyglassLoggerFactory.get(PluginManagerPreferencePage.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(PluginManagerPreferencePage.class);
 	
 	private Button buttonDown;
 	

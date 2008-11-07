@@ -8,7 +8,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class PlayPlayPauseAction extends Action {
 	
-	private static final Logger log = SpyglassLoggerFactory.get(PlayPlayPauseAction.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(PlayPlayPauseAction.class);
 	
 	private final ImageDescriptor pauseImageDescriptor = getImageDescriptor("play_pause.png");
 	

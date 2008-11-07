@@ -11,7 +11,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class PluginGeneratorGUIActions {
 	
-	private static final Logger log = SpyglassLoggerFactory.get(PluginGeneratorGUIActions.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(PluginGeneratorGUIActions.class);
 	
 	private final PacketGeneratorIShellPlugin gen;
 	

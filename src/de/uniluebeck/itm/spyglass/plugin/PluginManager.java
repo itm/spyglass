@@ -47,7 +47,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 @Root
 public class PluginManager {
 	
-	private static Logger log = SpyglassLoggerFactory.get(PluginManager.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(PluginManager.class);
 	
 	@ElementList
 	private final List<Plugin> plugins = Collections.synchronizedList(new ArrayList<Plugin>());

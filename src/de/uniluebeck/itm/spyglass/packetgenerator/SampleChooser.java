@@ -19,7 +19,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 @Root
 public class SampleChooser {
 	
-	private static Logger log = SpyglassLoggerFactory.get(SampleChooser.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(SampleChooser.class);
 	
 	/**
 	 * List of Samples.

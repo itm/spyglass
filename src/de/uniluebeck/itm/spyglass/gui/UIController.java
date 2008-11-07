@@ -40,7 +40,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class UIController {
 	
-	private static Logger log = SpyglassLoggerFactory.get(UIController.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(UIController.class);
 	
 	private AppWindow appWindow = null;
 	

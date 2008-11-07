@@ -28,7 +28,7 @@ import de.uniluebeck.itm.spyglass.util.Tools;
  * a concurrent modification exception.
  */
 public class PacketDispatcher {
-	private static Logger log = SpyglassLoggerFactory.get(PacketDispatcher.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(PacketDispatcher.class);
 	
 	private PluginManager pluginManager = null;
 	

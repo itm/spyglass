@@ -20,7 +20,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * @author dariush
  */
 public class IShellTab extends org.eclipse.swt.widgets.Composite {
-	private static Logger log = SpyglassLoggerFactory.get(IShellTab.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(IShellTab.class);
 	
 	Label label;
 	Text text;

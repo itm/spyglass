@@ -18,7 +18,7 @@ public class StringToStringFormatterConverter extends Converter {
 		super("", new StringFormatter(""));
 	}
 	
-	private static final Logger log = SpyglassLoggerFactory.get(StringToStringFormatterConverter.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(StringToStringFormatterConverter.class);
 	
 	@Override
 	public Object convert(final Object fromObject) {

@@ -18,7 +18,6 @@ import java.nio.channels.FileChannel;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -74,7 +73,7 @@ public class ConfigStore extends PropertyBean {
 	private SpyglassConfiguration spyglassConfig;
 	
 	/** An object which is used for logging errors and other events */
-	private static Logger log = SpyglassLoggerFactory.get(ConfigStore.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(ConfigStore.class);
 	
 	private volatile Boolean isStoringInvoked = false;
 	
@@ -281,10 +280,11 @@ public class ConfigStore extends PropertyBean {
 			return config;
 			
 		} catch (final Exception e) {
-			log.error("Unable to load configuration input: " + e, e);
-			MessageDialog.openError(Display.getDefault().getActiveShell(),
-					"Unable to load the SpyGlass configuration", "The configuration file '"
-							+ configFile.getName() + "' is invalid!\r\n" + e.getLocalizedMessage());
+			log.error("Unable to load configuration input:\r\nThe configuration file '"
+					+ configFile.getName() + "' is invalid!", e);
+			// MessageDialog.openError(Display.getDefault().getActiveShell(),
+			// "Unable to load the SpyGlass configuration", "The configuration file '"
+			// + configFile.getName() + "' is invalid!\r\n" + e.getLocalizedMessage());
 			return null;
 		}
 	}

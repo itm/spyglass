@@ -48,7 +48,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class DrawingArea extends Canvas {
 	
-	private static Logger log = SpyglassLoggerFactory.get(DrawingArea.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(DrawingArea.class);
 	
 	/**
 	 * Reference to model

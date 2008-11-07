@@ -15,7 +15,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * 
  */
 public class Runner {
-	private static Logger log = SpyglassLoggerFactory.get(Runner.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(Runner.class);
 	
 	/**
 	 * Start this generator.

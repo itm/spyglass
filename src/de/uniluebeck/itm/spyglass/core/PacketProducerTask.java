@@ -26,7 +26,7 @@ import de.uniluebeck.itm.spyglass.util.Tools;
  * <code>visualizationRunning</code> member of the Spyglass class is set to false.
  */
 public class PacketProducerTask implements Runnable {
-	private final Logger log = SpyglassLoggerFactory.get(PacketProducerTask.class);
+	private final Logger log = SpyglassLoggerFactory.getLogger(PacketProducerTask.class);
 	
 	// private Deque<Packet> packetCache = null;
 	

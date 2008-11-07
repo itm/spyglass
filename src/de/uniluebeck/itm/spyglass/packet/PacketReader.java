@@ -25,7 +25,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * @author Timo Rumland
  */
 public abstract class PacketReader extends PropertyBean {
-	private static Logger log = SpyglassLoggerFactory.get(PacketReader.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(PacketReader.class);
 	
 	@Element(name = "gateway", required = false)
 	private Gateway gateway = null;

@@ -8,7 +8,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class PlayResetAction extends Action {
 	
-	private static final Logger log = SpyglassLoggerFactory.get(PlayResetAction.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(PlayResetAction.class);
 	
 	private Spyglass spyglass;
 	

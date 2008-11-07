@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  * Convenience tools
  */
 public class Tools {
-	private static Logger log = SpyglassLoggerFactory.get(Tools.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(Tools.class);
 	
 	// -------------------------------------------------------------------------
 	/**

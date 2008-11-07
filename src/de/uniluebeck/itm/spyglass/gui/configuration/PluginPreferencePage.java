@@ -47,7 +47,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig>
 		extends PreferencePage {
 	
-	private static Logger log = SpyglassLoggerFactory.get(PluginPreferencePage.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(PluginPreferencePage.class);
 	
 	// --------------------------------------------------------------------------------
 	/**

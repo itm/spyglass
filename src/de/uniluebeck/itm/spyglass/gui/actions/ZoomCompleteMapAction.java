@@ -21,7 +21,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class ZoomCompleteMapAction extends Action {
 	
-	private static final Logger log = SpyglassLoggerFactory.get(ZoomCompleteMapAction.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(ZoomCompleteMapAction.class);
 	
 	private final ImageDescriptor imageDescriptor = getImageDescriptor("zoom_complete_map.png");
 	

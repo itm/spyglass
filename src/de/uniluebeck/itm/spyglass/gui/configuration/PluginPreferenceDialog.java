@@ -477,7 +477,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		
 	}
 	
-	private static final Logger log = SpyglassLoggerFactory.get(PluginPreferenceDialog.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(PluginPreferenceDialog.class);
 	
 	private static final String NODE_ID_PLUGINMANAGER = "NodeIdPluginManager";
 	

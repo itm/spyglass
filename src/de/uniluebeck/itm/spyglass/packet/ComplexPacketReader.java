@@ -25,7 +25,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class ComplexPacketReader extends PacketReader {
 	
-	private static Logger log = SpyglassLoggerFactory.get(ComplexPacketReader.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(ComplexPacketReader.class);
 	
 	private InputStream playbackFileReader = null;
 	

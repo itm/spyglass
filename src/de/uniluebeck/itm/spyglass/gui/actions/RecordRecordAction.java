@@ -11,7 +11,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class RecordRecordAction extends Action {
 	
-	private static final Logger log = SpyglassLoggerFactory.get(RecordRecordAction.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(RecordRecordAction.class);
 	
 	private Spyglass spyglass;
 	

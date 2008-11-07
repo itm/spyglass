@@ -18,7 +18,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class FileSink extends Sink {
 	
-	private static Logger log = SpyglassLoggerFactory.get(FileSink.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(FileSink.class);
 	
 	/**
 	 * The filename

@@ -39,7 +39,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * needed.
  */
 public class Spyglass {
-	private static Logger log = SpyglassLoggerFactory.get(Spyglass.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(Spyglass.class);
 	
 	// private static final String CONFIG_FILE = "config.xml";
 	

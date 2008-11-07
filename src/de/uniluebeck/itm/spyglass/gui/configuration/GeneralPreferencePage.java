@@ -23,7 +23,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 
 public class GeneralPreferencePage extends PreferencePage {
 	
-	private static Logger log = SpyglassLoggerFactory.get(GeneralPreferencePage.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(GeneralPreferencePage.class);
 	
 	/**
 	 * databinding context. may be null before createContents() is called.

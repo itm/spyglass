@@ -20,7 +20,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 @Root
 public class PacketGenerator {
 	
-	private static Logger log = SpyglassLoggerFactory.get(PacketGenerator.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(PacketGenerator.class);
 	
 	/**
 	 * The generator.

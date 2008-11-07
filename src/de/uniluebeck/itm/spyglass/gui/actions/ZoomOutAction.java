@@ -8,7 +8,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class ZoomOutAction extends Action {
 	
-	private static final Logger log = SpyglassLoggerFactory.get(ZoomOutAction.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(ZoomOutAction.class);
 	
 	private final ImageDescriptor imageDescriptor = getImageDescriptor("zoom_out.png");
 	

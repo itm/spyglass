@@ -66,7 +66,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * For further information, please refer to the iShell manual.
  */
 public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
-	private static Logger log = SpyglassLoggerFactory.get(PluginSpyGlass2iShell.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(PluginSpyGlass2iShell.class);
 	
 	private static final int SPYGLASS_PACKET_TYPE = 0x91;
 	

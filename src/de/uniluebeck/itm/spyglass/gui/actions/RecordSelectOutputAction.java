@@ -10,7 +10,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class RecordSelectOutputAction extends Action {
 	
-	private static final Logger log = SpyglassLoggerFactory.get(RecordSelectOutputAction.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(RecordSelectOutputAction.class);
 	
 	private Spyglass spyglass;
 	

@@ -29,7 +29,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
-	private static Logger log = SpyglassLoggerFactory.get(PositionPacketNodePositionerPlugin.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(PositionPacketNodePositionerPlugin.class);
 	
 	@Element(name = "parameters")
 	private final PositionPacketNodePositionerXMLConfig xmlConfig;

@@ -25,7 +25,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 @Root
 public class NetworkGateway implements Gateway {
-	private static Logger log = SpyglassLoggerFactory.get(NetworkGateway.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(NetworkGateway.class);
 	
 	@Element
 	private String hostname = "server";

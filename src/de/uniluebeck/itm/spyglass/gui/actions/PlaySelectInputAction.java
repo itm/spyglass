@@ -7,7 +7,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class PlaySelectInputAction extends Action {
 	
-	private static final Logger log = SpyglassLoggerFactory.get(PlaySelectInputAction.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(PlaySelectInputAction.class);
 	
 	@Override
 	public void run() {

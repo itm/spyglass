@@ -26,7 +26,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class PluginFactory {
 	
-	private static Logger log = SpyglassLoggerFactory.get(PluginFactory.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(PluginFactory.class);
 	
 	private final ConfigStore configStore;
 	

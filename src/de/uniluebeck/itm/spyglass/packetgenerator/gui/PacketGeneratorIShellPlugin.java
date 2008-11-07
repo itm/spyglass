@@ -28,7 +28,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * 
  */
 public class PacketGeneratorIShellPlugin extends Plugin {
-	private static Logger log = SpyglassLoggerFactory.get(PacketGeneratorIShellPlugin.class);
+	private static Logger log = SpyglassLoggerFactory.getLogger(PacketGeneratorIShellPlugin.class);
 	
 	/**
 	 * The packet generator
