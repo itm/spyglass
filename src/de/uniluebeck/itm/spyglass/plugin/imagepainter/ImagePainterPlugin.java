@@ -10,7 +10,6 @@ package de.uniluebeck.itm.spyglass.plugin.imagepainter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.List;
 
 import org.simpleframework.xml.Element;
@@ -101,12 +100,6 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	protected void updateQuadTree() {
 		// since the plug-in is not interested in packets, nothing has to be
 		// done here
-	}
-	
-	@Override
-	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		// auto-zoom should ignore images for convenience
-		return Collections.emptyList();
 	}
 	
 	@Override

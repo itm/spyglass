@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -241,10 +242,44 @@ public class Spyglass {
 	
 	// --------------------------------------------------------------------------------
 	/**
+	 * This method gets the bounding boxes of all visible drawingObjects
+	 */
+	public AbsoluteRectangle getBoundingBox() {
+		final List<Plugin> list = getPluginManager().getVisibleActivePlugins();
+		
+		final List<DrawingObject> dobs = new ArrayList<DrawingObject>();
+		
+		for (final Plugin plugin : list) {
+			if (plugin instanceof Drawable) {
+				final Drawable plugin2 = (Drawable) plugin;
+				
+				// XXX: this should be no hot path, so no big worry.
+				dobs.addAll(plugin2.getDrawingObjects(DrawingArea.getGlobalBoundingBox()));
+			}
+		}
+		
+		AbsoluteRectangle maxRect = new AbsoluteRectangle();
+		
+		for (final DrawingObject drawingObject : dobs) {
+			final AbsoluteRectangle nextRect = drawingObject.getBoundingBox();
+			if (nextRect == null) {
+				continue;
+			}
+			
+			if (maxRect == null) {
+				maxRect = nextRect;
+			} else {
+				maxRect = maxRect.union(nextRect);
+			}
+		}
+		return maxRect;
+	};
+	
+	/**
 	 * This method gets the bounding boxes of all visible drawingObjects (which are applicable for
 	 * AutoZoom and scrollbars) and merges them.
 	 */
-	public AbsoluteRectangle getBoundingBox() {
+	public AbsoluteRectangle getAutoZoomBoundingBox() {
 		final List<Plugin> list = getPluginManager().getVisibleActivePlugins();
 		
 		final List<DrawingObject> dobs = new ArrayList<DrawingObject>();

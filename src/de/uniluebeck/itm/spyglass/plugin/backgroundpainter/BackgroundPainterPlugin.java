@@ -1,14 +1,16 @@
 /*
- * ---------------------------------------------------------------------- This
- * file is part of the WSN visualization framework SpyGlass. Copyright (C)
- * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
- * software; you can redistribute it and/or modify it under the terms of the BSD
- * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
- * source tree for further details.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------- This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details. ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.backgroundpainter;
 
+import java.util.Collections;
+import java.util.List;
+
+import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
@@ -22,12 +24,10 @@ public abstract class BackgroundPainterPlugin extends Plugin implements Drawable
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor<br>
-	 * If the plug-in has to administer a packet queue a new thread will be
-	 * started.
+	 * If the plug-in has to administer a packet queue a new thread will be started.
 	 * 
 	 * @param needsPacketQueue
-	 *            indicates whether or not the plug-in has to administer a
-	 *            packet queue
+	 *            indicates whether or not the plug-in has to administer a packet queue
 	 */
 	public BackgroundPainterPlugin(final boolean needsPacketQueue) {
 		super(needsPacketQueue);
@@ -39,6 +39,16 @@ public abstract class BackgroundPainterPlugin extends Plugin implements Drawable
 	
 	public static String getHumanReadableName() {
 		return "BackgroundPainter";
+	}
+	
+	/**
+	 * As a general rule, BackgroundPainter DrawingObjects should not be considered for AutoZoom.
+	 * (Since putting a large Image or Grid in the Background would render the AutoZoom feature
+	 * useless).
+	 */
+	@Override
+	public List<DrawingObject> getAutoZoomDrawingObjects() {
+		return Collections.emptyList();
 	}
 	
 	@Override

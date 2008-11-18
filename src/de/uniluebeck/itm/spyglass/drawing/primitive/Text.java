@@ -72,12 +72,6 @@ public class Text extends DrawingObject {
 	}
 	
 	@Override
-	public AbsoluteRectangle getBoundingBox() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 		// TODO Auto-generated method stub
 		return null;

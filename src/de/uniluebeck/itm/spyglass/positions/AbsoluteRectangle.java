@@ -47,6 +47,15 @@ public class AbsoluteRectangle extends AbstractRectangle {
 		this.rectangle.y = upperLeft.y;
 	}
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the coordinates of the center point
+	 */
+	public AbsolutePosition getCenter() {
+		return new AbsolutePosition(rectangle.x + rectangle.width / 2, rectangle.y
+				+ rectangle.height / 2, 0);
+	}
+	
 	/**
 	 * Returns a new rectangle which represents the union of the receiver and the given rectangle.
 	 * 

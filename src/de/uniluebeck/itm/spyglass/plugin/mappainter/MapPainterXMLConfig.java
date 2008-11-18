@@ -12,6 +12,8 @@ package de.uniluebeck.itm.spyglass.plugin.mappainter;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
+import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -157,6 +159,16 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 		firePropertyChange("lowerLeftY", this.lowerLeftY, this.lowerLeftY = lowerLeftY);
 	}
 	
+	/**
+	 * Return the lower left point
+	 */
+	public AbsolutePosition getLowerLeft() {
+		final AbsolutePosition pos = new AbsolutePosition();
+		pos.x = getLowerLeftX();
+		pos.y = getLowerLeftY();
+		return pos;
+	}
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lockGridElementSquare
@@ -210,7 +222,7 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 */
 	public void setMaxColorRGB(final int[] maxColorRGB) {
 		
-		firePropertyChange("maxColorRGB", this.maxColorRGB, this.maxColorRGB = maxColorRGB);
+		firePropertyChange("maxColorRGB", this.maxColorRGB, this.maxColorRGB = maxColorRGB.clone());
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -246,7 +258,7 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 */
 	public void setMinColorRGB(final int[] minColorRGB) {
 		
-		firePropertyChange("minColorRGB", this.minColorRGB, this.minColorRGB = minColorRGB);
+		firePropertyChange("minColorRGB", this.minColorRGB, this.minColorRGB = minColorRGB.clone());
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -321,6 +333,13 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 		
 		firePropertyChange("numFramePointsVertical", this.numFramePointsVertical,
 				this.numFramePointsVertical = numFramePointsVertical);
+	}
+	
+	/**
+	 * Return the dimensions of the grid.
+	 */
+	public AbsoluteRectangle getBoundingBox() {
+		return new AbsoluteRectangle(this.getLowerLeft(), getWidth(), getHeight());
 	}
 	
 	// --------------------------------------------------------------------------------

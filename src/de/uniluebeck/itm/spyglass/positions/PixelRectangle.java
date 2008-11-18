@@ -19,6 +19,11 @@ public class PixelRectangle extends AbstractRectangle {
 		super(other);
 	}
 	
+	public PixelRectangle(final Rectangle other) {
+		super();
+		this.rectangle = other;
+	}
+	
 	public PixelRectangle(final int x, final int y, final int width, final int height) {
 		super(x, y, width, height);
 	}

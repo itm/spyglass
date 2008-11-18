@@ -498,7 +498,11 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
-			((DrawingObjectListener) list[i]).drawingObjectChanged(dob, oldBoundingBox);
+			if (oldBoundingBox != null) {
+				((DrawingObjectListener) list[i]).drawingObjectChanged(dob, oldBoundingBox);
+			} else {
+				((DrawingObjectListener) list[i]).drawingObjectChanged(dob, dob.getBoundingBox());
+			}
 		}
 	}
 	

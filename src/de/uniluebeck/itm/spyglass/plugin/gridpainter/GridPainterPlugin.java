@@ -10,7 +10,6 @@ package de.uniluebeck.itm.spyglass.plugin.gridpainter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.List;
 
 import org.simpleframework.xml.Element;
@@ -108,12 +107,6 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 		// dito
 		updateGrid();
 		
-	}
-	
-	@Override
-	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		// auto-zoom should ignore images for convenience
-		return Collections.emptyList();
 	}
 	
 	@Override

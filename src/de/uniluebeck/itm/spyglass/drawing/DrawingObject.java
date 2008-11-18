@@ -252,7 +252,7 @@ public abstract class DrawingObject {
 	 * 
 	 * @return the bounding box of this drawing object
 	 */
-	public AbsoluteRectangle getBoundingBox() {
+	public final AbsoluteRectangle getBoundingBox() {
 		if (boundingBox == null) {
 			updateBoundingBox();
 		}
@@ -290,11 +290,19 @@ public abstract class DrawingObject {
 		this.changeListeners.remove(listener);
 	}
 	
-	protected void updateBoundingBox() {
+	protected final void updateBoundingBox() {
 		updateBoundingBox(true);
 	}
 	
-	protected void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
+	/**
+	 * Indicates that the bounding box may have changed.
+	 * 
+	 * This method _must_ be called whenever the bounding box may have been changed.
+	 * 
+	 * @param fireBoundingBoxChangeEvent
+	 *            indicate that the listeners should be notified.
+	 */
+	protected final void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
 		final AbsoluteRectangle oldBox = this.boundingBox;
 		boundingBox = calculateBoundingBox();
 		if (fireBoundingBoxChangeEvent && ((oldBox != null) || !boundingBox.equals(oldBox))) {

@@ -22,7 +22,7 @@ public class AbsolutePosition extends AbstractPosition {
 	 * The z-coordinate is implicitly set to 0.
 	 */
 	public AbsolutePosition(final Point2D point) {
-		super((int) point.getX(), (int) point.getY(), 0);
+		super(point);
 	}
 	
 	public AbsolutePosition(final int x, final int y, final int z) {
@@ -49,6 +49,14 @@ public class AbsolutePosition extends AbstractPosition {
 	 */
 	public AbsolutePosition add(final AbsolutePosition p) {
 		return new AbsolutePosition(x + p.x, y + p.y, z + p.z);
+	}
+	
+	/**
+	 * 
+	 */
+	public double getDistance(final AbsolutePosition other) {
+		return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2)
+				+ Math.pow(this.z - other.z, 2));
 	}
 	
 }

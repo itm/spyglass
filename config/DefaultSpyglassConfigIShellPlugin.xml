@@ -30,9 +30,9 @@
                </stringFormatters>
                <defaultStringFormatter>fdsfsfsfs</defaultStringFormatter>
                <extendedInformation>
-                  <isActive nodeID="1">true</isActive>
-                  <isActive nodeID="2">true</isActive>
-                  <isActive nodeID="3">true</isActive>
+                  <isActive nodeID="1">false</isActive>
+                  <isActive nodeID="2">false</isActive>
+                  <isActive nodeID="3">false</isActive>
                </extendedInformation>
                <isExtendedDefaultValue>false</isExtendedDefaultValue>
                <lineColorRGB length="3">
@@ -147,7 +147,7 @@
                <int>-1</int>
             </semanticTypes>
             <image>images/icons/brokenImageLink.png</image>
-            <size height="1" width="1">
+            <size width="1" height="1">
                <upperLeft x="0" y="0" z="0"/>
             </size>
          </parameters>
