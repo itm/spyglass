@@ -35,8 +35,8 @@ public abstract class AbstractPosition implements Cloneable {
 	 * The z-coordinate is implicitly set to 0.
 	 */
 	public AbstractPosition(final Point2D point) {
-		x = (int) point.getX();
-		y = (int) point.getY();
+		x = (int) Math.floor(point.getX());
+		y = (int) Math.floor(point.getY());
 		z = 0;
 	}
 	
