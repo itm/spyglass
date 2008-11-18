@@ -358,10 +358,35 @@ public class DrawingArea extends Canvas {
 	/**
 	 * Transforms a rectangle from absolute coordinates into a one with pixel coordinates.
 	 * 
+	 * It is guaranteed that the resulting pixel rectangle will contain at least the area of the
+	 * original absolute rectangle (iow: the rounding is always done to the outside).
 	 * 
 	 * @param absRect
 	 */
 	public PixelRectangle absRect2PixelRect(final AbsoluteRectangle absRect) {
+		this.checkWidget();
+		
+		final PixelRectangle rect = new PixelRectangle();
+		
+		Point2D a = at.transform(absRect.getUpperLeft().toPoint2D(), null);
+		final PixelPosition upperLeftPx = new PixelPosition(a);
+		rect.setUpperLeft(upperLeftPx);
+		
+		final AbsolutePosition lowerRightAbs = new AbsolutePosition();
+		lowerRightAbs.x = absRect.getUpperLeft().x + absRect.getWidth();
+		lowerRightAbs.y = absRect.getUpperLeft().y + absRect.getHeight();
+		a = at.transform(lowerRightAbs.toPoint2D(), null);
+		final PixelPosition lowerRightPx = new PixelPosition((int) Math.floor(a.getX() + 1),
+				(int) Math.floor(a.getY() + 1));
+		
+		rect.setWidth(Math.abs(lowerRightPx.x - upperLeftPx.x));
+		rect.setHeight(Math.abs(upperLeftPx.y - lowerRightPx.y));
+		
+		return rect;
+		
+	}
+	
+	public PixelRectangle absRect2PixelRectOrig(final AbsoluteRectangle absRect) {
 		this.checkWidget();
 		
 		final PixelRectangle rect = new PixelRectangle();
@@ -540,25 +565,37 @@ public class DrawingArea extends Canvas {
 	/**
 	 * Transforms a rectangle from pixel coordinates into a one with absolute coordinates.
 	 * 
+	 * It is guaranteed that the resulting absolute rectangle will contain at least the area of the
+	 * original pixel rectangle (iow: the rounding is always done to the outside).
+	 * 
 	 * @param rect
 	 */
 	public AbsoluteRectangle pixelRect2AbsRect(final PixelRectangle rect) {
 		this.checkWidget();
 		
-		final AbsoluteRectangle absRect = new AbsoluteRectangle();
+		try {
+			final AbsoluteRectangle absRect = new AbsoluteRectangle();
+			
+			Point2D a = at.inverseTransform(rect.getUpperLeft().toPoint2D(), null);
+			final AbsolutePosition upperLeftAbs = new AbsolutePosition(a);
+			absRect.setUpperLeft(upperLeftAbs);
+			
+			final PixelPosition lowerRight = new PixelPosition();
+			lowerRight.x = rect.getUpperLeft().x + rect.getWidth();
+			lowerRight.y = rect.getUpperLeft().y + rect.getHeight();
+			a = at.inverseTransform(lowerRight.toPoint2D(), null);
+			final AbsolutePosition lowerRightAbs = new AbsolutePosition((int) Math
+					.floor(a.getX() + 1), (int) Math.floor(a.getY() + 1), 0);
+			
+			absRect.setWidth(Math.abs(lowerRightAbs.x - upperLeftAbs.x));
+			absRect.setHeight(Math.abs(upperLeftAbs.y - lowerRightAbs.y));
+			
+			return absRect;
+			
+		} catch (final NoninvertibleTransformException e) {
+			throw new RuntimeException("Transformation matrix in illegal state!", e);
+		}
 		
-		final AbsolutePosition upperLeftAbs = this.pixelPoint2AbsPoint(rect.getUpperLeft());
-		absRect.setUpperLeft(upperLeftAbs);
-		
-		final PixelPosition lowerRight = new PixelPosition();
-		lowerRight.x = rect.getUpperLeft().x + rect.getWidth();
-		lowerRight.y = rect.getUpperLeft().y + rect.getHeight();
-		final AbsolutePosition lowerRightAbs = this.pixelPoint2AbsPoint(lowerRight);
-		
-		absRect.setWidth(Math.abs(lowerRightAbs.x - upperLeftAbs.x));
-		absRect.setHeight(Math.abs(upperLeftAbs.y - lowerRightAbs.y));
-		
-		return absRect;
 	}
 	
 	/**
@@ -839,8 +876,8 @@ public class DrawingArea extends Canvas {
 	 */
 	private void syncScrollBars() {
 		
-		final AbsoluteRectangle bboxVisible = spyglass.getBoundingBox();
-		final AbsoluteRectangle bboxCurrent = getAbsoluteDrawingRectangle();
+		final AbsoluteRectangle bboxVisible = spyglass.getAutoZoomBoundingBox();
+		final AbsoluteRectangle bboxCurrent = spyglass.getBoundingBox();
 		final AbsoluteRectangle bbox = bboxCurrent.union(bboxVisible);
 		
 		getHorizontalBar().setMinimum(bbox.getUpperLeft().x);
