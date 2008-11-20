@@ -34,7 +34,7 @@ public class SampleChooser {
 	 */
 	public Sample getRandomSample() {
 		
-		log.debug("Generating new packet.");
+		// log.debug("Generating new packet.");
 		
 		/*
 		 * Put the probabilities of the samples in an array, for more convinient access.

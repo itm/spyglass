@@ -7,6 +7,8 @@
  */
 package de.uniluebeck.itm.spyglass.gui;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -161,9 +163,11 @@ public class UIController {
 				switch (what) {
 					case NEW_PLUGIN:
 						p.addDrawingObjectListener(drawingObjectListener);
+						p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
 						break;
 					case PLUGIN_REMOVED:
 						p.removeDrawingObjectListener(drawingObjectListener);
+						p.getXMLConfig().removePropertyChangeListener(pluginPropertyListener);
 						break;
 				}
 			}
@@ -269,6 +273,22 @@ public class UIController {
 				}
 			}
 			
+		}
+	};
+	
+	// --------------------------------------------------------------------------
+	/**
+	 * Listener for changes in the configuration of an plug-in.<br>
+	 */
+	PropertyChangeListener pluginPropertyListener = new PropertyChangeListener() {
+		
+		@Override
+		public void propertyChange(final PropertyChangeEvent evt) {
+			
+			// if the config of any plugin changes, better redraw the entire screen.
+			// TODO: in a perfect world this should be unneseccary, since the plugins would
+			// have done this themselves.
+			appWindow.getGui().getDrawingArea().redraw();
 		}
 	};
 	

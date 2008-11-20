@@ -115,6 +115,12 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 			return;
 		}
 		
+		if (!xmlConfig.containsSemanticType(packet.getSemanticType())) {
+			return;
+		}
+		
+		// log.debug(String.format("Parsing packet %s", packet));
+		
 		double value = Double.NaN;
 		
 		switch (packet.getSyntaxType()) {
@@ -150,11 +156,13 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				break;
 			}
 			case ISENSE_SPYGLASS_PACKET_VARIABLE: {
-				// TODO
+				// TODO: handle those
 				break;
 			}
 				
 		}
+		
+		// log.debug(String.format("Parsed packet %s: Got value %f", packet, value));
 		
 		// update the map
 		if (!Double.isNaN(value)) {
@@ -162,15 +170,15 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				map.positions.put(packet.getSenderId(), position);
 				map.values.put(packet.getSenderId(), value);
 			}
-			// TODO: should the redraw be delayed?
-			// fireDrawingObjectChanged(map, null);
+			
 		}
 		
 	}
 	
 	@Override
 	protected void updateQuadTree() {
-		// nothing to do
+		// TODO: should the redraw be delayed for performance reasons?
+		fireDrawingObjectChanged(map, null);
 	}
 	
 	@Override
@@ -197,39 +205,40 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 			
 			// add framepoints horizontally
 			int j = 1;
-			final int numFramePointsHorizontal = xmlConfig.getNumFramePointsHorizontal();
+			final float numFramePointsHorizontal = xmlConfig.getNumFramePointsHorizontal();
 			final int width = xmlConfig.getBoundingBox().getWidth();
 			final int height = xmlConfig.getBoundingBox().getHeight();
-			final AbsolutePosition upperLeft = xmlConfig.getBoundingBox().getUpperLeft();
+			final AbsolutePosition upperLeft = xmlConfig.getBoundingBox().getUpperLeft().clone();
 			final Double defaultValue = new Double(xmlConfig.getDefaultValue());
 			
 			for (int i = 0; i < numFramePointsHorizontal; i++) {
-				AbsolutePosition pos = upperLeft;
-				pos.x += i / numFramePointsHorizontal * width;
+				final AbsolutePosition pos = upperLeft.clone();
+				pos.x += i / (numFramePointsHorizontal - 1) * width;
 				map.positions.put(-j, pos);
 				map.values.put(-j, defaultValue);
 				j++;
-				
-				pos = upperLeft;
-				pos.x += i / numFramePointsHorizontal * width;
+			}
+			for (int i = 0; i < numFramePointsHorizontal; i++) {
+				final AbsolutePosition pos = upperLeft.clone();
+				pos.x += i / (numFramePointsHorizontal - 1) * width;
 				pos.y += height;
 				map.positions.put(-j, pos);
 				map.values.put(-j, defaultValue);
 				j++;
-				
 			}
 			
 			// add framepoints vertically
-			final int numFramePointsVertical = xmlConfig.getNumFramePointsVertical();
-			for (int i = 1; i < numFramePointsVertical; i++) {
-				AbsolutePosition pos = upperLeft;
-				pos.y += i / numFramePointsVertical * height;
+			final float numFramePointsVertical = xmlConfig.getNumFramePointsVertical();
+			for (int i = 0; i < numFramePointsVertical; i++) {
+				final AbsolutePosition pos = upperLeft.clone();
+				pos.y += i / (numFramePointsVertical - 1) * height;
 				map.positions.put(-j, pos);
 				map.values.put(-j, defaultValue);
 				j++;
-				
-				pos = upperLeft;
-				pos.y += i / numFramePointsVertical * height;
+			}
+			for (int i = 0; i < numFramePointsVertical; i++) {
+				final AbsolutePosition pos = upperLeft.clone();
+				pos.y += i / (numFramePointsVertical - 1) * height;
 				pos.x += width;
 				map.positions.put(-j, pos);
 				map.values.put(-j, defaultValue);

@@ -10,7 +10,7 @@ public class SpyglassPacket {
 	/**
 	 * 
 	 */
-	public static final int EXPECTED_PACKET_SIZE = 18;
+	public static final int EXPECTED_PACKET_SIZE = 19;
 	
 	/** The packets raw data */
 	private byte[] rawData;

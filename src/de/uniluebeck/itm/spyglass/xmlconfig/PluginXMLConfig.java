@@ -142,6 +142,22 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		return semanticTypes.clone();
 	}
 	
+	/**
+	 * Returns true, if the given integer is in the list of semantic types.
+	 */
+	public boolean containsSemanticType(final int type) {
+		if (this.isAllSemanticTypes()) {
+			return true;
+		}
+		
+		for (int i = 0; i < semanticTypes.length; i++) {
+			if (semanticTypes[i] == type) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param semanticTypes
