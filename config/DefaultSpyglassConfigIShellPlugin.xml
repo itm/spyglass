@@ -15,20 +15,52 @@
                </semanticTypes>
             </parameters>
          </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
+            <parameters>
+               <isActive>true</isActive>
+               <isVisible>true</isVisible>
+               <name>MapPainter</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <defaultValue>20.0</defaultValue>
+               <gridElementHeight>11</gridElementHeight>
+               <gridElementWidth>11</gridElementWidth>
+               <lowerLeftX>-5</lowerLeftX>
+               <lowerLeftY>-5</lowerLeftY>
+               <lockGridElementSquare>true</lockGridElementSquare>
+               <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
+               <maxColorRGB length="3">
+                  <int>255</int>
+                  <int>0</int>
+                  <int>0</int>
+               </maxColorRGB>
+               <maxValue>0.0</maxValue>
+               <minColorRGB length="3">
+                  <int>0</int>
+                  <int>0</int>
+                  <int>255</int>
+               </minColorRGB>
+               <minValue>20.0</minValue>
+               <width>400</width>
+               <numFramePointsHorizontal>3</numFramePointsHorizontal>
+               <numFramePointsVertical>3</numFramePointsVertical>
+               <height>400</height>
+               <refreshInterval>10</refreshInterval>
+            </parameters>
+         </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
             <parameters>
                <isActive>true</isActive>
                <isVisible>true</isVisible>
-               <name>default4</name>
+               <name>NodePainter</name>
                <timeout>-1</timeout>
                <semanticTypes length="1">
                   <int>-1</int>
                </semanticTypes>
-               <stringFormatters>
-                  <stringFormatter nodeID="3">zuozhuo</stringFormatter>
-                  <stringFormatter nodeID="5">ffsfwer %ds</stringFormatter>
-               </stringFormatters>
-               <defaultStringFormatter>fdsfsfsfs</defaultStringFormatter>
+               <stringFormatters/>
+               <defaultStringFormatter>Payload: %u0</defaultStringFormatter>
                <extendedInformation>
                   <isActive nodeID="1">false</isActive>
                   <isActive nodeID="2">false</isActive>
@@ -120,16 +152,16 @@
             <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
             <maxColorRGB length="3">
                <int>0</int>
-               <int>0</int>
-               <int>0</int>
+               <int>14</int>
+               <int>255</int>
             </maxColorRGB>
-            <maxValue>5.0</maxValue>
+            <maxValue>20.0</maxValue>
             <minColorRGB length="3">
+               <int>29</int>
                <int>255</int>
                <int>0</int>
-               <int>0</int>
             </minColorRGB>
-            <minValue>1.0</minValue>
+            <minValue>0.0</minValue>
             <width>1</width>
             <numFramePointsHorizontal>3</numFramePointsHorizontal>
             <numFramePointsVertical>3</numFramePointsVertical>

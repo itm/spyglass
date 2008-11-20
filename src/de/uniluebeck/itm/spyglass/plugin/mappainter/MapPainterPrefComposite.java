@@ -30,6 +30,7 @@ import com.cloudgarden.resource.SWTResourceManager;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ArrayToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverter;
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
@@ -41,7 +42,8 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 		SWTResourceManager.registerResourceUser(this);
 	}
 	
-	private static final Logger log = SpyglassLoggerFactory.getLogger(MapPainterPrefComposite.class);
+	private static final Logger log = SpyglassLoggerFactory
+			.getLogger(MapPainterPrefComposite.class);
 	private Group group1;
 	private Label label1;
 	private Label label11space;
@@ -455,19 +457,25 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 		
 		dbc.bindValue(SWTObservables.observeText(this.width, SWT.Modify), BeansObservables
 				.observeValue(dbc.getValidationRealm(), config, "width"), new UpdateValueStrategy(
-				UpdateValueStrategy.POLICY_CONVERT), null);
+				UpdateValueStrategy.POLICY_CONVERT)
+				.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
 		
 		dbc.bindValue(SWTObservables.observeText(this.height, SWT.Modify), BeansObservables
 				.observeValue(dbc.getValidationRealm(), config, "height"), new UpdateValueStrategy(
-				UpdateValueStrategy.POLICY_CONVERT), null);
+				UpdateValueStrategy.POLICY_CONVERT)
+				.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
 		
 		dbc.bindValue(SWTObservables.observeText(this.blockWidth, SWT.Modify), BeansObservables
 				.observeValue(dbc.getValidationRealm(), config, "gridElementWidth"),
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+						.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)),
+				null);
 		
 		dbc.bindValue(SWTObservables.observeText(this.blockHeight, SWT.Modify), BeansObservables
 				.observeValue(dbc.getValidationRealm(), config, "gridElementHeight"),
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+						.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)),
+				null);
 		
 		dbc.bindValue(SWTObservables.observeText(this.minValue, SWT.Modify), BeansObservables
 				.observeValue(dbc.getValidationRealm(), config, "minValue"),
@@ -483,11 +491,15 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 		
 		dbc.bindValue(SWTObservables.observeText(this.framePointsX, SWT.Modify), BeansObservables
 				.observeValue(dbc.getValidationRealm(), config, "numFramePointsHorizontal"),
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+						.setAfterConvertValidator(new IntegerRangeValidator(3, Integer.MAX_VALUE)),
+				null);
 		
 		dbc.bindValue(SWTObservables.observeText(this.framePointsY, SWT.Modify), BeansObservables
 				.observeValue(dbc.getValidationRealm(), config, "numFramePointsVertical"),
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+						.setAfterConvertValidator(new IntegerRangeValidator(3, Integer.MAX_VALUE)),
+				null);
 		
 		dbc.bindValue(SWTObservables.observeBackground(minValueColor), BeansObservables
 				.observeValue(dbc.getValidationRealm(), config, "minColorRGB"),
