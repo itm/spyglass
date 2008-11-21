@@ -82,7 +82,7 @@ public class DrawingArea extends Canvas {
 	/**
 	 * y-coordinate of the upper-left point of the world.
 	 */
-	private static final int WORLDS_UPPER_LEFT_Y = -((int) Math.pow(2, 16));
+	private static final int WORLD_UPPER_LEFT_Y = -((int) Math.pow(2, 16));
 	
 	/**
 	 * width of the world.
@@ -157,7 +157,18 @@ public class DrawingArea extends Canvas {
 		getHorizontalBar().addSelectionListener(scrollListenerH);
 		getVerticalBar().addSelectionListener(scrollListenerV);
 		
+		getHorizontalBar().setMinimum(0);
+		getHorizontalBar().setMaximum(WORLD_WIDTH);
+		getHorizontalBar().setPageIncrement(10);
+		getHorizontalBar().setIncrement(1);
+		
+		getVerticalBar().setMinimum(0);
+		getVerticalBar().setMaximum(WORLD_HEIGHT);
+		getVerticalBar().setPageIncrement(10);
+		getVerticalBar().setIncrement(1);
+		
 		addControlListener(this.controlListener);
+		
 		syncScrollBars();
 		
 		// The canvas must not act on mouse wheel events (normally it would move the
@@ -771,7 +782,7 @@ public class DrawingArea extends Canvas {
 	 */
 	public static AbsoluteRectangle getGlobalBoundingBox() {
 		
-		return new AbsoluteRectangle(WORLD_UPPER_LEFT_X, WORLDS_UPPER_LEFT_Y, WORLD_WIDTH,
+		return new AbsoluteRectangle(WORLD_UPPER_LEFT_X, WORLD_UPPER_LEFT_Y, WORLD_WIDTH,
 				WORLD_HEIGHT);
 		
 	}
@@ -834,13 +845,11 @@ public class DrawingArea extends Canvas {
 	 */
 	private void scrollVertically(final ScrollBar scrollBar) {
 		
-		final double ty = at.getTranslateY() / at.getScaleY();
+		final double ty = getUpperLeft().y;
 		final double select = scrollBar.getSelection();
-		final double diff = -select - ty;
+		final double diff = ty - select - WORLD_UPPER_LEFT_Y;
 		
-		final AffineTransform atCopy = new AffineTransform(at);
-		atCopy.concatenate(AffineTransform.getTranslateInstance(0, diff));
-		at = atCopy;
+		at.concatenate(AffineTransform.getTranslateInstance(0, diff));
 		
 		fireDrawingAreaTransformEvent();
 		
@@ -855,13 +864,11 @@ public class DrawingArea extends Canvas {
 	 */
 	private void scrollHorizontally(final ScrollBar scrollBar) {
 		
-		final double tx = at.getTranslateX() / at.getScaleX();
+		final double tx = getUpperLeft().x;
 		final double select = scrollBar.getSelection();
-		final double diff = -select - tx;
+		final double diff = tx - select - WORLD_UPPER_LEFT_X;
 		
-		final AffineTransform atCopy = new AffineTransform(at);
-		atCopy.concatenate(AffineTransform.getTranslateInstance(diff, 0));
-		at = atCopy;
+		at.concatenate(AffineTransform.getTranslateInstance(diff, 0));
 		
 		fireDrawingAreaTransformEvent();
 		
@@ -876,36 +883,8 @@ public class DrawingArea extends Canvas {
 	 */
 	private void syncScrollBars() {
 		
-		final AbsoluteRectangle bboxVisible = spyglass.getAutoZoomBoundingBox();
-		final AbsoluteRectangle bboxCurrent = spyglass.getBoundingBox();
-		final AbsoluteRectangle bbox = bboxCurrent.union(bboxVisible);
-		
-		getHorizontalBar().setMinimum(bbox.getUpperLeft().x);
-		getHorizontalBar().setMaximum(
-				bbox.getWidth() + bbox.getUpperLeft().x - bboxCurrent.getWidth());
-		getHorizontalBar().setSelection(getUpperLeft().x);
-		
-		getVerticalBar().setMinimum(bbox.getUpperLeft().y);
-		getVerticalBar().setMaximum(
-				bbox.getHeight() + bbox.getUpperLeft().y - bboxCurrent.getHeight());
-		getVerticalBar().setSelection(getUpperLeft().y);
-		
-		// Enlarge thumbs (disabled, since this screws up the math)
-		// appWindow.getGui().getCanvas().getHorizontalBar().setThumb(this.canvasRect.width);
-		// appWindow.getGui().getCanvas().getVerticalBar().setThumb(this.canvasRect.height);
-		
-		// Disable scroll bars when appropriate
-		if (bboxVisible.intersection(bboxCurrent).getWidth() == bboxVisible.getWidth()) {
-			getHorizontalBar().setEnabled(false);
-		} else {
-			getHorizontalBar().setEnabled(true);
-		}
-		
-		if (bboxVisible.intersection(bboxCurrent).getHeight() == bboxVisible.getHeight()) {
-			getVerticalBar().setEnabled(false);
-		} else {
-			getVerticalBar().setEnabled(true);
-		}
+		getHorizontalBar().setSelection(getUpperLeft().x - WORLD_UPPER_LEFT_X);
+		getVerticalBar().setSelection(getUpperLeft().y - WORLD_UPPER_LEFT_X);
 		
 	}
 	
