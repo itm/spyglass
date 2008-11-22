@@ -10,7 +10,6 @@ package de.uniluebeck.itm.spyglass.plugin.objectpainter;
 
 import org.simpleframework.xml.Element;
 
-import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -25,8 +24,68 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	@Element(name = "image")
 	private String imageFileName = "images/icons/brokenImageLink.png";
 	
-	@Element(name = "size")
-	private AbsoluteRectangle size = new AbsoluteRectangle();
+	@Element(name = "imageSizeX")
+	private int imageSizeX = 0;
+	
+	@Element(name = "imageSizeY")
+	private int imageSizeY = 0;
+	
+	@Element(name = "keepProportions")
+	private boolean keepProportions = true;
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getImageSizeX() {
+		return imageSizeX;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param imageSizeX
+	 */
+	public void setImageSizeX(final int imageSizeX) {
+		final int oldValue = this.imageSizeX;
+		this.imageSizeX = imageSizeX;
+		firePropertyChange("imageSizeX", oldValue, this.imageSizeX);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getImageSizeY() {
+		return imageSizeY;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param imageSizeY
+	 */
+	public void setImageSizeY(final int imageSizeY) {
+		final int oldValue = this.imageSizeY;
+		this.imageSizeY = imageSizeY;
+		firePropertyChange("imageSizeY", oldValue, this.imageSizeY);
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public boolean isKeepProportions() {
+		return keepProportions;
+	}
+	
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param keepProportions
+	 */
+	public void setKeepProportions(final boolean keepProportions) {
+		final boolean oldValue = this.keepProportions;
+		this.keepProportions = keepProportions;
+		firePropertyChange("keepProportions", oldValue, keepProportions);
+	}
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -46,31 +105,14 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 		firePropertyChange("imageFileName", this.imageFileName, this.imageFileName = imageFileName);
 	}
 	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the size
-	 */
-	public AbsoluteRectangle getSize() {
-		return size;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param size
-	 *            the size to set
-	 */
-	public void setSize(final AbsoluteRectangle size) {
-		firePropertyChange("size", this.size, this.size = size);
-		
-	}
-	
 	public boolean equals(final ObjectPainterXMLConfig o) {
 		
 		if (!super.equals(o)) {
 			return false;
 		}
 		
-		return imageFileName.equals(o.imageFileName) && (size == o.size);
+		return imageFileName.equals((o).imageFileName) && (imageSizeX == o.imageSizeX)
+				&& (imageSizeY == o.imageSizeY);
 	}
 	
 }

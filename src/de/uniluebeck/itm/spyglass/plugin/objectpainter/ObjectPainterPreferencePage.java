@@ -21,7 +21,14 @@ public class ObjectPainterPreferencePage extends
 	
 	@Override
 	protected Composite createContents(final Composite parent) {
-		return super.createMS2Warning(parent); // TODO: plugin-specific options
+		final Composite composite = super.createContents(parent);
+		
+		final ObjectPainterOptionsComposite optionsComposite = new ObjectPainterOptionsComposite(
+				composite);
+		
+		optionsComposite.setDatabinding(dbc, config, spyglass);
+		
+		return composite;
 	}
 	
 	@Override

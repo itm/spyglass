@@ -75,12 +75,37 @@
                <lineWidth>1</lineWidth>
             </parameters>
          </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
+            <parameters>
+               <isActive>true</isActive>
+               <isVisible>true</isVisible>
+               <name>default</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <gridElementHeight>1</gridElementHeight>
+               <gridElementWidth>1</gridElementWidth>
+               <lowerLeftX>0</lowerLeftX>
+               <lowerLeftY>0</lowerLeftY>
+               <lineColorRGB length="3">
+                  <int>192</int>
+                  <int>192</int>
+                  <int>192</int>
+               </lineColorRGB>
+               <lineWidth>1.0</lineWidth>
+               <lockGridElementsSquare>true</lockGridElementsSquare>
+               <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
+               <numCols>100</numCols>
+               <numRows>100</numRows>
+            </parameters>
+         </plugin>
       </plugins>
    </instances>
    <generalSettings>
       <showRuler>true</showRuler>
       <metrics>
-         <unit>cm</unit>
+         <unit>mm</unit>
          <abs2metricFactorX>1.0</abs2metricFactorX>
          <abs2metricFactorY>1.0</abs2metricFactorY>
          <abs2metricOffsetX>0.0</abs2metricOffsetX>
@@ -178,10 +203,10 @@
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
-            <image>images/icons/brokenImageLink.png</image>
-            <size width="1" height="1">
-               <upperLeft x="0" y="0" z="0"/>
-            </size>
+            <image>/home/dariush/lageplan.gif</image>
+            <imageSizeX>100</imageSizeX>
+            <imageSizeY>100</imageSizeY>
+            <keepProportions>true</keepProportions>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
