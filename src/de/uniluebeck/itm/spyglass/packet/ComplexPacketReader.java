@@ -22,6 +22,8 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * id:x:y
  * 
  * Each line is a packet with the given id and position (x and y coordinates).
+ * 
+ * @author Dariush Forouher
  */
 public class ComplexPacketReader extends PacketReader {
 	

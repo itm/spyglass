@@ -57,4 +57,8 @@ public class PacketFactory {
 		}
 		
 	}
+	
+	public SpyglassPacket castToTrajectoryPacket2D(final Uint16ListPacket packet) {
+		return null;
+	}
 }

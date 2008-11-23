@@ -8,6 +8,7 @@ import java.util.List;
  * Represents a Packet with the syntaxtype VariableListPacket
  * 
  * @author Nils Glombitza, ITM Uni Luebeck
+ * @author Dariush Forouher
  * 
  */
 public class VariableListPacket extends SpyglassPacket {
@@ -23,7 +24,7 @@ public class VariableListPacket extends SpyglassPacket {
 	 * @see SpyglassPacket#deserialize(byte[])
 	 */
 	@Override
-	public void deserialize(final byte[] buf) throws SpyglassPacketException {
+	void deserialize(final byte[] buf) throws SpyglassPacketException {
 		values.clear();
 		super.deserialize(buf);
 		if (getSyntaxType() != VariableListPacket.SYNTAXTYPE) {

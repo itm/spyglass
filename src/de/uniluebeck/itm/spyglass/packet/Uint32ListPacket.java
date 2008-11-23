@@ -4,6 +4,7 @@ package de.uniluebeck.itm.spyglass.packet;
  * Represents a Packet with the syntaxtype Uint32ListPacket
  * 
  * @author Nils Glombitza, ITM Uni Luebeck
+ * @author Dariush Forouher
  * 
  */
 public class Uint32ListPacket extends LongListPacket {
@@ -17,7 +18,7 @@ public class Uint32ListPacket extends LongListPacket {
 	 * @see SpyglassPacket#deserialize(byte[])
 	 */
 	@Override
-	public void deserialize(final byte[] buf) throws SpyglassPacketException {
+	void deserialize(final byte[] buf) throws SpyglassPacketException {
 		super.deserialize(buf);
 		if (getSyntaxType() != Uint32ListPacket.SYNTAXTYPE) {
 			throw new SpyglassPacketException("Wrong Syntaxtype");

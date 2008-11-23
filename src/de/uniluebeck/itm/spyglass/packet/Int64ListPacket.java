@@ -4,7 +4,7 @@ package de.uniluebeck.itm.spyglass.packet;
  * Represents a Packet with the syntaxtype Int64ListPacket
  * 
  * @author Nils Glombitza, ITM Uni Luebeck
- * 
+ * @author Dariush Forouher
  */
 public class Int64ListPacket extends LongListPacket {
 	/**
@@ -17,7 +17,7 @@ public class Int64ListPacket extends LongListPacket {
 	 * @see SpyglassPacket#deserialize(byte[])
 	 */
 	@Override
-	public void deserialize(final byte[] buf) throws SpyglassPacketException {
+	void deserialize(final byte[] buf) throws SpyglassPacketException {
 		super.deserialize(buf);
 		if (getSyntaxType() != Int64ListPacket.SYNTAXTYPE) {
 			throw new SpyglassPacketException("Wrong Syntaxtype");

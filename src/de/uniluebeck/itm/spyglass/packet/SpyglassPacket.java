@@ -4,6 +4,8 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 
 /**
  * Generic Spyglass packet.
+ * 
+ * @author Dariush Forouher
  */
 public class SpyglassPacket {
 	

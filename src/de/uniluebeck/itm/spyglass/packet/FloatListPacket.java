@@ -4,7 +4,7 @@ package de.uniluebeck.itm.spyglass.packet;
  * Represents a Packet with the syntaxtype FloatListPacket
  * 
  * @author Nils Glombitza, ITM Uni Luebeck
- * 
+ * @author Dariush Forouher
  */
 public class FloatListPacket extends SpyglassPacket {
 	
@@ -18,7 +18,7 @@ public class FloatListPacket extends SpyglassPacket {
 	 * @see SpyglassPacket#deserialize(byte[])
 	 */
 	@Override
-	public void deserialize(final byte[] buf) throws SpyglassPacketException {
+	void deserialize(final byte[] buf) throws SpyglassPacketException {
 		super.deserialize(buf);
 		if (getSyntaxType() != FloatListPacket.SYNTAXTYPE) {
 			throw new SpyglassPacketException("Wrong Syntaxtype");

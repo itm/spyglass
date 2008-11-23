@@ -4,6 +4,7 @@ package de.uniluebeck.itm.spyglass.packet;
  * Represents a Packet with the syntaxtype Uint8ListPacket
  * 
  * @author Nils Glombitza, ITM Uni Luebeck
+ * @author Dariush Forouher
  * 
  */
 public class Uint8ListPacket extends IntListPacket {
@@ -17,13 +18,13 @@ public class Uint8ListPacket extends IntListPacket {
 	 * @see SpyglassPacket#deserialize(byte[])
 	 */
 	@Override
-	public void deserialize(final byte[] buf) throws SpyglassPacketException {
+	void deserialize(final byte[] buf) throws SpyglassPacketException {
 		
 		super.deserialize(buf);
 		if (getSyntaxType() != Uint8ListPacket.SYNTAXTYPE) {
 			throw new SpyglassPacketException("Wrong Syntaxtype");
 		}
-		values = new int[buf.length - SpyglassPacket.EXPECTED_PACKET_SIZE];
+		values = new Integer[buf.length - SpyglassPacket.EXPECTED_PACKET_SIZE];
 		for (int i = 0; (i + SpyglassPacket.EXPECTED_PACKET_SIZE) < buf.length; i++) {
 			values[i] = deserializeUint8(buf[i + SpyglassPacket.EXPECTED_PACKET_SIZE]);
 		}

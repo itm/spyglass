@@ -21,6 +21,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * packet reader.
  * 
  * @author Sebastian Ebers
+ * @author Dariush Forouher
  */
 @Root
 public class IShellToSpyGlassPacketBroker extends PacketReader {
@@ -30,7 +31,8 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	 */
 	private Deque<SpyglassPacket> queue = new ArrayDeque<SpyglassPacket>(50);
 	
-	private static final Logger log = SpyglassLoggerFactory.getLogger(IShellToSpyGlassPacketBroker.class);
+	private static final Logger log = SpyglassLoggerFactory
+			.getLogger(IShellToSpyGlassPacketBroker.class);
 	
 	// --------------------------------------------------------------------------------
 	/**
