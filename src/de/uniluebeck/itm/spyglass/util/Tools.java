@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -27,7 +28,7 @@ import org.apache.log4j.Logger;
  */
 public class Tools {
 	private static Logger log = SpyglassLoggerFactory.getLogger(Tools.class);
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -36,29 +37,27 @@ public class Tools {
 	public static Vector<String> getExternalHostIps() {
 		final HashSet<String> ips = new HashSet<String>();
 		final Vector<String> external = new Vector<String>();
-		
+
 		try {
 			InetAddress i;
 			NetworkInterface iface = null;
-			
-			for (final Enumeration ifaces = NetworkInterface.getNetworkInterfaces(); ifaces
-					.hasMoreElements();) {
+
+			for (final Enumeration ifaces = NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements();) {
 				iface = (NetworkInterface) ifaces.nextElement();
-				for (final Enumeration ifaceips = iface.getInetAddresses(); ifaceips
-						.hasMoreElements();) {
+				for (final Enumeration ifaceips = iface.getInetAddresses(); ifaceips.hasMoreElements();) {
 					i = (InetAddress) ifaceips.nextElement();
 					if (i instanceof Inet4Address) {
 						ips.add(i.getHostAddress());
 					}
 				}
 			}
-			
+
 		} catch (final Throwable t) {
 			log.error("Unable to retrieve external ips: " + t, t);
-			
+
 			try {
 				log.debug("Trying different lookup scheme");
-				
+
 				final InetAddress li = InetAddress.getLocalHost();
 				final String strli = li.getHostName();
 				final InetAddress ia[] = InetAddress.getAllByName(strli);
@@ -68,19 +67,19 @@ public class Tools {
 			} catch (final Throwable t2) {
 				log.error("Also unable to retrieve external ips: " + t2, t2);
 			}
-			
+
 		}
-		
+
 		for (final String ip : ips) {
 			if (isExternalIp(ip)) {
 				log.debug("Found external ip: " + ip);
 				external.add(ip);
 			}
 		}
-		
+
 		return external;
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -88,16 +87,16 @@ public class Tools {
 	public static String getFirstLocalIp() {
 		final Vector<String> ips = getExternalHostIps();
 		String localHost = "127.0.0.1";
-		
+
 		for (final String ip : ips) {
 			if (!"127.0.0.1".equals(ip)) {
 				localHost = new String(ip);
 			}
 		}
-		
+
 		return localHost;
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * <pre>
@@ -109,7 +108,7 @@ public class Tools {
 	 */
 	public static boolean isExternalIp(final String ip) {
 		boolean external = true;
-		
+
 		if (ip == null) {
 			external = false;
 		} else if (ip.startsWith("127.")) {
@@ -119,17 +118,17 @@ public class Tools {
 		} else if (ip.startsWith("192.168.")) {
 			external = false;
 		}
-		
+
 		for (int i = 16; i <= 31; ++i) {
 			if (ip.startsWith("172." + i + ".")) {
 				external = false;
 			}
 		}
-		
+
 		log.debug("IP " + ip + " is an " + (external ? "external" : "internal") + " address");
 		return external;
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * @param millis
@@ -140,7 +139,7 @@ public class Tools {
 		} catch (final Throwable e) {
 		}
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -149,7 +148,7 @@ public class Tools {
 	public static String toString(final Collection l) {
 		return toString(l, ", ");
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -159,10 +158,10 @@ public class Tools {
 		for (int i = offset; i < offset + length; ++i) {
 			ll.add(l[i]);
 		}
-		
+
 		return toString(ll, ", ");
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -173,7 +172,7 @@ public class Tools {
 		}
 		return toString(l, 0, l.length);
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -182,15 +181,15 @@ public class Tools {
 		if (l == null) {
 			return "";
 		}
-		
+
 		final LinkedList<String> ll = new LinkedList<String>();
 		for (int i = offset; i < offset + length; ++i) {
 			ll.add(toHexString(l[i]));
 		}
-		
+
 		return toString(ll, ", ");
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -198,23 +197,23 @@ public class Tools {
 	@SuppressWarnings("unchecked")
 	public static String toString(final Collection l, final String divider) {
 		final StringBuffer b = new StringBuffer();
-		
+
 		if (l == null) {
 			return "<null>";
 		}
-		
+
 		for (final Object o : l) {
 			final String t = o != null ? o.toString() : "{null}";
 			if (b.length() > 0) {
 				b.append(divider);
 			}
-			
+
 			b.append(t);
 		}
-		
+
 		return b.toString().trim();
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -222,7 +221,7 @@ public class Tools {
 	public static String toHexString(final char tmp) {
 		return toHexString((byte) tmp);
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -230,7 +229,7 @@ public class Tools {
 	public static String toHexString(final byte tmp) {
 		return "0x" + Integer.toHexString(tmp & 0xFF);
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -238,7 +237,7 @@ public class Tools {
 	public static String toHexString(final byte[] tmp) {
 		return toHexString(tmp, 0, tmp.length);
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -250,19 +249,19 @@ public class Tools {
 		} else {
 			tmp += "    ";
 		}
-		
+
 		tmp += toHexString((byte) (i & 0xFF));
-		
+
 		return tmp;
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	public static String toHexString(final long i) {
 		String tmp = "";
-		
+
 		if (i > 0xFF) {
 			tmp += toHexString((byte) (i >> 24 & 0xFF)) + ":";
 		}
@@ -272,12 +271,12 @@ public class Tools {
 		if (i > 0xFF) {
 			tmp += toHexString((byte) (i >> 8 & 0xFF)) + ":";
 		}
-		
+
 		tmp += toHexString((byte) (i & 0xFF));
-		
+
 		return tmp;
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -285,7 +284,7 @@ public class Tools {
 	public static String toHexString(final byte[] tmp, final int offset) {
 		return toHexString(tmp, offset, tmp.length - offset);
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -301,7 +300,7 @@ public class Tools {
 		}
 		return s.toString();
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -311,7 +310,7 @@ public class Tools {
 		if ((m == null) || (m.size() == 0)) {
 			return "";
 		}
-		
+
 		final StringBuffer s = new StringBuffer();
 		for (final Object o : m.keySet()) {
 			if (s.length() > 0) {
@@ -323,22 +322,22 @@ public class Tools {
 		}
 		return s.toString();
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	public static int toInteger(final String s, final int defaultValue) {
 		int retVal = defaultValue;
-		
+
 		try {
 			retVal = Integer.parseInt(s);
 		} catch (final Throwable t) {
 		}
-		
+
 		return retVal;
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -351,7 +350,7 @@ public class Tools {
 		}
 		return toString(l);
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * @return
@@ -360,7 +359,7 @@ public class Tools {
 		final Throwable ex = new Throwable();
 		return ex.getStackTrace();
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * @return
@@ -373,7 +372,7 @@ public class Tools {
 		}
 		return s.toString();
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * 
@@ -382,14 +381,32 @@ public class Tools {
 		if ((s == null) || (s.length() <= 0)) {
 			return "";
 		}
-		
+
 		String result = s.substring(0, 1).toUpperCase();
-		
+
 		if (s.length() > 1) {
 			result += s.substring(1);
 		}
-		
+
 		return result;
 	}
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Converts an array of <code>int</code> values to a list of {@link Integer} values.
+	 * 
+	 * @param intList
+	 *            the array of <code>int</code> values.
+	 * @return a list of {@link Integer} values
+	 */
+	public static List<Integer> intArrayToIntegerList(final int[] intList) {
+		final List<Integer> list = new LinkedList<Integer>();
+		if (intList != null) {
+			for (int i = 0; i < intList.length; i++) {
+				list.add(intList[i]);
+			}
+		}
+		return list;
+	}
+
 }

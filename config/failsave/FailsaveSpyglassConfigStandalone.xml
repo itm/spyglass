@@ -1143,7 +1143,7 @@
 		</plugin>
 		<plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
 			<parameters>
-				<semanticTypes4Neighborhoods class="java.util.LinkedList"/>
+				<semanticTypes4Neighborhoods class="java.util.Set"/>
 				<showNodeDegree>true</showNodeDegree>
 				<showNumNodes>true</showNumNodes>
 				<isActive>true</isActive>

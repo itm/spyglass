@@ -9,16 +9,27 @@
  */
 package de.uniluebeck.itm.spyglass.plugin;
 
-import org.eclipse.swt.widgets.Widget;
+import de.uniluebeck.itm.spyglass.gui.view.GlobalInformationWidget;
 
+// --------------------------------------------------------------------------------
+/**
+ * Implementations of this interface provide global information to be shown by the application in a
+ * decided area.
+ * 
+ * @author Sebastian Ebers
+ * 
+ */
 public interface GlobalInformation {
-	
+
 	/**
+	 * Sets the widget to be used to display global information.<br>
+	 * This widget has to be maintained during the whole life cycle of the plug-in which implements
+	 * this interface. A plug-in which does not want the widget to be used has to set its visibility
+	 * state to <tt>invisible</tt>
 	 * 
 	 * @param widget
+	 *            the widget to be used to display global information
 	 */
-	public void addWidget(Widget widget);
-	
-	public Widget getWidget();
-	
+	public void setWidget(GlobalInformationWidget widget);
+
 }

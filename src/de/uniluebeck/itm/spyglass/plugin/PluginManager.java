@@ -46,17 +46,16 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 @Root
 public class PluginManager {
-	
+
 	private static Logger log = SpyglassLoggerFactory.getLogger(PluginManager.class);
-	
+
 	@ElementList
 	private final List<Plugin> plugins = Collections.synchronizedList(new ArrayList<Plugin>());
-	
-	private final Set<PluginListChangeListener> pluginListChangeListeners = Collections
-			.synchronizedSet(new HashSet<PluginListChangeListener>());
-	
+
+	private final Set<PluginListChangeListener> pluginListChangeListeners = Collections.synchronizedSet(new HashSet<PluginListChangeListener>());
+
 	private static final List<Class<? extends Plugin>> availablePluginsTypes = new ArrayList<Class<? extends Plugin>>();
-	
+
 	static {
 		availablePluginsTypes.add(GridPainterPlugin.class);
 		availablePluginsTypes.add(ImagePainterPlugin.class);
@@ -70,7 +69,7 @@ public class PluginManager {
 		availablePluginsTypes.add(LinePainterPlugin.class);
 		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
 	}
-	
+
 	/**
 	 * List of plugins that are currently being removed
 	 * 
@@ -78,7 +77,7 @@ public class PluginManager {
 	 * node positioner)
 	 */
 	private final List<Plugin> removePending = new ArrayList<Plugin>();
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -99,7 +98,7 @@ public class PluginManager {
 		}
 		return activePlugIns;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Adds a <code>PluginListChangeListener</code> instance to the list of listeners. Every
@@ -111,7 +110,7 @@ public class PluginManager {
 	public void addPluginListChangeListener(final PluginListChangeListener listener) {
 		pluginListChangeListeners.add(listener);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Removes a <code>PluginListChangeListener</code> instance from the list of listeners.
@@ -122,7 +121,7 @@ public class PluginManager {
 	public void removePluginListChangeListener(final PluginListChangeListener listener) {
 		pluginListChangeListeners.remove(listener);
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -135,7 +134,7 @@ public class PluginManager {
 			return new ArrayList<Plugin>(plugins);
 		}
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns a list-copy of all plugins which are currently administered by this instance, except
@@ -151,55 +150,54 @@ public class PluginManager {
 	 * @return a list-copy of plugin instances
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Plugin> getPlugins(final boolean checkHierarchy,
-			final Class<? extends Plugin>... excludes) {
-		
+	public List<Plugin> getPlugins(final boolean checkHierarchy, final Class<? extends Plugin>... excludes) {
+
 		Class<? extends Plugin> currentClass;
 		final List<Plugin> pluginList = new ArrayList<Plugin>();
 		boolean containedInExcludes;
-		
+
 		synchronized (plugins) {
 			for (final Plugin plugin : plugins) {
-				
+
 				containedInExcludes = false;
 				currentClass = plugin.getClass();
-				
+
 				if (checkHierarchy) {
-					
+
 					while (!currentClass.equals(Plugin.class)) {
-						
+
 						currentClass = (Class<? extends Plugin>) currentClass.getSuperclass();
-						
+
 						for (final Class<? extends Plugin> exclude : excludes) {
 							if (currentClass.equals(exclude)) {
 								containedInExcludes = true;
 								break;
 							}
 						}
-						
+
 					}
-					
+
 				} else {
-					
+
 					for (final Class<? extends Plugin> exclude : excludes) {
 						if (currentClass.equals(exclude)) {
 							containedInExcludes = true;
 							break;
 						}
 					}
-					
+
 				}
-				
+
 				if (!containedInExcludes) {
 					pluginList.add(plugin);
 				}
-				
+
 			}
 		}
-		
+
 		return pluginList;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -209,7 +207,7 @@ public class PluginManager {
 	 * This method is called after the PluginManager got instanciated by the XML Deserializer
 	 */
 	public void init() {
-		
+
 		// This is a workaround, since simple-xml does not call the setPlugins()
 		// method
 		synchronized (plugins) {
@@ -220,7 +218,7 @@ public class PluginManager {
 		}
 		log.debug("All plug-ins loaded and connected");
 	}
-	
+
 	/**
 	 * Connect the Plugin with the plugin manager
 	 */
@@ -229,33 +227,33 @@ public class PluginManager {
 		// (to disable all other plugins)
 		if (plugin instanceof NodePositionerPlugin) {
 			plugin.getXMLConfig().addPropertyChangeListener("active", new PropertyChangeListener() {
-				
+
 				@Override
 				public void propertyChange(final PropertyChangeEvent evt) {
 					final Boolean activeOld = (Boolean) evt.getOldValue();
 					final Boolean activeNew = (Boolean) evt.getNewValue();
 					if (activeNew && !activeOld) {
 						// the plugin got activated
-						
+
 						newNodePositioner(plugin);
-						
+
 						firePluginListChangedEvent(plugin, ListChangeEvent.NEW_NODE_POSITIONER);
-						
+
 					} else if (activeOld && !activeNew) {
 						// the plugin got deactivated
-						
+
 						findNewNodePositioner();
 					}
-					
+
 				}
-				
+
 			});
 		}
-		
+
 		plugin.init(this);
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -267,67 +265,67 @@ public class PluginManager {
 	 */
 	private void addPlugin(final Plugin plugin) {
 		this.connectPlugin(plugin);
-		
+
 		if (!plugins.contains(plugin)) {
 			plugins.add(plugin);
 		}
 		log.debug("Added plug-in: " + plugin);
-		
+
 		firePluginListChangedEvent(plugin, ListChangeEvent.NEW_PLUGIN);
-		
+
 		// TODO: fix!!!
 		// TEAMQUESTION: where should the new plugin be placed? At the beginning
 		// or the end?
-		
+
 	}
-	
+
 	/**
 	 * Enable another NodePositioner, if the active one got disabled or deleted.
 	 */
 	private void findNewNodePositioner() {
 		log.debug("Finding a new node positioner");
-		
+
 		final ArrayList<Plugin> nodePositioner = new ArrayList<Plugin>();
 		synchronized (plugins) {
 			for (final Plugin p : plugins) {
 				if ((p instanceof NodePositionerPlugin) && !this.removePending.contains(p)) {
 					nodePositioner.add(p);
-					
+
 					// If there is already one active, do nothing.
 					if (p.isActive()) {
 						return;
 					}
-					
+
 				}
 			}
 		}
-		
+
 		assert (nodePositioner.size() > 0);
-		
+
 		// activate the first one in the list
 		log.debug("Enabling " + nodePositioner.get(0));
 		nodePositioner.get(0).setActive(true);
-		
+
 	}
-	
+
 	/**
 	 * Disable all NodePositioner Plugins except the given one.
 	 */
 	private void newNodePositioner(final Plugin plugin) {
 		log.debug("Disabling old node positioner; new one is " + plugin);
-		
+
 		synchronized (plugins) {
 			for (final Plugin p : plugins) {
 				if ((p instanceof NodePositionerPlugin) && (p != plugin) && p.isActive()) {
 					p.getXMLConfig().setActive(false);
 					log.debug("Disabled " + p);
-					
+
 				}
 			}
 		}
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -342,7 +340,7 @@ public class PluginManager {
 	 *             <code>PluginManager</code>.
 	 */
 	public void increasePluginPriorityToTop(final Plugin plugin) {
-		
+
 		if (!plugins.remove(plugin)) {
 			throw new RuntimeException("The plugin was not yet managed.");
 		}
@@ -350,15 +348,15 @@ public class PluginManager {
 		log.debug("The plug-in: " + plugin + " is now the one with the highest priority");
 		firePluginListChangedEvent(plugin, ListChangeEvent.PRIORITY_CHANGED);
 	}
-	
+
 	public void increasePluginPriorities(final List<Plugin> list) {
-		
+
 		final HashMap<Plugin, Integer> newPrios = new HashMap<Plugin, Integer>();
-		
+
 		synchronized (this.plugins) {
-			
+
 			int currentIndex;
-			
+
 			for (final Plugin p : list) {
 				currentIndex = plugins.indexOf(p);
 				if (currentIndex == -1) {
@@ -366,56 +364,56 @@ public class PluginManager {
 				}
 				newPrios.put(p, currentIndex == 0 ? 0 : currentIndex - 1);
 			}
-			
+
 			for (final Plugin p : list) {
 				plugins.remove(p);
 				plugins.add(newPrios.get(p), p);
 			}
-			
+
 		}
-		
+
 		for (final Plugin p : plugins) {
 			log.debug("Gave plugin " + p + " priority number " + plugins.indexOf(p));
 			firePluginListChangedEvent(p, ListChangeEvent.PRIORITY_CHANGED);
 		}
-		
+
 	}
-	
+
 	public void decreasePluginPriorities(final List<Plugin> list) {
-		
+
 		final HashMap<Integer, Plugin> newPrios = new HashMap<Integer, Plugin>();
-		
+
 		synchronized (this.plugins) {
-			
+
 			int currentIndex, moveCount = 0;
 			boolean move;
-			
+
 			for (final Plugin p : plugins) {
-				
+
 				move = list.contains(p);
 				currentIndex = plugins.indexOf(p);
 				newPrios.put(move ? (currentIndex + 1) : (currentIndex + (-1 * moveCount)), p);
 				moveCount = move ? (moveCount + 1) : 0;
-				
+
 			}
-			
+
 			for (final Plugin p : newPrios.values()) {
 				plugins.remove(p);
 			}
-			
+
 			for (int i = 0; i < newPrios.size(); i++) {
 				plugins.add(i, newPrios.get(i));
 			}
-			
+
 		}
-		
+
 		for (final Plugin p : plugins) {
 			log.debug("Gave plugin " + p + " priority number " + plugins.indexOf(p));
 			firePluginListChangedEvent(p, ListChangeEvent.PRIORITY_CHANGED);
 		}
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Toggles the priorities of the two plugins passed in as parameters.
@@ -427,12 +425,12 @@ public class PluginManager {
 	 *             <code>PluginManager</code>.
 	 */
 	public void togglePluginPriorities(final Plugin onePlugin, final Plugin theOtherPlugin) {
-		
+
 		int onePos = Integer.MIN_VALUE, otherPos = Integer.MIN_VALUE;
 		int i = 0;
-		
+
 		synchronized (plugins) {
-			
+
 			for (final Plugin p : plugins) {
 				if (p == onePlugin) {
 					onePos = i;
@@ -441,32 +439,31 @@ public class PluginManager {
 				}
 				i++;
 			}
-			
+
 			if ((onePos == Integer.MIN_VALUE) || (otherPos == Integer.MIN_VALUE)) {
 				throw new RuntimeException("One of the plugins is not yet managed.");
 			}
-			
+
 			final Plugin tmp = plugins.get(onePos);
 			plugins.set(onePos, theOtherPlugin);
 			plugins.set(otherPos, tmp);
-			
-			log.debug("Toggled the priorities of the plug-ins \"" + onePlugin + "\" and \""
-					+ theOtherPlugin + "\"");
-			
+
+			log.debug("Toggled the priorities of the plug-ins \"" + onePlugin + "\" and \"" + theOtherPlugin + "\"");
+
 		}
 		firePluginListChangedEvent(onePlugin, ListChangeEvent.PRIORITY_CHANGED);
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * Removes a plug-in
 	 */
 	public boolean removePlugin(final Plugin plugin) {
-		
+
 		log.debug("Removing plugin " + plugin);
-		
+
 		// We cannot remove the active NodePositioner, if there is no other to replace it.
 		if ((plugin instanceof NodePositionerPlugin) && plugin.getXMLConfig().getActive()) {
 			boolean foundAnotherNP = false;
@@ -483,15 +480,15 @@ public class PluginManager {
 				return false;
 			}
 		}
-		
+
 		synchronized (removePending) {
 			removePending.add(plugin);
 		}
-		
+
 		// first disable the plugin. if it is a NodePositioner, this would also activate another one
 		// as replacement.
 		plugin.setActive(false);
-		
+
 		synchronized (plugins) {
 			plugins.remove(plugin);
 		}
@@ -500,10 +497,10 @@ public class PluginManager {
 		}
 		log.debug("Removed plug-in: " + plugin);
 		firePluginListChangedEvent(plugin, ListChangeEvent.PLUGIN_REMOVED);
-		
+
 		return true;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -521,7 +518,7 @@ public class PluginManager {
 		}
 		throw new IllegalStateException("No active NodePositioner found!");
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -531,10 +528,11 @@ public class PluginManager {
 	 *            the plug-in's class
 	 * @param config
 	 *            the plug-in's configuration parameters
+	 * @return the new instance of a plug-in
 	 */
 	public Plugin createNewPlugin(final Class<? extends Plugin> clazz, final PluginXMLConfig config) {
 		final Plugin plugin = PluginFactory.createInstance(config, clazz);
-		
+
 		final String baseName = config.getName();
 		String instanceName = baseName;
 		if (containsPlugin(instanceName)) {
@@ -544,13 +542,13 @@ public class PluginManager {
 				instanceName = String.format("%s (%d)", baseName, i);
 			}
 		}
-		
+
 		plugin.getXMLConfig().setName(instanceName);
-		
+
 		addPlugin(plugin);
 		return plugin;
 	}
-	
+
 	/**
 	 * Returns true, if a plugin with the given name already exists.
 	 */
@@ -562,7 +560,7 @@ public class PluginManager {
 		}
 		return false;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -574,7 +572,7 @@ public class PluginManager {
 	 *            the reason
 	 */
 	private void firePluginListChangedEvent(final Plugin p, final ListChangeEvent what) {
-		
+
 		// TODO: This is a workaround. The real solution is to make sure the
 		// eventListerList ist multithreading safe.
 		final Set<PluginListChangeListener> copySet;
@@ -585,7 +583,7 @@ public class PluginManager {
 			listener.pluginListChanged(p, what);
 		}
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -596,7 +594,7 @@ public class PluginManager {
 	public List<Class<? extends Plugin>> getAvailablePluginTypes() {
 		return availablePluginsTypes;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -610,44 +608,43 @@ public class PluginManager {
 	 *            returned, <code>false</code> otherwise
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Plugin> getPluginInstances(final Class<? extends Plugin> clazz,
-			final boolean checkHierarchy) {
-		
+	public List<Plugin> getPluginInstances(final Class<? extends Plugin> clazz, final boolean checkHierarchy) {
+
 		final List<Plugin> instances = new LinkedList<Plugin>();
 		Class<? extends Plugin> currentClass;
-		
+
 		synchronized (plugins) {
-			
+
 			for (final Plugin plugin : plugins) {
-				
+
 				if (checkHierarchy) {
-					
+
 					currentClass = plugin.getClass();
-					
+
 					while (!currentClass.equals(Plugin.class)) {
-						
+
 						currentClass = (Class<? extends Plugin>) currentClass.getSuperclass();
-						
+
 						if (currentClass.equals(clazz)) {
 							instances.add(plugin);
 							break;
 						}
-						
+
 					}
-					
+
 				} else {
 					if (plugin.getClass().equals(clazz)) {
 						instances.add(plugin);
 					}
 				}
-				
+
 			}
-			
+
 		}
-		
+
 		return instances;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -666,7 +663,7 @@ public class PluginManager {
 		}
 		return visibleActivePlugins;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -677,5 +674,5 @@ public class PluginManager {
 		plugin.reset();
 		plugins.remove(plugin);
 	}
-	
+
 }

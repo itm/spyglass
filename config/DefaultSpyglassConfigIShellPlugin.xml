@@ -100,6 +100,30 @@
                <numRows>100</numRows>
             </parameters>
          </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
+            <parameters>
+               <isActive>true</isActive>
+               <isVisible>true</isVisible>
+               <name>GlobalInformation</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <semanticTypes4Neighborhoods length="1">
+                  <int>-1</int>
+               </semanticTypes4Neighborhoods>
+               <showNodeDegree>true</showNodeDegree>
+               <showNumNodes>true</showNumNodes>
+               <statisticalInformationEvaluators class="java.util.TreeSet">
+                  <statisticalInformationEvaluator>
+                     <semanticType>12</semanticType>
+                     <description>test</description>
+                     <expression>%U5</expression>
+                     <operations>SUM</operations>
+                  </statisticalInformationEvaluator>
+               </statisticalInformationEvaluators>
+            </parameters>
+         </plugin>
       </plugins>
    </instances>
    <generalSettings>
@@ -218,9 +242,12 @@
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
-            <semanticTypes4Neighborhoods class="java.util.LinkedList"/>
-            <showNodeDegree>true</showNodeDegree>
+            <semanticTypes4Neighborhoods length="1">
+               <int>-1</int>
+            </semanticTypes4Neighborhoods>
+            <showNodeDegree>false</showNodeDegree>
             <showNumNodes>true</showNumNodes>
+            <statisticalInformationEvaluators class="java.util.TreeSet"/>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">

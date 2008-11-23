@@ -9,36 +9,34 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.globalinformation;
 
-import org.eclipse.swt.widgets.Widget;
-
 import de.uniluebeck.itm.spyglass.plugin.GlobalInformation;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 // --------------------------------------------------------------------------------
 /**
+ * Implementations of this class are plug-ins which provide global information.
  * 
+ * @author Sebastian Ebers
  */
 public abstract class GlobalInformationPlugin extends Plugin implements GlobalInformation {
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor enabling the plug-in to receive packets
+	 */
 	public GlobalInformationPlugin() {
 		super(true);
 	}
-	
-	public void addWidget(final Widget widget) {
-		
-	}
-	
-	public Widget getWidget() {
-		return null;
-	}
-	
+
+	// --------------------------------------------------------------------------------
 	public static String getHumanReadableName() {
 		return "GlobalInformation";
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	@Override
 	public String toString() {
 		return GlobalInformationPlugin.getHumanReadableName() + "." + this.getInstanceName();
 	}
-	
+
 }

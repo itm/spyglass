@@ -13,7 +13,6 @@ import ishell.util.IconTheme;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.action.Action;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -67,64 +66,17 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	private static Logger log = SpyglassLoggerFactory.getLogger(PluginSpyGlass2iShell.class);
-	
+
 	private static final int SPYGLASS_PACKET_TYPE = 0x91;
-	
+
 	private Composite container;
-	
+
 	private Spyglass spyglass = null;
-	
+
 	private SpyglassConfiguration config;
-	
-	// private Deque<SpyglassPacket> queue = new ArrayDeque<SpyglassPacket>(50);
-	
+
 	private IShellToSpyGlassPacketBroker packetBroker;
-	
-	// /**
-	// * Indicates whether the system is in playback mode or not.<br>
-	// * If the system is in playback mode, the packets which are received via
-	// * {@link PluginSpyGlass2iShell#receivePacket(MessagePacket)} will be ignored.
-	// */
-	// private boolean playbackMode = false;
-	
-	// --------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	class PluginAction extends Action {
-		private final de.uniluebeck.itm.spyglass.plugin.Plugin plugin;
-		
-		// ----------------------------------------------------------------------
-		/**
-		 * 
-		 */
-		public PluginAction(final de.uniluebeck.itm.spyglass.plugin.Plugin plugin) {
-			super();
-			this.plugin = plugin;
-			
-			setText("Reset");
-			setToolTipText("Clear");
-			setImageDescriptor(IconTheme.lookupDescriptor("edit-clear"));
-		}
-		
-		// ----------------------------------------------------------------------
-		/**
-		 * 
-		 */
-		@Override
-		public void run() {
-			log.debug("Ich wurde geklickt");
-			
-			if (config != null) {
-				for (final de.uniluebeck.itm.spyglass.plugin.Plugin p : config.getPluginManager()
-						.getActivePlugins()) {
-					p.reset();
-				}
-				
-			}
-		}
-	}
-	
+
 	// --------------------------------------------------------------------------
 	/**
 	 * 
@@ -132,37 +84,36 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	@Override
 	public int[] init() {
 		// iShell init (called on each plug-in start)
-		
+
 		final CTabItem tabItem = getTabItem(getName());
 		tabItem.setToolTipText(getName());
 		tabItem.setImage(IconTheme.lookup("system-search"));
-		
+
 		container = this.getTabContainer(true);
 		container.setLayout(new FillLayout());
 		container.addControlListener(new ControlListener() {
-			
+
 			@Override
 			public void controlMoved(final ControlEvent e) {
 				// Nothing to do
 			}
-			
+
 			@Override
 			public void controlResized(final ControlEvent e) {
 				log.debug("Control resized, received event: " + e);
 				// TODO Adapt zoom
 			}
 		});
-		
+
 		ConfigStore cs = null;
 		try {
 			cs = new ConfigStore(true);
 			// Create the configuration for SpyGlass
 			config = cs.getSpyglassConfig();
 		} catch (final Exception e) {
-			// TODO: SE - show a message
 			log.error(e, e);
 		}
-		
+
 		if (config == null) {
 			try {
 				ConfigStore.resetDefaultFile(true);
@@ -173,16 +124,15 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			// Create the configuration for SpyGlass
 			config = cs.getSpyglassConfig();
 		}
-		
-		// TODO: SE - an error will occur if the configuration file was corrupted
+
 		packetBroker = (IShellToSpyGlassPacketBroker) config.getPacketReader();
-		
+
 		// TODO
 		// Application objects
 		spyglass = new Spyglass(true, config);
 		final AppWindow appWindow = new AppWindow(container.getDisplay(), container, spyglass);
 		new UIController(spyglass, appWindow);
-		
+
 		// Add Toolbar Actions
 		addToolBarAction(new PlaySelectInputAction());
 		addToolBarAction(new PlayPlayPauseAction(spyglass));
@@ -195,14 +145,14 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		addToolBarAction(new OpenPreferencesAction(container.getShell(), spyglass));
 		addToolBarAction(new LoadConfigurationAction(container.getShell(), spyglass));
 		addToolBarAction(new StoreConfigurationAction(container.getShell(), spyglass));
-		
+
 		// Start visualization
 		spyglass.setVisualizationRunning(true);
 		spyglass.start();
-		
+
 		return new int[] { SPYGLASS_PACKET_TYPE };
 	}
-	
+
 	// --------------------------------------------------------------------------
 	/**
 	 * 
@@ -210,7 +160,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	@Override
 	public void receivePacket(final MessagePacket packet) {
 		log.debug("receivePacket called from iShell");
-		
+
 		if (isPaused()) {
 			return;
 		}
@@ -221,30 +171,30 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			log.error("Illegal Packet, could not deserialize it.", e);
 			return;
 		}
-		
+
 		log.debug("Received Packet in Spyglass from iShell: " + spyglassPacket);
 		// spyglass.getPacketRecorder().handlePacket(spyglassPacket);
 		packetBroker.push(spyglassPacket);
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------
 	/**
 	 * TODO: shutdown of the other thread doesn't work correctly...
 	 */
 	@Override
 	public void shutdown() {
-		
+
 		// if SpyGlass was not started correctly it might still be null
 		if (spyglass != null) {
 			spyglass.shutdown();
 		}
-		
+
 		spyglass = null;
 		container = null;
 		log.info("SpyGlass end. Done.");
 	}
-	
+
 	// --------------------------------------------------------------------------
 	/**
 	 * 
@@ -253,15 +203,14 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	public String getName() {
 		return "SpyGlass";
 	}
-	
+
 	// --------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	@Override
 	public String getDescription() {
-		return getName()
-				+ " is a visualization framework for binary data packets arriving from the WSN";
+		return getName() + " is a visualization framework for binary data packets arriving from the WSN";
 	}
-	
+
 }

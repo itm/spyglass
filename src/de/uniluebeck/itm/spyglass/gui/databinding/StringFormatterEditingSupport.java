@@ -13,31 +13,38 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 public class StringFormatterEditingSupport extends ObservableValueEditingSupport {
-	
+
 	private CellEditor cellEditor;
 	private DataBindingContext dbc;
-	
+	private String elementName = "value";
+
 	public StringFormatterEditingSupport(final ColumnViewer viewer, final DataBindingContext dbc) {
-		
 		super(viewer, dbc);
 		this.dbc = dbc;
 		cellEditor = new TextCellEditor((Composite) viewer.getControl());
 	}
-	
+
+	public StringFormatterEditingSupport(final ColumnViewer viewer, final DataBindingContext dbc, final String elementName) {
+		super(viewer, dbc);
+		this.dbc = dbc;
+		cellEditor = new TextCellEditor((Composite) viewer.getControl());
+		this.elementName = elementName;
+	}
+
 	@Override
 	protected CellEditor getCellEditor(final Object element) {
 		return cellEditor;
 	}
-	
+
 	@Override
 	protected IObservableValue doCreateCellEditorObservable(final CellEditor cellEditor) {
-		
+
 		return SWTObservables.observeText(cellEditor.getControl(), SWT.Modify);
 	}
-	
+
 	@Override
 	protected IObservableValue doCreateElementObservable(final Object element, final ViewerCell cell) {
-		return BeansObservables.observeValue(dbc.getValidationRealm(), element, "value");
+		return BeansObservables.observeValue(dbc.getValidationRealm(), element, elementName);
 	}
-	
+
 }

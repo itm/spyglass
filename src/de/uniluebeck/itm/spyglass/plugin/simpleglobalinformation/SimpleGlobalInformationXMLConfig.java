@@ -8,14 +8,15 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementArray;
 import org.simpleframework.xml.ElementList;
 
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
-import de.uniluebeck.itm.spyglass.xmlconfig.StringFormatterSettings;
+import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator;
 
 // --------------------------------------------------------------------------------
 /**
@@ -26,37 +27,40 @@ import de.uniluebeck.itm.spyglass.xmlconfig.StringFormatterSettings;
  * 
  */
 public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
-	
-	@ElementList
-	private List<Integer> semanticTypes4Neighborhoods = new LinkedList<Integer>();
-	
-	@Element
+
+	@ElementArray(name = "semanticTypes4Neighborhoods")
+	private int[] semanticTypes4Neighborhoods;
+
+	@Element(name = "showNodeDegree")
 	private boolean showNodeDegree = true;
-	
-	@Element
+
+	@Element(name = "showNumNodes")
 	private boolean showNumNodes = true;
-	
-	@ElementList(required = false)
-	private List<StringFormatterSettings> stringFormatterSettings = null;
-	
+
+	@ElementList(name = "statisticalInformationEvaluators", required = false)
+	private Set<StatisticalInformationEvaluator> statisticalInformationEvaluators = new TreeSet<StatisticalInformationEvaluator>();
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the semanticTypes4Neighborhoods
 	 */
-	public List<Integer> getSemanticTypes4Neighborhoods() {
+	public int[] getSemanticTypes4Neighborhoods() {
 		return semanticTypes4Neighborhoods;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
+	 * Sets the semantic types of packages which provide information about neighborhood relations.
+	 * 
 	 * @param semanticTypes4Neighborhoods
-	 *            the semanticTypes4Neighborhoods to set
+	 *            tSets the semantic types of packages which provide information about neighborhood
+	 *            relations.
 	 */
-	public void setSemanticTypes4Neighborhoods(final List<Integer> semanticTypes4Neighborhoods) {
+	public void setSemanticTypes4Neighborhoods(final int[] semanticTypes4Neighborhoods) {
 		firePropertyChange("semanticTypes4Neighborhoods", this.semanticTypes4Neighborhoods,
 				this.semanticTypes4Neighborhoods = semanticTypes4Neighborhoods);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the showNodeDegree
@@ -64,18 +68,17 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	public boolean isShowNodeDegree() {
 		return showNodeDegree;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param showNodeDegree
 	 *            the showNodeDegree to set
 	 */
 	public void setShowNodeDegree(final boolean showNodeDegree) {
-		
-		firePropertyChange("showNodeDegree", this.showNodeDegree,
-				this.showNodeDegree = showNodeDegree);
+
+		firePropertyChange("showNodeDegree", this.showNodeDegree, this.showNodeDegree = showNodeDegree);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the showNumNodes
@@ -83,7 +86,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	public boolean isShowNumNodes() {
 		return showNumNodes;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param showNumNodes
@@ -92,34 +95,49 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	public void setShowNumNodes(final boolean showNumNodes) {
 		firePropertyChange("showNumNodes", this.showNumNodes, this.showNumNodes = showNumNodes);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the stringFormatterSettings
+	 * @param semanticType
+	 * @return the statisticalInformationEvaluators
 	 */
-	public List<StringFormatterSettings> getStringFormatterSettings() {
-		return stringFormatterSettings;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param stringFormatterSettings
-	 *            the stringFormatterSettings to set
-	 */
-	public void setStringFormatterSettings(
-			final List<StringFormatterSettings> stringFormatterSettings) {
-		firePropertyChange("stringFormatterSettings", this.stringFormatterSettings,
-				this.stringFormatterSettings = stringFormatterSettings);
-	}
-	
-	public boolean equals(final SimpleGlobalInformationXMLConfig o) {
-		if (!super.equals(o)) {
-			return false;
+	public StatisticalInformationEvaluator getStatisticalInformationEvaluators4Type(final int semanticType) {
+		for (final StatisticalInformationEvaluator sfs : statisticalInformationEvaluators) {
+			if (sfs.getSemanticType() == semanticType) {
+				return sfs;
+			}
 		}
-		
-		return semanticTypes4Neighborhoods.equals(o.semanticTypes4Neighborhoods)
-				&& (showNodeDegree == o.showNodeDegree) && (showNumNodes == o.showNumNodes)
-				&& stringFormatterSettings.equals(o.stringFormatterSettings);
+		return null;
 	}
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return the statisticalInformationEvaluators
+	 */
+	public Set<StatisticalInformationEvaluator> getStatisticalInformationEvaluators() {
+		return statisticalInformationEvaluators;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param statisticalInformationEvaluators
+	 *            the statisticalInformationEvaluators to set
+	 */
+	public void setStatisticalInformationEvaluators(final Set<StatisticalInformationEvaluator> statisticalInformationEvaluators) {
+		// these extensive operations are necessary to prevent dependencies when creating new
+		// instances of the associated plug-in
+		final Set<StatisticalInformationEvaluator> oldValue = new TreeSet<StatisticalInformationEvaluator>(this.statisticalInformationEvaluators);
+		this.statisticalInformationEvaluators = new TreeSet<StatisticalInformationEvaluator>();
+		for (final StatisticalInformationEvaluator e : statisticalInformationEvaluators) {
+			this.statisticalInformationEvaluators.add(e.clone());
+		}
+		firePropertyChange("statisticalInformationEvaluators", oldValue, this.statisticalInformationEvaluators);
+	}
+
+	public boolean equals(final SimpleGlobalInformationXMLConfig o) {
+
+		return super.equals(o) && semanticTypes4Neighborhoods.equals(o.semanticTypes4Neighborhoods) && (showNodeDegree == o.showNodeDegree)
+				&& (showNumNodes == o.showNumNodes) && statisticalInformationEvaluators.equals(o.statisticalInformationEvaluators);
+	}
+
 }

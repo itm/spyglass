@@ -28,7 +28,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
- * Abstract base class for all Spyglass plug-ins.<br>
+ * Abstract base class for all SpyGlass plug-ins.<br>
  * This abstract class implements the {@link Runnable} interface to enhance the performance of
  * packet handling. When new packets arrive, they are just dropped in a queue to enable the
  * dispatcher's thread to go on. The plug-in's packet handling thread is automatically notified
@@ -39,31 +39,31 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 @Root
 public abstract class Plugin implements Runnable, Comparable<Plugin> {
-	
+
 	/**
 	 * Reference to the plug-in manager
 	 */
 	protected PluginManager pluginManager;
-	
+
 	/**
 	 * The queue where packets are dropped by the packet dispatcher and which is maintained
 	 * concurrently
 	 */
 	private ConcurrentLinkedQueue<SpyglassPacket> packetQueue = null;
-	
+
 	/** The thread used to consume packets from the packet queue */
 	private Thread packetConsumerThread;
-	
+
 	/**
 	 * Object which is used to log different kinds of messages
 	 */
 	private static final Logger log = SpyglassLoggerFactory.getLogger(Plugin.class);
-	
+
 	/**
 	 * This list contains the DrawingObjectListeners.
 	 */
 	private final EventListenerList listeners = new EventListenerList();
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor<br>
@@ -80,14 +80,14 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			packetQueue = new ConcurrentLinkedQueue<SpyglassPacket>();
 		}
 	}
-	
+
 	/**
 	 * Constructor creating a temporal storage for incoming packages
 	 */
 	public Plugin() {
 		this(true);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * This method handles a Packet object. Usually, a plug-in creates a new DrawingObject for each
@@ -101,7 +101,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		// if the packet is not null, check if its semantic type is one of
 		// those, the plug-in is interested in
 		if ((packet != null) && isActive()) {
-			
+
 			if (!getXMLConfig().isAllSemanticTypes()) {
 				final int[] mySemanticTypes = getXMLConfig().getSemanticTypes();
 				final int packetSemanticType = packet.getSemanticType();
@@ -119,7 +119,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the name of the plug-in instance
@@ -129,7 +129,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	public final String getInstanceName() {
 		return getXMLConfig().getName();
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns if the plug-in is currently active
@@ -139,14 +139,14 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	public final boolean isActive() {
 		return getXMLConfig().getActive();
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Resets the plug-in's state i.e. removing all objects from the QuadTree, clearing the packet
 	 * queue and setting all member variables to default.
 	 */
 	public abstract void reset();
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the plug-in's activation state
@@ -156,9 +156,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	public final void setActive(final boolean isActive) {
 		getXMLConfig().setActive(isActive);
-		
+
 		// TODO: Should be done via Events
-		
+
 		if (packetQueue != null) {
 			// if the plug-in is deactivated, stop the thread if it is currenrly
 			// running. Otherwise, start it
@@ -169,7 +169,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns whether the plug-ins packet consumer thread is currently running
@@ -177,10 +177,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @return whether the plug-ins packet consumer thread is currently running
 	 */
 	public boolean isThreadRunning() {
-		return ((packetConsumerThread != null) && packetConsumerThread.isAlive() && !packetConsumerThread
-				.isInterrupted());
+		return ((packetConsumerThread != null) && packetConsumerThread.isAlive() && !packetConsumerThread.isInterrupted());
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Initializes the plugin. It is called right after the plugin has been instanciated and the
@@ -194,9 +193,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @see PluginXMLConfig#getActive()
 	 */
 	public void init(final PluginManager manager) {
-		
+
 		this.pluginManager = manager;
-		
+
 		// if the plug-in has a packet queue, it is maintained by a separate
 		// thread. This thread has to be started on activation and stopped on
 		// deactivation
@@ -210,7 +209,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			}
 		}
 	}
-	
+
 	/**
 	 * Stops the thread which consumes the packets available in the packet queue
 	 */
@@ -218,19 +217,18 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		if ((packetConsumerThread != null) && !packetConsumerThread.isInterrupted()) {
 			try {
 				packetConsumerThread.interrupt();
-				log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName()
-						+ " stopped successfully.");
+				log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName() + " stopped successfully.");
 			} catch (final Exception e) {
 				log.error("An error occured while trying to stop the plug-in's thread", e);
 			}
 		}
 	}
-	
+
 	/**
 	 * Starts the thread which consumes the packets available in the packet queue
 	 */
 	private void startPacketConsumerThread() {
-		
+
 		if ((packetConsumerThread == null) || packetConsumerThread.isInterrupted()) {
 			try {
 				// since a thread cannot be restarted, a new one has to be
@@ -238,15 +236,14 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 				packetConsumerThread = new Thread(this);
 				packetConsumerThread.setDaemon(true);
 				packetConsumerThread.start();
-				
-				log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName()
-						+ " started successfully.");
+
+				log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName() + " started successfully.");
 			} catch (final Exception e) {
 				log.error("An error occured while trying to start the plug-in's thread", e);
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Creates and returns a widget which can be used to configure the plug-in
@@ -259,9 +256,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * 
 	 * @return a widget which can be used to configure the plug-in
 	 */
-	public abstract PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createPreferencePage(
-			final PluginPreferenceDialog dialog, final Spyglass spyglass);
-	
+	public abstract PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass);
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Creates and returns a widget which can be used to configure the plug-in's type.<br>
@@ -278,13 +275,12 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @throws UnsupportedOperationException
 	 *             if this operation is called on an abstract superclass of a plug-in
 	 */
-	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(
-			final PluginPreferenceDialog dialog, final Spyglass spyglass)
-			throws UnsupportedOperationException {
+	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) throws UnsupportedOperationException {
 		throw new UnsupportedOperationException(
 				"This method must only be called on subclasses and must be implemented in every instantiable subclass.");
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the plug-in's denotation in a human readable style
@@ -298,7 +294,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		throw new UnsupportedOperationException(
 				"This method must only be called on subclasses and must be implemented by every abstract or instantiable suclass.");
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the plug-in's configuration parameters
@@ -306,7 +302,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @return the plug-in's configuration parameters
 	 */
 	public abstract PluginXMLConfig getXMLConfig();
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Handles a mouse event
@@ -320,7 +316,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) {
 		return false;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns <tt>true</tt> if the plug-in is visible
@@ -330,7 +326,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	public final boolean isVisible() {
 		return getXMLConfig().getVisible();
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Processes a packet<br>
@@ -343,7 +339,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 *            the packet
 	 */
 	protected abstract void processPacket(SpyglassPacket packet);
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the visibility state of a plug in
@@ -354,7 +350,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	public final void setVisible(final boolean setVisible) {
 		getXMLConfig().setVisible(setVisible);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Updates the quad tree after all sensible information provided by a packet have been
@@ -362,7 +358,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * wait while the quad tree is updated.
 	 */
 	protected abstract void updateQuadTree();
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * This method returns an identification string representing the plugin. it is primarily used
@@ -370,7 +366,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	@Override
 	public abstract String toString();
-	
+
 	/**
 	 * Compares the instance names of two plug-ins lexicographically, ignoring case differences.
 	 * This method returns an integer whose sign is that of calling <code>compareTo</code> with
@@ -389,7 +385,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @since 1.2
 	 */
 	public int compareTo(final Plugin p) {
-		
+
 		// if (p instanceof Plugin) {
 		// final String s1 = getInstanceName();
 		// final String s2 = (p).getInstanceName();
@@ -398,14 +394,14 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		// }
 		// return 0;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Concurrently processes packets which are available in the packet queue and update's the quad
 	 * tree.
 	 */
 	public final void run() {
-		
+
 		while (!Thread.currentThread().isInterrupted()) {
 			final SpyglassPacket p = getPacketFromQueue(true);
 			if (p != null) {
@@ -414,7 +410,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Inserts the specified packet at the tail of the packet queue.
@@ -435,7 +431,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		}
 		return success;
 	}
-	
+
 	/**
 	 * Retrieves and removes the head of the packet queue, or returns <tt>null</tt> if it is empty.<br>
 	 * Note that this is done in an extra thread. If an {@link InterruptedException} occurs,
@@ -447,7 +443,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @return the head of the packet queue, or <tt>null</tt> if it is empty
 	 */
 	private SpyglassPacket getPacketFromQueue(final boolean wait) {
-		
+
 		synchronized (packetQueue) {
 			// wait for the arrival of a new packet if the packet queue is
 			// empty, and the caller want's to wait
@@ -455,32 +451,39 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 				try {
 					packetQueue.wait();
 				} catch (final InterruptedException e) {
-					log
-							.info("The packet consumer thread was interrupted while waiting for a notification of the arrival of a new packet");
+					log.info("The packet consumer thread was interrupted while waiting for a notification of the arrival of a new packet");
 					packetConsumerThread.interrupt();
 				}
 			}
 			return packetQueue.poll();
 		}
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
 	 * Register a new DrawingObjectListener.
 	 * 
-	 * The listener will be called everytime a new drawing object is added to the layer, removed
+	 * The listener will be called everyt ime a new drawing object is added to the layer, removed
 	 * from it, or modified.
+	 * 
+	 * @param listener
+	 *            a DrawingObjectListener
 	 */
 	public void addDrawingObjectListener(final DrawingObjectListener listener) {
 		listeners.add(DrawingObjectListener.class, listener);
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
 	 * Unregister an existing DrawingObjectListener.
+	 * 
+	 * @param listener
+	 *            an existing DrawingObjectListener
 	 */
 	public void removeDrawingObjectListener(final DrawingObjectListener listener) {
 		listeners.remove(DrawingObjectListener.class, listener);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectChanged event.
@@ -491,11 +494,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 *            The original boundingBox before the modification (may be null if the modified
 	 *            drawing object occupies (at least) the same space as before the modification).
 	 */
-	protected final void fireDrawingObjectChanged(final DrawingObject dob,
-			final AbsoluteRectangle oldBoundingBox) {
+	protected final void fireDrawingObjectChanged(final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
 		// Get listeners
 		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
-		
+
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
 			if (oldBoundingBox != null) {
@@ -505,7 +507,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			}
 		}
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectAdded event.
 	 * 
@@ -515,13 +518,14 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	protected final void fireDrawingObjectAdded(final DrawingObject dob) {
 		// Get listeners
 		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
-		
+
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
 			((DrawingObjectListener) list[i]).drawingObjectAdded(dob);
 		}
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectRemoved event.
 	 * 
@@ -531,18 +535,21 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	protected final void fireDrawingObjectRemoved(final DrawingObject dob) {
 		// Get listeners
 		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
-		
+
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
 			((DrawingObjectListener) list[i]).drawingObjectRemoved(dob);
 		}
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
-	 * Return the responsible plugin manager
+	 * Return the responsible plug-in manager
+	 * 
+	 * @return the responsible plug-in manager
 	 */
 	protected PluginManager getPluginManager() {
 		return pluginManager;
 	}
-	
+
 }

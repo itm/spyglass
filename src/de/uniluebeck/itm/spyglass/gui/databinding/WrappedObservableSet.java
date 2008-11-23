@@ -14,17 +14,17 @@ import org.junit.Assert;
  * Wraps a Set into an ObservableSet. The original set is not copied, instead calls to an
  * WrappedObservableSet are passed through to the original wrapped set.
  * 
- * Thus changes to ether the WrappedObservableSet or the origial set reflect on each other.
+ * Thus changes to either the WrappedObservableSet or the original set reflect on each other.
  * 
  * @author Dariush Forouher
  */
 @SuppressWarnings("unchecked")
 public class WrappedObservableSet extends ObservableSet {
-	
+
 	public WrappedObservableSet(final Realm realm, final Set set, final Object sample) {
 		super(realm, set, sample);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
@@ -42,12 +42,11 @@ public class WrappedObservableSet extends ObservableSet {
 				}
 			}
 			Assert.assertNotNull(newObject);
-			fireSetChange(Diffs.createSetDiff(Collections.singleton(newObject),
-					Collections.EMPTY_SET));
+			fireSetChange(Diffs.createSetDiff(Collections.singleton(newObject), Collections.EMPTY_SET));
 		}
 		return ret;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
@@ -62,9 +61,9 @@ public class WrappedObservableSet extends ObservableSet {
 			fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, Collections.singleton(o)));
 		}
 		return ret;
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
@@ -85,7 +84,7 @@ public class WrappedObservableSet extends ObservableSet {
 		fireSetChange(Diffs.createSetDiff(additions, Collections.EMPTY_SET));
 		return ret;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
@@ -99,7 +98,7 @@ public class WrappedObservableSet extends ObservableSet {
 		wrappedSet.clear();
 		fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, removals));
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
@@ -121,5 +120,5 @@ public class WrappedObservableSet extends ObservableSet {
 		fireSetChange(Diffs.createSetDiff(Collections.EMPTY_SET, removals));
 		return ret;
 	}
-	
+
 }
