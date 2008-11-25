@@ -30,22 +30,22 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	private static Logger log = SpyglassLoggerFactory.getLogger(PositionPacketNodePositionerPlugin.class);
-	
+
 	@Element(name = "parameters")
 	private final PositionPacketNodePositionerXMLConfig xmlConfig;
-	
+
 	/**
 	 * Hashmap containing the position information.
 	 */
 	private final HashMap<Integer, AbsolutePosition> positionMap = new HashMap<Integer, AbsolutePosition>();
-	
+
 	/**
 	 * Constructor
 	 */
 	public PositionPacketNodePositionerPlugin() {
 		xmlConfig = new PositionPacketNodePositionerXMLConfig();
 	}
-	
+
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
 		if (!positionMap.containsKey(nodeId)) {
@@ -54,27 +54,27 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 			return positionMap.get(nodeId);
 		}
 	}
-	
+
 	@Override
 	public PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> createPreferencePage(
 			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new PositionPacketNodePositionerPreferencePage(dialog, spyglass, this);
 	}
-	
+
 	public static PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> createTypePreferencePage(
 			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new PositionPacketNodePositionerPreferencePage(dialog, spyglass);
 	}
-	
+
 	public static String getHumanReadableName() {
 		return "PositionPacketNodePositioner";
 	}
-	
+
 	@Override
 	public PluginXMLConfig getXMLConfig() {
 		return this.xmlConfig;
 	}
-	
+
 	/**
 	 * Contrary to the usual convention for packet handling, a NodePositioner must handle packets
 	 * synchronously.
@@ -82,34 +82,38 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
 		final int id = packet.getSenderId();
-		final AbsolutePosition pos = packet.getPosition().clone();
-		this.positionMap.put(id, pos);
-		log.debug("Memorized position " + pos + " for node id " + id);
+
+		final AbsolutePosition newPos = packet.getPosition().clone();
+
+		final AbsolutePosition oldPos = positionMap.get(id);
+		this.positionMap.put(id, newPos);
+
+		pluginManager.fireNodePositionChangedEvent(id, oldPos, newPos);
 	}
-	
+
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
 		// is never called.
 	}
-	
+
 	@Override
 	public void reset() {
 		this.positionMap.clear();
 	}
-	
+
 	@Override
 	protected void updateQuadTree() {
 		// is never called.
 	}
-	
+
 	@Override
 	public int getNumNodes() {
 		return this.positionMap.size();
 	}
-	
+
 	@Override
 	public boolean offersMetric() {
 		return true;
 	}
-	
+
 }

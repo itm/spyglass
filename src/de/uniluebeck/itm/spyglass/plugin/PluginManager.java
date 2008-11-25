@@ -12,16 +12,20 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.event.EventListenerList;
+
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
+import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener.ListChangeEvent;
 import de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin;
@@ -35,6 +39,7 @@ import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInf
 import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.springembedderpositioner.SpringEmbedderPositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter.VectorSequencePainterPlugin;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -77,6 +82,11 @@ public class PluginManager {
 	 * node positioner)
 	 */
 	private final List<Plugin> removePending = new ArrayList<Plugin>();
+
+	/**
+	 * Listerers for the NodePositionListener
+	 */
+	private final EventListenerList nodePositionListeners = new EventListenerList();
 
 	// --------------------------------------------------------------------------
 	// ------
@@ -489,6 +499,9 @@ public class PluginManager {
 		// as replacement.
 		plugin.setActive(false);
 
+		// kills remaining threads (if the plugin has some)
+		plugin.shutdown();
+
 		synchronized (plugins) {
 			plugins.remove(plugin);
 		}
@@ -517,6 +530,62 @@ public class PluginManager {
 			}
 		}
 		throw new IllegalStateException("No active NodePositioner found!");
+	}
+
+	public AbsolutePosition getNodePosition(final int nodeID) {
+		return this.getNodePositioner().getPosition(nodeID);
+	}
+
+	/**
+	 * Add a new Listener for changes in the position of nodes.
+	 * 
+	 * Whenever a node moves around, an event is fired.
+	 * 
+	 * 
+	 */
+	public void addNodePositionChangedListener(final DrawingAreaTransformListener listener) {
+		if (listener == null) {
+			return;
+		}
+
+		log.debug("Added new listener: " + listener);
+		nodePositionListeners.add(DrawingAreaTransformListener.class, listener);
+	}
+
+	/**
+	 * Remove the given listener.
+	 */
+	public void removeNodePositionChangedListener(final DrawingAreaTransformListener listener) {
+		if (listener == null) {
+			return;
+		}
+
+		log.debug("Removing listener: " + listener);
+		nodePositionListeners.remove(DrawingAreaTransformListener.class, listener);
+	}
+
+	/**
+	 * Fires a NodePositionChangedEvent.
+	 * 
+	 * Note: This method should only be used by NodePositioners. It is declared public so that it
+	 * can be used across packages, but ordinary Plugins must never call it!
+	 * 
+	 * @param node
+	 *            sender id of a node
+	 * @param oldPos
+	 *            old Position of the node (null if it just appeared)
+	 * @param newPos
+	 *            new Position of the node
+	 * 
+	 */
+	public void fireNodePositionChangedEvent(final int node, final AbsolutePosition oldPos, final AbsolutePosition newPos) {
+		// Get listeners
+		final EventListener[] list = nodePositionListeners.getListeners(NodePositionChangedListener.class);
+
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
+			((NodePositionChangedListener) list[i]).handleEvent(new NodePositionChangedEvent(node, oldPos, newPos));
+		}
 	}
 
 	// --------------------------------------------------------------------------
@@ -662,17 +731,6 @@ public class PluginManager {
 			}
 		}
 		return visibleActivePlugins;
-	}
-
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * 
-	 * @param plugin
-	 */
-	public void shutdownPlugin(final Plugin plugin) {
-		plugin.reset();
-		plugins.remove(plugin);
 	}
 
 }
