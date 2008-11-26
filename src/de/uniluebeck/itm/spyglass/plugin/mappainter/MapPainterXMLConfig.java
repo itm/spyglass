@@ -86,9 +86,9 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 * @param defaultValue
 	 *            the defaultValue to set
 	 */
-	public void setDefaultValue(final float framePointDefaultValue) {
+	public void setDefaultValue(final float defaultValue) {
 		firePropertyChange("defaultValue", this.defaultValue,
-				this.defaultValue = framePointDefaultValue);
+				this.defaultValue = defaultValue);
 	}
 	
 	// --------------------------------------------------------------------------------
