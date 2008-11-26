@@ -23,11 +23,11 @@ import de.uniluebeck.itm.spyglass.positions.PixelPosition;
  */
 @Root
 public class Line extends DrawingObject {
-	
-	private AbsolutePosition lineEnd;
-	
-	private int width;
-	
+
+	private AbsolutePosition lineEnd = new AbsolutePosition();
+
+	private int width = 1;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -35,7 +35,7 @@ public class Line extends DrawingObject {
 	public Line() {
 		super();
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -48,24 +48,23 @@ public class Line extends DrawingObject {
 		clone.setLineWidth(getLineWidth());
 		return clone;
 	}
-	
+
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
-		
-		final Color color = new Color(gc.getDevice(), this.getColorR(), this.getColorG(), this
-				.getColorB());
+
+		final Color color = new Color(gc.getDevice(), this.getColorR(), this.getColorG(), this.getColorB());
 		gc.setForeground(color);
 		gc.setLineWidth(this.getLineWidth());
-		
+
 		final PixelPosition start = drawingArea.absPoint2PixelPoint(this.getPosition());
 		final PixelPosition end = drawingArea.absPoint2PixelPoint(this.getEnd());
-		
+
 		gc.drawLine(start.x, start.y, end.x, end.y);
 		color.dispose();
-		
-		drawBoundingBox(drawingArea, gc);
+
+		// drawBoundingBox(drawingArea, gc);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -73,15 +72,15 @@ public class Line extends DrawingObject {
 	public AbsolutePosition getEnd() {
 		return lineEnd;
 	}
-	
+
 	public int getLineWidth() {
 		return width;
 	}
-	
+
 	public void setEnd(final AbsolutePosition end) {
 		setEnd(end, true);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -90,16 +89,16 @@ public class Line extends DrawingObject {
 		lineEnd = end;
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
-	
+
 	public void setLineWidth(final int width) {
 		setLineWidth(width, true);
 	}
-	
+
 	public void setLineWidth(final int width, final boolean fireBoundingBoxChangeEvent) {
 		this.width = width;
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -109,17 +108,21 @@ public class Line extends DrawingObject {
 		// TODO Implement
 		return super.toString();
 	}
-	
+
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 		final AbsolutePosition pos = getPosition();
-		final int lowerLeftX = lineEnd.x < pos.x ? lineEnd.x : pos.x;
-		final int lowerLeftY = lineEnd.y < pos.y ? lineEnd.y : pos.y;
-		final int upperRightX = lineEnd.x > pos.x ? lineEnd.x : pos.x;
-		final int upperRightY = lineEnd.y > pos.y ? lineEnd.x : pos.y;
-		final int width = Math.abs(upperRightX - lowerLeftX);
-		final int height = Math.abs(upperRightY - lowerLeftY);
-		return new AbsoluteRectangle(new AbsolutePosition(lowerLeftX, lowerLeftY, 0), width, height);
+		final int upperLeftX = Math.min(lineEnd.x, pos.x);
+		final int upperLeftY = Math.min(lineEnd.y, pos.y);
+		// final int lowerRightX = Math.max(lineEnd.x, pos.x);
+		// final int lowerRightY = Math.max(lineEnd.x, pos.y);
+
+		// System.out.println("(" + upperLeftX + "," + upperLeftY + "," + lowerRightX + ","
+		// + lowerRightY + ")");
+
+		final int width = Math.abs(lineEnd.x - pos.x);
+		final int height = Math.abs(lineEnd.y - pos.y);
+		return new AbsoluteRectangle(new AbsolutePosition(upperLeftX, upperLeftY, 0), width, height);
 	}
-	
+
 }
