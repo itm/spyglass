@@ -499,9 +499,6 @@ public class PluginManager {
 		// as replacement.
 		plugin.setActive(false);
 
-		// kills remaining threads (if the plugin has some)
-		plugin.shutdown();
-
 		synchronized (plugins) {
 			plugins.remove(plugin);
 		}
