@@ -17,17 +17,21 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
 /**
  * Instances of this class contain the configuration parameters of a {@link LinePainterPlugin}
  * 
- * @author Sebastian Ebers, Dariush Forouher
+ * @author Sebastian Ebers, Dariush Forouher, Daniel Bimschas
  * 
  */
 public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
-	
+
+	public static final String PROPERTYNAME_LINECOLOR = "lineColorRGB";
+
+	public static final String PROPERTYNAME_LINEWIDTH = "lineWidth";
+
 	@ElementArray
 	private int[] lineColorRGB = { 0, 0, 0 };
-	
+
 	@Element
 	private int lineWidth = 1;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lineColorRGB
@@ -35,7 +39,7 @@ public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 	public int[] getLineColorRGB() {
 		return lineColorRGB.clone();
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param lineColorRGB
@@ -44,9 +48,9 @@ public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 	public void setLineColorRGB(final int[] lineColorRGB) {
 		final int[] oldValue = this.lineColorRGB;
 		this.lineColorRGB = lineColorRGB;
-		firePropertyChange("lineColorRGB", oldValue, lineColorRGB);
+		firePropertyChange(PROPERTYNAME_LINECOLOR, oldValue, lineColorRGB);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lineWidth
@@ -54,7 +58,7 @@ public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 	public int getLineWidth() {
 		return lineWidth;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param lineWidth
@@ -63,16 +67,16 @@ public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 	public void setLineWidth(final int lineWidth) {
 		final int oldValue = this.lineWidth;
 		this.lineWidth = lineWidth;
-		firePropertyChange("lineWidth", oldValue, lineWidth);
+		firePropertyChange(PROPERTYNAME_LINEWIDTH, oldValue, lineWidth);
 	}
-	
+
 	public boolean equals(final LinePainterXMLConfig o) {
-		
+
 		if (!super.equals(o)) {
 			return false;
 		}
-		
+
 		return equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth);
 	}
-	
+
 }

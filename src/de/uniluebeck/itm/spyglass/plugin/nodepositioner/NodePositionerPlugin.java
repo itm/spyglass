@@ -17,7 +17,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
  * based on a metric but it cannot be granted.
  */
 public abstract class NodePositionerPlugin extends Plugin {
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -25,17 +25,18 @@ public abstract class NodePositionerPlugin extends Plugin {
 	public NodePositionerPlugin() {
 		super(true);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns a node's absolute position
 	 * 
 	 * @param nodeId
 	 *            the node's identifier
-	 * @return Position of the node with the supplied nodeID
+	 * @return Position of the node with the supplied nodeID or <code>null</code> if the nodeId is
+	 *         unknown
 	 */
 	public abstract AbsolutePosition getPosition(int nodeId);
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the number of nodes which are currently active
@@ -43,7 +44,7 @@ public abstract class NodePositionerPlugin extends Plugin {
 	 * @return the number of nodes which are currently active
 	 */
 	public abstract int getNumNodes();
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns whether the node positioner offers metrical information
@@ -52,14 +53,14 @@ public abstract class NodePositionerPlugin extends Plugin {
 	 *         <code>false</code> otherwise
 	 */
 	public abstract boolean offersMetric();
-	
+
 	public static String getHumanReadableName() {
 		return "NodePositioner";
 	}
-	
+
 	@Override
 	public String toString() {
 		return NodePositionerPlugin.getHumanReadableName() + "." + this.getInstanceName();
 	}
-	
+
 }

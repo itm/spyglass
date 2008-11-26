@@ -29,7 +29,7 @@
 				<name>demo sample1</name>
 				
 				<!-- the probability that this sample is selected -->
-				<probability>0.4</probability>
+				<probability>0.2</probability>
 				
 				<!-- a list of node IDs. the IDs can be seperated by commata. additionally
 				 ! they can be given as a range. for each packet a node ID is randomly selected.
@@ -56,21 +56,39 @@
 
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>demo sample2</name>
-				<probability>0.25</probability>
+				<probability>0.2</probability>
 				<nodeIDs>2</nodeIDs>
-				<syntaxType>uint8List</syntaxType>
-				<semanticTypes>10,12</semanticTypes>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
 				<position x="200" y="100" z="0"/>
-				<payload>20BBFF</payload>
+				<payload>0001</payload>
 			</sample>
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>demo sample3</name>
-				<probability>0.25</probability>
+				<probability>0.2</probability>
 				<nodeIDs>3</nodeIDs>
-				<syntaxType>uint8List</syntaxType>
-				<semanticTypes>10-20</semanticTypes>
-				<position x="300" y="100" z="0"/>
-				<payload>30BBFF</payload>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="1000" y="-1000" z="0"/>
+				<payload>0001</payload>
+			</sample>
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample4</name>
+				<probability>0.2</probability>
+				<nodeIDs>4</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="-1000" y="1000" z="0"/>
+				<payload>00010002</payload>
+			</sample>
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample5</name>
+				<probability>0.2</probability>
+				<nodeIDs>5</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="1000" y="1000" z="0"/>
+				<payload>00010004</payload>
 			</sample>
 			
 			<!-- this is a raw sample. the bytes contained in this sample will be

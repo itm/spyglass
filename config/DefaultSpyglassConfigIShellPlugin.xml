@@ -62,13 +62,15 @@
                <stringFormatters/>
                <defaultStringFormatter>Payload: %u0</defaultStringFormatter>
                <extendedInformation>
-                  <isActive nodeID="1">false</isActive>
-                  <isActive nodeID="2">false</isActive>
-                  <isActive nodeID="3">false</isActive>
+                  <isActive nodeID="1">true</isActive>
+                  <isActive nodeID="2">true</isActive>
+                  <isActive nodeID="3">true</isActive>
+                  <isActive nodeID="4">false</isActive>
+                  <isActive nodeID="5">false</isActive>
                </extendedInformation>
                <isExtendedDefaultValue>false</isExtendedDefaultValue>
                <lineColorRGB length="3">
-                  <int>255</int>
+                  <int>128</int>
                   <int>0</int>
                   <int>0</int>
                </lineColorRGB>
@@ -122,6 +124,24 @@
                      <operations>SUM</operations>
                   </statisticalInformationEvaluator>
                </statisticalInformationEvaluators>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin">
+            <parameters>
+               <isActive>true</isActive>
+               <isVisible>true</isVisible>
+               <name>default10</name>
+               <timeout>-1</timeout>
+               <semanticTypes length="1">
+                  <int>11</int>
+               </semanticTypes>
+               <stringFormatters/>
+               <lineColorRGB length="3">
+                  <int>255</int>
+                  <int>0</int>
+                  <int>0</int>
+               </lineColorRGB>
+               <lineWidth>1</lineWidth>
             </parameters>
          </plugin>
       </plugins>

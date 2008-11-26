@@ -48,11 +48,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
-		if (!positionMap.containsKey(nodeId)) {
-			throw new IllegalArgumentException("I don't know any node with id " + nodeId);
-		} else {
-			return positionMap.get(nodeId);
-		}
+		return !positionMap.containsKey(nodeId) ? null : positionMap.get(nodeId);
 	}
 
 	@Override

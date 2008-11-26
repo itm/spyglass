@@ -144,41 +144,6 @@
             <keepProportions>true</keepProportions>
          </parameters>
       </plugin>
-      <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
-         <parameters>
-            <isActive>true</isActive>
-            <isVisible>true</isVisible>
-            <name>default4</name>
-            <timeout>0</timeout>
-            <semanticTypes length="1">
-               <int>-1</int>
-            </semanticTypes>
-            <framePointDefaultValue>3.0</framePointDefaultValue>
-            <gridElementHeight>1</gridElementHeight>
-            <gridElementWidth>1</gridElementWidth>
-            <lowerLeftX>0</lowerLeftX>
-            <lowerLeftY>0</lowerLeftY>
-            <lockGridElementSquare>true</lockGridElementSquare>
-            <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
-            <maxColorRGB length="3">
-               <int>0</int>
-               <int>0</int>
-               <int>0</int>
-            </maxColorRGB>
-            <maxValue>1.0</maxValue>
-            <minColorRGB length="3">
-               <int>255</int>
-               <int>255</int>
-               <int>255</int>
-            </minColorRGB>
-            <minValue>0.0</minValue>
-            <numCols>1</numCols>
-            <numFramePointsHorizontal>3</numFramePointsHorizontal>
-            <numFramePointsVertical>3</numFramePointsVertical>
-            <numRows>1</numRows>
-            <refreshInterval>10</refreshInterval>
-         </parameters>
-      </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin">
          <parameters>
             <isActive>true</isActive>
