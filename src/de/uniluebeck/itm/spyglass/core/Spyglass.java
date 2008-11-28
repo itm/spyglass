@@ -164,6 +164,12 @@ public class Spyglass {
 	public void shutdown() {
 		setVisualizationRunning(false);
 		configStore.store(true);
+		
+		// shutdown all plugins
+		for (final Plugin p : pluginManager.getPlugins()) {
+			p.shutdown();
+		}
+		
 		log.info("All plugin-threads stopped");
 	}
 

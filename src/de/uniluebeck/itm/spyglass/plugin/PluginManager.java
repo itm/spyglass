@@ -497,6 +497,8 @@ public class PluginManager {
 		// first disable the plugin. if it is a NodePositioner, this would also activate another one
 		// as replacement.
 		plugin.setActive(false);
+		
+		plugin.shutdown();
 
 		synchronized (plugins) {
 			plugins.remove(plugin);

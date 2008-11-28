@@ -555,5 +555,19 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	protected PluginManager getPluginManager() {
 		return pluginManager;
 	}
+	
+
+	/**
+	 * Is called before the plugin is removed or before spyglass shuts down.
+	 * 
+	 * This method will be called exactly once, at the end of the lifetime of the plugin.
+	 * It's purpose is to clean up behind, kill (eventually) remaining threads and unregister any
+	 * listeners (if necessary).
+	 * 
+	 */
+	public void shutdown() {
+		// stop the consumer thread
+		stopPacketConsumerThread();
+	}
 
 }
