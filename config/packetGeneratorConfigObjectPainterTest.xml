@@ -1,0 +1,51 @@
+<!-- a sample configuration file for the packet generator
+ -->
+<packetGenerator>
+
+	<!-- number of nodes sent per second -->
+	<packetsPerSecond>1</packetsPerSecond>
+
+	<!-- Sinks which will handle each generated packet. -->
+	<sinks>
+		<!-- this sink opens a socket, from which iShell can fetch the packets. -->
+		<sink class="de.uniluebeck.itm.spyglass.packetgenerator.sinks.IShellSocketSink">
+			<ip>0.0.0.0</ip>
+			<port>8472</port>
+			<iShellSourceNode>1</iShellSourceNode>
+		</sink>
+
+
+	</sinks>
+
+	<sampleChooser>
+		<!-- list of samples from which the packets are generated. each sample
+		 ! has a given probability of being selected. when editing this file you
+		 ! must make sure that the probabilities add up to 1.0 ! -->
+		<samples>
+
+
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample2</name>
+				<probability>0.9</probability>
+				<nodeIDs>2</nodeIDs>
+				<syntaxType>int16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="200" y="100" z="0"/>
+				<payload>0000000000000009005000000000</payload>
+			</sample>
+
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample2</name>
+				<probability>0.1</probability>
+				<nodeIDs>2</nodeIDs>
+				<syntaxType>int16List</syntaxType>
+				<semanticTypes>10</semanticTypes>
+				<position x="200" y="100" z="0"/>
+				<payload>0000000000000009005000000000</payload>
+			</sample>
+			
+
+		</samples>
+	</sampleChooser>
+	
+</packetGenerator>

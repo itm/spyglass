@@ -8,7 +8,9 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.objectpainter;
 
+import org.eclipse.swt.graphics.RGB;
 import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementArray;
 
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -29,6 +31,12 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_IMAGE_FILE_NAME = "imageFileName";
 
+	public static final String PROPERTYNAME_DRAW_LINE = "drawLine";
+
+	public static final String PROPERTYNAME_LINE_COLOR = "lineColor";
+
+	public static final String PROPERTYNAME_PACKET_TYPE_3D = "packetType3D";
+
 	@Element(name = PROPERTYNAME_IMAGE_FILE_NAME)
 	private String imageFileName = "images/icons/brokenImageLink.png";
 
@@ -40,6 +48,15 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 
 	@Element(name = PROPERTYNAME_KEEP_PROPORTIONS)
 	private boolean keepProportions = true;
+
+	@Element(name = PROPERTYNAME_DRAW_LINE)
+	private boolean drawLine = true;
+
+	@Element(name = PROPERTYNAME_PACKET_TYPE_3D)
+	private boolean packetType3D = true;
+
+	@ElementArray(name = PROPERTYNAME_LINE_COLOR)
+	private int[] lineColor = new int[] { 255, 0, 0 };
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -56,7 +73,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setImageSizeX(final int imageSizeX) {
 		final int oldValue = this.imageSizeX;
 		this.imageSizeX = imageSizeX;
-		firePropertyChange(PROPERTYNAME_IMAGE_SIZE_X, oldValue, this.imageSizeX);
+		firePropertyChange("imageSizeX", oldValue, this.imageSizeX);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -74,7 +91,43 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setImageSizeY(final int imageSizeY) {
 		final int oldValue = this.imageSizeY;
 		this.imageSizeY = imageSizeY;
-		firePropertyChange(PROPERTYNAME_IMAGE_SIZE_Y, oldValue, this.imageSizeY);
+		firePropertyChange("imageSizeY", oldValue, this.imageSizeY);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public boolean isPacketType3D() {
+		return packetType3D;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param drawLine
+	 */
+	public void setPacketType3D(final boolean packetType3D) {
+		final boolean oldValue = this.packetType3D;
+		this.packetType3D = packetType3D;
+		firePropertyChange("packetType3D", oldValue, packetType3D);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public boolean isDrawLine() {
+		return drawLine;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param drawLine
+	 */
+	public void setDrawLine(final boolean drawLine) {
+		final boolean oldValue = this.drawLine;
+		this.drawLine = drawLine;
+		firePropertyChange("drawLine", oldValue, drawLine);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -92,7 +145,21 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setKeepProportions(final boolean keepProportions) {
 		final boolean oldValue = this.keepProportions;
 		this.keepProportions = keepProportions;
-		firePropertyChange(PROPERTYNAME_KEEP_PROPORTIONS, oldValue, keepProportions);
+		firePropertyChange("keepProportions", oldValue, keepProportions);
+	}
+
+	public int[] getLineColor() {
+		return lineColor;
+	}
+
+	public RGB getLineColorRGB() {
+		return new RGB(lineColor[0], lineColor[1], lineColor[2]);
+	}
+
+	public void setLineColor(final int[] color) {
+		final int[] oldValue = this.lineColor;
+		this.lineColor = color;
+		firePropertyChange("lineColor", oldValue, color);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -110,7 +177,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	 */
 	public void setImageFileName(final String imageFileName) {
 
-		firePropertyChange(PROPERTYNAME_IMAGE_FILE_NAME, this.imageFileName, this.imageFileName = imageFileName);
+		firePropertyChange("imageFileName", this.imageFileName, this.imageFileName = imageFileName);
 	}
 
 	public boolean equals(final ObjectPainterXMLConfig o) {

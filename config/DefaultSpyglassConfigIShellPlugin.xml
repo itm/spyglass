@@ -216,6 +216,13 @@
             <imageSizeX>100</imageSizeX>
             <imageSizeY>100</imageSizeY>
             <keepProportions>true</keepProportions>
+            <drawLine>true</drawLine>
+            <packetType3D>true</packetType3D>
+            <lineColor length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </lineColor>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
