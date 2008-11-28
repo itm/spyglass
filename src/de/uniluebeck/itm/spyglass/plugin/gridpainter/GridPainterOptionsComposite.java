@@ -27,49 +27,49 @@ import de.uniluebeck.itm.spyglass.gui.databinding.converter.ArrayToColorConverte
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverter;
 
 public class GridPainterOptionsComposite extends Composite {
-	
+
 	{
 		// Register as a resource user - SWTResourceManager will
 		// handle the obtaining and disposing of resources
 		SWTResourceManager.registerResourceUser(this);
 	}
-	
+
 	private Text lowerLeftPointXText;
-	
+
 	private Text lowerLeftPointYText;
-	
+
 	private Text numRowsText;
-	
+
 	private Text numColsText;
-	
+
 	private Button lockGridElementsSquareCheckbox;
-	
+
 	private Text gridElementWidthText;
-	
+
 	private Text gridElementHeightText;
-	
+
 	private Button lockNumberOfRowsNColsCheckbox;
-	
+
 	private CLabel colorExample;
-	
+
 	private Button lineColor;
-	
+
 	private Text lineWidth;
-	
+
 	private Group group;
-	
+
 	GridPainterPreferencePage page;
-	
+
 	public GridPainterOptionsComposite(final Composite parent) {
 		super(parent, SWT.NONE);
 		initGUI();
 	}
-	
+
 	private void initGUI() {
-		
+
 		GridData data;
 		Label label;
-		
+
 		setLayout(new GridLayout());
 		data = new GridData();
 		data.horizontalAlignment = GridData.FILL;
@@ -77,141 +77,141 @@ public class GridPainterOptionsComposite extends Composite {
 		data.grabExcessHorizontalSpace = true;
 		data.grabExcessVerticalSpace = true;
 		setLayoutData(data);
-		
+
 		{
 			data = new GridData(SWT.TOP, SWT.LEFT, true, true);
 			data.horizontalAlignment = GridData.FILL;
 			data.verticalAlignment = GridData.FILL;
-			
+
 			group = new Group(this, SWT.NONE);
 			group.setLayoutData(data);
 			group.setLayout(new GridLayout(8, false));
 			group.setText("Grid");
-			
+
 			{
 				// lower left point
 				data = new GridData();
 				data.widthHint = 100;
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("Lower Left Point X:");
 				label.setLayoutData(data);
-				
+
 				data = new GridData();
 				data.widthHint = 40;
-				
+
 				lowerLeftPointXText = new Text(group, SWT.BORDER);
 				lowerLeftPointXText.setLayoutData(data);
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("m");
-				
+
 				data = new GridData();
 				data.verticalSpan = 4;
 				data.widthHint = 30;
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("");
 				label.setLayoutData(data);
-				
+
 				data = new GridData();
 				data.widthHint = 100;
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("Lower Left Point Y:");
 				label.setLayoutData(data);
-				
+
 				data = new GridData();
 				data.widthHint = 40;
-				
+
 				lowerLeftPointYText = new Text(group, SWT.BORDER);
 				lowerLeftPointYText.setLayoutData(data);
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("m");
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("");
-				
+
 				// rows and columns
 				label = new Label(group, SWT.NONE);
 				label.setText("# Rows");
-				
+
 				data = new GridData();
 				data.widthHint = 40;
-				
+
 				numRowsText = new Text(group, SWT.BORDER);
 				numRowsText.setLayoutData(data);
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("");
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("# Columns");
-				
+
 				data = new GridData();
 				data.widthHint = 40;
-				
+
 				numColsText = new Text(group, SWT.BORDER);
 				numColsText.setLayoutData(data);
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("");
-				
+
 				lockNumberOfRowsNColsCheckbox = new Button(group, SWT.CHECK);
 				lockNumberOfRowsNColsCheckbox.setText("lock");
-				
+
 				// row width and column height
 				label = new Label(group, SWT.NONE);
 				label.setText("Row Width");
-				
+
 				data = new GridData();
 				data.widthHint = 40;
-				
+
 				gridElementWidthText = new Text(group, SWT.BORDER);
 				gridElementWidthText.setLayoutData(data);
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("m");
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("Column Height");
-				
+
 				data = new GridData();
 				data.widthHint = 40;
-				
+
 				gridElementHeightText = new Text(group, SWT.BORDER);
 				gridElementHeightText.setLayoutData(data);
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("m");
-				
+
 				lockGridElementsSquareCheckbox = new Button(group, SWT.CHECK);
 				lockGridElementsSquareCheckbox.setText("lock");
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("Line Width");
-				
+
 				data = new GridData();
 				data.widthHint = 40;
 				data.horizontalSpan = 2;
-				
+
 				lineWidth = new Text(group, SWT.BORDER);
 				lineWidth.setLayoutData(data);
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("Line Color");
-				
+
 				data = new GridData();
 				data.widthHint = 50;
 				data.heightHint = 19;
-				
+
 				colorExample = new CLabel(group, SWT.BORDER);
 				colorExample.setLayoutData(data);
-				
+
 				data = new GridData();
 				data.horizontalSpan = 2;
-				
+
 				lineColor = new Button(group, SWT.PUSH | SWT.CENTER);
 				lineColor.setText("Change color");
 				lineColor.setLayoutData(data);
@@ -227,60 +227,54 @@ public class GridPainterOptionsComposite extends Composite {
 						}
 					}
 				});
-				
+
 			}
-			
+
 		}
 	}
-	
-	public void setDatabinding(final DataBindingContext dbc, final GridPainterXMLConfig config,
-			final GridPainterPreferencePage page) {
-		
+
+	public void setDatabinding(final DataBindingContext dbc, final GridPainterXMLConfig config, final GridPainterPreferencePage page) {
+
 		this.page = page;
-		
+
 		IObservableValue obsModel;
 		ISWTObservableValue obsWidget;
 		UpdateValueStrategy usTargetToModel;
 		UpdateValueStrategy usModelToTarget;
-		
+
 		{
 			obsWidget = SWTObservables.observeText(lowerLeftPointXText, SWT.Modify);
-			obsModel = BeansObservables
-					.observeValue(dbc.getValidationRealm(), config, "lowerLeftX");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, GridPainterXMLConfig.PROPERTYNAME_GRID_LOWER_LEFT_POINT_X);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeText(lowerLeftPointYText, SWT.Modify);
-			obsModel = BeansObservables
-					.observeValue(dbc.getValidationRealm(), config, "lowerLeftY");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, GridPainterXMLConfig.PROPERTYNAME_GRID_LOWER_LEFT_POINT_Y);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeText(gridElementHeightText, SWT.Modify);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-					"gridElementHeight");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, GridPainterXMLConfig.PROPERTYNAME_GRID_ELEMENT_HEIGHT);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeText(gridElementWidthText, SWT.Modify);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-					"gridElementWidth");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, GridPainterXMLConfig.PROPERTYNAME_GRID_ELEMENT_WIDTH);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeText(this.lineWidth, SWT.Modify);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, "lineWidth");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, GridPainterXMLConfig.PROPERTYNAME_LINE_WIDTH);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeBackground(colorExample);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-					"lineColorRGB");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, GridPainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			usTargetToModel.setConverter(new ColorToArrayConverter());
 			usModelToTarget = new UpdateValueStrategy();
@@ -289,30 +283,28 @@ public class GridPainterOptionsComposite extends Composite {
 		}
 		{
 			obsWidget = SWTObservables.observeSelection(lockGridElementsSquareCheckbox);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-					"lockGridElementsSquare");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, GridPainterXMLConfig.PROPERTYNAME_LOCK_GRID_ELEMENTS_SQUARE);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeSelection(lockNumberOfRowsNColsCheckbox);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-					"lockNumberOfRowsNCols");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, GridPainterXMLConfig.PROPERTYNAME_LOCK_NUMBER_OF_ROWS_N_COLS);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeText(numColsText, SWT.Modify);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, "numCols");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, GridPainterXMLConfig.PROPERTYNAME_NUM_COLS);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeText(numRowsText, SWT.Modify);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, "numRows");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, GridPainterXMLConfig.PROPERTYNAME_NUM_ROWS);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
-		
+
 	}
 }

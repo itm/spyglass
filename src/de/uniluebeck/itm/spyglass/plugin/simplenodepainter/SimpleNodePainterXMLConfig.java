@@ -25,19 +25,25 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
  * 
  */
 public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
-	
+
+	public static final String PROPERTYNAME_EXTENDED_DEFAULT_VALUE = "extendedDefaultValue";
+
+	public static final String PROPERTYNAME_LINE_WIDTH = "lineWidth";
+
+	public static final String PROPERTYNAME_LINE_COLOR = "lineColor";
+
 	@ElementMap(entry = "isActive", key = "nodeID", attribute = true, name = "extendedInformation", required = false)
 	private HashMap<Integer, Boolean> isExtendenInformationActive = new HashMap<Integer, Boolean>();
-	
+
 	@Element(name = "isExtendedDefaultValue")
 	private boolean isExtendedDefaultValue = false;
-	
+
 	@ElementArray
 	private int[] lineColorRGB = { 255, 0, 0 };
-	
+
 	@Element
 	private int lineWidth = 1;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns if a node's the extended information is to be shown
@@ -49,11 +55,11 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	 */
 	public boolean isExtendedInformationActive(final int nodeID) {
 		final Boolean isActive = isExtendenInformationActive.get(nodeID);
-		
+
 		// if there is no entry for a certain node in the map, yet, use the default behavior
 		return (isActive != null) ? isActive : isExtendedDefaultValue;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets if a node's the extended information is to be shown
@@ -66,16 +72,16 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	public void putExtendedInformationActive(final int nodeID, final boolean isExtendendActive) {
 		isExtendenInformationActive.put(nodeID, isExtendendActive);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lineColorRGB
 	 */
 	public int[] getLineColorRGB() {
 		return lineColorRGB.clone();
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param lineColorRGB
@@ -84,9 +90,9 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	public void setLineColorRGB(final int[] lineColorRGB) {
 		final int[] oldvalue = this.lineColorRGB.clone();
 		this.lineColorRGB = lineColorRGB;
-		firePropertyChange("lineColor", oldvalue, lineColorRGB);
+		firePropertyChange(PROPERTYNAME_LINE_COLOR, oldvalue, lineColorRGB);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lineWidth
@@ -94,7 +100,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	public int getLineWidth() {
 		return lineWidth;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param lineWidth
@@ -103,9 +109,9 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	public void setLineWidth(final int lineWidth) {
 		final int oldvalue = this.lineWidth;
 		this.lineWidth = lineWidth;
-		firePropertyChange("lineWidth", oldvalue, lineWidth);
+		firePropertyChange(PROPERTYNAME_LINE_WIDTH, oldvalue, lineWidth);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the getExtendedDefaultValue
@@ -113,7 +119,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	public boolean getExtendedDefaultValue() {
 		return isExtendedDefaultValue;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param isExtendedDefaultValue
@@ -122,23 +128,23 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	public void setExtendedDefaultValue(final boolean isExtendedDefaultValue) {
 		final boolean oldValue = this.isExtendedDefaultValue;
 		this.isExtendedDefaultValue = isExtendedDefaultValue;
-		firePropertyChange("extendedDefaultValue", oldValue, isExtendedDefaultValue);
+		firePropertyChange(PROPERTYNAME_EXTENDED_DEFAULT_VALUE, oldValue, isExtendedDefaultValue);
 	}
-	
+
 	public boolean equals(final SimpleNodePainterXMLConfig o) {
 		if (!super.equals(o)) {
 			return false;
 		}
-		
+
 		return super.equals(o) && (isExtendedDefaultValue == o.isExtendedDefaultValue)
-				&& (isExtendenInformationActive == o.isExtendenInformationActive)
-				&& equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth);
+				&& (isExtendenInformationActive == o.isExtendenInformationActive) && equalsRGB(lineColorRGB, o.lineColorRGB)
+				&& (lineWidth == o.lineWidth);
 	}
-	
+
 	@Override
 	protected void finalize() throws Throwable {
 		isExtendenInformationActive.clear();
 		super.finalize();
 	}
-	
+
 }

@@ -52,7 +52,7 @@
                <semanticTypes length="1">
                   <int>-1</int>
                </semanticTypes>
-               <image>Z:\Pictures\20050215\Bild000.jpg</image>
+               <imageFileName>Z:\Pictures\20050215\Bild000.jpg</imageFileName>
                <lowerLeftX>-32000</lowerLeftX>
                <lowerLeftY>-32000</lowerLeftY>
                <imageSizeX>32000</imageSizeX>
@@ -71,8 +71,8 @@
                </semanticTypes>
                <gridElementHeight>100</gridElementHeight>
                <gridElementWidth>100</gridElementWidth>
-               <lowerLeftX>0</lowerLeftX>
-               <lowerLeftY>0</lowerLeftY>
+               <gridLowerLeftPointX>0</gridLowerLeftPointX>
+               <gridLowerLeftPointY>0</gridLowerLeftPointY>
                <lineColorRGB length="3">
                   <int>192</int>
                   <int>192</int>
@@ -113,8 +113,8 @@
             </semanticTypes>
             <gridElementHeight>100</gridElementHeight>
             <gridElementWidth>100</gridElementWidth>
-            <lowerLeftX>0</lowerLeftX>
-            <lowerLeftY>0</lowerLeftY>
+            <gridLowerLeftPointX>0</gridLowerLeftPointX>
+            <gridLowerLeftPointY>0</gridLowerLeftPointY>
             <lineColorRGB length="3">
                <int>192</int>
                <int>192</int>
@@ -136,7 +136,7 @@
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
-            <image>/home/dariush/Lageplan3D.jpg</image>
+            <imageFileName>/home/dariush/Lageplan3D.jpg</imageFileName>
             <lowerLeftX>-16000</lowerLeftX>
             <lowerLeftY>16000</lowerLeftY>
             <imageSizeX>32000</imageSizeX>
@@ -153,7 +153,7 @@
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
-            <image>images/icons/brokenImageLink.png</image>
+            <imageFileName>images/icons/brokenImageLink.png</imageFileName>
             <size height="1" width="1">
                <upperLeft x="0" y="0" z="0"/>
             </size>

@@ -319,9 +319,9 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
-		if (LinePainterXMLConfig.PROPERTYNAME_LINECOLOR.equals(event.getPropertyName())) {
+		if (LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B.equals(event.getPropertyName())) {
 			updateLineColor((int[]) event.getNewValue());
-		} else if (LinePainterXMLConfig.PROPERTYNAME_LINEWIDTH.equals(event.getPropertyName())) {
+		} else if (LinePainterXMLConfig.PROPERTYNAME_LINE_WIDTH.equals(event.getPropertyName())) {
 			updateLineWidth((Integer) event.getNewValue());
 		}
 	}

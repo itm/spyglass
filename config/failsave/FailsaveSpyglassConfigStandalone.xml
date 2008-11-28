@@ -317,7 +317,7 @@
 		</plugin>
 		<plugin class="de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin">
 			<parameters>
-				<image>images/icons/brokenImageLink.png</image>
+				<imageFileName>images/icons/brokenImageLink.png</imageFileName>
 				<isActive>true</isActive>
 				<isVisible>true</isVisible>
 				<name>default</name>
@@ -584,7 +584,7 @@
 		</plugin>
 		<plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin">
 			<parameters>
-				<image>images/icons/brokenImageLink.png</image>
+				<imageFileName>images/icons/brokenImageLink.png</imageFileName>
 				<size height="1" width="1">
 					<upperLeft x="0" y="0" z="0"/>
 				</size>

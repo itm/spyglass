@@ -20,25 +20,37 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class ImagePainterXMLConfig extends PluginXMLConfig {
-	
-	@Element(name = "image")
+
+	public static final String PROPERTYNAME_IMAGE_FILE_NAME = "imageFileName";
+
+	public static final String PROPERTYNAME_KEEP_PROPORTIONS = "keepProportions";
+
+	public static final String PROPERTYNAME_IMAGE_SIZE_Y = "imageSizeY";
+
+	public static final String PROPERTYNAME_IMAGE_SIZE_X = "imageSizeX";
+
+	public static final String PROPERTYNAME_LOWER_LEFT_Y = "lowerLeftY";
+
+	public static final String PROPERTYNAME_LOWER_LEFT_X = "lowerLeftX";
+
+	@Element(name = PROPERTYNAME_IMAGE_FILE_NAME)
 	private String imageFileName = "images/icons/brokenImageLink.png";
-	
-	@Element(name = "lowerLeftX")
+
+	@Element(name = PROPERTYNAME_LOWER_LEFT_X)
 	private int lowerLeftX = 0;
-	
-	@Element(name = "lowerLeftY")
+
+	@Element(name = PROPERTYNAME_LOWER_LEFT_Y)
 	private int lowerLeftY = 0;
-	
-	@Element(name = "imageSizeX")
+
+	@Element(name = PROPERTYNAME_IMAGE_SIZE_X)
 	private int imageSizeX = 0;
-	
-	@Element(name = "imageSizeY")
+
+	@Element(name = PROPERTYNAME_IMAGE_SIZE_Y)
 	private int imageSizeY = 0;
-	
-	@Element(name = "keepProportions")
+
+	@Element(name = PROPERTYNAME_KEEP_PROPORTIONS)
 	private boolean keepProportions = true;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
@@ -46,7 +58,7 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public int getLowerLeftX() {
 		return lowerLeftX;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param lowerLeftX
@@ -54,9 +66,9 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public void setLowerLeftX(final int lowerLeftX) {
 		final int oldValue = this.lowerLeftX;
 		this.lowerLeftX = lowerLeftX;
-		firePropertyChange("lowerLeftX", oldValue, lowerLeftX);
+		firePropertyChange(PROPERTYNAME_LOWER_LEFT_X, oldValue, lowerLeftX);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
@@ -64,7 +76,7 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public int getLowerLeftY() {
 		return lowerLeftY;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param lowerLeftY
@@ -72,9 +84,9 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public void setLowerLeftY(final int lowerLeftY) {
 		final int oldValue = this.lowerLeftY;
 		this.lowerLeftY = lowerLeftY;
-		firePropertyChange("lowerLeftY", oldValue, lowerLeftY);
+		firePropertyChange(PROPERTYNAME_LOWER_LEFT_Y, oldValue, lowerLeftY);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
@@ -82,7 +94,7 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public int getImageSizeX() {
 		return imageSizeX;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param imageSizeX
@@ -90,9 +102,9 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public void setImageSizeX(final int imageSizeX) {
 		final int oldValue = this.imageSizeX;
 		this.imageSizeX = imageSizeX;
-		firePropertyChange("imageSizeX", oldValue, this.imageSizeX);
+		firePropertyChange(PROPERTYNAME_IMAGE_SIZE_X, oldValue, this.imageSizeX);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
@@ -100,7 +112,7 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public int getImageSizeY() {
 		return imageSizeY;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param imageSizeY
@@ -108,9 +120,9 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public void setImageSizeY(final int imageSizeY) {
 		final int oldValue = this.imageSizeY;
 		this.imageSizeY = imageSizeY;
-		firePropertyChange("imageSizeY", oldValue, this.imageSizeY);
+		firePropertyChange(PROPERTYNAME_IMAGE_SIZE_Y, oldValue, this.imageSizeY);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
@@ -118,7 +130,7 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public boolean isKeepProportions() {
 		return keepProportions;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param keepProportions
@@ -126,9 +138,9 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public void setKeepProportions(final boolean keepProportions) {
 		final boolean oldValue = this.keepProportions;
 		this.keepProportions = keepProportions;
-		firePropertyChange("keepProportions", oldValue, keepProportions);
+		firePropertyChange(PROPERTYNAME_KEEP_PROPORTIONS, oldValue, keepProportions);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the imageFileName
@@ -136,7 +148,7 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public String getImageFileName() {
 		return imageFileName;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param imageFileName
@@ -145,17 +157,16 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public void setImageFileName(final String imageFileName) {
 		final String oldValue = this.imageFileName;
 		this.imageFileName = imageFileName;
-		firePropertyChange("imageFileName", oldValue, this.imageFileName);
+		firePropertyChange(PROPERTYNAME_IMAGE_FILE_NAME, oldValue, this.imageFileName);
 	}
-	
+
 	public boolean equals(final ImagePainterXMLConfig o) {
 		if (!super.equals(o)) {
 			return false;
 		}
-		
-		return imageFileName.equals((o).imageFileName) && (imageSizeX == o.imageSizeX)
-				&& (imageSizeY == o.imageSizeY) && (lowerLeftX == o.lowerLeftX)
-				&& (lowerLeftY == o.lowerLeftY);
+
+		return imageFileName.equals((o).imageFileName) && (imageSizeX == o.imageSizeX) && (imageSizeY == o.imageSizeY)
+				&& (lowerLeftX == o.lowerLeftX) && (lowerLeftY == o.lowerLeftY);
 	}
-	
+
 }

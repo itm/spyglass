@@ -29,14 +29,14 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class GridPainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener {
-	
+
 	@Element(name = "parameters")
 	private final GridPainterXMLConfig xmlConfig;
-	
+
 	private final Layer layer;
-	
+
 	private Grid grid;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -46,97 +46,96 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 		xmlConfig = new GridPainterXMLConfig();
 		layer = new QuadTree();
 	}
-	
+
 	@Override
-	public PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createPreferencePage(
-			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+	public PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		return new GridPainterPreferencePage(dialog, spyglass, this);
 	}
-	
-	public static PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createTypePreferencePage(
-			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+
+	public static PluginPreferencePage<GridPainterPlugin, GridPainterXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		return new GridPainterPreferencePage(dialog, spyglass);
 	}
-	
+
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		return layer.getDrawingObjects(area);
 	}
-	
+
 	public static String getHumanReadableName() {
 		return "GridPainter";
 	}
-	
+
 	@Override
 	public PluginXMLConfig getXMLConfig() {
 		return xmlConfig;
 	}
-	
+
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
 		// since the plug-in is not interested in packets, nothing has to be
 		// done here
 	}
-	
+
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
 		// since the plug-in is not interested in packets, nothing has to be
 		// done here
 	}
-	
+
 	@Override
 	public void reset() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	@Override
 	protected void updateQuadTree() {
 		// since the plug-in is not interested in packets, nothing has to be
 		// done here
 	}
-	
+
 	@Override
 	public void init(final PluginManager manager) {
-		
+
 		super.init(manager);
-		
+
 		// adding this listener here so it is called
 		// on programm startup (doesn't work in constructor!)
 		xmlConfig.addPropertyChangeListener(this);
-		
+
 		// dito
 		updateGrid();
-		
+
 	}
-	
+
 	@Override
 	public void propertyChange(final PropertyChangeEvent arg0) {
 		updateGrid();
 	}
-	
+
 	private void updateGrid() {
-		
+
 		synchronized (layer) {
 			layer.remove(grid);
 		}
 		fireDrawingObjectRemoved(grid);
-		
+
 		grid = new Grid();
 		final int[] lineColor = xmlConfig.getLineColorRGB();
 		grid.setColor(lineColor[0], lineColor[1], lineColor[2]);
 		grid.setGridElementHeight(xmlConfig.getGridElementHeight());
 		grid.setGridElementWidth(xmlConfig.getGridElementWidth());
-		grid.setPosition(new AbsolutePosition(xmlConfig.getLowerLeftX(), xmlConfig.getLowerLeftY(),
-				0));
+		grid.setPosition(new AbsolutePosition(xmlConfig.getGridLowerLeftPointX(), xmlConfig.getGridLowerLeftPointY(), 0));
 		grid.setLineWidth((int) xmlConfig.getLineWidth());
 		grid.setNumCols(xmlConfig.getNumCols());
 		grid.setNumRows(xmlConfig.getNumRows());
-		
+
 		synchronized (layer) {
 			layer.addOrUpdate(grid);
 		}
-		
+
 		fireDrawingObjectAdded(grid);
 	}
-	
+
 }

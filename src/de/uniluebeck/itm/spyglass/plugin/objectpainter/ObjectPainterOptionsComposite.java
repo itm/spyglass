@@ -33,13 +33,13 @@ import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidato
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
 public class ObjectPainterOptionsComposite extends Composite {
-	
+
 	{
 		// Register as a resource user - SWTResourceManager will
 		// handle the obtaining and disposing of resources
 		SWTResourceManager.registerResourceUser(this);
 	}
-	
+
 	private Text imageFileText;
 	private Label imageDimesionsLabel;
 	private Text imageSizeWidthText;
@@ -49,14 +49,14 @@ public class ObjectPainterOptionsComposite extends Composite {
 	private Label label4;
 	private Button keepProportionsButton;
 	private Label label3;
-	
+
 	private double imageAspectRatio;
-	
+
 	/**
 	 * Is true while the algorith sets width/height (neccessary to avoid stack overflow ;)
 	 */
 	boolean aspectSettingInProgress = false;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param parent
@@ -65,14 +65,14 @@ public class ObjectPainterOptionsComposite extends Composite {
 		super(parent, SWT.NONE);
 		initGUI();
 	}
-	
+
 	private void initGUI() {
-		
+
 		final GridLayout thisLayout = new GridLayout(1, true);
-		
+
 		this.setLayout(thisLayout);
 		this.setSize(660, 191);
-		
+
 		final GridData gridData = new GridData();
 		gridData.horizontalAlignment = GridData.FILL;
 		gridData.grabExcessHorizontalSpace = true;
@@ -89,14 +89,14 @@ public class ObjectPainterOptionsComposite extends Composite {
 			group.setLayout(groupLayout);
 			groupLayout.numColumns = 7;
 			group.setText("Image options");
-			
+
 			{
 				final GridData imageFileData = new GridData();
 				imageFileData.widthHint = 100;
 				final Label imageFileLabel = new Label(group, SWT.NONE);
 				imageFileLabel.setLayoutData(imageFileData);
 				imageFileLabel.setText("File path: ");
-				
+
 				final GridLayout imageFileCompositeLayout = new GridLayout();
 				imageFileCompositeLayout.numColumns = 2;
 				final Composite imageFileComposite = new Composite(group, SWT.NONE);
@@ -116,20 +116,18 @@ public class ObjectPainterOptionsComposite extends Composite {
 						public void modifyText(final ModifyEvent evt) {
 							if (new File(imageFileText.getText()).canRead()) {
 								final Image i = new Image(null, imageFileText.getText());
-								imageAspectRatio = (i.getBounds().width)
-										/ ((double) i.getBounds().height);
-								
-								imageDimesionsLabel.setText(String
-										.format("%d/%d px (ratio %.2f)", i.getBounds().height, i
-												.getBounds().width, imageAspectRatio));
-								
+								imageAspectRatio = (i.getBounds().width) / ((double) i.getBounds().height);
+
+								imageDimesionsLabel.setText(String.format("%d/%d px (ratio %.2f)", i.getBounds().height, i.getBounds().width,
+										imageAspectRatio));
+
 								i.dispose();
 							} else {
 								imageDimesionsLabel.setText("???/??? px");
 							}
 						}
 					});
-					
+
 					final GridData imageFileButtonData = new GridData();
 					imageFileButtonData.widthHint = 80;
 					final Button imageFileButton = new Button(imageFileComposite, SWT.PUSH);
@@ -140,12 +138,11 @@ public class ObjectPainterOptionsComposite extends Composite {
 						public void widgetDefaultSelected(final SelectionEvent e) {
 							widgetSelected(e);
 						}
-						
+
 						@Override
 						public void widgetSelected(final SelectionEvent e) {
 							final FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
-							fileDialog
-									.setFilterExtensions(new String[] { "*.jpg;*.png;*.gif", "*" });
+							fileDialog.setFilterExtensions(new String[] { "*.jpg;*.png;*.gif", "*" });
 							final String file = fileDialog.open();
 							if (file != null) {
 								imageFileText.setText(file);
@@ -153,7 +150,7 @@ public class ObjectPainterOptionsComposite extends Composite {
 						}
 					});
 				}
-				
+
 				final GridData lowerLeftLabelData = new GridData();
 				final Label lowerLeftLabel = new Label(group, SWT.NONE);
 				lowerLeftLabel.setLayoutData(lowerLeftLabelData);
@@ -201,9 +198,9 @@ public class ObjectPainterOptionsComposite extends Composite {
 				label2.setLayoutData(label2LData);
 				label2.setText("/");
 			}
-			
+
 			{
-				
+
 				final GridData imageSizeHeightTextData = new GridData();
 				imageSizeHeightTextData.horizontalAlignment = GridData.FILL;
 				imageSizeHeightTextData.heightHint = 17;
@@ -224,7 +221,7 @@ public class ObjectPainterOptionsComposite extends Composite {
 				label3LData.heightHint = 17;
 				label3.setLayoutData(label3LData);
 				label3.setText("m");
-				
+
 			}
 			{
 				label1 = new Label(group, SWT.NONE);
@@ -235,92 +232,86 @@ public class ObjectPainterOptionsComposite extends Composite {
 				keepProportionsButton.setText("Keep proportions");
 			}
 		}
-		
+
 	}
-	
-	public void setDatabinding(final DataBindingContext dbc, final ObjectPainterXMLConfig config,
-			final Spyglass spyglass) {
-		
+
+	public void setDatabinding(final DataBindingContext dbc, final ObjectPainterXMLConfig config, final Spyglass spyglass) {
+
 		IObservableValue obsModel;
 		ISWTObservableValue obsWidget;
 		UpdateValueStrategy usTargetToModel;
-		
+
 		{
 			obsWidget = SWTObservables.observeText(imageFileText, SWT.Modify);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-					"imageFileName");
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterGetValidator(new FileReadableValidator());
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ObjectPainterXMLConfig.PROPERTYNAME_IMAGE_FILE_NAME);
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setAfterGetValidator(new FileReadableValidator());
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
-		
+
 		{
 			obsWidget = SWTObservables.observeText(imageSizeWidthText, SWT.Modify);
-			obsModel = BeansObservables
-					.observeValue(dbc.getValidationRealm(), config, "imageSizeX");
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(0, Integer.MAX_VALUE));
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ObjectPainterXMLConfig.PROPERTYNAME_IMAGE_SIZE_X);
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setAfterConvertValidator(new IntegerRangeValidator(0,
+					Integer.MAX_VALUE));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeText(imageSizeHeightText, SWT.Modify);
-			obsModel = BeansObservables
-					.observeValue(dbc.getValidationRealm(), config, "imageSizeY");
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(0, Integer.MAX_VALUE));
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ObjectPainterXMLConfig.PROPERTYNAME_IMAGE_SIZE_Y);
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setAfterConvertValidator(new IntegerRangeValidator(0,
+					Integer.MAX_VALUE));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeSelection(keepProportionsButton);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-					"keepProportions");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ObjectPainterXMLConfig.PROPERTYNAME_KEEP_PROPORTIONS);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
-			final MetricsXMLConfig mConf = spyglass.getConfigStore().getSpyglassConfig()
-					.getGeneralSettings().getMetrics();
-			dbc.bindValue(SWTObservables.observeText(this.label3), BeansObservables.observeValue(
-					dbc.getValidationRealm(), mConf, "unit"), null, null);
+			final MetricsXMLConfig mConf = spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getMetrics();
+			dbc
+					.bindValue(SWTObservables.observeText(this.label3), BeansObservables.observeValue(dbc.getValidationRealm(), mConf, "unit"), null,
+							null);
 		}
-		
+
 	}
-	
+
 	private void imageSizeHeightTextModifyText(final ModifyEvent evt) {
 		if (aspectSettingInProgress || !this.keepProportionsButton.getSelection()) {
 			return;
 		}
-		
+
 		final String s = this.imageSizeHeightText.getText();
 		aspectSettingInProgress = true;
 		try {
 			final int i = NumberFormat.getNumberInstance().parse(s).intValue();
 			final int w = (int) (i / imageAspectRatio);
 			this.imageSizeWidthText.setText(w + "");
-			
+
 		} catch (final ParseException e) {
 			// this is no valid integer yet
 		} finally {
 			aspectSettingInProgress = false;
 		}
 		return;
-		
+
 	}
-	
+
 	private void imageSizeWidthTextModifyText(final ModifyEvent evt) {
-		
+
 		if (aspectSettingInProgress || !this.keepProportionsButton.getSelection()) {
 			return;
 		}
-		
+
 		final String s = this.imageSizeWidthText.getText();
 		aspectSettingInProgress = true;
-		
+
 		try {
 			final int i = NumberFormat.getNumberInstance().parse(s).intValue();
 			final int h = (int) (i * imageAspectRatio);
 			this.imageSizeHeightText.setText(h + "");
-			
+
 		} catch (final ParseException e) {
 			// this is no valid integer yet
 			return;

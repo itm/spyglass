@@ -19,41 +19,53 @@ import org.simpleframework.xml.Element;
  * 
  */
 public class MetricsXMLConfig extends XMLConfig {
-	
+
+	public static final String PROPERTYNAME_LOCK_ABS2METRIC_FACTOR = "lockAbs2metricFactor";
+
+	public static final String PROPERTYNAME_ABS2METRIC_OFFSET_Y = "abs2metricOffsetY";
+
+	public static final String PROPERTYNAME_ABS2METRIC_OFFSET_X = "abs2metricOffsetX";
+
+	public static final String PROPERTYNAME_ABS2METRIC_FACTOR_Y = "abs2metricFactorY";
+
+	public static final String PROPERTYNAME_ABS2METRIC_FACTOR_X = "abs2metricFactorX";
+
+	public static final String PROPERTYNAME_UNIT = "unit";
+
 	/**
 	 * a string for the unit
 	 */
 	@Element
 	private String unit = "m";
-	
+
 	/**
 	 * multiplying an absolute coordinate's x value with this factor will result in the
 	 * corresponding metric value
 	 */
 	@Element
 	private float abs2metricFactorX = 1;
-	
+
 	/**
 	 * multiplying an absolute coordinate's y value with this factor will result in the
 	 * corresponding metric value
 	 */
 	@Element
 	private float abs2metricFactorY = 1;
-	
+
 	/**
 	 * this is an offset value which allows the user to let the metric coordinates starting position
 	 * be anywhere in the absolute coordinate system
 	 */
 	@Element
 	private float abs2metricOffsetX = 0;
-	
+
 	/**
 	 * this is an offset value which allows the user to let the metric coordinates starting position
 	 * be anywhere in the absolute coordinate system
 	 */
 	@Element
 	private float abs2metricOffsetY = 0;
-	
+
 	/**
 	 * TODO (SE) - what is this?
 	 * 
@@ -61,7 +73,7 @@ public class MetricsXMLConfig extends XMLConfig {
 	 */
 	@Element
 	private boolean lockAbs2metricFactor = false;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the unit
@@ -69,7 +81,7 @@ public class MetricsXMLConfig extends XMLConfig {
 	public String getUnit() {
 		return unit;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param unit
@@ -78,9 +90,9 @@ public class MetricsXMLConfig extends XMLConfig {
 	public void setUnit(final String unit) {
 		final String oldValue = this.unit;
 		this.unit = unit;
-		firePropertyChange("unit", oldValue, unit);
+		firePropertyChange(PROPERTYNAME_UNIT, oldValue, unit);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the abs2metricFactorX
@@ -88,7 +100,7 @@ public class MetricsXMLConfig extends XMLConfig {
 	public float getAbs2metricFactorX() {
 		return abs2metricFactorX;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param abs2metricFactorX
@@ -97,9 +109,9 @@ public class MetricsXMLConfig extends XMLConfig {
 	public void setAbs2metricFactorX(final float abs2metricFactorX) {
 		final float oldValue = this.abs2metricFactorX;
 		this.abs2metricFactorX = abs2metricFactorX;
-		firePropertyChange("abs2metricFactorX", oldValue, abs2metricFactorX);
+		firePropertyChange(PROPERTYNAME_ABS2METRIC_FACTOR_X, oldValue, abs2metricFactorX);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the abs2metricFactorY
@@ -107,7 +119,7 @@ public class MetricsXMLConfig extends XMLConfig {
 	public float getAbs2metricFactorY() {
 		return abs2metricFactorY;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param abs2metricFactorY
@@ -116,9 +128,9 @@ public class MetricsXMLConfig extends XMLConfig {
 	public void setAbs2metricFactorY(final float abs2metricFactorY) {
 		final float oldValue = this.abs2metricFactorY;
 		this.abs2metricFactorY = abs2metricFactorY;
-		firePropertyChange("abs2metricFactorY", oldValue, abs2metricFactorY);
+		firePropertyChange(PROPERTYNAME_ABS2METRIC_FACTOR_Y, oldValue, abs2metricFactorY);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the abs2metricOffsetX
@@ -126,7 +138,7 @@ public class MetricsXMLConfig extends XMLConfig {
 	public float getAbs2metricOffsetX() {
 		return abs2metricOffsetX;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param abs2metricOffsetX
@@ -135,9 +147,9 @@ public class MetricsXMLConfig extends XMLConfig {
 	public void setAbs2metricOffsetX(final float abs2metricOffsetX) {
 		final float oldValue = this.abs2metricOffsetX;
 		this.abs2metricOffsetX = abs2metricOffsetX;
-		firePropertyChange("abs2metricOffsetX", oldValue, abs2metricOffsetX);
+		firePropertyChange(PROPERTYNAME_ABS2METRIC_OFFSET_X, oldValue, abs2metricOffsetX);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the abs2metricOffsetY
@@ -145,7 +157,7 @@ public class MetricsXMLConfig extends XMLConfig {
 	public float getAbs2metricOffsetY() {
 		return abs2metricOffsetY;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param abs2metricOffsetY
@@ -154,9 +166,9 @@ public class MetricsXMLConfig extends XMLConfig {
 	public void setAbs2metricOffsetY(final float abs2metricOffsetY) {
 		final float oldValue = this.abs2metricOffsetY;
 		this.abs2metricOffsetY = abs2metricOffsetY;
-		firePropertyChange("abs2metricOffsetY", oldValue, abs2metricOffsetY);
+		firePropertyChange(PROPERTYNAME_ABS2METRIC_OFFSET_Y, oldValue, abs2metricOffsetY);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lockAbs2metricFactor
@@ -164,7 +176,7 @@ public class MetricsXMLConfig extends XMLConfig {
 	public boolean getLockAbs2metricFactor() {
 		return lockAbs2metricFactor;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param lockAbs2metricFactor
@@ -173,7 +185,7 @@ public class MetricsXMLConfig extends XMLConfig {
 	public void setLockAbs2metricFactor(final boolean lockAbs2metricFactor) {
 		final boolean oldValue = this.lockAbs2metricFactor;
 		this.lockAbs2metricFactor = lockAbs2metricFactor;
-		firePropertyChange("lockAbs2metricFactor", oldValue, lockAbs2metricFactor);
+		firePropertyChange(PROPERTYNAME_LOCK_ABS2METRIC_FACTOR, oldValue, lockAbs2metricFactor);
 	}
-	
+
 }

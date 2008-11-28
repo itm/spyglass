@@ -34,13 +34,13 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
-	
+
 	{
 		// Register as a resource user - SWTResourceManager will
 		// handle the obtaining and disposing of resources
 		SWTResourceManager.registerResourceUser(this);
 	}
-	
+
 	private static final Logger log = SpyglassLoggerFactory.getLogger(OptionsComposite.class);
 	private Group group1;
 	private Label label1;
@@ -49,11 +49,11 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 	private Button lineColor;
 	private Label label2;
 	private Text lineWidth;
-	
+
 	StringFormatter stringFormatter = new StringFormatter();
-	
+
 	SimpleNodePainterPreferencePage page;
-	
+
 	/**
 	 * Auto-generated main method to display this org.eclipse.swt.widgets.Composite inside a new
 	 * Shell.
@@ -61,7 +61,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 	public static void main(final String[] args) {
 		showGUI();
 	}
-	
+
 	/**
 	 * Auto-generated method to display this org.eclipse.swt.widgets.Composite inside a new Shell.
 	 */
@@ -86,12 +86,12 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 			}
 		}
 	}
-	
+
 	public OptionsComposite(final org.eclipse.swt.widgets.Composite parent, final int style) {
 		super(parent, style);
 		initGUI();
 	}
-	
+
 	private void initGUI() {
 		try {
 			final FillLayout thisLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -102,7 +102,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 			gridData.grabExcessHorizontalSpace = true;
 			gridData.grabExcessVerticalSpace = true;
 			this.setLayoutData(gridData);
-			
+
 			this.setSize(613, 273);
 			{
 				group1 = new Group(this, SWT.NONE);
@@ -151,18 +151,18 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 					showExtInfLData.horizontalSpan = 3;
 					showExtInf.setLayoutData(showExtInfLData);
 					showExtInf.setText("Show extended information by default");
-					
+
 				}
-				
+
 				stringFormatter.addStringFormatterFields(group1, 2);
-				
+
 			}
 			this.layout();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void lineColorWidgetSelected(final SelectionEvent evt) {
 		log.debug("lineColor.widgetSelected, event=" + evt);
 		final ColorDialog dlg = new ColorDialog(this.getShell());
@@ -173,37 +173,34 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 			this.page.markFormDirty();
 		}
 	}
-	
-	public void setDatabinding(final DataBindingContext dbc, final PluginXMLConfig config,
-			final SimpleNodePainterPreferencePage page) {
-		
+
+	public void setDatabinding(final DataBindingContext dbc, final PluginXMLConfig config, final SimpleNodePainterPreferencePage page) {
+
 		this.page = page;
-		
+
 		// line width
-		
-		final IObservableValue modelObservable = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "lineWidth");
-		dbc.bindValue(SWTObservables.observeText(this.lineWidth, SWT.Modify), modelObservable,
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
-		
+
+		final IObservableValue modelObservable = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+				SimpleNodePainterXMLConfig.PROPERTYNAME_LINE_WIDTH);
+		dbc.bindValue(SWTObservables.observeText(this.lineWidth, SWT.Modify), modelObservable, new UpdateValueStrategy(
+				UpdateValueStrategy.POLICY_CONVERT), null);
+
 		// extended inf
-		
-		final IObservableValue observableExtInf = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "extendedDefaultValue");
+
+		final IObservableValue observableExtInf = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+				SimpleNodePainterXMLConfig.PROPERTYNAME_EXTENDED_DEFAULT_VALUE);
 		dbc.bindValue(SWTObservables.observeSelection(this.showExtInf), observableExtInf,
 				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
-		
+
 		// line color
-		
-		final IObservableValue observableColor = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "lineColorRGB");
-		dbc.bindValue(SWTObservables.observeBackground(colorExample), observableColor,
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-						.setConverter(new ColorToArrayConverter()), new UpdateValueStrategy()
-						.setConverter(new ArrayToColorConverter(this.getDisplay())));
-		
+
+		final IObservableValue observableColor = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+				SimpleNodePainterXMLConfig.PROPERTYNAME_LINE_COLOR);
+		dbc.bindValue(SWTObservables.observeBackground(colorExample), observableColor, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+				.setConverter(new ColorToArrayConverter()), new UpdateValueStrategy().setConverter(new ArrayToColorConverter(this.getDisplay())));
+
 		stringFormatter.setDataBinding(dbc, config, page);
-		
+
 	}
-	
+
 }

@@ -22,16 +22,22 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
-	
+
+	public static final String PROPERTYNAME_LINE_WIDTH = "lineWidth";
+
+	public static final String PROPERTYNAME_LINE_COLOR_R_G_B = "lineColorRGB";
+
+	public static final String PROPERTYNAME_DIMENSION = "dimension";
+
 	@Element
 	private byte dimension = 2;
-	
+
 	@ElementArray
 	private int[] lineColorRGB = { 0, 0, 0 };
-	
+
 	@Element
 	private int lineWidth = 1;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the dimension
@@ -39,18 +45,18 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	public byte getDimension() {
 		return dimension;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param dimension
 	 *            the dimension to set
 	 */
 	public void setDimension(final byte dimension) {
-		
-		firePropertyChange("dimension", this.dimension, this.dimension = dimension);
-		
+
+		firePropertyChange(PROPERTYNAME_DIMENSION, this.dimension, this.dimension = dimension);
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lineColorRGB
@@ -58,18 +64,18 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	public int[] getLineColorRGB() {
 		return lineColorRGB;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param lineColorRGB
 	 *            the lineColorRGB to set
 	 */
 	public void setLineColorRGB(final int[] lineColorRGB) {
-		
-		firePropertyChange("lineColorRGB", this.lineColorRGB, this.lineColorRGB = lineColorRGB);
-		
+
+		firePropertyChange(PROPERTYNAME_LINE_COLOR_R_G_B, this.lineColorRGB, this.lineColorRGB = lineColorRGB);
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the lineWidth
@@ -77,23 +83,22 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	public int getLineWidth() {
 		return lineWidth;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param lineWidth
 	 *            the lineWidth to set
 	 */
 	public void setLineWidth(final int lineWidth) {
-		
-		firePropertyChange("lineWidth", this.lineWidth, this.lineWidth = lineWidth);
+
+		firePropertyChange(PROPERTYNAME_LINE_WIDTH, this.lineWidth, this.lineWidth = lineWidth);
 	}
-	
+
 	public boolean equals(final VectorSequencePainterXMLConfig o) {
 		if (!super.equals(o)) {
 			return false;
 		}
-		return (dimension == o.dimension) && equalsRGB(lineColorRGB, o.lineColorRGB)
-				&& (lineWidth == o.lineWidth);
+		return (dimension == o.dimension) && equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth);
 	}
-	
+
 }

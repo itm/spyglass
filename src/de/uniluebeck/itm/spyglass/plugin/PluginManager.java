@@ -30,7 +30,6 @@ import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener.ListChangeEven
 import de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin;
-import de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangePlugin;
 import de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin;
@@ -64,7 +63,7 @@ public class PluginManager {
 	static {
 		availablePluginsTypes.add(GridPainterPlugin.class);
 		availablePluginsTypes.add(ImagePainterPlugin.class);
-		availablePluginsTypes.add(MapPainterPlugin.class);
+		// availablePluginsTypes.add(MapPainterPlugin.class);
 		availablePluginsTypes.add(NodeSensorRangePlugin.class);
 		availablePluginsTypes.add(ObjectPainterPlugin.class);
 		availablePluginsTypes.add(SimpleGlobalInformationPlugin.class);

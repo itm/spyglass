@@ -22,9 +22,9 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
  */
 public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 
-	public static final String PROPERTYNAME_LINECOLOR = "lineColorRGB";
+	public static final String PROPERTYNAME_LINE_COLOR_R_G_B = "lineColorRGB";
 
-	public static final String PROPERTYNAME_LINEWIDTH = "lineWidth";
+	public static final String PROPERTYNAME_LINE_WIDTH = "lineWidth";
 
 	@ElementArray
 	private int[] lineColorRGB = { 0, 0, 0 };
@@ -48,7 +48,7 @@ public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 	public void setLineColorRGB(final int[] lineColorRGB) {
 		final int[] oldValue = this.lineColorRGB;
 		this.lineColorRGB = lineColorRGB;
-		firePropertyChange(PROPERTYNAME_LINECOLOR, oldValue, lineColorRGB);
+		firePropertyChange(PROPERTYNAME_LINE_COLOR_R_G_B, oldValue, lineColorRGB);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 	public void setLineWidth(final int lineWidth) {
 		final int oldValue = this.lineWidth;
 		this.lineWidth = lineWidth;
-		firePropertyChange(PROPERTYNAME_LINEWIDTH, oldValue, lineWidth);
+		firePropertyChange(PROPERTYNAME_LINE_WIDTH, oldValue, lineWidth);
 	}
 
 	public boolean equals(final LinePainterXMLConfig o) {

@@ -28,29 +28,29 @@ import de.uniluebeck.itm.spyglass.gui.databinding.converter.ArrayToColorConverte
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverter;
 
 public class LinePainterOptionsComposite extends Composite {
-	
+
 	private Group group;
 	private Text lineWidth;
 	private CLabel lineColor;
 	private Button buttonLineColor;
 	StringFormatter stringFormatter = new StringFormatter();
-	
+
 	{
 		// Register as a resource user - SWTResourceManager will
 		// handle the obtaining and disposing of resources
 		SWTResourceManager.registerResourceUser(this);
 	}
-	
+
 	public LinePainterOptionsComposite(final Composite parent) {
 		super(parent, SWT.NONE);
 		initGUI();
 	}
-	
+
 	private void initGUI() {
-		
+
 		GridData data;
 		Label label;
-		
+
 		setLayout(new GridLayout());
 		data = new GridData();
 		data.horizontalAlignment = GridData.FILL;
@@ -58,40 +58,40 @@ public class LinePainterOptionsComposite extends Composite {
 		data.grabExcessHorizontalSpace = true;
 		data.grabExcessVerticalSpace = true;
 		setLayoutData(data);
-		
+
 		{
 			data = new GridData(SWT.TOP, SWT.LEFT, true, true);
 			data.horizontalAlignment = GridData.FILL;
 			data.verticalAlignment = GridData.FILL;
-			
+
 			group = new Group(this, SWT.NONE);
 			group.setLayoutData(data);
 			group.setLayout(new GridLayout(3, false));
 			group.setText("Display");
-			
+
 			{
 				label = new Label(group, SWT.NONE);
 				label.setText("Line Width");
-				
+
 				data = new GridData();
 				data.widthHint = 40;
 				data.horizontalSpan = 2;
-				
+
 				lineWidth = new Text(group, SWT.BORDER);
 				lineWidth.setLayoutData(data);
-				
+
 				label = new Label(group, SWT.NONE);
 				label.setText("Line Color");
-				
+
 				data = new GridData();
 				data.widthHint = 50;
 				data.heightHint = 19;
-				
+
 				lineColor = new CLabel(group, SWT.BORDER);
 				lineColor.setLayoutData(data);
-				
+
 				data = new GridData();
-				
+
 				buttonLineColor = new Button(group, SWT.PUSH | SWT.CENTER);
 				buttonLineColor.setText("Change color");
 				buttonLineColor.setLayoutData(data);
@@ -107,37 +107,36 @@ public class LinePainterOptionsComposite extends Composite {
 					}
 				});
 			}
-			
+
 			stringFormatter.addStringFormatterFields(group, 3);
-			
+
 		}
-		
+
 	}
-	
+
 	public void setDatabinding(final DataBindingContext dbc, final LinePainterXMLConfig config) {
-		
+
 		IObservableValue obsModel;
 		ISWTObservableValue obsWidget;
 		UpdateValueStrategy usTargetToModel;
 		UpdateValueStrategy usModelToTarget;
-		
+
 		{
 			obsWidget = SWTObservables.observeText(lineWidth, SWT.Modify);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, "lineWidth");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, LinePainterXMLConfig.PROPERTYNAME_LINE_WIDTH);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeBackground(lineColor);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-					"lineColorRGB");
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			usTargetToModel.setConverter(new ColorToArrayConverter());
 			usModelToTarget = new UpdateValueStrategy();
 			usModelToTarget.setConverter(new ArrayToColorConverter(this.getDisplay()));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
 		}
-		
+
 	}
-	
+
 }

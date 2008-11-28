@@ -20,19 +20,27 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class ObjectPainterXMLConfig extends PluginXMLConfig {
-	
-	@Element(name = "image")
+
+	public static final String PROPERTYNAME_IMAGE_SIZE_X = "imageSizeX";
+
+	public static final String PROPERTYNAME_IMAGE_SIZE_Y = "imageSizeY";
+
+	public static final String PROPERTYNAME_KEEP_PROPORTIONS = "keepProportions";
+
+	public static final String PROPERTYNAME_IMAGE_FILE_NAME = "imageFileName";
+
+	@Element(name = PROPERTYNAME_IMAGE_FILE_NAME)
 	private String imageFileName = "images/icons/brokenImageLink.png";
-	
-	@Element(name = "imageSizeX")
+
+	@Element(name = PROPERTYNAME_IMAGE_SIZE_X)
 	private int imageSizeX = 0;
-	
-	@Element(name = "imageSizeY")
+
+	@Element(name = PROPERTYNAME_IMAGE_SIZE_Y)
 	private int imageSizeY = 0;
-	
-	@Element(name = "keepProportions")
+
+	@Element(name = PROPERTYNAME_KEEP_PROPORTIONS)
 	private boolean keepProportions = true;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
@@ -40,7 +48,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public int getImageSizeX() {
 		return imageSizeX;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param imageSizeX
@@ -48,9 +56,9 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setImageSizeX(final int imageSizeX) {
 		final int oldValue = this.imageSizeX;
 		this.imageSizeX = imageSizeX;
-		firePropertyChange("imageSizeX", oldValue, this.imageSizeX);
+		firePropertyChange(PROPERTYNAME_IMAGE_SIZE_X, oldValue, this.imageSizeX);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
@@ -58,7 +66,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public int getImageSizeY() {
 		return imageSizeY;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param imageSizeY
@@ -66,9 +74,9 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setImageSizeY(final int imageSizeY) {
 		final int oldValue = this.imageSizeY;
 		this.imageSizeY = imageSizeY;
-		firePropertyChange("imageSizeY", oldValue, this.imageSizeY);
+		firePropertyChange(PROPERTYNAME_IMAGE_SIZE_Y, oldValue, this.imageSizeY);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
@@ -76,7 +84,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public boolean isKeepProportions() {
 		return keepProportions;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param keepProportions
@@ -84,9 +92,9 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setKeepProportions(final boolean keepProportions) {
 		final boolean oldValue = this.keepProportions;
 		this.keepProportions = keepProportions;
-		firePropertyChange("keepProportions", oldValue, keepProportions);
+		firePropertyChange(PROPERTYNAME_KEEP_PROPORTIONS, oldValue, keepProportions);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the imageFileName
@@ -94,25 +102,24 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public String getImageFileName() {
 		return imageFileName;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param imageFileName
 	 *            the imageFileName to set
 	 */
 	public void setImageFileName(final String imageFileName) {
-		
-		firePropertyChange("imageFileName", this.imageFileName, this.imageFileName = imageFileName);
+
+		firePropertyChange(PROPERTYNAME_IMAGE_FILE_NAME, this.imageFileName, this.imageFileName = imageFileName);
 	}
-	
+
 	public boolean equals(final ObjectPainterXMLConfig o) {
-		
+
 		if (!super.equals(o)) {
 			return false;
 		}
-		
-		return imageFileName.equals((o).imageFileName) && (imageSizeX == o.imageSizeX)
-				&& (imageSizeY == o.imageSizeY);
+
+		return imageFileName.equals((o).imageFileName) && (imageSizeX == o.imageSizeX) && (imageSizeY == o.imageSizeY);
 	}
-	
+
 }

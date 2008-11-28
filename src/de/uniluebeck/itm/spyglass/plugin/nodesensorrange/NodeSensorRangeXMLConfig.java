@@ -23,13 +23,15 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
-	
+
+	public static final String PROPERTYNAME_NODE_RANGES = "nodeRanges";
+
 	@Element(name = "default")
 	// TODO: solve cyclic dependencies here
 	// private NodeSensorRange defalutNodeSensorRange = new NodeSensorRange();
 	@ElementMap(entry = "ranges", key = "nodeID", attribute = true, valueType = NodeSensorRange.class)
 	private HashMap<Integer, NodeSensorRange> nodeRanges = new HashMap<Integer, NodeSensorRange>();
-	
+
 	// //
 	// --------------------------------------------------------------------------------
 	// /**
@@ -49,7 +51,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
 	// defalutNodeSensorRange) {
 	// this.defalutNodeSensorRange = defalutNodeSensorRange;
 	// }
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the nodeRanges
@@ -57,23 +59,23 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
 	public HashMap<Integer, NodeSensorRange> getNodeRanges() {
 		return nodeRanges;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param nodeRanges
 	 *            the nodeRanges to set
 	 */
 	public void setNodeRanges(final HashMap<Integer, NodeSensorRange> nodeRanges) {
-		
-		firePropertyChange("nodeRanges", this.nodeRanges, this.nodeRanges = nodeRanges);
-		
+
+		firePropertyChange(PROPERTYNAME_NODE_RANGES, this.nodeRanges, this.nodeRanges = nodeRanges);
+
 	}
-	
+
 	public boolean equals(final NodeSensorRangeXMLConfig o) {
 		if (!super.equals(o)) {
 			return false;
 		}
 		return nodeRanges.equals((o).nodeRanges);
 	}
-	
+
 }

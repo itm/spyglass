@@ -24,10 +24,12 @@ import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerXMLConfig;
  * 
  */
 public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
-	
+
+	public static final String PROPERTYNAME_EDGE_SEMANTIC_TYPES = "edgeSemanticTypes";
+
 	@ElementList
 	private List<Integer> edgeSemanticTypes = new LinkedList<Integer>();
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the edgeSemanticTypes
@@ -35,24 +37,23 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 	public List<Integer> getEdgeSemanticTypes() {
 		return edgeSemanticTypes;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param edgeSemanticTypes
 	 *            the edgeSemanticTypes to set
 	 */
 	public void setEdgeSemanticTypes(final List<Integer> edgeSemanticTypes) {
-		firePropertyChange("edgeSemanticTypes", this.edgeSemanticTypes,
-				this.edgeSemanticTypes = edgeSemanticTypes);
-		
+		firePropertyChange(PROPERTYNAME_EDGE_SEMANTIC_TYPES, this.edgeSemanticTypes, this.edgeSemanticTypes = edgeSemanticTypes);
+
 	}
-	
+
 	public boolean equals(final SpringEmbedderPositionerXMLConfig o) {
 		if (!super.equals(o)) {
 			return false;
 		}
-		
+
 		return edgeSemanticTypes.equals(o.edgeSemanticTypes);
 	}
-	
+
 }

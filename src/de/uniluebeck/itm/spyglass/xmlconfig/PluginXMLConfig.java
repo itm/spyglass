@@ -19,37 +19,47 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
 /**
  * Instances of this class contain the configuration parameters of a {@link Plugin}
  * 
- * @author Sebastian Ebers
+ * @author Sebastian Ebers, Daniel Bimschas
  * 
  */
 public abstract class PluginXMLConfig extends XMLConfig {
-	
+
+	public static final String PROPERTYNAME_SEMANTIC_TYPES = "semanticTypes";
+
+	public static final String PROPERTYNAME_TIMEOUT = "timeout";
+
+	public static final String PROPERTYNAME_NAME = "name";
+
+	public static final String PROPERTYNAME_VISIBLE = "visible";
+
+	public static final String PROPERTYNAME_ACTIVE = "active";
+
 	// private static final Logger log = SpyglassLoggerFactory.get(PluginXMLConfig.class);
-	
+
 	// public static final int[] ALL_SEMANTIC_TYPES = new int[256];
 	// static {
 	// for (int i = 0; i < 256; i++) {
 	// ALL_SEMANTIC_TYPES[i] = i;
 	// }
 	// }
-	
+
 	@Element(name = "isActive")
 	private boolean active = true;
-	
+
 	@Element(name = "isVisible", required = false)
 	private boolean visible = true;
-	
-	@Element(name = "name")
+
+	@Element(name = PROPERTYNAME_NAME)
 	private String name = "default";
-	
-	@Element(name = "timeout", required = false)
+
+	@Element(name = PROPERTYNAME_TIMEOUT, required = false)
 	private int timeout = -1;
-	
-	@ElementArray(name = "semanticTypes", required = false)
+
+	@ElementArray(name = PROPERTYNAME_SEMANTIC_TYPES, required = false)
 	private int[] semanticTypes = new int[] { -1 };
-	
+
 	// private int[] semanticTypes = ALL_SEMANTIC_TYPES.clone();
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the isActive
@@ -57,7 +67,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public boolean getActive() {
 		return active;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param active
@@ -66,9 +76,9 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public void setActive(final boolean active) {
 		final boolean oldvalue = this.active;
 		this.active = active;
-		firePropertyChange("active", oldvalue, active);
+		firePropertyChange(PROPERTYNAME_ACTIVE, oldvalue, active);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the isVisible
@@ -76,7 +86,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public boolean getVisible() {
 		return visible;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param visible
@@ -85,9 +95,9 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public void setVisible(final boolean visible) {
 		final boolean oldvalue = this.visible;
 		this.visible = visible;
-		firePropertyChange("visible", oldvalue, visible);
+		firePropertyChange(PROPERTYNAME_VISIBLE, oldvalue, visible);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the name
@@ -95,7 +105,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public String getName() {
 		return name;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param name
@@ -104,9 +114,9 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public void setName(final String name) {
 		final String oldValue = this.name;
 		this.name = name;
-		firePropertyChange("name", oldValue, name);
+		firePropertyChange(PROPERTYNAME_NAME, oldValue, name);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the timeout value
@@ -116,7 +126,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public int getTimeout() {
 		return timeout;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the timeout value
@@ -127,9 +137,9 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public void setTimeout(final int timeout) {
 		final int oldvalue = this.timeout;
 		this.timeout = timeout;
-		firePropertyChange("timeout", oldvalue, timeout);
+		firePropertyChange(PROPERTYNAME_TIMEOUT, oldvalue, timeout);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the list of semantic types.
@@ -141,7 +151,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public int[] getSemanticTypes() {
 		return semanticTypes.clone();
 	}
-	
+
 	/**
 	 * Returns true, if the given integer is in the list of semantic types.
 	 */
@@ -149,7 +159,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		if (this.isAllSemanticTypes()) {
 			return true;
 		}
-		
+
 		for (int i = 0; i < semanticTypes.length; i++) {
 			if (semanticTypes[i] == type) {
 				return true;
@@ -157,7 +167,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		}
 		return false;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param semanticTypes
@@ -165,7 +175,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 */
 	public void setSemanticTypes(final int[] semanticTypes) {
 		final int[] oldvalue = this.semanticTypes;
-		
+
 		// If "-1" is in the list, reduce it to that number
 		Arrays.sort(semanticTypes);
 		if (Arrays.binarySearch(semanticTypes, -1) >= 0) {
@@ -173,9 +183,9 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		} else {
 			this.semanticTypes = semanticTypes;
 		}
-		firePropertyChange("semanticTypes", oldvalue, semanticTypes);
+		firePropertyChange(PROPERTYNAME_SEMANTIC_TYPES, oldvalue, semanticTypes);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns <code>true</code> if the plug-in is interested all packages independent of the
@@ -187,7 +197,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public boolean isAllSemanticTypes() {
 		return (semanticTypes.length == 1) && (semanticTypes[0] == -1);
 	}
-	
+
 	/**
 	 * Returns <code>true</code> if the configuration is equal to certain other configuration
 	 * 
@@ -196,19 +206,17 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 * @return <code>true</code> if the configuration is equal to certain other configuration
 	 */
 	public boolean equals(final PluginXMLConfig other) {
-		
+
 		// needed, since invocations on implementing subclasses may fall back
 		// to this method
 		if (!this.getClass().equals(other.getClass())) {
 			return false;
 		}
-		
-		return (this.getActive() == other.getActive()) && (this.getVisible() == other.getVisible())
-				&& this.getName().equals(other.getName())
-				&& Arrays.equals(this.getSemanticTypes(), other.getSemanticTypes())
-				&& (this.getTimeout() == other.getTimeout());
+
+		return (this.getActive() == other.getActive()) && (this.getVisible() == other.getVisible()) && this.getName().equals(other.getName())
+				&& Arrays.equals(this.getSemanticTypes(), other.getSemanticTypes()) && (this.getTimeout() == other.getTimeout());
 	}
-	
+
 	/**
 	 * Returns if two color settings equal one another
 	 * 
@@ -219,14 +227,12 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 * @return <code>true</code> if two color settings equal one another
 	 */
 	protected boolean equalsRGB(final int[] lineColorRGB, final int[] otherLineColorRGB) {
-		return (lineColorRGB[0] == otherLineColorRGB[0])
-				&& (lineColorRGB[1] == otherLineColorRGB[1])
-				&& (lineColorRGB[2] == otherLineColorRGB[2]);
+		return (lineColorRGB[0] == otherLineColorRGB[0]) && (lineColorRGB[1] == otherLineColorRGB[1]) && (lineColorRGB[2] == otherLineColorRGB[2]);
 	}
-	
+
 	@Override
 	public final PluginXMLConfig clone() {
-		
+
 		try {
 			final PluginXMLConfig clone = this.getClass().newInstance();
 			clone.overwriteWith(this);

@@ -28,16 +28,24 @@ import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator;
  */
 public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
-	@ElementArray(name = "semanticTypes4Neighborhoods")
+	public static final String PROPERTYNAME_STATISTICAL_INFORMATION_EVALUATORS = "statisticalInformationEvaluators";
+
+	public static final String PROPERTYNAME_SHOW_NUM_NODES = "showNumNodes";
+
+	public static final String PROPERTYNAME_SHOW_NODE_DEGREE = "showNodeDegree";
+
+	public static final String PROPERTYNAME_SEMANTIC_TYPES4_NEIGHBORHOODS = "semanticTypes4Neighborhoods";
+
+	@ElementArray(name = PROPERTYNAME_SEMANTIC_TYPES4_NEIGHBORHOODS)
 	private int[] semanticTypes4Neighborhoods;
 
-	@Element(name = "showNodeDegree")
+	@Element(name = PROPERTYNAME_SHOW_NODE_DEGREE)
 	private boolean showNodeDegree = true;
 
-	@Element(name = "showNumNodes")
+	@Element(name = PROPERTYNAME_SHOW_NUM_NODES)
 	private boolean showNumNodes = true;
 
-	@ElementList(name = "statisticalInformationEvaluators", required = false)
+	@ElementList(name = PROPERTYNAME_STATISTICAL_INFORMATION_EVALUATORS, required = false)
 	private Set<StatisticalInformationEvaluator> statisticalInformationEvaluators = new TreeSet<StatisticalInformationEvaluator>();
 
 	// --------------------------------------------------------------------------------
@@ -57,7 +65,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 *            relations.
 	 */
 	public void setSemanticTypes4Neighborhoods(final int[] semanticTypes4Neighborhoods) {
-		firePropertyChange("semanticTypes4Neighborhoods", this.semanticTypes4Neighborhoods,
+		firePropertyChange(PROPERTYNAME_SEMANTIC_TYPES4_NEIGHBORHOODS, this.semanticTypes4Neighborhoods,
 				this.semanticTypes4Neighborhoods = semanticTypes4Neighborhoods);
 	}
 
@@ -76,7 +84,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 */
 	public void setShowNodeDegree(final boolean showNodeDegree) {
 
-		firePropertyChange("showNodeDegree", this.showNodeDegree, this.showNodeDegree = showNodeDegree);
+		firePropertyChange(PROPERTYNAME_SHOW_NODE_DEGREE, this.showNodeDegree, this.showNodeDegree = showNodeDegree);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -93,7 +101,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 *            the showNumNodes to set
 	 */
 	public void setShowNumNodes(final boolean showNumNodes) {
-		firePropertyChange("showNumNodes", this.showNumNodes, this.showNumNodes = showNumNodes);
+		firePropertyChange(PROPERTYNAME_SHOW_NUM_NODES, this.showNumNodes, this.showNumNodes = showNumNodes);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -131,7 +139,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 		for (final StatisticalInformationEvaluator e : statisticalInformationEvaluators) {
 			this.statisticalInformationEvaluators.add(e.clone());
 		}
-		firePropertyChange("statisticalInformationEvaluators", oldValue, this.statisticalInformationEvaluators);
+		firePropertyChange(PROPERTYNAME_STATISTICAL_INFORMATION_EVALUATORS, oldValue, this.statisticalInformationEvaluators);
 	}
 
 	public boolean equals(final SimpleGlobalInformationXMLConfig o) {
