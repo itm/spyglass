@@ -1,23 +1,21 @@
-/*
- * ---------------------------------------------------------------------- This file is part of the
+/*----------------------------------------------------------------------------------------
+ * This file is part of the
  * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
  * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
  * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
- * further details. ------------------------------------------------------------------------
+ * further details.
+ * ---------------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.packet;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.gateway.Gateway;
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
-// --
 /**
  * Abstract class for all PacketReader implementations. A PacketReader must provide the next packet
  * with the <code>getNextPacket()</code> method.
@@ -25,17 +23,22 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * @author Timo Rumland
  */
 public abstract class PacketReader extends PropertyBean {
-	private static Logger log = SpyglassLoggerFactory.getLogger(PacketReader.class);
-	
+
 	@Element(name = "gateway", required = false)
 	private Gateway gateway = null;
-	
+
+	/**
+	 * Indicates whether the packets to be provided should be read from a file or to be forwarded
+	 * from iShell
+	 */
+	protected boolean readFromFile = true;
+
 	/**
 	 * Delay between
 	 */
 	@Element(name = "delayMillies", required = false)
 	protected int delayMillies = 1000;
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -49,27 +52,40 @@ public abstract class PacketReader extends PropertyBean {
 	 * @return a new SpyGlass packet
 	 * 
 	 */
-	public abstract SpyglassPacket getNextPacket() throws SpyglassPacketException,
-			InterruptedException;
-	
+	public abstract SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException;
+
 	// --------------------------------------------------------------------------
-	// ------
 	/**
+	 * Returns the gateway which offers an input stream to the packet data.
 	 * 
+	 * @return the gateway which offers an input stream to the packet data
 	 */
 	public Gateway getGateway() {
-		return gateway;
+		if (gateway == null) {
+			return null;
+		}
+		synchronized (gateway) {
+			return gateway;
+		}
 	}
-	
+
 	// --------------------------------------------------------------------------
-	// ------
 	/**
+	 * Sets the gateway which offers an input stream to the packet data
 	 * 
+	 * @param gateway
+	 *            the gateway which offers an input stream to the packet data
 	 */
 	public void setGateway(final Gateway gateway) {
-		this.gateway = gateway;
+		if (this.gateway == null) {
+			this.gateway = gateway;
+		} else {
+			synchronized (this.gateway) {
+				this.gateway = gateway;
+			}
+		}
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the delayMillies
@@ -77,7 +93,7 @@ public abstract class PacketReader extends PropertyBean {
 	public int getDelayMillies() {
 		return delayMillies;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param delayMillies
@@ -88,7 +104,7 @@ public abstract class PacketReader extends PropertyBean {
 		this.delayMillies = delayMillies;
 		firePropertyChange("delayMillies", oldMillies, delayMillies);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Performs a reset of all transient settings. The configuration of this object is not affected
@@ -98,5 +114,27 @@ public abstract class PacketReader extends PropertyBean {
 	 *             thrown if the resetting of the input fails
 	 */
 	public abstract void reset() throws IOException;
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns if a file is used as input.
+	 * 
+	 * @return <code>true</code> if the input is a file, <code>false</code> otherwise
+	 */
+	public boolean isReadFromFile() {
+		return readFromFile;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets an indicator which indicates if a file is used as input
+	 * 
+	 * @param readFromFile
+	 *            indicates whether a file is to be used as input
+	 * @return <code>true</code> if the input is a file, <code>false</code> otherwise
+	 */
+	public boolean setReadFromFile(final boolean readFromFile) {
+		return (this.readFromFile = readFromFile);
+	}
+
 }

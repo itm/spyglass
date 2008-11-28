@@ -10,6 +10,7 @@ package de.uniluebeck.itm.spyglass.gateway;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.log4j.Logger;
@@ -26,11 +27,11 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 @Root
 public class FileReaderGateway implements Gateway {
 	private static Logger log = SpyglassLoggerFactory.getLogger(FileReaderGateway.class);
-	
+
 	private File file = null;
-	
+
 	private InputStream inputStream = null;
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -40,33 +41,49 @@ public class FileReaderGateway implements Gateway {
 	public InputStream getInputStream() {
 		return inputStream;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
 	 */
-	@Element
+	@Element(name = "file", required = false)
 	public File getFile() {
 		return file;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
+	 * Sets the input file
 	 * 
+	 * @param file
+	 *            the input file
 	 */
-	@Element
+	@Element(name = "file", required = false)
 	public void setFile(final File file) {
 		this.file = file;
-		
+
 		// Construct the input stream from that file
 		try {
-			inputStream = new FileInputStream(file);
+			if (inputStream != null) {
+				inputStream.close();
+			}
+			if (file != null) {
+				inputStream = new FileInputStream(file);
+			}
 		} catch (final FileNotFoundException e) {
 			log.error("File[" + file + "] not found" + e, e);
+		} catch (final IOException e) {
+			log.error("Error while setting an input file.\r\nPlease close the pallication and try again.", e);
 		}
-		
 	}
-	
+
+	/**
+	 * Resets the file.
+	 */
+	public void reset() {
+		setFile(file);
+	}
+
 }

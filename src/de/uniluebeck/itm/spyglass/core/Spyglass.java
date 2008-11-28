@@ -24,6 +24,7 @@ import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
@@ -41,32 +42,32 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class Spyglass {
 	private static Logger log = SpyglassLoggerFactory.getLogger(Spyglass.class);
-	
+
 	// private static final String CONFIG_FILE = "config.xml";
-	
+
 	private PacketDispatcher packetDispatcher = null;
-	
+
 	private PluginManager pluginManager = null;
-	
+
 	private PacketReader packetReader = null;
-	
+
 	private PacketProducerTask packetProducerTask = null;
-	
+
 	private ExecutorService executor = Executors.newFixedThreadPool(2);
-	
+
 	/**
 	 * TODO: Define exactly what this should do
 	 */
 	private boolean visualizationRunning = true;
-	
+
 	private final ConfigStore configStore;
-	
+
 	// --------------------------------------------------------------------------
 	/**
 	 * Listener for changes in the plug-in list
 	 */
 	private final PropertyChangeListener configStoreListener = new PropertyChangeListener() {
-		
+
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
 			try {
@@ -78,11 +79,11 @@ public class Spyglass {
 			} catch (final Exception e) {
 				log.error(e, e);
 			}
-			
+
 		}
-		
+
 	};
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -98,7 +99,7 @@ public class Spyglass {
 		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -114,7 +115,7 @@ public class Spyglass {
 		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -130,7 +131,7 @@ public class Spyglass {
 		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -138,19 +139,17 @@ public class Spyglass {
 	 */
 	private void init(final SpyglassConfiguration config) {
 		// Create and inject objects
-		
 		pluginManager = config.getPluginManager();
 		pluginManager.init();
-		
+
 		packetReader = config.getPacketReader();
-		
+
 		packetDispatcher = new PacketDispatcher(pluginManager);
-		packetProducerTask = new PacketProducerTask(this, config.getGeneralSettings()
-				.getPacketDeliveryInitialDelay());
-		
+		packetProducerTask = new PacketProducerTask(this, config.getGeneralSettings().getPacketDeliveryInitialDelay());
+
 		log.debug("Init done");
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -161,55 +160,55 @@ public class Spyglass {
 		executor.execute(packetProducerTask);
 		executor.shutdown();
 	}
-	
+
 	public void shutdown() {
 		setVisualizationRunning(false);
 		configStore.store(true);
 		log.info("All plugin-threads stopped");
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// -------
 	public PacketDispatcher getPacketDispatcher() {
 		return packetDispatcher;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	public void setPacketDispatcher(final PacketDispatcher packetDispatcher) {
 		this.packetDispatcher = packetDispatcher;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	public PluginManager getPluginManager() {
 		return pluginManager;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	public void setPluginManager(final PluginManager pluginManager) {
 		this.pluginManager = pluginManager;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	public boolean isVisualizationRunning() {
 		return visualizationRunning;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	public void setVisualizationRunning(final boolean visualizationRunning) {
 		this.visualizationRunning = visualizationRunning;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	public PacketReader getPacketReader() {
 		return packetReader;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the currently active packet recorder or <code>null</code> if no recorder is active
@@ -219,19 +218,19 @@ public class Spyglass {
 	public PacketRecorder getPacketRecorder() {
 		return packetReader instanceof PacketRecorder ? ((PacketRecorder) packetReader) : null;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	public void setPacketReader(final PacketReader packetReader) {
 		this.packetReader = packetReader;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	public ConfigStore getConfigStore() {
 		return configStore;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the packetProducerTask
@@ -239,33 +238,33 @@ public class Spyglass {
 	public PacketProducerTask getPacketProducerTask() {
 		return packetProducerTask;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * This method gets the bounding boxes of all visible drawingObjects
 	 */
 	public AbsoluteRectangle getBoundingBox() {
 		final List<Plugin> list = getPluginManager().getVisibleActivePlugins();
-		
+
 		final List<DrawingObject> dobs = new ArrayList<DrawingObject>();
-		
+
 		for (final Plugin plugin : list) {
 			if (plugin instanceof Drawable) {
 				final Drawable plugin2 = (Drawable) plugin;
-				
+
 				// XXX: this should be no hot path, so no big worry.
 				dobs.addAll(plugin2.getDrawingObjects(DrawingArea.getGlobalBoundingBox()));
 			}
 		}
-		
+
 		AbsoluteRectangle maxRect = new AbsoluteRectangle();
-		
+
 		for (final DrawingObject drawingObject : dobs) {
 			final AbsoluteRectangle nextRect = drawingObject.getBoundingBox();
 			if (nextRect == null) {
 				continue;
 			}
-			
+
 			if (maxRect == null) {
 				maxRect = nextRect;
 			} else {
@@ -274,32 +273,32 @@ public class Spyglass {
 		}
 		return maxRect;
 	};
-	
+
 	/**
 	 * This method gets the bounding boxes of all visible drawingObjects (which are applicable for
 	 * AutoZoom and scrollbars) and merges them.
 	 */
 	public AbsoluteRectangle getAutoZoomBoundingBox() {
 		final List<Plugin> list = getPluginManager().getVisibleActivePlugins();
-		
+
 		final List<DrawingObject> dobs = new ArrayList<DrawingObject>();
-		
+
 		for (final Plugin plugin : list) {
 			if (plugin instanceof Drawable) {
 				final Drawable plugin2 = (Drawable) plugin;
-				
+
 				dobs.addAll(plugin2.getAutoZoomDrawingObjects());
 			}
 		}
-		
+
 		AbsoluteRectangle maxRect = new AbsoluteRectangle();
-		
+
 		for (final DrawingObject drawingObject : dobs) {
 			final AbsoluteRectangle nextRect = drawingObject.getBoundingBox();
 			if (nextRect == null) {
 				continue;
 			}
-			
+
 			if (maxRect == null) {
 				maxRect = nextRect;
 			} else {
@@ -307,8 +306,8 @@ public class Spyglass {
 			}
 		}
 		return maxRect;
-	};
-	
+	}
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Resets the application
@@ -319,10 +318,15 @@ public class Spyglass {
 		} catch (final IOException e) {
 			log.error("Error while trying to reset the packet reader", e);
 		}
+		// reset the plug-ins. The active NodePositionerPlugin has to be reseted at last because
+		// otherwise plug-ins which are not reseted, yet might miss needed positioning information
 		final List<Plugin> plugins = pluginManager.getPlugins();
 		for (final Plugin plugin : plugins) {
-			plugin.reset();
+			if (!((plugin instanceof NodePositionerPlugin) && plugin.isActive())) {
+				plugin.reset();
+			}
 		}
+		pluginManager.getNodePositioner().reset();
 	}
-	
+
 }

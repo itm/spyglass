@@ -112,7 +112,7 @@ public class SimpleGlobalInformationOptionsComposite extends Composite {
 			new Label(groupPredef, SWT.NONE);
 
 			showAVGNodeDegree = new Button(groupPredef, SWT.CHECK);
-			showAVGNodeDegree.setText("show average node degree");
+			showAVGNodeDegree.setText("Show average node degree");
 			showAVGNodeDegree.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {

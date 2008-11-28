@@ -1,3 +1,11 @@
+/*----------------------------------------------------------------------------------------
+ * This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details.
+ * ---------------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.core;
 
 import java.io.File;
@@ -32,90 +40,118 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * @see SpyglassPacket
  */
 public class PacketRecorder extends IShellToSpyGlassPacketBroker {
-	
+
+	// ----------------------------------------------------------------
 	/** Object to log status and error messages within the PacketRecorder */
 	static final Logger log = SpyglassLoggerFactory.getLogger(PacketRecorder.class);
-	
+
+	// ----------------------------------------------------------------
 	/**
 	 * Indicates whether the incoming packages are currently recorded
 	 */
 	private boolean record = false;
-	
-	/**
-	 * Indicates whether the packets to be provided should be read from a file or to be forwarded
-	 * from iShell
-	 */
-	private boolean playback = false;
-	
+
+	// ----------------------------------------------------------------
 	/**
 	 * The queue where packets are dropped by the packet dispatcher and which is maintained
 	 * concurrently
 	 */
 	private ConcurrentLinkedQueue<SpyglassPacket> recordingQueue = null;
-	
+
+	// ----------------------------------------------------------------
 	/** The thread used to consume packets from the packet queue */
 	private Thread packetConsumerThread = null;
-	
+
+	// ----------------------------------------------------------------
 	/** The path to the file the packages are recorder */
 	private String recordFileString = null;
-	
+
+	// ----------------------------------------------------------------
 	/** The path to the directory where the record files are located */
 	private final String recordDirectory = new File("./record/").getAbsoluteFile().toString();
-	
-	/** The time stamp of the last packed read from the playback file */
+
+	// ----------------------------------------------------------------
+	/** The time stamp of the last packed read from the readFromFile file */
 	private long lastPlaybackPacketTimestamp = -1;
-	
-	private String previousRecordFile = null;
-	
+
+	// ----------------------------------------------------------------
+	/**
+	 * The string to the file which was last selected by the user for recording (this will be needed
+	 * to check whether the user has to be asked to append content)
+	 */
+	private String lastSelectedRecordFilePath = null;
+
+	// --------------------------------------------------------------------------------
+	/** Object to secure packet reading and manipulations at the input source */
+	private Object inputStreamMutex = new Object();
+
+	// --------------------------------------------------------------------------------
+	/** Indicates if an end of file warning was shown for the current file, yet */
+	private boolean endofFileReachedMessageShown = false;
+
+	// --------------------------------------------------------------------------------
+	/** Indicates that a reset is taking place */
+	private boolean isResetting = false;
+
+	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
 	 */
 	public PacketRecorder() {
 		recordingQueue = new ConcurrentLinkedQueue<SpyglassPacket>();
+		readFromFile = false;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Activates or deactivates the recording mode
 	 * 
-	 * @param record
+	 * @param enable
 	 *            if <code>true</code> the recording mode will be activated, if <code>false</code>
 	 *            the recording mode will be deactivated
 	 * @return <code>true</code> if the recording mode was activated, <code>false</code> otherwise
 	 * 
 	 */
-	public boolean setRecord(final boolean record) {
-		
-		if (record) {
-			
+	public boolean enableRecording(final boolean enable) {
+
+		if (enable) {
+
 			// if no record file was selected, let the user select one and the user denies to
 			// select a file, the recording will be aborted
-			
+
 			if (getRecordFilePath() == null) {
-				log
-						.info("No file selected to be used to record the packages.\r\n The recording will be aborted!");
+				log.info("No file selected to be used to record the packages.\r\n The recording will be aborted!");
 				this.record = false;
 			}
 
-			else {
-				
-				// Check if the file already exists and if it differs from the previous chosen one.
-				// If so, the user can decide to append the information, to overwrite the file or to
-				// abort the recording
-				final int result = checkAppend();
-				
-				// the user decided to abort selecting a file and nothing is to be done
-				if (result == 2) {
-					// in case a recording process is already running it will not be aborted
-					return this.record;
+			if (recordFileString != null) {
+
+				final File file = new File(recordFileString);
+
+				if (isWritable(file)) {
+
+					// Check if the file already exists and if it differs from the previous chosen
+					// one.
+					// If so, the user can decide to append the information, to overwrite the file
+					// or to abort the recording
+					final int result = checkAppend(file);
+
+					// the user decided to abort selecting a file and nothing is to be done
+					if (result == 2) {
+						// in case a recording process is already running it will not be aborted
+						return this.record;
+					}
+
+					startPacketConsumerThread((result == 0));
+					this.record = true;
 				}
-				
-				startPacketConsumerThread((result == 0));
-				this.record = true;
 			}
-			
-		} else {
-			
+
+		}
+
+		// if recording is to be disabled, stop the thread and clean up
+		else {
+
 			this.record = false;
 			if ((packetConsumerThread != null) && !packetConsumerThread.isInterrupted()) {
 				packetConsumerThread.interrupt();
@@ -123,58 +159,94 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 			recordingQueue.clear();
 			packetConsumerThread = null;
 		}
-		
+
 		return this.record;
 	}
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns if a file is writable
+	 * 
+	 * @param file
+	 *            the file to be checked
+	 * @return <code>true</code> if the file is writable, <code>false</code> otherwise
+	 */
+	private boolean isWritable(final File file) {
+		// check if it is a file at all (this should always be the case but we want to make sure)
+		if (!file.isFile()) {
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					MessageDialog.openError(null, "Invalid file", "No valid file for recording specified.\r\nPlease choose a different one");
+				}
+			});
+			return false;
+		}
+
+		// if it is a file, it has to be writable
+		else if (!file.canWrite()) {
+			Display.getDefault().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					MessageDialog.openError(null, "Write protection activated",
+							"The file cannot be written.\r\nPlease disable write protection or choose a different file!");
+				}
+			});
+			return false;
+		}
+		return true;
+	}
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Checks if the selected recording file already exists and if it is was already selected. If it
 	 * was not selected but it already exists, a dialog window will show up to ask the user whether
-	 * the content is to be appended to the file or not. Alternatively the user can abort selecting
-	 * the file.
+	 * the content is to be appended to the file or not. Alternatively, the user can abort selecting
+	 * the file at all.
 	 * 
-	 * @return <tt>0</tt> if the content is to be appended, <tt>1</tt> if the files content is to be
-	 *         replaced with the new one or <tt>2</tt> if the selection is to be aborted
+	 * @param file
+	 *            the file to be checked
+	 * @return <ul>
+	 *         <li><tt>0</tt> if the content is to be appended</li>
+	 *         <li><tt>1</tt> if the files content is to be replaced with the new one</li>
+	 *         <li><tt>2</tt> if the selection is to be aborted</li>
+	 *         </ul>
 	 */
-	private int checkAppend() {
+	private int checkAppend(final File file) {
 		int result = 0;
+
 		// Check if the file already exists and if it differs from the previous chosen one.
 		// If so, the user can decide to append the information, to overwrite the file or to
 		// abort the recording
-		final File file = new File(recordFileString);
-		if (file.exists() && (file.length() > 0)
-				&& ((previousRecordFile == null) || !recordFileString.equals(previousRecordFile))) {
-			result = new MessageDialog(
-					Display.getCurrent().getActiveShell(),
-					"Append or Replace",
-					null,
-					"The file already exists. Shall the new information be appended or shall the file be replaced?",
-					SWT.ICON_QUESTION, new String[] { "Append", "Replace", "Abort" }, 0).open();
+		if (file.exists() && (file.length() > 0) && ((lastSelectedRecordFilePath == null) || !recordFileString.equals(lastSelectedRecordFilePath))) {
+			result = new MessageDialog(Display.getCurrent().getActiveShell(), "Append or Replace", null,
+					"The file already exists. Shall the new information be appended or shall the file be replaced?", SWT.ICON_QUESTION, new String[] {
+							"Append", "Replace", "Abort" }, 0).open();
+			lastSelectedRecordFilePath = recordFileString;
 		}
 		return result;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
-	 * Starts the thread used to consume the packets which have been pushed into the packet queue
+	 * Starts the thread which consumes the packets which have been pushed into the recording queue
 	 * previously
 	 */
 	private void startPacketConsumerThread(final boolean append) {
-		
+
 		packetConsumerThread = new Thread() {
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void run() {
 				try {
-					
-					FileOutputStream recordFileWriter = new FileOutputStream(getRecordFileString(),
-							append);
+
+					FileOutputStream recordFileWriter = new FileOutputStream(getRecordFileString(), append);
 					final ConcurrentLinkedQueue<SpyglassPacket> queue = getPacketQueue();
 					SpyglassPacket packet = null;
 					while (!isInterrupted()) {
 						byte[] data = null;
 						synchronized (queue) {
-							
+
 							if (queue.isEmpty()) {
 								try {
 									queue.wait();
@@ -185,7 +257,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 								}
 							}
 							packet = queue.poll();
-							
+
 						}
 						if (packet != null) {
 							data = packet.serialize();
@@ -204,51 +276,53 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 		};
 		packetConsumerThread.start();
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the recordFileString
+	 * Returns the path to the file which is used for recording the input
+	 * 
+	 * @return the path to the file which is used for recording the input
 	 */
-	String getRecordFileString() {
+	private String getRecordFileString() {
 		return recordFileString;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the recordingQueue
+	 * Returns the queue where the packages which are to be recorded are temporarily stored
+	 * 
+	 * @return the queue where the packages which are to be recorded are temporarily stored
 	 */
-	ConcurrentLinkedQueue<SpyglassPacket> getPacketQueue() {
+	private ConcurrentLinkedQueue<SpyglassPacket> getPacketQueue() {
 		return recordingQueue;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
+	 * Sets the file which is used for recording the input
+	 * 
 	 * @param path
-	 *            the recordFileString to set
+	 *            the path to the file which is used for recording the input
 	 */
 	public void setRecordFile(final String path) {
 		if (path != null) {
-			if (recordFileString != null) {
-				previousRecordFile = recordFileString;
-			} else {
-				previousRecordFile = path;
-			}
 			// if the recording is currently in process, stop it, replace the output file and
 			// restart the recording again
 			if (isRecord()) {
-				setRecord(false);
+				enableRecording(false);
 				recordFileString = path;
-				setRecord(true);
+				enableRecording(true);
 			} else {
 				// otherwise just set the output file
 				recordFileString = path;
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------------
 	/**
-	 * Opens a dialog to select a file which will be used to store the recorded packets.
+	 * Returns the file where the recoded data has to be saved.<br>
+	 * If no file was specified, yet, a dialog will be opened to let the user choose one.
 	 */
 	private String getRecordFilePath() {
 		if (recordFileString == null) {
@@ -256,17 +330,17 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 		}
 		return recordFileString;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	/**
 	 * Opens a dialog to select a file which will be used to store the recorded packets.
 	 */
 	public void setRectordFile() {
-		
+
 		setRecordFile(selectRecodingFileByUser());
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Opens a message dialog for the user to select the recording file
@@ -285,19 +359,18 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 				if (!path.endsWith(".rec")) {
 					path += ".rec";
 				}
-				
-				conflictingFileSelected = isPlaybackFilePathEqual(path);
-				if (isPlayback() && conflictingFileSelected) {
-					
-					MessageDialog
-							.openError(null, "The file is already in use",
-									"The chosen file is already used for playback. please choose a different one ");
-					
+
+				conflictingFileSelected = equalsPlaybackFilePath(path);
+				if (isReadFromFile() && conflictingFileSelected) {
+
+					MessageDialog.openError(null, "The file is already in use",
+							"Sorry, the chosen file is already in use for playback. please choose a different one ");
+
 				}
 
-				// if a file conflict was detected but the playback mode is disabled, set the
-				// playbackfile to null
-				else if (!isPlayback() && isPlaybackFilePathEqual(path)) {
+				// if a file conflict was detected but the readFromFile mode is disabled, set the
+				// playback file to null
+				else if (!isReadFromFile() && equalsPlaybackFilePath(path)) {
 					((FileReaderGateway) getGateway()).setFile(null);
 					conflictingFileSelected = false;
 				}
@@ -305,15 +378,16 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 		} while (conflictingFileSelected);
 		return path;
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
 	 * Returns whether a provided path equals the one of the playback file
 	 * 
 	 * @param path
-	 *            the provided path
+	 *            a path e.g. to the recording file
 	 * @return <code>true</code> if the provided path equals the one of the playback file
 	 */
-	private boolean isPlaybackFilePathEqual(final String path) {
+	private boolean equalsPlaybackFilePath(final String path) {
 		File in = null;
 		if ((getGateway() instanceof FileReaderGateway) && (path != null)) {
 			in = ((FileReaderGateway) getGateway()).getFile();
@@ -321,7 +395,8 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 		}
 		return false;
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
 	 * Records a provided packet in recording mode, discards them in normal mode
 	 * 
@@ -329,74 +404,107 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	 *            the packet to be recorded
 	 */
 	public void handlePacket(final SpyglassPacket packet) {
-		
-		if (!record) {
-			return;
+
+		if (packet != null) {
+
+			if (!record) {
+				return;
+			}
+			synchronized (recordingQueue) {
+				recordingQueue.offer(packet);
+				recordingQueue.notify();
+			}
 		}
-		synchronized (recordingQueue) {
-			recordingQueue.offer(packet);
-			recordingQueue.notify();
-		}
-		
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	@Override
 	public void push(final SpyglassPacket packet) {
-		// the packets could be pushed in the super classes queue but when the playback time lasts
+		// the packets could be pushed in the super classes queue but when the readFromFile time
+		// lasts
 		// to long, an out of memory exception might occur
-		if (!playback) {
+		if (!readFromFile) {
 			handlePacket(packet);
 			super.push(packet);
 		}
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	@Override
 	public SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException {
-		
-		if (playback) {
-			
-			InputStream playbackFileReader = null;
-			if ((getGateway() == null)
-					|| ((playbackFileReader = getGateway().getInputStream()) == null)) {
-				setPlayBackFile();
-			}
-			
-			SpyglassPacket packet = null;
-			try {
-				
-				int next;
-				byte[] packetData;
-				if ((next = playbackFileReader.read()) != -1) {
-					packetData = new byte[next];
-					System.out.println(next);
-					playbackFileReader.read(packetData);
-					packet = PacketFactory.createInstance(packetData);
-				} else {
+
+		// if a reset is taking place, wait a second before delivering the next packet
+		if (isResetting) {
+			Thread.sleep(1000);
+			isResetting = false;
+		}
+
+		// get a mutex lock which will prevent the input stream to be accessed externally
+		synchronized (inputStreamMutex) {
+
+			// if a file was chosen as input source ...
+			if (readFromFile) {
+
+				SpyglassPacket packet = null;
+
+				// get the input stream which will deliver the packets
+				InputStream playbackFileReader = null;
+				if ((getGateway() == null) || ((playbackFileReader = getGateway().getInputStream()) == null)) {
+					// initialize it by instructions of the user since it was not set previously
+					setPlayBackFile();
+				}
+
+				// if the input stream is still not available generate an error message
+				if (playbackFileReader == null) {
+					log.error("The gateway which delivers the packets was not initialized correcly.\r\n" + "Please specify the input source.");
 					return null;
 				}
-				
-			} catch (final IOException e) {
-				log.error("Error while reading a new packet...", e);
+
+				// get the next packet from the input stream
+				try {
+					final int next;
+					byte[] packetData;
+					if ((next = playbackFileReader.read()) != -1) {
+						packetData = new byte[next];
+						playbackFileReader.read(packetData);
+						packet = PacketFactory.createInstance(packetData);
+					} else if (!endofFileReachedMessageShown) {
+						Display.getDefault().syncExec(new Runnable() {
+							@Override
+							public void run() {
+								MessageDialog.openInformation(null, "No more data", "The end of the playback file was reached!");
+							}
+						});
+						endofFileReachedMessageShown = true;
+						return null;
+					}
+
+				} catch (final IOException e) {
+					log.error("Error while reading a new packet...", e);
+				}
+
+				// Hold back the packet at least for delayMillies
+				final long now = System.currentTimeMillis();
+				final long diff = now - lastPlaybackPacketTimestamp;
+				if (diff < delayMillies) {
+					Thread.sleep(delayMillies - diff);
+				}
+				lastPlaybackPacketTimestamp = System.currentTimeMillis();
+
+				// this is done to enable the user to cut the packet stream read from a file
+				handlePacket(packet);
+
+				return packet;
+
 			}
-			
-			// Hold back the packet at least for delayMillies
-			final long now = System.currentTimeMillis();
-			final long diff = now - lastPlaybackPacketTimestamp;
-			if (diff < delayMillies) {
-				Thread.sleep(delayMillies - diff);
-			}
-			lastPlaybackPacketTimestamp = System.currentTimeMillis();
-			
-			// this is done to enable the user to cut the packet stream read from a file
-			handlePacket(packet);
-			return packet;
-			
-		} else {
+
+			// if the packets are not read from the file, use the overridden method of the super
+			// class. The functionality is the same but it uses a different packet queue.
 			return super.getNextPacket();
 		}
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns whether the currently provided files are read from a file or handed over from iShell
@@ -404,35 +512,40 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	 * @return <code>true</code> if the currently provided files are read from a file or handed over
 	 *         from iShell
 	 */
-	public boolean isPlayback() {
-		return playback;
+	@Override
+	public boolean isReadFromFile() {
+		return readFromFile;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
-	 * Enables or disables the playback mode
+	 * Enables or disables the readFromFile mode
 	 * 
 	 * @param enable
-	 *            <code>true</code> if the playback mode is to be enabled, <code>false</code>
+	 *            <code>true</code> if the readFromFile mode is to be enabled, <code>false</code>
 	 *            otherwise
-	 * @return <code>true</code> if the playback mode is enabled, <code>false</code> otherwise
+	 * @return <code>true</code> if the readFromFile mode is enabled, <code>false</code> otherwise
 	 */
-	public boolean setPlayback(final boolean enable) {
-		// TODO: If the user switches during an active recording process, playback and live packages
-		// will be mixed up in the same file. Either a message has to be shown to the user or the
-		// recording has to be aborted or sth. else has to happen
-		if (enable && (getPlaybackFile() == null)) {
+	@Override
+	public boolean setReadFromFile(final boolean enable) {
+		if (!enable) {
+			readFromFile = false;
+		} else if (enable && (getPlaybackFile() == null)) {
+			// let the user select a new playback file
 			setPlayBackFile();
 		} else {
-			this.playback = false;
+			readFromFile = true;
+			endofFileReachedMessageShown = false;
 		}
-		return this.playback;
+
+		return readFromFile;
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the file currently selected for playback
+	 * Returns the file currently selected for readFromFile
 	 * 
-	 * @return the file currently selected for playback
+	 * @return the file currently selected for readFromFile
 	 */
 	public File getPlaybackFile() {
 		if (getGateway() instanceof FileReaderGateway) {
@@ -440,21 +553,22 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 		}
 		return null;
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
 	 * Returns whether a provided path equals the one of the recording file
 	 * 
 	 * @param path
-	 *            the provided path
+	 *            a path e.g. to the playback file
 	 * @return <code>true</code> if the provided path equals the one of the recording file
 	 */
-	private boolean isRecordingFilePathEqual(final String path) {
+	private boolean equalsRecordingFilePath(final String path) {
 		if ((path != null) && (recordFileString != null)) {
 			return (new File(path).equals(new File(recordFileString)));
 		}
 		return false;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns whether the incoming packets are currently recorded
@@ -464,39 +578,76 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	public boolean isRecord() {
 		return record;
 	}
-	
+
 	// --------------------------------------------------------------------------
 	/**
 	 * Opens a dialog to open a file which contains a previously recorder packet stream.
 	 * 
-	 * @return <code>true</code> if a playback file was set successfully
+	 * @return <code>true</code> if a readFromFile file was set successfully
 	 */
 	public boolean setPlayBackFile() {
-		final String path = selectPlayBackFileByUser();
-		
-		if (path != null) {
-			final Gateway gw = getGateway();
-			if ((gw == null) || (!(gw instanceof FileReaderGateway))) {
-				final FileReaderGateway frgw = new FileReaderGateway();
-				frgw.setFile(new File(path));
-				if (isPlayback()) {
-					setPlayback(false);
-					setGateway(frgw);
-					setPlayback(true);
-				}
-			} else {
-				((FileReaderGateway) gw).setFile(new File(path));
-			}
-			playback = getGateway().getInputStream() != null;
-		} else {
-			playback = false;
-		}
-		return playback;
+		return setPlayBackFile(selectPlayBackFileByUser());
 	}
-	
+
+	// --------------------------------------------------------------------------
+	/**
+	 * Sets the file to be used to readFromFile the previously recorded packages.
+	 * 
+	 * @param path
+	 *            the path to the file
+	 * @return <code>true</code> if a readFromFile file was set successfully
+	 */
+	public boolean setPlayBackFile(final String path) {
+
+		if (path != null) {
+
+			boolean isConflictingFileSelected = equalsRecordingFilePath(path);
+			if (isRecord() && isConflictingFileSelected) {
+				Display.getDefault().syncExec(new Runnable() {
+					@Override
+					public void run() {
+						MessageDialog.openError(null, "The file is already in use",
+								"Sorry, the chosen file is already in use for recording.\r\nPlayback will not be started.");
+					}
+				});
+
+			}
+			// if a file conflict was detected but the recording mode is disabled, set the
+			// recording file to null
+			else if (isConflictingFileSelected && !isRecord()) {
+				recordFileString = null;
+				isConflictingFileSelected = false;
+			}
+
+			if (!isConflictingFileSelected) {
+
+				// get a mutex lock which will prevent the input stream to be accessed externally
+				synchronized (inputStreamMutex) {
+					// check whether the current Gateway is capable of processing a file
+					Gateway gw = getGateway();
+					if ((gw == null) || (!(gw instanceof FileReaderGateway))) {
+
+						// if not, create a usable gateway and
+						final FileReaderGateway frgw = new FileReaderGateway();
+						frgw.setFile(new File(path));
+						setGateway(frgw);
+						gw = frgw;
+					}
+
+					((FileReaderGateway) gw).setFile(new File(path));
+
+					setReadFromFile(getGateway().getInputStream() != null);
+				}
+			}
+		} else {
+			setReadFromFile(false);
+		}
+		return isReadFromFile();
+	}
+
 	// --------------------------------------------------------------------------------
 	/**
-	 * Opens a message dialog for the user to select the playback file
+	 * Opens a message dialog for the user to select the readFromFile file
 	 * 
 	 * @return the path to the file selected by the user
 	 */
@@ -508,12 +659,11 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 		String path;
 		do {
 			path = fd.open();
-			isConflictingFileSelected = isRecordingFilePathEqual(path);
+			isConflictingFileSelected = equalsRecordingFilePath(path);
 			if (isRecord() && isConflictingFileSelected) {
-				MessageDialog
-						.openError(null, "The file is already in use",
-								"The chosen file is already used for recording. Please choose a diferent one.");
-				
+				MessageDialog.openError(null, "The file is already in use",
+						"Sorry, the chosen file is already in use for recording. Please choose a diferent one.");
+
 			}
 			// if a file conflict was detected but the recording mode is disabled, set the
 			// recording file to null
@@ -524,68 +674,43 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 		} while (isConflictingFileSelected);
 		return path;
 	}
-	
-	/**
-	 * Sets the file to be used to playback the previously recorded packages
-	 * 
-	 * @param path
-	 *            the path to the file
-	 * @return <code>true</code> if a playback file was set successfully
-	 * @deprecated
-	 */
-	@Deprecated
-	private boolean setPlayBackFile(final String path) {
-		if (path != null) {
-			final Gateway gw = getGateway();
-			if ((gw == null) || (!(gw instanceof FileReaderGateway))) {
-				final FileReaderGateway frgw = new FileReaderGateway();
-				frgw.setFile(new File(path));
-				setGateway(frgw);
-			} else {
-				((FileReaderGateway) gw).setFile(new File(path));
-			}
-			playback = getGateway().getInputStream() != null;
-		} else {
-			playback = false;
-		}
-		return playback;
-	}
-	
+
+	// --------------------------------------------------------------------------------
 	@Override
 	public void reset() throws IOException {
 		log.info("Reset requested");
-		super.reset();
-		
-		if (isPlayback() && !isRecord()) {
-			MessageDialog.openInformation(null, "Reset playback",
-					"The playback will be restarted from the beginning of the file.");
-		}
+		isResetting = true;
+		synchronized (inputStreamMutex) {
 
-		else if (isPlayback() && isRecord()) {
-			setRecord(!MessageDialog.openConfirm(null, "Reset Recorder",
-					"The playback will be restarted from the beginning of the file.\r\n"
-							+ "Do you want to disable recording?"));
-		}
+			if (isReadFromFile() && !isRecord()) {
+				MessageDialog.openInformation(null, "Reset Playbak", "The playback will be started from the beginning of the file.");
+			}
 
-		else if (isRecord()) {
-			setRecord(!MessageDialog.openConfirm(null, "Reset Recorder",
-					"Do you want to disable recording?"));
+			else if (isReadFromFile() && isRecord()) {
+				enableRecording(!MessageDialog.openQuestion(null, "Reset Recorder",
+						"The playback will be started from the beginning of the file.\r\n" + "Do you want to disable recording?"));
+			}
+
+			else if (isRecord()) {
+				enableRecording(!MessageDialog.openQuestion(null, "Reset Recorder", "Do you want to disable recording?"));
+			}
+
+			// setPlayback(false);
+			recordFileString = null;
+			lastPlaybackPacketTimestamp = -1;
+			lastSelectedRecordFilePath = null;
+			endofFileReachedMessageShown = false;
+			getPacketQueue().clear();
+			Gateway gw = null;
+			if ((gw = getGateway()) != null) {
+				if (gw instanceof FileReaderGateway) {
+					((FileReaderGateway) gw).reset();
+				}
+			}
+			super.reset();
 		}
-		
-		// setPlayback(false);
-		recordFileString = null;
-		lastPlaybackPacketTimestamp = -1;
-		previousRecordFile = null;
-		if ((getGateway() != null) && (getGateway().getInputStream() != null)) {
-			getGateway().getInputStream().reset();
-			// getGateway().getInputStream().close();
-			// if (getGateway() instanceof FileReaderGateway) {
-			// ((FileReaderGateway) getGateway()).setFile(null);
-			// }
-		}
-		
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param args
@@ -593,15 +718,15 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	 * @throws SpyglassPacketException
 	 * @throws InterruptedException
 	 */
-	public static void main(final String[] args) throws IOException, SpyglassPacketException,
-			InterruptedException {
+	public static void main(final String[] args) throws IOException, SpyglassPacketException, InterruptedException {
 		final PacketRecorder recorder = new PacketRecorder();
 		recorder.setDelayMillies(0);
-		recorder.setPlayBackFile("record/record3.rec");
+		recorder.setPlayBackFile("record/record1.rec");
 		SpyglassPacket packet = null;
+		int i = 0;
 		while ((packet = recorder.getNextPacket()) != null) {
-			System.out.println(packet.getSenderId());
+			System.out.println(packet.getSenderId() + " Nr: " + (++i));
 		}
 	}
-	
+
 }

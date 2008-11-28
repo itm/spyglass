@@ -27,17 +27,17 @@ import de.uniluebeck.itm.spyglass.util.Tools;
  */
 public class PacketProducerTask implements Runnable {
 	private final Logger log = SpyglassLoggerFactory.getLogger(PacketProducerTask.class);
-	
+
 	// private Deque<Packet> packetCache = null;
-	
+
 	private PacketReader packetReader = null;
-	
+
 	private Spyglass spyglass = null;
-	
+
 	private final long initialDelayMs;
-	
+
 	private Boolean paused = false;
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * Constructor.
@@ -47,13 +47,13 @@ public class PacketProducerTask implements Runnable {
 	public PacketProducerTask(final Spyglass spyglass, final long initialDelayMs) {
 		this.spyglass = spyglass;
 		this.initialDelayMs = initialDelayMs;
-		
+
 		// packetCache = spyglass.getPacketCache();
 		packetReader = spyglass.getPacketReader();
-		
+
 		log.debug("New producer task.");
 	}
-	
+
 	// -------------------------------------------------------------------------
 	/**
 	 * The run() method uses a PacketReader to get the next Packet in line and pushes that packet
@@ -63,53 +63,53 @@ public class PacketProducerTask implements Runnable {
 	public void run() {
 		SpyglassPacket packet = null;
 		log.debug("Producer task staring.");
-		
+
 		Tools.sleep(initialDelayMs);
-		
+
 		while (spyglass.isVisualizationRunning()) {
-			
+
 			try {
 				synchronized (paused) {
 					if (paused) {
 						paused.wait();
 					}
 				}
-				
+
 				packet = packetReader.getNextPacket();
-				
+
 				if (!spyglass.isVisualizationRunning()) {
 					break;
 				}
-				
+
 				log.debug("Added packet: " + packet);
-				
+
 				// packetCache.push(packet);
 				spyglass.getPacketDispatcher().dispatchPacket(packet);
-				
+
 			} catch (final InterruptedException e) {
 				log.error("PacketReader has been interrupted.", e);
 			} catch (final SpyglassPacketException e) {
 				log.error("Could not receive a packet from the packetReader.", e);
 			}
-			
+
 		}
-		
+
 		log.debug("PacketProducerTask ended. Done.");
 	}
-	
+
 	public void setPaused(final boolean paused) {
 		synchronized (this.paused) {
 			this.paused.notifyAll();
 			this.paused = paused;
 			log.debug("Set Paused to " + this.paused);
 		}
-		
+
 	}
-	
+
 	public boolean getPaused() {
 		synchronized (paused) {
 			return paused;
 		}
-		
+
 	}
 }

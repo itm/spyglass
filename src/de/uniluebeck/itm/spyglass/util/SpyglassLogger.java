@@ -18,6 +18,7 @@ import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggerRepository;
 import org.apache.log4j.spi.LoggingEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 
 // --------------------------------------------------------------------------------
 /**
@@ -27,9 +28,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
  * 
  */
 public class SpyglassLogger extends Logger {
-	
+
 	private Logger log;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -41,7 +42,7 @@ public class SpyglassLogger extends Logger {
 		super(clazz.getName());
 		log = Logger.getLogger(clazz);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -52,37 +53,37 @@ public class SpyglassLogger extends Logger {
 	protected SpyglassLogger(final String clazz) {
 		super(clazz);
 	}
-	
+
 	@Override
 	public void addAppender(final Appender newAppender) {
 		log.addAppender(newAppender);
 	}
-	
+
 	@Override
 	public void assertLog(final boolean assertion, final String msg) {
 		log.assertLog(assertion, msg);
 	}
-	
+
 	@Override
 	public void callAppenders(final LoggingEvent event) {
 		log.callAppenders(event);
 	}
-	
+
 	@Override
 	public void debug(final Object message, final Throwable t) {
 		log.debug(message, t);
 	}
-	
+
 	@Override
 	public void debug(final Object message) {
 		log.debug(message);
 	}
-	
+
 	@Override
 	public boolean equals(final Object obj) {
 		return log.equals(obj);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Log a message object with the <code>ERROR</code> level including the stack trace of the
@@ -100,9 +101,16 @@ public class SpyglassLogger extends Logger {
 	@Override
 	public void error(final Object message, final Throwable t) {
 		log.error(message, t);
-		MessageDialog.openError(null, "An error occured", message.toString());
+		Display.getDefault().syncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				MessageDialog.openError(null, "An error occured", message.toString());
+			}
+		});
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Log a message object with the {@link Level#ERROR ERROR} Level. Additionally, the message is
@@ -127,9 +135,15 @@ public class SpyglassLogger extends Logger {
 	@Override
 	public void error(final Object message) {
 		log.error(message);
-		MessageDialog.openError(null, "An error occured", message.toString());
+		Display.getDefault().syncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				MessageDialog.openError(null, "An error occured", message.toString());
+			}
+		});
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Log a message object with the <code>FATAL</code> level including the stack trace of the
@@ -147,9 +161,15 @@ public class SpyglassLogger extends Logger {
 	@Override
 	public void fatal(final Object message, final Throwable t) {
 		log.fatal(message, t);
-		MessageDialog.openError(null, "Critical error", message.toString());
+		Display.getDefault().syncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				MessageDialog.openError(null, "Critical error", message.toString());
+			}
+		});
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Log a message object with the {@link Level#FATAL FATAL} Level. Additionally, the message is
@@ -174,178 +194,182 @@ public class SpyglassLogger extends Logger {
 	@Override
 	public void fatal(final Object message) {
 		log.fatal(message);
-		MessageDialog.openError(null, "Critical error", message.toString());
+		Display.getDefault().syncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				MessageDialog.openError(null, "Critical error", message.toString());
+			}
+		});
 	}
-	
+
 	@Override
 	public boolean getAdditivity() {
 		return log.getAdditivity();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Enumeration getAllAppenders() {
 		return log.getAllAppenders();
 	}
-	
+
 	@Override
 	public Appender getAppender(final String name) {
 		return log.getAppender(name);
 	}
-	
+
 	@Deprecated
 	@Override
 	public Priority getChainedPriority() {
 		return log.getChainedPriority();
 	}
-	
+
 	@Override
 	public Level getEffectiveLevel() {
 		return log.getEffectiveLevel();
 	}
-	
+
 	@Deprecated
 	@Override
 	public LoggerRepository getHierarchy() {
 		return log.getHierarchy();
 	}
-	
+
 	@Override
 	public LoggerRepository getLoggerRepository() {
 		return log.getLoggerRepository();
 	}
-	
+
 	@Override
 	public ResourceBundle getResourceBundle() {
 		return log.getResourceBundle();
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return log.hashCode();
 	}
-	
+
 	@Override
 	public void info(final Object message, final Throwable t) {
 		log.info(message, t);
 	}
-	
+
 	@Override
 	public void info(final Object message) {
 		log.info(message);
 	}
-	
+
 	@Override
 	public boolean isAttached(final Appender appender) {
 		return log.isAttached(appender);
 	}
-	
+
 	@Override
 	public boolean isDebugEnabled() {
 		return log.isDebugEnabled();
 	}
-	
+
 	@Override
 	public boolean isEnabledFor(final Priority level) {
 		return log.isEnabledFor(level);
 	}
-	
+
 	@Override
 	public boolean isInfoEnabled() {
 		return log.isInfoEnabled();
 	}
-	
+
 	@Override
 	public boolean isTraceEnabled() {
 		return log.isTraceEnabled();
 	}
-	
+
 	@Override
-	public void l7dlog(final Priority priority, final String key, final Object[] params,
-			final Throwable t) {
+	public void l7dlog(final Priority priority, final String key, final Object[] params, final Throwable t) {
 		log.l7dlog(priority, key, params, t);
 	}
-	
+
 	@Override
 	public void l7dlog(final Priority priority, final String key, final Throwable t) {
 		log.l7dlog(priority, key, t);
 	}
-	
+
 	@Override
 	public void log(final Priority priority, final Object message, final Throwable t) {
 		log.log(priority, message, t);
 	}
-	
+
 	@Override
 	public void log(final Priority priority, final Object message) {
 		log.log(priority, message);
 	}
-	
+
 	@Override
-	public void log(final String callerFQCN, final Priority level, final Object message,
-			final Throwable t) {
+	public void log(final String callerFQCN, final Priority level, final Object message, final Throwable t) {
 		log.log(callerFQCN, level, message, t);
 	}
-	
+
 	@Override
 	public void removeAllAppenders() {
 		log.removeAllAppenders();
 	}
-	
+
 	@Override
 	public void removeAppender(final Appender appender) {
 		log.removeAppender(appender);
 	}
-	
+
 	@Override
 	public void removeAppender(final String name) {
 		log.removeAppender(name);
 	}
-	
+
 	@Override
 	public void setAdditivity(final boolean additive) {
 		log.setAdditivity(additive);
 	}
-	
+
 	@Override
 	public void setLevel(final Level level) {
 		log.setLevel(level);
 	}
-	
+
 	@Deprecated
 	@Override
 	public void setPriority(final Priority priority) {
 		log.setPriority(priority);
 	}
-	
+
 	@Override
 	public void setResourceBundle(final ResourceBundle bundle) {
 		log.setResourceBundle(bundle);
 	}
-	
+
 	@Override
 	public String toString() {
 		return log.toString();
 	}
-	
+
 	@Override
 	public void trace(final Object message, final Throwable t) {
 		log.trace(message, t);
 	}
-	
+
 	@Override
 	public void trace(final Object message) {
 		log.trace(message);
 	}
-	
+
 	@Override
 	public void warn(final Object message, final Throwable t) {
 		log.warn(message, t);
 	}
-	
+
 	@Override
 	public void warn(final Object message) {
 		log.warn(message);
 	}
-	
+
 }

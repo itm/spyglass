@@ -35,7 +35,7 @@ public class RecordRecordAction extends Action {
 					"The input type you selected does not support recording");
 			isRecording = false;
 		} else {
-			isRecording = spyglass.getPacketRecorder().setRecord(!isRecording);
+			isRecording = spyglass.getPacketRecorder().enableRecording(!isRecording);
 		}
 		setText(isRecording ? "Pause" : "Record");
 		setToolTipText(isRecording ? "Pause" : "Record");

@@ -29,6 +29,7 @@ import de.uniluebeck.itm.spyglass.gui.view.GlobalInformationBar;
 import de.uniluebeck.itm.spyglass.gui.view.GlobalInformationWidget;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
+import de.uniluebeck.itm.spyglass.packet.Uint16ListPacket;
 import de.uniluebeck.itm.spyglass.plugin.globalinformation.GlobalInformationPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.Tools;
@@ -55,7 +56,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	private SimpleGlobalInformationWidget widget;
 
-	private StatisticalInformationEvaluator avgNodeDegEvaluator;
+	private StatisticalOperation avgNodeDegEvaluator;
 
 	private List<Integer> semanticTypes4Neighborhoods;
 
@@ -65,11 +66,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	 */
 	public SimpleGlobalInformationPlugin() {
 		xmlConfig = new SimpleGlobalInformationXMLConfig();
-		// the semantic type has no real meaning here
-		avgNodeDegEvaluator = new StatisticalInformationEvaluator(-1);
-		avgNodeDegString = "avg. node deg.: ";
-		avgNodeDegEvaluator.setDescription(avgNodeDegString);
-		avgNodeDegEvaluator.setOperation(STATISTICAL_OPERATIONS.AVG);
+		avgNodeDegEvaluator = new StatisticalOperation(10, STATISTICAL_OPERATIONS.AVG);
+		avgNodeDegString = "avg. node degree: ";
 		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
 	}
 
@@ -136,14 +134,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 		final int packetSemanticType = packet.getSemanticType();
 
-		if (semanticTypes4Neighborhoods.contains(packetSemanticType)) {
-			try {
-				avgNodeDegString = avgNodeDegEvaluator.parse(packet);
-			} catch (final SpyglassPacketException e) {
-				log.warn("SpyglassPacketException: The packet with semantic type '" + packetSemanticType
-						+ "' could not be successfuly parsed for neighborhood information.");
-				avgNodeDegString = avgNodeDegEvaluator.getDescription() + " ###";
-			}
+		if (semanticTypes4Neighborhoods.contains(packetSemanticType) && (packet instanceof Uint16ListPacket)) {
+			avgNodeDegString = "avg. node degree: " + avgNodeDegEvaluator.addValue(((Uint16ListPacket) packet).getNeighborhoodPacketNodeIDs().size());
 		}
 
 		final StatisticalInformationEvaluator sfs = xmlConfig.getStatisticalInformationEvaluators4Type(packetSemanticType);
@@ -155,7 +147,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 			} catch (final SpyglassPacketException e) {
 				log.error("Error parsing a packet in the " + getHumanReadableName()
 						+ ".\r\nPlease check the values in the StringFormatter for semantic type " + packetSemanticType + "!", e);
-				value = sfs.getDescription() + " ###";
+				value = sfs.getDescription() + " NaN";
 			}
 
 			final String val = value;

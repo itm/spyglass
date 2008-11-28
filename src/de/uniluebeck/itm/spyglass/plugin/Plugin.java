@@ -405,7 +405,11 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		while (!Thread.currentThread().isInterrupted()) {
 			final SpyglassPacket p = getPacketFromQueue(true);
 			if (p != null) {
-				processPacket(p);
+				try {
+					processPacket(p);
+				} catch (final Exception e) {
+					log.error("An exception occured while processing a packet in Plugin '" + getInstanceName() + "'", e);
+				}
 				updateQuadTree();
 			}
 		}
