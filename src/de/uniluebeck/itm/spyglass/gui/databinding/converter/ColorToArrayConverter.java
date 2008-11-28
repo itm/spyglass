@@ -11,16 +11,18 @@ import org.eclipse.swt.graphics.RGB;
  * 
  */
 public class ColorToArrayConverter extends Converter {
-	
+
 	public ColorToArrayConverter() {
+
+		// leaks one Color ressource at construction
 		super(new Color(null, 0, 0, 0), new int[3]);
 	}
-	
+
 	@Override
 	public Object convert(final Object fromObject) {
 		final Color color = (Color) fromObject;
 		final RGB rgb = color.getRGB();
 		return new int[] { rgb.red, rgb.green, rgb.blue };
 	}
-	
+
 }

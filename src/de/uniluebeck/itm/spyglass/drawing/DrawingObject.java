@@ -12,8 +12,7 @@ import java.util.Set;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
+import org.eclipse.swt.graphics.RGB;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
@@ -25,50 +24,18 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
  * Abstract class that represents a drawing object. Every DrawingObject should have an unique id, a
  * position and a color, given by the RGB components in a R8G8B8 format.
  */
-@Root
 public abstract class DrawingObject {
-	
+
 	private AbsolutePosition position = new AbsolutePosition(0, 0, 0);
-	
+
 	private Set<BoundingBoxChangeListener> changeListeners = new HashSet<BoundingBoxChangeListener>();
-	
+
 	protected AbsoluteRectangle boundingBox;
-	
-	@Element
-	private int colorR = 200;
-	
-	@Element
-	private int colorG = 0;
-	
-	@Element
-	private int colorB = 0;
-	
-	@Element
-	private int bgColorR = 255;
-	
-	@Element
-	private int bgColorG = 255;
-	
-	@Element
-	private int bgColorB = 255;
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Constructor
-	 */
-	public DrawingObject() {
-		super();
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	@Override
-	public DrawingObject clone() throws CloneNotSupportedException {
-		throw new CloneNotSupportedException();
-	}
-	
+
+	private RGB color = new RGB(200, 0, 0);
+
+	private RGB bgColor = new RGB(255, 255, 255);
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the position of the upper left point of the <code>DrawingObject</code>.
@@ -78,7 +45,7 @@ public abstract class DrawingObject {
 	public AbsolutePosition getPosition() {
 		return position;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the position of the upper left point of the <code>DrawingObject</code>
@@ -89,93 +56,41 @@ public abstract class DrawingObject {
 	public void setPosition(final AbsolutePosition position) {
 		setPosition(position, true);
 	}
-	
-	public void setPosition(final AbsolutePosition position,
-			final boolean fireBoundingBoxChangeEvent) {
-		
+
+	public void setPosition(final AbsolutePosition position, final boolean fireBoundingBoxChangeEvent) {
+
 		this.position = position;
 		updateBoundingBox();
 		if (fireBoundingBoxChangeEvent) {
 			fireBoundingBoxChangeEvent();
 		}
 	}
-	
-	public void fireBoundingBoxChangeEvent() {
+
+	protected void fireBoundingBoxChangeEvent() {
 		for (final BoundingBoxChangeListener listener : changeListeners) {
 			listener.onBoundingBoxChanged(this);
 		}
 	}
-	
-	// --------------------------------------------------------------------------------
+
 	/**
 	 * 
 	 */
-	public int getColorR() {
-		return colorR;
+	public RGB getColor() {
+		return color;
 	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public void setColorR(final int colorR) {
-		this.colorR = colorR;
+
+	public RGB getBgColor() {
+		return bgColor;
 	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public int getColorG() {
-		return colorG;
+
+	public void setBgColor(final RGB bgColor) {
+		this.bgColor = bgColor;
 	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public void setColorG(final int colorG) {
-		this.colorG = colorG;
+
+	public void setColor(final RGB color) {
+		this.color = color;
 	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public int getColorB() {
-		return colorB;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public void setColorB(final int colorB) {
-		this.colorB = colorB;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Sets the objects color
-	 * 
-	 * @param r
-	 *            red
-	 * @param g
-	 *            green
-	 * @param b
-	 *            blue
-	 */
-	public void setColor(final int r, final int g, final int b) {
-		this.colorR = r;
-		this.colorG = g;
-		this.colorB = b;
-	}
-	
-	@Override
-	public String toString() {
-		return super.toString();
-	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -188,48 +103,7 @@ public abstract class DrawingObject {
 		buff.append(toString());
 		return buff.toString();
 	}
-	
-	public int getBgColorR() {
-		return bgColorR;
-	}
-	
-	public void setBgColorR(final int bgColorR) {
-		this.bgColorR = bgColorR;
-	}
-	
-	public int getBgColorG() {
-		return bgColorG;
-	}
-	
-	public void setBgColor(final int bgColorG) {
-		this.bgColorG = bgColorG;
-	}
-	
-	public int getBgColorB() {
-		return bgColorB;
-	}
-	
-	public void setBgColorB(final int bgColorB) {
-		this.bgColorB = bgColorB;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Sets the objects background color
-	 * 
-	 * @param r
-	 *            red
-	 * @param b
-	 *            blue
-	 * @param g
-	 *            green
-	 */
-	public void setBgColor(final int r, final int b, final int g) {
-		this.bgColorR = r;
-		this.bgColorB = b;
-		this.bgColorG = g;
-	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Forces this DrawingObject to paint itself on the given GC.
@@ -243,7 +117,7 @@ public abstract class DrawingObject {
 	 *            the currently used graphics context
 	 */
 	public abstract void draw(DrawingArea drawingArea, GC gc);
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the bounding box of this drawing object.<br>
@@ -258,7 +132,7 @@ public abstract class DrawingObject {
 		}
 		return boundingBox;
 	}
-	
+
 	/**
 	 * Draws a line which indicates the object's bounding box
 	 * 
@@ -268,7 +142,7 @@ public abstract class DrawingObject {
 	 *            the currently used graphics context
 	 */
 	protected void drawBoundingBox(final DrawingArea drawingArea, final GC gc) {
-		
+
 		final PixelRectangle rect = drawingArea.absRect2PixelRect(getBoundingBox());
 		final int x = rect.getUpperLeft().x;
 		final int y = rect.getUpperLeft().y;
@@ -279,21 +153,21 @@ public abstract class DrawingObject {
 		gc.setForeground(color);
 		gc.drawRectangle(x, y, width, height);
 		color.dispose();
-		
+
 	}
-	
+
 	public void addBoundingBoxChangedListener(final BoundingBoxChangeListener listener) {
 		this.changeListeners.add(listener);
 	}
-	
+
 	public void removeBoundingBoxChangeListener(final BoundingBoxChangeListener listener) {
 		this.changeListeners.remove(listener);
 	}
-	
+
 	protected final void updateBoundingBox() {
 		updateBoundingBox(true);
 	}
-	
+
 	/**
 	 * Indicates that the bounding box may have changed.
 	 * 
@@ -309,7 +183,7 @@ public abstract class DrawingObject {
 			fireBoundingBoxChangeEvent();
 		}
 	}
-	
+
 	protected abstract AbsoluteRectangle calculateBoundingBox();
-	
+
 }

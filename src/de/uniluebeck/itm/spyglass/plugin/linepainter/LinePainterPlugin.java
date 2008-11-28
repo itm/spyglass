@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.swt.graphics.RGB;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -61,7 +62,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		line1.setPosition(new AbsolutePosition(-1000, 0, 0), false);
 		line1.setEnd(new AbsolutePosition(1000, 0, 0), false);
 		line1.setLineWidth(1, false);
-		line1.setColor(55, 55, 55);
+		line1.setColor(new RGB(55, 55, 55));
 		layer.addOrUpdate(line1);
 
 		// rechts nach links horizontal
@@ -69,7 +70,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		line2.setPosition(new AbsolutePosition(1000, 0, 0), false);
 		line2.setEnd(new AbsolutePosition(-1000, 0, 0), false);
 		line2.setLineWidth(1, false);
-		line2.setColor(55, 55, 55);
+		line2.setColor(new RGB(55, 55, 55));
 		layer.addOrUpdate(line2);
 
 		// oben nach unten vertikal
@@ -77,7 +78,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		line3.setPosition(new AbsolutePosition(0, 1000, 0), false);
 		line3.setEnd(new AbsolutePosition(0, -1000, 0), false);
 		line3.setLineWidth(1, false);
-		line3.setColor(55, 55, 55);
+		line3.setColor(new RGB(55, 55, 55));
 		layer.addOrUpdate(line3);
 
 		// unten nach oben vertikal
@@ -85,7 +86,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		line4.setPosition(new AbsolutePosition(0, -1000, 0), false);
 		line4.setEnd(new AbsolutePosition(0, 1000, 0), false);
 		line4.setLineWidth(1, false);
-		line4.setColor(55, 55, 55);
+		line4.setColor(new RGB(55, 55, 55));
 		layer.addOrUpdate(line4);
 
 		// links unten nach rechts oben diagonal
@@ -93,7 +94,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		line5.setPosition(new AbsolutePosition(-1000, -1000, 0), false);
 		line5.setEnd(new AbsolutePosition(1000, 1000, 0), false);
 		line5.setLineWidth(1, false);
-		line5.setColor(55, 55, 55);
+		line5.setColor(new RGB(55, 55, 55));
 		layer.addOrUpdate(line5);
 
 		// rechts oben nach links unten diagonal
@@ -101,7 +102,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		line6.setPosition(new AbsolutePosition(1000, 1000, 0), false);
 		line6.setEnd(new AbsolutePosition(-1000, -1000, 0), false);
 		line6.setLineWidth(1, false);
-		line6.setColor(55, 55, 55);
+		line6.setColor(new RGB(55, 55, 55));
 		layer.addOrUpdate(line6);
 
 		// links oben nach rechts unten diagonal
@@ -109,7 +110,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		line7.setPosition(new AbsolutePosition(-1000, 1000, 0), false);
 		line7.setEnd(new AbsolutePosition(1000, -1000, 0), false);
 		line7.setLineWidth(1, false);
-		line7.setColor(55, 55, 55);
+		line7.setColor(new RGB(55, 55, 55));
 		layer.addOrUpdate(line7);
 
 		// rechts unten nach links oben diagonal
@@ -117,7 +118,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		line8.setPosition(new AbsolutePosition(1000, -1000, 0), false);
 		line8.setEnd(new AbsolutePosition(-1000, 1000, 0), false);
 		line8.setLineWidth(1, false);
-		line8.setColor(55, 55, 55);
+		line8.setColor(new RGB(55, 55, 55));
 		layer.addOrUpdate(line8);
 
 	}
@@ -257,7 +258,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 				e.line.setPosition(pos1);
 				e.line.setEnd(pos2);
 				final int[] color = xmlConfig.getLineColorRGB();
-				e.line.setColor(color[0], color[1], color[2]);
+				e.line.setColor(new RGB(color[0], color[1], color[2]));
 				e.line.setLineWidth(xmlConfig.getLineWidth());
 
 			}
@@ -329,7 +330,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	private void updateLineColor(final int[] color) {
 		synchronized (layer) {
 			for (final DrawingObject o : layer.getDrawingObjects()) {
-				((LinePainterLine) o).setColor(color[0], color[1], color[2]);
+				((LinePainterLine) o).setColor(new RGB(color[0], color[1], color[2]));
 			}
 		}
 		// TODO neu zeichnen der betroffenen boxen implementieren

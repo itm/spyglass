@@ -19,7 +19,7 @@ public class Grid extends DrawingObject {
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 		
-		final Color color = new Color(gc.getDevice(), getColorR(), getColorG(), getColorB());
+		final Color color = new Color(gc.getDevice(), getColor());
 		
 		gc.setLineWidth(lineWidth);
 		gc.setForeground(color);

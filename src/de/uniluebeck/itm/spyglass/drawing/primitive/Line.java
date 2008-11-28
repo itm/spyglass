@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 @Root
 public class Line extends DrawingObject {
 
-	private AbsolutePosition lineEnd = new AbsolutePosition();
+	private AbsolutePosition lineEnd = new AbsolutePosition(1, 0, 0);
 
 	private int width = 1;
 
@@ -36,23 +36,10 @@ public class Line extends DrawingObject {
 		super();
 	}
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	@Override
-	public DrawingObject clone() throws CloneNotSupportedException {
-		final Line clone = new Line();
-		clone.setColor(getColorR(), getColorG(), getColorB());
-		clone.setPosition(new AbsolutePosition(getPosition().x, getPosition().y, 0));
-		clone.setLineWidth(getLineWidth());
-		return clone;
-	}
-
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 
-		final Color color = new Color(gc.getDevice(), this.getColorR(), this.getColorG(), this.getColorB());
+		final Color color = new Color(gc.getDevice(), this.getColor());
 		gc.setForeground(color);
 		gc.setLineWidth(this.getLineWidth());
 
@@ -105,8 +92,7 @@ public class Line extends DrawingObject {
 	 */
 	@Override
 	public String toString() {
-		// TODO Implement
-		return super.toString();
+		return String.format("Line from %s to %s", this.getPosition(), this.lineEnd);
 	}
 
 	@Override

@@ -34,15 +34,6 @@ public abstract class PluginXMLConfig extends XMLConfig {
 
 	public static final String PROPERTYNAME_ACTIVE = "active";
 
-	// private static final Logger log = SpyglassLoggerFactory.get(PluginXMLConfig.class);
-
-	// public static final int[] ALL_SEMANTIC_TYPES = new int[256];
-	// static {
-	// for (int i = 0; i < 256; i++) {
-	// ALL_SEMANTIC_TYPES[i] = i;
-	// }
-	// }
-
 	@Element(name = "isActive")
 	private boolean active = true;
 
@@ -226,7 +217,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 *            the second color setting
 	 * @return <code>true</code> if two color settings equal one another
 	 */
-	protected boolean equalsRGB(final int[] lineColorRGB, final int[] otherLineColorRGB) {
+	protected static boolean equalsRGB(final int[] lineColorRGB, final int[] otherLineColorRGB) {
 		return (lineColorRGB[0] == otherLineColorRGB[0]) && (lineColorRGB[1] == otherLineColorRGB[1]) && (lineColorRGB[2] == otherLineColorRGB[2]);
 	}
 

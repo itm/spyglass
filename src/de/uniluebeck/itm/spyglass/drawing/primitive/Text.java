@@ -13,45 +13,45 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
 public class Text extends DrawingObject {
-	
+
 	public String text;
-	
+
 	public enum TextJustification {
 		center, right, left
 	}
-	
+
 	public TextJustification justification;
-	
+
 	public Text(final String s, final AbsolutePosition p, final int id) {
 		setPosition(p);
 		text = s;
 		justification = TextJustification.left;
 	}
-	
+
 	public void setText(final String s) {
 		text = s;
 	}
-	
+
 	public String getText() {
 		return text;
 	}
-	
+
 	public TextJustification getJustification() {
 		return justification;
 	}
-	
+
 	public void setJustification(final TextJustification justification) {
 		this.justification = justification;
 	}
-	
+
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
-		final Color color = new Color(null, getColorR(), getColorG(), getColorB());
-		final Color bgColor = new Color(null, getBgColorR(), getBgColorG(), getBgColorB());
+		final Color color = new Color(null, this.getColor());
+		final Color bgColor = new Color(null, this.getBgColor());
 		final Font f = new Font(gc.getDevice(), "Arial", 6, SWT.NORMAL);
-		
+
 		final PixelPosition px = drawingArea.absPoint2PixelPoint(this.getPosition());
-		
+
 		gc.setFont(f);
 		gc.setForeground(color);
 		gc.setBackground(bgColor);
@@ -70,11 +70,11 @@ public class Text extends DrawingObject {
 		bgColor.dispose();
 		f.dispose();
 	}
-	
+
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }

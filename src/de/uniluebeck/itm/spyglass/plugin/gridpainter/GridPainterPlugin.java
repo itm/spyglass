@@ -12,6 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
+import org.eclipse.swt.graphics.RGB;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -123,7 +124,7 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 
 		grid = new Grid();
 		final int[] lineColor = xmlConfig.getLineColorRGB();
-		grid.setColor(lineColor[0], lineColor[1], lineColor[2]);
+		grid.setColor(new RGB(lineColor[0], lineColor[1], lineColor[2]));
 		grid.setGridElementHeight(xmlConfig.getGridElementHeight());
 		grid.setGridElementWidth(xmlConfig.getGridElementWidth());
 		grid.setPosition(new AbsolutePosition(xmlConfig.getGridLowerLeftPointX(), xmlConfig.getGridLowerLeftPointY(), 0));

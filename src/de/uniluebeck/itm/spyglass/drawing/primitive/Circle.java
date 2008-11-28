@@ -14,7 +14,6 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
@@ -26,7 +25,7 @@ public class Circle extends DrawingObject {
 	@Element
 	private int diameter = 10;
 	private short lineWidth = 1;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -34,21 +33,7 @@ public class Circle extends DrawingObject {
 	public Circle() {
 		super();
 	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	@Override
-	public DrawingObject clone() throws CloneNotSupportedException {
-		final Circle clone = new Circle();
-		clone.setDiameter(diameter);
-		clone.setColor(getColorR(), getColorG(), getColorB());
-		clone.setPosition(new AbsolutePosition(getPosition().x, getPosition().y, 0));
-		
-		return clone;
-	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -56,11 +41,11 @@ public class Circle extends DrawingObject {
 	public int getDiameter() {
 		return diameter;
 	}
-	
+
 	public void setDiameter(final int diameter) {
 		setDiameter(diameter, true);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -69,7 +54,7 @@ public class Circle extends DrawingObject {
 		this.diameter = diameter;
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -79,39 +64,37 @@ public class Circle extends DrawingObject {
 		// TODO Implement
 		return super.toString();
 	}
-	
+
 	public short getLineWidth() {
 		return lineWidth;
 	}
-	
+
 	public void setLineWidth(final short lineWidth) {
 		this.lineWidth = lineWidth;
 	}
-	
+
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
-		final Color color = new Color(null, this.getColorR(), this.getColorG(), this.getColorB());
-		final Color bg = new Color(null, this.getBgColorR(), this.getBgColorG(), this.getBgColorB());
-		
+		final Color color = new Color(null, this.getColor());
+		final Color bg = new Color(null, this.getBgColor());
+
 		gc.setForeground(color);
 		gc.setBackground(bg);
 		gc.setLineWidth(this.getLineWidth());
-		
+
 		final PixelPosition px = drawingArea.absPoint2PixelPoint(this.getPosition());
-		
-		gc.fillOval((px.x - (this.getDiameter() / 2)), (px.y - (this.getDiameter() / 2)), this
-				.getDiameter(), this.getDiameter());
-		gc.drawOval((px.x - (this.getDiameter() / 2)), (px.y - (this.getDiameter() / 2)), this
-				.getDiameter(), this.getDiameter());
-		
+
+		gc.fillOval((px.x - (this.getDiameter() / 2)), (px.y - (this.getDiameter() / 2)), this.getDiameter(), this.getDiameter());
+		gc.drawOval((px.x - (this.getDiameter() / 2)), (px.y - (this.getDiameter() / 2)), this.getDiameter(), this.getDiameter());
+
 		color.dispose();
 		bg.dispose();
 	}
-	
+
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }
