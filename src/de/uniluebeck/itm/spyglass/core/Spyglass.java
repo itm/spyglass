@@ -304,20 +304,29 @@ public class Spyglass {
 	 * Resets the application
 	 */
 	public void reset() {
+		log.debug("========================================================= reset");
 		try {
 			packetReader.reset();
 		} catch (final IOException e) {
 			log.error("Error while trying to reset the packet reader", e);
 		}
+
+		log.debug("+++++++++++++++++ packt reader reseted");
+
 		// reset the plug-ins. The active NodePositionerPlugin has to be reseted at last because
 		// otherwise plug-ins which are not reseted, yet might miss needed positioning information
 		final List<Plugin> plugins = pluginManager.getPlugins();
 		for (final Plugin plugin : plugins) {
 			if (!((plugin instanceof NodePositionerPlugin) && plugin.isActive())) {
+
+				log.debug("--------------------- try to reset " + plugin.getClass());
 				plugin.reset();
+				log.debug("++++++++++++++++++++++ " + plugin.getClass() + " resetted");
 			}
 		}
+		log.debug("--------------------- try to reset " + pluginManager.getNodePositioner().getClass());
 		pluginManager.getNodePositioner().reset();
+		log.debug("++++++++++++++++++++++ " + pluginManager.getNodePositioner().getClass() + " resetted");
 	}
 
 }

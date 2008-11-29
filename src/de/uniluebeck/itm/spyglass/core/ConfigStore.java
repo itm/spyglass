@@ -228,7 +228,6 @@ public class ConfigStore {
 				// destroy the currently active plug-ins since they will be no longer needed
 				if (spyglassConfig != null) {
 					for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
-						p.reset();
 						p.shutdown();
 					}
 					final PacketReader pr = spyglassConfig.getPacketReader();

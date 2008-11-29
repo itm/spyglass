@@ -1,13 +1,16 @@
 /*
- * -------------------------------------------------------------------------------- This file is
- * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
- * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
- * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
- * SpyGlass source tree for further details.
+ * -------------------------------------------------------------------------------- 
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,6 +35,9 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionChangedEvent;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionChangedListener;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.nodepainter.NodePainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
@@ -58,6 +64,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
+	/** Loggs messages */
 	private static final Logger log = SpyglassLoggerFactory.getLogger(SimpleNodePainterPlugin.class);
 
 	/**
@@ -82,7 +89,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	private Map<Integer, Map<Integer, String>> stringFormatterResults;
 
+	/** Temporarily stores the bounding boxes which are used during redraw events */
 	private Map<DrawingObject, AbsoluteRectangle> boundingBoxes;
+
+	/** Listens for changes of the nodes' positions */
+	private NodePositionChangedListener npcl;
+
+	/** Listens for changes of configuration properties */
+	private PropertyChangeListener pcl;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -96,6 +110,39 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		obsoleteObjects = new HashSet<DrawingObject>();
 		stringFormatterResults = new TreeMap<Integer, Map<Integer, String>>();
 		boundingBoxes = new HashMap<DrawingObject, AbsoluteRectangle>();
+	}
+
+	// --------------------------------------------------------------------------------
+	@Override
+	public void init(final PluginManager manager) {
+		super.init(manager);
+		npcl = new NodePositionChangedListener() {
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void handleEvent(final NodePositionChangedEvent e) {
+				setNodePosition(e.node, e.newPosition);
+			}
+
+		};
+		manager.addNodePositionChangedListener(npcl);
+		pcl = new PropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent evt) {
+				if (!(Boolean) evt.getNewValue()) {
+					reset();
+				}
+			}
+		};
+		xmlConfig.addPropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, pcl);
+	}
+
+	// --------------------------------------------------------------------------------
+	@Override
+	public void shutdown() {
+		super.shutdown();
+		getPluginManager().removeNodePositionChangedListener(npcl);
+		xmlConfig.removePropertyChangeListener(pcl);
+		reset();
 	}
 
 	@Override
@@ -139,45 +186,46 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		return "SimpleNodePainter";
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public PluginXMLConfig getXMLConfig() {
 		return xmlConfig;
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
 
 		final int nodeID = packet.getSenderId();
 
-		// get the absolute position of the node which sent the packet
-		final AbsolutePosition position = getPluginManager().getNodePositioner().getPosition(nodeID);
-
-		boolean needsUpdate = false;
-
-		// get all drawing objects from the quad tree
-		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
-		synchronized (layer) {
-			drawingObjects.addAll(layer.getDrawingObjects());
-		}
-
-		// get the instance of the node's visualization
-		final NodeObject nodeObject = getMatchingNodeObject(nodeID, drawingObjects);
-
-		// if the node object did not have any information about the node's
-		// position or the position has changed, update the node object
-		if ((nodeObject.getPosition() == null) || !position.equals(nodeObject.getPosition())) {
-			nodeObject.setPosition(position);
-			needsUpdate = true;
-		}
-
-		needsUpdate = parsePayloadByStringFormatters(packet, nodeObject) || needsUpdate;
-
-		if (needsUpdate) {
+		// if the description was changed, an update is needed
+		if (parsePayloadByStringFormatters(packet)) {
+			// get the instance of the node's visualization
+			final NodeObject nodeObject = getMatchingNodeObject(nodeID);
 			nodeObject.setDescription(getStringFormatterResultString(nodeID));
 			// add the object to the one which have to be (re)drawn ...
 			synchronized (updatedObjects) {
 				updatedObjects.add(nodeObject);
 			}
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the position of a node
+	 * 
+	 * @param nodeID
+	 *            the node's identifier
+	 * @param position
+	 *            the node's position
+	 */
+	private void setNodePosition(final int nodeID, final AbsolutePosition position) {
+
+		// get the instance of the node's visualization
+		final NodeObject nodeObject = getMatchingNodeObject(nodeID);
+		nodeObject.setPosition(position);
+		synchronized (updatedObjects) {
+			updatedObjects.add(nodeObject);
 		}
 	}
 
@@ -189,11 +237,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * 
 	 * @param packet
 	 *            the packet containing the payload
-	 * @param nodeObject
-	 *            the graphical object which corresponds to the physical node which sent the packet-
 	 * @return <code>true</code> if a StringFormatter gained information from the payload
 	 */
-	private boolean parsePayloadByStringFormatters(final SpyglassPacket packet, final NodeObject nodeObject) {
+	private boolean parsePayloadByStringFormatters(final SpyglassPacket packet) {
 
 		boolean needsUpdate = false;
 		final int nodeID = packet.getSenderId();
@@ -229,6 +275,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		return needsUpdate;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Updates the the part of the string formatter results corresponding to the semantic type
 	 * 
@@ -266,11 +313,17 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * 
 	 * @param nodeID
 	 *            the node's identifier
-	 * @param drawingObjects
-	 *            the drawing objects which are currently available in the quad tree
 	 * @return the up to date instance of a node's visualization
 	 */
-	private NodeObject getMatchingNodeObject(final int nodeID, final List<DrawingObject> drawingObjects) {
+	private synchronized NodeObject getMatchingNodeObject(final int nodeID) {
+
+		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
+		synchronized (layer) {
+			drawingObjects.addAll(layer.getDrawingObjects());
+		}
+		synchronized (updatedObjects) {
+			drawingObjects.addAll(updatedObjects);
+		}
 
 		NodeObject nodeObject = null;
 		DrawingArea drawingArea = null;
@@ -299,9 +352,13 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
 		final NodeObject no = new NodeObject(nodeID, "Node " + nodeID, stringFormatterResult, isExtended, lineColorRGB, lineWidth, drawingArea);
-		// TODO: this is hacky but since no drawing area is accessible, I don't know what to
-		// to...
+		// this is hacky but since no drawing area is accessible, I don't know what to do...
 		boundingBoxes.put(no, (drawingArea != null) ? new AbsoluteRectangle(no.getBoundingBox()) : new AbsoluteRectangle(0, 0, 1000, 1000));
+
+		synchronized (updatedObjects) {
+			updatedObjects.add(no);
+		}
+
 		return no;
 	}
 
@@ -381,11 +438,12 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * <b>Note:</b> This object updates the quadTree in a synchronized block which means that the
 	 * GUI has to wait for the end of the processing
 	 */
-	public synchronized void refreshNodeObjectConfiguration() {
+	public void refreshNodeObjectConfiguration() {
 
 		purgeStringFormatterResults();
 		// get all drawing objects from the quad tree
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
+
 		synchronized (layer) {
 			drawingObjects.addAll(layer.getDrawingObjects());
 		}
@@ -413,6 +471,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		updateQuadTree();
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void reset() {
 
@@ -430,10 +489,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		synchronized (updatedObjects) {
 			updatedObjects.clear();
 		}
+
 		stringFormatterResults.clear();
-		refreshConfigurationParameters();
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	protected void updateQuadTree() {
 
@@ -486,6 +546,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public List<DrawingObject> getAutoZoomDrawingObjects() {
 		synchronized (layer) {
@@ -493,6 +554,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) {
 
@@ -589,7 +651,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					final NodeObject no = (NodeObject) drawingObject;
 					no.setExtended(!no.isExtended());
 					xmlConfig.putExtendedInformationActive(no.getNodeID(), no.isExtended());
-					updatedObjects.add(no);
+					synchronized (updatedObjects) {
+						updatedObjects.add(no);
+					}
 					updateQuadTree();
 				}
 				return true;

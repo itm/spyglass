@@ -97,8 +97,8 @@
                   <isActive nodeID="1">true</isActive>
                   <isActive nodeID="2">true</isActive>
                   <isActive nodeID="3">true</isActive>
-                  <isActive nodeID="4">false</isActive>
-                  <isActive nodeID="5">false</isActive>
+                  <isActive nodeID="4">true</isActive>
+                  <isActive nodeID="5">true</isActive>
                </extendedInformation>
                <isExtendedDefaultValue>false</isExtendedDefaultValue>
                <lineColorRGB length="3">
