@@ -161,7 +161,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 
 		// get the instance of the node's visualization
-		final NodeObject nodeObject = getMatchingNodeObject(nodeID, position, drawingObjects);
+		final NodeObject nodeObject = getMatchingNodeObject(nodeID, drawingObjects);
 
 		// if the node object did not have any information about the node's
 		// position or the position has changed, update the node object
@@ -266,13 +266,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * 
 	 * @param nodeID
 	 *            the node's identifier
-	 * @param position
-	 *            the node's position
 	 * @param drawingObjects
 	 *            the drawing objects which are currently available in the quad tree
 	 * @return the up to date instance of a node's visualization
 	 */
-	private NodeObject getMatchingNodeObject(final int nodeID, final AbsolutePosition position, final List<DrawingObject> drawingObjects) {
+	private NodeObject getMatchingNodeObject(final int nodeID, final List<DrawingObject> drawingObjects) {
 
 		NodeObject nodeObject = null;
 		DrawingArea drawingArea = null;
@@ -301,7 +299,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
 		final NodeObject no = new NodeObject(nodeID, "Node " + nodeID, stringFormatterResult, isExtended, lineColorRGB, lineWidth, drawingArea);
-		boundingBoxes.put(no, new AbsoluteRectangle(no.getBoundingBox()));
+		// TODO: this is hacky but since no drawing area is accessible, I don't know what to
+		// to...
+		boundingBoxes.put(no, (drawingArea != null) ? new AbsoluteRectangle(no.getBoundingBox()) : new AbsoluteRectangle(0, 0, 1000, 1000));
 		return no;
 	}
 

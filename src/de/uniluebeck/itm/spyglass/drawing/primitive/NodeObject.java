@@ -124,7 +124,7 @@ public class NodeObject extends DrawingObject {
 		this.lineWidth = lineWidth;
 		this.setColor(new RGB(lineColorRGB[0], lineColorRGB[1], lineColorRGB[2]));
 		setDrawingArea(drawingArea);
-
+		updateBoundingBox();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -270,6 +270,8 @@ public class NodeObject extends DrawingObject {
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 
+		setDrawingArea(drawingArea);
+
 		if (!listenerConnected) {
 			listenerConnected = true;
 			drawingArea.addDrawingAreaTransformListener(this.drawingAreaListener);
@@ -320,7 +322,7 @@ public class NodeObject extends DrawingObject {
 		// dispose the no longer used colors
 		color.dispose();
 		bg.dispose();
-		setDrawingArea(drawingArea);
+
 	}
 
 	// --------------------------------------------------------------------------------
@@ -353,7 +355,7 @@ public class NodeObject extends DrawingObject {
 			public void run() {
 				final DrawingArea drawingArea = getDrawingArea();
 				if (drawingArea == null) {
-					boundingBox = new AbsoluteRectangle(getPosition(), 1, 1);
+					setBoundingBox(new AbsoluteRectangle(getPosition(), 1, 1));
 					return;
 				}
 				// get the information to be displayed
@@ -380,12 +382,12 @@ public class NodeObject extends DrawingObject {
 				final int bbHeight = height + 2 * lineWidth;
 				final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht + 1, bbHeight + 1);
 
-				boundingBox = getDrawingArea().pixelRect2AbsRect(bbArea);
+				setBoundingBox(getDrawingArea().pixelRect2AbsRect(bbArea));
 
 			}
 		});
 
-		return boundingBox;
+		return getBoundingBox();
 
 	}
 

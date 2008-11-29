@@ -7,6 +7,9 @@
  */
 package de.uniluebeck.itm.spyglass.core;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.apache.log4j.Logger;
 
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
@@ -14,6 +17,7 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.Tools;
+import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 
 // ------------------------------------------------------------------------------
 // --
@@ -34,9 +38,12 @@ public class PacketProducerTask implements Runnable {
 
 	private Spyglass spyglass = null;
 
-	private final long initialDelayMs;
+	private long initialDelayMs;
 
 	private Boolean paused = false;
+
+	/** Object to securely access the configuration variables */
+	private Object mutex = new Object();
 
 	// -------------------------------------------------------------------------
 	/**
@@ -44,12 +51,33 @@ public class PacketProducerTask implements Runnable {
 	 * 
 	 * @param spyglass
 	 */
-	public PacketProducerTask(final Spyglass spyglass, final long initialDelayMs) {
+	public PacketProducerTask(final Spyglass spyglass, final long initialDelayMillis) {
 		this.spyglass = spyglass;
-		this.initialDelayMs = initialDelayMs;
+		this.initialDelayMs = initialDelayMillis;
 
 		// packetCache = spyglass.getPacketCache();
 		packetReader = spyglass.getPacketReader();
+
+		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(final PropertyChangeEvent evt) {
+				if (evt.getPropertyName().equals("generalSettings")) {
+
+					synchronized (mutex) {
+						initialDelayMs = ((GeneralSettingsXMLConfig) evt.getNewValue()).getPacketDeliveryInitialDelay();
+					}
+
+				} else if (evt.getPropertyName().equals("packetReader")) {
+
+					synchronized (mutex) {
+						packetReader = (PacketReader) evt.getNewValue();
+					}
+
+				}
+
+			}
+		});
 
 		log.debug("New producer task.");
 	}
@@ -64,7 +92,9 @@ public class PacketProducerTask implements Runnable {
 		SpyglassPacket packet = null;
 		log.debug("Producer task staring.");
 
-		Tools.sleep(initialDelayMs);
+		synchronized (mutex) {
+			Tools.sleep(initialDelayMs);
+		}
 
 		while (spyglass.isVisualizationRunning()) {
 
@@ -75,8 +105,9 @@ public class PacketProducerTask implements Runnable {
 					}
 				}
 
-				packet = packetReader.getNextPacket();
-
+				synchronized (mutex) {
+					packet = packetReader.getNextPacket();
+				}
 				if (!spyglass.isVisualizationRunning()) {
 					break;
 				}

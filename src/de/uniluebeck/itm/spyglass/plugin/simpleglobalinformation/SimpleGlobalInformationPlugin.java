@@ -166,16 +166,35 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	@Override
+	public void shutdown() {
+		super.shutdown();
+		if ((widget != null) && !widget.isDisposed()) {
+			widget.getDisplay().asyncExec(new Runnable() {
+				// ------------------------------------------------------------------------
+				@SuppressWarnings("synthetic-access")
+				@Override
+				public void run() {
+					widget.clear();
+					((GlobalInformationWidget) widget.getParent()).setShow(false);
+				}
+			});
+		}
+	}
+
 	@Override
 	public void reset() {
-		widget.getDisplay().asyncExec(new Runnable() {
-			// ------------------------------------------------------------------------
-			@SuppressWarnings("synthetic-access")
-			@Override
-			public void run() {
-				widget.clear();
-			}
-		});
+		if (widget != null) {
+			widget.getDisplay().asyncExec(new Runnable() {
+				// ------------------------------------------------------------------------
+				@SuppressWarnings("synthetic-access")
+				@Override
+				public void run() {
+					widget.clear();
+				}
+			});
+		}
 	}
 
 	@Override

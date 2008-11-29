@@ -29,6 +29,7 @@ import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.DrawingObjectListener;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
@@ -41,18 +42,18 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * controller must also be changed/replaced.
  */
 public class UIController {
-	
+
 	private static Logger log = SpyglassLoggerFactory.getLogger(UIController.class);
-	
+
 	private AppWindow appWindow = null;
-	
+
 	private Spyglass spyglass = null;
-	
+
 	private final Display display;
-	
+
 	/** User events will be dispatched here */
-	private final EventDispatcher eventDispatcher;
-	
+	private EventDispatcher eventDispatcher;
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -62,44 +63,61 @@ public class UIController {
 		if ((spyglass == null) || (appWindow == null)) {
 			throw new IllegalArgumentException();
 		}
-		
+
 		this.spyglass = spyglass;
 		this.appWindow = appWindow;
-		this.eventDispatcher = new EventDispatcher(spyglass.getPluginManager(), appWindow.getGui()
-				.getDrawingArea());
-		
+		this.eventDispatcher = new EventDispatcher(spyglass.getPluginManager(), appWindow.getGui().getDrawingArea());
+
 		display = appWindow.getDisplay();
-		
+
 		init();
+
+		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener("pluginManager", new PropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent evt) {
+				/*
+				 * Add DrawingObjectListeners to all current and future plug-ins (used for knowing
+				 * when to update the drawing area)
+				 */
+				final List<Plugin> plugins = ((PluginManager) evt.getNewValue()).getPlugins();
+				for (final Plugin p : plugins) {
+					if (p instanceof Drawable) {
+						p.addDrawingObjectListener(drawingObjectListener);
+					}
+				}
+				((PluginManager) evt.getNewValue()).addPluginListChangeListener(pluginListChangeListener);
+				eventDispatcher = new EventDispatcher(((PluginManager) evt.getNewValue()), appWindow.getGui().getDrawingArea());
+			}
+		});
 	}
-	
+
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * 
 	 */
 	private void init() {
-		
+
 		// Add paint listener to the canvas
 		appWindow.getGui().getDrawingArea().addPaintListener(paintListener);
-		
+
 		/*
 		 * mouse button events - are forwarded to plugins
 		 */
 		appWindow.getGui().getDrawingArea().addMouseListener(mouseListener);
-		
+
 		/*
-		 * Add DrawingObjectListeners to all current and future plugins (used for knowing when to
+		 * Add DrawingObjectListeners to all current and future plug-ins (used for knowing when to
 		 * update the drawing area)
 		 */
-		for (final Plugin p : spyglass.getPluginManager().getPlugins()) {
+		final List<Plugin> plugins = spyglass.getPluginManager().getPlugins();
+		for (final Plugin p : plugins) {
 			if (p instanceof Drawable) {
 				p.addDrawingObjectListener(drawingObjectListener);
 			}
 		}
 		spyglass.getPluginManager().addPluginListChangeListener(pluginListChangeListener);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Draw all drawing objects inside the bounding box <code>area</code> from the plugin
@@ -113,9 +131,8 @@ public class UIController {
 	 *            Only drawing objects inside this area will be redrawn.
 	 */
 	private void renderPlugin(final GC gc, final Drawable plugin, final AbsoluteRectangle area) {
-		
-		final List<DrawingObject> dos = new LinkedList<DrawingObject>(plugin
-				.getDrawingObjects(area));
+
+		final List<DrawingObject> dos = new LinkedList<DrawingObject>(plugin.getDrawingObjects(area));
 		if (dos != null) {
 			for (final DrawingObject object : dos) {
 				object.draw(appWindow.getGui().getDrawingArea(), gc);
@@ -124,7 +141,7 @@ public class UIController {
 			log.error("The plugin " + plugin + " did not provide any drawing objects!");
 		}
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -133,33 +150,33 @@ public class UIController {
 	public AppWindow getAppWindow() {
 		return appWindow;
 	}
-	
+
 	// ----------------------------------------------------------------------------
-	
+
 	private MouseListener mouseListener = new MouseAdapter() {
-		
+
 		@Override
 		public void mouseDoubleClick(final MouseEvent e) {
 			if (e.button == 1) {
 				eventDispatcher.handleEvent(e);
 			}
 		}
-		
+
 		@Override
 		public void mouseDown(final MouseEvent e) {
 			if (e.button > 1) {
 				eventDispatcher.handleEvent(e);
 			}
 		}
-		
+
 	};
-	
+
 	private PluginListChangeListener pluginListChangeListener = new PluginListChangeListener() {
-		
+
 		@Override
 		public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
 			if (p instanceof Drawable) {
-				
+
 				switch (what) {
 					case NEW_PLUGIN:
 						p.addDrawingObjectListener(drawingObjectListener);
@@ -173,79 +190,74 @@ public class UIController {
 			}
 		}
 	};
-	
+
 	private DrawingObjectListener drawingObjectListener = new DrawingObjectListener() {
-		
+
 		@Override
 		public void drawingObjectAdded(final DrawingObject dob) {
-			
+
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					final AbsoluteRectangle absBBox = dob.getBoundingBox();
-					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea()
-							.absRect2PixelRect(absBBox);
-					
+					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea().absRect2PixelRect(absBBox);
+
 					redraw(pxBBox);
 				}
 			});
-			
+
 		}
-		
+
 		@Override
-		public void drawingObjectChanged(final DrawingObject dob,
-				final AbsoluteRectangle oldBoundingBox) {
-			
+		public void drawingObjectChanged(final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
+
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					// the old area of the drawing object
 					if (oldBoundingBox != null) {
-						final PixelRectangle pxBBoxOld = getAppWindow().getGui().getDrawingArea()
-								.absRect2PixelRect(oldBoundingBox);
+						final PixelRectangle pxBBoxOld = getAppWindow().getGui().getDrawingArea().absRect2PixelRect(oldBoundingBox);
 						redraw(pxBBoxOld);
 					}
 					// the new area of the drawing object
 					final AbsoluteRectangle absBBox = dob.getBoundingBox();
-					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea()
-							.absRect2PixelRect(absBBox);
-					
+					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea().absRect2PixelRect(absBBox);
+
 					redraw(pxBBox);
-					
+
 				}
 			});
-			
+
 		}
-		
+
 		@Override
 		public void drawingObjectRemoved(final DrawingObject dob) {
-			
+
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
-				
+
 				@Override
 				public void run() {
 					final AbsoluteRectangle absBBox = dob.getBoundingBox();
-					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea()
-							.absRect2PixelRect(absBBox);
-					
+					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea().absRect2PixelRect(absBBox);
+
 					redraw(pxBBox);
 				}
 			});
-			
+
 		}
-		
+
 		private void redraw(final PixelRectangle pxBBox) {
-			appWindow.getGui().getDrawingArea().redraw(pxBBox.getUpperLeft().x,
-					pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
+			appWindow.getGui().getDrawingArea()
+					.redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
 		}
-		
+
 	};
-	
+
 	/**
 	 * Renders the visible plug-in's.<br>
 	 * The plug-ins provide objects which are drawn into the drawing area.
@@ -255,41 +267,40 @@ public class UIController {
 	 * @see DrawingObject
 	 */
 	private PaintListener paintListener = new PaintListener() {
-		
+
 		@Override
 		public void paintControl(final PaintEvent e) {
-			
-			final PixelRectangle pxArea = new PixelRectangle(e.gc.getClipping().x, e.gc
-					.getClipping().y, e.gc.getClipping().width, e.gc.getClipping().height);
-			
-			final AbsoluteRectangle area = appWindow.getGui().getDrawingArea().pixelRect2AbsRect(
-					pxArea);
-			
+
+			final PixelRectangle pxArea = new PixelRectangle(e.gc.getClipping().x, e.gc.getClipping().y, e.gc.getClipping().width,
+					e.gc.getClipping().height);
+
+			final AbsoluteRectangle area = appWindow.getGui().getDrawingArea().pixelRect2AbsRect(pxArea);
+
 			final List<Plugin> plugins = spyglass.getPluginManager().getVisibleActivePlugins();
-			
+
 			for (final Plugin plugin : plugins) {
 				if (plugin instanceof Drawable) {
 					renderPlugin(e.gc, (Drawable) plugin, area);
 				}
 			}
-			
+
 		}
 	};
-	
+
 	// --------------------------------------------------------------------------
 	/**
 	 * Listener for changes in the configuration of an plug-in.<br>
 	 */
 	PropertyChangeListener pluginPropertyListener = new PropertyChangeListener() {
-		
+
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
-			
+
 			// if the config of any plugin changes, better redraw the entire screen.
 			// TODO: in a perfect world this should be unneseccary, since the plugins would
 			// have done this themselves.
 			appWindow.getGui().getDrawingArea().redraw();
 		}
 	};
-	
+
 }

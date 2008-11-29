@@ -8,6 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.gui.view;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.swt.SWT;
@@ -16,6 +18,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.GlobalInformation;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
@@ -55,12 +58,23 @@ public class GlobalInformationBar {
 	 *            the parent composite
 	 * @param style
 	 *            the layout style to use
+	 * @param spyglass
+	 *            a spyglass instance
 	 */
-	public GlobalInformationBar(final Composite parent, final int style) {
+	public GlobalInformationBar(final Composite parent, final int style, final Spyglass spyglass) {
 		expandBar = new ExpandBar(parent, style);
 		widgets = new ConcurrentLinkedQueue<GlobalInformationWidget>();
-
+		setPluginManager(spyglass.getPluginManager());
 		expandBar.setSpacing(3);
+		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
+			// --------------------------------------------------------------------------------
+			@Override
+			public void propertyChange(final PropertyChangeEvent evt) {
+				if (evt.getPropertyName().equals("pluginManager")) {
+					setPluginManager((PluginManager) evt.getNewValue());
+				}
+			}
+		});
 	}
 
 	// --------------------------------------------------------------------------------
@@ -80,7 +94,7 @@ public class GlobalInformationBar {
 	 * @param pluginManager
 	 *            the pluginManager to set
 	 */
-	public void setPluginManager(final PluginManager pluginManager) {
+	private void setPluginManager(final PluginManager pluginManager) {
 
 		// set all GlobalInformationPlugins tinto the managed state
 		for (final Plugin p : pluginManager.getActivePlugins()) {

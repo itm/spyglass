@@ -30,7 +30,7 @@ public abstract class DrawingObject {
 
 	private Set<BoundingBoxChangeListener> changeListeners = new HashSet<BoundingBoxChangeListener>();
 
-	protected AbsoluteRectangle boundingBox;
+	private AbsoluteRectangle boundingBox;
 
 	private RGB color = new RGB(200, 0, 0);
 
@@ -182,6 +182,17 @@ public abstract class DrawingObject {
 		if (fireBoundingBoxChangeEvent && ((oldBox != null) || !boundingBox.equals(oldBox))) {
 			fireBoundingBoxChangeEvent();
 		}
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the bounding box
+	 * 
+	 * @param boundingBox
+	 *            the bounding box to set
+	 */
+	protected void setBoundingBox(final AbsoluteRectangle boundingBox) {
+		this.boundingBox = boundingBox;
 	}
 
 	protected abstract AbsoluteRectangle calculateBoundingBox();

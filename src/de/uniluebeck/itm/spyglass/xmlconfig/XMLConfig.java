@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 
 public abstract class XMLConfig extends PropertyBean {
-	
+
 	/**
 	 * Copy the data from <code>other</code> into this object.
 	 * 
@@ -19,30 +19,28 @@ public abstract class XMLConfig extends PropertyBean {
 	 *             if the given object is of the wrong type.
 	 */
 	public final void overwriteWith(final XMLConfig other) {
-		
+
 		if (!this.getClass().equals(other.getClass())) {
-			throw new ClassCastException("Cannot cast " + other.getClass() + " to "
-					+ this.getClass() + ".");
+			throw new ClassCastException("Cannot cast " + other.getClass() + " to " + this.getClass() + ".");
 		}
-		
+
 		// From here on we assume that "this" and "other" both have the same type
 		final Class<? extends XMLConfig> clazz = this.getClass();
-		
+
 		for (final Method setter : clazz.getMethods()) {
-			
+
 			// iterate through all setter methods
-			if (setter.getName().startsWith("set")
-					&& (setter.getAnnotation(Transient.class) == null)) {
+			if (setter.getName().startsWith("set") && (setter.getAnnotation(Transient.class) == null)) {
 				try {
-					
+
 					final Method getter = findCorrespondingGetterMethod(clazz, setter);
-					
+
 					final Object newValue = getter.invoke(other);
 					setter.invoke(this, newValue);
-					
+
 				} catch (final NoSuchMethodException e) {
-					throw new RuntimeException("Could not find corresponding getter method to "
-							+ setter.getName() + " in class " + clazz.getName(), e);
+					throw new RuntimeException("Could not find corresponding getter method to " + setter.getName() + " in class " + clazz.getName(),
+							e);
 				} catch (final Exception e) {
 					throw new RuntimeException(
 							String
@@ -50,11 +48,12 @@ public abstract class XMLConfig extends PropertyBean {
 											"Something wicked happened during reflection. Maybe there is something wrong with the getter/setter method %s of class %s",
 											setter.getName(), clazz.getName()), e);
 				}
-				
+
 			}
 		}
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Finds the corresponding getter-Method of the given setter.
@@ -64,24 +63,22 @@ public abstract class XMLConfig extends PropertyBean {
 	 * @return
 	 * @throws NoSuchMethodException
 	 */
-	private Method findCorrespondingGetterMethod(final Class<? extends XMLConfig> clazz,
-			final Method setter) throws NoSuchMethodException {
-		
+	private Method findCorrespondingGetterMethod(final Class<? extends XMLConfig> clazz, final Method setter) throws NoSuchMethodException {
+
 		final String propertyName = setter.getName().substring(3);
-		
+
 		boolean getGetter, isGetter;
-		
+
 		for (final Method getter : clazz.getMethods()) {
-			
+
 			getGetter = getter.getName().equalsIgnoreCase("get" + propertyName);
 			isGetter = getter.getName().equalsIgnoreCase("is" + propertyName);
-			
+
 			if (getGetter || isGetter) {
 				return getter;
 			}
-			
+
 		}
-		throw new NoSuchMethodException("Could not find a corresponding getter for "
-				+ setter.getName() + ".");
+		throw new NoSuchMethodException("Could not find a corresponding getter for " + setter.getName() + ".");
 	}
 }

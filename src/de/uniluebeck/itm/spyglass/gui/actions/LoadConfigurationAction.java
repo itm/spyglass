@@ -17,7 +17,7 @@ public class LoadConfigurationAction extends Action {
 	@Override
 	public void run() {
 		spyglass.getConfigStore().loadFromFileSystem();
-	};
+	}
 
 	@Override
 	public String getText() {

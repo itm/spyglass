@@ -64,29 +64,6 @@ public class Spyglass {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * Listener for changes in the plug-in list
-	 */
-	private final PropertyChangeListener configStoreListener = new PropertyChangeListener() {
-
-		@Override
-		public void propertyChange(final PropertyChangeEvent evt) {
-			try {
-				if (evt.getPropertyName().equals("replaceConfiguration")) {
-					init((SpyglassConfiguration) evt.getNewValue());
-					executor = Executors.newFixedThreadPool(2);
-					start();
-				}
-			} catch (final Exception e) {
-				log.error(e, e);
-			}
-
-		}
-
-	};
-
-	// --------------------------------------------------------------------------
-	// ------
-	/**
 	 * Constructor. Invokes the XML configuration reading from the default configuration files.
 	 * Which file is used depends on the context (if spyglass is used as stand alone application or
 	 * iShell plug-in).
@@ -96,7 +73,6 @@ public class Spyglass {
 	 */
 	public Spyglass(final boolean isIShellPlugin) {
 		configStore = new ConfigStore(isIShellPlugin);
-		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
 	}
 
@@ -112,7 +88,6 @@ public class Spyglass {
 	 */
 	public Spyglass(final boolean isIShellPlugin, final SpyglassConfiguration config) {
 		configStore = new ConfigStore(isIShellPlugin, config);
-		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
 	}
 
@@ -128,7 +103,6 @@ public class Spyglass {
 	 */
 	public Spyglass(final boolean isIShellPlugin, final File configFile) {
 		configStore = new ConfigStore(isIShellPlugin, configFile);
-		configStore.addPropertyChangeListener(configStoreListener);
 		init(configStore.getSpyglassConfig());
 	}
 
@@ -139,13 +113,25 @@ public class Spyglass {
 	 */
 	private void init(final SpyglassConfiguration config) {
 		// Create and inject objects
-		pluginManager = config.getPluginManager();
-		pluginManager.init();
+		setPluginManager(config.getPluginManager());
 
 		packetReader = config.getPacketReader();
 
-		packetDispatcher = new PacketDispatcher(pluginManager);
+		packetDispatcher = new PacketDispatcher(this);
+		setVisualizationRunning(true);
 		packetProducerTask = new PacketProducerTask(this, config.getGeneralSettings().getPacketDeliveryInitialDelay());
+
+		config.addPropertyChangeListener(new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(final PropertyChangeEvent evt) {
+				if (evt.getPropertyName().equals("packetReader")) {
+					setPacketReader((PacketReader) evt.getNewValue());
+				} else if (evt.getPropertyName().equals("pluginManager")) {
+					setPluginManager((PluginManager) evt.getNewValue());
+				}
+			}
+		});
 
 		log.debug("Init done");
 	}
@@ -164,12 +150,12 @@ public class Spyglass {
 	public void shutdown() {
 		setVisualizationRunning(false);
 		configStore.store(true);
-		
+
 		// shutdown all plugins
 		for (final Plugin p : pluginManager.getPlugins()) {
 			p.shutdown();
 		}
-		
+
 		log.info("All plugin-threads stopped");
 	}
 
@@ -195,6 +181,7 @@ public class Spyglass {
 	// ------
 	public void setPluginManager(final PluginManager pluginManager) {
 		this.pluginManager = pluginManager;
+		pluginManager.init();
 	}
 
 	// --------------------------------------------------------------------------
@@ -226,13 +213,11 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	public void setPacketReader(final PacketReader packetReader) {
 		this.packetReader = packetReader;
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	public ConfigStore getConfigStore() {
 		return configStore;
 	}

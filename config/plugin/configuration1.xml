@@ -1,5 +1,5 @@
 <spyglassConfiguration>
-   <packetReader class="de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketBroker">
+   <packetReader class="de.uniluebeck.itm.spyglass.core.PacketRecorder">
       <delayMillies>1000</delayMillies>
    </packetReader>
    <instances>
@@ -11,68 +11,23 @@
                <name>default8hh</name>
                <timeout>0</timeout>
                <semanticTypes length="1">
-                  <int>-1</int>
+                  <int>4</int>
                </semanticTypes>
-            </parameters>
-         </plugin>
-         <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
-            <parameters>
-               <isActive>true</isActive>
-               <isVisible>true</isVisible>
-               <name>default4</name>
-               <timeout>-1</timeout>
-               <semanticTypes length="1">
-                  <int>-1</int>
-               </semanticTypes>
-               <stringFormatters>
-                  <stringFormatter nodeID="3">zuozhuo</stringFormatter>
-                  <stringFormatter nodeID="5">ffsfwer %ds</stringFormatter>
-               </stringFormatters>
-               <defaultStringFormatter>fdsfsfsfs</defaultStringFormatter>
-               <extendedInformation>
-                  <isActive nodeID="1">true</isActive>
-                  <isActive nodeID="2">true</isActive>
-                  <isActive nodeID="3">true</isActive>
-               </extendedInformation>
-               <isExtendedDefaultValue>false</isExtendedDefaultValue>
-               <lineColorRGB length="3">
-                  <int>255</int>
-                  <int>0</int>
-                  <int>0</int>
-               </lineColorRGB>
-               <lineWidth>1</lineWidth>
-            </parameters>
-         </plugin>
-         <plugin class="de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin">
-            <parameters>
-               <isActive>true</isActive>
-               <isVisible>true</isVisible>
-               <name>default3</name>
-               <timeout>0</timeout>
-               <semanticTypes length="1">
-                  <int>-1</int>
-               </semanticTypes>
-               <imageFileName>Z:\Pictures\20050215\Bild000.jpg</imageFileName>
-               <lowerLeftX>-32000</lowerLeftX>
-               <lowerLeftY>-32000</lowerLeftY>
-               <imageSizeX>32000</imageSizeX>
-               <imageSizeY>32000</imageSizeY>
-               <keepProportions>true</keepProportions>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
             <parameters>
                <isActive>true</isActive>
                <isVisible>true</isVisible>
-               <name>default (2)</name>
+               <name>default</name>
                <timeout>0</timeout>
                <semanticTypes length="1">
                   <int>-1</int>
                </semanticTypes>
-               <gridElementHeight>100</gridElementHeight>
-               <gridElementWidth>100</gridElementWidth>
-               <gridLowerLeftPointX>0</gridLowerLeftPointX>
-               <gridLowerLeftPointY>0</gridLowerLeftPointY>
+               <gridElementHeight>320</gridElementHeight>
+               <gridElementWidth>320</gridElementWidth>
+               <gridLowerLeftPointX>-16000</gridLowerLeftPointX>
+               <gridLowerLeftPointY>-16000</gridLowerLeftPointY>
                <lineColorRGB length="3">
                   <int>192</int>
                   <int>192</int>
@@ -85,12 +40,81 @@
                <numRows>100</numRows>
             </parameters>
          </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
+            <parameters>
+               <isActive>true</isActive>
+               <isVisible>true</isVisible>
+               <name>GlobalInformation</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <semanticTypes4Neighborhoods length="1">
+                  <int>-1</int>
+               </semanticTypes4Neighborhoods>
+               <showNodeDegree>true</showNodeDegree>
+               <showNumNodes>true</showNumNodes>
+               <statisticalInformationEvaluators class="java.util.TreeSet">
+                  <statisticalInformationEvaluator>
+                     <semanticType>12</semanticType>
+                     <description>test</description>
+                     <expression>%U5</expression>
+                     <operations>SUM</operations>
+                  </statisticalInformationEvaluator>
+               </statisticalInformationEvaluators>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin">
+            <parameters>
+               <isActive>true</isActive>
+               <isVisible>true</isVisible>
+               <name>default10</name>
+               <timeout>-1</timeout>
+               <semanticTypes length="1">
+                  <int>11</int>
+               </semanticTypes>
+               <stringFormatters/>
+               <lineColorRGB length="3">
+                  <int>255</int>
+                  <int>0</int>
+                  <int>0</int>
+               </lineColorRGB>
+               <lineWidth>1</lineWidth>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
+            <parameters>
+               <isActive>true</isActive>
+               <isVisible>true</isVisible>
+               <name>NodePainter</name>
+               <timeout>-1</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <stringFormatters/>
+               <defaultStringFormatter>Payload: %u0</defaultStringFormatter>
+               <extendedInformation>
+                  <isActive nodeID="1">true</isActive>
+                  <isActive nodeID="2">true</isActive>
+                  <isActive nodeID="3">true</isActive>
+                  <isActive nodeID="4">false</isActive>
+                  <isActive nodeID="5">false</isActive>
+               </extendedInformation>
+               <isExtendedDefaultValue>false</isExtendedDefaultValue>
+               <lineColorRGB length="3">
+                  <int>128</int>
+                  <int>0</int>
+                  <int>0</int>
+               </lineColorRGB>
+               <lineWidth>1</lineWidth>
+            </parameters>
+         </plugin>
       </plugins>
    </instances>
    <generalSettings>
       <showRuler>true</showRuler>
       <metrics>
-         <unit>m</unit>
+         <unit>mm</unit>
          <abs2metricFactorX>1.0</abs2metricFactorX>
          <abs2metricFactorY>1.0</abs2metricFactorY>
          <abs2metricOffsetX>0.0</abs2metricOffsetX>
@@ -144,6 +168,41 @@
             <keepProportions>true</keepProportions>
          </parameters>
       </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
+         <parameters>
+            <isActive>true</isActive>
+            <isVisible>true</isVisible>
+            <name>default4</name>
+            <timeout>0</timeout>
+            <semanticTypes length="1">
+               <int>-1</int>
+            </semanticTypes>
+            <defaultValue>3.0</defaultValue>
+            <gridElementHeight>1</gridElementHeight>
+            <gridElementWidth>1</gridElementWidth>
+            <lowerLeftX>0</lowerLeftX>
+            <lowerLeftY>0</lowerLeftY>
+            <lockGridElementSquare>true</lockGridElementSquare>
+            <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
+            <maxColorRGB length="3">
+               <int>0</int>
+               <int>14</int>
+               <int>255</int>
+            </maxColorRGB>
+            <maxValue>20.0</maxValue>
+            <minColorRGB length="3">
+               <int>29</int>
+               <int>255</int>
+               <int>0</int>
+            </minColorRGB>
+            <minValue>0.0</minValue>
+            <width>1</width>
+            <numFramePointsHorizontal>3</numFramePointsHorizontal>
+            <numFramePointsVertical>3</numFramePointsVertical>
+            <height>1</height>
+            <refreshInterval>10</refreshInterval>
+         </parameters>
+      </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin">
          <parameters>
             <isActive>true</isActive>
@@ -153,10 +212,17 @@
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
-            <imageFileName>images/icons/brokenImageLink.png</imageFileName>
-            <size height="1" width="1">
-               <upperLeft x="0" y="0" z="0"/>
-            </size>
+            <imageFileName>/home/dariush/lageplan.gif</imageFileName>
+            <imageSizeX>100</imageSizeX>
+            <imageSizeY>100</imageSizeY>
+            <keepProportions>true</keepProportions>
+            <drawLine>true</drawLine>
+            <packetType3D>true</packetType3D>
+            <lineColor length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </lineColor>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
@@ -168,14 +234,17 @@
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
-            <semanticTypes4Neighborhoods class="java.util.LinkedList"/>
-            <showNodeDegree>true</showNodeDegree>
+            <semanticTypes4Neighborhoods length="1">
+               <int>-1</int>
+            </semanticTypes4Neighborhoods>
+            <showNodeDegree>false</showNodeDegree>
             <showNumNodes>true</showNumNodes>
+            <statisticalInformationEvaluators class="java.util.TreeSet"/>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
          <parameters>
-            <isActive>true</isActive>
+            <isActive>false</isActive>
             <isVisible>true</isVisible>
             <name>default</name>
             <timeout>-1</timeout>

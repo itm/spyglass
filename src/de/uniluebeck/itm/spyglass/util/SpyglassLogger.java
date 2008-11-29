@@ -101,13 +101,37 @@ public class SpyglassLogger extends Logger {
 	@Override
 	public void error(final Object message, final Throwable t) {
 		log.error(message, t);
-		Display.getDefault().syncExec(new Runnable() {
+		error(message, t, true);
 
-			@Override
-			public void run() {
-				MessageDialog.openError(null, "An error occured", message.toString());
-			}
-		});
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Log a message object with the <code>ERROR</code> level including the stack trace of the
+	 * {@link Throwable} <code>t</code> passed as parameter. Additionally, the message is displayed
+	 * in a dialog window to the user.
+	 * 
+	 * <p>
+	 * See {@link #error(Object)} form for more detailed information.
+	 * 
+	 * @param message
+	 *            the message object to log.
+	 * @param t
+	 *            the exception to log, including its stack trace.
+	 * @param showErrorMessageDialog
+	 *            if <code>true</code> an error message dialog window will be shown
+	 */
+	public void error(final Object message, final Throwable t, final boolean showErrorMessageDialog) {
+		log.error(message, t);
+		if (showErrorMessageDialog) {
+			Display.getDefault().syncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(null, "An error occured", message.toString());
+				}
+			});
+		}
 
 	}
 
@@ -134,14 +158,43 @@ public class SpyglassLogger extends Logger {
 	 */
 	@Override
 	public void error(final Object message) {
-		log.error(message);
-		Display.getDefault().syncExec(new Runnable() {
+		error(message, true);
+	}
 
-			@Override
-			public void run() {
-				MessageDialog.openError(null, "An error occured", message.toString());
-			}
-		});
+	// --------------------------------------------------------------------------------
+	/**
+	 * Log a message object with the {@link Level#ERROR ERROR} Level. Additionally, the message is
+	 * displayed in a dialog window to the user.
+	 * 
+	 * <p>
+	 * This method first checks if this category is <code>ERROR</code> enabled by comparing the
+	 * level of this category with {@link Level#ERROR ERROR} Level. If this category is
+	 * <code>ERROR</code> enabled, then it converts the message object passed as parameter to a
+	 * string by invoking the appropriate {@link org.apache.log4j.or.ObjectRenderer}. It proceeds to
+	 * call all the registered appenders in this category and also higher in the hierarchy depending
+	 * on the value of the additivity flag.
+	 * 
+	 * <p>
+	 * <b>WARNING</b> Note that passing a {@link Throwable} to this method will print the name of
+	 * the <code>Throwable</code> but no stack trace. To print a stack trace use the
+	 * {@link #error(Object, Throwable)} form instead.
+	 * 
+	 * @param message
+	 *            the message object to log
+	 * @param showErrorMessageDialog
+	 *            if <code>true</code> an error message dialog window will be shown
+	 */
+	public void error(final Object message, final boolean showErrorMessageDialog) {
+		log.error(message);
+		if (showErrorMessageDialog) {
+			Display.getDefault().syncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(null, "An error occured", message.toString());
+				}
+			});
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -160,14 +213,37 @@ public class SpyglassLogger extends Logger {
 	 */
 	@Override
 	public void fatal(final Object message, final Throwable t) {
-		log.fatal(message, t);
-		Display.getDefault().syncExec(new Runnable() {
+		fatal(message, t, true);
+	}
 
-			@Override
-			public void run() {
-				MessageDialog.openError(null, "Critical error", message.toString());
-			}
-		});
+	// --------------------------------------------------------------------------------
+	/**
+	 * Log a message object with the <code>FATAL</code> level including the stack trace of the
+	 * {@link Throwable} <code>t</code> passed as parameter. Additionally, the message is displayed
+	 * in a dialog window to the user.
+	 * 
+	 * <p>
+	 * See {@link #fatal(Object)} for more detailed information.
+	 * 
+	 * @param message
+	 *            the message object to log.
+	 * @param t
+	 *            the exception to log, including its stack trace.
+	 * @param showErrorMessageDialog
+	 *            if <code>true</code> an error message dialog window will be shown
+	 */
+
+	public void fatal(final Object message, final Throwable t, final boolean showErrorMessageDialog) {
+		log.fatal(message, t);
+		if (showErrorMessageDialog) {
+			Display.getDefault().syncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(null, "Critical error", message.toString());
+				}
+			});
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -193,14 +269,43 @@ public class SpyglassLogger extends Logger {
 	 */
 	@Override
 	public void fatal(final Object message) {
-		log.fatal(message);
-		Display.getDefault().syncExec(new Runnable() {
+		fatal(message, true);
+	}
 
-			@Override
-			public void run() {
-				MessageDialog.openError(null, "Critical error", message.toString());
-			}
-		});
+	// --------------------------------------------------------------------------------
+	/**
+	 * Log a message object with the {@link Level#FATAL FATAL} Level. Additionally, the message is
+	 * displayed in a dialog window to the user.
+	 * 
+	 * <p>
+	 * This method first checks if this category is <code>FATAL</code> enabled by comparing the
+	 * level of this category with {@link Level#FATAL FATAL} Level. If the category is
+	 * <code>FATAL</code> enabled, then it converts the message object passed as parameter to a
+	 * string by invoking the appropriate {@link org.apache.log4j.or.ObjectRenderer}. It proceeds to
+	 * call all the registered appenders in this category and also higher in the hierarchy depending
+	 * on the value of the additivity flag.
+	 * 
+	 * <p>
+	 * <b>WARNING</b> Note that passing a {@link Throwable} to this method will print the name of
+	 * the Throwable but no stack trace. To print a stack trace use the
+	 * {@link #fatal(Object, Throwable)} form instead.
+	 * 
+	 * @param message
+	 *            the message object to log
+	 * @param showErrorMessageDialog
+	 *            if <code>true</code> an error message dialog window will be shown
+	 */
+	public void fatal(final Object message, final boolean showErrorMessageDialog) {
+		log.fatal(message);
+		if (showErrorMessageDialog) {
+			Display.getDefault().syncExec(new Runnable() {
+
+				@Override
+				public void run() {
+					MessageDialog.openError(null, "Critical error", message.toString());
+				}
+			});
+		}
 	}
 
 	@Override

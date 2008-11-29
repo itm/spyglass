@@ -14,10 +14,10 @@ import java.beans.PropertyChangeSupport;
  * 
  */
 public abstract class PropertyBean {
-	
+
 	/** This is a utility class that can be used by beans that support bound properties. */
 	private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Add a PropertyChangeListener to the listener list. The listener is registered for all
@@ -31,7 +31,24 @@ public abstract class PropertyBean {
 	public void addPropertyChangeListener(final PropertyChangeListener listener) {
 		propertyChangeSupport.addPropertyChangeListener(listener);
 	}
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Add PropertyChangeListeners to the listener list. The listeners are registered for all
+	 * properties. The same listener object may be added more than once, and will be called as many
+	 * times as it is added. If <code>listener</code> is null, no exception is thrown and no action
+	 * is taken.
+	 * 
+	 * @param other
+	 *            another {@link PropertyBean} which listeners are to be added
+	 */
+	public void addPropertyChangeListeners(final PropertyBean other) {
+		final PropertyChangeListener[] listeners = other.propertyChangeSupport.getPropertyChangeListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			propertyChangeSupport.addPropertyChangeListener(listeners[i]);
+		}
+	}
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Add a PropertyChangeListener for a specific property. The listener will be invoked only when
@@ -45,11 +62,10 @@ public abstract class PropertyBean {
 	 * @param listener
 	 *            The PropertyChangeListener to be added
 	 */
-	public void addPropertyChangeListener(final String propertyName,
-			final PropertyChangeListener listener) {
+	public void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
 		propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Remove a PropertyChangeListener from the listener list. This removes a PropertyChangeListener
@@ -64,7 +80,7 @@ public abstract class PropertyBean {
 	public void removePropertyChangeListener(final PropertyChangeListener listener) {
 		propertyChangeSupport.removePropertyChangeListener(listener);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Remove a PropertyChangeListener for a specific property. If <code>listener</code> was added
@@ -78,11 +94,10 @@ public abstract class PropertyBean {
 	 * @param listener
 	 *            The PropertyChangeListener to be removed
 	 */
-	public void removePropertyChangeListener(final String propertyName,
-			final PropertyChangeListener listener) {
+	public void removePropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
 		propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Report a bound property update to any registered listeners. No event is fired if old and new
@@ -99,9 +114,8 @@ public abstract class PropertyBean {
 	 * @param newValue
 	 *            The new value of the property.
 	 */
-	protected void firePropertyChange(final String propertyName, final Object oldValue,
-			final Object newValue) {
+	protected void firePropertyChange(final String propertyName, final Object oldValue, final Object newValue) {
 		propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
 	}
-	
+
 }

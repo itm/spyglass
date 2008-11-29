@@ -33,24 +33,24 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class MapPainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener {
-	
+
 	private static Logger log = SpyglassLoggerFactory.getLogger(MapPainterPlugin.class);
-	
+
 	@Element(name = "parameters")
 	private final MapPainterXMLConfig xmlConfig;
-	
+
 	/**
 	 * The layer. it contains only one static element, so it isn't really necessary. but since the
 	 * QuadTree already has some nice features like boundingBox comparison, we use it for
 	 * convenience.
 	 */
 	private final Layer layer = new QuadTree();
-	
+
 	/**
 	 * The drawing object representing the map.
 	 */
 	private Map map = null;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -59,70 +59,71 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		super(true);
 		xmlConfig = new MapPainterXMLConfig();
 	}
-	
+
 	@Override
-	public PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> createPreferencePage(
-			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+	public PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		return new MapPainterPreferencePage(dialog, spyglass, this);
 	}
-	
-	public static PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> createTypePreferencePage(
-			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+
+	public static PluginPreferencePage<MapPainterPlugin, MapPainterXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		return new MapPainterPreferencePage(dialog, spyglass);
 	}
-	
+
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		return layer.getDrawingObjects(area);
 	}
-	
+
 	public static String getHumanReadableName() {
 		return "MapPainter";
 	}
-	
+
 	@Override
 	public MapPainterXMLConfig getXMLConfig() {
 		return xmlConfig;
 	}
-	
+
 	@Override
 	public void reset() {
 		// clear the drawing object
-		synchronized (map) {
-			map.positions.clear();
-			map.values.clear();
-			updateFramepoints();
+		if (map != null) {
+			synchronized (map) {
+				map.positions.clear();
+				map.values.clear();
+				updateFramepoints();
+			}
 		}
 	}
-	
+
 	@Override
 	public void init(final PluginManager manager) {
 		super.init(manager);
-		
+
 		this.map = new Map(xmlConfig);
 		layer.addOrUpdate(map);
 		xmlConfig.addPropertyChangeListener(this);
 		updateFramepoints();
 	}
-	
+
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
-		
-		final AbsolutePosition position = pluginManager.getNodePositioner().getPosition(
-				packet.getSenderId());
-		
+
+		final AbsolutePosition position = pluginManager.getNodePositioner().getPosition(packet.getSenderId());
+
 		// ignore nodes outside the area
 		if (!xmlConfig.getBoundingBox().contains(position.x, position.y)) {
 			return;
 		}
-		
+
 		if (!xmlConfig.containsSemanticType(packet.getSemanticType())) {
 			return;
 		}
-		
+
 		// log.debug(String.format("Parsing packet %s", packet));
-		
+
 		double value = Double.NaN;
-		
+
 		switch (packet.getSyntaxType()) {
 			case ISENSE_SPYGLASS_PACKET_FLOAT: {
 				final FloatListPacket p = ((FloatListPacket) packet);
@@ -159,41 +160,41 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				// TODO: handle those
 				break;
 			}
-				
+
 		}
-		
+
 		// log.debug(String.format("Parsed packet %s: Got value %f", packet, value));
-		
+
 		// update the map
 		if (!Double.isNaN(value)) {
 			synchronized (map) {
 				map.positions.put(packet.getSenderId(), position);
 				map.values.put(packet.getSenderId(), value);
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	@Override
 	protected void updateQuadTree() {
 		// TODO: should the redraw be delayed for performance reasons?
 		fireDrawingObjectChanged(map, null);
 	}
-	
+
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
-		
+
 		updateFramepoints();
-		
+
 		// now cause a redraw
 		fireDrawingObjectChanged(map, null);
 	}
-	
+
 	private void updateFramepoints() {
 		// Update the framepoints
 		synchronized (map) {
-			
+
 			// kill all old framepoints
 			final Iterator<Integer> it = map.positions.keySet().iterator();
 			while (it.hasNext()) {
@@ -202,7 +203,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 					it.remove();
 				}
 			}
-			
+
 			// add framepoints horizontally
 			int j = 1;
 			final float numFramePointsHorizontal = xmlConfig.getNumFramePointsHorizontal();
@@ -210,7 +211,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 			final int height = xmlConfig.getBoundingBox().getHeight();
 			final AbsolutePosition upperLeft = xmlConfig.getBoundingBox().getUpperLeft().clone();
 			final Double defaultValue = new Double(xmlConfig.getDefaultValue());
-			
+
 			for (int i = 0; i < numFramePointsHorizontal; i++) {
 				final AbsolutePosition pos = upperLeft.clone();
 				pos.x += i / (numFramePointsHorizontal - 1) * width;
@@ -226,7 +227,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				map.values.put(-j, defaultValue);
 				j++;
 			}
-			
+
 			// add framepoints vertically
 			final float numFramePointsVertical = xmlConfig.getNumFramePointsVertical();
 			for (int i = 0; i < numFramePointsVertical; i++) {
@@ -244,8 +245,8 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				map.values.put(-j, defaultValue);
 				j++;
 			}
-			
+
 		}
 	}
-	
+
 }

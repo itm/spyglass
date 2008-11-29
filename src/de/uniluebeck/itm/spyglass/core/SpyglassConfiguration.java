@@ -32,28 +32,30 @@ import de.uniluebeck.itm.spyglass.xmlconfig.XMLConfig;
  */
 @Root
 public class SpyglassConfiguration extends XMLConfig {
-	
+
 	@Element(name = "packetReader")
 	private PacketReader packetReader = null;
-	
+
 	@Element(name = "instances")
 	private PluginManager pluginManager = new PluginManager();
-	
+
 	@Element(name = "generalSettings")
 	private GeneralSettingsXMLConfig generalSettings = new GeneralSettingsXMLConfig();
-	
+
 	@ElementList(name = "defaults")
 	private Collection<Plugin> defaults = new LinkedList<Plugin>();
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param generalSettings
 	 *            the generalSettings to set
 	 */
 	public void setGeneralSettings(final GeneralSettingsXMLConfig generalSettings) {
+		final GeneralSettingsXMLConfig old = this.generalSettings;
 		this.generalSettings = generalSettings;
+		firePropertyChange("generalSettings", old, this.generalSettings);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the generalSettings
@@ -61,18 +63,20 @@ public class SpyglassConfiguration extends XMLConfig {
 	public GeneralSettingsXMLConfig getGeneralSettings() {
 		return generalSettings;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param defaults
 	 *            the defaults to set
 	 */
 	public void setDefaultPlugins(final Collection<Plugin> defaults) {
+		final Collection<Plugin> oldDefaults = this.defaults;
 		// this is necessary in case of getting an unmodifiable list from a plug-in which is to be
 		// copied
 		this.defaults = new LinkedList<Plugin>(defaults);
+		firePropertyChange("defaults", oldDefaults, this.defaults);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns a read-only collection of plug-ins which are configured by default
@@ -84,7 +88,7 @@ public class SpyglassConfiguration extends XMLConfig {
 	public Collection<Plugin> getDefaultPlugins() {
 		return Collections.unmodifiableCollection(defaults);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the instance which manages the plug-ins
@@ -93,9 +97,11 @@ public class SpyglassConfiguration extends XMLConfig {
 	 *            the instance which manages the plug-ins
 	 */
 	public void setPluginManager(final PluginManager pluginManager) {
+		final PluginManager oldPM = this.pluginManager;
 		this.pluginManager = pluginManager;
+		firePropertyChange("pluginManager", oldPM, this.pluginManager);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the instance which manages the plug-ins
@@ -105,17 +111,34 @@ public class SpyglassConfiguration extends XMLConfig {
 	public PluginManager getPluginManager() {
 		return pluginManager;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	public PacketReader getPacketReader() {
 		return packetReader;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	public void setPacketReader(final PacketReader packetReader) {
 		final PacketReader oldReader = this.packetReader;
 		this.packetReader = packetReader;
 		firePropertyChange("packetReader", oldReader, packetReader);
 	}
-	
+
+	// public void shutdown() {
+	// if (pluginManager != null) {
+	// final List<Plugin> plugins = pluginManager.getPlugins();
+	// for (final Plugin plugin : plugins) {
+	// if (!((plugin instanceof NodePositionerPlugin) && plugin.isActive())) {
+	//
+	// plugin.setActive2(false);
+	// plugin.reset();
+	// }
+	// }
+	// pluginManager.getNodePositioner().setActive2(false);
+	// pluginManager.getNodePositioner().reset();
+	// pluginManager = null;
+	// packetReader = null;
+	// defaults.clear();
+	// }
+	// }
 }

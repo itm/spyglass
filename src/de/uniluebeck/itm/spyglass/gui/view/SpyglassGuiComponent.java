@@ -189,8 +189,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	 *            the parent widget
 	 */
 	private void initGlobalInformationBar(final Composite parent, final Spyglass spyglass) {
-		globalInformationBar = new GlobalInformationBar(parent, SWT.V_SCROLL);
-		globalInformationBar.setPluginManager(spyglass.getPluginManager());
+		globalInformationBar = new GlobalInformationBar(parent, SWT.V_SCROLL, spyglass);
 	}
 
 	// --------------------------------------------------------------------------------

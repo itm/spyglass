@@ -7,6 +7,8 @@
  */
 package de.uniluebeck.itm.spyglass.core;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -29,9 +31,9 @@ import de.uniluebeck.itm.spyglass.util.Tools;
  */
 public class PacketDispatcher {
 	private static Logger log = SpyglassLoggerFactory.getLogger(PacketDispatcher.class);
-	
+
 	private PluginManager pluginManager = null;
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -42,15 +44,22 @@ public class PacketDispatcher {
 	 * @param packetRecorder
 	 *            object which records incoming packets
 	 */
-	public PacketDispatcher(final PluginManager pluginManager) {
-		if (pluginManager == null) {
+	public PacketDispatcher(final Spyglass spyglass) {
+		if (spyglass.getPluginManager() == null) {
 			log.error("Supplied plug-in manager is null");
 			throw new IllegalArgumentException("pluginManager must not be null.");
 		}
-		
-		this.pluginManager = pluginManager;
+
+		this.pluginManager = spyglass.getPluginManager();
+
+		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener("pluginManager", new PropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent evt) {
+				pluginManager = (PluginManager) evt.getNewValue();
+			}
+		});
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -64,7 +73,7 @@ public class PacketDispatcher {
 		if (packet == null) {
 			return;
 		}
-		
+
 		// get the active node positioner which has to handle the packet
 		// synchronously.
 		// Note that no exception is caught here since an error
@@ -74,14 +83,14 @@ public class PacketDispatcher {
 		final NodePositionerPlugin np = pluginManager.getNodePositioner();
 		log.debug("Dispatching packet[" + packet + "] to NodePositioner " + np);
 		np.handlePacket(packet);
-		
+
 		final List<Plugin> plugins = pluginManager.getActivePlugins();
 		if (plugins == null) {
 			return;
 		}
-		
+
 		log.debug("Dispatching packet[" + packet + "] to plugins: " + Tools.toString(plugins));
-		
+
 		for (final Plugin plugin : plugins) {
 			// We handled the active NodePositioner already
 			if (plugin instanceof NodePositionerPlugin) {

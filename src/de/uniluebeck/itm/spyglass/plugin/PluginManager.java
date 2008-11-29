@@ -121,6 +121,21 @@ public class PluginManager {
 
 	// --------------------------------------------------------------------------------
 	/**
+	 * Adds a <code>PluginListChangeListener</code> instances to the list of listeners. Every
+	 * listener will be informed of changes when plug-in-instances are added or removed.
+	 * 
+	 * @param listeners
+	 *            the listeners to add
+	 */
+	public void addPluginListChangeListeners(final List<PluginListChangeListener> listeners) {
+		for (final PluginListChangeListener listener : listeners) {
+			pluginListChangeListeners.add(listener);
+		}
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
 	 * Removes a <code>PluginListChangeListener</code> instance from the list of listeners.
 	 * 
 	 * @param listener

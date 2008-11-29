@@ -455,7 +455,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 				try {
 					packetQueue.wait();
 				} catch (final InterruptedException e) {
-					log.info("The packet consumer thread was interrupted while waiting for a notification of the arrival of a new packet");
+					log.info(getInstanceName()
+							+ ": The packet consumer thread was interrupted while waiting for a notification of the arrival of a new packet");
 					packetConsumerThread.interrupt();
 				}
 			}
@@ -555,13 +556,12 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	protected PluginManager getPluginManager() {
 		return pluginManager;
 	}
-	
 
 	/**
 	 * Is called before the plugin is removed or before spyglass shuts down.
 	 * 
-	 * This method will be called exactly once, at the end of the lifetime of the plugin.
-	 * It's purpose is to clean up behind, kill (eventually) remaining threads and unregister any
+	 * This method will be called exactly once, at the end of the lifetime of the plugin. It's
+	 * purpose is to clean up behind, kill (eventually) remaining threads and unregister any
 	 * listeners (if necessary).
 	 * 
 	 */

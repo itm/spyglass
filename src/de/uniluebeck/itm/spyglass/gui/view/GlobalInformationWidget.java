@@ -67,7 +67,7 @@ public class GlobalInformationWidget extends Composite {
 	 * @return <code>true</code> if the widget is to be displayed
 	 */
 	public boolean isShow() {
-		return plugin.isActive() && plugin.isVisible();
+		return plugin.isActive() && plugin.isVisible() && show;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -122,6 +122,15 @@ public class GlobalInformationWidget extends Composite {
 	public void redraw() {
 		super.redraw();
 		giBar.refresh(this);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param show
+	 *            the show to set
+	 */
+	public void setShow(final boolean show) {
+		this.show = show;
 	}
 
 }
