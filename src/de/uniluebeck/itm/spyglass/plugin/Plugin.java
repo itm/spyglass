@@ -23,6 +23,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -402,7 +403,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	public final void run() {
 
-		while (!Thread.currentThread().isInterrupted()) {
+		while (!packetConsumerThread.isInterrupted()) {
 			final SpyglassPacket p = getPacketFromQueue(true);
 			if (p != null) {
 				try {
@@ -413,6 +414,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 				updateQuadTree();
 			}
 		}
+		packetConsumerThread = null;
 	}
 
 	// --------------------------------------------------------------------------------

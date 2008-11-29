@@ -128,12 +128,19 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		pcl = new PropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
-				if (!(Boolean) evt.getNewValue()) {
+				if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ACTIVE) && !((Boolean) evt.getNewValue())) {
 					reset();
+				} else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_VISIBLE) && !((Boolean) evt.getNewValue())) {
+					synchronized (layer) {
+						for (final DrawingObject drawingObject : layer.getDrawingObjects()) {
+							fireDrawingObjectRemoved(drawingObject);
+							boundingBoxes.remove(drawingObject);
+						}
+					}
 				}
 			}
 		};
-		xmlConfig.addPropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, pcl);
+		xmlConfig.addPropertyChangeListener(pcl);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -475,19 +482,18 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	@Override
 	public void reset() {
 
-		synchronized (layer) {
-			for (final DrawingObject d : layer.getDrawingObjects()) {
-				fireDrawingObjectRemoved(d);
-			}
-			try {
-				layer.clear();
-			} catch (final Exception e) {
-				log.error("An error occured while trying to clear the layer", e);
-			}
-		}
-
 		synchronized (updatedObjects) {
 			updatedObjects.clear();
+		}
+
+		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
+		synchronized (layer) {
+			drawingObjects.addAll(layer.getDrawingObjects());
+		}
+
+		synchronized (obsoleteObjects) {
+			obsoleteObjects.addAll(layer.getDrawingObjects());
+			updateQuadTree();
 		}
 
 		stringFormatterResults.clear();
@@ -532,11 +538,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		for (final DrawingObject drawingObject : update) {
 			if ((oldBB = boundingBoxes.get(drawingObject)) != null) {
 				fireDrawingObjectChanged(drawingObject, oldBB);
-				boundingBoxes.put(drawingObject, new AbsoluteRectangle(drawingObject.getBoundingBox()));
 			} else {
 				fireDrawingObjectAdded(drawingObject);
-				boundingBoxes.put(drawingObject, new AbsoluteRectangle(drawingObject.getBoundingBox()));
 			}
+			boundingBoxes.put(drawingObject, new AbsoluteRectangle(drawingObject.getBoundingBox()));
 		}
 
 		for (final DrawingObject drawingObject : obsolete) {
