@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener.ListChangeEvent;
 import de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin;
@@ -541,25 +540,25 @@ public class PluginManager {
 	 * 
 	 * 
 	 */
-	public void addNodePositionChangedListener(final DrawingAreaTransformListener listener) {
+	public void addNodePositionChangedListener(final NodePositionChangedListener listener) {
 		if (listener == null) {
 			return;
 		}
 
 		log.debug("Added new listener: " + listener);
-		nodePositionListeners.add(DrawingAreaTransformListener.class, listener);
+		nodePositionListeners.add(NodePositionChangedListener.class, listener);
 	}
 
 	/**
 	 * Remove the given listener.
 	 */
-	public void removeNodePositionChangedListener(final DrawingAreaTransformListener listener) {
+	public void removeNodePositionChangedListener(final NodePositionChangedListener listener) {
 		if (listener == null) {
 			return;
 		}
 
 		log.debug("Removing listener: " + listener);
-		nodePositionListeners.remove(DrawingAreaTransformListener.class, listener);
+		nodePositionListeners.remove(NodePositionChangedListener.class, listener);
 	}
 
 	/**

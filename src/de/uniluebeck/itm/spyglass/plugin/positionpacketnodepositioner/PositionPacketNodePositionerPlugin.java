@@ -77,14 +77,19 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	 */
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
+
 		final int id = packet.getSenderId();
 
 		final AbsolutePosition newPos = packet.getPosition().clone();
-
 		final AbsolutePosition oldPos = positionMap.get(id);
-		this.positionMap.put(id, newPos);
 
-		pluginManager.fireNodePositionChangedEvent(id, oldPos, newPos);
+		// only send events and update map when the
+		// position really changes. lowers number of
+		// redraws
+		if ((oldPos == null) || !oldPos.equals(newPos)) {
+			this.positionMap.put(id, newPos);
+			pluginManager.fireNodePositionChangedEvent(id, oldPos, newPos);
+		}
 	}
 
 	@Override

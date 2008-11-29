@@ -15,17 +15,17 @@ public class NodePositionChangedEvent extends Event {
 	/**
 	 * The sender ID of the node
 	 */
-	int node;
+	public int node;
 
 	/**
 	 * The old position of the node (may be null if it has no known old position)
 	 */
-	AbsolutePosition oldPosition;
+	public AbsolutePosition oldPosition;
 
 	/**
 	 * The new obtained position.
 	 */
-	AbsolutePosition newPosition;
+	public AbsolutePosition newPosition;
 
 	public NodePositionChangedEvent(final int node, final AbsolutePosition oldPosition, final AbsolutePosition newPosition) {
 		super();

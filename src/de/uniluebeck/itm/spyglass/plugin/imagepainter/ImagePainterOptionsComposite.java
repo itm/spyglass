@@ -20,6 +20,9 @@ import org.eclipse.swt.widgets.Text;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
+import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
+
 public class ImagePainterOptionsComposite extends Composite {
 
 	{
@@ -34,6 +37,10 @@ public class ImagePainterOptionsComposite extends Composite {
 	private Text imageSizeWidthText;
 	private Text imageSizeHeightText;
 	private Button keepProportionsButton;
+	private Label heightUnitLabel;
+	private Label widthUnitLabel;
+	private Label yUnitLabel;
+	private Label xUnitLabel;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -123,8 +130,7 @@ public class ImagePainterOptionsComposite extends Composite {
 				lowerLeftXText = new Text(group, SWT.BORDER);
 				lowerLeftXText.setLayoutData(lowerLeftXTextData);
 
-				label = new Label(group, SWT.NONE);
-				label.setText("m (TODO!)");
+				xUnitLabel = new Label(group, SWT.NONE);
 
 				label = new Label(group, SWT.NONE);
 				label.setText("y:");
@@ -134,8 +140,7 @@ public class ImagePainterOptionsComposite extends Composite {
 				lowerLeftYText = new Text(group, SWT.BORDER);
 				lowerLeftYText.setLayoutData(lowerLeftYTextData);
 
-				label = new Label(group, SWT.NONE);
-				label.setText("m (TODO!)");
+				yUnitLabel = new Label(group, SWT.NONE);
 
 				// image size
 				final GridData imageSizeLabelData = new GridData();
@@ -152,8 +157,7 @@ public class ImagePainterOptionsComposite extends Composite {
 				imageSizeWidthText = new Text(group, SWT.BORDER);
 				imageSizeWidthText.setLayoutData(imageSizeWidthTextData);
 
-				label = new Label(group, SWT.NONE);
-				label.setText("m (TODO!)");
+				widthUnitLabel = new Label(group, SWT.NONE);
 
 				label = new Label(group, SWT.NONE);
 				label.setText("Height:");
@@ -163,8 +167,7 @@ public class ImagePainterOptionsComposite extends Composite {
 				imageSizeHeightText = new Text(group, SWT.BORDER);
 				imageSizeHeightText.setLayoutData(imageSizeHeightTextData);
 
-				label = new Label(group, SWT.NONE);
-				label.setText("m (TODO!)");
+				heightUnitLabel = new Label(group, SWT.NONE);
 
 				// keep proportions
 				label = new Label(group, SWT.NONE);
@@ -179,7 +182,7 @@ public class ImagePainterOptionsComposite extends Composite {
 		}
 	}
 
-	public void setDatabinding(final DataBindingContext dbc, final ImagePainterXMLConfig config) {
+	public void setDatabinding(final DataBindingContext dbc, final ImagePainterXMLConfig config, final Spyglass spyglass) {
 
 		IObservableValue obsModel;
 		ISWTObservableValue obsWidget;
@@ -220,6 +223,15 @@ public class ImagePainterOptionsComposite extends Composite {
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ImagePainterXMLConfig.PROPERTYNAME_KEEP_PROPORTIONS);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+		}
+
+		final MetricsXMLConfig metrics = spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getMetrics();
+		{
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), metrics, MetricsXMLConfig.PROPERTYNAME_UNIT);
+			dbc.bindValue(SWTObservables.observeText(xUnitLabel), obsModel, null, null);
+			dbc.bindValue(SWTObservables.observeText(yUnitLabel), obsModel, null, null);
+			dbc.bindValue(SWTObservables.observeText(widthUnitLabel), obsModel, null, null);
+			dbc.bindValue(SWTObservables.observeText(heightUnitLabel), obsModel, null, null);
 		}
 
 	}

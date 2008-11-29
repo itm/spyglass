@@ -23,8 +23,10 @@ import org.eclipse.swt.widgets.Text;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ArrayToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverter;
+import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
 public class GridPainterOptionsComposite extends Composite {
 
@@ -59,6 +61,14 @@ public class GridPainterOptionsComposite extends Composite {
 	private Group group;
 
 	GridPainterPreferencePage page;
+
+	private Label lowerLeftPointXUnitLabel;
+
+	private Label lowerLeftPointYUnitLabel;
+
+	private Label gridElementWidthUnitLabel;
+
+	private Label gridElementHeightUnitLabel;
 
 	public GridPainterOptionsComposite(final Composite parent) {
 		super(parent, SWT.NONE);
@@ -103,8 +113,7 @@ public class GridPainterOptionsComposite extends Composite {
 				lowerLeftPointXText = new Text(group, SWT.BORDER);
 				lowerLeftPointXText.setLayoutData(data);
 
-				label = new Label(group, SWT.NONE);
-				label.setText("m");
+				lowerLeftPointXUnitLabel = new Label(group, SWT.NONE);
 
 				data = new GridData();
 				data.verticalSpan = 4;
@@ -127,8 +136,7 @@ public class GridPainterOptionsComposite extends Composite {
 				lowerLeftPointYText = new Text(group, SWT.BORDER);
 				lowerLeftPointYText.setLayoutData(data);
 
-				label = new Label(group, SWT.NONE);
-				label.setText("m");
+				lowerLeftPointYUnitLabel = new Label(group, SWT.NONE);
 
 				label = new Label(group, SWT.NONE);
 				label.setText("");
@@ -171,8 +179,7 @@ public class GridPainterOptionsComposite extends Composite {
 				gridElementWidthText = new Text(group, SWT.BORDER);
 				gridElementWidthText.setLayoutData(data);
 
-				label = new Label(group, SWT.NONE);
-				label.setText("m");
+				gridElementWidthUnitLabel = new Label(group, SWT.NONE);
 
 				label = new Label(group, SWT.NONE);
 				label.setText("Column Height");
@@ -183,8 +190,7 @@ public class GridPainterOptionsComposite extends Composite {
 				gridElementHeightText = new Text(group, SWT.BORDER);
 				gridElementHeightText.setLayoutData(data);
 
-				label = new Label(group, SWT.NONE);
-				label.setText("m");
+				gridElementHeightUnitLabel = new Label(group, SWT.NONE);
 
 				lockGridElementsSquareCheckbox = new Button(group, SWT.CHECK);
 				lockGridElementsSquareCheckbox.setText("lock");
@@ -233,7 +239,8 @@ public class GridPainterOptionsComposite extends Composite {
 		}
 	}
 
-	public void setDatabinding(final DataBindingContext dbc, final GridPainterXMLConfig config, final GridPainterPreferencePage page) {
+	public void setDatabinding(final DataBindingContext dbc, final GridPainterXMLConfig config, final GridPainterPreferencePage page,
+			final Spyglass spyglass) {
 
 		this.page = page;
 
@@ -304,6 +311,15 @@ public class GridPainterOptionsComposite extends Composite {
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, GridPainterXMLConfig.PROPERTYNAME_NUM_ROWS);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+		}
+
+		final MetricsXMLConfig metrics = spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getMetrics();
+		{
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), metrics, MetricsXMLConfig.PROPERTYNAME_UNIT);
+			dbc.bindValue(SWTObservables.observeText(lowerLeftPointXUnitLabel), obsModel, null, null);
+			dbc.bindValue(SWTObservables.observeText(lowerLeftPointYUnitLabel), obsModel, null, null);
+			dbc.bindValue(SWTObservables.observeText(gridElementWidthUnitLabel), obsModel, null, null);
+			dbc.bindValue(SWTObservables.observeText(gridElementHeightUnitLabel), obsModel, null, null);
 		}
 
 	}

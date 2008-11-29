@@ -28,6 +28,8 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.Uint16ListPacket;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionChangedEvent;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionChangedListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
@@ -36,96 +38,20 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class LinePainterPlugin extends RelationPainterPlugin implements PropertyChangeListener {
+public class LinePainterPlugin extends RelationPainterPlugin implements PropertyChangeListener, NodePositionChangedListener {
 
 	@Element(name = "parameters")
 	private final LinePainterXMLConfig xmlConfig;
 
 	private Layer layer;
 
-	// public StringFormatter m_StringFormatter;
-
 	public LinePainterPlugin() {
+
 		super();
 
 		xmlConfig = new LinePainterXMLConfig();
 		layer = new QuadTree();
 
-		// addDebugLines();
-
-	}
-
-	private void addDebugLines() {
-
-		// links nach rechts horizontal
-		final LinePainterLine line1 = new LinePainterLine();
-		line1.setPosition(new AbsolutePosition(-1000, 0, 0), false);
-		line1.setEnd(new AbsolutePosition(1000, 0, 0), false);
-		line1.setLineWidth(1, false);
-		line1.setColor(new RGB(55, 55, 55));
-		layer.addOrUpdate(line1);
-
-		// rechts nach links horizontal
-		final LinePainterLine line2 = new LinePainterLine();
-		line2.setPosition(new AbsolutePosition(1000, 0, 0), false);
-		line2.setEnd(new AbsolutePosition(-1000, 0, 0), false);
-		line2.setLineWidth(1, false);
-		line2.setColor(new RGB(55, 55, 55));
-		layer.addOrUpdate(line2);
-
-		// oben nach unten vertikal
-		final LinePainterLine line3 = new LinePainterLine();
-		line3.setPosition(new AbsolutePosition(0, 1000, 0), false);
-		line3.setEnd(new AbsolutePosition(0, -1000, 0), false);
-		line3.setLineWidth(1, false);
-		line3.setColor(new RGB(55, 55, 55));
-		layer.addOrUpdate(line3);
-
-		// unten nach oben vertikal
-		final LinePainterLine line4 = new LinePainterLine();
-		line4.setPosition(new AbsolutePosition(0, -1000, 0), false);
-		line4.setEnd(new AbsolutePosition(0, 1000, 0), false);
-		line4.setLineWidth(1, false);
-		line4.setColor(new RGB(55, 55, 55));
-		layer.addOrUpdate(line4);
-
-		// links unten nach rechts oben diagonal
-		final LinePainterLine line5 = new LinePainterLine();
-		line5.setPosition(new AbsolutePosition(-1000, -1000, 0), false);
-		line5.setEnd(new AbsolutePosition(1000, 1000, 0), false);
-		line5.setLineWidth(1, false);
-		line5.setColor(new RGB(55, 55, 55));
-		layer.addOrUpdate(line5);
-
-		// rechts oben nach links unten diagonal
-		final LinePainterLine line6 = new LinePainterLine();
-		line6.setPosition(new AbsolutePosition(1000, 1000, 0), false);
-		line6.setEnd(new AbsolutePosition(-1000, -1000, 0), false);
-		line6.setLineWidth(1, false);
-		line6.setColor(new RGB(55, 55, 55));
-		layer.addOrUpdate(line6);
-
-		// links oben nach rechts unten diagonal
-		final LinePainterLine line7 = new LinePainterLine();
-		line7.setPosition(new AbsolutePosition(-1000, 1000, 0), false);
-		line7.setEnd(new AbsolutePosition(1000, -1000, 0), false);
-		line7.setLineWidth(1, false);
-		line7.setColor(new RGB(55, 55, 55));
-		layer.addOrUpdate(line7);
-
-		// rechts unten nach links oben diagonal
-		final LinePainterLine line8 = new LinePainterLine();
-		line8.setPosition(new AbsolutePosition(1000, -1000, 0), false);
-		line8.setEnd(new AbsolutePosition(-1000, 1000, 0), false);
-		line8.setLineWidth(1, false);
-		line8.setColor(new RGB(55, 55, 55));
-		layer.addOrUpdate(line8);
-
-	}
-
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
 	}
 
 	@Override
@@ -178,11 +104,26 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 	}
 
+	public void handleEvent(final NodePositionChangedEvent event) {
+		AbsoluteRectangle oldBoundingBox;
+		for (final Edge e : nodeGraph.getIncidentEdges(event.node)) {
+			oldBoundingBox = e.line.getBoundingBox();
+			if (e.nodeId1 == event.node) {
+				e.line.setPosition(event.newPosition);
+			} else {
+				e.line.setEnd(event.newPosition);
+			}
+			fireDrawingObjectChanged(e.line, oldBoundingBox);
+		}
+	}
+
 	private class UndirectedNodeGraph {
 
-		private Set<Edge> edges = Collections.synchronizedSet(new HashSet<Edge>());
+		public Set<Edge> edges = Collections.synchronizedSet(new HashSet<Edge>());
 
 		public Deque<Edge> newEdges = new LinkedList<Edge>();
+
+		public Deque<Edge> updatedEdges = new LinkedList<Edge>();
 
 		public Deque<Edge> removedEdges = new LinkedList<Edge>();
 
@@ -195,6 +136,16 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 				newEdges.add(edge);
 			}
 
+		}
+
+		public Set<Edge> getIncidentEdges(final int nodeId) {
+			final Set<Edge> incidentEdges = new HashSet<Edge>();
+			for (final Edge e : edges) {
+				if ((e.nodeId1 == nodeId) || (e.nodeId2 == nodeId)) {
+					incidentEdges.add(e);
+				}
+			}
+			return incidentEdges;
 		}
 
 		public void addEdge(final int nodeId, final List<Integer> toNodeIds) {
@@ -287,10 +238,14 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	@Override
 	protected void updateQuadTree() {
 
+		LinePainterLine line;
+
 		while (nodeGraph.newEdges.peek() != null) {
 
 			synchronized (layer) {
-				layer.addOrUpdate(nodeGraph.newEdges.poll().line);
+				line = nodeGraph.newEdges.poll().line;
+				layer.addOrUpdate(line);
+				fireDrawingObjectAdded(line);
 			}
 
 		}
@@ -298,7 +253,9 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		while (nodeGraph.removedEdges.peek() != null) {
 
 			synchronized (layer) {
-				layer.remove(nodeGraph.removedEdges.poll().line);
+				line = nodeGraph.removedEdges.poll().line;
+				layer.remove(line);
+				fireDrawingObjectRemoved(line);
 			}
 
 		}
@@ -307,8 +264,20 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 	@Override
 	public void init(final PluginManager manager) {
+
 		super.init(manager);
+
 		xmlConfig.addPropertyChangeListener(this);
+		pluginManager.addNodePositionChangedListener(this);
+
+	}
+
+	@Override
+	public void shutdown() {
+
+		xmlConfig.removePropertyChangeListener(this);
+		pluginManager.removeNodePositionChangedListener(this);
+
 	}
 
 	@Override
@@ -328,21 +297,25 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	}
 
 	private void updateLineColor(final int[] color) {
+		LinePainterLine line;
 		synchronized (layer) {
 			for (final DrawingObject o : layer.getDrawingObjects()) {
-				((LinePainterLine) o).setColor(new RGB(color[0], color[1], color[2]));
+				line = (LinePainterLine) o;
+				line.setColor(new RGB(color[0], color[1], color[2]));
+				fireDrawingObjectChanged(line, line.getBoundingBox());
 			}
 		}
-		// TODO neu zeichnen der betroffenen boxen implementieren
 	}
 
 	private void updateLineWidth(final int width) {
+		LinePainterLine line;
 		synchronized (layer) {
 			for (final DrawingObject o : layer.getDrawingObjects()) {
-				((LinePainterLine) o).setLineWidth(width);
+				line = (LinePainterLine) o;
+				line.setLineWidth(width);
+				fireDrawingObjectChanged(line, line.getBoundingBox());
 			}
 		}
-		// TODO neu zeichnen der betroffenen boxen implementieren
 	}
 
 }

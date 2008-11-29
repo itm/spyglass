@@ -195,7 +195,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 		// line color
 
 		final IObservableValue observableColor = BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				SimpleNodePainterXMLConfig.PROPERTYNAME_LINE_COLOR);
+				SimpleNodePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B);
 		dbc.bindValue(SWTObservables.observeBackground(colorExample), observableColor, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
 				.setConverter(new ColorToArrayConverter()), new UpdateValueStrategy().setConverter(new ArrayToColorConverter(this.getDisplay())));
 

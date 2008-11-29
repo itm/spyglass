@@ -233,7 +233,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			try {
 				// since a thread cannot be restarted, a new one has to be
 				// created
-				packetConsumerThread = new Thread(this);
+				packetConsumerThread = new Thread(this, "PacketConsumerThread[" + this.getClass().getSimpleName() + "]");
 				packetConsumerThread.setDaemon(true);
 				packetConsumerThread.start();
 

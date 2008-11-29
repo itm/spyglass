@@ -30,7 +30,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 
 	public static final String PROPERTYNAME_LINE_WIDTH = "lineWidth";
 
-	public static final String PROPERTYNAME_LINE_COLOR = "lineColor";
+	public static final String PROPERTYNAME_LINE_COLOR_R_G_B = "lineColorRGB";
 
 	@ElementMap(entry = "isActive", key = "nodeID", attribute = true, name = "extendedInformation", required = false)
 	private HashMap<Integer, Boolean> isExtendenInformationActive = new HashMap<Integer, Boolean>();
@@ -38,10 +38,10 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	@Element(name = "isExtendedDefaultValue")
 	private boolean isExtendedDefaultValue = false;
 
-	@ElementArray
+	@ElementArray(name = PROPERTYNAME_LINE_COLOR_R_G_B)
 	private int[] lineColorRGB = { 255, 0, 0 };
 
-	@Element
+	@Element(name = PROPERTYNAME_LINE_WIDTH)
 	private int lineWidth = 1;
 
 	// --------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	public void setLineColorRGB(final int[] lineColorRGB) {
 		final int[] oldvalue = this.lineColorRGB.clone();
 		this.lineColorRGB = lineColorRGB;
-		firePropertyChange(PROPERTYNAME_LINE_COLOR, oldvalue, lineColorRGB);
+		firePropertyChange(PROPERTYNAME_LINE_COLOR_R_G_B, oldvalue, lineColorRGB);
 	}
 
 	// --------------------------------------------------------------------------------

@@ -98,16 +98,10 @@ public class Line extends DrawingObject {
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 		final AbsolutePosition pos = getPosition();
-		final int upperLeftX = Math.min(lineEnd.x, pos.x);
-		final int upperLeftY = Math.min(lineEnd.y, pos.y);
-		// final int lowerRightX = Math.max(lineEnd.x, pos.x);
-		// final int lowerRightY = Math.max(lineEnd.x, pos.y);
-
-		// System.out.println("(" + upperLeftX + "," + upperLeftY + "," + lowerRightX + ","
-		// + lowerRightY + ")");
-
-		final int width = Math.abs(lineEnd.x - pos.x);
-		final int height = Math.abs(lineEnd.y - pos.y);
+		final int upperLeftX = Math.min(lineEnd.x, pos.x) - (this.width / 2);
+		final int upperLeftY = Math.min(lineEnd.y, pos.y) - (this.width / 2);
+		final int width = Math.abs(lineEnd.x - pos.x) + this.width;
+		final int height = Math.abs(lineEnd.y - pos.y) + this.width;
 		return new AbsoluteRectangle(new AbsolutePosition(upperLeftX, upperLeftY, 0), width, height);
 	}
 

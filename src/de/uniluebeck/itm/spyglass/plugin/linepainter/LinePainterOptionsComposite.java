@@ -34,6 +34,7 @@ public class LinePainterOptionsComposite extends Composite {
 	private CLabel lineColor;
 	private Button buttonLineColor;
 	StringFormatter stringFormatter = new StringFormatter();
+	private LinePainterPreferencePage page;
 
 	{
 		// Register as a resource user - SWTResourceManager will
@@ -103,6 +104,7 @@ public class LinePainterOptionsComposite extends Composite {
 						final RGB color = dlg.open();
 						if (color != null) {
 							lineColor.setBackground(new Color(getDisplay(), color));
+							page.markFormDirty();
 						}
 					}
 				});
@@ -114,7 +116,9 @@ public class LinePainterOptionsComposite extends Composite {
 
 	}
 
-	public void setDatabinding(final DataBindingContext dbc, final LinePainterXMLConfig config) {
+	public void setDatabinding(final DataBindingContext dbc, final LinePainterXMLConfig config, final LinePainterPreferencePage page) {
+
+		this.page = page;
 
 		IObservableValue obsModel;
 		ISWTObservableValue obsWidget;
