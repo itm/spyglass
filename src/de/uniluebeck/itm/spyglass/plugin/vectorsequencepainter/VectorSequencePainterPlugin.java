@@ -312,7 +312,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 		if (timer != null) {
 			timer.cancel();
 		}
-		if (timeout != 0) {
+		if (timeout > 0) {
 			timer = new Timer(TIMER_NAME);
 			timer.schedule(new TimerTask() {
 				@Override
