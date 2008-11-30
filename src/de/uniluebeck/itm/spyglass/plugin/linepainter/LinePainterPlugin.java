@@ -319,7 +319,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		if (timer != null) {
 			timer.cancel();
 		}
-		if (timeout != -1) {
+		if (timeout != 0) {
 			timer = new Timer(TIMER_NAME);
 			timer.schedule(new TimerTask() {
 				@Override
