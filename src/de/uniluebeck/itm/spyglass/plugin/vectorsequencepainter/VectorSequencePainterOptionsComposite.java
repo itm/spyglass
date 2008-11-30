@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.plugin.linepainter;
+package de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter;
 
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -23,21 +23,20 @@ import org.eclipse.swt.widgets.Text;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
-import de.uniluebeck.itm.spyglass.gui.databinding.StringFormatter;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ArrayToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class LinePainterOptionsComposite extends Composite {
+public class VectorSequencePainterOptionsComposite extends Composite {
 
 	private Group group;
 	private Text lineWidth;
 	private CLabel lineColor;
 	private Button buttonLineColor;
-	StringFormatter stringFormatter = new StringFormatter();
-	private LinePainterPreferencePage page;
+	private VectorSequencePainterPreferencePage page;
 	private Text ttl;
+	private Text dimension;
 
 	{
 		// Register as a resource user - SWTResourceManager will
@@ -45,7 +44,7 @@ public class LinePainterOptionsComposite extends Composite {
 		SWTResourceManager.registerResourceUser(this);
 	}
 
-	public LinePainterOptionsComposite(final Composite parent) {
+	public VectorSequencePainterOptionsComposite(final Composite parent) {
 		super(parent, SWT.NONE);
 		initGUI();
 	}
@@ -122,15 +121,24 @@ public class LinePainterOptionsComposite extends Composite {
 				ttl = new Text(group, SWT.BORDER);
 				ttl.setLayoutData(data);
 
-			}
+				label = new Label(group, SWT.NONE);
+				label.setText("Dimension");
 
-			stringFormatter.addStringFormatterFields(group, 3);
+				data = new GridData();
+				data.widthHint = 40;
+				data.horizontalSpan = 2;
+
+				dimension = new Text(group, SWT.BORDER);
+				dimension.setLayoutData(data);
+
+			}
 
 		}
 
 	}
 
-	public void setDatabinding(final DataBindingContext dbc, final LinePainterXMLConfig config, final LinePainterPreferencePage page) {
+	public void setDatabinding(final DataBindingContext dbc, final VectorSequencePainterXMLConfig config,
+			final VectorSequencePainterPreferencePage page) {
 
 		this.page = page;
 
@@ -141,13 +149,13 @@ public class LinePainterOptionsComposite extends Composite {
 
 		{
 			obsWidget = SWTObservables.observeText(lineWidth, SWT.Modify);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, LinePainterXMLConfig.PROPERTYNAME_LINE_WIDTH);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, VectorSequencePainterXMLConfig.PROPERTYNAME_LINE_WIDTH);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeBackground(lineColor);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, VectorSequencePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			usTargetToModel.setConverter(new ColorToArrayConverter());
 			usModelToTarget = new UpdateValueStrategy();
@@ -161,7 +169,13 @@ public class LinePainterOptionsComposite extends Composite {
 			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(-1, Integer.MAX_VALUE));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
+		{
+			obsWidget = SWTObservables.observeText(dimension, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, VectorSequencePainterXMLConfig.PROPERTYNAME_DIMENSION);
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(2, 3));
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+		}
 
 	}
-
 }

@@ -26,15 +26,15 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
  */
 public abstract class DrawingObject {
 
-	private AbsolutePosition position = new AbsolutePosition(0, 0, 0);
+	protected AbsolutePosition position = new AbsolutePosition(0, 0, 0);
 
 	private Set<BoundingBoxChangeListener> changeListeners = new HashSet<BoundingBoxChangeListener>();
 
-	private AbsoluteRectangle boundingBox;
+	protected AbsoluteRectangle boundingBox;
 
-	private RGB color = new RGB(200, 0, 0);
+	protected RGB color = new RGB(200, 0, 0);
 
-	private RGB bgColor = new RGB(255, 255, 255);
+	protected RGB bgColor = new RGB(255, 255, 255);
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -142,7 +142,6 @@ public abstract class DrawingObject {
 	 *            the currently used graphics context
 	 */
 	protected void drawBoundingBox(final DrawingArea drawingArea, final GC gc) {
-
 		final PixelRectangle rect = drawingArea.absRect2PixelRect(getBoundingBox());
 		final int x = rect.getUpperLeft().x;
 		final int y = rect.getUpperLeft().y;
@@ -153,7 +152,6 @@ public abstract class DrawingObject {
 		gc.setForeground(color);
 		gc.drawRectangle(x, y, width, height);
 		color.dispose();
-
 	}
 
 	public void addBoundingBoxChangedListener(final BoundingBoxChangeListener listener) {

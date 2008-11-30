@@ -12,11 +12,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.eclipse.swt.graphics.RGB;
 import org.simpleframework.xml.Element;
@@ -66,6 +69,8 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	}
 
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+		System.out.println("Layer: " + layer.getDrawingObjects());
+		System.out.println("Edges: " + edgeTimes.keySet());
 		synchronized (layer) {
 			return layer.getDrawingObjects(area);
 		}
@@ -93,20 +98,16 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 			this.nodeId2 = nodeId2;
 		}
 
-		public boolean equals(final Edge other) {
-			return ((nodeId1 == other.nodeId1) && (nodeId2 == other.nodeId2)) || ((nodeId1 == other.nodeId2) && (nodeId2 == other.nodeId1));
-		}
-
 		@Override
-		public int hashCode() {
-			return 7 + (31 * nodeId1) + (31 * nodeId2);
+		public String toString() {
+			return line.toString();
 		}
 
 	}
 
 	public void handleEvent(final NodePositionChangedEvent event) {
 		AbsoluteRectangle oldBoundingBox;
-		for (final Edge e : nodeGraph.getIncidentEdges(event.node)) {
+		for (final Edge e : getIncidentEdges(event.node)) {
 			oldBoundingBox = e.line.getBoundingBox();
 			if (e.nodeId1 == event.node) {
 				e.line.setPosition(event.newPosition);
@@ -117,147 +118,136 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		}
 	}
 
-	private class UndirectedNodeGraph {
+	private Map<Edge, Long> edgeTimes = Collections.synchronizedMap(new HashMap<Edge, Long>());
 
-		public Set<Edge> edges = Collections.synchronizedSet(new HashSet<Edge>());
+	private List<Edge> newEdges = Collections.synchronizedList(new LinkedList<Edge>());
 
-		public Deque<Edge> newEdges = new LinkedList<Edge>();
+	private List<Edge> removedEdges = Collections.synchronizedList(new LinkedList<Edge>());
 
-		public Deque<Edge> updatedEdges = new LinkedList<Edge>();
-
-		public Deque<Edge> removedEdges = new LinkedList<Edge>();
-
-		public void addEdge(final int nodeId1, final int nodeId2) {
-
-			final Edge edge = new Edge(nodeId1, nodeId2);
-
-			if (!edges.contains(edge)) {
-				edges.add(edge);
-				newEdges.add(edge);
-			}
-
-		}
-
-		public Set<Edge> getIncidentEdges(final int nodeId) {
-			final Set<Edge> incidentEdges = new HashSet<Edge>();
-			for (final Edge e : edges) {
-				if ((e.nodeId1 == nodeId) || (e.nodeId2 == nodeId)) {
-					incidentEdges.add(e);
-				}
-			}
-			return incidentEdges;
-		}
-
-		public void addEdge(final int nodeId, final List<Integer> toNodeIds) {
-
-			for (final int id : toNodeIds) {
-				addEdge(nodeId, id);
-			}
-
-		}
-
-		public void removeEdge(final int nodeId1, final int nodeId2) {
-
-			final Edge edge = new Edge(nodeId1, nodeId2);
-
-			if (edges.contains(edge)) {
-				edges.remove(edge);
-				removedEdges.add(edge);
-			}
-
-		}
-
-		public void clear() {
-			removedEdges.addAll(edges);
-			edges.clear();
-		}
-
+	public void updateEdgeTime(final Edge edge) {
+		edgeTimes.put(edge, System.currentTimeMillis());
 	}
 
-	private UndirectedNodeGraph nodeGraph = new UndirectedNodeGraph();
+	public Edge getExistingEdge(final int nodeId1, final int nodeId2) {
+		for (final Edge e : edgeTimes.keySet()) {
+			final boolean same = ((e.nodeId1 == nodeId1) && (e.nodeId2 == nodeId2)) || ((e.nodeId1 == nodeId2) && (e.nodeId2 == nodeId1));
+			if (same) {
+				return e;
+			}
+		}
+		return null;
+	}
+
+	public Set<Edge> getIncidentEdges(final int nodeId) {
+		final Set<Edge> incidentEdges = new HashSet<Edge>();
+		for (final Edge e : edgeTimes.keySet()) {
+			if ((e.nodeId1 == nodeId) || (e.nodeId2 == nodeId)) {
+				incidentEdges.add(e);
+			}
+		}
+		return incidentEdges;
+	}
+
+	public void removeEdge(final Edge edge) {
+		if (edgeTimes.remove(edge) != null) {
+			removedEdges.add(edge);
+			return;
+		}
+		throw new NullPointerException("Edge was not contained.");
+	}
+
+	public void addEdge(final Edge edge) {
+		edgeTimes.put(edge, System.currentTimeMillis());
+		newEdges.add(edge);
+	}
 
 	@Override
 	protected void processPacket(final SpyglassPacket p) {
 
 		final Uint16ListPacket packet = (Uint16ListPacket) p;
 
-		synchronized (nodeGraph) {
-			nodeGraph.addEdge(packet.getSenderId(), packet.getNeighborhoodPacketNodeIDs());
-		}
+		final List<Integer> neighboorIds = packet.getNeighborhoodPacketNodeIDs();
+		final int senderId = packet.getSenderId();
+		Edge e;
 
-		final List<Edge> edgesToRemove = new ArrayList<Edge>();
-
-		for (final Edge e : nodeGraph.newEdges) {
-
-			if (e.line != null) {
-				throw new RuntimeException("Damnit. This should not happen...");
-			}
+		for (final int neighboorId : neighboorIds) {
 
 			final NodePositionerPlugin nodePositioner = getPluginManager().getNodePositioner();
-			final AbsolutePosition pos1 = nodePositioner.getPosition(e.nodeId1);
-			final AbsolutePosition pos2 = nodePositioner.getPosition(e.nodeId2);
+			final AbsolutePosition pos1 = nodePositioner.getPosition(senderId);
+			final AbsolutePosition pos2 = nodePositioner.getPosition(neighboorId);
 
-			if ((pos1 == null) || (pos2 == null)) {
+			if ((pos1 != null) && (pos2 != null)) {
 
-				// remove edge, since it can't be painted anyway
-				// until NodePositioner knows it's position
-				edgesToRemove.add(e);
+				e = getExistingEdge(senderId, neighboorId);
 
-			} else {
+				if (e == null) {
+					e = new Edge(senderId, neighboorId);
+					e.line = new LinePainterLine();
+					e.line.setPosition(pos1);
+					e.line.setEnd(pos2);
+					final int[] color = xmlConfig.getLineColorRGB();
+					e.line.setColor(new RGB(color[0], color[1], color[2]));
+					e.line.setLineWidth(xmlConfig.getLineWidth());
+					addEdge(e);
 
-				e.line = new LinePainterLine();
-				e.line.setPosition(pos1);
-				e.line.setEnd(pos2);
-				final int[] color = xmlConfig.getLineColorRGB();
-				e.line.setColor(new RGB(color[0], color[1], color[2]));
-				e.line.setLineWidth(xmlConfig.getLineWidth());
+				} else {
+
+					updateEdgeTime(e);
+
+				}
 
 			}
 
-		}
-
-		synchronized (nodeGraph) {
-			for (final Edge edge : edgesToRemove) {
-				nodeGraph.edges.remove(edge);
-				nodeGraph.newEdges.remove(edge);
-			}
 		}
 
 	}
 
 	@Override
 	public void reset() {
-		synchronized (nodeGraph) {
-			nodeGraph.clear();
-		}
+		removedEdges.addAll(edgeTimes.keySet());
+		edgeTimes.clear();
+		newEdges.clear();
 		synchronized (layer) {
 			layer.clear();
 		}
+		updateQuadTree();
 	}
 
 	@Override
 	protected void updateQuadTree() {
 
 		LinePainterLine line;
+		final List<LinePainterLine> addedLines = new ArrayList<LinePainterLine>();
+		final List<LinePainterLine> removedLines = new ArrayList<LinePainterLine>();
 
-		while (nodeGraph.newEdges.peek() != null) {
+		synchronized (layer) {
 
-			synchronized (layer) {
-				line = nodeGraph.newEdges.poll().line;
+			while (newEdges.size() > 0) {
+				line = newEdges.get(0).line;
+				newEdges.remove(0);
 				layer.addOrUpdate(line);
-				fireDrawingObjectAdded(line);
+				addedLines.add(line);
 			}
 
 		}
 
-		while (nodeGraph.removedEdges.peek() != null) {
+		synchronized (layer) {
 
-			synchronized (layer) {
-				line = nodeGraph.removedEdges.poll().line;
+			while (removedEdges.size() > 0) {
+				line = removedEdges.get(0).line;
+				removedEdges.remove(0);
 				layer.remove(line);
-				fireDrawingObjectRemoved(line);
+				removedLines.add(line);
 			}
 
+		}
+
+		for (final LinePainterLine l : addedLines) {
+			fireDrawingObjectAdded(l);
+		}
+
+		for (final LinePainterLine l : removedLines) {
+			fireDrawingObjectRemoved(l);
 		}
 
 	}
@@ -269,6 +259,8 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 		xmlConfig.addPropertyChangeListener(this);
 		pluginManager.addNodePositionChangedListener(this);
+
+		handleTimeoutChange(xmlConfig.getTimeout());
 
 	}
 
@@ -293,6 +285,50 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 			updateLineColor((int[]) event.getNewValue());
 		} else if (LinePainterXMLConfig.PROPERTYNAME_LINE_WIDTH.equals(event.getPropertyName())) {
 			updateLineWidth((Integer) event.getNewValue());
+		} else if (PluginXMLConfig.PROPERTYNAME_TIMEOUT.equals(event.getPropertyName())) {
+			handleTimeoutChange((Integer) event.getNewValue());
+		}
+	}
+
+	private Timer timer;
+
+	private static final String TIMER_NAME = "LinePainterPlugin-Timeout-Timer";
+
+	private void handleTimeout() {
+		final long now = System.currentTimeMillis();
+		final long timeout = 1000 * xmlConfig.getTimeout();
+		long diff;
+
+		final List<Edge> edgesToRemove = new ArrayList<Edge>();
+
+		for (final Edge e : edgeTimes.keySet()) {
+
+			diff = now - edgeTimes.get(e);
+			if (diff > timeout) {
+				edgesToRemove.add(e);
+			}
+
+		}
+
+		for (final Edge e : edgesToRemove) {
+			removeEdge(e);
+		}
+
+		updateQuadTree();
+	}
+
+	private void handleTimeoutChange(final long timeout) {
+		if (timer != null) {
+			timer.cancel();
+		}
+		if (timeout != -1) {
+			timer = new Timer(TIMER_NAME);
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					handleTimeout();
+				}
+			}, 1000 * timeout, 1000 * timeout);
 		}
 	}
 

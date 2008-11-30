@@ -6,8 +6,8 @@
       <plugins class="java.util.ArrayList">
          <plugin class="de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin">
             <parameters>
-               <isActive>true</isActive>
-               <isVisible>true</isVisible>
+               <active>true</active>
+               <visible>true</visible>
                <name>default8hh</name>
                <timeout>0</timeout>
                <semanticTypes length="1">
@@ -17,8 +17,8 @@
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
             <parameters>
-               <isActive>true</isActive>
-               <isVisible>true</isVisible>
+               <active>true</active>
+               <visible>true</visible>
                <name>default</name>
                <timeout>0</timeout>
                <semanticTypes length="1">
@@ -29,9 +29,9 @@
                <gridLowerLeftPointX>-16000</gridLowerLeftPointX>
                <gridLowerLeftPointY>-16000</gridLowerLeftPointY>
                <lineColorRGB length="3">
-                  <int>192</int>
-                  <int>192</int>
-                  <int>192</int>
+                  <int>212</int>
+                  <int>212</int>
+                  <int>212</int>
                </lineColorRGB>
                <lineWidth>1.0</lineWidth>
                <lockGridElementsSquare>true</lockGridElementsSquare>
@@ -40,27 +40,10 @@
                <numRows>100</numRows>
             </parameters>
          </plugin>
-         <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
-            <parameters>
-               <isActive>true</isActive>
-               <isVisible>true</isVisible>
-               <name>GlobalInformation</name>
-               <timeout>0</timeout>
-               <semanticTypes length="1">
-                  <int>-1</int>
-               </semanticTypes>
-               <semanticTypes4Neighborhoods length="1">
-                  <int>-1</int>
-               </semanticTypes4Neighborhoods>
-               <showNodeDegree>true</showNodeDegree>
-               <showNumNodes>true</showNumNodes>
-               <statisticalInformationEvaluators class="java.util.TreeSet"/>
-            </parameters>
-         </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin">
             <parameters>
-               <isActive>true</isActive>
-               <isVisible>true</isVisible>
+               <active>true</active>
+               <visible>true</visible>
                <name>default10</name>
                <timeout>-1</timeout>
                <semanticTypes length="1">
@@ -68,17 +51,35 @@
                </semanticTypes>
                <stringFormatters/>
                <lineColorRGB length="3">
+                  <int>128</int>
+                  <int>255</int>
+                  <int>128</int>
+               </lineColorRGB>
+               <lineWidth>2</lineWidth>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter.VectorSequencePainterPlugin">
+            <parameters>
+               <active>true</active>
+               <visible>true</visible>
+               <name>VecPainter</name>
+               <timeout>3</timeout>
+               <semanticTypes length="1">
+                  <int>12</int>
+               </semanticTypes>
+               <dimension>2</dimension>
+               <lineColorRGB length="3">
+                  <int>128</int>
                   <int>255</int>
                   <int>0</int>
-                  <int>0</int>
                </lineColorRGB>
-               <lineWidth>1</lineWidth>
+               <lineWidth>50</lineWidth>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
             <parameters>
-               <isActive>true</isActive>
-               <isVisible>true</isVisible>
+               <active>true</active>
+               <visible>true</visible>
                <name>NodePainter</name>
                <timeout>-1</timeout>
                <semanticTypes length="1">
@@ -88,10 +89,12 @@
                <defaultStringFormatter>Payload: %u0</defaultStringFormatter>
                <extendedInformation>
                   <isActive nodeID="1">false</isActive>
-                  <isActive nodeID="2">true</isActive>
-                  <isActive nodeID="3">true</isActive>
+                  <isActive nodeID="2">false</isActive>
+                  <isActive nodeID="3">false</isActive>
                   <isActive nodeID="4">false</isActive>
                   <isActive nodeID="5">false</isActive>
+                  <isActive nodeID="6">false</isActive>
+                  <isActive nodeID="7">true</isActive>
                </extendedInformation>
                <isExtendedDefaultValue>false</isExtendedDefaultValue>
                <lineColorRGB length="3">
@@ -100,6 +103,23 @@
                   <int>0</int>
                </lineColorRGB>
                <lineWidth>1</lineWidth>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
+            <parameters>
+               <active>true</active>
+               <visible>true</visible>
+               <name>GlobalInformation</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <semanticTypes4Neighborhoods length="1">
+                  <int>-1</int>
+               </semanticTypes4Neighborhoods>
+               <showNodeDegree>false</showNodeDegree>
+               <showNumNodes>true</showNumNodes>
+               <statisticalInformationEvaluators class="java.util.TreeSet"/>
             </parameters>
          </plugin>
       </plugins>
@@ -121,8 +141,8 @@
    <defaults class="java.util.LinkedList">
       <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
          <parameters>
-            <isActive>true</isActive>
-            <isVisible>true</isVisible>
+            <active>true</active>
+            <visible>true</visible>
             <name>default</name>
             <timeout>0</timeout>
             <semanticTypes length="1">
@@ -146,8 +166,8 @@
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin">
          <parameters>
-            <isActive>true</isActive>
-            <isVisible>true</isVisible>
+            <active>true</active>
+            <visible>true</visible>
             <name>default3</name>
             <timeout>0</timeout>
             <semanticTypes length="1">
@@ -163,8 +183,8 @@
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
          <parameters>
-            <isActive>true</isActive>
-            <isVisible>true</isVisible>
+            <active>true</active>
+            <visible>true</visible>
             <name>default4</name>
             <timeout>0</timeout>
             <semanticTypes length="1">
@@ -198,8 +218,8 @@
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin">
          <parameters>
-            <isActive>true</isActive>
-            <isVisible>true</isVisible>
+            <active>true</active>
+            <visible>true</visible>
             <name>default5</name>
             <timeout>0</timeout>
             <semanticTypes length="1">
@@ -220,8 +240,8 @@
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
          <parameters>
-            <isActive>true</isActive>
-            <isVisible>true</isVisible>
+            <active>true</active>
+            <visible>true</visible>
             <name>default6</name>
             <timeout>0</timeout>
             <semanticTypes length="1">
@@ -237,8 +257,8 @@
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
          <parameters>
-            <isActive>false</isActive>
-            <isVisible>true</isVisible>
+            <active>true</active>
+            <visible>true</visible>
             <name>default</name>
             <timeout>-1</timeout>
             <semanticTypes length="1">
@@ -261,8 +281,8 @@
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin">
          <parameters>
-            <isActive>false</isActive>
-            <isVisible>true</isVisible>
+            <active>true</active>
+            <visible>true</visible>
             <name>default8</name>
             <timeout>0</timeout>
             <semanticTypes length="1">
@@ -272,8 +292,8 @@
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.springembedderpositioner.SpringEmbedderPositionerPlugin">
          <parameters>
-            <isActive>true</isActive>
-            <isVisible>true</isVisible>
+            <active>true</active>
+            <visible>true</visible>
             <name>default9</name>
             <timeout>-1</timeout>
             <semanticTypes length="1">
@@ -284,8 +304,8 @@
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin">
          <parameters>
-            <isActive>true</isActive>
-            <isVisible>true</isVisible>
+            <active>true</active>
+            <visible>true</visible>
             <name>default10</name>
             <timeout>-1</timeout>
             <semanticTypes length="1">
@@ -302,8 +322,8 @@
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter.VectorSequencePainterPlugin">
          <parameters>
-            <isActive>true</isActive>
-            <isVisible>true</isVisible>
+            <active>true</active>
+            <visible>true</visible>
             <name>default11</name>
             <timeout>-1</timeout>
             <semanticTypes length="1">
@@ -311,11 +331,23 @@
             </semanticTypes>
             <dimension>2</dimension>
             <lineColorRGB length="3">
-               <int>0</int>
-               <int>0</int>
-               <int>0</int>
+               <int>192</int>
+               <int>192</int>
+               <int>192</int>
             </lineColorRGB>
             <lineWidth>1</lineWidth>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangePlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>default</name>
+            <timeout>-1</timeout>
+            <semanticTypes length="1">
+               <int>-1</int>
+            </semanticTypes>
+            <nodeRanges/>
          </parameters>
       </plugin>
    </defaults>

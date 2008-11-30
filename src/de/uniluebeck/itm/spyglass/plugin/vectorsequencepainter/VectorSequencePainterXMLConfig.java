@@ -29,20 +29,20 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_DIMENSION = "dimension";
 
-	@Element(required=false)
-	private byte dimension = 2;
+	@Element(name = PROPERTYNAME_DIMENSION, required = false)
+	private int dimension = 2;
 
-	@ElementArray(required=false)
+	@ElementArray(name = PROPERTYNAME_LINE_COLOR_R_G_B, required = false)
 	private int[] lineColorRGB = { 0, 0, 0 };
 
-	@Element(required=false)
+	@Element(name = PROPERTYNAME_LINE_WIDTH, required = false)
 	private int lineWidth = 1;
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the dimension
 	 */
-	public byte getDimension() {
+	public int getDimension() {
 		return dimension;
 	}
 
@@ -51,7 +51,7 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	 * @param dimension
 	 *            the dimension to set
 	 */
-	public void setDimension(final byte dimension) {
+	public void setDimension(final int dimension) {
 
 		firePropertyChange(PROPERTYNAME_DIMENSION, this.dimension, this.dimension = dimension);
 

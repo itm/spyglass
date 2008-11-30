@@ -29,7 +29,7 @@
 				<name>demo sample1</name>
 				
 				<!-- the probability that this sample is selected -->
-				<probability>0.2</probability>
+				<probability>0.15</probability>
 				
 				<!-- a list of node IDs. the IDs can be seperated by commata. additionally
 				 ! they can be given as a range. for each packet a node ID is randomly selected.
@@ -46,7 +46,7 @@
 				
 				<!-- the position of the packets. as with the nodeIDs and the semanticTypes,
 				 ! lists or ranges can be given. -->
-				<position x="100" y="100" z="0"/>
+				<position x="0" y="0" z="0"/>
 				
 				<!-- the payload in hexadecimal -->
 				<payload>10AABBCCDDEEFF</payload>
@@ -60,7 +60,7 @@
 				<nodeIDs>2</nodeIDs>
 				<syntaxType>uint16List</syntaxType>
 				<semanticTypes>11</semanticTypes>
-				<position x="200" y="100" z="0"/>
+				<position x="500" y="0" z="0"/>
 				<payload>0001</payload>
 			</sample>
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
@@ -83,12 +83,95 @@
 			</sample>
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>demo sample5</name>
-				<probability>0.2</probability>
+				<probability>0.04</probability>
 				<nodeIDs>5</nodeIDs>
 				<syntaxType>uint16List</syntaxType>
 				<semanticTypes>11</semanticTypes>
 				<position x="1000" y="1000" z="0"/>
 				<payload>00010004</payload>
+			</sample>
+			
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample6.1</name>
+				<probability>0.02</probability>
+				<nodeIDs>6</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="0" y="500" z="0"/>
+				<payload>0001</payload>
+			</sample>
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample6.2</name>
+				<probability>0.02</probability>
+				<nodeIDs>6</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="500" y="500" z="0"/>
+				<payload>0001</payload>
+			</sample>
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample6.3</name>
+				<probability>0.02</probability>
+				<nodeIDs>6</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="500" y="0" z="0"/>
+				<payload>0001</payload>
+			</sample>
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample6.4</name>
+				<probability>0.02</probability>
+				<nodeIDs>6</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="500" y="-500" z="0"/>
+				<payload>0001</payload>
+			</sample>
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample6.5</name>
+				<probability>0.02</probability>
+				<nodeIDs>6</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="0" y="-500" z="0"/>
+				<payload>0001</payload>
+			</sample>
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample6.6</name>
+				<probability>0.02</probability>
+				<nodeIDs>6</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="-500" y="-500" z="0"/>
+				<payload>0001</payload>
+			</sample>
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample6.7</name>
+				<probability>0.02</probability>
+				<nodeIDs>6</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="-500" y="0" z="0"/>
+				<payload>0001</payload>
+			</sample>
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample6.8</name>
+				<probability>0.02</probability>
+				<nodeIDs>6</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>11</semanticTypes>
+				<position x="-500" y="500" z="0"/>
+				<payload>0001</payload>
+			</sample>
+			
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample7</name>
+				<probability>0.05</probability>
+				<nodeIDs>7</nodeIDs>
+				<syntaxType>int16List</syntaxType>
+				<semanticTypes>12</semanticTypes>
+				<position x="-500" y="500" z="0"/>
+				<payload>0000000001000000010001000000010000000000</payload>
 			</sample>
 			
 			<!-- this is a raw sample. the bytes contained in this sample will be

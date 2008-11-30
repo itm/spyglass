@@ -187,8 +187,12 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 				// check if any of the corners of entity on
 				// position pos would be contained in the box
 				// of e.
-				if (root.boxes.get(e).intersects(box)) {
-					list.add(e);
+				try {
+					if (root.boxes.get(e).intersects(box)) {
+						list.add(e);
+					}
+				} catch (final NullPointerException ef) {
+					System.err.println(ef);
 				}
 
 			}
@@ -345,19 +349,19 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * @param object
 	 */
 	public boolean remove(final DrawingObject object) {
-
-		final QuadTree elem = search(object);
-		if (elem != null) {
-			object.removeBoundingBoxChangeListener(this);
-			elem.objects.remove(object);
-			root.boxes.remove(object);
-			if (elem.parent != null) {
-				elem.parent.updateSonsAfterRemove();
+		synchronized (this) {
+			final QuadTree elem = search(object);
+			if (elem != null) {
+				object.removeBoundingBoxChangeListener(this);
+				elem.objects.remove(object);
+				root.boxes.remove(object);
+				if (elem.parent != null) {
+					elem.parent.updateSonsAfterRemove();
+				}
+				return true;
 			}
-			return true;
+			return false;
 		}
-		return false;
-
 	}
 
 	// --------------------------------------------------------------------------------
@@ -494,8 +498,10 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 
 	@Override
 	public void addOrUpdate(final DrawingObject d) {
-		insertInternal(d, !remove(d));
-		d.addBoundingBoxChangedListener(this);
+		synchronized (this) {
+			insertInternal(d, !remove(d));
+			d.addBoundingBoxChangedListener(this);
+		}
 	}
 
 	// ------------------------------------------------------------------------------
@@ -508,7 +514,10 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 */
 	@Override
 	public void bringToFront(final DrawingObject dob) {
-		root.insertionOrder.put(dob, ++insertionOrderLargest);
+		synchronized (this) {
+			// TODO zahlenüberlauf behandeln
+			root.insertionOrder.put(dob, ++insertionOrderLargest);
+		}
 	}
 
 	// ------------------------------------------------------------------------------
@@ -521,14 +530,18 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 */
 	@Override
 	public void pushBack(final DrawingObject object) {
-		root.insertionOrder.put(object, --insertionOrderSmallest);
+		synchronized (this) {
+			root.insertionOrder.put(object, --insertionOrderSmallest);
+		}
 	}
 
 	@Override
 	public void clear() {
-		removeBoundingBoxListenersRecursive();
-		destroySons();
-		objects.clear();
+		synchronized (this) {
+			removeBoundingBoxListenersRecursive();
+			destroySons();
+			objects.clear();
+		}
 	}
 
 	private void removeBoundingBoxListenersRecursive() {
@@ -544,21 +557,27 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 
 	@Override
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle rect) {
-		final List<DrawingObject> list = getCollisionEntities(rect);
-		Collections.sort(list, sorter);
-		return list;
+		synchronized (this) {
+			final List<DrawingObject> list = getCollisionEntities(rect);
+			Collections.sort(list, sorter);
+			return list;
+		}
 	}
 
 	@Override
 	public List<DrawingObject> getDrawingObjects() {
-		final List<DrawingObject> list = getObjectsRecursive();
-		Collections.sort(list, sorter);
-		return list;
+		synchronized (this) {
+			final List<DrawingObject> list = getObjectsRecursive();
+			Collections.sort(list, sorter);
+			return list;
+		}
 	}
 
 	@Override
 	public void onBoundingBoxChanged(final DrawingObject updatedDrawingObject) {
-		addOrUpdate(updatedDrawingObject);
+		synchronized (this) {
+			addOrUpdate(updatedDrawingObject);
+		}
 	}
 
 }
