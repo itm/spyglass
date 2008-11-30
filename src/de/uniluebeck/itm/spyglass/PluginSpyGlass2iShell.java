@@ -21,16 +21,16 @@ import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
-import de.uniluebeck.itm.spyglass.core.SpyglassConfiguration;
 import de.uniluebeck.itm.spyglass.gui.UIController;
+import de.uniluebeck.itm.spyglass.gui.actions.LoadConfigurationAction;
 import de.uniluebeck.itm.spyglass.gui.actions.OpenPreferencesAction;
 import de.uniluebeck.itm.spyglass.gui.actions.PlayPlayPauseAction;
 import de.uniluebeck.itm.spyglass.gui.actions.PlayResetAction;
 import de.uniluebeck.itm.spyglass.gui.actions.PlaySelectInputAction;
 import de.uniluebeck.itm.spyglass.gui.actions.RecordRecordAction;
 import de.uniluebeck.itm.spyglass.gui.actions.RecordSelectOutputAction;
+import de.uniluebeck.itm.spyglass.gui.actions.StoreConfigurationAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomCompleteMapAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomInAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomOutAction;
@@ -73,8 +73,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 
 	private Spyglass spyglass = null;
 
-	private SpyglassConfiguration config;
-
 	private IShellToSpyGlassPacketBroker packetBroker;
 
 	// --------------------------------------------------------------------------
@@ -105,44 +103,33 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			}
 		});
 
-		ConfigStore cs = null;
+
+		// create Model
 		try {
-			cs = new ConfigStore(true);
-			// Create the configuration for SpyGlass
-			config = cs.getSpyglassConfig();
-		} catch (final Exception e) {
-			log.error(e, e);
+			spyglass = new Spyglass();
+		} catch (final IOException e1) {
+			// TODO What should we do now?
+			log.error("",e1);
+			return new int[] {};
 		}
-
-		if (config == null) {
-			try {
-				ConfigStore.resetDefaultFile(true);
-			} catch (final IOException e1) {
-				log.fatal("The configuration could not be loaded", e1);
-			}
-			cs = new ConfigStore(true);
-			// Create the configuration for SpyGlass
-			config = cs.getSpyglassConfig();
-
-		}
-
-		packetBroker = (IShellToSpyGlassPacketBroker) config.getPacketReader();
-
-		// TODO
-		// Application objects
-		spyglass = new Spyglass(true, config);
-
-		config.addPropertyChangeListener(new PropertyChangeListener() {
+		
+		// save the packet broker for later
+		// XXX: can we really assume this cast?
+		packetBroker = (IShellToSpyGlassPacketBroker) spyglass.getPacketReader();
+		
+		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
 				if (evt.getPropertyName().equals("packetReader")) {
-					config = spyglass.getConfigStore().getSpyglassConfig();
-					packetBroker = (IShellToSpyGlassPacketBroker) config.getPacketReader();
+					packetBroker = (IShellToSpyGlassPacketBroker) spyglass.getConfigStore().getSpyglassConfig().getPacketReader();
 				}
 			}
 		});
-
-		final AppWindow appWindow = new AppWindow(container.getDisplay(), container, spyglass);
+		
+		// create View
+		final AppWindow appWindow = new AppWindow(spyglass, container);
+		
+		// create Control
 		new UIController(spyglass, appWindow);
 
 		// Add Toolbar Actions
@@ -155,8 +142,8 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		addToolBarAction(new ZoomOutAction(appWindow.getGui().getDrawingArea()));
 		addToolBarAction(new ZoomCompleteMapAction(spyglass, appWindow.getGui().getDrawingArea()));
 		addToolBarAction(new OpenPreferencesAction(container.getShell(), spyglass));
-		// addToolBarAction(new LoadConfigurationAction(spyglass));
-		// addToolBarAction(new StoreConfigurationAction(container.getShell(), spyglass));
+		addToolBarAction(new LoadConfigurationAction(spyglass));
+		addToolBarAction(new StoreConfigurationAction(spyglass));
 
 		// Start visualization
 		spyglass.setVisualizationRunning(true);

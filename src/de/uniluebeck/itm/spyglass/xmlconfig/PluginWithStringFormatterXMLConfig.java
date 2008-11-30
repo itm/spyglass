@@ -14,10 +14,10 @@ public abstract class PluginWithStringFormatterXMLConfig extends PluginXMLConfig
 
 	public static final String PROPERTYNAME_STRING_FORMATTERS = "stringFormatters";
 
-	@ElementMap(entry = "stringFormatter", key = "nodeID", attribute = true, valueType = String.class, required = true)
+	@ElementMap(entry = "stringFormatter", key = "nodeID", attribute = true, valueType = String.class, required = false)
 	private HashMap<Integer, String> stringFormatters = new HashMap<Integer, String>();
 
-	@Element(name = PROPERTYNAME_DEFAULT_STRING_FORMATTER, required = false)
+	@Element(required = false)
 	private String defaultStringFormatter = null;
 
 	// --------------------------------------------------------------------------------

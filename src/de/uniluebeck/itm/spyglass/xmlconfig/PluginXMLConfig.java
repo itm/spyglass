@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
+import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
@@ -21,7 +22,10 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
  * 
  * @author Sebastian Ebers, Daniel Bimschas
  * 
+ * TODO: validate, if plugin name is used twice! (may happen at lax deserial)
+ * 
  */
+@Root(strict=false)
 public abstract class PluginXMLConfig extends XMLConfig {
 
 	public static final String PROPERTYNAME_SEMANTIC_TYPES = "semanticTypes";
@@ -34,22 +38,20 @@ public abstract class PluginXMLConfig extends XMLConfig {
 
 	public static final String PROPERTYNAME_ACTIVE = "active";
 
-	@Element(name = "isActive")
+	@Element(required=false)
 	private boolean active = true;
 
-	@Element(name = "isVisible", required = false)
+	@Element(required=false)
 	private boolean visible = true;
 
-	@Element(name = PROPERTYNAME_NAME)
+	@Element(required=false)
 	private String name = "default";
 
-	@Element(name = PROPERTYNAME_TIMEOUT, required = false)
-	private int timeout = -1;
+	@Element(required=false)
+	private int timeout = 0;
 
-	@ElementArray(name = PROPERTYNAME_SEMANTIC_TYPES, required = false)
+	@ElementArray(required = false)
 	private int[] semanticTypes = new int[] { -1 };
-
-	// private int[] semanticTypes = ALL_SEMANTIC_TYPES.clone();
 
 	// --------------------------------------------------------------------------------
 	/**

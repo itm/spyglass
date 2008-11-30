@@ -27,8 +27,8 @@ public class AppWindow {
 	/**
 	 * 
 	 */
-	public AppWindow(final Display display, final Composite parent, final Spyglass spyglass) {
-		this.display = display;
+	public AppWindow(final Spyglass spyglass, final Composite parent) {
+		this.display = parent.getDisplay();
 		gui = new SpyglassGuiComponent(parent, SWT.NULL, spyglass);
 	}
 	

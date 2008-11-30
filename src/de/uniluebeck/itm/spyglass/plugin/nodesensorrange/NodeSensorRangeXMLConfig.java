@@ -10,7 +10,6 @@ package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
 import java.util.HashMap;
 
-import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementMap;
 
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -26,10 +25,10 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_NODE_RANGES = "nodeRanges";
 
-	@Element(name = "default")
+	//@Element(required=false)
 	// TODO: solve cyclic dependencies here
 	// private NodeSensorRange defalutNodeSensorRange = new NodeSensorRange();
-	@ElementMap(entry = "ranges", key = "nodeID", attribute = true, valueType = NodeSensorRange.class)
+	@ElementMap(entry = "ranges", key = "nodeID", attribute = true, valueType = NodeSensorRange.class, required=false)
 	private HashMap<Integer, NodeSensorRange> nodeRanges = new HashMap<Integer, NodeSensorRange>();
 
 	// //

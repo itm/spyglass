@@ -26,10 +26,10 @@ public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 
 	public static final String PROPERTYNAME_LINE_WIDTH = "lineWidth";
 
-	@ElementArray
+	@ElementArray(required=false)
 	private int[] lineColorRGB = { 0, 0, 0 };
 
-	@Element
+	@Element(required=false)
 	private int lineWidth = 1;
 
 	// --------------------------------------------------------------------------------

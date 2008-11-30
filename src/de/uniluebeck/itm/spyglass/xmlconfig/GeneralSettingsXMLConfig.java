@@ -22,33 +22,33 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 	/**
 	 * if <code>true</code> a ruler is shown in the graphical user interface
 	 */
-	@Element
+	@Element(required=false)
 	private boolean showRuler = true;
 	
 	/**
 	 * defines the metric settings
 	 */
-	@Element
+	@Element(required=false)
 	final private MetricsXMLConfig metrics = new MetricsXMLConfig();
 	
 	/**
 	 * the time's unit (important when showing the results of received packets on the graphical user
 	 * interface). The unit is just for information purposes. It is not processed in any way.
 	 */
-	@Element
+	@Element(required=false)
 	private String timeUnit = "s";
 	
 	/**
 	 * the time's scale(important when showing the results of received packets on the graphical user
 	 * interface)
 	 */
-	@Element
+	@Element(required=false)
 	private float timeScale = 1;
 	
 	/**
 	 * the delay used when processing recorded packets TODO: wrong!
 	 */
-	@Element
+	@Element(required=false)
 	private long packetDeliveryInitialDelay = 1000;
 	
 	// --------------------------------------------------------------------------------

@@ -36,16 +36,16 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_SEMANTIC_TYPES4_NEIGHBORHOODS = "semanticTypes4Neighborhoods";
 
-	@ElementArray(name = PROPERTYNAME_SEMANTIC_TYPES4_NEIGHBORHOODS)
+	@ElementArray(required=false)
 	private int[] semanticTypes4Neighborhoods;
 
-	@Element(name = PROPERTYNAME_SHOW_NODE_DEGREE)
+	@Element(required=false)
 	private boolean showNodeDegree = true;
 
-	@Element(name = PROPERTYNAME_SHOW_NUM_NODES)
+	@Element(required=false)
 	private boolean showNumNodes = true;
 
-	@ElementList(name = PROPERTYNAME_STATISTICAL_INFORMATION_EVALUATORS, required = false)
+	@ElementList(required=false)
 	private Set<StatisticalInformationEvaluator> statisticalInformationEvaluators = new TreeSet<StatisticalInformationEvaluator>();
 
 	// --------------------------------------------------------------------------------

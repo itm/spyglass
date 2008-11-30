@@ -35,35 +35,35 @@ public class MetricsXMLConfig extends XMLConfig {
 	/**
 	 * a string for the unit
 	 */
-	@Element
+	@Element(required=false)
 	private String unit = "m";
 
 	/**
 	 * multiplying an absolute coordinate's x value with this factor will result in the
 	 * corresponding metric value
 	 */
-	@Element
+	@Element(required=false)
 	private float abs2metricFactorX = 1;
 
 	/**
 	 * multiplying an absolute coordinate's y value with this factor will result in the
 	 * corresponding metric value
 	 */
-	@Element
+	@Element(required=false)
 	private float abs2metricFactorY = 1;
 
 	/**
 	 * this is an offset value which allows the user to let the metric coordinates starting position
 	 * be anywhere in the absolute coordinate system
 	 */
-	@Element
+	@Element(required=false)
 	private float abs2metricOffsetX = 0;
 
 	/**
 	 * this is an offset value which allows the user to let the metric coordinates starting position
 	 * be anywhere in the absolute coordinate system
 	 */
-	@Element
+	@Element(required=false)
 	private float abs2metricOffsetY = 0;
 
 	/**
@@ -71,7 +71,7 @@ public class MetricsXMLConfig extends XMLConfig {
 	 * 
 	 * TODO does this belong to the model? (DFO)
 	 */
-	@Element
+	@Element(required=false)
 	private boolean lockAbs2metricFactor = false;
 
 	// --------------------------------------------------------------------------------

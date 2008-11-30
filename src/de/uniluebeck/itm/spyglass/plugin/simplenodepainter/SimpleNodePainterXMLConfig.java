@@ -35,13 +35,13 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	@ElementMap(entry = "isActive", key = "nodeID", attribute = true, name = "extendedInformation", required = false)
 	private HashMap<Integer, Boolean> isExtendenInformationActive = new HashMap<Integer, Boolean>();
 
-	@Element(name = "isExtendedDefaultValue")
+	@Element(required=false)
 	private boolean isExtendedDefaultValue = false;
 
-	@ElementArray(name = PROPERTYNAME_LINE_COLOR_R_G_B)
+	@ElementArray(required=false)
 	private int[] lineColorRGB = { 255, 0, 0 };
 
-	@Element(name = PROPERTYNAME_LINE_WIDTH)
+	@Element(required=false)
 	private int lineWidth = 1;
 
 	// --------------------------------------------------------------------------------

@@ -24,11 +24,13 @@ import javax.swing.event.EventListenerList;
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
+import org.simpleframework.xml.load.Commit;
 
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener.ListChangeEvent;
 import de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin;
+import de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangePlugin;
 import de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin;
@@ -52,8 +54,18 @@ public class PluginManager {
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(PluginManager.class);
 
-	@ElementList
-	private final List<Plugin> plugins = Collections.synchronizedList(new ArrayList<Plugin>());
+	/**
+	 * This List is serialized by the XMLSerializer. It must not be used by any code, since
+	 * access to it is not synchronized! Use the variable <code>plugins</code> instead, which
+	 * has a Collections.synchronizedList() wrapper around it.
+	 */
+	@ElementList(name="plugins")
+	private final List<Plugin> pluginsInternal = new ArrayList<Plugin>();
+
+	/**
+	 * The list of plugins. Has always to be a wrapper arround pluginsInternal. 
+	 */
+	private List<Plugin> plugins = Collections.synchronizedList(pluginsInternal);
 
 	private final Set<PluginListChangeListener> pluginListChangeListeners = Collections.synchronizedSet(new HashSet<PluginListChangeListener>());
 
@@ -62,7 +74,7 @@ public class PluginManager {
 	static {
 		availablePluginsTypes.add(GridPainterPlugin.class);
 		availablePluginsTypes.add(ImagePainterPlugin.class);
-		// availablePluginsTypes.add(MapPainterPlugin.class);
+		availablePluginsTypes.add(MapPainterPlugin.class);
 		availablePluginsTypes.add(NodeSensorRangePlugin.class);
 		availablePluginsTypes.add(ObjectPainterPlugin.class);
 		availablePluginsTypes.add(SimpleGlobalInformationPlugin.class);
@@ -71,6 +83,11 @@ public class PluginManager {
 		availablePluginsTypes.add(SpringEmbedderPositionerPlugin.class);
 		availablePluginsTypes.add(LinePainterPlugin.class);
 		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
+	}
+	
+	@Commit
+	public void commit() {
+		this.plugins = Collections.synchronizedList(pluginsInternal);
 	}
 
 	/**
@@ -612,9 +629,14 @@ public class PluginManager {
 	 * @return the new instance of a plug-in
 	 */
 	public Plugin createNewPlugin(final Class<? extends Plugin> clazz, final PluginXMLConfig config) {
-		final Plugin plugin = PluginFactory.createInstance(config, clazz);
-
-		final String baseName = config.getName();
+		final Plugin plugin;
+		if (config != null) {
+			plugin = PluginFactory.createInstance(config, clazz);
+		} else {
+			plugin = PluginFactory.createDefaultInstance(clazz);	
+		}
+ 		
+		final String baseName = plugin.getInstanceName();
 		String instanceName = baseName;
 		if (containsPlugin(instanceName)) {
 			int i = 1;

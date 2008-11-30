@@ -49,6 +49,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.gui.actions.LoadConfigurationAction;
+import de.uniluebeck.itm.spyglass.gui.actions.StoreConfigurationAction;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
@@ -641,30 +643,14 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	}
 
 	private void clickedButtonLoadPreferences() {
-		// final File loadFile = getSaveLoadFileFromUser(SWT.OPEN);
-		// final String msg = loadFile == null ? "The user cancelled selecting a file." :
-		// "The preferences would now be loaded from "
-		// + loadFile.getAbsolutePath() + " if it was implemented.";
-		// MessageDialog.openInformation(preferenceDialog.getShell(), "Save Preferences...", msg);
-		spyglass.getConfigStore().loadFromFileSystem();
+		new LoadConfigurationAction(spyglass).run();
 		clickedButtonClose();
 	}
 
 	private void clickedButtonSavePreferences() {
 		if (proceedIfUnsavedChanges()) {
-			// final File saveFile = getSaveLoadFileFromUser(SWT.SAVE);
-			// final String msg = saveFile == null ? "The user cancelled selecting a file."
-			// : "The preferences would now be saved to " + saveFile.getAbsolutePath()
-			// + " if it was implemented.";
-			// MessageDialog.openInformation(preferenceDialog.getShell(), "Save Preferences...",
-			// msg);
-			spyglass.getConfigStore().storeFileSystem();
+			new StoreConfigurationAction(spyglass).run();
 		}
-	}
-
-	@Override
-	public void finalize() throws Throwable {
-		// nothing to do
 	}
 
 	private ImageDescriptor getPluginImageDescriptor() {
@@ -868,7 +854,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		try {
 			final Display display = Display.getDefault();
 			final Shell shell = new Shell(display);
-			final Spyglass sg = new Spyglass(true);
+			final Spyglass sg = new Spyglass();
 			final PluginPreferenceDialog inst = new PluginPreferenceDialog(shell, sg);
 			inst.open();
 		} catch (final Exception e) {

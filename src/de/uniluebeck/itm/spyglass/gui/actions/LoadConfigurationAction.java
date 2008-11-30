@@ -1,11 +1,21 @@
 package de.uniluebeck.itm.spyglass.gui.actions;
 
-import org.eclipse.jface.resource.ImageDescriptor;
+import java.io.File;
 
+import org.apache.log4j.Logger;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
+
+import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class LoadConfigurationAction extends Action {
 
+	private static Logger log = SpyglassLoggerFactory.getLogger(LoadConfigurationAction.class);
+	
 	private final ImageDescriptor imageDescriptor = getImageDescriptor("page_gear.png");
 
 	private final Spyglass spyglass;
@@ -16,8 +26,28 @@ public class LoadConfigurationAction extends Action {
 
 	@Override
 	public void run() {
-		spyglass.getConfigStore().loadFromFileSystem();
-	}
+		final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
+		fd.setFilterExtensions(new String[] { "*.xml" });
+		fd.setFilterPath(SpyglassEnvironment.getConfigFileWorkingDirectory());
+		final String path = fd.open();
+		if (path != null) {
+			final File f = new File(path);
+			if (!f.canRead()) {
+				log.error("Could not read file "+f);
+				return;
+			}
+
+			// first we have to load the new config, to avoid that it is overwritten in the meantime
+			try {
+				spyglass.getConfigStore().importConfig(f);
+			} catch (final Exception e) {
+				log.error("Could not load the config.",e);
+			}
+			
+			SpyglassEnvironment.setConfigFilePath(f);
+
+		}
+	};
 
 	@Override
 	public String getText() {

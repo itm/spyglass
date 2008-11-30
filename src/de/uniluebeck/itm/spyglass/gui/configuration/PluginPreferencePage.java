@@ -203,8 +203,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.propertyChangeListener = null;
 		
 		// This is fine
-		config = (ConfigClass) spyglass.getConfigStore().readPluginTypeDefaults(
-				this.getPluginClass());
+		config = (ConfigClass) spyglass.getConfigStore().getSpyglassConfig().getDefaultConfig(this.getPluginClass());
 		if (config == null) {
 			// this page represents an abstract plugin type. so no config here
 		}
@@ -516,8 +515,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		log.info("Pressed button restoreDefaults");
 		// TODO: vorher fragen?
 		final Class<? extends Plugin> pluginClass = this.getPluginClass();
-		final PluginXMLConfig defaults = spyglass.getConfigStore().readPluginTypeDefaults(
-				pluginClass);
+		final PluginXMLConfig defaults = spyglass.getConfigStore().getSpyglassConfig().getDefaultConfig(pluginClass);
 		this.config.overwriteWith(defaults);
 		
 		this.loadFromModel();

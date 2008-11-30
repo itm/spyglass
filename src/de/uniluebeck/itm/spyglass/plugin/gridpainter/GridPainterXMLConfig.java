@@ -42,34 +42,34 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_GRID_ELEMENT_HEIGHT = "gridElementHeight";
 
-	@Element(name = PROPERTYNAME_GRID_ELEMENT_HEIGHT)
+	@Element(required=false)
 	private int gridElementHeight = 1;
 
-	@Element(name = PROPERTYNAME_GRID_ELEMENT_WIDTH)
+	@Element(required=false)
 	private int gridElementWidth = 1;
 
-	@Element(name = PROPERTYNAME_GRID_LOWER_LEFT_POINT_X)
+	@Element(required=false)
 	private int gridLowerLeftPointX = 0;
 
-	@Element(name = PROPERTYNAME_GRID_LOWER_LEFT_POINT_Y)
+	@Element(required=false)
 	private int gridLowerLeftPointY = 0;
 
-	@ElementArray(name = PROPERTYNAME_LINE_COLOR_R_G_B)
+	@ElementArray(required=false)
 	private int[] lineColorRGB = { 0, 0, 0 };
 
-	@Element(name = PROPERTYNAME_LINE_WIDTH)
+	@Element(required=false)
 	private float lineWidth = 1;
 
-	@Element(name = PROPERTYNAME_LOCK_GRID_ELEMENTS_SQUARE)
+	@Element(required=false)
 	private boolean lockGridElementsSquare = true;
 
-	@Element(name = PROPERTYNAME_LOCK_NUMBER_OF_ROWS_N_COLS)
+	@Element(required=false)
 	private boolean lockNumberOfRowsNCols = true;
 
-	@Element(name = PROPERTYNAME_NUM_COLS)
+	@Element(required=false)
 	private int numCols = 1;
 
-	@Element(name = PROPERTYNAME_NUM_ROWS)
+	@Element(required=false)
 	private int numRows = 1;
 
 	public boolean equals(final GridPainterXMLConfig o) {

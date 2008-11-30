@@ -9,7 +9,6 @@ package de.uniluebeck.itm.spyglass.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,61 +66,31 @@ public class Spyglass {
 	 * Constructor. Invokes the XML configuration reading from the default configuration files.
 	 * Which file is used depends on the context (if spyglass is used as stand alone application or
 	 * iShell plug-in).
+	 * @throws IOException 
 	 * 
-	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell plug-in
 	 */
-	public Spyglass(final boolean isIShellPlugin) {
-		configStore = new ConfigStore(isIShellPlugin);
-		init(configStore.getSpyglassConfig());
+	public Spyglass() throws IOException {
+		configStore = new ConfigStore();
+		init();
 	}
 
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * Constructor. Invokes the XML configuration reading.
-	 * 
-	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell plug-in
-	 * @param config
-	 *            the configuration parameters
-	 */
-	public Spyglass(final boolean isIShellPlugin, final SpyglassConfiguration config) {
-		configStore = new ConfigStore(isIShellPlugin, config);
-		init(configStore.getSpyglassConfig());
-	}
-
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * Constructor. Invokes the XML configuration reading.
-	 * 
-	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell plug-in
-	 * @param configFile
-	 *            the file which contains the configuration parameters
-	 */
-	public Spyglass(final boolean isIShellPlugin, final File configFile) {
-		configStore = new ConfigStore(isIShellPlugin, configFile);
-		init(configStore.getSpyglassConfig());
-	}
 
 	// --------------------------------------------------------------------------
 	// ------
 	/**
 	 * 
 	 */
-	private void init(final SpyglassConfiguration config) {
+	private void init() {
 		// Create and inject objects
-		setPluginManager(config.getPluginManager());
+		setPluginManager(configStore.getSpyglassConfig().getPluginManager());
 
-		packetReader = config.getPacketReader();
+		packetReader = configStore.getSpyglassConfig().getPacketReader();
 
 		packetDispatcher = new PacketDispatcher(this);
 		setVisualizationRunning(true);
-		packetProducerTask = new PacketProducerTask(this, config.getGeneralSettings().getPacketDeliveryInitialDelay());
+		packetProducerTask = new PacketProducerTask(this, configStore.getSpyglassConfig().getGeneralSettings().getPacketDeliveryInitialDelay());
 
-		config.addPropertyChangeListener(new PropertyChangeListener() {
+		configStore.getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
 
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
@@ -132,7 +101,7 @@ public class Spyglass {
 				}
 			}
 		});
-
+		
 		log.debug("Init done");
 	}
 
@@ -149,13 +118,16 @@ public class Spyglass {
 
 	public void shutdown() {
 		setVisualizationRunning(false);
-		configStore.store(true);
-
+		
+		configStore.store();
+		configStore.signalShutdown();
+		configStore.waitForRemainingWrites();
+		
 		// shutdown all plugins
 		for (final Plugin p : pluginManager.getPlugins()) {
 			p.shutdown();
 		}
-
+		
 		log.info("All plugin-threads stopped");
 	}
 
@@ -213,11 +185,13 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
+	// ------
 	public void setPacketReader(final PacketReader packetReader) {
 		this.packetReader = packetReader;
 	}
 
 	// --------------------------------------------------------------------------
+	// ------
 	public ConfigStore getConfigStore() {
 		return configStore;
 	}
@@ -309,7 +283,6 @@ public class Spyglass {
 		} catch (final IOException e) {
 			log.error("Error while trying to reset the packet reader", e);
 		}
-
 		// reset the plug-ins. The active NodePositionerPlugin has to be reseted at last because
 		// otherwise plug-ins which are not reseted, yet might miss needed positioning information
 		final List<Plugin> plugins = pluginManager.getPlugins();

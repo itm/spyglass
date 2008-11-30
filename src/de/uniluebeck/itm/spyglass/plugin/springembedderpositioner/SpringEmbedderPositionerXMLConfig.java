@@ -27,7 +27,7 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 
 	public static final String PROPERTYNAME_EDGE_SEMANTIC_TYPES = "edgeSemanticTypes";
 
-	@ElementList
+	@ElementList(required=false)
 	private List<Integer> edgeSemanticTypes = new LinkedList<Integer>();
 
 	// --------------------------------------------------------------------------------

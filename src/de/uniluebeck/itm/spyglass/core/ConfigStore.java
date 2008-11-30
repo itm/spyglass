@@ -11,25 +11,24 @@ package de.uniluebeck.itm.spyglass.core;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.io.StringWriter;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.load.Persister;
 
+import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
+import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.plugin.PluginFactory;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // ------------------------------------------------------------------------------
 // --
@@ -39,49 +38,22 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * Additionally, configuration parameters can be loaded and stored partially.
  * 
  * @author Sebastian Ebers
+ * @author Dariush Forouher
  * 
  */
-public class ConfigStore {
-
-	/**
-	 * Path to the configuration file to be loaded if the default one is corrupted and the
-	 * application is started in stand-alone mode
-	 */
-	public static final String FAILSAVE_CONFIG_FILE_STANDALONE = "config/failsave/FailsaveSpyglassConfigStandalone.xml";
-
-	/**
-	 * Path to the configuration file to be loaded if the default one is corrupted and the
-	 * application is started in plug-in mode
-	 */
-	public static final String FAILSAVE_CONFIG_FILE_ISHELL_PLUGIN = "config/failsave/FailsaveSpyglassConfigIShellPlugin.xml";
-
-	private static final String pluginConfigDirectory = new File("./config/plugin").getAbsoluteFile().toString();
-	private static final String standaloneConfigDirectory = new File("./config/plugin").getAbsoluteFile().toString();
-
-	/** The path to the file where the default configuration is located */
-	private static final String DEFAULT_CONFIG_FILE_STANDALONE = "config/DefaultSpyglassConfigStandalone.xml";
-
-	private static final String DEFAULT_CONFIG_FILE_ISHELL_PLUGIN = "config/DefaultSpyglassConfigIShellPlugin.xml";
-
-	private String configFilePath = "config/DefaultSpyglassConfigStandalone.xml";
-
-	/** The path to the configuration file which was last loaded by the user (in this session) */
-	private String userDefinedCurrentConfiguration = null;
-
-	/** An instance of a SpyGlass configuration object */
-	private SpyglassConfiguration spyglassConfig;
+public class ConfigStore extends PropertyBean {
 
 	/** An object which is used for logging errors and other events */
 	private static Logger log = SpyglassLoggerFactory.getLogger(ConfigStore.class);
 
-	private volatile Boolean isStoringInvoked = false;
+	/** Current instance of a SpyGlass configuration object */
+	private final SpyglassConfiguration spyglassConfig;
 
-	private final boolean isIShellPlugin;
+	private volatile Boolean storingPending = false;
 
-	@Override
-	public void finalize() throws Throwable {
-		spyglassConfig = null;
-	}
+	private Object storeMutex = new Object();
+
+	private volatile Boolean shutdownInProgress = false;
 
 	// --------------------------------------------------------------------------
 	/**
@@ -125,42 +97,88 @@ public class ConfigStore {
 	 * Reads the configuration from an hard-coded standard-path (which is stored internally in this
 	 * class)
 	 * 
-	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell plug-in
 	 */
-	public ConfigStore(final boolean isIShellPlugin) {
-		this(isIShellPlugin, new File((isIShellPlugin) ? DEFAULT_CONFIG_FILE_ISHELL_PLUGIN : DEFAULT_CONFIG_FILE_STANDALONE));
+	public ConfigStore() throws IOException {
+		final File f = SpyglassEnvironment.getConfigFilePath();
+
+		// create the file if necessary
+		if (!f.exists()) {
+			f.createNewFile();
+		}
+
+		// no point in continuing here
+		if (!f.canWrite()) {
+			throw new IOException("Cannot open file " + f + " for writing!");
+		}
+
+		SpyglassConfiguration newConfig = null;
+		try {
+			newConfig = ConfigStore.load(f);
+		} catch (final Exception e) {
+			log.error("Unable to load configuration input:\r\nThe configuration file '" + f + "' is invalid! I'll move"
+					+ " the broken one away and start with a fresh config", e);
+
+			final boolean ret = f.renameTo(new File(f.getAbsolutePath() + ".save-" + System.currentTimeMillis()));
+			if (!ret) {
+				throw new IOException("Could not move config file out of the way. Stopping.", e);
+			}
+		}
+
+		// create a new config, if none exists
+		if (newConfig == null) {
+
+			newConfig = createDefaultSpyglassConfig();
+
+			store();
+		}
+
+		spyglassConfig = newConfig;
+
+		registerListener();
+
+		// TODO: for Milestone2: register for events from the PacketReader
 	}
 
-	// --------------------------------------------------------------------------
-	/**
-	 * Reads the configuration from an hard-coded standard-path (which is stored internally in this
-	 * class)
-	 * 
-	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell plug-in
-	 * @param spyglassConfig
-	 *            the configuration parameters
-	 */
-	public ConfigStore(final boolean isIShellPlugin, final SpyglassConfiguration spyglassConfig) {
-		this.isIShellPlugin = isIShellPlugin;
-		this.configFilePath = (isIShellPlugin) ? DEFAULT_CONFIG_FILE_ISHELL_PLUGIN : DEFAULT_CONFIG_FILE_STANDALONE;
-		this.spyglassConfig = spyglassConfig;
+	private void registerListener() {
+		spyglassConfig.getPluginManager().addPluginListChangeListener(pluginManagerListener);
+		spyglassConfig.getGeneralSettings().addPropertyChangeListener(pluginPropertyListener);
+		spyglassConfig.getGeneralSettings().getMetrics().addPropertyChangeListener(pluginPropertyListener);
+		for (final Plugin p : spyglassConfig.getDefaultPlugins()) {
+			p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
+		}
+		for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
+			p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
+		}
 	}
 
-	// --------------------------------------------------------------------------
+	private void unregisterListener() {
+		spyglassConfig.getPluginManager().removePluginListChangeListener(pluginManagerListener);
+		spyglassConfig.getGeneralSettings().removePropertyChangeListener(pluginPropertyListener);
+		spyglassConfig.getGeneralSettings().getMetrics().removePropertyChangeListener(pluginPropertyListener);
+		for (final Plugin p : spyglassConfig.getDefaultPlugins()) {
+			p.getXMLConfig().removePropertyChangeListener(pluginPropertyListener);
+		}
+		for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
+			p.getXMLConfig().removePropertyChangeListener(pluginPropertyListener);
+		}
+	}
+
 	/**
-	 * Creates a new configStore for the given file.
-	 * 
-	 * @param isIShellPlugin
-	 *            indicates whether or not the application is used as iShell plug-in
-	 * @param configFile
-	 *            the file which contains the configuration parameters
+	 * Create a Spyglass Configuration with default values and one PostionPacketNodePositioner as
+	 * the only plugin.
 	 */
-	public ConfigStore(final boolean isIShellPlugin, final File configFile) {
-		this.isIShellPlugin = isIShellPlugin;
-		this.configFilePath = configFile.getPath();
-		load(configFile);
+	private static SpyglassConfiguration createDefaultSpyglassConfig() {
+		SpyglassConfiguration newConfig;
+		newConfig = new SpyglassConfiguration();
+		final Collection<Plugin> defaultPlugins = new HashSet<Plugin>();
+		for (final Class<? extends Plugin> p : newConfig.getPluginManager().getAvailablePluginTypes()) {
+			defaultPlugins.add(PluginFactory.createDefaultInstance(p));
+		}
+		newConfig.setDefaultPlugins(defaultPlugins);
+
+		// Create node positioner
+		newConfig.getPluginManager().createNewPlugin(PositionPacketNodePositionerPlugin.class, null);
+		return newConfig;
 	}
 
 	// --------------------------------------------------------------------------
@@ -173,90 +191,48 @@ public class ConfigStore {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * Returns the default configuration parameters of a plug-in
+	 * Overwrites the current config with the one inside the given file.
 	 * 
-	 * @param clazz
-	 *            the plug-in's class
-	 * @return the default configuration parameters of a plug-in
+	 * @throws Exception
+	 * 
 	 */
-	public PluginXMLConfig readPluginTypeDefaults(final Class<? extends Plugin> clazz) {
-
-		final Collection<Plugin> plugins = spyglassConfig.getDefaultPlugins();
-		for (final Plugin plugin : plugins) {
-			if (plugin.getClass().equals(clazz)) {
-				return plugin.getXMLConfig();
-			}
+	public void importConfig(final File file) throws Exception {
+		if (spyglassConfig == null) {
+			throw new IllegalStateException("Cannot import a configuration when we have" + "no working base configuration yet.");
 		}
 
-		return null;
+		final SpyglassConfiguration sgc = ConfigStore.load(file);
+
+		// unregister the old ones
+		unregisterListener();
+		
+		// destroy the currently active plug-ins since they will be no longer needed
+		for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
+			p.reset();
+			p.shutdown();
+		}
+		final PacketReader pr = spyglassConfig.getPacketReader();
+		if (pr instanceof PacketRecorder) {
+			((PacketRecorder) pr).setReadFromFile(false);
+			((PacketRecorder) pr).enableRecording(false);
+		}
+
+		spyglassConfig.overwriteWith(sgc);
+
+		// register the new ones
+		registerListener();
+
+		firePropertyChange("replaceConfiguration", null, spyglassConfig);
+
+		// TODO: for Milestone2: register for events from the PacketReader
 
 	}
 
-	// --------------------------------------------------------------------------
 	/**
-	 * Opens a dialog to load the configuration from the local file system.
-	 * 
-	 * @return <code>true</code> if the configuration was loaded successfully
+	 * Exports the config into the given file
 	 */
-	public boolean loadFromFileSystem() {
-		final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
-		fd.setFilterExtensions(new String[] { "*.xml" });
-		fd.setFilterPath(isIShellPlugin ? pluginConfigDirectory : standaloneConfigDirectory);
-		final String path = fd.open();
-		if (path != null) {
-			final File file = new File(path);
-			userDefinedCurrentConfiguration = file.toString();
-			return load(file);
-		}
-		return false;
-	}
-
-	// --------------------------------------------------------------------------
-	/**
-	 * Loads the configuration from a file
-	 * 
-	 * @param configFile
-	 *            the file containing the configuration data
-	 * @return <code>true</code> if the configuration was loaded successfully
-	 */
-	private boolean load(final File configFile) {
-		final SpyglassConfiguration sgc = ConfigStore.loadSpyglassConfig(configFile);
-
-		if (sgc != null) {
-
-			{
-				// destroy the currently active plug-ins since they will be no longer needed
-				if (spyglassConfig != null) {
-					for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
-						p.shutdown();
-					}
-					final PacketReader pr = spyglassConfig.getPacketReader();
-					if (pr instanceof PacketRecorder) {
-						((PacketRecorder) pr).setReadFromFile(false);
-						((PacketRecorder) pr).enableRecording(false);
-					}
-				}
-
-			}
-			if (spyglassConfig == null) {
-				spyglassConfig = sgc;
-			} else {
-				spyglassConfig.overwriteWith(sgc);
-			}
-			spyglassConfig.getPluginManager().addPluginListChangeListener(pluginManagerListener);
-			spyglassConfig.getGeneralSettings().addPropertyChangeListener(pluginPropertyListener);
-			for (final Plugin p : spyglassConfig.getDefaultPlugins()) {
-				p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
-			}
-			for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
-				p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
-			}
-
-			// TODO: for Milestone2: register for events from the PacketReader
-
-			return true;
-		}
-		return false;
+	public void exportConfig(final File file) {
+		this.store(file);
 	}
 
 	// --------------------------------------------------------------------------
@@ -265,202 +241,113 @@ public class ConfigStore {
 	 * 
 	 * @param configFile
 	 *            the file containing the configuration data
-	 * @return <code>true</code> if the configuration was loaded successfully
+	 * @returns a valid SpyglassConfiguration
+	 * @throws an
+	 *             Exception if anything goes wrong
 	 */
-	private static SpyglassConfiguration loadSpyglassConfig(final File configFile) {
-		return loadSpyglassConfig(configFile, false);
-	}
-
-	// --------------------------------------------------------------------------
-	/**
-	 * Loads and returns the configuration from a file
-	 * 
-	 * @param configFile
-	 *            the file containing the configuration data
-	 * @param quiet
-	 *            indicates whether error messages concerning an invalid configuration file format
-	 *            have to be suppressed or not
-	 * @return <code>true</code> if the configuration was loaded successfully
-	 */
-	private static SpyglassConfiguration loadSpyglassConfig(final File configFile, final boolean quiet) {
+	private static SpyglassConfiguration load(final File configFile) throws Exception {
 		log.debug("Initializing. Reading config from file: " + configFile);
 		SpyglassConfiguration config = null;
 
 		if (!configFile.isFile()) {
-			throw new RuntimeException("Can't find config file '" + configFile + "'");
+			throw new IOException("Can't find config file '" + configFile + "'");
 		}
 
-		try {
-			final Serializer serializer = new Persister();
-			config = serializer.read(SpyglassConfiguration.class, configFile);
+		final Serializer serializer = new Persister();
+		config = serializer.read(SpyglassConfiguration.class, configFile);
 
-			if (config == null) {
-				throw new RuntimeException("Can't load configuration.");
-			}
-			return config;
-
-		} catch (final Exception e) {
-			if (quiet && (log instanceof SpyglassLogger)) {
-				((SpyglassLogger) log).error("Unable to load configuration input:\r\nThe configuration file '" + configFile.getName()
-						+ "' is invalid!", e, false);
-			} else {
-				log.error("Unable to load configuration input:\r\nThe configuration file '" + configFile.getName() + "' is invalid!", e);
-			}
-			// MessageDialog.openError(Display.getDefault().getActiveShell(),
-			// "Unable to load the SpyGlass configuration", "The configuration file '"
-			// + configFile.getName() + "' is invalid!\r\n" + e.getLocalizedMessage());
-			return null;
-		}
+		return config;
 	}
 
-	// --------------------------------------------------------------------------
 	/**
-	 * Opens a dialog to store the current configuration to the local file system.<br>
-	 * After the file was selected, the configuration will be stored (in an extra {@link Thread}).
-	 * If no file was selected, the storing operation will be aborted.
-	 */
-	public void storeFileSystem() {
-		final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
-		fd.setFilterExtensions(new String[] { "*.xml" });
-		fd.setFilterPath(isIShellPlugin ? pluginConfigDirectory : standaloneConfigDirectory);
-		String path = fd.open();
-		if (path != null) {
-			if (!path.endsWith(".xml")) {
-				path += ".xml";
-			}
-			final File file = new File(path);
-			storeInExtraThread(file);
-		}
-	}
-
-	// --------------------------------------------------------------------------
-	/**
-	 * Stores the configuration persistently into the local file system using an extra
-	 * {@link Thread}
+	 * Store the config into the system-given file.
 	 */
 	public void store() {
-		store(false);
+		this.store(SpyglassEnvironment.getConfigFilePath());
 	}
 
-	// --------------------------------------------------------------------------
 	/**
-	 * Stores the configuration persistently into the local file system.
-	 * 
-	 * @param blocking
-	 *            if <code>false</code> an extra {@link Thread} will be used
-	 */
-	public void store(final boolean blocking) {
-		if (blocking) {
-			store(new File(configFilePath));
-		} else {
-			storeInExtraThread(new File(configFilePath));
-		}
-	}
-
-	// --------------------------------------------------------------------------
-	/**
-	 * Stores the configuration persistently into the local file system.<br>
+	 * Stores the configuration persistently into the given file.<br>
 	 * <br>
 	 * 
-	 * The given configFile will not be used for subsequent updates. This method is therefore more
-	 * suited for "Exports" of the configuration.<br>
-	 * <br>
-	 * 
-	 * Note that if a file was previously loaded by the user, this file will be updated, too.
-	 * 
-	 * @param configFile
-	 *            the file which will contain the configuration data afterwards
-	 * @return <code>true</code> if the configuration was stored successfully
-	 */
-	private synchronized boolean store(final File configFile) {
-
-		// the fail-save files must not be overwritten
-		if (configFile.toString().contains(FAILSAVE_CONFIG_FILE_ISHELL_PLUGIN) || configFile.toString().contains(FAILSAVE_CONFIG_FILE_STANDALONE)) {
-			return false;
-		}
-
-		log.debug("Initializing. Storing config to file: " + configFile);
-		SpyglassConfiguration backup = null;
-
-		// if the configuration file is not a file, yet, try to create it
-		if (!configFile.isFile()) {
-			try {
-				configFile.createNewFile();
-
-			} catch (final IOException e) {
-				log.error("Error creating the file " + configFilePath, e);
-			}
-			if (!configFile.isFile()) {
-				throw new RuntimeException("Can't find config file '" + configFile + "'");
-			}
-		}
-
-		// otherwise load the file's configuration as backup
-		else {
-			backup = loadSpyglassConfig(configFile, true);
-		}
-
-		try {
-			purgeDefaults();
-			new Persister().write(spyglassConfig, configFile);
-			log.debug("Storing config to file: " + configFile + " completed");
-
-			// if the user loaded a configuration file, this file has to be updated, too.
-			if (userDefinedCurrentConfiguration != null) {
-				log.debug("Initializing. Storing config to file: " + userDefinedCurrentConfiguration);
-				new Persister().write(spyglassConfig, new File(userDefinedCurrentConfiguration));
-				log.debug("Storing config to file: " + userDefinedCurrentConfiguration + " completed");
-			}
-
-			return true;
-		} catch (final Exception e) {
-			log.error("Unable to store configuration output: " + e, e);
-			if (backup != null) {
-				try {
-					new Persister().write(backup, configFile);
-					log.debug("The old content of the configuration file " + configFile + " was recovered");
-				} catch (final Exception e1) {
-					log.error("Unable to store configuration output! The file" + configFile + " may be corrupted!", e1);
-				}
-			}
-			return false;
-		}
-	}
-
-	/**
 	 * Stores the configuration in an extra {@link Thread} to improve the performance.<br>
 	 * The storing operation will be delayed for one second. Every call received within this second
 	 * will be ignored.
+	 * 
+	 * @param configFile
+	 *            the file which will contain the configuration data afterwards
 	 */
-	private void storeInExtraThread(final File configFile) {
+	private void store(final File configFile) {
+
+		// don't start new writes when we are leaving the building
+		if (shutdownInProgress) {
+			return;
+		}
+		
+		// if configFile is not our main configfile, then save regardless
+		// of any other pending storing.
+		final boolean storeAnyway = configFile.equals(SpyglassEnvironment.getConfigFilePath());
 
 		// check if there is already a storing operation in progress
-		synchronized (isStoringInvoked) {
-			// if so, return
-			if (isStoringInvoked) {
-				return;
+		if (!storeAnyway) {
+			synchronized (storingPending) {
+				// if so, return
+				if (storingPending) {
+					return;
+				}
+				// otherwise proceed
+				storingPending = true;
 			}
-			// otherwise proceed
-			isStoringInvoked = true;
 		}
 
 		// create the thread to store
 		final Thread t = new Thread() {
 			@Override
 			public void run() {
-				try {
-					// sleep for one second to wait for other calls which have not to be
-					// processed for that reason
-					sleep(1000);
-				} catch (final InterruptedException e) {
-					log.error(e, e);
-				} finally {
-					// the next successive call will no longer be ignored
-					synchronized (isStoringInvoked) {
-						isStoringInvoked = false;
+
+				// storing concurrently may have unpleasant results (file corruption etc).
+				synchronized (storeMutex) {
+
+					try {
+						// sleep for one second to wait for other calls which have not to be
+						// processed for that reason
+						sleep(1000);
+					} catch (final InterruptedException e) {
+						log.error(e, e);
+					} finally {
+						// the next successive call will no longer be ignored
+						if (!storeAnyway) {
+							synchronized (storingPending) {
+								storingPending = false;
+							}
+						}
+					}
+
+					log.debug("Storing config to file: " + configFile);
+
+					try {
+
+						final StringWriter buf = new StringWriter();
+
+						// If something happens here, the file will never have been opened.
+						new Persister().write(spyglassConfig, buf);
+
+						final FileWriter writer = new FileWriter(configFile);
+						writer.write(buf.toString());
+						writer.close();
+
+						log.debug("Stored config to file: " + configFile + ".");
+
+					} catch (final Exception e) {
+						log.error("Unable to store configuration output: " + e, e);
+					}
+
+					// notify waitForRemainingWrites() that maybe it can return
+					synchronized (storingPending) {
+						storingPending.notifyAll();
 					}
 				}
-				store(configFile);
+
 			}
 		};
 
@@ -471,43 +358,29 @@ public class ConfigStore {
 		t.start();
 
 	}
-
-	public static void resetDefaultFile(final boolean isIShellPlugin) throws IOException {
-
-		File in = null;
-		File out = null;
-		if (isIShellPlugin) {
-			out = new File(DEFAULT_CONFIG_FILE_ISHELL_PLUGIN);
-			in = new File(FAILSAVE_CONFIG_FILE_ISHELL_PLUGIN);
-		} else {
-			out = new File(DEFAULT_CONFIG_FILE_STANDALONE);
-			in = new File(FAILSAVE_CONFIG_FILE_STANDALONE);
-		}
-
-		final FileChannel inChannel = new FileInputStream(in).getChannel();
-		final FileChannel outChannel = new FileOutputStream(out).getChannel();
-		try {
-			inChannel.transferTo(0, inChannel.size(), outChannel);
-		} catch (final IOException e) {
-			throw e;
-		} finally {
-			if (inChannel != null) {
-				inChannel.close();
-			}
-			if (outChannel != null) {
-				outChannel.close();
-			}
-		}
+	
+	/**
+	 * Notify the ConfigStore that Spyglass is shutting down and thus we
+	 * should not accept any mre store requests.
+	 */
+	public void signalShutdown() {
+		shutdownInProgress = true;
 	}
 
-	// --------------------------------------------------------------------------
-	// ------
 	/**
-	 * Replaces all duplicated class instances from the list of plug-ins which are configured by
-	 * default.
+	 * This method blocks until the config has been written. If there is currently no write in
+	 * progress, this method returns instantly.
 	 */
-	private void purgeDefaults() {
-		// spyglassConfig
-		// .setDefaultPlugins(new LinkedList<Plugin>(spyglassConfig.getDefaultPlugins()));
+	public void waitForRemainingWrites() {
+		synchronized (storingPending) {
+			while (storingPending) {
+				log.debug("Waiting for remaining configuration writes...");
+				try {
+					storingPending.wait();
+				} catch (final InterruptedException e) {
+					log.error("Interrupted", e);
+				}
+			}
+		}
 	}
 }

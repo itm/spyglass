@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
+import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ArrayToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverter;
@@ -39,14 +40,6 @@ import de.uniluebeck.itm.spyglass.gui.databinding.validator.FileReadableValidato
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
-/**
- * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free
- * for non-commercial use. If Jigloo is being used commercially (ie, by a corporation, company or
- * business for any purpose whatever) then you should purchase a license for each developer using
- * Jigloo. Please visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these
- * licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS MACHINE, SO JIGLOO OR THIS
- * CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
- */
 public class ObjectPainterOptionsComposite extends Composite {
 
 	{
@@ -159,6 +152,7 @@ public class ObjectPainterOptionsComposite extends Composite {
 						public void widgetSelected(final SelectionEvent e) {
 							final FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
 							fileDialog.setFilterExtensions(new String[] { "*.jpg;*.png;*.gif", "*" });
+							fileDialog.setFilterPath(SpyglassEnvironment.getImageWorkingDirectory());
 							final String file = fileDialog.open();
 							if (file != null) {
 								imageFileText.setText(file);

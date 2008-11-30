@@ -8,6 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -99,10 +100,10 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 		return SimpleGlobalInformationPlugin.class;
 	}
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 		final Display display = Display.getDefault();
 		final Shell shell = new Shell(display);
-		final Spyglass sg = new Spyglass(true);
+		final Spyglass sg = new Spyglass();
 		final PluginPreferenceDialog inst = new PluginPreferenceDialog(shell, sg);
 		inst.open();
 	}

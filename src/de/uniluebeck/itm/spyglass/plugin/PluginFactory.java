@@ -76,10 +76,8 @@ public class PluginFactory {
 	// ------
 	/**
 	 * Crates a plug-in instance of a certain class type and initializes the instances parameters
-	 * using the provided ones
+	 * with the default config from the configuration file.
 	 * 
-	 * @param tempConfig
-	 *            the configuration parameters
 	 * @param clazz
 	 *            the plug-in's class
 	 */
@@ -87,7 +85,7 @@ public class PluginFactory {
 		
 		try {
 			final Plugin plugin = clazz.newInstance();
-			plugin.getXMLConfig().overwriteWith(configStore.readPluginTypeDefaults(clazz));
+			plugin.getXMLConfig().overwriteWith(configStore.getSpyglassConfig().getDefaultConfig(clazz));
 			return plugin;
 		} catch (final InstantiationException e) {
 			log.error("The plug-in of class " + clazz + " could not be instantiated", e);
@@ -101,8 +99,25 @@ public class PluginFactory {
 	
 	// --------------------------------------------------------------------------
 	// ------
-	@Override
-	public void finalize() throws Throwable {
+	/**
+	 * Crates a plug-in instance of a certain class type. Its config is left untouched.
+	 * 
+	 * @param clazz
+	 *            the plug-in's class
+	 */
+	public static Plugin createDefaultInstance(final Class<? extends Plugin> clazz) {
+		
+		try {
+			final Plugin plugin = clazz.newInstance();
+			return plugin;
+		} catch (final InstantiationException e) {
+			log.error("The plug-in of class " + clazz + " could not be instantiated", e);
+			return null;
+		} catch (final IllegalAccessException e) {
+			log.error("The plug-in of class " + clazz + " could not be instantiated", e);
+			return null;
+		}
 		
 	}
+
 }

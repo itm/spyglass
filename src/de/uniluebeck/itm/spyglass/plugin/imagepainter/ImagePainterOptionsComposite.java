@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
+import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
@@ -108,6 +109,7 @@ public class ImagePainterOptionsComposite extends Composite {
 						public void widgetSelected(final SelectionEvent e) {
 							final FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
 							fileDialog.setFilterExtensions(new String[] { "*.jpg;*.png;*.gif", "*" });
+							fileDialog.setFilterPath(SpyglassEnvironment.getImageWorkingDirectory());
 							final String file = fileDialog.open();
 							if (file != null) {
 								imageFileText.setText(file);

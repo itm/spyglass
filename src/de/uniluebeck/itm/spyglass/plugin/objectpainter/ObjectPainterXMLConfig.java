@@ -37,25 +37,25 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_PACKET_TYPE_3D = "packetType3D";
 
-	@Element(name = PROPERTYNAME_IMAGE_FILE_NAME)
+	@Element(required=false)
 	private String imageFileName = "images/icons/brokenImageLink.png";
 
-	@Element(name = PROPERTYNAME_IMAGE_SIZE_X)
+	@Element(required=false)
 	private int imageSizeX = 0;
 
-	@Element(name = PROPERTYNAME_IMAGE_SIZE_Y)
+	@Element(required=false)
 	private int imageSizeY = 0;
 
-	@Element(name = PROPERTYNAME_KEEP_PROPORTIONS)
+	@Element(required=false)
 	private boolean keepProportions = true;
 
-	@Element(name = PROPERTYNAME_DRAW_LINE)
+	@Element(required=false)
 	private boolean drawLine = true;
 
-	@Element(name = PROPERTYNAME_PACKET_TYPE_3D)
+	@Element(required=false)
 	private boolean packetType3D = true;
 
-	@ElementArray(name = PROPERTYNAME_LINE_COLOR)
+	@ElementArray(required=false)
 	private int[] lineColor = new int[] { 255, 0, 0 };
 
 	// --------------------------------------------------------------------------------

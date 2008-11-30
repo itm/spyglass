@@ -57,52 +57,52 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_DEFAULT_VALUE = "defaultValue";
 
-	@Element
+	@Element(required=false)
 	private float defaultValue = 3;
 
-	@Element
+	@Element(required=false)
 	private int gridElementHeight = 1;
 
-	@Element
+	@Element(required=false)
 	private int gridElementWidth = 1;
 
-	@Element
+	@Element(required=false)
 	private int lowerLeftX = 0;
 
-	@Element
+	@Element(required=false)
 	private int lowerLeftY = 0;
 
-	@Element
+	@Element(required=false)
 	private boolean lockGridElementSquare = true;
 
-	@Element
+	@Element(required=false)
 	private boolean lockNumberOfRowsNCols = true;
 
-	@ElementArray
+	@ElementArray(required=false)
 	private int[] maxColorRGB = { 0, 0, 0 };
 
-	@Element
+	@Element(required=false)
 	private float maxValue = 1;
 
-	@ElementArray
+	@ElementArray(required=false)
 	private int[] minColorRGB = { 255, 255, 255 };
 
-	@Element
+	@Element(required=false)
 	private float minValue = 0;
 
-	@Element
+	@Element(required=false)
 	private int width = 1;
 
-	@Element
+	@Element(required=false)
 	private int numFramePointsHorizontal = 3;
 
-	@Element
+	@Element(required=false)
 	private int numFramePointsVertical = 3;
 
-	@Element
+	@Element(required=false)
 	private int height = 1;
 
-	@Element
+	@Element(required=false)
 	private int refreshInterval = 10;
 
 	// --------------------------------------------------------------------------------

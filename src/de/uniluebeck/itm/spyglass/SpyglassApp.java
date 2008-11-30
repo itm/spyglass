@@ -7,6 +7,8 @@
  */
 package de.uniluebeck.itm.spyglass;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.DeviceData;
 import org.eclipse.swt.layout.FillLayout;
@@ -29,9 +31,10 @@ public class SpyglassApp {
 	
 	// -------------------------------------------------------------------------
 	/**
+	 * @throws IOException 
 	 * 
 	 */
-	public SpyglassApp() {
+	public SpyglassApp() throws IOException {
 		log.info("New SpyGlass instance.");
 		
 		// GUI
@@ -48,12 +51,14 @@ public class SpyglassApp {
 		shell.setSize(800, 600);
 		shell.open();
 		
-		// Application objects
-		final Spyglass spyglass = new Spyglass(true);
-		final AppWindow appWindow = new AppWindow(display, shell, spyglass);
+		// Model
+		final Spyglass spyglass = new Spyglass();
 		
-		@SuppressWarnings("unused")
-		final UIController uiController = new UIController(spyglass, appWindow);
+		// View
+		final AppWindow appWindow = new AppWindow(spyglass, shell);
+		
+		// Control
+		new UIController(spyglass, appWindow);
 		
 		// Start visualization
 		spyglass.start();
@@ -66,14 +71,16 @@ public class SpyglassApp {
 		}
 		
 		spyglass.shutdown();
+		
 		log.info("SpyGlass end. Done.");
 	}
 	
 	// -------------------------------------------------------------------------
 	/**
+	 * @throws IOException 
 	 * 
 	 */
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 		log.info("Starting SpyGlass app.");
 		new SpyglassApp();
 	}

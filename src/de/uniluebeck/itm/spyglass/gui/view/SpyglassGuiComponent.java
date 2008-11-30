@@ -7,6 +7,8 @@
  */
 package de.uniluebeck.itm.spyglass.gui.view;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -51,19 +53,21 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	 * 
 	 * @param args
 	 *            the arguments
+	 * @throws IOException 
 	 */
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 		showGUI();
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * Displays this org.eclipse.swt.widgets.Composite inside a new Shell.
+	 * @throws IOException 
 	 */
-	public static void showGUI() {
+	public static void showGUI() throws IOException {
 		final Display display = Display.getDefault();
 		final Shell shell = new Shell(display);
-		final SpyglassGuiComponent inst = new SpyglassGuiComponent(shell, SWT.NULL, new Spyglass(false));
+		final SpyglassGuiComponent inst = new SpyglassGuiComponent(shell, SWT.NULL, new Spyglass());
 		final Point size = inst.getSize();
 		shell.setLayout(new FillLayout());
 		shell.layout();
