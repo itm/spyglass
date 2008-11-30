@@ -363,7 +363,8 @@ public class NodeObject extends DrawingObject {
 				final int lineWidth = getLineWidth();
 				// determine the size parameters of the rectangle which represents the node in
 				// respect to the sting to be displayed
-				final Point size = new GC(Display.getCurrent()).textExtent(string);
+				final GC gc = new GC(Display.getCurrent());
+				final Point size = gc.textExtent(string);
 				final int width = size.x + lineWidth + 3; // +3: see above
 				final int height = size.y + lineWidth + 3;
 
@@ -383,6 +384,8 @@ public class NodeObject extends DrawingObject {
 				final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht + 1, bbHeight + 1);
 
 				setBoundingBox(getDrawingArea().pixelRect2AbsRect(bbArea));
+
+				gc.dispose();
 
 			}
 		});

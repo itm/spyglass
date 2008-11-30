@@ -69,8 +69,6 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	}
 
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
-		System.out.println("Layer: " + layer.getDrawingObjects());
-		System.out.println("Edges: " + edgeTimes.keySet());
 		synchronized (layer) {
 			return layer.getDrawingObjects(area);
 		}
