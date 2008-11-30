@@ -15,6 +15,58 @@
                </semanticTypes>
             </parameters>
          </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
+            <parameters>
+               <active>true</active>
+               <visible>true</visible>
+               <name>GlobalInformation</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <semanticTypes4Neighborhoods length="1">
+                  <int>-1</int>
+               </semanticTypes4Neighborhoods>
+               <showNodeDegree>false</showNodeDegree>
+               <showNumNodes>true</showNumNodes>
+               <statisticalInformationEvaluators class="java.util.TreeSet"/>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
+            <parameters>
+               <active>true</active>
+               <visible>true</visible>
+               <name>default4</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <defaultValue>3.0</defaultValue>
+               <gridElementHeight>1000</gridElementHeight>
+               <gridElementWidth>1000</gridElementWidth>
+               <lowerLeftX>-16000</lowerLeftX>
+               <lowerLeftY>-16000</lowerLeftY>
+               <lockGridElementSquare>true</lockGridElementSquare>
+               <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
+               <maxColorRGB length="3">
+                  <int>255</int>
+                  <int>0</int>
+                  <int>0</int>
+               </maxColorRGB>
+               <maxValue>20.0</maxValue>
+               <minColorRGB length="3">
+                  <int>0</int>
+                  <int>0</int>
+                  <int>255</int>
+               </minColorRGB>
+               <minValue>0.0</minValue>
+               <width>32000</width>
+               <numFramePointsHorizontal>3</numFramePointsHorizontal>
+               <numFramePointsVertical>3</numFramePointsVertical>
+               <height>32000</height>
+               <refreshInterval>10</refreshInterval>
+            </parameters>
+         </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
             <parameters>
                <active>true</active>
@@ -29,9 +81,9 @@
                <gridLowerLeftPointX>-16000</gridLowerLeftPointX>
                <gridLowerLeftPointY>-16000</gridLowerLeftPointY>
                <lineColorRGB length="3">
-                  <int>212</int>
-                  <int>212</int>
-                  <int>212</int>
+                  <int>81</int>
+                  <int>128</int>
+                  <int>206</int>
                </lineColorRGB>
                <lineWidth>1.0</lineWidth>
                <lockGridElementsSquare>true</lockGridElementsSquare>
@@ -51,29 +103,29 @@
                </semanticTypes>
                <stringFormatters/>
                <lineColorRGB length="3">
-                  <int>128</int>
-                  <int>255</int>
-                  <int>128</int>
+                  <int>0</int>
+                  <int>0</int>
+                  <int>0</int>
                </lineColorRGB>
-               <lineWidth>2</lineWidth>
+               <lineWidth>1</lineWidth>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter.VectorSequencePainterPlugin">
             <parameters>
                <active>true</active>
                <visible>true</visible>
-               <name>VecPainter</name>
-               <timeout>3</timeout>
+               <name>default11</name>
+               <timeout>10</timeout>
                <semanticTypes length="1">
                   <int>12</int>
                </semanticTypes>
                <dimension>2</dimension>
                <lineColorRGB length="3">
-                  <int>128</int>
+                  <int>0</int>
                   <int>255</int>
                   <int>0</int>
                </lineColorRGB>
-               <lineWidth>50</lineWidth>
+               <lineWidth>3</lineWidth>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
@@ -92,7 +144,7 @@
                   <isActive nodeID="2">false</isActive>
                   <isActive nodeID="3">false</isActive>
                   <isActive nodeID="4">false</isActive>
-                  <isActive nodeID="5">false</isActive>
+                  <isActive nodeID="5">true</isActive>
                   <isActive nodeID="6">false</isActive>
                   <isActive nodeID="7">true</isActive>
                </extendedInformation>
@@ -102,24 +154,7 @@
                   <int>0</int>
                   <int>0</int>
                </lineColorRGB>
-               <lineWidth>1</lineWidth>
-            </parameters>
-         </plugin>
-         <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
-            <parameters>
-               <active>true</active>
-               <visible>true</visible>
-               <name>GlobalInformation</name>
-               <timeout>0</timeout>
-               <semanticTypes length="1">
-                  <int>-1</int>
-               </semanticTypes>
-               <semanticTypes4Neighborhoods length="1">
-                  <int>-1</int>
-               </semanticTypes4Neighborhoods>
-               <showNodeDegree>false</showNodeDegree>
-               <showNumNodes>true</showNumNodes>
-               <statisticalInformationEvaluators class="java.util.TreeSet"/>
+               <lineWidth>2</lineWidth>
             </parameters>
          </plugin>
       </plugins>
@@ -148,16 +183,16 @@
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
-            <gridElementHeight>100</gridElementHeight>
-            <gridElementWidth>100</gridElementWidth>
-            <gridLowerLeftPointX>0</gridLowerLeftPointX>
-            <gridLowerLeftPointY>0</gridLowerLeftPointY>
+            <gridElementHeight>320</gridElementHeight>
+            <gridElementWidth>320</gridElementWidth>
+            <gridLowerLeftPointX>-16000</gridLowerLeftPointX>
+            <gridLowerLeftPointY>-16000</gridLowerLeftPointY>
             <lineColorRGB length="3">
                <int>192</int>
                <int>192</int>
                <int>192</int>
             </lineColorRGB>
-            <lineWidth>3.0</lineWidth>
+            <lineWidth>1.0</lineWidth>
             <lockGridElementsSquare>true</lockGridElementsSquare>
             <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
             <numCols>100</numCols>
@@ -191,10 +226,10 @@
                <int>-1</int>
             </semanticTypes>
             <defaultValue>3.0</defaultValue>
-            <gridElementHeight>1</gridElementHeight>
-            <gridElementWidth>1</gridElementWidth>
-            <lowerLeftX>0</lowerLeftX>
-            <lowerLeftY>0</lowerLeftY>
+            <gridElementHeight>10</gridElementHeight>
+            <gridElementWidth>10</gridElementWidth>
+            <lowerLeftX>-6000</lowerLeftX>
+            <lowerLeftY>-6000</lowerLeftY>
             <lockGridElementSquare>true</lockGridElementSquare>
             <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
             <maxColorRGB length="3">
@@ -209,10 +244,10 @@
                <int>0</int>
             </minColorRGB>
             <minValue>0.0</minValue>
-            <width>1</width>
+            <width>100</width>
             <numFramePointsHorizontal>3</numFramePointsHorizontal>
             <numFramePointsVertical>3</numFramePointsVertical>
-            <height>1</height>
+            <height>100</height>
             <refreshInterval>10</refreshInterval>
          </parameters>
       </plugin>
