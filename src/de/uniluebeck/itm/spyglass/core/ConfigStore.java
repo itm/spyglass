@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -247,15 +248,23 @@ public class ConfigStore extends PropertyBean {
 	 */
 	private static SpyglassConfiguration load(final File configFile) throws Exception {
 		log.debug("Initializing. Reading config from file: " + configFile);
-		SpyglassConfiguration config = null;
 
 		if (!configFile.isFile()) {
 			throw new IOException("Can't find config file '" + configFile + "'");
 		}
 
 		final Serializer serializer = new Persister();
-		config = serializer.read(SpyglassConfiguration.class, configFile);
+		final SpyglassConfiguration config = serializer.read(SpyglassConfiguration.class, configFile);
 
+		// if there is a default config missing, add it
+		for(final Class<? extends Plugin> clazz: config.getPluginManager().getAvailablePluginTypes()) {
+			if (config.getDefaultConfig(clazz) == null) {
+				final ArrayList<Plugin> set = new ArrayList<Plugin>(config.getDefaultPlugins());
+				set.add(PluginFactory.createDefaultInstance(clazz));
+				config.setDefaultPlugins(set);
+			}
+		}
+		
 		return config;
 	}
 
