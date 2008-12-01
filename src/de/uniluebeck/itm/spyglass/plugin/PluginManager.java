@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.load.Commit;
+import org.simpleframework.xml.load.Validate;
 
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener.ListChangeEvent;
 import de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin;
@@ -85,11 +86,33 @@ public class PluginManager {
 		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
 	}
 	
+	/**
+	 * This method is called after the deserialization of this instance has finished.
+	 * 
+	 * it wraps the deserialized plugin list into a synchrozied collection.
+	 */
 	@Commit
-	public void commit() {
+	protected void commit() {
 		this.plugins = Collections.synchronizedList(pluginsInternal);
 	}
 
+	/**
+	 * This method is called after the deserialization of this instance has finished.
+	 * 
+	 * it checks for duplicate plugin names
+	 */
+	@Validate
+	protected void validate() {
+		final HashSet<String> pluginNames = new HashSet<String>();
+		for (final Plugin p: pluginsInternal) {
+			final String name = p.getInstanceName();
+			if (pluginNames.contains(name)) {
+				throw new IllegalStateException("Found two plugins with the name "+name+". Cannot continue.");
+			}
+			pluginNames.add(name);
+		}
+	}
+	
 	/**
 	 * List of plugins that are currently being removed
 	 * 
