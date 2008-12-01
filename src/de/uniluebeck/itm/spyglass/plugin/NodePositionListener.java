@@ -13,7 +13,7 @@ import java.util.EventListener;
 /**
  * Listener for NodePosition events
  */
-public interface NodePositionChangedListener extends EventListener {
+public interface NodePositionListener extends EventListener {
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -21,5 +21,5 @@ public interface NodePositionChangedListener extends EventListener {
 	 * 
 	 * @param e
 	 */
-	public void handleEvent(NodePositionChangedEvent e);
+	public void handleEvent(NodePositionEvent e);
 }

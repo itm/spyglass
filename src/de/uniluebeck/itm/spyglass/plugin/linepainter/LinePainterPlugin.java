@@ -31,8 +31,8 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.Uint16ListPacket;
-import de.uniluebeck.itm.spyglass.plugin.NodePositionChangedEvent;
-import de.uniluebeck.itm.spyglass.plugin.NodePositionChangedListener;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionEvent;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
@@ -41,7 +41,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-public class LinePainterPlugin extends RelationPainterPlugin implements PropertyChangeListener, NodePositionChangedListener {
+public class LinePainterPlugin extends RelationPainterPlugin implements PropertyChangeListener, NodePositionListener {
 
 	@Element(name = "parameters")
 	private final LinePainterXMLConfig xmlConfig;
@@ -103,7 +103,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 	}
 
-	public void handleEvent(final NodePositionChangedEvent event) {
+	public void handleEvent(final NodePositionEvent event) {
 		AbsoluteRectangle oldBoundingBox;
 		for (final Edge e : getIncidentEdges(event.node)) {
 			oldBoundingBox = e.line.getBoundingBox();
@@ -256,7 +256,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		super.init(manager);
 
 		xmlConfig.addPropertyChangeListener(this);
-		pluginManager.addNodePositionChangedListener(this);
+		pluginManager.addNodePositionListener(this);
 
 		handleTimeoutChange(xmlConfig.getTimeout());
 
@@ -266,7 +266,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	public void shutdown() {
 
 		xmlConfig.removePropertyChangeListener(this);
-		pluginManager.removeNodePositionChangedListener(this);
+		pluginManager.removeNodePositionListener(this);
 
 	}
 

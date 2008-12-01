@@ -99,15 +99,25 @@ public class PluginManager {
 	/**
 	 * This method is called after the deserialization of this instance has finished.
 	 * 
-	 * it checks for duplicate plugin names
+	 * - checks for duplicate plugin names
+	 * - checks for the NodePositioner
 	 */
 	@Validate
 	protected void validate() {
 		final HashSet<String> pluginNames = new HashSet<String>();
+		
+		boolean foundActiveNodePos = false;
+		
 		for (final Plugin p: pluginsInternal) {
 			final String name = p.getInstanceName();
 			if (pluginNames.contains(name)) {
 				throw new IllegalStateException("Found two plugins with the name "+name+". Cannot continue.");
+			}
+			if ((p instanceof NodePositionerPlugin) && p.isActive()) {
+				if (foundActiveNodePos) {
+					throw new IllegalStateException("There must always only be one NodePositioner active.");
+				}
+				foundActiveNodePos = true;
 			}
 			pluginNames.add(name);
 		}
@@ -595,25 +605,25 @@ public class PluginManager {
 	 * 
 	 * 
 	 */
-	public void addNodePositionChangedListener(final NodePositionChangedListener listener) {
+	public void addNodePositionListener(final NodePositionListener listener) {
 		if (listener == null) {
 			return;
 		}
 
 		log.debug("Added new listener: " + listener);
-		nodePositionListeners.add(NodePositionChangedListener.class, listener);
+		nodePositionListeners.add(NodePositionListener.class, listener);
 	}
 
 	/**
 	 * Remove the given listener.
 	 */
-	public void removeNodePositionChangedListener(final NodePositionChangedListener listener) {
+	public void removeNodePositionListener(final NodePositionListener listener) {
 		if (listener == null) {
 			return;
 		}
 
 		log.debug("Removing listener: " + listener);
-		nodePositionListeners.remove(NodePositionChangedListener.class, listener);
+		nodePositionListeners.remove(NodePositionListener.class, listener);
 	}
 
 	/**
@@ -630,15 +640,16 @@ public class PluginManager {
 	 *            new Position of the node
 	 * 
 	 */
-	public void fireNodePositionChangedEvent(final int node, final AbsolutePosition oldPos, final AbsolutePosition newPos) {
+	public void fireNodePositionEvent(final NodePositionEvent event) {
 		// Get listeners
-		final EventListener[] list = nodePositionListeners.getListeners(NodePositionChangedListener.class);
+		final EventListener[] list = nodePositionListeners.getListeners(NodePositionListener.class);
 
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
-			((NodePositionChangedListener) list[i]).handleEvent(new NodePositionChangedEvent(node, oldPos, newPos));
+			((NodePositionListener) list[i]).handleEvent(event);
 		}
 	}
+
 
 	// --------------------------------------------------------------------------
 	// ------

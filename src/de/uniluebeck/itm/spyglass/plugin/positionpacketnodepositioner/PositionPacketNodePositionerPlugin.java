@@ -10,6 +10,8 @@ package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
@@ -18,6 +20,7 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionEvent;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
@@ -32,10 +35,16 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
+	
 	private static Logger log = SpyglassLoggerFactory.getLogger(PositionPacketNodePositionerPlugin.class);
 
 	@Element(name = "parameters")
 	private final PositionPacketNodePositionerXMLConfig config;
+
+	/**
+	 * Time for scheduling packet removals
+	 */
+	private Timer timer = new Timer();
 
 	/**
 	 * Hashmap containing the position information.
@@ -45,8 +54,11 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	/**
 	 * System time, when the node has been last seen.
 	 */
-	private final HashMap<Integer, Long> lastSeem = new HashMap<Integer, Long>();
+	private final HashMap<Integer, Long> lastSeen = new HashMap<Integer, Long>();
 
+	/**
+	 * Mutex to protect lastSeen and positionMap
+	 */
 	private Object mutex = new Object();
 	
 	/**
@@ -54,14 +66,22 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	 */
 	public PositionPacketNodePositionerPlugin() {
 		config = new PositionPacketNodePositionerXMLConfig();
+		
+		// Check every second for old nodes 
+		timer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				removeOldNodes();
+			}
+			
+		}, 1000, 100);
 	}
 
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
 		
 		synchronized (mutex) {
-			removeOldNodes();
-
 			return positionMap.get(nodeId);
 		}
 	}
@@ -75,20 +95,26 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 			return;
 		}
 		
-		synchronized (mutex) {
-
-			final Iterator<Integer> it = lastSeem.keySet().iterator();
-			while (it.hasNext()) {
-				final int id = it.next();
-				if (lastSeem.get(id) != null) {
-					final long time = lastSeem.get(id);
-					if (System.currentTimeMillis() - time > config.getTimeout()*1000) {
+		final Iterator<Integer> it = lastSeen.keySet().iterator();
+		while (it.hasNext()) {
+			final int id = it.next();
+			if (lastSeen.get(id) != null) {
+				final long time = lastSeen.get(id);
+				if (System.currentTimeMillis() - time > config.getTimeout()*1000) {
+					
+					final AbsolutePosition oldPos = positionMap.get(id);;
+					synchronized (mutex) {
 						positionMap.remove(id);
 						it.remove();
 					}
+					log.debug("Removed node "+ id + " after timeout.");
+					pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.REMOVED, oldPos, null));
+
 				}
 			}
 		}
+		
+
 	}
 		
 
@@ -126,14 +152,17 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 		synchronized (mutex) {
 
-			this.lastSeem.put(id, System.currentTimeMillis());
+			this.lastSeen.put(id, System.currentTimeMillis());
 			this.positionMap.put(id, newPos);
 
 		}
 
 		// only send events when the position really changes.
-		if ((oldPos == null) || !oldPos.equals(newPos)) {
-			pluginManager.fireNodePositionChangedEvent(id, oldPos, newPos);
+		if (oldPos == null) {
+			pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.ADDED, null, newPos));
+		}
+		else if (!oldPos.equals(newPos)) {
+			pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.MOVED, oldPos, newPos));
 		}
 
 	}
@@ -159,7 +188,6 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	public int getNumNodes() {
 
 		synchronized (mutex) {
-			removeOldNodes();
 			return this.positionMap.size();
 		}
 	}

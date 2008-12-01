@@ -35,8 +35,8 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
-import de.uniluebeck.itm.spyglass.plugin.NodePositionChangedEvent;
-import de.uniluebeck.itm.spyglass.plugin.NodePositionChangedListener;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionEvent;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.nodepainter.NodePainterPlugin;
@@ -93,7 +93,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	private Map<DrawingObject, AbsoluteRectangle> boundingBoxes;
 
 	/** Listens for changes of the nodes' positions */
-	private NodePositionChangedListener npcl;
+	private NodePositionListener npcl;
 
 	/** Listens for changes of configuration properties */
 	private PropertyChangeListener pcl;
@@ -116,15 +116,15 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	@Override
 	public void init(final PluginManager manager) {
 		super.init(manager);
-		npcl = new NodePositionChangedListener() {
+		npcl = new NodePositionListener() {
 			@SuppressWarnings("synthetic-access")
 			@Override
-			public void handleEvent(final NodePositionChangedEvent e) {
+			public void handleEvent(final NodePositionEvent e) {
 				setNodePosition(e.node, e.newPosition);
 			}
 
 		};
-		manager.addNodePositionChangedListener(npcl);
+		manager.addNodePositionListener(npcl);
 		pcl = new PropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
@@ -147,7 +147,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	@Override
 	public void shutdown() {
 		super.shutdown();
-		getPluginManager().removeNodePositionChangedListener(npcl);
+		getPluginManager().removeNodePositionListener(npcl);
 		xmlConfig.removePropertyChangeListener(pcl);
 		reset();
 	}
