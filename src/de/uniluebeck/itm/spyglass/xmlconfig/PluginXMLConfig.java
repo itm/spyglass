@@ -46,7 +46,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	private String name = "default";
 
 	@Element(name = PROPERTYNAME_TIMEOUT, required = false)
-	private int timeout = -1;
+	private int timeout = 0;
 
 	@ElementArray(name = PROPERTYNAME_SEMANTIC_TYPES, required = false)
 	private int[] semanticTypes = new int[] { -1 };
