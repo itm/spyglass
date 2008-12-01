@@ -9,6 +9,7 @@
 package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
@@ -25,14 +26,16 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * Default node positioner. it reads the position information from the incoming packets.
  * 
- * @author dariush
+ * TODO: add a time to give precise events when a node is removed.
+ * 
+ * @author Dariush Forouher
  * 
  */
 public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	private static Logger log = SpyglassLoggerFactory.getLogger(PositionPacketNodePositionerPlugin.class);
 
 	@Element(name = "parameters")
-	private final PositionPacketNodePositionerXMLConfig xmlConfig;
+	private final PositionPacketNodePositionerXMLConfig config;
 
 	/**
 	 * Hashmap containing the position information.
@@ -40,16 +43,54 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	private final HashMap<Integer, AbsolutePosition> positionMap = new HashMap<Integer, AbsolutePosition>();
 
 	/**
+	 * System time, when the node has been last seen.
+	 */
+	private final HashMap<Integer, Long> lastSeem = new HashMap<Integer, Long>();
+
+	private Object mutex = new Object();
+	
+	/**
 	 * Constructor
 	 */
 	public PositionPacketNodePositionerPlugin() {
-		xmlConfig = new PositionPacketNodePositionerXMLConfig();
+		config = new PositionPacketNodePositionerXMLConfig();
 	}
 
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
-		return !positionMap.containsKey(nodeId) ? null : positionMap.get(nodeId);
+		
+		synchronized (mutex) {
+			removeOldNodes();
+
+			return positionMap.get(nodeId);
+		}
 	}
+
+	/** 
+	 * Remove nodes which have timed out.
+	 */
+	private void removeOldNodes() {
+		
+		if (config.getTimeout()==0) {
+			return;
+		}
+		
+		synchronized (mutex) {
+
+			final Iterator<Integer> it = lastSeem.keySet().iterator();
+			while (it.hasNext()) {
+				final int id = it.next();
+				if (lastSeem.get(id) != null) {
+					final long time = lastSeem.get(id);
+					if (System.currentTimeMillis() - time > config.getTimeout()*1000) {
+						positionMap.remove(id);
+						it.remove();
+					}
+				}
+			}
+		}
+	}
+		
 
 	@Override
 	public PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> createPreferencePage(
@@ -68,7 +109,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		return this.xmlConfig;
+		return this.config;
 	}
 
 	/**
@@ -83,13 +124,18 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 		final AbsolutePosition newPos = packet.getPosition().clone();
 		final AbsolutePosition oldPos = positionMap.get(id);
 
-		// only send events and update map when the
-		// position really changes. lowers number of
-		// redraws
-		if ((oldPos == null) || !oldPos.equals(newPos)) {
+		synchronized (mutex) {
+
+			this.lastSeem.put(id, System.currentTimeMillis());
 			this.positionMap.put(id, newPos);
+
+		}
+
+		// only send events when the position really changes.
+		if ((oldPos == null) || !oldPos.equals(newPos)) {
 			pluginManager.fireNodePositionChangedEvent(id, oldPos, newPos);
 		}
+
 	}
 
 	@Override
@@ -99,7 +145,9 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public void reset() {
-		this.positionMap.clear();
+		synchronized (mutex) {
+			this.positionMap.clear();
+		}
 	}
 
 	@Override
@@ -109,7 +157,11 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public int getNumNodes() {
-		return this.positionMap.size();
+
+		synchronized (mutex) {
+			removeOldNodes();
+			return this.positionMap.size();
+		}
 	}
 
 	@Override

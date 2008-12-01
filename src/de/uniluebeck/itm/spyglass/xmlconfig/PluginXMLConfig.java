@@ -45,6 +45,9 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	@Element(name = PROPERTYNAME_NAME, required = false)
 	private String name = "default";
 
+	/**
+	 * Timeout (in seconds)
+	 */
 	@Element(name = PROPERTYNAME_TIMEOUT, required = false)
 	private int timeout = 0;
 
