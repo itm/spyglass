@@ -7,6 +7,7 @@
  */
 package de.uniluebeck.itm.spyglass.gui;
 
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
@@ -25,6 +26,7 @@ import de.uniluebeck.itm.spyglass.core.EventDispatcher;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
+import de.uniluebeck.itm.spyglass.gui.view.RulerArea;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.DrawingObjectListener;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -52,6 +54,7 @@ public class UIController {
 	private final Display display;
 
 	/** User events will be dispatched here */
+
 	private EventDispatcher eventDispatcher;
 
 	// --------------------------------------------------------------------------
@@ -116,6 +119,10 @@ public class UIController {
 			}
 		}
 		spyglass.getPluginManager().addPluginListChangeListener(pluginListChangeListener);
+
+		spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().addPropertyChangeListener(rulerPropertyListener);
+
+		appWindow.getGui().getDrawingArea().addPaintListener(paintRulerListener);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -300,6 +307,54 @@ public class UIController {
 			// TODO: in a perfect world this should be unneseccary, since the plugins would
 			// have done this themselves.
 			appWindow.getGui().getDrawingArea().redraw();
+		}
+	};
+
+	// ----------------------------------------------------------------
+	/**
+	 * Listener for change of visibility of ruler
+	 */
+
+	PropertyChangeListener rulerPropertyListener = new PropertyChangeListener() {
+
+		@Override
+		public void propertyChange(final PropertyChangeEvent evt) {
+
+			appWindow.getGui().changeRulerVis();
+
+		}
+	};
+
+	/**
+	 * Renders the visible plug-in's.<br>
+	 * The plug-ins provide objects which are drawn into the drawing area.
+	 * 
+	 * @param gc
+	 *            the graphic context used to actually draw the provided objects
+	 * @see DrawingObject
+	 */
+	private PaintListener paintRulerListener = new PaintListener() {
+
+		@Override
+		public void paintControl(final PaintEvent e) {
+
+			final PixelRectangle pxArea = appWindow.getGui().getDrawingArea().getDrawingRectangle();
+
+			final Point2D upperLeft = appWindow.getGui().getDrawingArea().getUpperLeftPrecise();
+			final Point2D lowerRight = appWindow.getGui().getDrawingArea().getLowerRightPrecise();
+
+			GC gc = new GC(appWindow.getGui().getRulerH());
+			appWindow.getGui().getRulerH().redraw(pxArea, upperLeft, lowerRight, gc, RulerArea.HORIZONTAL);
+			gc.dispose();
+
+			gc = new GC(appWindow.getGui().getRulerV());
+			appWindow.getGui().getRulerV().redraw(pxArea, upperLeft, lowerRight, gc, RulerArea.VERTICAL);
+			gc.dispose();
+
+			/*
+			 * gc = new GC(appWindow.getGui().getRulerV());
+			 * appWindow.getGui().getRulerV().redrawV(pxArea, area, gc); gc.dispose();
+			 */
 		}
 	};
 

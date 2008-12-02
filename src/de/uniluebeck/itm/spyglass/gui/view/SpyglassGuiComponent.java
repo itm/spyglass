@@ -45,6 +45,12 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 
 	private DrawingArea canvas;
 
+	private RulerArea dummy;
+	private RulerArea rulerH;
+	private RulerArea rulerV;
+
+	private static int defaultRulerWidth = 30;
+
 	private GlobalInformationBar globalInformationBar;
 
 	// --------------------------------------------------------------------------------
@@ -53,7 +59,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	 * 
 	 * @param args
 	 *            the arguments
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(final String[] args) throws IOException {
 		showGUI();
@@ -62,7 +68,8 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Displays this org.eclipse.swt.widgets.Composite inside a new Shell.
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 */
 	public static void showGUI() throws IOException {
 		final Display display = Display.getDefault();
@@ -101,7 +108,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	 * @param spyglass
 	 *            the <code>SpyGlass</code> instance
 	 */
-	public SpyglassGuiComponent(final org.eclipse.swt.widgets.Composite parent, final int style, final Spyglass spyglass) {
+	public SpyglassGuiComponent(final Composite parent, final int style, final Spyglass spyglass) {
 		super(parent, style);
 		initGUI(spyglass);
 	}
@@ -158,9 +165,12 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 			{
 				final Composite compositeDrawingArea = new Composite(parent, SWT.NONE);
 				final GridLayout composite1Layout = new GridLayout();
-				composite1Layout.makeColumnsEqualWidth = true;
+				// composite1Layout.makeColumnsEqualWidth = true;
 				composite1Layout.marginHeight = 0;
 				composite1Layout.marginWidth = 0;
+				composite1Layout.numColumns = 2;
+				composite1Layout.verticalSpacing = 0;
+				composite1Layout.horizontalSpacing = 0;
 				final GridData composite1LData = new GridData();
 				composite1LData.grabExcessHorizontalSpace = true;
 				composite1LData.horizontalAlignment = GridData.FILL;
@@ -169,6 +179,37 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 				compositeDrawingArea.setLayoutData(composite1LData);
 				compositeDrawingArea.setLayout(composite1Layout);
 				compositeDrawingArea.setBackground(SWTResourceManager.getColor(255, 255, 255));
+
+				int rulerWidth = 0;
+				if (spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getShowRuler()) {
+					rulerWidth = defaultRulerWidth;
+				}
+
+				// begin creation of ruler canvases
+				{
+					final GridData dummyData = new GridData();
+					dummyData.heightHint = rulerWidth;
+					dummyData.widthHint = rulerWidth;
+					dummy = new RulerArea(compositeDrawingArea);
+					dummy.setLayoutData(dummyData);
+				}
+
+				{
+					final GridData rulerHData = new GridData();
+					rulerHData.heightHint = rulerWidth;
+					rulerHData.horizontalAlignment = SWT.FILL;
+					rulerH = new RulerArea(compositeDrawingArea);
+					rulerH.setLayoutData(rulerHData);
+				}
+
+				{
+					final GridData rulerVData = new GridData();
+					rulerVData.widthHint = rulerWidth;
+					rulerVData.verticalAlignment = SWT.FILL;
+					rulerV = new RulerArea(compositeDrawingArea);
+					rulerV.setLayoutData(rulerVData);
+				}
+				// end creation of ruler canvases
 				{
 					final GridData canvas1LData = new GridData();
 					canvas1LData.horizontalAlignment = GridData.FILL;
@@ -218,4 +259,39 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 		return globalInformationBar;
 	}
 
+	public void changeRulerVis() {
+		log.debug("Ruler visibility changed!");
+		final GridData dataD = (GridData) dummy.getLayoutData();
+		final GridData dataV = (GridData) rulerV.getLayoutData();
+		final GridData dataH = (GridData) rulerH.getLayoutData();
+
+		final int curVal = dataD.widthHint;
+		if (curVal == 0) {
+			dataD.widthHint = defaultRulerWidth;
+			dataD.heightHint = defaultRulerWidth;
+			dataV.widthHint = defaultRulerWidth;
+			dataH.heightHint = defaultRulerWidth;
+		} else {
+			dataD.widthHint = 0;
+			dataD.heightHint = 0;
+			dataV.widthHint = 0;
+			dataH.heightHint = 0;
+		}
+
+		dummy.setLayoutData(dataD);
+		rulerV.setLayoutData(dataV);
+		rulerH.setLayoutData(dataH);
+		// final Point size2 = new Point(200, 200);
+		// canvas.setSize(size2);
+
+		canvas.getParent().layout();
+	}
+
+	public RulerArea getRulerH() {
+		return rulerH;
+	}
+
+	public RulerArea getRulerV() {
+		return rulerV;
+	}
 }
