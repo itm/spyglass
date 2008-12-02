@@ -473,6 +473,24 @@ public class DrawingArea extends Canvas {
 	}
 	
 	/**
+	 * return the absolute point represented by the lower right point of the drawing area.
+	 */
+	public Point2D getLowerRightPrecise() {
+		this.checkWidget();
+		
+		try {
+			
+			final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(),
+					this.getDrawingRectangle().getHeight());
+			final Point2D lowerRight2D = at.inverseTransform(lowerRight, null);
+			return lowerRight2D;
+			
+		} catch (final NoninvertibleTransformException e) {
+			throw new RuntimeException("Transformation matrix in illegal state!", e);
+		}
+	}
+	
+	/**
 	 * return the absolute point represented by the upper left point of the drawing area.
 	 */
 	public AbsolutePosition getUpperLeft() {
@@ -482,6 +500,22 @@ public class DrawingArea extends Canvas {
 			
 			final Point2D upperLeft2D = at.inverseTransform(new Point2D.Double(0, 0), null);
 			return new AbsolutePosition(upperLeft2D);
+			
+		} catch (final NoninvertibleTransformException e) {
+			throw new RuntimeException("Transformation matrix in illegal state!", e);
+		}
+	}
+	
+	/**
+	 * return the absolute point represented by the upper left point of the drawing area.
+	 */
+	public Point2D getUpperLeftPrecise() {
+		this.checkWidget();
+		
+		try {
+			
+			final Point2D upperLeft2D = at.inverseTransform(new Point2D.Double(0, 0), null);
+			return upperLeft2D;
 			
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
