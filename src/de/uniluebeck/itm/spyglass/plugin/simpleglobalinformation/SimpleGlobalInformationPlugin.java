@@ -8,6 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +43,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STAT
  * Instances of this class provide statistical information which will be displayed on the
  * {@link GlobalInformationBar}
  * 
- * @author Sebastian Ebers TODO: AverageNodeDegree
+ * @author Sebastian Ebers
  * 
  */
 public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
@@ -135,7 +136,9 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		final int packetSemanticType = packet.getSemanticType();
 
 		if (semanticTypes4Neighborhoods.contains(packetSemanticType) && (packet instanceof Uint16ListPacket)) {
-			avgNodeDegString = "avg. node degree: " + avgNodeDegEvaluator.addValue(((Uint16ListPacket) packet).getNeighborhoodPacketNodeIDs().size());
+			avgNodeDegString = "avg. node degree: "
+					+ new DecimalFormat("0.0#").format(avgNodeDegEvaluator
+							.addValue(((Uint16ListPacket) packet).getNeighborhoodPacketNodeIDs().size()));
 		}
 
 		final StatisticalInformationEvaluator sfs = xmlConfig.getStatisticalInformationEvaluators4Type(packetSemanticType);

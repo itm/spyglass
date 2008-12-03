@@ -13,7 +13,6 @@ import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -114,14 +113,12 @@ public class SimpleGlobalInformationOptionsComposite extends Composite {
 			showAVGNodeDegree = new Button(groupPredef, SWT.CHECK);
 			showAVGNodeDegree.setText("Show average node degree");
 			showAVGNodeDegree.addSelectionListener(new SelectionAdapter() {
+				@SuppressWarnings("synthetic-access")
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					final boolean isSelected = ((Button) e.widget).getSelection();
 					if (!isSelected && !StringToIntListValidator.isValid(semanticTypes.getText())) {
 						semanticTypes.setText("-1");
-					}
-					if (isSelected) {
-						MessageDialog.openError(null, "Error", "Sorry, this feature is not implemented, yet");
 					}
 				}
 			});

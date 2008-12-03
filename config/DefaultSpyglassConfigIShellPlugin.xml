@@ -25,9 +25,9 @@
                   <int>-1</int>
                </semanticTypes>
                <semanticTypes4Neighborhoods length="1">
-                  <int>-1</int>
+                  <int>11</int>
                </semanticTypes4Neighborhoods>
-               <showNodeDegree>false</showNodeDegree>
+               <showNodeDegree>true</showNodeDegree>
                <showNumNodes>true</showNumNodes>
                <statisticalInformationEvaluators class="java.util.TreeSet"/>
             </parameters>
