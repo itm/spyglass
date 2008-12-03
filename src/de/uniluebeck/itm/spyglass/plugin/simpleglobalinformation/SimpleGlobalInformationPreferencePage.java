@@ -77,9 +77,6 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 		super.storeToModel();
 
 		config.setStatisticalInformationEvaluators(this.tempStringFormatterSettingsList);
-		if (plugin != null) {
-			plugin.refreshConfigurationParameters();
-		}
 	}
 
 	@Override

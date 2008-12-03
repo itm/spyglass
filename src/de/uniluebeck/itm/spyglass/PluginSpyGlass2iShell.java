@@ -23,14 +23,12 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.UIController;
-import de.uniluebeck.itm.spyglass.gui.actions.LoadConfigurationAction;
 import de.uniluebeck.itm.spyglass.gui.actions.OpenPreferencesAction;
 import de.uniluebeck.itm.spyglass.gui.actions.PlayPlayPauseAction;
 import de.uniluebeck.itm.spyglass.gui.actions.PlayResetAction;
 import de.uniluebeck.itm.spyglass.gui.actions.PlaySelectInputAction;
 import de.uniluebeck.itm.spyglass.gui.actions.RecordRecordAction;
 import de.uniluebeck.itm.spyglass.gui.actions.RecordSelectOutputAction;
-import de.uniluebeck.itm.spyglass.gui.actions.StoreConfigurationAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomCompleteMapAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomInAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomOutAction;
@@ -103,20 +101,19 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			}
 		});
 
-
 		// create Model
 		try {
 			spyglass = new Spyglass();
 		} catch (final IOException e1) {
 			// TODO What should we do now?
-			log.error("",e1);
+			log.error("", e1);
 			return new int[] {};
 		}
-		
+
 		// save the packet broker for later
 		// XXX: can we really assume this cast?
 		packetBroker = (IShellToSpyGlassPacketBroker) spyglass.getPacketReader();
-		
+
 		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
@@ -125,10 +122,10 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 				}
 			}
 		});
-		
+
 		// create View
 		final AppWindow appWindow = new AppWindow(spyglass, container);
-		
+
 		// create Control
 		new UIController(spyglass, appWindow);
 
@@ -142,8 +139,8 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		addToolBarAction(new ZoomOutAction(appWindow.getGui().getDrawingArea()));
 		addToolBarAction(new ZoomCompleteMapAction(spyglass, appWindow.getGui().getDrawingArea()));
 		addToolBarAction(new OpenPreferencesAction(container.getShell(), spyglass));
-		addToolBarAction(new LoadConfigurationAction(spyglass));
-		addToolBarAction(new StoreConfigurationAction(spyglass));
+		// addToolBarAction(new LoadConfigurationAction(spyglass));
+		// addToolBarAction(new StoreConfigurationAction(spyglass));
 
 		// Start visualization
 		spyglass.setVisualizationRunning(true);

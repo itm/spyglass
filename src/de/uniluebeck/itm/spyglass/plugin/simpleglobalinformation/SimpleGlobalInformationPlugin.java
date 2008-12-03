@@ -8,6 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -16,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -31,7 +32,9 @@ import de.uniluebeck.itm.spyglass.gui.view.GlobalInformationWidget;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.packet.Uint16ListPacket;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.globalinformation.GlobalInformationPlugin;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.Tools;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -48,7 +51,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STAT
  */
 public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
-	private static final Logger log = SpyglassLoggerFactory.getLogger(SimpleGlobalInformationPlugin.class);
+	private static final SpyglassLogger log = (SpyglassLogger) SpyglassLoggerFactory.getLogger(SimpleGlobalInformationPlugin.class);
 
 	@Element(name = "parameters")
 	private final SimpleGlobalInformationXMLConfig xmlConfig;
@@ -61,6 +64,9 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	private List<Integer> semanticTypes4Neighborhoods;
 
+	/** Listens for changes of configuration properties */
+	private PropertyChangeListener pcl;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -72,9 +78,24 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
 	}
 
+	// --------------------------------------------------------------------------------
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniluebeck.itm.spyglass.plugin.Plugin#init(de.uniluebeck.itm.spyglass.plugin.PluginManager
+	 * )
+	 */
 	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
+	public void init(final PluginManager manager) {
+		super.init(manager);
+		pcl = new PropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent evt) {
+				refreshConfigurationParameters();
+			}
+		};
+		xmlConfig.addPropertyChangeListener(pcl);
 	}
 
 	@Override
@@ -149,7 +170,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				value = sfs.parse(packet);
 			} catch (final SpyglassPacketException e) {
 				log.error("Error parsing a packet in the " + getHumanReadableName()
-						+ ".\r\nPlease check the values in the StringFormatter for semantic type " + packetSemanticType + "!", e);
+						+ ".\r\nPlease check the values in the StringFormatter for semantic type " + packetSemanticType + "!", e, false);
 				value = sfs.getDescription() + " NaN";
 			}
 

@@ -29,7 +29,14 @@
                </semanticTypes4Neighborhoods>
                <showNodeDegree>true</showNodeDegree>
                <showNumNodes>true</showNumNodes>
-               <statisticalInformationEvaluators class="java.util.TreeSet"/>
+               <statisticalInformationEvaluators class="java.util.TreeSet">
+                  <statisticalInformationEvaluator>
+                     <semanticType>9</semanticType>
+                     <description>T</description>
+                     <expression></expression>
+                     <operations>SUM</operations>
+                  </statisticalInformationEvaluator>
+               </statisticalInformationEvaluators>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
@@ -135,13 +142,13 @@
                <name>NodePainter</name>
                <timeout>-1</timeout>
                <semanticTypes length="1">
-                  <int>-1</int>
+                  <int>1</int>
                </semanticTypes>
                <stringFormatters/>
                <defaultStringFormatter>Payload: %u0</defaultStringFormatter>
                <extendedInformation>
-                  <isActive nodeID="1">false</isActive>
-                  <isActive nodeID="2">false</isActive>
+                  <isActive nodeID="1">true</isActive>
+                  <isActive nodeID="2">true</isActive>
                   <isActive nodeID="3">false</isActive>
                   <isActive nodeID="4">false</isActive>
                   <isActive nodeID="5">true</isActive>

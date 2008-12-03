@@ -98,6 +98,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	/** Listens for changes of configuration properties */
 	private PropertyChangeListener pcl;
 
+	private volatile Boolean refreshPending = false;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -126,6 +128,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		};
 		manager.addNodePositionListener(npcl);
 		pcl = new PropertyChangeListener() {
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
 				if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ACTIVE) && !((Boolean) evt.getNewValue())) {
@@ -138,6 +141,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 						}
 					}
 				}
+				refreshConfigurationParameters();
+
 			}
 		};
 		xmlConfig.addPropertyChangeListener(pcl);
@@ -290,8 +295,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 *            the semantic type
 	 * @param str
 	 *            the semantic type's new string
-	 * @param nodeObject
-	 *            the drawing objects to be updated in order to display the new information
+	 * @param nodeID
+	 *            the node which sent the packet
 	 */
 	private void updateStringFormatterResults(final int packetSemanticType, final String str, final int nodeID) {
 
@@ -433,9 +438,30 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * changed.
 	 */
 	public void refreshConfigurationParameters() {
-		refreshNodeObjectConfiguration();
-		// this has to be done to start or stop the packet consumer thread
-		setActive(isActive());
+
+		synchronized (refreshPending) {
+			// if so, return
+			if (refreshPending) {
+				return;
+			}
+			// otherwise proceed
+			refreshPending = true;
+		}
+
+		// create the thread to store
+		final Thread t = new Thread() {
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void run() {
+				// this has to be done to start or stop the packet consumer thread
+				setActive(isActive());
+
+				refreshNodeObjectConfiguration();
+				refreshPending = false;
+			}
+		};
+		t.setDaemon(true);
+		t.start();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -447,7 +473,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 */
 	public void refreshNodeObjectConfiguration() {
 
+		// delete all cached string formatter results which are no longer needed
 		purgeStringFormatterResults();
+
 		// get all drawing objects from the quad tree
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
 
@@ -455,9 +483,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			drawingObjects.addAll(layer.getDrawingObjects());
 		}
 
-		// update all objects which represent nodes and store them in a list
-		// of objects to be updated in the quad tree
-		final List<DrawingObject> update = new LinkedList<DrawingObject>();
+		// update all objects which represent nodes
 		for (final DrawingObject drawingObject : drawingObjects) {
 			if (drawingObject instanceof NodeObject) {
 				final NodeObject nodeObject = (NodeObject) drawingObject;
@@ -466,12 +492,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				final String stringFormatterResult = getStringFormatterResultString(nodeID);
 				nodeObject.update("Node " + nodeID, stringFormatterResult, xmlConfig.isExtendedInformationActive(nodeID),
 						xmlConfig.getLineColorRGB(), xmlConfig.getLineWidth());
-				update.add(nodeObject);
 			}
 		}
 
 		synchronized (updatedObjects) {
-			updatedObjects.addAll(update);
+			updatedObjects.addAll(drawingObjects);
 		}
 
 		// and update the quad tree
