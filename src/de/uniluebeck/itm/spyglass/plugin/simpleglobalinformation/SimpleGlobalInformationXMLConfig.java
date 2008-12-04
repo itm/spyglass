@@ -36,16 +36,16 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_SEMANTIC_TYPES4_NEIGHBORHOODS = "semanticTypes4Neighborhoods";
 
-	@ElementArray(required=false)
+	@ElementArray(required = false)
 	private int[] semanticTypes4Neighborhoods;
 
-	@Element(required=false)
+	@Element(required = false)
 	private boolean showNodeDegree = true;
 
-	@Element(required=false)
+	@Element(required = false)
 	private boolean showNumNodes = true;
 
-	@ElementList(required=false)
+	@ElementList(required = false)
 	private Set<StatisticalInformationEvaluator> statisticalInformationEvaluators = new TreeSet<StatisticalInformationEvaluator>();
 
 	// --------------------------------------------------------------------------------
@@ -135,7 +135,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 		// these extensive operations are necessary to prevent dependencies when creating new
 		// instances of the associated plug-in
 		final Set<StatisticalInformationEvaluator> oldValue = new TreeSet<StatisticalInformationEvaluator>(this.statisticalInformationEvaluators);
-		this.statisticalInformationEvaluators = new TreeSet<StatisticalInformationEvaluator>();
+		this.statisticalInformationEvaluators.clear();
 		for (final StatisticalInformationEvaluator e : statisticalInformationEvaluators) {
 			this.statisticalInformationEvaluators.add(e.clone());
 		}

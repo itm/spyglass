@@ -51,20 +51,41 @@ import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STAT
  */
 public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
+	/**
+	 * An object which logs messages
+	 */
 	private static final SpyglassLogger log = (SpyglassLogger) SpyglassLoggerFactory.getLogger(SimpleGlobalInformationPlugin.class);
 
+	/**
+	 * The configuration
+	 */
 	@Element(name = "parameters")
 	private final SimpleGlobalInformationXMLConfig xmlConfig;
 
+	/**
+	 * A string holding the information about the average node degree
+	 */
 	private String avgNodeDegString;
 
+	/**
+	 * The widget where the information to be shown are placed in
+	 */
 	private SimpleGlobalInformationWidget widget;
 
+	/**
+	 * Object performing the statistical operation to determine the average node degree
+	 */
 	private StatisticalOperation avgNodeDegEvaluator;
 
+	/**
+	 * A list of semantic types of packages which provide information about neighborhood
+	 * relationships
+	 */
 	private List<Integer> semanticTypes4Neighborhoods;
 
-	/** Listens for changes of configuration properties */
+	/**
+	 * Listens for changes of configuration properties
+	 */
 	private PropertyChangeListener pcl;
 
 	// --------------------------------------------------------------------------------
@@ -79,13 +100,6 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	}
 
 	// --------------------------------------------------------------------------------
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.uniluebeck.itm.spyglass.plugin.Plugin#init(de.uniluebeck.itm.spyglass.plugin.PluginManager
-	 * )
-	 */
 	@Override
 	public void init(final PluginManager manager) {
 		super.init(manager);
@@ -98,6 +112,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		xmlConfig.addPropertyChangeListener(pcl);
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void setWidget(final GlobalInformationWidget widget) {
 		final GridLayout layout = new GridLayout();
@@ -126,6 +141,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		refreshConfigurationParameters();
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> createPreferencePage(
 			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
@@ -205,6 +221,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				}
 			});
 		}
+		xmlConfig.removePropertyChangeListener(pcl);
 	}
 
 	@Override
@@ -237,19 +254,22 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		refreshNodeCounts();
 		final Set<StatisticalInformationEvaluator> sfSettings = xmlConfig.getStatisticalInformationEvaluators();
 
-		widget.getDisplay().asyncExec(new Runnable() {
-			@SuppressWarnings("synthetic-access")
-			@Override
-			public void run() {
-				final Collection<Integer> semanticTypes = new LinkedList<Integer>();
-				for (final StatisticalInformationEvaluator sfs : sfSettings) {
-					semanticTypes.add(sfs.getSemanticType());
-					widget.createOrUpdateLabel(sfs.getSemanticType(), sfs.getDescription());
-				}
-				widget.retaingLabels(semanticTypes);
+		if (sfSettings != null) {
+			widget.getDisplay().asyncExec(new Runnable() {
+				@SuppressWarnings("synthetic-access")
+				@Override
+				public void run() {
+					final Collection<Integer> semanticTypes = new LinkedList<Integer>();
+					for (final StatisticalInformationEvaluator sfs : sfSettings) {
+						final int semanticType = sfs.getSemanticType();
+						semanticTypes.add(semanticType);
+						widget.createOrUpdateLabel(semanticType, sfs.getDescription());
+					}
+					widget.retaingLabels(semanticTypes);
 
-			}
-		});
+				}
+			});
+		}
 
 	}
 
@@ -400,7 +420,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				if (label == null) {
 					label = new Label(this, SWT.NONE);
 					sfLabels.put(semanticType, label);
-					label.setText(text);
+					label.setText(text != null ? text : "");
 					label.pack(true);
 					super.getParent().redraw();
 				}

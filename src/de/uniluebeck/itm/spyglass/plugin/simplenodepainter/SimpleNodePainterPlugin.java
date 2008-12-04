@@ -141,6 +141,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 						}
 					}
 				}
+
 				refreshConfigurationParameters();
 
 			}

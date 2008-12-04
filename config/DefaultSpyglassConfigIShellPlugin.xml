@@ -29,14 +29,7 @@
                </semanticTypes4Neighborhoods>
                <showNodeDegree>true</showNodeDegree>
                <showNumNodes>true</showNumNodes>
-               <statisticalInformationEvaluators class="java.util.TreeSet">
-                  <statisticalInformationEvaluator>
-                     <semanticType>9</semanticType>
-                     <description>T</description>
-                     <expression></expression>
-                     <operations>SUM</operations>
-                  </statisticalInformationEvaluator>
-               </statisticalInformationEvaluators>
+               <statisticalInformationEvaluators class="java.util.TreeSet"/>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">

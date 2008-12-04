@@ -23,7 +23,6 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
-import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -159,6 +158,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		getXMLConfig().setActive(isActive);
 
 		// TODO: Should be done via Events
+		// TODO: call reset()?
 
 		if (packetQueue != null) {
 			// if the plug-in is deactivated, stop the thread if it is currenrly
@@ -350,6 +350,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	public final void setVisible(final boolean setVisible) {
 		getXMLConfig().setVisible(setVisible);
+		// if (this instanceof Drawable){
+		//			
+		// ((Drawable)this).getAutoZoomDrawingObjects()
+		// }
 	}
 
 	// --------------------------------------------------------------------------------
