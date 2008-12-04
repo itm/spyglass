@@ -29,7 +29,20 @@
                </semanticTypes4Neighborhoods>
                <showNodeDegree>true</showNodeDegree>
                <showNumNodes>true</showNumNodes>
-               <statisticalInformationEvaluators class="java.util.TreeSet"/>
+               <statisticalInformationEvaluators class="java.util.TreeSet">
+                  <statisticalInformationEvaluator>
+                     <semanticType>1</semanticType>
+                     <description>Test2</description>
+                     <expression>%3</expression>
+                     <operations>MAX</operations>
+                  </statisticalInformationEvaluator>
+                  <statisticalInformationEvaluator>
+                     <semanticType>2</semanticType>
+                     <description>df</description>
+                     <expression>%U5</expression>
+                     <operations>MIN</operations>
+                  </statisticalInformationEvaluator>
+               </statisticalInformationEvaluators>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">

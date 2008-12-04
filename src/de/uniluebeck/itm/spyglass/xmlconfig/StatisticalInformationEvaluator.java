@@ -15,6 +15,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 
 // --------------------------------------------------------------------------------
@@ -30,16 +31,16 @@ import de.uniluebeck.itm.spyglass.util.StringFormatter;
 public class StatisticalInformationEvaluator extends PropertyBean implements Comparable<StatisticalInformationEvaluator> {
 
 	@Element(name = "semanticType")
-	private int semanticType;
+	private int semanticType = -1;
 
 	@Element(name = "description", required = false)
-	private String description;
+	private String description = "";
 
 	@Element(name = "expression", required = false)
-	private String expression;
+	private String expression = "";
 
 	@Element(name = "operations")
-	private STATISTICAL_OPERATIONS operation;
+	private STATISTICAL_OPERATIONS operation = STATISTICAL_OPERATIONS.SUM;
 
 	private StringFormatter stringFormatter;
 
@@ -71,15 +72,15 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 		MEDIAN
 	}
 
-	private static final Logger log = Logger.getLogger(StatisticalInformationEvaluator.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(StatisticalInformationEvaluator.class);
 
 	private StatisticalOperation operationExecutor;
 
 	/**
-	 * Private constructor to be used by the XML framework
+	 * Protected constructor to be used by the XML framework
 	 */
-	private StatisticalInformationEvaluator() {
-		// for SimpleXML
+	protected StatisticalInformationEvaluator() {
+		// nothing to do here
 	}
 
 	// --------------------------------------------------------------------------------
@@ -194,9 +195,16 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	 *            the expression to set
 	 */
 	public void setExpression(final String expression) {
+		StringFormatter newStringFormatter = null;
+		try {
+			newStringFormatter = new StringFormatter(expression);
+		} catch (final IllegalArgumentException e) {
+			log.error("The string " + expression + " is no valid format expression!", e);
+			return;
+		}
+		this.stringFormatter = newStringFormatter;
 		final String oldValue = new String(this.expression);
-		this.expression = expression;
-		stringFormatter = new StringFormatter(this.expression);
+		this.expression = new String(expression);
 		firePropertyChange("expression", oldValue, expression);
 	}
 

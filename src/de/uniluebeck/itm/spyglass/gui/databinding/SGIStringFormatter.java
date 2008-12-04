@@ -176,7 +176,8 @@ public class SGIStringFormatter {
 		final ObservableSetContentProvider contentProvider = new ObservableSetContentProvider();
 		table.setContentProvider(contentProvider);
 
-		final IObservableMap typeMap = BeansObservables.observeMap(contentProvider.getKnownElements(), StatisticalInformationEvaluator.class, "semanticType");
+		final IObservableMap typeMap = BeansObservables.observeMap(contentProvider.getKnownElements(), StatisticalInformationEvaluator.class,
+				"semanticType");
 		final IObservableMap fmtStringMap = BeansObservables.observeMap(contentProvider.getKnownElements(), StatisticalInformationEvaluator.class,
 				"expression");
 
@@ -216,7 +217,6 @@ public class SGIStringFormatter {
 		});
 	}
 
-	@SuppressWarnings("unchecked")
 	private void addEntryWidgetSelected(final SelectionEvent evt) {
 		final InputDialog dlg = new InputDialog(parent.getShell(), "Enter a semantic type", "Please enter a semantic type (-1 - 255)", "",
 				new IInputValidator() {
@@ -228,9 +228,9 @@ public class SGIStringFormatter {
 
 							if ((i < -1) || (i > 255)) {
 								return "Please enter a number between -1 and 255";
-							} else {
-								return null;
 							}
+							return null;
+
 						} catch (final NumberFormatException e) {
 							return "Please enter an integer";
 						}

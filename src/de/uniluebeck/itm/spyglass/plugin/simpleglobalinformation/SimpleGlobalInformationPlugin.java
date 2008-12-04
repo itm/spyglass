@@ -106,6 +106,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		pcl = new PropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
+				evt.getPropertyName();
 				refreshConfigurationParameters();
 			}
 		};
@@ -420,7 +421,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				if (label == null) {
 					label = new Label(this, SWT.NONE);
 					sfLabels.put(semanticType, label);
-					label.setText(text != null ? text : "");
+					label.setText(text);
 					label.pack(true);
 					super.getParent().redraw();
 				}

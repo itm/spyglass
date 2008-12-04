@@ -8,14 +8,11 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
@@ -37,6 +34,7 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 
 	private SimpleGlobalInformationOptionsComposite optionsComposite;
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
 	 * 
@@ -49,6 +47,7 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 		super(dialog, spyglass, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
 	 * 
@@ -64,21 +63,7 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 		super(dialog, spyglass, plugin, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
 	}
 
-	@Override
-	protected void loadFromModel() {
-		super.loadFromModel();
-
-		tempStringFormatterSettingsList = config.getStatisticalInformationEvaluators();
-		optionsComposite.getStringFormatter().connectTableWithData(dbc, tempStringFormatterSettingsList);
-	}
-
-	@Override
-	public void storeToModel() {
-		super.storeToModel();
-
-		config.setStatisticalInformationEvaluators(this.tempStringFormatterSettingsList);
-	}
-
+	// --------------------------------------------------------------------------------
 	@Override
 	protected Composite createContents(final Composite parent) {
 		final Composite composite = createContentsInternal(parent);
@@ -92,16 +77,17 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 		return composite;
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return SimpleGlobalInformationPlugin.class;
 	}
 
-	public static void main(final String[] args) throws IOException {
-		final Display display = Display.getDefault();
-		final Shell shell = new Shell(display);
-		final Spyglass sg = new Spyglass();
-		final PluginPreferenceDialog inst = new PluginPreferenceDialog(shell, sg);
-		inst.open();
-	}
+	// public static void main(final String[] args) throws IOException {
+	// final Display display = Display.getDefault();
+	// final Shell shell = new Shell(display);
+	// final Spyglass sg = new Spyglass();
+	// final PluginPreferenceDialog inst = new PluginPreferenceDialog(shell, sg);
+	// inst.open();
+	// }
 }
