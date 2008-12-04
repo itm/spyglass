@@ -415,9 +415,14 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		 * @param text
 		 *            the text that will be displayed
 		 */
-		public void createOrUpdateLabel(final int semanticType, final String text) {
+		public void createOrUpdateLabel(final int semanticType, String text) {
 			synchronized (sfLabels) {
 				Label label = sfLabels.get(semanticType);
+				// null cannot be handled by a label. However, its semantic is the same as the empty
+				// string
+				if (text == null) {
+					text = "";
+				}
 				if (label == null) {
 					label = new Label(this, SWT.NONE);
 					sfLabels.put(semanticType, label);
