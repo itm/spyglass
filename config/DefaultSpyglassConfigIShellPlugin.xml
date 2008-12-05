@@ -15,6 +15,35 @@
                </semanticTypes>
             </parameters>
          </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
+            <parameters>
+               <active>true</active>
+               <visible>true</visible>
+               <name>NodePainter</name>
+               <timeout>-1</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <stringFormatters/>
+               <defaultStringFormatter>Payload: %u0</defaultStringFormatter>
+               <extendedInformation>
+                  <isActive nodeID="1">true</isActive>
+                  <isActive nodeID="2">true</isActive>
+                  <isActive nodeID="3">false</isActive>
+                  <isActive nodeID="4">false</isActive>
+                  <isActive nodeID="5">true</isActive>
+                  <isActive nodeID="6">false</isActive>
+                  <isActive nodeID="7">true</isActive>
+               </extendedInformation>
+               <isExtendedDefaultValue>false</isExtendedDefaultValue>
+               <lineColorRGB length="3">
+                  <int>128</int>
+                  <int>0</int>
+                  <int>0</int>
+               </lineColorRGB>
+               <lineWidth>10</lineWidth>
+            </parameters>
+         </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
             <parameters>
                <active>true</active>
@@ -139,35 +168,6 @@
                   <int>0</int>
                </lineColorRGB>
                <lineWidth>3</lineWidth>
-            </parameters>
-         </plugin>
-         <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
-            <parameters>
-               <active>true</active>
-               <visible>false</visible>
-               <name>NodePainter</name>
-               <timeout>-1</timeout>
-               <semanticTypes length="1">
-                  <int>1</int>
-               </semanticTypes>
-               <stringFormatters/>
-               <defaultStringFormatter>Payload: %u0</defaultStringFormatter>
-               <extendedInformation>
-                  <isActive nodeID="1">true</isActive>
-                  <isActive nodeID="2">true</isActive>
-                  <isActive nodeID="3">false</isActive>
-                  <isActive nodeID="4">false</isActive>
-                  <isActive nodeID="5">true</isActive>
-                  <isActive nodeID="6">false</isActive>
-                  <isActive nodeID="7">true</isActive>
-               </extendedInformation>
-               <isExtendedDefaultValue>false</isExtendedDefaultValue>
-               <lineColorRGB length="3">
-                  <int>128</int>
-                  <int>0</int>
-                  <int>0</int>
-               </lineColorRGB>
-               <lineWidth>2</lineWidth>
             </parameters>
          </plugin>
       </plugins>

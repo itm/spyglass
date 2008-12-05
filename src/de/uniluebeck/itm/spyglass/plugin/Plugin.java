@@ -350,10 +350,6 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	public final void setVisible(final boolean setVisible) {
 		getXMLConfig().setVisible(setVisible);
-		// if (this instanceof Drawable){
-		//			
-		// ((Drawable)this).getAutoZoomDrawingObjects()
-		// }
 	}
 
 	// --------------------------------------------------------------------------------

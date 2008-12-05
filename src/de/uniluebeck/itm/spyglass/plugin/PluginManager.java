@@ -1,10 +1,10 @@
 /*
- * ------------------------------------------------------------------------------ -- This file is
- * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
- * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
- * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
- * SpyGlass source tree for further details. ----------------------------------------------
- * ----------------------------------
+ * ---------------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007
+ * by the SwarmNet (www.swarmnet.de) project SpyGlass is free software; you can redistribute
+ * it and/or modify it under the terms of the BSD License. Refer to spyglass-licence.txt
+ * file in the root of the SpyGlass source tree for further details. 
+ * --------------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin;
 
@@ -45,10 +45,9 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // ------------------------------------------------------------------------------
-// --
 /**
- * The PluginManager holds all loaded plugins and is basically a wrapper for an internal list of
- * plugins.
+ * The PluginManager holds all loaded plug-ins and is basically a wrapper for an internal list of
+ * plug-ins.
  */
 @Root
 public class PluginManager {
@@ -56,15 +55,15 @@ public class PluginManager {
 	private static Logger log = SpyglassLoggerFactory.getLogger(PluginManager.class);
 
 	/**
-	 * This List is serialized by the XMLSerializer. It must not be used by any code, since
-	 * access to it is not synchronized! Use the variable <code>plugins</code> instead, which
-	 * has a Collections.synchronizedList() wrapper around it.
+	 * This List is serialized by the XMLSerializer. It must not be used by any code, since access
+	 * to it is not synchronized! Use the variable <code>plugins</code> instead, which has a
+	 * Collections.synchronizedList() wrapper around it.
 	 */
-	@ElementList(name="plugins")
+	@ElementList(name = "plugins")
 	private final List<Plugin> pluginsInternal = new ArrayList<Plugin>();
 
 	/**
-	 * The list of plugins. Has always to be a wrapper arround pluginsInternal. 
+	 * The list of plugins. Has always to be a wrapper arround pluginsInternal.
 	 */
 	private List<Plugin> plugins = Collections.synchronizedList(pluginsInternal);
 
@@ -85,7 +84,7 @@ public class PluginManager {
 		availablePluginsTypes.add(LinePainterPlugin.class);
 		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
 	}
-	
+
 	/**
 	 * This method is called after the deserialization of this instance has finished.
 	 * 
@@ -99,19 +98,18 @@ public class PluginManager {
 	/**
 	 * This method is called after the deserialization of this instance has finished.
 	 * 
-	 * - checks for duplicate plugin names
-	 * - checks for the NodePositioner
+	 * - checks for duplicate plugin names - checks for the NodePositioner
 	 */
 	@Validate
 	protected void validate() {
 		final HashSet<String> pluginNames = new HashSet<String>();
-		
+
 		boolean foundActiveNodePos = false;
-		
-		for (final Plugin p: pluginsInternal) {
+
+		for (final Plugin p : pluginsInternal) {
 			final String name = p.getInstanceName();
 			if (pluginNames.contains(name)) {
-				throw new IllegalStateException("Found two plugins with the name "+name+". Cannot continue.");
+				throw new IllegalStateException("Found two plugins with the name " + name + ". Cannot continue.");
 			}
 			if ((p instanceof NodePositionerPlugin) && p.isActive()) {
 				if (foundActiveNodePos) {
@@ -122,7 +120,7 @@ public class PluginManager {
 			pluginNames.add(name);
 		}
 	}
-	
+
 	/**
 	 * List of plugins that are currently being removed
 	 * 
@@ -301,6 +299,7 @@ public class PluginManager {
 		if (plugin instanceof NodePositionerPlugin) {
 			plugin.getXMLConfig().addPropertyChangeListener("active", new PropertyChangeListener() {
 
+				@SuppressWarnings("synthetic-access")
 				@Override
 				public void propertyChange(final PropertyChangeEvent evt) {
 					final Boolean activeOld = (Boolean) evt.getOldValue();
@@ -561,7 +560,7 @@ public class PluginManager {
 		// first disable the plugin. if it is a NodePositioner, this would also activate another one
 		// as replacement.
 		plugin.setActive(false);
-		
+
 		plugin.shutdown();
 
 		synchronized (plugins) {
@@ -627,17 +626,13 @@ public class PluginManager {
 	}
 
 	/**
-	 * Fires a NodePositionChangedEvent.
+	 * Fires a NodePositionEvent.
 	 * 
 	 * Note: This method should only be used by NodePositioners. It is declared public so that it
-	 * can be used across packages, but ordinary Plugins must never call it!
+	 * can be used across packages, but ordinary plug-ins must never call it!
 	 * 
-	 * @param node
-	 *            sender id of a node
-	 * @param oldPos
-	 *            old Position of the node (null if it just appeared)
-	 * @param newPos
-	 *            new Position of the node
+	 * @param event
+	 *            the NodePositionEvent to be fired
 	 * 
 	 */
 	public void fireNodePositionEvent(final NodePositionEvent event) {
@@ -649,7 +644,6 @@ public class PluginManager {
 			((NodePositionListener) list[i]).handleEvent(event);
 		}
 	}
-
 
 	// --------------------------------------------------------------------------
 	// ------
@@ -667,9 +661,9 @@ public class PluginManager {
 		if (config != null) {
 			plugin = PluginFactory.createInstance(config, clazz);
 		} else {
-			plugin = PluginFactory.createDefaultInstance(clazz);	
+			plugin = PluginFactory.createDefaultInstance(clazz);
 		}
- 		
+
 		final String baseName = plugin.getInstanceName();
 		String instanceName = baseName;
 		if (containsPlugin(instanceName)) {

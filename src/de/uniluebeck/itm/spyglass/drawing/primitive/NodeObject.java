@@ -351,44 +351,49 @@ public class NodeObject extends DrawingObject {
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 
-		Display.getDefault().syncExec(new Runnable() {
-			public void run() {
-				final DrawingArea drawingArea = getDrawingArea();
-				if (drawingArea == null) {
-					setBoundingBox(new AbsoluteRectangle(getPosition(), 1, 1));
-					return;
+		final Display display = Display.getDefault();
+		if ((display != null) && !display.isDisposed()) {
+			display.syncExec(new Runnable() {
+				@SuppressWarnings("synthetic-access")
+				public void run() {
+					final DrawingArea drawingArea = getDrawingArea();
+					if (drawingArea == null) {
+						setBoundingBox(new AbsoluteRectangle(getPosition(), 1, 1));
+						return;
+					}
+					// get the information to be displayed
+					final String string = getInformationString();
+					final int lineWidth = getLineWidth();
+					// determine the size parameters of the rectangle which represents the node in
+					// respect to the sting to be displayed
+					final GC gc = new GC(Display.getCurrent());
+					final Point size = gc.textExtent(string);
+					final int width = size.x + lineWidth + 3; // +3: see above
+					final int height = size.y + lineWidth + 3;
+
+					final PixelPosition upperLeft = getDrawingArea().absPoint2PixelPoint(getPosition());
+
+					// since the rectangle's line is spread according to its width with the actual
+					// position in
+					// it's center, the upper left position of the bounding box has to adapt to this
+					final int bbUpperLeftX = upperLeft.x;
+					final int bbUpperLeftY = upperLeft.y;
+
+					// the line width has to be counted twice because two lines with the same width
+					// are
+					// drawn on
+					// the drawing area
+					final int bbWidht = width + 2 * lineWidth;
+					final int bbHeight = height + 2 * lineWidth;
+					final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht + 1, bbHeight + 1);
+
+					setBoundingBox(getDrawingArea().pixelRect2AbsRect(bbArea));
+
+					gc.dispose();
+
 				}
-				// get the information to be displayed
-				final String string = getInformationString();
-				final int lineWidth = getLineWidth();
-				// determine the size parameters of the rectangle which represents the node in
-				// respect to the sting to be displayed
-				final GC gc = new GC(Display.getCurrent());
-				final Point size = gc.textExtent(string);
-				final int width = size.x + lineWidth + 3; // +3: see above
-				final int height = size.y + lineWidth + 3;
-
-				final PixelPosition upperLeft = getDrawingArea().absPoint2PixelPoint(getPosition());
-
-				// since the rectangle's line is spread according to its width with the actual
-				// position in
-				// it's center, the upper left position of the bounding box has to adapt to this
-				final int bbUpperLeftX = upperLeft.x;
-				final int bbUpperLeftY = upperLeft.y;
-
-				// the line width has to be counted twice because two lines with the same width are
-				// drawn on
-				// the drawing area
-				final int bbWidht = width + 2 * lineWidth;
-				final int bbHeight = height + 2 * lineWidth;
-				final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht + 1, bbHeight + 1);
-
-				setBoundingBox(getDrawingArea().pixelRect2AbsRect(bbArea));
-
-				gc.dispose();
-
-			}
-		});
+			});
+		}
 
 		return getBoundingBox();
 

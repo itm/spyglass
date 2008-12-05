@@ -122,7 +122,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			@SuppressWarnings("synthetic-access")
 			@Override
 			public void handleEvent(final NodePositionEvent e) {
-				setNodePosition(e.node, e.newPosition);
+				if (e.change.equals(NodePositionEvent.Change.REMOVED) || (e.newPosition == null)) {
+					handleNodeTimeout(e.node);
+				} else {
+					setNodePosition(e.node, e.newPosition);
+				}
 			}
 
 		};
@@ -240,6 +244,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		synchronized (updatedObjects) {
 			updatedObjects.add(nodeObject);
 		}
+		updateQuadTree();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -623,13 +628,12 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Handles the timeout of a node.<br>
-	 * That means that the node will not be painted any longer.
+	 * Handles the timeout of a node - the node will not be painted any longer.
 	 * 
 	 * @param nodeID
 	 *            the node's identifier
 	 */
-	public void handleNodeTimeout(final int nodeID) {
+	private void handleNodeTimeout(final int nodeID) {
 
 		// get all the layer's drawing objects
 		final List<DrawingObject> dos = new LinkedList<DrawingObject>();

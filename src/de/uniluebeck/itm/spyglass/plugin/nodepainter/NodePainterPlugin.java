@@ -9,23 +9,19 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.nodepainter;
 
-import org.apache.log4j.Logger;
-
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class are used create and administer visualizations of
- * sensor nodes.
+ * Instances of this class are used create and administer visualizations of sensor nodes.
  * 
  * @author Sebastian Ebers
  */
 public abstract class NodePainterPlugin extends Plugin implements Drawable {
-	
-	private final Logger log = SpyglassLoggerFactory.getLogger(NodePainterPlugin.class);
-	
+
+	// private final Logger log = SpyglassLoggerFactory.getLogger(NodePainterPlugin.class);
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -34,7 +30,7 @@ public abstract class NodePainterPlugin extends Plugin implements Drawable {
 		// for this plug-in a packet queue has to be used
 		super(true);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the time the plug-in's drawing objects will be visible
@@ -44,7 +40,7 @@ public abstract class NodePainterPlugin extends Plugin implements Drawable {
 	public final int getTimeout() {
 		return getXMLConfig().getTimeout();
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the plug-in's denotation in a human readable style
@@ -54,10 +50,10 @@ public abstract class NodePainterPlugin extends Plugin implements Drawable {
 	public static String getHumanReadableName() {
 		return "NodePainter";
 	}
-	
+
 	@Override
 	public String toString() {
 		return NodePainterPlugin.getHumanReadableName() + "." + this.getInstanceName();
 	}
-	
+
 }
