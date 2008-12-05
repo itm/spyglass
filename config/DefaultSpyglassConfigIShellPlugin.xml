@@ -61,6 +61,12 @@
                <statisticalInformationEvaluators class="java.util.TreeSet">
                   <statisticalInformationEvaluator>
                      <semanticType>1</semanticType>
+                     <description>test</description>
+                     <expression></expression>
+                     <operations>SUM</operations>
+                  </statisticalInformationEvaluator>
+                  <statisticalInformationEvaluator>
+                     <semanticType>1</semanticType>
                      <description>Test2</description>
                      <expression>%3</expression>
                      <operations>MAX</operations>

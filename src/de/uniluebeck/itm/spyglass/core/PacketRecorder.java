@@ -725,7 +725,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 		SpyglassPacket packet = null;
 		int i = 0;
 		while ((packet = recorder.getNextPacket()) != null) {
-			System.out.println(packet.getSenderId() + " Nr: " + (++i));
+			log.debug(packet.getSenderId() + " Nr: " + (++i));
 		}
 	}
 

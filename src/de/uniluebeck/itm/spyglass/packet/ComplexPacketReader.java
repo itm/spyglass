@@ -26,13 +26,13 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * @author Dariush Forouher
  */
 public class ComplexPacketReader extends PacketReader {
-	
+
 	private static Logger log = SpyglassLoggerFactory.getLogger(ComplexPacketReader.class);
-	
+
 	private InputStream playbackFileReader = null;
-	
+
 	private long lastPacketTimestamp = -1;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -42,27 +42,27 @@ public class ComplexPacketReader extends PacketReader {
 	 */
 	@Override
 	public SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException {
-		
+
 		if (playbackFileReader == null) {
 			playbackFileReader = getGateway().getInputStream();
 		}
-		
+
 		SpyglassPacket packet = null;
 		try {
-			
+
 			int next;
 			byte[] packetData;
 			if ((next = playbackFileReader.read()) != -1) {
 				packetData = new byte[next];
-				System.out.println(next);
+				log.debug(next);
 				playbackFileReader.read(packetData);
 				packet = PacketFactory.createInstance(packetData);
 			}
-			
+
 		} catch (final IOException e) {
 			log.error("Error while reading a new packet...", e);
 		}
-		
+
 		// Hold back the packet at least for delayMillies
 		final long now = System.currentTimeMillis();
 		final long diff = now - lastPacketTimestamp;
@@ -72,11 +72,11 @@ public class ComplexPacketReader extends PacketReader {
 		lastPacketTimestamp = System.currentTimeMillis();
 		return packet;
 	}
-	
+
 	@Override
 	public void reset() throws IOException {
 		lastPacketTimestamp = -1;
 		playbackFileReader.reset();
 	}
-	
+
 }

@@ -182,24 +182,21 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 		final StatisticalInformationEvaluator sfs = xmlConfig.getStatisticalInformationEvaluators4Type(packetSemanticType);
 
-		String value = "";
 		if (sfs != null) {
 			try {
-				value = sfs.parse(packet);
+				sfs.parse(packet);
 			} catch (final SpyglassPacketException e) {
 				log.error("Error parsing a packet in the " + getHumanReadableName()
 						+ ".\r\nPlease check the values in the StringFormatter for semantic type " + packetSemanticType + "!", e, false);
-				value = sfs.getDescription() + " NaN";
+				sfs.setDescription(sfs.getDescription() + " NaN");
 			}
 
-			final String val = value;
 			synchronized (widget) {
-
 				widget.getDisplay().syncExec(new Runnable() {
 					@SuppressWarnings("synthetic-access")
 					@Override
 					public void run() {
-						widget.createOrUpdateLabel(packetSemanticType, val);
+						widget.createOrUpdateLabel(sfs);
 					}
 				});
 			}
@@ -261,13 +258,12 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
-					final Collection<Integer> semanticTypes = new LinkedList<Integer>();
+					final Collection<StatisticalInformationEvaluator> sfss = new LinkedList<StatisticalInformationEvaluator>();
 					for (final StatisticalInformationEvaluator sfs : sfSettings) {
-						final int semanticType = sfs.getSemanticType();
-						semanticTypes.add(semanticType);
-						widget.createOrUpdateLabel(semanticType, sfs.getDescription());
+						sfss.add(sfs);
+						widget.createOrUpdateLabel(sfs);
 					}
-					widget.retaingLabels(semanticTypes);
+					widget.retaingLabels(sfss);
 
 				}
 			});
@@ -324,7 +320,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 		private Label labelNumNodes;
 		private Label labelAVGNodeDegree;
-		private Map<Integer, Label> sfLabels = new TreeMap<Integer, Label>();
+		private Map<StatisticalInformationEvaluator, Label> sfLabels = new TreeMap<StatisticalInformationEvaluator, Label>();
 
 		// --------------------------------------------------------------------------------
 		/**
@@ -407,18 +403,16 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 		// --------------------------------------------------------------------------------
 		/**
-		 * Creates or updates the label which provides information related to a certain semantic
-		 * type.<br>
+		 * Creates or updates a label which provides a certain statistical information.<br>
 		 * If the label already exists, it will be updated, otherwise the label will be created.
 		 * 
-		 * @param semanticType
-		 *            the semantic type
-		 * @param text
-		 *            the text that will be displayed
+		 * @param siEvaluator
+		 *            an object which encapsulates the statistical information
 		 */
-		public void createOrUpdateLabel(final int semanticType, String text) {
+		public void createOrUpdateLabel(final StatisticalInformationEvaluator siEvaluator) {
 			synchronized (sfLabels) {
-				Label label = sfLabels.get(semanticType);
+				String text = siEvaluator.getDescription();
+				Label label = sfLabels.get(siEvaluator);
 				// null cannot be handled by a label. However, its semantic is the same as the empty
 				// string
 				if (text == null) {
@@ -426,7 +420,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				}
 				if (label == null) {
 					label = new Label(this, SWT.NONE);
-					sfLabels.put(semanticType, label);
+					sfLabels.put(siEvaluator, label);
 					label.setText(text);
 					label.pack(true);
 					super.getParent().redraw();
@@ -442,22 +436,22 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 		// --------------------------------------------------------------------------------
 		/**
-		 * Removes the label which provides information related to a certain semantic type.
+		 * Removes the label which provides a certain statistical information.
 		 * 
-		 * @param semanticType
-		 *            the related semantic type
+		 * @param siEvaluator
+		 *            an object which encapsulates the statistical information
 		 */
-		public void removeLabel(final int semanticType) {
+		public void removeLabel(final StatisticalInformationEvaluator siEvaluator) {
 			Display.getDefault().syncExec(new Runnable() {
-				// --------------------------------------------------------------------------------
+				// ------------------------------------------------------------------------
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
 					synchronized (sfLabels) {
-						final Label label = sfLabels.get(semanticType);
+						final Label label = sfLabels.get(siEvaluator);
 						if (label != null) {
 							label.dispose();
-							sfLabels.remove(semanticType);
+							sfLabels.remove(siEvaluator);
 						}
 					}
 				}
@@ -467,19 +461,19 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 		// --------------------------------------------------------------------------------
 		/**
-		 * Removes all labels which are related to semantic types which cannot be found in the
-		 * provided list of valid semantic types.
+		 * Removes all labels providing statistical information which are no longer relevant.
 		 * 
-		 * @param semanticTypes
-		 *            the list with valid semantic types
+		 * @param siEvaluators
+		 *            a list containing objects which encapsulate the relevant statistical
+		 *            information
 		 */
-		public void retaingLabels(final Collection<Integer> semanticTypes) {
-			final Collection<Integer> keySet = new LinkedList<Integer>();
+		public void retaingLabels(final Collection<StatisticalInformationEvaluator> siEvaluators) {
+			final Collection<StatisticalInformationEvaluator> keySet = new LinkedList<StatisticalInformationEvaluator>();
 			synchronized (sfLabels) {
 				keySet.addAll(sfLabels.keySet());
 			}
-			for (final Integer key : keySet) {
-				if (!semanticTypes.contains(key)) {
+			for (final StatisticalInformationEvaluator key : keySet) {
+				if (!siEvaluators.contains(key)) {
 					removeLabel(key);
 				}
 			}
@@ -491,11 +485,11 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		public void clear() {
 			removeAVGNodeDeg();
 			removeNumNodes();
-			final Collection<Integer> keySet = new LinkedList<Integer>();
+			final Collection<StatisticalInformationEvaluator> keySet = new LinkedList<StatisticalInformationEvaluator>();
 			synchronized (sfLabels) {
 				keySet.addAll(sfLabels.keySet());
 			}
-			for (final Integer key : keySet) {
+			for (final StatisticalInformationEvaluator key : keySet) {
 				removeLabel(key);
 			}
 		}
