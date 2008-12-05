@@ -15,7 +15,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 public class LoadConfigurationAction extends Action {
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(LoadConfigurationAction.class);
-	
+
 	private final ImageDescriptor imageDescriptor = getImageDescriptor("page_gear.png");
 
 	private final Spyglass spyglass;
@@ -26,6 +26,15 @@ public class LoadConfigurationAction extends Action {
 
 	@Override
 	public void run() {
+		loadFromFileSystem();
+	}
+
+	/**
+	 * Loads the configuration from a file which is selected using a {@link FileDialog}
+	 * 
+	 * @return <code>true</code> if the configuration was set successfully
+	 */
+	public boolean loadFromFileSystem() {
 		final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
 		fd.setFilterExtensions(new String[] { "*.xml" });
 		fd.setFilterPath(SpyglassEnvironment.getConfigFileWorkingDirectory());
@@ -33,21 +42,23 @@ public class LoadConfigurationAction extends Action {
 		if (path != null) {
 			final File f = new File(path);
 			if (!f.canRead()) {
-				log.error("Could not read file "+f);
-				return;
+				log.error("Could not read file " + f);
+				return false;
 			}
 
 			// first we have to load the new config, to avoid that it is overwritten in the meantime
 			try {
 				spyglass.getConfigStore().importConfig(f);
 			} catch (final Exception e) {
-				log.error("Could not load the config.",e);
+				log.error("Could not load the config.", e);
+				return false;
 			}
-			
-			SpyglassEnvironment.setConfigFilePath(f);
 
+			SpyglassEnvironment.setConfigFilePath(f);
+			return true;
 		}
-	};
+		return false;
+	}
 
 	@Override
 	public String getText() {

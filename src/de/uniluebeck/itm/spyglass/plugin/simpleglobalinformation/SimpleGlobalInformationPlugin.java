@@ -21,6 +21,7 @@ import java.util.TreeMap;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.simpleframework.xml.Element;
 
@@ -447,15 +448,21 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		 *            the related semantic type
 		 */
 		public void removeLabel(final int semanticType) {
-			synchronized (sfLabels) {
-				final Label label = sfLabels.get(semanticType);
-				if (label != null) {
-					label.dispose();
-					sfLabels.remove(semanticType);
-					super.getParent().redraw();
+			Display.getDefault().syncExec(new Runnable() {
+				// --------------------------------------------------------------------------------
+				@SuppressWarnings("synthetic-access")
+				@Override
+				public void run() {
+					synchronized (sfLabels) {
+						final Label label = sfLabels.get(semanticType);
+						if (label != null) {
+							label.dispose();
+							sfLabels.remove(semanticType);
+						}
+					}
 				}
-			}
-
+			});
+			super.getParent().redraw();
 		}
 
 		// --------------------------------------------------------------------------------
@@ -484,7 +491,11 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		public void clear() {
 			removeAVGNodeDeg();
 			removeNumNodes();
-			for (final Integer key : sfLabels.keySet()) {
+			final Collection<Integer> keySet = new LinkedList<Integer>();
+			synchronized (sfLabels) {
+				keySet.addAll(sfLabels.keySet());
+			}
+			for (final Integer key : keySet) {
 				removeLabel(key);
 			}
 		}

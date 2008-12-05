@@ -643,8 +643,9 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	}
 
 	private void clickedButtonLoadPreferences() {
-		new LoadConfigurationAction(spyglass).run();
-		clickedButtonClose();
+		if (new LoadConfigurationAction(spyglass).loadFromFileSystem()) {
+			preferenceDialog.close();
+		}
 	}
 
 	private void clickedButtonSavePreferences() {

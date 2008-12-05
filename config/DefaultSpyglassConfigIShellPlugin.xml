@@ -144,7 +144,7 @@
          <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
             <parameters>
                <active>true</active>
-               <visible>true</visible>
+               <visible>false</visible>
                <name>NodePainter</name>
                <timeout>-1</timeout>
                <semanticTypes length="1">
