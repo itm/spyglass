@@ -17,10 +17,10 @@ import de.uniluebeck.itm.spyglass.plugin.PluginManager;
  * 
  */
 public class EventDispatcher {
-	
+
 	private PluginManager pluginManager;
 	private DrawingArea drawingArea;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -34,13 +34,13 @@ public class EventDispatcher {
 		this.pluginManager = pluginManager;
 		this.drawingArea = drawingArea;
 	}
-	
+
 	@Override
 	public void finalize() throws Throwable {
 		pluginManager = null;
 		drawingArea = null;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Forwards a event to the first plug-in which can handle it.
@@ -50,11 +50,13 @@ public class EventDispatcher {
 	 */
 	public void handleEvent(final EventObject e) {
 		final List<Plugin> plugins = pluginManager.getVisibleActivePlugins();
-		for (final Plugin p : plugins) {
-			if ((e instanceof MouseEvent) && p.handleEvent((MouseEvent) e, drawingArea)) {
+		// this has to be done in reverse order since the "normal" order is used for painting which
+		// means that the topmost element is actually the last element in the list
+		for (int i = plugins.size() - 1; i >= 0; i--) {
+			if ((e instanceof MouseEvent) && plugins.get(i).handleEvent((MouseEvent) e, drawingArea)) {
 				return;
 			}
 		}
 	}
-	
+
 }
