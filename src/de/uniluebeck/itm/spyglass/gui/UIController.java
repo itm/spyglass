@@ -338,18 +338,24 @@ public class UIController {
 		@Override
 		public void paintControl(final PaintEvent e) {
 
-			final PixelRectangle pxArea = appWindow.getGui().getDrawingArea().getDrawingRectangle();
+			final String unit = spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getMetrics().getUnit();
 
 			final Point2D upperLeft = appWindow.getGui().getDrawingArea().getUpperLeftPrecise();
 			final Point2D lowerRight = appWindow.getGui().getDrawingArea().getLowerRightPrecise();
+			final PixelRectangle pxRect = appWindow.getGui().getDrawingArea().getDrawingRectangle();
 
 			GC gc = new GC(appWindow.getGui().getRulerH());
-			appWindow.getGui().getRulerH().redraw(pxArea, upperLeft, lowerRight, gc, RulerArea.HORIZONTAL);
+			appWindow.getGui().getRulerH().drawRuler(pxRect, upperLeft, lowerRight, gc, RulerArea.HORIZONTAL);
 			gc.dispose();
 
 			gc = new GC(appWindow.getGui().getRulerV());
-			appWindow.getGui().getRulerV().redraw(pxArea, upperLeft, lowerRight, gc, RulerArea.VERTICAL);
+			appWindow.getGui().getRulerV().drawRuler(pxRect, upperLeft, lowerRight, gc, RulerArea.VERTICAL);
+
+			gc = new GC(appWindow.getGui().getUnitArea());
+			appWindow.getGui().getUnitArea().drawUnit(gc, unit);
+
 			gc.dispose();
+
 		}
 	};
 

@@ -8,13 +8,14 @@ import java.awt.geom.Point2D;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
-import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
@@ -27,17 +28,49 @@ public class RulerArea extends Canvas {
 
 	public static int HORIZONTAL = 1;
 	public static int VERTICAL = 2;
+	public static int UNIT = 3;
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(RulerArea.class);
 
-	Spyglass spyglass;
+	private int rulerDirection;
+	private DrawingArea drawingArea;
 
-	public RulerArea(final Composite parent) {
+	public RulerArea(final Composite parent, final int direction) {
 
 		super(parent, SWT.NONE);
+		this.rulerDirection = direction;
+		this.addControlListener(controlListener);
+
 	}
 
-	public void redraw(final PixelRectangle pxRect, final Point2D upperLeft, final Point2D lowerRight, final GC gc, final int direction) {
+	public void setDrawingArea(final DrawingArea drawingArea) {
+		this.drawingArea = drawingArea;
+	}
+
+	public void drawUnit(final GC gc, final String unit) {
+
+		gc.fillRectangle(0, 0, this.getClientArea().width, this.getClientArea().height);
+		// draw 2 arrows as a polyline
+		final int[] pointArray = { 1, 20, 4, 23, 7, 20, 4, 23, 4, 4, 23, 4, 20, 1, 23, 4, 20, 7 };
+		gc.drawPolyline(pointArray);
+
+		Font font = gc.getFont();
+		final FontData fontData = font.getFontData()[0];
+		int fontHeight = fontData.getHeight();
+
+		// as "mm" is the widest unit-string to be displayed properly, resize the font to do so
+		while (!(gc.stringExtent("" + unit).x <= 22)) {
+			gc.setFont(null);
+			fontHeight--;
+			fontData.setHeight(fontHeight);
+			font = new Font(this.getDisplay(), fontData);
+			gc.setFont(font);
+		}
+
+		gc.drawText("" + unit, 7, 6, true);
+	}
+
+	public void drawRuler(final PixelRectangle pxRect, final Point2D upperLeft, final Point2D lowerRight, final GC gc, final int direction) {
 
 		gc.fillRectangle(0, 0, this.getClientArea().width, this.getClientArea().height);
 
@@ -107,6 +140,7 @@ public class RulerArea extends Canvas {
 		Font font = gc.getFont();
 		final FontData fontData = gc.getFont().getFontData()[0];
 		int fontHeight = fontData.getHeight();
+
 		while (!(gc.stringExtent("-00000").x <= 28)) {
 			fontHeight--;
 			fontData.setHeight(fontHeight);
@@ -156,7 +190,32 @@ public class RulerArea extends Canvas {
 			}
 		}
 
-		font.dispose();
-
+		// gc.dispose();
 	}
+
+	private void test() {
+		/*
+		 * final GC gc = new GC(this); this.drawRuler(gc, this.rulerDirection); gc.dispose();
+		 * log.debug("Da is was passiert...");
+		 */
+	}
+
+	private ControlListener controlListener = new ControlListener() {
+
+		@Override
+		public void controlMoved(final ControlEvent e) {
+			// TODO Auto-generated method stub
+			log.debug("Ruler moved...");
+			test();
+
+		}
+
+		@Override
+		public void controlResized(final ControlEvent e) {
+			// TODO Auto-generated method stub
+			log.debug("Ruler resized...");
+			test();
+		}
+
+	};
 }

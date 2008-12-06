@@ -45,7 +45,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 
 	private DrawingArea canvas;
 
-	private RulerArea dummy;
+	private RulerArea unitArea;
 	private RulerArea rulerH;
 	private RulerArea rulerV;
 
@@ -187,18 +187,18 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 
 				// begin creation of ruler canvases
 				{
-					final GridData dummyData = new GridData();
-					dummyData.heightHint = rulerWidth;
-					dummyData.widthHint = rulerWidth;
-					dummy = new RulerArea(compositeDrawingArea);
-					dummy.setLayoutData(dummyData);
+					final GridData unitData = new GridData();
+					unitData.heightHint = rulerWidth;
+					unitData.widthHint = rulerWidth;
+					unitArea = new RulerArea(compositeDrawingArea, RulerArea.UNIT);
+					unitArea.setLayoutData(unitData);
 				}
 
 				{
 					final GridData rulerHData = new GridData();
 					rulerHData.heightHint = rulerWidth;
 					rulerHData.horizontalAlignment = SWT.FILL;
-					rulerH = new RulerArea(compositeDrawingArea);
+					rulerH = new RulerArea(compositeDrawingArea, RulerArea.HORIZONTAL);
 					rulerH.setLayoutData(rulerHData);
 				}
 
@@ -206,7 +206,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 					final GridData rulerVData = new GridData();
 					rulerVData.widthHint = rulerWidth;
 					rulerVData.verticalAlignment = SWT.FILL;
-					rulerV = new RulerArea(compositeDrawingArea);
+					rulerV = new RulerArea(compositeDrawingArea, RulerArea.VERTICAL);
 					rulerV.setLayoutData(rulerVData);
 				}
 				// end creation of ruler canvases
@@ -218,6 +218,9 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 					canvas1LData.grabExcessVerticalSpace = true;
 					canvas = new DrawingArea(compositeDrawingArea, SWT.None, spyglass);
 					canvas.setLayoutData(canvas1LData);
+
+					rulerH.setDrawingArea(canvas);
+					rulerV.setDrawingArea(canvas);
 				}
 			}
 			parent.layout();
@@ -261,7 +264,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 
 	public void changeRulerVis() {
 		log.debug("Ruler visibility changed!");
-		final GridData dataD = (GridData) dummy.getLayoutData();
+		final GridData dataD = (GridData) unitArea.getLayoutData();
 		final GridData dataV = (GridData) rulerV.getLayoutData();
 		final GridData dataH = (GridData) rulerH.getLayoutData();
 
@@ -278,7 +281,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 			dataH.heightHint = 0;
 		}
 
-		dummy.setLayoutData(dataD);
+		unitArea.setLayoutData(dataD);
 		rulerV.setLayoutData(dataV);
 		rulerH.setLayoutData(dataH);
 		// final Point size2 = new Point(200, 200);
@@ -293,5 +296,9 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 
 	public RulerArea getRulerV() {
 		return rulerV;
+	}
+
+	public RulerArea getUnitArea() {
+		return unitArea;
 	}
 }
