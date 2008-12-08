@@ -179,9 +179,9 @@ public class StringFormatter {
 
 							if ((i < -1) || (i > 255)) {
 								return "Please enter a number between -1 and 255";
-							} else {
-								return null;
 							}
+							return null;
+
 						} catch (final NumberFormatException e) {
 							return "Please enter an integer";
 						}

@@ -61,15 +61,15 @@
                <statisticalInformationEvaluators class="java.util.TreeSet">
                   <statisticalInformationEvaluator>
                      <semanticType>1</semanticType>
-                     <description>test</description>
-                     <expression></expression>
-                     <operations>SUM</operations>
-                  </statisticalInformationEvaluator>
-                  <statisticalInformationEvaluator>
-                     <semanticType>1</semanticType>
                      <description>Test2</description>
                      <expression>%3</expression>
                      <operations>MAX</operations>
+                  </statisticalInformationEvaluator>
+                  <statisticalInformationEvaluator>
+                     <semanticType>1</semanticType>
+                     <description>test</description>
+                     <expression></expression>
+                     <operations>MIN</operations>
                   </statisticalInformationEvaluator>
                   <statisticalInformationEvaluator>
                      <semanticType>2</semanticType>
@@ -82,7 +82,7 @@
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
             <parameters>
-               <active>true</active>
+               <active>false</active>
                <visible>true</visible>
                <name>default4</name>
                <timeout>0</timeout>

@@ -163,6 +163,15 @@ public class SGIStringFormatter {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Activates data binding
+	 * 
+	 * @param dbc
+	 *            the {@link DataBindingContext}
+	 * @param config
+	 *            the configuration which represents the model
+	 */
 	public void setDataBinding(final DataBindingContext dbc, final PluginXMLConfig config) {
 
 		// table
@@ -268,6 +277,10 @@ public class SGIStringFormatter {
 		table.refresh();
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Creates a connection between the view's table and data from the model
+	 */
 	public void connectTableWithData(final DataBindingContext dbc, final Set<StatisticalInformationEvaluator> tempStringFormatterTable) {
 
 		tableData = new WrappedObservableSet(dbc.getValidationRealm(), tempStringFormatterTable, null);

@@ -206,7 +206,7 @@ public class ConfigStore extends PropertyBean {
 
 		// unregister the old ones
 		unregisterListener();
-		
+
 		// destroy the currently active plug-ins since they will be no longer needed
 		for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
 			p.reset();
@@ -257,14 +257,14 @@ public class ConfigStore extends PropertyBean {
 		final SpyglassConfiguration config = serializer.read(SpyglassConfiguration.class, configFile);
 
 		// if there is a default config missing, add it
-		for(final Class<? extends Plugin> clazz: config.getPluginManager().getAvailablePluginTypes()) {
+		for (final Class<? extends Plugin> clazz : config.getPluginManager().getAvailablePluginTypes()) {
 			if (config.getDefaultConfig(clazz) == null) {
 				final ArrayList<Plugin> set = new ArrayList<Plugin>(config.getDefaultPlugins());
 				set.add(PluginFactory.createDefaultInstance(clazz));
 				config.setDefaultPlugins(set);
 			}
 		}
-		
+
 		return config;
 	}
 
@@ -292,7 +292,7 @@ public class ConfigStore extends PropertyBean {
 		if (shutdownInProgress) {
 			return;
 		}
-		
+
 		// if configFile is not our main configfile, then save regardless
 		// of any other pending storing.
 		final boolean storeAnyway = configFile.equals(SpyglassEnvironment.getConfigFilePath());
@@ -367,10 +367,10 @@ public class ConfigStore extends PropertyBean {
 		t.start();
 
 	}
-	
+
 	/**
-	 * Notify the ConfigStore that Spyglass is shutting down and thus we
-	 * should not accept any mre store requests.
+	 * Notify the ConfigStore that Spyglass is shutting down and thus we should not accept any mre
+	 * store requests.
 	 */
 	public void signalShutdown() {
 		shutdownInProgress = true;

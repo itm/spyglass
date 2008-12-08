@@ -38,7 +38,6 @@ public class StringFormatterEditingSupport extends ObservableValueEditingSupport
 
 	@Override
 	protected IObservableValue doCreateCellEditorObservable(final CellEditor cellEditor) {
-
 		return SWTObservables.observeText(cellEditor.getControl(), SWT.Modify);
 	}
 

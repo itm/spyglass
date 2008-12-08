@@ -8,11 +8,14 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;

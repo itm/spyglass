@@ -290,9 +290,7 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 			return description + " " + computetValue;
 		} catch (final Exception e) {
 			throw new SpyglassPacketException("A packet coult not be evaluated in StatisticalInformationEvaluator");
-			// log.warn("A packet coult not be evaluated in StatisticalInformationEvaluator");
 		}
-		// return description + " ###";
 	}
 
 	@Override

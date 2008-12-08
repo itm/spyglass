@@ -66,14 +66,14 @@ public class Spyglass {
 	 * Constructor. Invokes the XML configuration reading from the default configuration files.
 	 * Which file is used depends on the context (if spyglass is used as stand alone application or
 	 * iShell plug-in).
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 * 
 	 */
 	public Spyglass() throws IOException {
 		configStore = new ConfigStore();
 		init();
 	}
-
 
 	// --------------------------------------------------------------------------
 	// ------
@@ -101,7 +101,7 @@ public class Spyglass {
 				}
 			}
 		});
-		
+
 		log.debug("Init done");
 	}
 
@@ -118,16 +118,15 @@ public class Spyglass {
 
 	public void shutdown() {
 		setVisualizationRunning(false);
-		
 		configStore.store();
 		configStore.signalShutdown();
 		configStore.waitForRemainingWrites();
-		
+
 		// shutdown all plugins
 		for (final Plugin p : pluginManager.getPlugins()) {
 			p.shutdown();
 		}
-		
+
 		log.info("All plugin-threads stopped");
 	}
 
