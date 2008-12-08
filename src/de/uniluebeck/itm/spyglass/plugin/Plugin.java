@@ -276,8 +276,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @throws UnsupportedOperationException
 	 *             if this operation is called on an abstract superclass of a plug-in
 	 */
-	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) throws UnsupportedOperationException {
+	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(
+			@SuppressWarnings("unused") final PluginPreferenceDialog dialog, @SuppressWarnings("unused") final Spyglass spyglass)
+			throws UnsupportedOperationException {
 		throw new UnsupportedOperationException(
 				"This method must only be called on subclasses and must be implemented in every instantiable subclass.");
 	}
@@ -314,7 +315,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 *            the drawing area in which the event occured
 	 * @return <code>true</code> if the plug-in could handle the event, <code>false</code> otherwise
 	 */
-	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) {
+	public boolean handleEvent(@SuppressWarnings("unused") final MouseEvent e, @SuppressWarnings("unused") final DrawingArea drawingArea) {
 		return false;
 	}
 

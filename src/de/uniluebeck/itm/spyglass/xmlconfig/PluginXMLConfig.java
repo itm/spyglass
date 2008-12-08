@@ -146,8 +146,13 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		return semanticTypes.clone();
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * Returns true, if the given integer is in the list of semantic types.
+	 * Returns <code>true</code>, if the given semantic type is in the list of semantic types.
+	 * 
+	 * @param type
+	 *            the semantic type to be tested
+	 * @return <code>true</code>, if the given integer is in the list of semantic types.
 	 */
 	public boolean containsSemanticType(final int type) {
 		if (this.isAllSemanticTypes()) {
@@ -192,6 +197,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		return (semanticTypes.length == 1) && (semanticTypes[0] == -1);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Returns <code>true</code> if the configuration is equal to certain other configuration
 	 * 
@@ -211,6 +217,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 				&& Arrays.equals(this.getSemanticTypes(), other.getSemanticTypes()) && (this.getTimeout() == other.getTimeout());
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Returns if two color settings equal one another
 	 * 

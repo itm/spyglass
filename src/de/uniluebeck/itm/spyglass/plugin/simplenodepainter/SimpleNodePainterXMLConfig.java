@@ -35,13 +35,13 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	@ElementMap(entry = "isActive", key = "nodeID", attribute = true, name = "extendedInformation", required = false)
 	private HashMap<Integer, Boolean> isExtendenInformationActive = new HashMap<Integer, Boolean>();
 
-	@Element(required=false)
+	@Element(required = false)
 	private boolean isExtendedDefaultValue = false;
 
-	@ElementArray(required=false)
+	@ElementArray(required = false)
 	private int[] lineColorRGB = { 255, 0, 0 };
 
-	@Element(required=false)
+	@Element(required = false)
 	private int lineWidth = 1;
 
 	// --------------------------------------------------------------------------------
@@ -131,14 +131,22 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 		firePropertyChange(PROPERTYNAME_EXTENDED_DEFAULT_VALUE, oldValue, isExtendedDefaultValue);
 	}
 
-	public boolean equals(final SimpleNodePainterXMLConfig o) {
-		if (!super.equals(o)) {
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns <code>true</code> if the configuration is equal to certain other configuration
+	 * 
+	 * @param other
+	 *            the configuration this one is compared to
+	 * @return <code>true</code> if the configuration is equal to certain other configuration
+	 */
+	public boolean equals(final SimpleNodePainterXMLConfig other) {
+		if (!super.equals(other)) {
 			return false;
 		}
 
-		return super.equals(o) && (isExtendedDefaultValue == o.isExtendedDefaultValue)
-				&& (isExtendenInformationActive == o.isExtendenInformationActive) && equalsRGB(lineColorRGB, o.lineColorRGB)
-				&& (lineWidth == o.lineWidth);
+		return super.equals(other) && (isExtendedDefaultValue == other.isExtendedDefaultValue)
+				&& (isExtendenInformationActive == other.isExtendenInformationActive) && equalsRGB(lineColorRGB, other.lineColorRGB)
+				&& (lineWidth == other.lineWidth);
 	}
 
 	@Override

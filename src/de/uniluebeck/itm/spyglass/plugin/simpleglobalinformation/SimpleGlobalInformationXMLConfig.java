@@ -142,10 +142,19 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 		firePropertyChange(PROPERTYNAME_STATISTICAL_INFORMATION_EVALUATORS, oldValue, this.statisticalInformationEvaluators);
 	}
 
-	public boolean equals(final SimpleGlobalInformationXMLConfig o) {
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns <code>true</code> if the configuration is equal to certain other configuration
+	 * 
+	 * @param other
+	 *            the configuration this one is compared to
+	 * @return <code>true</code> if the configuration is equal to certain other configuration
+	 */
+	public boolean equals(final SimpleGlobalInformationXMLConfig other) {
 
-		return super.equals(o) && semanticTypes4Neighborhoods.equals(o.semanticTypes4Neighborhoods) && (showNodeDegree == o.showNodeDegree)
-				&& (showNumNodes == o.showNumNodes) && statisticalInformationEvaluators.equals(o.statisticalInformationEvaluators);
+		return super.equals(other) && semanticTypes4Neighborhoods.equals(other.semanticTypes4Neighborhoods)
+				&& (showNodeDegree == other.showNodeDegree) && (showNumNodes == other.showNumNodes)
+				&& statisticalInformationEvaluators.equals(other.statisticalInformationEvaluators);
 	}
 
 }

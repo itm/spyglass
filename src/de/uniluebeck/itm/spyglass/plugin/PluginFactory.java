@@ -25,11 +25,11 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class PluginFactory {
-	
+
 	private static Logger log = SpyglassLoggerFactory.getLogger(PluginFactory.class);
-	
+
 	private final ConfigStore configStore;
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -41,23 +41,20 @@ public class PluginFactory {
 	public PluginFactory(final ConfigStore configStore) {
 		this.configStore = configStore;
 	}
-	
+
 	// --------------------------------------------------------------------------
-	// ------
 	/**
-	 * Crates a plug-in instance of a certain class type and initializes the instances parameters
+	 * Creates a plug-in instance of a certain class type and initializes the instances parameters
 	 * using the provided ones
 	 * 
-	 * @param pluginManager
-	 *            the plug-in managing facility
 	 * @param config
 	 *            the configuration parameters
 	 * @param clazz
 	 *            the plug-in's class
+	 * @return the created plug-in instance
 	 */
-	public static Plugin createInstance(final PluginXMLConfig config,
-			final Class<? extends Plugin> clazz) {
-		
+	public static Plugin createInstance(final PluginXMLConfig config, final Class<? extends Plugin> clazz) {
+
 		try {
 			final Plugin plugin = clazz.newInstance();
 			plugin.getXMLConfig().overwriteWith(config);
@@ -69,20 +66,20 @@ public class PluginFactory {
 			log.error("The plug-in of class " + clazz + " could not be instantiated", e);
 			return null;
 		}
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------
-	// ------
 	/**
-	 * Crates a plug-in instance of a certain class type and initializes the instances parameters
-	 * with the default config from the configuration file.
+	 * Creates a plug-in instance of a certain class type and initializes the instances parameters
+	 * with the default configuration from the configuration file.
 	 * 
 	 * @param clazz
 	 *            the plug-in's class
+	 * @return the created plug-in instance
 	 */
 	public Plugin createInstance(final Class<? extends Plugin> clazz) {
-		
+
 		try {
 			final Plugin plugin = clazz.newInstance();
 			plugin.getXMLConfig().overwriteWith(configStore.getSpyglassConfig().getDefaultConfig(clazz));
@@ -94,19 +91,19 @@ public class PluginFactory {
 			log.error("The plug-in of class " + clazz + " could not be instantiated", e);
 			return null;
 		}
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------
-	// ------
 	/**
-	 * Crates a plug-in instance of a certain class type. Its config is left untouched.
+	 * Creates a plug-in instance of a certain class type. Its configuration is left untouched.
 	 * 
 	 * @param clazz
 	 *            the plug-in's class
+	 * @return the created plug-in instance
 	 */
 	public static Plugin createDefaultInstance(final Class<? extends Plugin> clazz) {
-		
+
 		try {
 			final Plugin plugin = clazz.newInstance();
 			return plugin;
@@ -117,7 +114,7 @@ public class PluginFactory {
 			log.error("The plug-in of class " + clazz + " could not be instantiated", e);
 			return null;
 		}
-		
+
 	}
 
 }
