@@ -80,7 +80,7 @@ public class ZoomCompleteMapAction extends Action {
 			for (int i = 0; i < 10; i++) {
 				
 				final AbsoluteRectangle maxRect = spyglass.getAutoZoomBoundingBox();
-				if (maxRect != null) {
+				if ((maxRect != null) && (maxRect.getHeight()>0) && (maxRect.getWidth()>0)) {
 					drawingArea.getDisplay().syncExec(new Runnable() {
 						
 						@Override
