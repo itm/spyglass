@@ -19,6 +19,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -48,6 +50,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class DrawingArea extends Canvas {
 	
+	
 	private static Logger log = SpyglassLoggerFactory.getLogger(DrawingArea.class);
 	
 	/**
@@ -75,24 +78,29 @@ public class DrawingArea extends Canvas {
 	private AffineTransform at = new AffineTransform();
 	
 	/**
+	 * Limitation of the zoom. Any zoom level which completely shows this rectangle will be considered forbidden.
+	 */
+	private static final AbsoluteRectangle MAX_ZOMM_OUT = new AbsoluteRectangle( -((int) Math.pow(2, 17)),  -((int) Math.pow(2, 17)), 2 * ((int) Math.pow(2, 17)), 2 * ((int) Math.pow(2, 17)));
+	
+	/**
 	 * x-coordinate of the upper-left point of the world.
 	 */
-	private static final int WORLD_UPPER_LEFT_X = -((int) Math.pow(2, 16));
+	private static final int WORLD_UPPER_LEFT_X = -((int) Math.pow(2, 15));
 	
 	/**
 	 * y-coordinate of the upper-left point of the world.
 	 */
-	private static final int WORLD_UPPER_LEFT_Y = -((int) Math.pow(2, 16));
+	private static final int WORLD_UPPER_LEFT_Y = -((int) Math.pow(2, 15));
 	
 	/**
 	 * width of the world.
 	 */
-	private static final int WORLD_WIDTH = 2 * ((int) Math.pow(2, 16));
+	private static final int WORLD_WIDTH = 2 * ((int) Math.pow(2, 15));
 	
 	/**
 	 * height of the world.
 	 */
-	private static final int WORLD_HEIGHT = 2 * ((int) Math.pow(2, 16));
+	private static final int WORLD_HEIGHT = 2 * ((int) Math.pow(2, 15));
 	
 	/**
 	 * Listerers for the DrawingAreaTransformEvent.
@@ -180,8 +188,50 @@ public class DrawingArea extends Canvas {
 				event.doit = false;
 			}
 		});
+		
+		addPaintListener(paintListener);
+		
 	}
 	
+	/**
+	 * PaintListener
+	 * 
+	 * Draws areas outside of the world in a gray color.
+	 */
+	private PaintListener paintListener = new PaintListener() {
+	
+		@Override
+		public void paintControl(final PaintEvent arg0) {
+	
+			arg0.gc.setBackground(canvasOutOfMapColor);
+	
+			final PixelRectangle world = absRect2PixelRect(getGlobalBoundingBox());
+			final PixelRectangle canvas = getDrawingRectangle();
+	
+			final int edgeN = world.getUpperLeft().y;
+			if (edgeN >0) {
+				arg0.gc.fillRectangle(0, 0, canvas.getWidth(), edgeN);
+			}
+			final int edgeE = canvas.getWidth()-world.getWidth()-world.getUpperLeft().x;
+			if (edgeE >0) {
+				arg0.gc.fillRectangle(world.getWidth()+world.getUpperLeft().x,0,  edgeE, canvas.getHeight());
+			}
+			final int edgeS = canvas.getHeight()-world.getHeight()-world.getUpperLeft().y;
+			if (edgeS >0) {
+				arg0.gc.fillRectangle(0,world.getHeight()+world.getUpperLeft().y, canvas.getWidth(),edgeS);
+			}
+			final int edgeW = world.getUpperLeft().x;
+			if (edgeW >0) {
+				arg0.gc.fillRectangle(0, 0, edgeW, canvas.getHeight());
+			}
+	
+			arg0.gc.setBackground(canvasBgColor);
+	
+		}
+	};
+	
+	
+
 	/**
 	 * 
 	 * mouse drag and drop: used for moving the drawing area.
@@ -575,9 +625,9 @@ public class DrawingArea extends Canvas {
 			// log.debug(String.format("upperLeft2D=%s, lowerRight2D=%s", upperLeft2D,
 			// lowerRight2D));
 			
-			ok = DrawingArea.getGlobalBoundingBox()
+			ok = DrawingArea.MAX_ZOMM_OUT
 					.contains(upperLeft2D.getX(), upperLeft2D.getY())
-					&& DrawingArea.getGlobalBoundingBox().contains(lowerRight2D.getX(),
+					&& DrawingArea.MAX_ZOMM_OUT.contains(lowerRight2D.getX(),
 							lowerRight2D.getY());
 			
 		} catch (final NoninvertibleTransformException e) {

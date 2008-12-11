@@ -11,7 +11,6 @@ import org.eclipse.swt.graphics.Point;
 
 import de.uniluebeck.itm.spyglass.drawing.BoundingBoxChangeListener;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
@@ -54,7 +53,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	private DrawingObjectComparator sorter = new DrawingObjectComparator();
 
 	public QuadTree() {
-		this(DrawingArea.getGlobalBoundingBox());
+		this(new AbsoluteRectangle(Integer.MIN_VALUE/2,Integer.MIN_VALUE/2,Integer.MAX_VALUE,Integer.MAX_VALUE));
 	}
 
 	// --------------------------------------------------------------------------------
