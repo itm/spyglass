@@ -796,8 +796,13 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		boolean hashUnsavedChanges = false;
 
 		// check if we're looking at general preference page or plug-in preference page
-		if ((selectedPage instanceof GeneralPreferencePage) || (selectedPage instanceof PluginManagerPreferencePage)) {
+		if (selectedPage instanceof PluginManagerPreferencePage) {
 			hashUnsavedChanges = !selectedPage.okToLeave();
+		}
+
+		// check if we're looking at general preference page or plug-in preference page
+		if (selectedPage instanceof GeneralPreferencePage) {
+			hashUnsavedChanges = ((GeneralPreferencePage) selectedPage).hasUnsavedChanges();
 		}
 
 		if (selectedPage instanceof PluginPreferencePage) {
