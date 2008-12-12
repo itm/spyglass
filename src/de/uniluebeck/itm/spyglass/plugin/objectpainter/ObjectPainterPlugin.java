@@ -10,15 +10,15 @@ package de.uniluebeck.itm.spyglass.plugin.objectpainter;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
 
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.drawing.primitive.Image;
-import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.layer.Layer;
@@ -28,134 +28,34 @@ import de.uniluebeck.itm.spyglass.packet.Int16ListPacket.TrajectorySection;
 import de.uniluebeck.itm.spyglass.plugin.NeedsMetric;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
-import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
- * // -------------------------------------------------------------------------------- /** TODO: -
- * line is not removed (quadtree??) - performance problems? -
+ * ObjectPainter plugin
  * 
  * 
- * 
- * @author dariush
+ * @author Dariush Forouher
  * 
  */
 public class ObjectPainterPlugin extends BackgroundPainterPlugin implements NeedsMetric {
 
-	private class Trajectory implements Runnable {
-
-		@Override
-		public void run() {
-
-			// Draw lines
-			for (final DrawingObject d : lines) {
-				synchronized (layer) {
-					layer.addOrUpdate(d);
-				}
-				fireDrawingObjectAdded(d);
-			}
-
-			synchronized (layer) {
-				layer.addOrUpdate(image);
-			}
-			fireDrawingObjectAdded(image);
-
-			sectionTimestamp = startTime;
-
-			while (running) {
-
-				try {
-					Thread.sleep(50);
-
-					final long time = System.currentTimeMillis();
-
-					final long diff = time - this.sectionTimestamp;
-					if (diff >= list.get(currentSection).duration * 1000) {
-
-						// were at the end. stop
-						if (currentSection == list.size() - 1) {
-							running = false;
-							continue;
-						} else {
-							currentSection++;
-							sectionTimestamp = time;
-						}
-
-					}
-
-					final TrajectorySection sect = list.get(currentSection);
-
-					// move image to the next position
-					final double lambda = diff / (sect.duration * 1000.0);
-
-					final AbsolutePosition location = new AbsolutePosition();
-					location.x = (int) (sect.start.x + lambda * (sect.end.x - sect.start.x));
-					location.y = (int) (sect.start.y + lambda * (sect.end.y - sect.start.y));
-
-					location.x -= image.getImageSizeX() / 2;
-					location.y -= image.getImageSizeY() / 2;
-
-					// log.debug(String.format("diff=%d; lambda=%f", diff, lambda));
-
-					final AbsoluteRectangle oldBBox = image.getBoundingBox();
-					synchronized (layer) {
-						image.setPosition(location);
-						layer.bringToFront(image);
-					}
-
-					fireDrawingObjectChanged(image, oldBBox);
-
-				} catch (final InterruptedException e) {
-					log.error("", e);
-				}
-			}
-
-			synchronized (layer) {
-				layer.remove(image);
-			}
-			fireDrawingObjectRemoved(image);
-
-			// Remove lines
-			for (final DrawingObject d : lines) {
-				synchronized (layer) {
-					layer.remove(d);
-				}
-				fireDrawingObjectRemoved(d);
-				log.debug("Removed line " + d);
-			}
-
-			log.debug("Finished trajectory " + this);
-
-		}
-
-		boolean running = true;
-
-		/** Fetched directly from the packet */
-		List<TrajectorySection> list;
-
-		/** When did the packet arrive */
-		long startTime;
-
-		int currentSection = 0;
-
-		long sectionTimestamp;
-
-		ArrayList<Line> lines = new ArrayList<Line>();
-
-		Image image = null;
-
-	}
-
-	private static Logger log = SpyglassLoggerFactory.getLogger(ObjectPainterPlugin.class);
+	static Logger log = SpyglassLoggerFactory.getLogger(ObjectPainterPlugin.class);
 
 	@Element(name = "parameters")
 	private final ObjectPainterXMLConfig config;
 
-	private final ArrayList<Trajectory> trajectories = new ArrayList<Trajectory>();
+	/**
+	 * Timer used for updating the trajectories
+	 */
+	private final Timer timer = new Timer();
 
-	private final Layer layer = new QuadTree();
+	/**
+	 * List of trajectories. Each trajectory is a TimerTask in our timer.
+	 */
+	final List<Trajectory> trajectories = Collections.synchronizedList(new ArrayList<Trajectory>());
+	
+	final Layer layer = new QuadTree();
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -188,7 +88,7 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	}
 
 	@Override
-	public PluginXMLConfig getXMLConfig() {
+	public ObjectPainterXMLConfig getXMLConfig() {
 		return config;
 	}
 
@@ -217,47 +117,33 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 			return;
 		}
 
-		final Trajectory t = new Trajectory();
-		t.startTime = System.currentTimeMillis();
-		t.list = list;
-
-		// create drawing objects;
-
-		if (config.isDrawLine()) {
-			for (final TrajectorySection s : list) {
-				final Line l = new Line();
-				l.setPosition(s.start, false);
-				l.setEnd(s.end, false);
-				l.setColor(config.getLineColorRGB());
-				t.lines.add(l);
-			}
-		}
-
-		final Image i = new Image(config.getImageFileName());
-		final AbsolutePosition pos = list.get(0).start.clone();
-		pos.x -= config.getImageSizeX() / 2;
-		pos.y -= config.getImageSizeY() / 2;
-		i.setPosition(pos);
-		t.image = i;
-		i.setImageSizeX(config.getImageSizeX());
-		i.setImageSizeY(config.getImageSizeY());
+		final Trajectory t = new Trajectory(this, list, config.getImageFileName());
 
 		this.trajectories.add(t);
-		new Thread(t).start();
-
+		timer.schedule(t, 0, 100);
+		
+		// TODO: currently the trajectories stay in the list. but
+		// this doesn't really matter (except that it takes a small amount
+		// of mememory)
+		// it will be cleared when the user presses reset
 	}
 
 	@Override
 	public void reset() {
-		for (final Trajectory t : this.trajectories) {
-			t.running = false;
+		
+		synchronized (trajectories) {
+			for (final Trajectory t : this.trajectories) {
+				t.cancel();
+			}
 		}
 		this.trajectories.clear();
-		this.layer.clear();
+		synchronized (layer) {
+			this.layer.clear();
+		}
 	}
 
 	@Override
-	protected void updateQuadTree() {
+	protected void updateLayer() {
 		// nothing to do here
 	}
 
@@ -268,12 +154,25 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 		}
 	}
 
+	@Override
 	public void shutdown() {
-		// super.shutdown();
+		super.shutdown();
 
-		// shutdown the threads
-		for (final Trajectory t : this.trajectories) {
-			t.running = false;
-		}
+		// shutdown the timer (don't bother to clean up the DrawingObjects)
+		timer.cancel();
+	}
+	
+	/* Methods needed for scope-reasons */
+	
+	void fireDrawingObjectChangedInternal(final DrawingObject dob, final AbsoluteRectangle rect) {
+		fireDrawingObjectChanged(dob, rect);
+	}
+
+	void fireDrawingObjectAddedInternal(final DrawingObject dob) {
+		fireDrawingObjectAdded(dob);
+	}
+
+	void fireDrawingObjectRemovedInternal(final DrawingObject dob) {
+		fireDrawingObjectRemoved(dob);
 	}
 }

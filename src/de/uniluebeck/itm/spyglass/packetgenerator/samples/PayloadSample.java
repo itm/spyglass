@@ -20,32 +20,32 @@ public class PayloadSample extends Sample {
 	/**
 	 * The syntaxType. See the translate("Pflichtenheft") for a complete list.
 	 */
-	@Element
-	private String syntaxType;
+	@Element(required=false)
+	private String syntaxType = "int16List";
 	
 	/**
 	 * a list of semantic types
 	 */
-	@Element
-	private String semanticTypes;
+	@Element(required=false)
+	private String semanticTypes = "1";
 	
 	/**
 	 * the payload in hex
 	 */
-	@Element
-	private String payload;
+	@Element(required=false)
+	private String payload = null;
 	
 	/**
 	 * a list of node ids.
 	 */
-	@Element
-	private String nodeIDs;
+	@Element(required=false)
+	private String nodeIDs = "1";
 	
 	/**
 	 * the position of the node.
 	 */
-	@Element
-	private Position position;
+	@Element(required=false)
+	private Position position = new Position("0","0","0");
 	
 	public String getSyntaxType() {
 		return syntaxType;
@@ -69,8 +69,11 @@ public class PayloadSample extends Sample {
 	
 	/**
 	 * Transforms the Payload from an hex string to an byte array.
+	 * 
+	 * May be overwritten by any subclass to some fancier thing (like building the
+	 * payload from an abstract description) 
 	 */
-	private byte[] getBytePayload() throws ParseException {
+	protected byte[] getBytePayload() throws ParseException {
 		final int length = this.payload.length() / 2;
 		final byte[] array = new byte[length];
 		
@@ -85,35 +88,35 @@ public class PayloadSample extends Sample {
 	 * returns a random x position based on the range given in the config.
 	 */
 	private short getRandomXPosition() throws ParseException {
-		return (short) this.getRandomIntFromList(this.position.x);
+		return (short) PayloadSample.getRandomIntFromList(this.position.x);
 	}
 	
 	/**
 	 * returns a random y position based on the range given in the config.
 	 */
 	private short getRandomYPosition() throws ParseException {
-		return (short) this.getRandomIntFromList(this.position.y);
+		return (short) PayloadSample.getRandomIntFromList(this.position.y);
 	}
 	
 	/**
 	 * returns a random z position based on the range given in the config.
 	 */
 	private short getRandomZPosition() throws ParseException {
-		return (short) this.getRandomIntFromList(this.position.z);
+		return (short) PayloadSample.getRandomIntFromList(this.position.z);
 	}
 	
 	/**
 	 * returns a random semantic type based on the range given in the config.
 	 */
 	private byte getRandomSemanticType() throws ParseException {
-		return (byte) this.getRandomIntFromList(this.semanticTypes);
+		return (byte) PayloadSample.getRandomIntFromList(this.semanticTypes);
 	}
 	
 	/**
 	 * returns a random node id based on the range given in the config.
 	 */
 	private short getRandomNodeID() throws ParseException {
-		return (short) this.getRandomIntFromList(this.nodeIDs);
+		return (short) PayloadSample.getRandomIntFromList(this.nodeIDs);
 	}
 	
 	/**
@@ -128,7 +131,7 @@ public class PayloadSample extends Sample {
 	 * @return
 	 * @throws ParseException
 	 */
-	private int getRandomIntFromList(final String intList) throws ParseException {
+	protected static int getRandomIntFromList(final String intList) throws ParseException {
 		final TreeSet<Integer> intSet = new TreeSet<Integer>();
 		;
 		final String[] parts = intList.split(",");
@@ -188,8 +191,10 @@ public class PayloadSample extends Sample {
 	@Override
 	public byte[] generatePacket() throws ParseException {
 		
+		final byte[] payload = this.getBytePayload();
+		
 		// compute the packet length
-		final short packetLength = (short) (this.getBytePayload().length + HEADER_SIZE);
+		final short packetLength = (short) (payload.length + HEADER_SIZE);
 		
 		// this byte array will contain the packet
 		final byte[] backendArray = new byte[packetLength];
@@ -218,7 +223,7 @@ public class PayloadSample extends Sample {
 		buf.putShort(this.getRandomYPosition());
 		buf.putShort(this.getRandomZPosition());
 		
-		buf.put(this.getBytePayload()); // the Payload
+		buf.put(payload); // the Payload
 		
 		// Return the Byte array
 		return backendArray;

@@ -74,7 +74,7 @@
 			</sample>
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>demo sample4</name>
-				<probability>0.2</probability>
+				<probability>0.1</probability>
 				<nodeIDs>4</nodeIDs>
 				<syntaxType>uint16List</syntaxType>
 				<semanticTypes>11</semanticTypes>
@@ -172,6 +172,30 @@
 				<semanticTypes>12</semanticTypes>
 				<position x="-500" y="500" z="0"/>
 				<payload>0000000003E8000003E803E8000003E800000000</payload>
+			</sample>
+			
+			<!-- ObjectPainter Testcase -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySample">
+				<name>trajectory</name>
+				<probability>0.1</probability>
+				<sections class="java.util.ArrayList">
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="0" y="0" z="0"/>
+						<duration>10</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="10000" y="10000" z="0"/>
+						<duration>10</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="20000" y="10000" z="0"/>
+						<duration>10</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="10000" y="20000" z="0"/>
+						<duration>XX</duration>
+					</section>
+				</sections>
 			</sample>
 			
 			<!-- this is a raw sample. the bytes contained in this sample will be

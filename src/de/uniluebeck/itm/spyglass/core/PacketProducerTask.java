@@ -108,6 +108,12 @@ public class PacketProducerTask implements Runnable {
 				synchronized (mutex) {
 					packet = packetReader.getNextPacket();
 				}
+				
+				if (packet == null) {
+					log.error("Received a null packet from the PacketReader. Skipping it!");
+					continue;
+				}
+				
 				if (!spyglass.isVisualizationRunning()) {
 					break;
 				}

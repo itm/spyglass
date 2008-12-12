@@ -100,7 +100,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	public void handlePacket(final SpyglassPacket packet) {
 		// if the packet is not null, check if its semantic type is one of
 		// those, the plug-in is interested in
-		if ((packet != null) && isActive()) {
+		if (isActive()) {
 
 			if (!getXMLConfig().isAllSemanticTypes()) {
 				final int[] mySemanticTypes = getXMLConfig().getSemanticTypes();
@@ -359,7 +359,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * processed. This method should be processed quickly since the graphical user interface has to
 	 * wait while the quad tree is updated.
 	 */
-	protected abstract void updateQuadTree();
+	protected abstract void updateLayer();
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -412,7 +412,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 				} catch (final Exception e) {
 					log.error("An exception occured while processing a packet in Plugin '" + getInstanceName() + "'", e);
 				}
-				updateQuadTree();
+				updateLayer();
 			}
 		}
 		packetConsumerThread = null;

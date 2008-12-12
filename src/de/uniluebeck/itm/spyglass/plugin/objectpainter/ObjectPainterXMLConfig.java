@@ -53,7 +53,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	private boolean drawLine = true;
 
 	@Element(required=false)
-	private boolean packetType3D = true;
+	private boolean packetType3D = false;
 
 	@ElementArray(required=false)
 	private int[] lineColor = new int[] { 255, 0, 0 };
@@ -178,15 +178,6 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setImageFileName(final String imageFileName) {
 
 		firePropertyChange("imageFileName", this.imageFileName, this.imageFileName = imageFileName);
-	}
-
-	public boolean equals(final ObjectPainterXMLConfig o) {
-
-		if (!super.equals(o)) {
-			return false;
-		}
-
-		return imageFileName.equals((o).imageFileName) && (imageSizeX == o.imageSizeX) && (imageSizeY == o.imageSizeY);
 	}
 
 }

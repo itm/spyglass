@@ -290,15 +290,16 @@ public class ConfigStore extends PropertyBean {
 
 		// don't start new writes when we are leaving the building
 		if (shutdownInProgress) {
+			//TODO racy zu storePending!!
 			return;
 		}
 
 		// if configFile is not our main configfile, then save regardless
 		// of any other pending storing.
-		final boolean storeAnyway = configFile.equals(SpyglassEnvironment.getConfigFilePath());
+		final boolean foreignFile = !configFile.equals(SpyglassEnvironment.getConfigFilePath());
 
 		// check if there is already a storing operation in progress
-		if (!storeAnyway) {
+		if (!foreignFile) {
 			synchronized (storingPending) {
 				// if so, return
 				if (storingPending) {
@@ -325,7 +326,7 @@ public class ConfigStore extends PropertyBean {
 						log.error(e, e);
 					} finally {
 						// the next successive call will no longer be ignored
-						if (!storeAnyway) {
+						if (!foreignFile) {
 							synchronized (storingPending) {
 								storingPending = false;
 							}
@@ -381,15 +382,16 @@ public class ConfigStore extends PropertyBean {
 	 * progress, this method returns instantly.
 	 */
 	public void waitForRemainingWrites() {
-		synchronized (storingPending) {
-			while (storingPending) {
-				log.debug("Waiting for remaining configuration writes...");
-				try {
-					storingPending.wait();
-				} catch (final InterruptedException e) {
-					log.error("Interrupted", e);
-				}
-			}
-		}
+		return;
+//		synchronized (storingPending) {
+//			while (storingPending) {
+//				log.debug("Waiting for remaining configuration writes...");
+//				try {
+//					storingPending.wait();
+//				} catch (final InterruptedException e) {
+//					log.error("Interrupted", e);
+//				}
+//			}
+//		}
 	}
 }

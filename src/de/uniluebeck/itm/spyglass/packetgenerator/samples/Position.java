@@ -37,4 +37,15 @@ public class Position {
 	@Attribute
 	String z;
 	
+	public Position() {
+		
+	}
+
+	public Position(final String x, final String y, final String z) {
+		super();
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+	
 }
