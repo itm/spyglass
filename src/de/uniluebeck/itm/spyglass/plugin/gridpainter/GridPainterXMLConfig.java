@@ -72,17 +72,6 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 	@Element(required=false)
 	private int numRows = 1;
 
-	public boolean equals(final GridPainterXMLConfig o) {
-		if (!super.equals(o)) {
-			return false;
-		}
-
-		return (gridElementHeight == o.gridElementHeight) && (gridElementWidth == o.gridElementWidth)
-				&& (gridLowerLeftPointX == o.gridLowerLeftPointX) && (gridLowerLeftPointY == o.gridLowerLeftPointY)
-				&& equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth) && (lockGridElementsSquare == o.lockGridElementsSquare)
-				&& (lockNumberOfRowsNCols == o.lockNumberOfRowsNCols) && (numCols == o.numCols) && (numRows == o.numRows);
-	}
-
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the gridElementHeight

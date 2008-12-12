@@ -48,12 +48,4 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 
 	}
 
-	public boolean equals(final SpringEmbedderPositionerXMLConfig o) {
-		if (!super.equals(o)) {
-			return false;
-		}
-
-		return edgeSemanticTypes.equals(o.edgeSemanticTypes);
-	}
-
 }

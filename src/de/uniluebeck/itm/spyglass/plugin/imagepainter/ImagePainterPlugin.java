@@ -97,7 +97,7 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	}
 	
 	@Override
-	protected void updateQuadTree() {
+	protected void updateLayer() {
 		// since the plug-in is not interested in packets, nothing has to be
 		// done here
 	}

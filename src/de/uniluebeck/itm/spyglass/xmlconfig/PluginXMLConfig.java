@@ -197,39 +197,6 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		return (semanticTypes.length == 1) && (semanticTypes[0] == -1);
 	}
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * Returns <code>true</code> if the configuration is equal to certain other configuration
-	 * 
-	 * @param other
-	 *            the configuration this one is compared to
-	 * @return <code>true</code> if the configuration is equal to certain other configuration
-	 */
-	public boolean equals(final PluginXMLConfig other) {
-
-		// needed, since invocations on implementing subclasses may fall back
-		// to this method
-		if (!this.getClass().equals(other.getClass())) {
-			return false;
-		}
-
-		return (this.getActive() == other.getActive()) && (this.getVisible() == other.getVisible()) && this.getName().equals(other.getName())
-				&& Arrays.equals(this.getSemanticTypes(), other.getSemanticTypes()) && (this.getTimeout() == other.getTimeout());
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Returns if two color settings equal one another
-	 * 
-	 * @param lineColorRGB
-	 *            the first color setting
-	 * @param otherLineColorRGB
-	 *            the second color setting
-	 * @return <code>true</code> if two color settings equal one another
-	 */
-	protected static boolean equalsRGB(final int[] lineColorRGB, final int[] otherLineColorRGB) {
-		return (lineColorRGB[0] == otherLineColorRGB[0]) && (lineColorRGB[1] == otherLineColorRGB[1]) && (lineColorRGB[2] == otherLineColorRGB[2]);
-	}
 
 	@Override
 	public final PluginXMLConfig clone() {

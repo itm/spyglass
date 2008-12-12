@@ -208,11 +208,11 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		synchronized (layer) {
 			layer.clear();
 		}
-		updateQuadTree();
+		updateLayer();
 	}
 
 	@Override
-	protected void updateQuadTree() {
+	protected void updateLayer() {
 
 		LinePainterLine line;
 		final List<LinePainterLine> addedLines = new ArrayList<LinePainterLine>();
@@ -312,7 +312,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 			removeEdge(e);
 		}
 
-		updateQuadTree();
+		updateLayer();
 	}
 
 	private void handleTimeoutChange(final long timeout) {

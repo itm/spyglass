@@ -71,7 +71,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	}
 	
 	@Override
-	protected void updateQuadTree() {
+	protected void updateLayer() {
 		// TODO Auto-generated method stub
 		
 	}

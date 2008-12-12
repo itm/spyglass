@@ -177,7 +177,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	}
 
 	@Override
-	protected void updateQuadTree() {
+	protected void updateLayer() {
 		// TODO: should the redraw be delayed for performance reasons?
 		fireDrawingObjectChanged(map, null);
 	}

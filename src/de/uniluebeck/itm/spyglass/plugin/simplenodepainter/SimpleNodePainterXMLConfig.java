@@ -131,24 +131,6 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 		firePropertyChange(PROPERTYNAME_EXTENDED_DEFAULT_VALUE, oldValue, isExtendedDefaultValue);
 	}
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * Returns <code>true</code> if the configuration is equal to certain other configuration
-	 * 
-	 * @param other
-	 *            the configuration this one is compared to
-	 * @return <code>true</code> if the configuration is equal to certain other configuration
-	 */
-	public boolean equals(final SimpleNodePainterXMLConfig other) {
-		if (!super.equals(other)) {
-			return false;
-		}
-
-		return super.equals(other) && (isExtendedDefaultValue == other.isExtendedDefaultValue)
-				&& (isExtendenInformationActive == other.isExtendenInformationActive) && equalsRGB(lineColorRGB, other.lineColorRGB)
-				&& (lineWidth == other.lineWidth);
-	}
-
 	@Override
 	protected void finalize() throws Throwable {
 		isExtendenInformationActive.clear();

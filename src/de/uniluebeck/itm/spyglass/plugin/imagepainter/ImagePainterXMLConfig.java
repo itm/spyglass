@@ -160,13 +160,4 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 		firePropertyChange(PROPERTYNAME_IMAGE_FILE_NAME, oldValue, this.imageFileName);
 	}
 
-	public boolean equals(final ImagePainterXMLConfig o) {
-		if (!super.equals(o)) {
-			return false;
-		}
-
-		return imageFileName.equals((o).imageFileName) && (imageSizeX == o.imageSizeX) && (imageSizeY == o.imageSizeY)
-				&& (lowerLeftX == o.lowerLeftX) && (lowerLeftY == o.lowerLeftY);
-	}
-
 }

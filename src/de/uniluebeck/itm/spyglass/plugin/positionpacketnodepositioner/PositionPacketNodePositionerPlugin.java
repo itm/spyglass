@@ -180,7 +180,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	}
 
 	@Override
-	protected void updateQuadTree() {
+	protected void updateLayer() {
 		// is never called.
 	}
 

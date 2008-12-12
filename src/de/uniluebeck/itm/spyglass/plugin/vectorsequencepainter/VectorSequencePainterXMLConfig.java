@@ -94,11 +94,4 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 		firePropertyChange(PROPERTYNAME_LINE_WIDTH, this.lineWidth, this.lineWidth = lineWidth);
 	}
 
-	public boolean equals(final VectorSequencePainterXMLConfig o) {
-		if (!super.equals(o)) {
-			return false;
-		}
-		return (dimension == o.dimension) && equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth);
-	}
-
 }

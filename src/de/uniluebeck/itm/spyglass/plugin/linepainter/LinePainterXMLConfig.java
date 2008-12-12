@@ -70,13 +70,4 @@ public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 		firePropertyChange(PROPERTYNAME_LINE_WIDTH, oldValue, lineWidth);
 	}
 
-	public boolean equals(final LinePainterXMLConfig o) {
-
-		if (!super.equals(o)) {
-			return false;
-		}
-
-		return equalsRGB(lineColorRGB, o.lineColorRGB) && (lineWidth == o.lineWidth);
-	}
-
 }

@@ -404,17 +404,4 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 		firePropertyChange(PROPERTYNAME_REFRESH_INTERVAL, this.refreshInterval, this.refreshInterval = refreshInterval);
 	}
 
-	public boolean equals(final MapPainterXMLConfig o) {
-		if (!super.equals(o)) {
-			return false;
-		}
-
-		return (defaultValue == o.defaultValue) && (gridElementHeight == o.gridElementHeight) && (gridElementWidth == o.gridElementWidth)
-				&& (lowerLeftX == o.lowerLeftX) && (lowerLeftY == o.lowerLeftY) && (lockGridElementSquare == o.lockGridElementSquare)
-				&& (lockNumberOfRowsNCols == o.lockNumberOfRowsNCols) && equalsRGB(maxColorRGB, o.maxColorRGB) && (maxValue == o.maxValue)
-				&& equalsRGB(minColorRGB, o.minColorRGB) && (minValue == o.minValue) && (width == o.width)
-				&& (numFramePointsHorizontal == o.numFramePointsHorizontal) && (numFramePointsVertical == o.numFramePointsVertical)
-				&& (height == o.height) && (refreshInterval == o.refreshInterval);
-	}
-
 }

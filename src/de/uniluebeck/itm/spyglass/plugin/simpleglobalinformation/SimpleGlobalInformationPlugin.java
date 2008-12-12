@@ -238,7 +238,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	}
 
 	@Override
-	protected void updateQuadTree() {
+	protected void updateLayer() {
 		// nothing to do here
 	}
 

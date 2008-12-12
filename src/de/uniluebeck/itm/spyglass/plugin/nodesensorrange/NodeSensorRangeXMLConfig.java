@@ -70,11 +70,4 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
 
 	}
 
-	public boolean equals(final NodeSensorRangeXMLConfig o) {
-		if (!super.equals(o)) {
-			return false;
-		}
-		return nodeRanges.equals((o).nodeRanges);
-	}
-
 }

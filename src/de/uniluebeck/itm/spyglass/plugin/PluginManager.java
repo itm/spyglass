@@ -82,6 +82,7 @@ public class PluginManager {
 		availablePluginsTypes.add(SpringEmbedderPositionerPlugin.class);
 		availablePluginsTypes.add(LinePainterPlugin.class);
 		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
+		//availablePluginsTypes.add(TemplatePlugin.class);
 	}
 
 	// --------------------------------------------------------------------------

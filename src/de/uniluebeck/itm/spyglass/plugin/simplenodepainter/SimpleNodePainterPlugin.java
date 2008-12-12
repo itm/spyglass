@@ -80,7 +80,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	/**
 	 * Objects which have recently been updated and which needs to be updated in the quad tree as
-	 * well (which is done in {@link SimpleNodePainterPlugin#updateQuadTree()}
+	 * well (which is done in {@link SimpleNodePainterPlugin#updateLayer()}
 	 */
 	private final Set<DrawingObject> updatedObjects;
 
@@ -244,7 +244,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		synchronized (updatedObjects) {
 			updatedObjects.add(nodeObject);
 		}
-		updateQuadTree();
+		updateLayer();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -506,7 +506,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 
 		// and update the quad tree
-		updateQuadTree();
+		updateLayer();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -524,7 +524,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 		synchronized (obsoleteObjects) {
 			obsoleteObjects.addAll(layer.getDrawingObjects());
-			updateQuadTree();
+			updateLayer();
 		}
 
 		stringFormatterResults.clear();
@@ -532,7 +532,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	// --------------------------------------------------------------------------------
 	@Override
-	protected void updateQuadTree() {
+	protected void updateLayer() {
 
 		// copy all objects which have to be updated in a separate List and
 		// clear the original list
@@ -650,7 +650,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					obsoleteObjects.add(drawingObject);
 				}
 				// remove the object by calling updateQuadTree() and return
-				updateQuadTree();
+				updateLayer();
 				return;
 			}
 		}
@@ -689,7 +689,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					synchronized (updatedObjects) {
 						updatedObjects.add(no);
 					}
-					updateQuadTree();
+					updateLayer();
 				}
 				return true;
 			}

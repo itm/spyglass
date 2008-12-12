@@ -155,7 +155,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 				}
 			}
 		}
-		updateQuadTree();
+		updateLayer();
 	}
 
 	@Override
@@ -248,11 +248,11 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 			removedSequences.push(s);
 		}
 		sequences.clear();
-		updateQuadTree();
+		updateLayer();
 	}
 
 	@Override
-	protected void updateQuadTree() {
+	protected void updateLayer() {
 
 		synchronized (layer) {
 
