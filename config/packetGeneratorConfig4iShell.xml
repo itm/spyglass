@@ -178,6 +178,7 @@
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySample">
 				<name>trajectory</name>
 				<probability>0.1</probability>
+				<semanticTypes>42</semanticTypes>
 				<sections class="java.util.ArrayList">
 					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
 						<pos x="0" y="0" z="0"/>

@@ -120,12 +120,11 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 		final Trajectory t = new Trajectory(this, list, config.getImageFileName());
 
 		this.trajectories.add(t);
-		timer.schedule(t, 0, 100);
+		timer.schedule(t, 0, config.getUpdateInterval());
 		
-		// TODO: currently the trajectories stay in the list. but
-		// this doesn't really matter (except that it takes a small amount
-		// of mememory)
-		// it will be cleared when the user presses reset
+		// NOTE: the trajectories stay in the list until the plugin is shut down. but
+		// this doesn't really matter (except that it takes a small amount of mememory)
+		// since the list is only used on reset().
 	}
 
 	@Override

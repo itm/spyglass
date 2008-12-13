@@ -37,6 +37,8 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_PACKET_TYPE_3D = "packetType3D";
 
+	public static final String PROPERTYNAME_UPDATE_INTERVAL = "updateInterval";
+
 	@Element(required=false)
 	private String imageFileName = "images/icons/brokenImageLink.png";
 
@@ -58,6 +60,10 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	@ElementArray(required=false)
 	private int[] lineColor = new int[] { 255, 0, 0 };
 
+	@Element(required=false)
+	private int updateInterval = 500;
+
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
@@ -73,7 +79,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setImageSizeX(final int imageSizeX) {
 		final int oldValue = this.imageSizeX;
 		this.imageSizeX = imageSizeX;
-		firePropertyChange("imageSizeX", oldValue, this.imageSizeX);
+		firePropertyChange(PROPERTYNAME_IMAGE_SIZE_X, oldValue, this.imageSizeX);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -91,7 +97,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setImageSizeY(final int imageSizeY) {
 		final int oldValue = this.imageSizeY;
 		this.imageSizeY = imageSizeY;
-		firePropertyChange("imageSizeY", oldValue, this.imageSizeY);
+		firePropertyChange(PROPERTYNAME_IMAGE_SIZE_Y, oldValue, this.imageSizeY);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -109,7 +115,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setPacketType3D(final boolean packetType3D) {
 		final boolean oldValue = this.packetType3D;
 		this.packetType3D = packetType3D;
-		firePropertyChange("packetType3D", oldValue, packetType3D);
+		firePropertyChange(PROPERTYNAME_PACKET_TYPE_3D, oldValue, packetType3D);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -127,7 +133,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setDrawLine(final boolean drawLine) {
 		final boolean oldValue = this.drawLine;
 		this.drawLine = drawLine;
-		firePropertyChange("drawLine", oldValue, drawLine);
+		firePropertyChange(PROPERTYNAME_DRAW_LINE, oldValue, drawLine);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -145,7 +151,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setKeepProportions(final boolean keepProportions) {
 		final boolean oldValue = this.keepProportions;
 		this.keepProportions = keepProportions;
-		firePropertyChange("keepProportions", oldValue, keepProportions);
+		firePropertyChange(PROPERTYNAME_KEEP_PROPORTIONS, oldValue, keepProportions);
 	}
 
 	public int[] getLineColor() {
@@ -159,7 +165,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public void setLineColor(final int[] color) {
 		final int[] oldValue = this.lineColor;
 		this.lineColor = color;
-		firePropertyChange("lineColor", oldValue, color);
+		firePropertyChange(PROPERTYNAME_LINE_COLOR, oldValue, color);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -177,7 +183,15 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	 */
 	public void setImageFileName(final String imageFileName) {
 
-		firePropertyChange("imageFileName", this.imageFileName, this.imageFileName = imageFileName);
+		firePropertyChange(PROPERTYNAME_IMAGE_FILE_NAME, this.imageFileName, this.imageFileName = imageFileName);
+	}
+
+	public int getUpdateInterval() {
+		return updateInterval;
+	}
+
+	public void setUpdateInterval(final int updateInterval) {
+		firePropertyChange(PROPERTYNAME_UPDATE_INTERVAL, this.updateInterval, this.updateInterval = updateInterval);
 	}
 
 }

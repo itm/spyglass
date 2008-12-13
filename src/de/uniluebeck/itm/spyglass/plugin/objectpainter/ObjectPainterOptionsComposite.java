@@ -7,6 +7,7 @@ import java.text.ParseException;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.conversion.Converter;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
@@ -24,6 +25,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.ColorDialog;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
@@ -40,6 +42,19 @@ import de.uniluebeck.itm.spyglass.gui.databinding.validator.FileReadableValidato
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 public class ObjectPainterOptionsComposite extends Composite {
 
 	{
@@ -53,6 +68,12 @@ public class ObjectPainterOptionsComposite extends Composite {
 	private Text imageSizeWidthText;
 	private Text imageSizeHeightText;
 	private Label label1;
+	private Text inteval;
+	private Label label10;
+	private Label label9;
+	private Label label8;
+	private Label label7;
+	private Combo combo1;
 	private Button button1;
 	private CLabel colorExample;
 	private Label label6;
@@ -83,10 +104,13 @@ public class ObjectPainterOptionsComposite extends Composite {
 
 	private void initGUI() {
 
+		final GridData groupData2 = new GridData();
+		groupData2.horizontalAlignment = GridData.FILL;
+		groupData2.grabExcessHorizontalSpace = true;
+		this.setLayoutData(groupData2);
 		final GridLayout thisLayout = new GridLayout(1, true);
-
 		this.setLayout(thisLayout);
-		this.setSize(660, 340);
+		this.setSize(660, 411);
 		{
 			final GridData groupData = new GridData();
 			groupData.horizontalAlignment = GridData.FILL;
@@ -289,7 +313,7 @@ public class ObjectPainterOptionsComposite extends Composite {
 			}
 			{
 				label6 = new Label(group, SWT.NONE);
-				label6.setText("Line color");
+				label6.setText("Line color: ");
 			}
 			{
 				final GridData cLabel1LData = new GridData();
@@ -313,6 +337,43 @@ public class ObjectPainterOptionsComposite extends Composite {
 						button1WidgetSelected(evt);
 					}
 				});
+			}
+			{
+				label8 = new Label(group, SWT.NONE);
+				label8.setText("Trajectory");
+				final GridData label8LData = new GridData();
+				label8LData.widthHint = 101;
+				label8LData.heightHint = 17;
+				label8LData.horizontalSpan = 5;
+				label8.setLayoutData(label8LData);
+				label8.setFont(SWTResourceManager.getFont("Sans",10,1,false,false));
+			}
+			{
+				label7 = new Label(group, SWT.NONE);
+				label7.setText("Packet type: ");
+			}
+			{
+				final GridData combo1LData = new GridData();
+				combo1LData.horizontalSpan = 4;
+				combo1 = new Combo(group, SWT.NONE);
+				combo1.setLayoutData(combo1LData);
+				combo1.add("TrajectoryPacket2D");
+				combo1.add("TrajectoryPacket3D");
+			}
+			{
+				label9 = new Label(group, SWT.NONE);
+				label9.setText("Display update interval: ");
+			}
+			{
+				final GridData text1LData = new GridData();
+				text1LData.widthHint = 72;
+				text1LData.heightHint = 17;
+				inteval = new Text(group, SWT.BORDER);
+				inteval.setLayoutData(text1LData);
+			}
+			{
+				label10 = new Label(group, SWT.NONE);
+				label10.setText("milliseconds");
 			}
 		}
 
@@ -372,6 +433,32 @@ public class ObjectPainterOptionsComposite extends Composite {
 			dbc.bindValue(SWTObservables.observeBackground(colorExample), observableColor,
 					new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setConverter(new ColorToArrayConverter()), new UpdateValueStrategy()
 							.setConverter(new ArrayToColorConverter(this.getDisplay())));
+		}
+		{
+			final IObservableValue observable = BeansObservables.observeValue(dbc.getValidationRealm(), config, ObjectPainterXMLConfig.PROPERTYNAME_PACKET_TYPE_3D);
+			dbc.bindValue(SWTObservables.observeSelection(combo1), observable,
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setConverter(new Converter("",true) {
+
+						@Override
+						public Object convert(final Object fromObject) {
+							return fromObject.equals("TrajectoryPacket3D");
+						}
+						
+					}), new UpdateValueStrategy()
+							.setConverter(new Converter(true,"") {
+
+								@Override
+								public Object convert(final Object fromObject) {
+									return ((Boolean)fromObject) ? "TrajectoryPacket3D" : "TrajectoryPacket2D";
+								}}
+							));
+		}
+		{
+			obsWidget = SWTObservables.observeText(inteval, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ObjectPainterXMLConfig.PROPERTYNAME_UPDATE_INTERVAL);
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setAfterConvertValidator(new IntegerRangeValidator(50,
+					10000));
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 
 	}
