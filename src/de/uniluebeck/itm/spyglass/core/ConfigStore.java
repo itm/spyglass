@@ -44,18 +44,66 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class ConfigStore extends PropertyBean {
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Thread, which is responsible for storing into the default config file.
+	 * 
+	 * @author Dariush Forouher
+	 *
+	 */
+	private final class AsyncStoreThread extends Thread {
+
+		@Override
+		public void run() {
+
+			log.debug("Async-Store thread started.");
+
+			while (!isInterrupted())
+			{
+				try {
+					
+					// wait until we're notified
+					synchronized (storePendingMutex) {
+						if (!storePending) {
+							storePendingMutex.wait();
+						}
+					}
+					log.debug("Woke up, waiting another second.");
+
+					// sleep for one second to wait for other calls which have not to be
+					// processed for that reason
+					sleep(1000);
+	
+				} catch (final InterruptedException e) {
+					this.interrupt();
+					
+				} finally {
+					if (!this.isInterrupted()) {
+						
+						// allow new store requests to be made
+						storePending = false;
+						
+						storeSync(SpyglassEnvironment.getConfigFilePath());
+					}
+				}
+			}
+		}
+	}
+
 	/** An object which is used for logging errors and other events */
 	private static Logger log = SpyglassLoggerFactory.getLogger(ConfigStore.class);
 
 	/** Current instance of a SpyGlass configuration object */
 	private final SpyglassConfiguration spyglassConfig;
 
-	private volatile Boolean storingPending = false;
+	/** true, if the config should be written to file. */
+	private volatile boolean storePending = false;
+	
+	private final Object storePendingMutex = new Object();
 
-	private Object storeMutex = new Object();
-
-	private volatile Boolean shutdownInProgress = false;
-
+	/** Thread for async stores */
+	private final Thread storeThread = new AsyncStoreThread();
+	
 	// --------------------------------------------------------------------------
 	/**
 	 * Listener for changes in the plug-in list
@@ -137,6 +185,8 @@ public class ConfigStore extends PropertyBean {
 
 		registerListener();
 
+		storeThread.start();
+		
 		// TODO: for Milestone2: register for events from the PacketReader
 	}
 
@@ -201,29 +251,38 @@ public class ConfigStore extends PropertyBean {
 		if (spyglassConfig == null) {
 			throw new IllegalStateException("Cannot import a configuration when we have" + "no working base configuration yet.");
 		}
-
+		
 		final SpyglassConfiguration sgc = ConfigStore.load(file);
 
+		log.debug("Unregistering old listener.");
 		// unregister the old ones
 		unregisterListener();
 
+		log.debug("Stopping plugins.");
 		// destroy the currently active plug-ins since they will be no longer needed
 		for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
 			p.reset();
 			p.shutdown();
 		}
+
+		log.debug("Stopping packet reader.");
 		final PacketReader pr = spyglassConfig.getPacketReader();
 		if (pr instanceof PacketRecorder) {
 			((PacketRecorder) pr).setReadFromFile(false);
 			((PacketRecorder) pr).enableRecording(false);
 		}
 
+		log.debug("Overwriting config.");
 		spyglassConfig.overwriteWith(sgc);
 
+		log.debug("Registering new listener.");
 		// register the new ones
 		registerListener();
 
+		log.debug("Firing replaceConfiguration event.");
 		firePropertyChange("replaceConfiguration", null, spyglassConfig);
+
+		log.debug("Finished with importing config. Yeah!");
 
 		// TODO: for Milestone2: register for events from the PacketReader
 
@@ -231,9 +290,13 @@ public class ConfigStore extends PropertyBean {
 
 	/**
 	 * Exports the config into the given file
+	 * 
+	 * Note: Do this synchronized, since users generally don't mind waiting
+	 * on this occasions (lots of programs hang when saving their files after
+	 * explicitly been commanded by the user).
 	 */
 	public void exportConfig(final File file) {
-		this.store(file);
+		storeSync(file);
 	}
 
 	// --------------------------------------------------------------------------
@@ -270,128 +333,65 @@ public class ConfigStore extends PropertyBean {
 
 	/**
 	 * Store the config into the system-given file.
-	 */
-	public void store() {
-		this.store(SpyglassEnvironment.getConfigFilePath());
-	}
-
-	/**
-	 * Stores the configuration persistently into the given file.<br>
-	 * <br>
-	 * 
+	 *
 	 * Stores the configuration in an extra {@link Thread} to improve the performance.<br>
 	 * The storing operation will be delayed for one second. Every call received within this second
 	 * will be ignored.
+	 */
+	public void store() {
+		synchronized (storePendingMutex) {
+		
+			//log.debug("Waking up async-store thread.");
+			this.storePending = true;
+			this.storePendingMutex.notifyAll();
+		}
+	}
+
+	/**
+	 * Stores the configuration persistently into the given file.
+	 * 
+	 * This method is synchronized to avoid storing into the same file concurrently.
 	 * 
 	 * @param configFile
 	 *            the file which will contain the configuration data afterwards
 	 */
-	private void store(final File configFile) {
+	private synchronized void storeSync(final File configFile) {
 
-		// don't start new writes when we are leaving the building
-		if (shutdownInProgress) {
-			//TODO racy zu storePending!!
-			return;
+		log.debug("Storing config to file: " + configFile);
+
+		final StringWriter buf = new StringWriter();
+		
+		try {
+	
+			// If something happens here, the file will never have been opened.
+			new Persister().write(spyglassConfig, buf);
+
+			final FileWriter writer = new FileWriter(configFile);
+			writer.write(buf.toString());
+			writer.close();
+			
+		} catch (final IOException e) {
+			log.error("Unable to store configuration output: Error while writing the file!", e);
+		} catch (final Exception e) {
+			log.error("Unable to store configuration output: " + e.getMessage(), e);
 		}
 
-		// if configFile is not our main configfile, then save regardless
-		// of any other pending storing.
-		final boolean foreignFile = !configFile.equals(SpyglassEnvironment.getConfigFilePath());
-
-		// check if there is already a storing operation in progress
-		if (!foreignFile) {
-			synchronized (storingPending) {
-				// if so, return
-				if (storingPending) {
-					return;
-				}
-				// otherwise proceed
-				storingPending = true;
-			}
-		}
-
-		// create the thread to store
-		final Thread t = new Thread() {
-			@Override
-			public void run() {
-
-				// storing concurrently may have unpleasant results (file corruption etc).
-				synchronized (storeMutex) {
-
-					try {
-						// sleep for one second to wait for other calls which have not to be
-						// processed for that reason
-						sleep(1000);
-					} catch (final InterruptedException e) {
-						log.error(e, e);
-					} finally {
-						// the next successive call will no longer be ignored
-						if (!foreignFile) {
-							synchronized (storingPending) {
-								storingPending = false;
-							}
-						}
-					}
-
-					log.debug("Storing config to file: " + configFile);
-
-					try {
-
-						final StringWriter buf = new StringWriter();
-
-						// If something happens here, the file will never have been opened.
-						new Persister().write(spyglassConfig, buf);
-
-						final FileWriter writer = new FileWriter(configFile);
-						writer.write(buf.toString());
-						writer.close();
-
-						log.debug("Stored config to file: " + configFile + ".");
-
-					} catch (final Exception e) {
-						log.error("Unable to store configuration output: " + e, e);
-					}
-
-					// notify waitForRemainingWrites() that maybe it can return
-					synchronized (storingPending) {
-						storingPending.notifyAll();
-					}
-				}
-
-			}
-		};
-
-		// this Thread must not be a Daemon! Otherwise a running storing process would be
-		// interrupted when the program terminates.
-		// This would result in a corrupted configuration file.
-		t.setDaemon(false);
-		t.start();
-
+		log.debug("Stored config to file: " + configFile + ".");
+	
 	}
 
 	/**
 	 * Notify the ConfigStore that Spyglass is shutting down and thus we should not accept any mre
 	 * store requests.
+	 * 
+	 * This method blocks until  async-store thread has died.
+	 * 
+	 * @throws InterruptedException if the excecuting thread is interrupted while this method is called.
 	 */
-	public void signalShutdown() {
-		shutdownInProgress = true;
+	public void shutdown() throws InterruptedException {
+
+		storeThread.interrupt();
+		storeThread.join();
 	}
 
-	/**
-	 * This method blocks until the config has been written. If there is currently no write in
-	 * progress, this method returns instantly.
-	 */
-	public void waitForRemainingWrites() {
-		return;
-//		synchronized (storingPending) {
-//			while (storingPending) {
-//				log.debug("Waiting for remaining configuration writes...");
-//				try {
-//					storingPending.wait();
-//				} catch (final InterruptedException e) {
-//					log.error("Interrupted", e);
-//				}
-//			}
-//		}
-	}
 }

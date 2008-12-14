@@ -119,9 +119,12 @@ public class Spyglass {
 	public void shutdown() {
 		setVisualizationRunning(false);
 		configStore.store();
-		configStore.signalShutdown();
-		configStore.waitForRemainingWrites();
-
+		try {
+			configStore.shutdown();
+		} catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+		
 		// shutdown all plugins
 		for (final Plugin p : pluginManager.getPlugins()) {
 			p.shutdown();
