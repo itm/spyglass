@@ -1,6 +1,5 @@
 package de.uniluebeck.itm.spyglass.plugin.mappainter;
 
-import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -31,7 +30,6 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ArrayToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
 public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
@@ -42,7 +40,6 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 		SWTResourceManager.registerResourceUser(this);
 	}
 
-	private static final Logger log = SpyglassLoggerFactory.getLogger(MapPainterPrefComposite.class);
 	private Group group1;
 	private Label label1;
 	private Label label11space;
@@ -68,6 +65,9 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 	private Button button1;
 	private Label label8space;
 	private Label label11;
+	private Label label18;
+	private Text kNN;
+	private Label label16;
 	private Label label8;
 	private Label label5;
 	private Text defaultValue;
@@ -131,12 +131,8 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 			final GridLayout thisLayout = new GridLayout(1, true);
 
 			this.setLayout(thisLayout);
-			this.setSize(475, 343);
+			this.setSize(654, 379);
 
-			final GridData gridData = new GridData();
-			gridData.horizontalAlignment = GridData.FILL;
-			gridData.grabExcessHorizontalSpace = true;
-			this.setLayoutData(gridData);
 			{
 				group1 = new Group(this, SWT.NONE);
 				final GridLayout group1Layout = new GridLayout();
@@ -316,7 +312,7 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 				final GridData group2LData = new GridData();
 				group2LData.horizontalAlignment = GridData.FILL;
 				group2LData.grabExcessHorizontalSpace = true;
-				group2LData.heightHint = 139;
+				group2LData.heightHint = 174;
 				group2.setLayoutData(group2LData);
 				group2.setText("Data");
 				{
@@ -425,6 +421,26 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 					framePointsYLData.horizontalAlignment = GridData.FILL;
 					framePointsY.setLayoutData(framePointsYLData);
 				}
+				{
+					label18 = new Label(group2, SWT.NONE);
+					final GridData label18LData = new GridData();
+					label18LData.widthHint = 17;
+					label18LData.heightHint = 17;
+					label18.setLayoutData(label18LData);
+					label18.setText(" ");
+				}
+				{
+					label16 = new Label(group2, SWT.NONE);
+					label16.setText("Neighbors (for kNN):");
+				}
+				{
+					kNN = new Text(group2, SWT.BORDER);
+					final GridData text1LData = new GridData();
+					text1LData.widthHint = 36;
+					text1LData.heightHint = 17;
+					kNN.setLayoutData(text1LData);
+					kNN.setText("k");
+				}
 			}
 
 			{
@@ -442,63 +458,95 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 		this.config = config;
 		this.dbc = dbc;
 
-		dbc.bindValue(SWTObservables.observeText(this.lowerLeftX, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_LOWER_LEFT_X), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		{
+			dbc.bindValue(SWTObservables.observeText(this.lowerLeftX, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_LOWER_LEFT_X), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		}
+		{
+			dbc.bindValue(SWTObservables.observeText(this.lowerLeftY, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_LOWER_LEFT_Y), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		}
+		{
+			dbc.bindValue(SWTObservables.observeText(this.width, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_WIDTH), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+		}
+		{
 
-		dbc.bindValue(SWTObservables.observeText(this.lowerLeftY, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_LOWER_LEFT_Y), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+			dbc.bindValue(SWTObservables.observeText(this.height, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_HEIGHT), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+		}
+		{
 
-		dbc.bindValue(SWTObservables.observeText(this.width, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_WIDTH), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-				.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+			dbc.bindValue(SWTObservables.observeText(this.blockWidth, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_GRID_ELEMENT_WIDTH), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+		}
+		{
 
-		dbc.bindValue(SWTObservables.observeText(this.height, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_HEIGHT), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-				.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+			dbc.bindValue(SWTObservables.observeText(this.blockHeight, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_GRID_ELEMENT_HEIGHT), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
 
-		dbc.bindValue(SWTObservables.observeText(this.blockWidth, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_GRID_ELEMENT_WIDTH), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-				.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+		}
+		{
+			dbc.bindValue(SWTObservables.observeText(this.minValue, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_MIN_VALUE), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
 
-		dbc.bindValue(SWTObservables.observeText(this.blockHeight, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_GRID_ELEMENT_HEIGHT), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-				.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+		}
+		{
+			dbc.bindValue(SWTObservables.observeText(this.maxValue, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_MAX_VALUE), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
 
-		dbc.bindValue(SWTObservables.observeText(this.minValue, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_MIN_VALUE), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		}
+		{
+			dbc.bindValue(SWTObservables.observeText(this.defaultValue, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_DEFAULT_VALUE), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
 
-		dbc.bindValue(SWTObservables.observeText(this.maxValue, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_MAX_VALUE), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		}
+		{
+			dbc.bindValue(SWTObservables.observeText(this.framePointsX, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_NUM_FRAME_POINTS_HORIZONTAL), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
 
-		dbc.bindValue(SWTObservables.observeText(this.defaultValue, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_DEFAULT_VALUE), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+		}
+		{
+			dbc.bindValue(SWTObservables.observeText(this.framePointsY, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_NUM_FRAME_POINTS_VERTICAL), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
 
-		dbc.bindValue(SWTObservables.observeText(this.framePointsX, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_NUM_FRAME_POINTS_HORIZONTAL), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-				.setAfterConvertValidator(new IntegerRangeValidator(3, Integer.MAX_VALUE)), null);
+		}
+		{
+			dbc.bindValue(SWTObservables.observeBackground(minValueColor), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_MIN_COLOR_R_G_B), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setConverter(new ColorToArrayConverter()), new UpdateValueStrategy().setConverter(new ArrayToColorConverter(this.getDisplay())));
 
-		dbc.bindValue(SWTObservables.observeText(this.framePointsY, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_NUM_FRAME_POINTS_VERTICAL), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-				.setAfterConvertValidator(new IntegerRangeValidator(3, Integer.MAX_VALUE)), null);
+		}
+		{
+			dbc.bindValue(SWTObservables.observeBackground(maxValueColor), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_MAX_COLOR_R_G_B), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setConverter(new ColorToArrayConverter()), new UpdateValueStrategy().setConverter(new ArrayToColorConverter(this.getDisplay())));
 
-		dbc.bindValue(SWTObservables.observeBackground(minValueColor), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_MIN_COLOR_R_G_B), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-				.setConverter(new ColorToArrayConverter()), new UpdateValueStrategy().setConverter(new ArrayToColorConverter(this.getDisplay())));
+		}
+		{
+			dbc.bindValue(SWTObservables.observeText(this.kNN, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_K), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
 
-		dbc.bindValue(SWTObservables.observeBackground(maxValueColor), BeansObservables.observeValue(dbc.getValidationRealm(), config,
-				MapPainterXMLConfig.PROPERTYNAME_MAX_COLOR_R_G_B), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-				.setConverter(new ColorToArrayConverter()), new UpdateValueStrategy().setConverter(new ArrayToColorConverter(this.getDisplay())));
+		}
+		{
+			final MetricsXMLConfig mConf = spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getMetrics();
+			dbc.bindValue(SWTObservables.observeText(this.label11space), BeansObservables.observeValue(dbc.getValidationRealm(), mConf,
+					MetricsXMLConfig.PROPERTYNAME_UNIT), null, null);
+			dbc.bindValue(SWTObservables.observeText(this.label3space), BeansObservables.observeValue(dbc.getValidationRealm(), mConf,
+					MetricsXMLConfig.PROPERTYNAME_UNIT), null, null);
+			dbc.bindValue(SWTObservables.observeText(this.label8space), BeansObservables.observeValue(dbc.getValidationRealm(), mConf,
+					MetricsXMLConfig.PROPERTYNAME_UNIT), null, null);
+			dbc.bindValue(SWTObservables.observeText(this.labelspace), BeansObservables.observeValue(dbc.getValidationRealm(), mConf,
+					MetricsXMLConfig.PROPERTYNAME_UNIT), null, null);
 
-		final MetricsXMLConfig mConf = spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getMetrics();
-		dbc.bindValue(SWTObservables.observeText(this.label11space), BeansObservables.observeValue(dbc.getValidationRealm(), mConf,
-				MetricsXMLConfig.PROPERTYNAME_UNIT), null, null);
-		dbc.bindValue(SWTObservables.observeText(this.label3space), BeansObservables.observeValue(dbc.getValidationRealm(), mConf,
-				MetricsXMLConfig.PROPERTYNAME_UNIT), null, null);
-		dbc.bindValue(SWTObservables.observeText(this.label8space), BeansObservables.observeValue(dbc.getValidationRealm(), mConf,
-				MetricsXMLConfig.PROPERTYNAME_UNIT), null, null);
-		dbc.bindValue(SWTObservables.observeText(this.labelspace), BeansObservables.observeValue(dbc.getValidationRealm(), mConf,
-				MetricsXMLConfig.PROPERTYNAME_UNIT), null, null);
-
+		}
 		updateScaleLinkBlock();
 		updateScaleLinkDim();
 	}

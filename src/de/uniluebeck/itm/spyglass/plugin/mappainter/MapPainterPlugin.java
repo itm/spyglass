@@ -46,6 +46,8 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	 */
 	private final Layer layer = new QuadTree();
 
+	DataStore dataStore = new DataStore();
+	
 	/**
 	 * The drawing object representing the map.
 	 */
@@ -87,12 +89,9 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	@Override
 	public void reset() {
 		// clear the drawing object
-		if (map != null) {
-			synchronized (map) {
-				map.positions.clear();
-				map.values.clear();
-				updateFramepoints();
-			}
+		synchronized (dataStore) {
+			dataStore.clear();
+			updateFramepoints();
 		}
 	}
 
@@ -100,7 +99,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	public void init(final PluginManager manager) {
 		super.init(manager);
 
-		this.map = new Map(xmlConfig);
+		this.map = new Map(xmlConfig, this);
 		layer.addOrUpdate(map);
 		xmlConfig.addPropertyChangeListener(this);
 		updateFramepoints();
@@ -167,9 +166,12 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 		// update the map
 		if (!Double.isNaN(value)) {
-			synchronized (map) {
-				map.positions.put(packet.getSenderId(), position);
-				map.values.put(packet.getSenderId(), value);
+			synchronized (dataStore) {
+				final DataPoint e = new DataPoint();
+				e.isFramepoint=false;
+				e.position = position;
+				e.value = value;
+				dataStore.add(e);
 			}
 
 		}
@@ -193,19 +195,17 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 	private void updateFramepoints() {
 		// Update the framepoints
-		synchronized (map) {
+		synchronized (dataStore) {
 
 			// kill all old framepoints
-			final Iterator<Integer> it = map.positions.keySet().iterator();
+			final Iterator<DataPoint> it = dataStore.iterator();
 			while (it.hasNext()) {
-				final Integer i = it.next();
-				if (i < 0) {
+				if (it.next().isFramepoint) {
 					it.remove();
 				}
 			}
 
 			// add framepoints horizontally
-			int j = 1;
 			final float numFramePointsHorizontal = xmlConfig.getNumFramePointsHorizontal();
 			final int width = xmlConfig.getBoundingBox().getWidth();
 			final int height = xmlConfig.getBoundingBox().getHeight();
@@ -215,17 +215,13 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 			for (int i = 0; i < numFramePointsHorizontal; i++) {
 				final AbsolutePosition pos = upperLeft.clone();
 				pos.x += i / (numFramePointsHorizontal - 1) * width;
-				map.positions.put(-j, pos);
-				map.values.put(-j, defaultValue);
-				j++;
+				newDP(defaultValue, pos);
 			}
 			for (int i = 0; i < numFramePointsHorizontal; i++) {
 				final AbsolutePosition pos = upperLeft.clone();
 				pos.x += i / (numFramePointsHorizontal - 1) * width;
 				pos.y += height;
-				map.positions.put(-j, pos);
-				map.values.put(-j, defaultValue);
-				j++;
+				newDP(defaultValue, pos);
 			}
 
 			// add framepoints vertically
@@ -233,20 +229,24 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 			for (int i = 0; i < numFramePointsVertical; i++) {
 				final AbsolutePosition pos = upperLeft.clone();
 				pos.y += i / (numFramePointsVertical - 1) * height;
-				map.positions.put(-j, pos);
-				map.values.put(-j, defaultValue);
-				j++;
+				newDP(defaultValue, pos);
 			}
 			for (int i = 0; i < numFramePointsVertical; i++) {
 				final AbsolutePosition pos = upperLeft.clone();
 				pos.y += i / (numFramePointsVertical - 1) * height;
 				pos.x += width;
-				map.positions.put(-j, pos);
-				map.values.put(-j, defaultValue);
-				j++;
+				newDP(defaultValue, pos);
 			}
 
 		}
+	}
+
+	private void newDP(final Double defaultValue, final AbsolutePosition pos) {
+		final DataPoint p = new DataPoint();
+		p.isFramepoint=true;
+		p.value = defaultValue;
+		p.position=pos;
+		this.dataStore.add(p);
 	}
 
 }

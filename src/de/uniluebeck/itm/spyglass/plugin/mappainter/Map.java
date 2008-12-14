@@ -2,10 +2,7 @@ package de.uniluebeck.itm.spyglass.plugin.mappainter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
@@ -22,9 +19,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * A map object for the MapPainterPlugin
- * 
- * TODO: the algorithms used here are abysmally slow...
- * 
+ *  
  * @author Dariush Forouher
  * 
  */
@@ -39,18 +34,11 @@ public class Map extends DrawingObject {
 	 */
 	private final MapPainterXMLConfig config;
 	
-	/**
-	 * Data of the nodes
-	 */
-	final HashMap<Integer, Double> values = new HashMap<Integer, Double>();
+	final private MapPainterPlugin plugin;
 	
-	/**
-	 * Positions of the nodes
-	 */
-	final HashMap<Integer, AbsolutePosition> positions = new HashMap<Integer, AbsolutePosition>();
-	
-	Map(final MapPainterXMLConfig config) {
+	Map(final MapPainterXMLConfig config, final MapPainterPlugin plugin) {
 		this.config = config;
+		this.plugin = plugin;
 		
 		config.addPropertyChangeListener(new PropertyChangeListener() {
 			
@@ -67,17 +55,16 @@ public class Map extends DrawingObject {
 		
 		final PixelRectangle clippAreaPx = new PixelRectangle(gc.getClipping());
 		
-		// TODO
-		final AbsoluteRectangle area = drawingArea.pixelRect2AbsRect(clippAreaPx);
+		final AbsoluteRectangle clippingArea = drawingArea.pixelRect2AbsRect(clippAreaPx);
 		
 		if (DEBUG) {
-			final Color colorBla = new Color(null, 0, 0, 0);
-			gc.setBackground(colorBla);
-			for (final AbsolutePosition pos : this.positions.values()) {
-				final PixelPosition px = drawingArea.absPoint2PixelPoint(pos);
+			final Color boxColor = new Color(null, 0, 0, 0);
+			gc.setBackground(boxColor);
+			for (final DataPoint p : plugin.dataStore) {
+				final PixelPosition px = drawingArea.absPoint2PixelPoint(p.position);
 				gc.fillRectangle(px.x - 5, px.y - 5, 10, 10);
 			}
-			colorBla.dispose();
+			boxColor.dispose();
 		}
 		
 		final AbsoluteRectangle drawRect = new AbsoluteRectangle();
@@ -91,24 +78,17 @@ public class Map extends DrawingObject {
 				drawRect.setWidth(config.getGridElementWidth());
 				drawRect.setUpperLeft(curUL);
 				
-				final PixelRectangle pxRect = drawingArea.absRect2PixelRect(drawRect);
+				// Clipping
+				if (clippingArea.intersects(drawRect)) {
 				
-				final double average = calculateValue(drawRect.getCenter());
-				final RGB avgColor = calculateColor(average);
-				
-				final Color color = new Color(null, avgColor);
-				gc.setBackground(color);
-				gc.fillRectangle(pxRect.toSWTRectangle());
-				
-				if (DEBUG) {
-					gc.drawText(String.format("%.0f", average), pxRect.getUpperLeft().x, pxRect
-							.getUpperLeft().y);
+					drawElement(drawingArea, gc, drawRect);
+					
 				}
-				
-				color.dispose();
-				
+
 				curUL.x += config.getGridElementWidth();
+
 			}
+			
 			curUL.x = config.getLowerLeft().x;
 			curUL.y += config.getGridElementWidth();
 		}
@@ -116,6 +96,27 @@ public class Map extends DrawingObject {
 		if (DEBUG) {
 			drawBoundingBox(drawingArea, gc);
 		}
+	}
+
+	/**
+	 * Draw the Element drawRect.
+	 */
+	private void drawElement(final DrawingArea drawingArea, final GC gc, final AbsoluteRectangle drawRect) {
+		final PixelRectangle pxRect = drawingArea.absRect2PixelRect(drawRect);
+		
+		final double average = calculateValue(drawRect.getCenter());
+		final RGB avgColor = calculateColor(average);
+		final Color color = new Color(gc.getDevice(), avgColor);
+
+		gc.setBackground(color);
+		gc.fillRectangle(pxRect.toSWTRectangle());
+		
+		if (DEBUG) {
+			gc.drawText(String.format("%.0f", average), pxRect.getUpperLeft().x, pxRect
+					.getUpperLeft().y);
+		}
+		
+		color.dispose();
 	}
 	
 	/**
@@ -155,62 +156,18 @@ public class Map extends DrawingObject {
 	 * Calculate the value at the given point in space based on sourrounding nodes.
 	 */
 	private double calculateValue(final AbsolutePosition point) {
-		
-		final ArrayList<Integer> sorted = new ArrayList<Integer>(this.positions.keySet());
-		
-		Collections.sort(sorted, new Comparator<Integer>() {
-			
-			@Override
-			public int compare(final Integer o1, final Integer o2) {
-				
-				final double dist1 = positions.get(o1).getDistance(point);
-				final double dist2 = positions.get(o2).getDistance(point);
-				
-				if (dist1 < dist2) {
-					return -1;
-				} else if (dist1 > dist2) {
-					return 1;
-				} else {
-					return 0;
-				}
-			}
-			
-		});
-		
-		// sorted should now contain the nearest nodes at the beginning
-		
-		// runtime check
-		if (DEBUG) {
-			for (int i = 0; i < sorted.size() - 1; i++) {
-				final double dist1 = positions.get(sorted.get(i)).getDistance(point);
-				final double dist2 = positions.get(sorted.get(i + 1)).getDistance(point);
-				if (!(dist1 <= dist2)) {
-					positions.get(sorted.get(i + 1)).getDistance(point);
-				}
-				assert dist1 <= dist2 : dist1 + " larger than " + dist2;
-			}
-			// because of the framepoints there should always be at least three points
-			assert sorted.size() >= 3 : "Not enough nodes available";
-			
+		final List<DataPoint> neighbors;
+		synchronized (plugin.dataStore) {
+			neighbors = plugin.dataStore.kNN(point, config.getK());
 		}
 		
-		// log.debug(String.format("The data of the three nodes: %f, %f, %f", values
-		// .get(sorted.get(0)), values.get(sorted.get(1)), values.get(sorted.get(2))));
+		double sum = 0;
+		for (final DataPoint dataPoint : neighbors) {
+			sum += dataPoint.value;
+		}
+		sum /= neighbors.size();
 		
-		final double average = (values.get(sorted.get(0)) + values.get(sorted.get(1)) + values
-				.get(sorted.get(2))) / 3;
-		
-		// log
-		// .debug(String
-		// .format(
-		// "minValue=%f, maxValue=%f, defaultValue=%f minColor=[%d,%d,%d]; maxColor [%d,%d,%d]",
-		// config.getMinValue(), config.getMaxValue(), config
-		// .getDefaultValue(), config.getMinColorRGB()[0], config
-		// .getMinColorRGB()[1], config.getMinColorRGB()[2], config
-		// .getMaxColorRGB()[0], config.getMaxColorRGB()[1], config
-		// .getMaxColorRGB()[2]));
-		
-		return average;
+		return sum;
 	}
 	
 	@Override

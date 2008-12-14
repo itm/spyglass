@@ -17,14 +17,14 @@
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
             <parameters>
-               <active>false</active>
+               <active>true</active>
                <visible>true</visible>
                <name>default4</name>
                <timeout>0</timeout>
                <semanticTypes length="1">
                   <int>-1</int>
                </semanticTypes>
-               <defaultValue>3.0</defaultValue>
+               <defaultValue>10.0</defaultValue>
                <gridElementHeight>1000</gridElementHeight>
                <gridElementWidth>1000</gridElementWidth>
                <lowerLeftX>-16000</lowerLeftX>
@@ -44,16 +44,17 @@
                </minColorRGB>
                <minValue>0.0</minValue>
                <width>32000</width>
-               <numFramePointsHorizontal>3</numFramePointsHorizontal>
-               <numFramePointsVertical>3</numFramePointsVertical>
+               <numFramePointsHorizontal>1</numFramePointsHorizontal>
+               <numFramePointsVertical>1</numFramePointsVertical>
                <height>32000</height>
                <refreshInterval>10</refreshInterval>
+               <k>1</k>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
             <parameters>
                <active>true</active>
-               <visible>true</visible>
+               <visible>false</visible>
                <name>default</name>
                <timeout>0</timeout>
                <semanticTypes length="1">
@@ -123,13 +124,13 @@
                <stringFormatters/>
                <defaultStringFormatter>Payload: %u0</defaultStringFormatter>
                <extendedInformation>
-                  <isActive nodeID="1">true</isActive>
-                  <isActive nodeID="2">true</isActive>
+                  <isActive nodeID="1">false</isActive>
+                  <isActive nodeID="2">false</isActive>
                   <isActive nodeID="3">false</isActive>
                   <isActive nodeID="4">false</isActive>
-                  <isActive nodeID="5">true</isActive>
+                  <isActive nodeID="5">false</isActive>
                   <isActive nodeID="6">false</isActive>
-                  <isActive nodeID="7">true</isActive>
+                  <isActive nodeID="7">false</isActive>
                </extendedInformation>
                <isExtendedDefaultValue>false</isExtendedDefaultValue>
                <lineColorRGB length="3">
@@ -137,17 +138,17 @@
                   <int>0</int>
                   <int>0</int>
                </lineColorRGB>
-               <lineWidth>10</lineWidth>
+               <lineWidth>2</lineWidth>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin">
             <parameters>
-               <active>true</active>
+               <active>false</active>
                <visible>true</visible>
                <name>default5</name>
                <timeout>0</timeout>
                <semanticTypes length="1">
-                  <int>-1</int>
+                  <int>42</int>
                </semanticTypes>
                <imageFileName>/home/dariush/Vorlesungen/Fallstudie/workspace/SpyglassPure/images/icons/brokenImageLink.png</imageFileName>
                <imageSizeX>1000</imageSizeX>
@@ -160,6 +161,7 @@
                   <int>0</int>
                   <int>255</int>
                </lineColor>
+               <updateInterval>100</updateInterval>
             </parameters>
          </plugin>
       </plugins>
@@ -254,6 +256,7 @@
             <numFramePointsVertical>3</numFramePointsVertical>
             <height>100</height>
             <refreshInterval>10</refreshInterval>
+            <k>3</k>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin">
@@ -276,6 +279,7 @@
                <int>0</int>
                <int>0</int>
             </lineColor>
+            <updateInterval>50</updateInterval>
          </parameters>
       </plugin>
       <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">

@@ -57,6 +57,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_DEFAULT_VALUE = "defaultValue";
 
+	public static final String PROPERTYNAME_K = "k";
+
 	@Element(required=false)
 	private float defaultValue = 3;
 
@@ -104,6 +106,9 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 
 	@Element(required=false)
 	private int refreshInterval = 10;
+
+	@Element(required=false)
+	private int k = 3;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -403,5 +408,12 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 
 		firePropertyChange(PROPERTYNAME_REFRESH_INTERVAL, this.refreshInterval, this.refreshInterval = refreshInterval);
 	}
+
+	public int getK() {
+		return k;
+	}
+
+	public void setK(final int k) {
+		firePropertyChange(PROPERTYNAME_K, this.k, this.k = k);	}
 
 }
