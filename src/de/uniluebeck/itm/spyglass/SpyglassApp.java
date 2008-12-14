@@ -39,10 +39,9 @@ public class SpyglassApp {
 		
 		// GUI
 		final DeviceData data = new DeviceData();
-		// data.tracking = true;
+		data.tracking = true;
+		data.debug = true;
 		final Display display = new Display(data);
-		// final Sleak sleak = new Sleak();
-		// sleak.open();
 		
 		final Shell shell = new Shell(display);
 		shell.setLayout(new FillLayout());
@@ -61,6 +60,8 @@ public class SpyglassApp {
 		new UIController(spyglass, appWindow);
 		
 		// Start visualization
+
+		spyglass.setVisualizationRunning(true);
 		spyglass.start();
 		
 		// SWT message loop
