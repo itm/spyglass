@@ -286,16 +286,16 @@ public class DrawingArea extends Canvas {
 		public void keyPressed(final KeyEvent arg0) {
 			log.debug("pressed" + arg0);
 			if (arg0.keyCode == 16777219) {
-				move(-MOVE_OFFSET, 0);
-			}
-			if (arg0.keyCode == 16777220) {
 				move(MOVE_OFFSET, 0);
 			}
+			if (arg0.keyCode == 16777220) {
+				move(-MOVE_OFFSET, 0);
+			}
 			if (arg0.keyCode == 16777217) {
-				move(0, -MOVE_OFFSET);
+				move(0, MOVE_OFFSET);
 			}
 			if (arg0.keyCode == 16777218) {
-				move(0, MOVE_OFFSET);
+				move(0, -MOVE_OFFSET);
 			}
 		}
 		
