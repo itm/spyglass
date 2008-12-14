@@ -25,6 +25,9 @@ import de.uniluebeck.itm.spyglass.packet.FloatListPacket;
 import de.uniluebeck.itm.spyglass.packet.IntListPacket;
 import de.uniluebeck.itm.spyglass.packet.LongListPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.packet.VariableListPacket;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionEvent;
+import de.uniluebeck.itm.spyglass.plugin.NodePositionListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
@@ -32,7 +35,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
-public class MapPainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener {
+public class MapPainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener, NodePositionListener {
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(MapPainterPlugin.class);
 
@@ -102,6 +105,9 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		this.map = new Map(xmlConfig, this);
 		layer.addOrUpdate(map);
 		xmlConfig.addPropertyChangeListener(this);
+		
+		manager.addNodePositionListener(this);
+		
 		updateFramepoints();
 	}
 
@@ -156,7 +162,12 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				break;
 			}
 			case ISENSE_SPYGLASS_PACKET_VARIABLE: {
-				// TODO: handle those
+				final VariableListPacket p = ((VariableListPacket) packet);
+				if (p.getValues().length > 0) {
+					value = p.getValues()[0].doubleValue();
+				} else {
+					log.error(String.format("Packet %s has no payload.", p));
+				}
 				break;
 			}
 
@@ -170,6 +181,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				final DataPoint e = new DataPoint();
 				e.isFramepoint=false;
 				e.position = position;
+				e.nodeID = packet.getSenderId();
 				e.value = value;
 				dataStore.add(e);
 			}
@@ -247,6 +259,43 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		p.value = defaultValue;
 		p.position=pos;
 		this.dataStore.add(p);
+	}
+
+	// --------------------------------------------------------------------------------
+	/* (non-Javadoc)
+	 * @see de.uniluebeck.itm.spyglass.plugin.NodePositionListener#handleEvent(de.uniluebeck.itm.spyglass.plugin.NodePositionEvent)
+	 */
+	@Override
+	public void handleEvent(final NodePositionEvent e) {
+		switch (e.change) {
+			case ADDED:
+				// do nothing. will be handled by handlePacket anyway
+				break;
+			case REMOVED:
+			{
+				// remove the node from the datastore
+				final Iterator<DataPoint> it = dataStore.iterator();
+				while (it.hasNext()) {
+					final DataPoint p = it.next();
+					if (!p.isFramepoint && (p.nodeID==e.node)) {
+						it.remove();
+					}
+				}
+				break;
+			}
+			case MOVED:
+			{
+				final Iterator<DataPoint> it = dataStore.iterator();
+				while (it.hasNext()) {
+					final DataPoint p = it.next();
+					if (!p.isFramepoint && (p.nodeID==e.node)) {
+						p.position = e.newPosition;
+					}
+				}
+				break;
+			}
+		}
+		
 	}
 
 }

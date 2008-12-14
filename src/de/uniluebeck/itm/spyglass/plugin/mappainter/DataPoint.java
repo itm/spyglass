@@ -26,6 +26,11 @@ public class DataPoint {
 	public AbsolutePosition position = null;
 
 	/**
+	 * sender ID of the node
+	 */
+	public int nodeID = -1;
+	
+	/**
 	 * the value
 	 */
 	public double value = 0;

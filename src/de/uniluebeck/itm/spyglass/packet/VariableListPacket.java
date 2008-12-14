@@ -17,7 +17,7 @@ public class VariableListPacket extends SpyglassPacket {
 	 */
 	public static final SyntaxTypes SYNTAXTYPE = SyntaxTypes.ISENSE_SPYGLASS_PACKET_VARIABLE;
 	
-	private List<Object> values = new LinkedList<Object>();
+	private List<Number> values = new LinkedList<Number>();
 	
 	/**
 	 * @author Nils Glombitza, ITM Uni Luebeck
@@ -77,12 +77,8 @@ public class VariableListPacket extends SpyglassPacket {
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @return
 	 */
-	public Object[] getValues() {
-		Object[] ret = new Object[values.size()];
-		if (ret.length > 0) {
-			ret = values.toArray(ret);
-		}
-		return ret;
+	public Number[] getValues() {
+		return values.toArray(new Number[0]);
 	}
 	
 	/**
@@ -92,7 +88,7 @@ public class VariableListPacket extends SpyglassPacket {
 	@Override
 	public String toString() {
 		String ret = super.toString() + ", values: ";
-		final Iterator<Object> it = values.iterator();
+		final Iterator<Number> it = values.iterator();
 		for (int i = 0; it.hasNext(); i++) {
 			if (i > 0) {
 				ret = ret + ", ";
