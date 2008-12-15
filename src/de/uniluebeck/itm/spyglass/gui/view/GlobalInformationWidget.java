@@ -25,7 +25,6 @@ import de.uniluebeck.itm.spyglass.plugin.globalinformation.GlobalInformationPlug
  */
 public class GlobalInformationWidget extends Composite {
 
-	private String title;
 	private GlobalInformationBar giBar;
 	private final GlobalInformationPlugin plugin;
 	private ExpandItem expandItem;
@@ -44,7 +43,6 @@ public class GlobalInformationWidget extends Composite {
 	 */
 	public GlobalInformationWidget(final GlobalInformationBar giBar, final int style, final GlobalInformationPlugin plugin) {
 		super(giBar.getExpandBar(), style);
-		title = "";
 		this.plugin = plugin;
 		this.giBar = giBar;
 		plugin.getXMLConfig().addPropertyChangeListener(new PropertyChangeListener() {

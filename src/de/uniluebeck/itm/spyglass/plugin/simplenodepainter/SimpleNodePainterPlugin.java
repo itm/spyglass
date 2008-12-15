@@ -29,7 +29,7 @@ import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.drawing.primitive.NodeObject;
+import de.uniluebeck.itm.spyglass.drawing.primitive.Node;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
@@ -100,6 +100,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	private volatile Boolean refreshPending = false;
 
+	private Map<Integer, Collection<Integer>> nodeSemanticTypes;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -112,6 +114,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		obsoleteObjects = new HashSet<DrawingObject>();
 		stringFormatterResults = new TreeMap<Integer, Map<Integer, String>>();
 		boundingBoxes = new HashMap<DrawingObject, AbsoluteRectangle>();
+		nodeSemanticTypes = new HashMap<Integer, Collection<Integer>>();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -135,9 +138,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			@SuppressWarnings("synthetic-access")
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
+
+				// if the plug-in is no longer active, reset it completely
 				if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ACTIVE) && !((Boolean) evt.getNewValue())) {
 					reset();
-				} else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_VISIBLE) && !((Boolean) evt.getNewValue())) {
+				}
+
+				// if the plug-in is no longer visible, hide its graphical objects
+				else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_VISIBLE) && !((Boolean) evt.getNewValue())) {
 					synchronized (layer) {
 						for (final DrawingObject drawingObject : layer.getDrawingObjects()) {
 							fireDrawingObjectRemoved(drawingObject);
@@ -146,6 +154,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					}
 				}
 
+				// refresh the configuration parameters no matter what property changed
 				refreshConfigurationParameters();
 
 			}
@@ -162,6 +171,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		reset();
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void finalize() throws Throwable {
 		super.finalize();
@@ -218,11 +228,22 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		// if the description was changed, an update is needed
 		if (parsePayloadByStringFormatters(packet)) {
 			// get the instance of the node's visualization
-			final NodeObject nodeObject = getMatchingNodeObject(nodeID);
-			nodeObject.setDescription(getStringFormatterResultString(nodeID));
+			final Node node = getMatchingNodeObject(nodeID);
+			node.setDescription(getStringFormatterResultString(nodeID));
+
+			// add the packet's semantic type to the ones associated with the node
+			synchronized (nodeSemanticTypes) {
+				Collection<Integer> semanticTypes = nodeSemanticTypes.get(nodeID);
+				if (semanticTypes == null) {
+					semanticTypes = new HashSet<Integer>();
+					nodeSemanticTypes.put(nodeID, semanticTypes);
+				}
+				semanticTypes.add(packet.getSemanticType());
+			}
+
 			// add the object to the one which have to be (re)drawn ...
 			synchronized (updatedObjects) {
-				updatedObjects.add(nodeObject);
+				updatedObjects.add(node);
 			}
 		}
 	}
@@ -238,19 +259,28 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 */
 	private void setNodePosition(final int nodeID, final AbsolutePosition position) {
 
+		// the node has to be associated to a valid semantic type to be marked for redraw
+		synchronized (nodeSemanticTypes) {
+			if (nodeSemanticTypes.get(nodeID) == null) {
+				return;
+			}
+		}
+
 		// get the instance of the node's visualization
-		final NodeObject nodeObject = getMatchingNodeObject(nodeID);
-		nodeObject.setPosition(position);
+		final Node node = getMatchingNodeObject(nodeID);
+		node.setPosition(position);
+
 		synchronized (updatedObjects) {
-			updatedObjects.add(nodeObject);
+			updatedObjects.add(node);
 		}
 		updateLayer();
+
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * Parses the packets payload using the defined {@link StringFormatter}s.<br>
-	 * If a string formatter exists which gains information from the payload, the {@link NodeObject}
+	 * If a string formatter exists which gains information from the payload, the {@link Node}
 	 * corresponding to the node which sent the packet will be updated.
 	 * 
 	 * @param packet
@@ -273,6 +303,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				// parses the packet. The resulting string will be stored separately
 				final String str = stringFormatter.parse(packet);
 				updateStringFormatterResults(-1, packetSemanticType + ": " + str, nodeID);
+				// updateStringFormatterResults(-1, str, nodeID);
 				needsUpdate = true;
 
 			}
@@ -333,7 +364,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 *            the node's identifier
 	 * @return the up to date instance of a node's visualization
 	 */
-	private synchronized NodeObject getMatchingNodeObject(final int nodeID) {
+	private synchronized Node getMatchingNodeObject(final int nodeID) {
 
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
 		synchronized (layer) {
@@ -343,19 +374,19 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			drawingObjects.addAll(updatedObjects);
 		}
 
-		NodeObject nodeObject = null;
+		Node node = null;
 		DrawingArea drawingArea = null;
 
 		// if there is already an instance of the node's visualization
 		// available in the quadTree it has to be updated
 		for (final DrawingObject drawingObject : drawingObjects) {
-			if (drawingObject instanceof NodeObject) {
-				nodeObject = (NodeObject) drawingObject;
-				drawingArea = nodeObject.getDrawingArea();
+			if (drawingObject instanceof Node) {
+				node = (Node) drawingObject;
+				drawingArea = node.getDrawingArea();
 
 				// if the matching node is found ...
-				if (nodeObject.getNodeID() == nodeID) {
-					return nodeObject;
+				if (node.getNodeID() == nodeID) {
+					return node;
 				}
 			}
 		}
@@ -369,13 +400,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
-		final NodeObject no = new NodeObject(nodeID, "Node " + nodeID, stringFormatterResult, isExtended, lineColorRGB, lineWidth, drawingArea);
+		final Node no = new Node(nodeID, "Node " + nodeID, stringFormatterResult, isExtended, lineColorRGB, lineWidth, drawingArea,
+				getPluginManager().getNodePositioner().getPosition(nodeID));
 		// this is hacky but since no drawing area is accessible, I don't know what to do...
 		boundingBoxes.put(no, (drawingArea != null) ? new AbsoluteRectangle(no.getBoundingBox()) : new AbsoluteRectangle(0, 0, 1000, 1000));
 
-		synchronized (updatedObjects) {
-			updatedObjects.add(no);
-		}
+		// synchronized (updatedObjects) {
+		// updatedObjects.add(no);
+		// }
 
 		return no;
 	}
@@ -454,16 +486,26 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			refreshPending = true;
 		}
 
-		// create the thread to store
+		// create the thread to refresh concurrently
 		final Thread t = new Thread() {
 			@SuppressWarnings("synthetic-access")
 			@Override
 			public void run() {
-				// this has to be done to start or stop the packet consumer thread
-				setActive(isActive());
+				try {
+					Thread.sleep(500);
 
-				refreshNodeObjectConfiguration();
-				refreshPending = false;
+					// this has to be done to start or stop the packet consumer thread
+					setActive(isActive());
+
+					refreshNodeObjectConfiguration();
+
+				} catch (final InterruptedException e) {
+					log.error("Sleeping was interrupted while waiting to perform a refresh of the configuration parameters");
+				} catch (final Exception e) {
+					log.error(e, e);
+				} finally {
+					refreshPending = false;
+				}
 			}
 		};
 		t.setDaemon(true);
@@ -482,31 +524,93 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		// delete all cached string formatter results which are no longer needed
 		purgeStringFormatterResults();
 
-		// get all drawing objects from the quad tree
-		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
+		final List<DrawingObject> obsoleteNodes = new LinkedList<DrawingObject>();
 
+		// get all drawing objects from the layer
+		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
 		synchronized (layer) {
 			drawingObjects.addAll(layer.getDrawingObjects());
 		}
 
-		// update all objects which represent nodes
+		// process and update or remove all objects which represent nodes
 		for (final DrawingObject drawingObject : drawingObjects) {
-			if (drawingObject instanceof NodeObject) {
-				final NodeObject nodeObject = (NodeObject) drawingObject;
-				final int nodeID = nodeObject.getNodeID();
+			if (drawingObject instanceof Node) {
+				final Node node = (Node) drawingObject;
+				final int nodeID = node.getNodeID();
 
+				// if the node is not associated to any semantic type, it is to be removed
+				if (!isAssociatedToSemanticType(node)) {
+					obsoleteNodes.add(node);
+					continue;
+				}
+
+				// otherwise it needs to be updated
 				final String stringFormatterResult = getStringFormatterResultString(nodeID);
-				nodeObject.update("Node " + nodeID, stringFormatterResult, xmlConfig.isExtendedInformationActive(nodeID),
-						xmlConfig.getLineColorRGB(), xmlConfig.getLineWidth());
+				node.update("Node " + nodeID, stringFormatterResult, xmlConfig.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(),
+						xmlConfig.getLineWidth());
+
 			}
 		}
 
+		// put all nodes which have to be removed into the designated data structure
+		synchronized (obsoleteObjects) {
+			obsoleteObjects.addAll(obsoleteNodes);
+		}
+
+		// put all nodes which have to be removed into the designated data structure
+		drawingObjects.removeAll(obsoleteNodes);
 		synchronized (updatedObjects) {
 			updatedObjects.addAll(drawingObjects);
 		}
 
-		// and update the quad tree
+		// and update the layer
 		updateLayer();
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns if the node is associated to any semantic type
+	 * 
+	 * @param node
+	 *            a node
+	 * @return <code>true</code> if the node is associated to a semantic type, <code>false</code>
+	 *         otherwise
+	 */
+	private boolean isAssociatedToSemanticType(final Node node) {
+
+		Collection<Integer> semanticTypes = null;
+		synchronized (nodeSemanticTypes) {
+			final int nodeID = node.getNodeID();
+			semanticTypes = nodeSemanticTypes.get(nodeID);
+
+			// if a list of semantic types is associated to the node at all, check if the semantic
+			// types in the list are still valid
+			if (semanticTypes != null) {
+
+				if (xmlConfig.isAllSemanticTypes()) {
+					return true;
+				}
+
+				// retain all still valid semantic type's in the node's list of associated semantic
+				// types
+				// Note: Arrays.asList(xmlConfig.getSemanticTypes()) does not work here!
+				final Collection<Integer> validSemanticTypes = new LinkedList<Integer>();
+				final int[] semTypes = xmlConfig.getSemanticTypes();
+				for (int i = 0; i < semTypes.length; i++) {
+					validSemanticTypes.add(semTypes[i]);
+				}
+				semanticTypes.retainAll(validSemanticTypes);
+
+				// if not, remove the whole list
+				if (semanticTypes.size() == 0) {
+					nodeSemanticTypes.remove(nodeID);
+					return false;
+				}
+				return true;
+
+			}
+		}
+		return false;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -520,6 +624,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
 		synchronized (layer) {
 			drawingObjects.addAll(layer.getDrawingObjects());
+		}
+
+		synchronized (nodeSemanticTypes) {
+			nodeSemanticTypes.clear();
 		}
 
 		synchronized (obsoleteObjects) {
@@ -641,14 +749,21 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			dos.addAll(layer.getDrawingObjects());
 		}
 
+		// since the node does not exist any more, its list of associated semantic types can
+		// be removed
+		synchronized (nodeSemanticTypes) {
+			nodeSemanticTypes.remove(nodeID);
+		}
+
 		// look for the node object with the matching identifier
 		for (final DrawingObject drawingObject : dos) {
-			if ((drawingObject instanceof NodeObject) && (((NodeObject) drawingObject).getNodeID() == nodeID)) {
+			if ((drawingObject instanceof Node) && (((Node) drawingObject).getNodeID() == nodeID)) {
 
 				// if the object was found, put it into the set of objects to be removed
 				synchronized (obsoleteObjects) {
 					obsoleteObjects.add(drawingObject);
 				}
+
 				// remove the object by calling updateQuadTree() and return
 				updateLayer();
 				return;
@@ -681,9 +796,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			// was clicked (if any)
 			if (bbox.contains(clickPoint)) {
 				// check if the object is representing a node
-				if (drawingObject instanceof NodeObject) {
+				if (drawingObject instanceof Node) {
 					// if so, toggle its extension state
-					final NodeObject no = (NodeObject) drawingObject;
+					final Node no = (Node) drawingObject;
 					no.setExtended(!no.isExtended());
 					xmlConfig.putExtendedInformationActive(no.getNodeID(), no.isExtended());
 					synchronized (updatedObjects) {

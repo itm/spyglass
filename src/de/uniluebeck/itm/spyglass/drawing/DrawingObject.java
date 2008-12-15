@@ -10,6 +10,7 @@ package de.uniluebeck.itm.spyglass.drawing;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -18,6 +19,8 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
@@ -26,14 +29,20 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
  */
 public abstract class DrawingObject {
 
+	private static final SpyglassLogger log = (SpyglassLogger) SpyglassLoggerFactory.getLogger(DrawingObject.class);
+
+	/** The position of the object's upper left point */
 	protected AbsolutePosition position = new AbsolutePosition(0, 0, 0);
 
 	private Set<BoundingBoxChangeListener> changeListeners = new HashSet<BoundingBoxChangeListener>();
 
+	/** The object's bounding box */
 	protected AbsoluteRectangle boundingBox;
 
+	/** The object's foreground color */
 	protected RGB color = new RGB(200, 0, 0);
 
+	/** The object's background color */
 	protected RGB bgColor = new RGB(255, 255, 255);
 
 	// --------------------------------------------------------------------------------
@@ -48,7 +57,7 @@ public abstract class DrawingObject {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Sets the position of the upper left point of the <code>DrawingObject</code>
+	 * Sets the position of the object's upper left point
 	 * 
 	 * @param position
 	 *            the position of the upper left point of the <code>DrawingObject</code>.
@@ -57,6 +66,15 @@ public abstract class DrawingObject {
 		setPosition(position, true);
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the position of the object's upper left point
+	 * 
+	 * @param position
+	 *            the position of the upper left point of the <code>DrawingObject</code>
+	 * @param fireBoundingBoxChangeEvent
+	 *            indicates whether a changeEvent has to be thrown
+	 */
 	public void setPosition(final AbsolutePosition position, final boolean fireBoundingBoxChangeEvent) {
 
 		this.position = position;
@@ -66,34 +84,66 @@ public abstract class DrawingObject {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Informs all listeners which registered for changes of the drawing objects bounding box that
+	 * the box has actually changed
+	 */
 	protected void fireBoundingBoxChangeEvent() {
 		for (final BoundingBoxChangeListener listener : changeListeners) {
 			listener.onBoundingBoxChanged(this);
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
+	 * Returns the instance's foreground color
 	 * 
+	 * @return the instance's foreground color
 	 */
 	public RGB getColor() {
 		return color;
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the instance's background color
+	 * 
+	 * @return the instance's background color
+	 */
 	public RGB getBgColor() {
 		return bgColor;
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the the instance's background color
+	 * 
+	 * @param bgColor
+	 *            the the background color to set
+	 */
 	public void setBgColor(final RGB bgColor) {
 		this.bgColor = bgColor;
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the instance's foreground color
+	 * 
+	 * @param color
+	 *            the foreground color to set
+	 */
 	public void setColor(final RGB color) {
 		this.color = color;
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
+	 * Returns the string representation of the object
 	 * 
+	 * @param tabCount
+	 *            the number of tab stops used to intent the string representation
+	 * @return the string representation of the object
 	 */
 	public String toString(final int tabCount) {
 		final StringBuffer buff = new StringBuffer();
@@ -133,6 +183,7 @@ public abstract class DrawingObject {
 		return boundingBox;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Draws a line which indicates the object's bounding box
 	 * 
@@ -154,14 +205,32 @@ public abstract class DrawingObject {
 		color.dispose();
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Adds a listener for changes concerning the object's bounding box
+	 * 
+	 * @param listener
+	 *            a listener for changes concerning the object's bounding box
+	 */
 	public void addBoundingBoxChangedListener(final BoundingBoxChangeListener listener) {
 		this.changeListeners.add(listener);
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Removes a listener for changes concerning the object's bounding box
+	 * 
+	 * @param listener
+	 *            a listener for changes concerning the object's bounding box
+	 */
 	public void removeBoundingBoxChangeListener(final BoundingBoxChangeListener listener) {
 		this.changeListeners.remove(listener);
 	}
 
+	/**
+	 * Update's the object's bounding box and fires an event which informs all listeners for changes
+	 * concerning the objects bounding box
+	 */
 	protected final void updateBoundingBox() {
 		updateBoundingBox(true);
 	}
@@ -176,9 +245,17 @@ public abstract class DrawingObject {
 	 */
 	protected final void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
 		final AbsoluteRectangle oldBox = this.boundingBox;
-		boundingBox = calculateBoundingBox();
-		if (fireBoundingBoxChangeEvent && ((oldBox != null) || !boundingBox.equals(oldBox))) {
-			fireBoundingBoxChangeEvent();
+		try {
+			boundingBox = calculateBoundingBox();
+			if (fireBoundingBoxChangeEvent && ((oldBox != null) || !boundingBox.equals(oldBox))) {
+				fireBoundingBoxChangeEvent();
+			}
+		} catch (final SWTException e) {
+			if (e.getMessage().contains("Widget is disposed")) {
+				log.warn("A boundingBox could not determined correctly: " + e);
+			} else {
+				log.error(e, e, false);
+			}
 		}
 	}
 
@@ -193,6 +270,12 @@ public abstract class DrawingObject {
 		this.boundingBox = boundingBox;
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Calculates and returns the object's bounding box
+	 * 
+	 * @return the calculated bounding box
+	 */
 	protected abstract AbsoluteRectangle calculateBoundingBox();
 
 }

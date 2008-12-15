@@ -107,7 +107,6 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		pcl = new PropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
-				evt.getPropertyName();
 				refreshConfigurationParameters();
 			}
 		};
