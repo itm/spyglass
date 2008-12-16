@@ -50,7 +50,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	private final Layer layer = new QuadTree();
 
 	DataStore dataStore = new DataStore();
-	
+
 	/**
 	 * The drawing object representing the map.
 	 */
@@ -105,9 +105,9 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		this.map = new Map(xmlConfig, this);
 		layer.addOrUpdate(map);
 		xmlConfig.addPropertyChangeListener(this);
-		
+
 		manager.addNodePositionListener(this);
-		
+
 		updateFramepoints();
 	}
 
@@ -117,7 +117,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		final AbsolutePosition position = pluginManager.getNodePositioner().getPosition(packet.getSenderId());
 
 		// ignore nodes outside the area
-		if (!xmlConfig.getBoundingBox().contains(position.x, position.y)) {
+		if ((position == null) || !xmlConfig.getBoundingBox().contains(position.x, position.y)) {
 			return;
 		}
 
@@ -179,7 +179,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		if (!Double.isNaN(value)) {
 			synchronized (dataStore) {
 				final DataPoint e = new DataPoint();
-				e.isFramepoint=false;
+				e.isFramepoint = false;
 				e.position = position;
 				e.nodeID = packet.getSenderId();
 				e.value = value;
@@ -255,15 +255,19 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 	private void newDP(final Double defaultValue, final AbsolutePosition pos) {
 		final DataPoint p = new DataPoint();
-		p.isFramepoint=true;
+		p.isFramepoint = true;
 		p.value = defaultValue;
-		p.position=pos;
+		p.position = pos;
 		this.dataStore.add(p);
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see de.uniluebeck.itm.spyglass.plugin.NodePositionListener#handleEvent(de.uniluebeck.itm.spyglass.plugin.NodePositionEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniluebeck.itm.spyglass.plugin.NodePositionListener#handleEvent(de.uniluebeck.itm.spyglass
+	 * .plugin.NodePositionEvent)
 	 */
 	@Override
 	public void handleEvent(final NodePositionEvent e) {
@@ -271,31 +275,29 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 			case ADDED:
 				// do nothing. will be handled by handlePacket anyway
 				break;
-			case REMOVED:
-			{
+			case REMOVED: {
 				// remove the node from the datastore
 				final Iterator<DataPoint> it = dataStore.iterator();
 				while (it.hasNext()) {
 					final DataPoint p = it.next();
-					if (!p.isFramepoint && (p.nodeID==e.node)) {
+					if (!p.isFramepoint && (p.nodeID == e.node)) {
 						it.remove();
 					}
 				}
 				break;
 			}
-			case MOVED:
-			{
+			case MOVED: {
 				final Iterator<DataPoint> it = dataStore.iterator();
 				while (it.hasNext()) {
 					final DataPoint p = it.next();
-					if (!p.isFramepoint && (p.nodeID==e.node)) {
+					if (!p.isFramepoint && (p.nodeID == e.node)) {
 						p.position = e.newPosition;
 					}
 				}
 				break;
 			}
 		}
-		
+
 	}
 
 }

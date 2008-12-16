@@ -155,8 +155,8 @@ public class Node extends DrawingObject {
 		this.isExtended = isExtended;
 		this.lineWidth = lineWidth;
 		this.setColor(new RGB(lineColorRGB[0], lineColorRGB[1], lineColorRGB[2]));
-		setPosition(position);
 		setDrawingArea(drawingArea);
+		setPosition(position);
 		updateBoundingBox();
 	}
 
@@ -322,19 +322,18 @@ public class Node extends DrawingObject {
 			final String string = getInformationString();
 
 			// determine the size parameters of the rectangle which represents the node in respect
-			// to
-			// the sting to be displayed
+			// to the sting to be displayed
 			final Point size = gc.textExtent(string);
 			final int width = size.x + lineWidth + 3; // +1 for correct display with uneven line
 			// width
 			final int height = size.y + lineWidth + 3; // and +2 for the oval to be drawn
 
 			// get the node's position in the drawing area
-			final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(this.getPosition());
+			final AbsolutePosition pos = getPosition();
+			final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(pos != null ? pos : new AbsolutePosition(0, 0, 0));
 
 			// the rectangles upper left pint will be in the middle of the surrounding line. Since
-			// the
-			// rectangle's upper left edge represents the object location, it has to be adapted
+			// the rectangle's upper left edge represents the object location, it has to be adapted
 			final PixelPosition upperLeftRect = new PixelPosition(upperLeft.x + lineWidth / 2, upperLeft.y + lineWidth / 2);
 
 			// determine the bounding box (this time use the objects upper left point and not the
@@ -343,15 +342,13 @@ public class Node extends DrawingObject {
 			updateBoundingBox();
 
 			// the new rectangle starts at the determined upper left position. Its with and height
-			// was
-			// determined in respect to the text which is to be displayed
+			// was determined in respect to the text which is to be displayed
 			final PixelRectangle pxRect = new PixelRectangle(upperLeftRect, width, height);
 			gc.fillRectangle(pxRect.toSWTRectangle());
 			gc.drawRectangle(pxRect.toSWTRectangle());
 
 			// place the string inside the rectangle with respect to the side effects of the line
-			// width
-			// (see above)
+			// width (see above)
 			gc.drawText(string, 3 + upperLeftRect.x + lineWidth / 2, 3 + upperLeftRect.y + lineWidth / 2);
 
 			// draw an oval to indicate that the objects location is the rectangles upper left edge
@@ -402,36 +399,36 @@ public class Node extends DrawingObject {
 				@SuppressWarnings("synthetic-access")
 				public void run() {
 					final DrawingArea drawingArea = getDrawingArea();
+
+					// to prevent NPEs
+					AbsolutePosition pos = getPosition();
+					if (pos == null) {
+						pos = new AbsolutePosition(0, 0, 0);
+					}
 					if (drawingArea == null) {
-						setBoundingBox(new AbsoluteRectangle(getPosition(), 1, 1));
+						setBoundingBox(new AbsoluteRectangle(pos, 1, 1));
 						return;
 					}
 					// get the information to be displayed
 					final String string = getInformationString();
 					final int lineWidth = getLineWidth();
 					// determine the size parameters of the rectangle which represents the node
-					// in
-					// respect to the sting to be displayed
+					// in respect to the sting to be displayed
 					final GC gc = new GC(Display.getCurrent());
 					final Point size = gc.textExtent(string);
 					final int width = size.x + lineWidth + 3; // +3: see above
 					final int height = size.y + lineWidth + 3;
 
-					final PixelPosition upperLeft = getDrawingArea().absPoint2PixelPoint(getPosition());
+					final PixelPosition upperLeft = getDrawingArea().absPoint2PixelPoint(pos);
 
 					// since the rectangle's line is spread according to its width with the
-					// actual
-					// position in
-					// it's center, the upper left position of the bounding box has to adapt to
-					// this
+					// actual position in it's center, the upper left position of the bounding box
+					// has to adapt to this
 					final int bbUpperLeftX = upperLeft.x;
 					final int bbUpperLeftY = upperLeft.y;
 
 					// the line width has to be counted twice because two lines with the same
-					// width
-					// are
-					// drawn on
-					// the drawing area
+					// width are drawn on the drawing area
 					final int bbWidht = width + 2 * lineWidth;
 					final int bbHeight = height + 2 * lineWidth;
 					final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht + 1, bbHeight + 1);
