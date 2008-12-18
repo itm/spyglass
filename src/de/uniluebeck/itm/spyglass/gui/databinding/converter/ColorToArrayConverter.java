@@ -15,7 +15,7 @@ public class ColorToArrayConverter extends Converter {
 	public ColorToArrayConverter() {
 
 		// leaks one Color ressource at construction
-		super(new Color(null, 0, 0, 0), new int[3]);
+		super(null, new int[3]);
 	}
 
 	@Override

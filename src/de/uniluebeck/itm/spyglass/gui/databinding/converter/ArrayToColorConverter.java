@@ -19,7 +19,7 @@ public class ArrayToColorConverter extends Converter {
 	private Display device;
 
 	public ArrayToColorConverter(final Display device) {
-		super(new int[3], new Color(null, 0, 0, 0));
+		super(new int[3], null);
 		this.device = device;
 	}
 
