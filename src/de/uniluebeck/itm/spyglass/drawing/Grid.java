@@ -47,14 +47,17 @@ public class Grid extends DrawingObject {
 			pxOrigin = drawingArea.absPoint2PixelPoint(origin);
 			pxDest = drawingArea.absPoint2PixelPoint(dest);
 
-			x1 = Math.max(clipping.x, pxOrigin.x);
-			y1 = Math.max(clipping.y, pxOrigin.y);
-			x2 = Math.min(clipping.width, pxDest.x);
-			y2 = Math.min(clipping.height, pxDest.y);
+			if ((pxOrigin.y >= clipping.y) && (pxOrigin.y <= (clipping.y + clipping.height))) {
 
-			if ((y1 > 0) && (y1 < clipping.height)) {
+				x1 = Math.max(clipping.x, pxOrigin.x);
+				y1 = pxOrigin.y;
+				x2 = Math.min((clipping.x + clipping.width), pxDest.x);
+				y2 = pxDest.y;
+
 				gc.drawLine(x1, y1, x2, y2);
+
 			}
+
 		}
 
 		originY = pos.y;
@@ -70,12 +73,12 @@ public class Grid extends DrawingObject {
 			pxOrigin = drawingArea.absPoint2PixelPoint(origin);
 			pxDest = drawingArea.absPoint2PixelPoint(dest);
 
-			x1 = Math.max(clipping.x, pxOrigin.x);
-			y1 = Math.max(clipping.y, pxOrigin.y);
-			x2 = Math.min(clipping.width, pxDest.x);
-			y2 = Math.min(clipping.height, pxDest.y);
+			if ((pxOrigin.x >= clipping.x) && (pxOrigin.x <= (clipping.x + clipping.width))) {
 
-			if ((x1 > 0) && (x1 < clipping.width)) {
+				x1 = pxOrigin.x;
+				y1 = Math.max(clipping.y, pxOrigin.y);
+				x2 = pxDest.x;
+				y2 = Math.min((clipping.y + clipping.height), pxDest.y);
 
 				gc.drawLine(x1, y1, x2, y2);
 
