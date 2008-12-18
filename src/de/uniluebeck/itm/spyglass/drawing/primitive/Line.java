@@ -9,6 +9,7 @@ package de.uniluebeck.itm.spyglass.drawing.primitive;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.simpleframework.xml.Root;
 
@@ -54,12 +55,18 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 
 		final PixelPosition start = drawingArea.absPoint2PixelPoint(this.getPosition());
 		final PixelPosition end = drawingArea.absPoint2PixelPoint(this.getEnd());
+		final Rectangle clipping = gc.getClipping();
+		final PixelRectangle pxBoundingBox = drawingArea.absRect2PixelRect(boundingBox);
 
-		gc.drawLine(start.x, start.y, end.x, end.y);
+		// should evade some unnecessary painting, not all, but it's better than nothing
+		if (pxBoundingBox.rectangle.intersects(clipping)) {
+
+			gc.setClipping(clipping);
+			gc.drawLine(start.x, start.y, end.x, end.y);
+
+		}
 
 		color.dispose();
-
-		// drawBoundingBox(drawingArea, gc);
 
 	}
 
@@ -142,7 +149,26 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 
 	@Override
 	public int hashCode() {
-		return position.x + position.y + position.z - lineEnd.x - lineEnd.y - lineEnd.z;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((lineEnd == null) ? 0 : lineEnd.hashCode());
+		result = prime * result + lineWidth;
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Line other = (Line) obj;
+		return equals(other);
 	}
 
 	@Override
