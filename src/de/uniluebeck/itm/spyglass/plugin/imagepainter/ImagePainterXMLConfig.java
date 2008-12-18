@@ -33,22 +33,22 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_LOWER_LEFT_X = "lowerLeftX";
 
-	@Element(required=false)
+	@Element(required = false)
 	private String imageFileName = "images/icons/brokenImageLink.png";
 
-	@Element(required=false)
+	@Element(required = false)
 	private int lowerLeftX = 0;
 
-	@Element(required=false)
+	@Element(required = false)
 	private int lowerLeftY = 0;
 
-	@Element(required=false)
+	@Element(required = false)
 	private int imageSizeX = 0;
 
-	@Element(required=false)
+	@Element(required = false)
 	private int imageSizeY = 0;
 
-	@Element(required=false)
+	@Element(required = false)
 	private boolean keepProportions = true;
 
 	// --------------------------------------------------------------------------------

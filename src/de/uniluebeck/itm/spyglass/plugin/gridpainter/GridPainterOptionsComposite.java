@@ -45,13 +45,9 @@ public class GridPainterOptionsComposite extends Composite {
 
 	private Text numColsText;
 
-	private Button lockGridElementsSquareCheckbox;
-
 	private Text gridElementWidthText;
 
 	private Text gridElementHeightText;
-
-	private Button lockNumberOfRowsNColsCheckbox;
 
 	private CLabel colorExample;
 

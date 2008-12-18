@@ -151,6 +151,7 @@ public class VectorSequencePainterOptionsComposite extends Composite {
 			obsWidget = SWTObservables.observeText(lineWidth, SWT.Modify);
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, VectorSequencePainterXMLConfig.PROPERTYNAME_LINE_WIDTH);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{

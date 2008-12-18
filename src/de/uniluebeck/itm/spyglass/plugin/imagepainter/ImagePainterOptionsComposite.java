@@ -1,5 +1,8 @@
 package de.uniluebeck.itm.spyglass.plugin.imagepainter;
 
+import java.io.File;
+
+import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -7,8 +10,13 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTException;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -22,6 +30,7 @@ import com.cloudgarden.resource.SWTResourceManager;
 
 import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.FileReadableValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
 public class ImagePainterOptionsComposite extends Composite {
@@ -93,6 +102,7 @@ public class ImagePainterOptionsComposite extends Composite {
 					imageFileTextData.widthHint = 300;
 					imageFileText = new Text(imageFileComposite, SWT.BORDER);
 					imageFileText.setLayoutData(imageFileTextData);
+					imageFileText.addModifyListener(imageFileModifyListener);
 
 					final GridData imageFileButtonData = new GridData();
 					imageFileButtonData.widthHint = 80;
@@ -180,11 +190,113 @@ public class ImagePainterOptionsComposite extends Composite {
 				keepProportionsButton = new Button(group, SWT.CHECK);
 				keepProportionsButton.setText("Keep proportions");
 				keepProportionsButton.setLayoutData(keepProportionsButtonData);
+
+				keepProportionsButton.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(final SelectionEvent evt) {
+
+						/*
+						 * if pressed, change image/text and change binding between both text fields
+						 * (add binding / remove binding
+						 */
+						final boolean currentlyLocked = config.isKeepProportions();
+						config.setKeepProportions(!currentlyLocked);
+						updateLock();
+					}
+
+				});
+
+			}
+		}
+	}
+
+	private float imgRatio = 1f;
+
+	private ModifyListener imageFileModifyListener = new ModifyListener() {
+
+		@Override
+		public void modifyText(final ModifyEvent e) {
+
+			final String newFileName = imageFileText.getText();
+
+			try {
+
+				final File f = new File(newFileName);
+
+				if (f.exists()) {
+
+					Image img = null;
+
+					try {
+
+						img = new Image(null, newFileName);
+						imgRatio = (float) img.getImageData().width / (float) img.getImageData().height;
+						img.dispose();
+
+					} catch (final SWTException swtException) {
+						if (img != null) {
+							img.dispose();
+						}
+						imgRatio = 1f;
+					}
+
+				}
+
+			} catch (final NullPointerException npe) {
+				// do nothing, text field should not deliver null
+			}
+		}
+	};
+
+	private ImagePainterXMLConfig config;
+
+	private DataBindingContext dbc;
+
+	private Binding lockBinding;
+
+	private void updateLock() {
+
+		final boolean locked = config.isKeepProportions();
+
+		if (locked) {
+
+			final int newWidth = config.getImageSizeX();
+			final int newHeight = (int) Math.floor(newWidth / imgRatio);
+			config.setImageSizeY(newHeight);
+
+			if (lockBinding == null) {
+
+				// bind the two fields together
+				final UpdateValueStrategy uvs = new UpdateValueStrategy() {
+					@Override
+					public Object convert(final Object value) {
+						final int intValue = Integer.parseInt(((String) value).replaceAll("\\.", ""));
+						return (int) Math.ceil(intValue / imgRatio);
+					}
+				};
+				final UpdateValueStrategy uvs2 = new UpdateValueStrategy() {
+					@Override
+					public Object convert(final Object value) {
+						final int intValue = Integer.parseInt(((String) value).replaceAll("\\.", ""));
+						return (int) Math.ceil(intValue * imgRatio);
+					}
+				};
+				lockBinding = dbc.bindValue(SWTObservables.observeText(imageSizeWidthText, SWT.Modify), SWTObservables.observeText(
+						imageSizeHeightText, SWT.Modify), uvs, uvs2);
+			}
+		} else {
+			if (lockBinding != null) {
+				// Kill the binding (it will be automatically removed from the dbc)
+				lockBinding.dispose();
+				lockBinding = null;
 			}
 		}
 	}
 
 	public void setDatabinding(final DataBindingContext dbc, final ImagePainterXMLConfig config, final Spyglass spyglass) {
+
+		this.dbc = dbc;
+		this.config = config;
 
 		IObservableValue obsModel;
 		ISWTObservableValue obsWidget;
@@ -193,7 +305,7 @@ public class ImagePainterOptionsComposite extends Composite {
 		{
 			obsWidget = SWTObservables.observeText(imageFileText, SWT.Modify);
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ImagePainterXMLConfig.PROPERTYNAME_IMAGE_FILE_NAME);
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setAfterGetValidator(new FileReadableValidator());
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
@@ -235,6 +347,8 @@ public class ImagePainterOptionsComposite extends Composite {
 			dbc.bindValue(SWTObservables.observeText(widthUnitLabel), obsModel, null, null);
 			dbc.bindValue(SWTObservables.observeText(heightUnitLabel), obsModel, null, null);
 		}
+
+		updateLock();
 
 	}
 }
