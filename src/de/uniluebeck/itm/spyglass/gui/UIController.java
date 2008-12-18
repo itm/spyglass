@@ -350,10 +350,10 @@ public class UIController {
 
 			gc = new GC(appWindow.getGui().getRulerV());
 			appWindow.getGui().getRulerV().drawRuler(pxRect, upperLeft, lowerRight, gc, RulerArea.VERTICAL);
+			gc.dispose();
 
 			gc = new GC(appWindow.getGui().getUnitArea());
 			appWindow.getGui().getUnitArea().drawUnit(gc, unit);
-
 			gc.dispose();
 
 		}
