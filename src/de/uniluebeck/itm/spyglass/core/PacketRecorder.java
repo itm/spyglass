@@ -680,6 +680,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	public void reset() throws IOException {
 		log.info("Reset requested");
 		isResetting = true;
+		super.reset();
 		synchronized (inputStreamMutex) {
 
 			if (isReadFromFile() && !isRecord()) {
@@ -707,7 +708,6 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 					((FileReaderGateway) gw).reset();
 				}
 			}
-			super.reset();
 		}
 	}
 

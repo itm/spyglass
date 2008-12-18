@@ -25,15 +25,14 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 @Root
 public class IShellToSpyGlassPacketBroker extends PacketReader {
-	
+
 	/**
 	 * The queue where packets provided by iShell are stored
 	 */
 	private Deque<SpyglassPacket> queue = new ArrayDeque<SpyglassPacket>(50);
-	
-	private static final Logger log = SpyglassLoggerFactory
-			.getLogger(IShellToSpyGlassPacketBroker.class);
-	
+
+	private static final Logger log = SpyglassLoggerFactory.getLogger(IShellToSpyGlassPacketBroker.class);
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -41,7 +40,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	public IShellToSpyGlassPacketBroker() {
 		super();
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -52,11 +51,11 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	public IShellToSpyGlassPacketBroker(final Deque<SpyglassPacket> queue) {
 		this.queue = queue;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
-	 * Retrieves and removes the last packet of the packet queue, or returns <tt>null</tt> if this
-	 * packet queue is empty.
+	 * Retrieves and removes the last packet of the packet queue.<br>
+	 * If the packet queue is empty, the current thread will be suspended until a packet arrives.
 	 * 
 	 * @return the tail of the packet queue, or <tt>null</tt> if the packet queue is empty
 	 * @exception SpyglassPacketException
@@ -66,31 +65,28 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	 */
 	@Override
 	public SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException {
-		
-		synchronized (queue) {
-			
-			SpyglassPacket packet = null;
-			
-			// Loop until we have a packet.
-			while (packet == null) {
-				
+
+		SpyglassPacket packet = null;
+
+		// Loop until we have a packet.
+		while (packet == null) {
+
+			synchronized (queue) {
+
+				// if no packet is available dream of the arrival of a new packet
 				if (queue.isEmpty()) {
-					
-					// the queue is empty, wait until we have something.
 					queue.wait();
-					
 				}
-				
-				packet = queue.remove();
-				
+
 			}
-			
-			log.debug("Returning packet from queue");
-			return packet;
+
+			// the queue might still be empty in case of a requested reset
+			packet = queue.poll();
 		}
-		
+		return packet;
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Inserts the element at the front of the packet queue
@@ -107,11 +103,20 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 			queue.notifyAll(); // wake up all waiting threads
 		}
 	}
-	
+
 	@Override
 	public void reset() throws IOException {
+		// prevent threads to be waiting for the queue forever...
+		try {
+			synchronized (queue) {
+				queue.notifyAll();
+			}
+		} catch (final Exception e) {
+			log.error(e, e);
+		}
 		synchronized (queue) {
 			queue.clear();
 		}
+
 	}
 }

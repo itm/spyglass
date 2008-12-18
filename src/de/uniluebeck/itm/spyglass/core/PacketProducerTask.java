@@ -9,6 +9,7 @@ package de.uniluebeck.itm.spyglass.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 
@@ -28,6 +29,9 @@ import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
  * PacketReader object to get new Packets and put them into a Packet-Cache (
  * <code>packetCache</code> member of the Spyglass class). This thread stop when the
  * <code>visualizationRunning</code> member of the Spyglass class is set to false.
+ * 
+ * @author Dariush Forouher (?)
+ * @author Sebastian Ebers
  */
 public class PacketProducerTask implements Runnable {
 	private final Logger log = SpyglassLoggerFactory.getLogger(PacketProducerTask.class);
@@ -50,6 +54,9 @@ public class PacketProducerTask implements Runnable {
 	 * Constructor.
 	 * 
 	 * @param spyglass
+	 *            the Spyglass current instance
+	 * @param initialDelayMillis
+	 *            the time in milliseconds which has to elapse before producing a new packet
 	 */
 	public PacketProducerTask(final Spyglass spyglass, final long initialDelayMillis) {
 		this.spyglass = spyglass;
@@ -60,6 +67,7 @@ public class PacketProducerTask implements Runnable {
 
 		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
 
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
 				if (evt.getPropertyName().equals("generalSettings")) {
@@ -69,11 +77,7 @@ public class PacketProducerTask implements Runnable {
 					}
 
 				} else if (evt.getPropertyName().equals("packetReader")) {
-
-					synchronized (mutex) {
-						packetReader = (PacketReader) evt.getNewValue();
-					}
-
+					setPacketReader((PacketReader) evt.getNewValue());
 				}
 
 			}
@@ -105,22 +109,20 @@ public class PacketProducerTask implements Runnable {
 					}
 				}
 
-				synchronized (mutex) {
-					packet = packetReader.getNextPacket();
-				}
-				
+				// wait for the next packet to arrive
+				packet = getPacketReader().getNextPacket();
+
 				if (packet == null) {
 					log.error("Received a null packet from the PacketReader. Skipping it!");
 					continue;
 				}
-				
+
 				if (!spyglass.isVisualizationRunning()) {
 					break;
 				}
 
 				log.debug("Added packet: " + packet);
 
-				// packetCache.push(packet);
 				spyglass.getPacketDispatcher().dispatchPacket(packet);
 
 			} catch (final InterruptedException e) {
@@ -134,6 +136,13 @@ public class PacketProducerTask implements Runnable {
 		log.debug("PacketProducerTask ended. Done.");
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Enables or disables the pause mode
+	 * 
+	 * @param paused
+	 *            indicates whether the pause mode is to be enabled
+	 */
 	public void setPaused(final boolean paused) {
 		synchronized (this.paused) {
 			this.paused.notifyAll();
@@ -143,10 +152,52 @@ public class PacketProducerTask implements Runnable {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns whether the pause mode is enabled or disabled
+	 * 
+	 * @return whether the pause mode is enabled or disabled
+	 */
 	public boolean getPaused() {
 		synchronized (paused) {
 			return paused;
 		}
-
 	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the currently active packet reader instance
+	 * 
+	 * @return the currently active packet reader instance
+	 */
+	private PacketReader getPacketReader() {
+		synchronized (mutex) {
+			return packetReader;
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Activates a new packet reader instance
+	 * 
+	 * @param packetReader
+	 *            a new packet reader instance
+	 */
+	private void setPacketReader(final PacketReader packetReader) {
+		synchronized (mutex) {
+
+			if (this.packetReader != null) {
+				try {
+					// the previous packet reader has to be reseted since it may be dreaming of the
+					// arrival of a new packet.
+					this.packetReader.reset();
+				} catch (final IOException e) {
+					log.error(e, e);
+				}
+			}
+
+			this.packetReader = packetReader;
+		}
+	}
+
 }
