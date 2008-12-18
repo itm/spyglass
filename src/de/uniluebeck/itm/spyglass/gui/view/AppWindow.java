@@ -23,27 +23,25 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class AppWindow {
 	private static Logger log = SpyglassLoggerFactory.getLogger(AppWindow.class);
-	
+
 	private Display display = null;
-	
+
 	private SpyglassGuiComponent gui = null;
-	
+
 	/**
-	 * Enables SWT Object tracking. This allows tracking memory leaks
-	 * (e.g. missing dispose)
+	 * Enables SWT Object tracking. This allows tracking memory leaks (e.g. missing dispose)
 	 * 
-	 * IMPORTANT: This activates some really hacky butchering in internal SWT
-	 * data structures. Only the bravest of all should consider enabling this.
-	 * You have been warned.
+	 * IMPORTANT: This activates some really hacky butchering in internal SWT data structures. Only
+	 * the bravest of all should consider enabling this. You have been warned.
 	 */
-	public static final boolean ENABLE_SWT_DEBUGGING = false;
-	
+	public static final boolean ENABLE_SWT_DEBUGGING = true;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	public AppWindow(final Spyglass spyglass, final Composite parent) {
-		
+
 		if (ENABLE_SWT_DEBUGGING) {
 			if (!parent.getDisplay().getDeviceData().tracking) {
 				log.warn("Enabling SWT-Tracking hack. Expect problems.");
@@ -52,11 +50,11 @@ public class AppWindow {
 			final Sleak sleak = new Sleak();
 			sleak.open();
 		}
-		
+
 		this.display = parent.getDisplay();
 		gui = new SpyglassGuiComponent(parent, SWT.NULL, spyglass);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -64,7 +62,7 @@ public class AppWindow {
 	public SpyglassGuiComponent getGui() {
 		return gui;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -72,7 +70,7 @@ public class AppWindow {
 	public Display getDisplay() {
 		return display;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -80,5 +78,5 @@ public class AppWindow {
 	public void setDisplay(final Display display) {
 		this.display = display;
 	}
-	
+
 }

@@ -191,6 +191,7 @@ public class RulerArea extends Canvas {
 		}
 
 		// gc.dispose();
+		font.dispose();
 	}
 
 	private void test() {
