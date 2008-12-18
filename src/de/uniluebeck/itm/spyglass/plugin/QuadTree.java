@@ -34,8 +34,6 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 
 	private HashMap<DrawingObject, Long> insertionOrder;
 
-	private HashMap<DrawingObject, AbsoluteRectangle> boxes;
-
 	private long insertionOrderLargest;
 
 	private long insertionOrderSmallest;
@@ -53,7 +51,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	private DrawingObjectComparator sorter = new DrawingObjectComparator();
 
 	public QuadTree() {
-		this(new AbsoluteRectangle(Integer.MIN_VALUE/2,Integer.MIN_VALUE/2,Integer.MAX_VALUE,Integer.MAX_VALUE));
+		this(new AbsoluteRectangle(Integer.MIN_VALUE / 2, Integer.MIN_VALUE / 2, Integer.MAX_VALUE, Integer.MAX_VALUE));
 	}
 
 	// --------------------------------------------------------------------------------
@@ -77,7 +75,6 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 		this.root = this;
 		this.box = box;
 		this.insertionOrder = new HashMap<DrawingObject, Long>();
-		this.boxes = new HashMap<DrawingObject, AbsoluteRectangle>();
 		this.insertionOrderLargest = 0;
 		this.insertionOrderSmallest = 0;
 	}
@@ -89,7 +86,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * @param entity
 	 * @return
 	 */
-	boolean contains(final DrawingObject entity) {
+	synchronized boolean contains(final DrawingObject entity) {
 		return search(entity) != null;
 	}
 
@@ -146,7 +143,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * 
 	 * @return the bounding box of this QuadTree element
 	 */
-	AbsoluteRectangle getBoundingBox() {
+	synchronized AbsoluteRectangle getBoundingBox() {
 		return box;
 	}
 
@@ -156,7 +153,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * @param entity
 	 * @return
 	 */
-	List<DrawingObject> getCollisionEntities(final AbsoluteRectangle box) {
+	synchronized List<DrawingObject> getCollisionEntities(final AbsoluteRectangle box) {
 		final List<DrawingObject> list = new ArrayList<DrawingObject>();
 
 		// search for the quadrant where this entity
@@ -168,8 +165,12 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 		if ((elem != null) && elem.hasSons) {
 			for (final QuadTree son : sons) {
 				for (final DrawingObject e : son.getObjectsRecursive()) {
-					if (root.boxes.get(e).intersects(box)) {
-						list.add(e);
+					try {
+						if (e.getBoundingBox().intersects(box)) {
+							list.add(e);
+						}
+					} catch (final Throwable t) {
+						// System.out.println("bla" + t);
 					}
 				}
 			}
@@ -187,7 +188,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 				// position pos would be contained in the box
 				// of e.
 				try {
-					if (root.boxes.get(e).intersects(box)) {
+					if (e.getBoundingBox().intersects(box)) {
 						list.add(e);
 					}
 				} catch (final NullPointerException ef) {
@@ -210,7 +211,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * 
 	 * @return a list of the objects attached to this quadtree element
 	 */
-	ArrayList<DrawingObject> getObjects() {
+	synchronized ArrayList<DrawingObject> getObjects() {
 		return new ArrayList<DrawingObject>(objects);
 	}
 
@@ -220,7 +221,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * 
 	 * @return
 	 */
-	List<DrawingObject> getObjectsRecursive() {
+	synchronized List<DrawingObject> getObjectsRecursive() {
 		final ArrayList<DrawingObject> list = new ArrayList<DrawingObject>();
 		getObjectsRecursiveInternal(list);
 		return list;
@@ -248,7 +249,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * 
 	 * @return
 	 */
-	int getObjectCount() {
+	synchronized int getObjectCount() {
 		int cnt = 0;
 		for (int i = 0; i < sons.length; i++) {
 			cnt += (sons[i] != null) ? sons[i].getObjectCount() : 0;
@@ -290,7 +291,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * @return the parent element of this <code>QuadTree</code> or <code>null</code> if this node is
 	 *         the root
 	 */
-	QuadTree getParent() {
+	synchronized QuadTree getParent() {
 		return parent;
 	}
 
@@ -300,7 +301,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * 
 	 * @return the son nodes of this <code>QuadTree</code> element
 	 */
-	QuadTree[] getSons() {
+	synchronized QuadTree[] getSons() {
 		return sons;
 	}
 
@@ -310,7 +311,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * 
 	 * @param object
 	 */
-	boolean insert(final DrawingObject object) {
+	synchronized boolean insert(final DrawingObject object) {
 		return insertInternal(object, true);
 	}
 
@@ -320,7 +321,6 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 		final QuadTree elem = getInsertionElement(bbox);
 		if (elem != null) {
 			elem.objects.add(object);
-			root.boxes.put(object, bbox);
 			if (updateInsertionTime) {
 				root.insertionOrder.put(object, ++insertionOrderLargest);
 			}
@@ -337,7 +337,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * 
 	 * @return if this <code>QuadTree</code> element has any son nodes
 	 */
-	boolean isHasSons() {
+	synchronized boolean isHasSons() {
 		return hasSons;
 	}
 
@@ -347,20 +347,17 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * 
 	 * @param object
 	 */
-	public boolean remove(final DrawingObject object) {
-		synchronized (this) {
-			final QuadTree elem = search(object);
-			if (elem != null) {
-				object.removeBoundingBoxChangeListener(this);
-				elem.objects.remove(object);
-				root.boxes.remove(object);
-				if (elem.parent != null) {
-					elem.parent.updateSonsAfterRemove();
-				}
-				return true;
+	public synchronized boolean remove(final DrawingObject object) {
+		final QuadTree elem = search(object);
+		if (elem != null) {
+			object.removeBoundingBoxChangeListener(this);
+			elem.objects.remove(object);
+			if (elem.parent != null) {
+				elem.parent.updateSonsAfterRemove();
 			}
-			return false;
+			return true;
 		}
+		return false;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -371,11 +368,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 *            the entity to search for
 	 * @return the QuadTree containing <code>entity</code>.
 	 */
-	QuadTree search(final DrawingObject entity) {
-
-		if (root.boxes.get(entity) == null) {
-			return null;
-		}
+	synchronized QuadTree search(final DrawingObject entity) {
 
 		if (objects.contains(entity)) {
 			return this;
@@ -386,7 +379,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 		if (hasSons) {
 
 			for (int i = 0; i < 4; i++) {
-				if (sons[i].box.contains(root.boxes.get(entity))) {
+				if (sons[i].box.contains(entity.getBoundingBox())) {
 					foundElem = sons[i].search(entity);
 					break;
 				}
@@ -405,12 +398,12 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * @param position
 	 * @return
 	 */
-	Collection<DrawingObject> search(final Point position) {
+	synchronized Collection<DrawingObject> search(final Point position) {
 		return getCollisionEntities(new AbsoluteRectangle(position.x, position.y, 1, 1));
 	}
 
 	@Override
-	public String toString() {
+	public synchronized String toString() {
 		return toString(0);
 	}
 
@@ -420,7 +413,7 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 *            the number of tabs to print before each line
 	 * @return
 	 */
-	public String toString(final int tabCount) {
+	public synchronized String toString(final int tabCount) {
 		final StringBuffer buff = new StringBuffer();
 		for (final DrawingObject e : objects) {
 			buff.append(e.toString(tabCount + 1));
@@ -496,11 +489,9 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	}
 
 	@Override
-	public void addOrUpdate(final DrawingObject d) {
-		synchronized (this) {
-			insertInternal(d, !remove(d));
-			d.addBoundingBoxChangedListener(this);
-		}
+	public synchronized void addOrUpdate(final DrawingObject d) {
+		insertInternal(d, !remove(d));
+		d.addBoundingBoxChangedListener(this);
 	}
 
 	// ------------------------------------------------------------------------------
@@ -512,11 +503,9 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 *            the drawing object to be brought to the front
 	 */
 	@Override
-	public void bringToFront(final DrawingObject dob) {
-		synchronized (this) {
-			// TODO zahlenüberlauf behandeln
-			root.insertionOrder.put(dob, ++insertionOrderLargest);
-		}
+	public synchronized void bringToFront(final DrawingObject dob) {
+		// TODO zahlenüberlauf behandeln
+		root.insertionOrder.put(dob, ++insertionOrderLargest);
 	}
 
 	// ------------------------------------------------------------------------------
@@ -528,19 +517,15 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	 *            the drawing object to be pushed to the back
 	 */
 	@Override
-	public void pushBack(final DrawingObject object) {
-		synchronized (this) {
-			root.insertionOrder.put(object, --insertionOrderSmallest);
-		}
+	public synchronized void pushBack(final DrawingObject object) {
+		root.insertionOrder.put(object, --insertionOrderSmallest);
 	}
 
 	@Override
-	public void clear() {
-		synchronized (this) {
-			removeBoundingBoxListenersRecursive();
-			destroySons();
-			objects.clear();
-		}
+	public synchronized void clear() {
+		removeBoundingBoxListenersRecursive();
+		destroySons();
+		objects.clear();
 	}
 
 	private void removeBoundingBoxListenersRecursive() {
@@ -555,28 +540,22 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 	}
 
 	@Override
-	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle rect) {
-		synchronized (this) {
-			final List<DrawingObject> list = getCollisionEntities(rect);
-			Collections.sort(list, sorter);
-			return list;
-		}
+	public synchronized List<DrawingObject> getDrawingObjects(final AbsoluteRectangle rect) {
+		final List<DrawingObject> list = getCollisionEntities(rect);
+		Collections.sort(list, sorter);
+		return list;
 	}
 
 	@Override
-	public List<DrawingObject> getDrawingObjects() {
-		synchronized (this) {
-			final List<DrawingObject> list = getObjectsRecursive();
-			Collections.sort(list, sorter);
-			return list;
-		}
+	public synchronized List<DrawingObject> getDrawingObjects() {
+		final List<DrawingObject> list = getObjectsRecursive();
+		Collections.sort(list, sorter);
+		return list;
 	}
 
 	@Override
-	public void onBoundingBoxChanged(final DrawingObject updatedDrawingObject) {
-		synchronized (this) {
-			addOrUpdate(updatedDrawingObject);
-		}
+	public synchronized void onBoundingBoxChanged(final DrawingObject updatedDrawingObject) {
+		addOrUpdate(updatedDrawingObject);
 	}
 
 }

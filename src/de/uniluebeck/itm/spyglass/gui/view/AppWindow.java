@@ -34,7 +34,7 @@ public class AppWindow {
 	 * IMPORTANT: This activates some really hacky butchering in internal SWT data structures. Only
 	 * the bravest of all should consider enabling this. You have been warned.
 	 */
-	public static final boolean ENABLE_SWT_DEBUGGING = true;
+	public static final boolean ENABLE_SWT_DEBUGGING = false;
 
 	// --------------------------------------------------------------------------------
 	/**
