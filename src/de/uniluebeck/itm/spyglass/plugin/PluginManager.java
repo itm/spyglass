@@ -82,7 +82,7 @@ public class PluginManager {
 		availablePluginsTypes.add(SpringEmbedderPositionerPlugin.class);
 		availablePluginsTypes.add(LinePainterPlugin.class);
 		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
-		//availablePluginsTypes.add(TemplatePlugin.class);
+		// availablePluginsTypes.add(TemplatePlugin.class);
 	}
 
 	// --------------------------------------------------------------------------
@@ -198,7 +198,8 @@ public class PluginManager {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * Returns a list-copy of all plug-ins which are currently administered by this instance
+	 * Returns a list-copy of all plug-ins which are currently administered by this instance<br>
+	 * Note that the priorities of the plug-ins are decreasing.
 	 * 
 	 * @return a list-copy of all plug-ins which are currently administered by this instance
 	 */
@@ -211,7 +212,8 @@ public class PluginManager {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns a list-copy of all plug-ins which are currently administered by this instance, except
-	 * of the plug-ins that are of a class (or extending a class) contained in the excludes list
+	 * of the plug-ins that are of a class (or extending a class) contained in the excludes list.<br>
+	 * Note that the priorities of the plug-ins are decreasing.
 	 * 
 	 * @param checkHierarchy
 	 *            <code>true</code> if the class hierarchy should be checked, such that even
@@ -220,7 +222,7 @@ public class PluginManager {
 	 *            <code>exclude</code> list shall be excluded
 	 * @param excludes
 	 *            plug-in class to exclude from the list
-	 * @return a list-copy of plug-in instances
+	 * @return a list-copy of plug-in instances in decreasing priority
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Plugin> getPlugins(final boolean checkHierarchy, final Class<? extends Plugin>... excludes) {
@@ -417,23 +419,23 @@ public class PluginManager {
 		if (!plugins.remove(plugin)) {
 			throw new RuntimeException("The plugin was not yet managed.");
 		}
-		plugins.add(0, plugin);
+		plugins.add(plugin);
 		log.debug("The plug-in: " + plugin + " is now the one with the highest priority");
 		firePluginListChangedEvent(plugin, ListChangeEvent.PRIORITY_CHANGED);
 	}
 
 	// --------------------------------------------------------------------------
 	/**
-	 * Increases the priorities of a list of plug-ins by one each.<br>
+	 * Decreases the priorities of a list of plug-ins by one each.<br>
 	 * If two plug-ins draw objects at the same spot on the drawing area, the one with the higher
 	 * priority will draw the object on top of the other. The same holds for events as the object
 	 * with the higher priority will receive the event previously to one with a lower priority.
 	 * 
 	 * @param list
-	 *            the list of plug-ins which priorities are to be increased
+	 *            the list of plug-ins which priorities are to be decreased
 	 * 
 	 */
-	public void increasePluginPriorities(final List<Plugin> list) {
+	public void decreasePluginPriorities(final List<Plugin> list) {
 
 		final HashMap<Plugin, Integer> newPrios = new HashMap<Plugin, Integer>();
 
@@ -465,16 +467,16 @@ public class PluginManager {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * Decreases the priorities of a list of plug-ins by one each.<br>
+	 * Increases the priorities of a list of plug-ins by one each.<br>
 	 * If two plug-ins draw objects at the same spot on the drawing area, the one with the higher
 	 * priority will draw the object on top of the other. The same holds for events as the object
 	 * with the higher priority will receive the event previously to one with a lower priority.
 	 * 
 	 * @param list
-	 *            the list of plug-ins which priorities are to be decreased
+	 *            the list of plug-ins which priorities are to be increased
 	 * 
 	 */
-	public void decreasePluginPriorities(final List<Plugin> list) {
+	public void increasePluginPriorities(final List<Plugin> list) {
 
 		final HashMap<Integer, Plugin> newPrios = new HashMap<Integer, Plugin>();
 
@@ -804,9 +806,9 @@ public class PluginManager {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * Returns all active plug-ins which are currently visible
+	 * Returns all active plug-ins in decreasing priority which are currently visible
 	 * 
-	 * @return all active plug-ins which are currently visible
+	 * @return all active plug-ins in decreasing priority which are currently visible
 	 */
 	public List<Plugin> getVisibleActivePlugins() {
 		final List<Plugin> visibleActivePlugins = new LinkedList<Plugin>();

@@ -54,7 +54,6 @@ public class UIController {
 	private final Display display;
 
 	/** User events will be dispatched here */
-
 	private EventDispatcher eventDispatcher;
 
 	// --------------------------------------------------------------------------
