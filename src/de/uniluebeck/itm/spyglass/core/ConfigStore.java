@@ -150,9 +150,14 @@ public class ConfigStore extends PropertyBean {
 	public ConfigStore() throws IOException {
 		final File f = SpyglassEnvironment.getConfigFilePath();
 
+		boolean newFile = false;
 		// create the file if necessary
 		if (!f.exists()) {
+			if (!f.getParentFile().mkdirs()) {
+				throw new IOException("Could not create directory "+f.getParent());
+			}
 			f.createNewFile();
+			newFile = true;
 		}
 
 		// no point in continuing here
@@ -161,15 +166,19 @@ public class ConfigStore extends PropertyBean {
 		}
 
 		SpyglassConfiguration newConfig = null;
-		try {
-			newConfig = ConfigStore.load(f);
-		} catch (final Exception e) {
-			log.error("Unable to load configuration input:\r\nThe configuration file '" + f + "' is invalid! I'll move"
-					+ " the broken one away and start with a fresh config", e);
+		
+		if (!newFile) {
 
-			final boolean ret = f.renameTo(new File(f.getAbsolutePath() + ".save-" + System.currentTimeMillis()));
-			if (!ret) {
-				throw new IOException("Could not move config file out of the way. Stopping.", e);
+			try {
+				newConfig = ConfigStore.load(f);
+			} catch (final Exception e) {
+				log.error("Unable to load configuration input:\r\nThe configuration file '" + f + "' is invalid! I'll move"
+						+ " the broken one away and start with a fresh config", e);
+		
+				final boolean ret = f.renameTo(new File(f.getAbsolutePath() + ".save-" + System.currentTimeMillis()));
+				if (!ret) {
+					throw new IOException("Could not move config file out of the way. Stopping.", e);
+				}
 			}
 		}
 
