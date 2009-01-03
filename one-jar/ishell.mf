@@ -1,0 +1,3 @@
+Main-Class: com.simontuffs.onejar.Boot
+One-Jar-Main-Class: ishell.gui.MainWindow
+One-Jar-Expand: iShell.properties
