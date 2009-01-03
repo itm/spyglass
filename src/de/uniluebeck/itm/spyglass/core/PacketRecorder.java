@@ -498,10 +498,11 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 
 			}
 
-			// if the packets are not read from the file, use the overridden method of the super
-			// class. The functionality is the same but it uses a different packet queue.
-			return super.getNextPacket();
 		}
+
+		// if the packets are not read from the file, use the overridden method of the super
+		// class. The functionality is the same but it uses a different packet queue.
+		return super.getNextPacket();
 
 	}
 
