@@ -9,7 +9,7 @@ Install instructions
 
 Spyglass can be used in two ways:
 
-a) as a standalone application
+a) as a standalone application (not implemented yet!)
 b) as a plugin inside the iShell tool
 
 Also, since Spyglass uses the SWT framework, you have to
@@ -21,8 +21,8 @@ The resulting jar files contain all needed libraries (via the
 "one-jar" boot-mechanism) and are directly excecutable.
 
 
-Building Spyglass as a standalone application
----------------------------------------------
+Building Spyglass as a standalone application (XXX: not implemented yet!)
+-------------------------------------------------------------------------
 
 Just run 
 
