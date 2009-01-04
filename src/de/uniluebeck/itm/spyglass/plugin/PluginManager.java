@@ -630,9 +630,6 @@ public class PluginManager {
 	 *            a listener to be added to the already existing ones
 	 */
 	public void addNodePositionListener(final NodePositionListener listener) {
-		if (listener == null) {
-			return;
-		}
 
 		log.debug("Added new listener: " + listener);
 		nodePositionListeners.add(NodePositionListener.class, listener);
@@ -646,9 +643,6 @@ public class PluginManager {
 	 *            the listener to be removed
 	 */
 	public void removeNodePositionListener(final NodePositionListener listener) {
-		if (listener == null) {
-			return;
-		}
 
 		log.debug("Removing listener: " + listener);
 		nodePositionListeners.remove(NodePositionListener.class, listener);
