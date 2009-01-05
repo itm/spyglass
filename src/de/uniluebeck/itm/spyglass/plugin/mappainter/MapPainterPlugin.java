@@ -40,7 +40,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	private static Logger log = SpyglassLoggerFactory.getLogger(MapPainterPlugin.class);
 
 	@Element(name = "parameters")
-	private final MapPainterXMLConfig xmlConfig;
+	private final MapPainterXMLConfig xmlConfig = new MapPainterXMLConfig();;
 
 	/**
 	 * The layer. it contains only one static element, so it isn't really necessary. but since the
@@ -62,7 +62,6 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	 */
 	public MapPainterPlugin() {
 		super(true);
-		xmlConfig = new MapPainterXMLConfig();
 	}
 
 	@Override
@@ -109,6 +108,15 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		manager.addNodePositionListener(this);
 
 		updateFramepoints();
+	}
+
+	
+	@Override
+	public void shutdown() {
+		super.shutdown();
+		
+		this.pluginManager.removeNodePositionListener(this);
+		this.xmlConfig.removePropertyChangeListener(this);
 	}
 
 	@Override
