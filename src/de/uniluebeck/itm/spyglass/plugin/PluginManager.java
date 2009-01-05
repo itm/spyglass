@@ -744,7 +744,7 @@ public class PluginManager {
 	 * 
 	 * @return a list of all types of plug-ins which are currently administered by this instance
 	 */
-	public List<Class<? extends Plugin>> getAvailablePluginTypes() {
+	public static List<Class<? extends Plugin>> getAvailablePluginTypes() {
 		return availablePluginsTypes;
 	}
 
