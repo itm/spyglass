@@ -8,7 +8,6 @@ import java.util.Set;
 import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.set.ObservableSet;
-import org.junit.Assert;
 
 /**
  * Wraps a Set into an ObservableSet. The original set is not copied, instead calls to an
@@ -41,7 +40,7 @@ public class WrappedObservableSet extends ObservableSet {
 					newObject = member;
 				}
 			}
-			Assert.assertNotNull(newObject);
+			assert(newObject != null);
 			fireSetChange(Diffs.createSetDiff(Collections.singleton(newObject), Collections.EMPTY_SET));
 		}
 		return ret;
