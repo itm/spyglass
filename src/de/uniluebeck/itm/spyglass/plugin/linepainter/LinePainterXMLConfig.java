@@ -27,10 +27,10 @@ public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 	public static final String PROPERTYNAME_LINE_WIDTH = "lineWidth";
 
 	@ElementArray(required=false)
-	private int[] lineColorRGB = { 0, 0, 0 };
+	private volatile int[] lineColorRGB = { 0, 0, 0 };
 
 	@Element(required=false)
-	private int lineWidth = 1;
+	private volatile int lineWidth = 1;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -47,8 +47,8 @@ public class LinePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 	 */
 	public void setLineColorRGB(final int[] lineColorRGB) {
 		final int[] oldValue = this.lineColorRGB;
-		this.lineColorRGB = lineColorRGB;
-		firePropertyChange(PROPERTYNAME_LINE_COLOR_R_G_B, oldValue, lineColorRGB);
+		this.lineColorRGB = lineColorRGB.clone();
+		firePropertyChange(PROPERTYNAME_LINE_COLOR_R_G_B, oldValue, lineColorRGB.clone());
 	}
 
 	// --------------------------------------------------------------------------------

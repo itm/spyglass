@@ -28,14 +28,14 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 	public static final String PROPERTYNAME_EDGE_SEMANTIC_TYPES = "edgeSemanticTypes";
 
 	@ElementList(required=false)
-	private List<Integer> edgeSemanticTypes = new LinkedList<Integer>();
+	private volatile List<Integer> edgeSemanticTypes = new LinkedList<Integer>();
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the edgeSemanticTypes
 	 */
 	public List<Integer> getEdgeSemanticTypes() {
-		return edgeSemanticTypes;
+		return new LinkedList<Integer>(edgeSemanticTypes);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -43,8 +43,8 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 	 * @param edgeSemanticTypes
 	 *            the edgeSemanticTypes to set
 	 */
-	public void setEdgeSemanticTypes(final List<Integer> edgeSemanticTypes) {
-		firePropertyChange(PROPERTYNAME_EDGE_SEMANTIC_TYPES, this.edgeSemanticTypes, this.edgeSemanticTypes = edgeSemanticTypes);
+	public void setEdgeSemanticTypes(final LinkedList<Integer> edgeSemanticTypes) {
+		firePropertyChange(PROPERTYNAME_EDGE_SEMANTIC_TYPES, this.edgeSemanticTypes, this.edgeSemanticTypes = new LinkedList<Integer>(edgeSemanticTypes));
 
 	}
 

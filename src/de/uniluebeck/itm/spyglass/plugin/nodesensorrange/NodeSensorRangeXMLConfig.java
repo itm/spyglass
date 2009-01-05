@@ -29,7 +29,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
 	// TODO: solve cyclic dependencies here
 	// private NodeSensorRange defalutNodeSensorRange = new NodeSensorRange();
 	@ElementMap(entry = "ranges", key = "nodeID", attribute = true, valueType = NodeSensorRange.class, required=false)
-	private HashMap<Integer, NodeSensorRange> nodeRanges = new HashMap<Integer, NodeSensorRange>();
+	private volatile HashMap<Integer, NodeSensorRange> nodeRanges = new HashMap<Integer, NodeSensorRange>();
 
 	// //
 	// --------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
 	 * @return the nodeRanges
 	 */
 	public HashMap<Integer, NodeSensorRange> getNodeRanges() {
-		return nodeRanges;
+		return new HashMap<Integer, NodeSensorRange>(nodeRanges);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig {
 	 */
 	public void setNodeRanges(final HashMap<Integer, NodeSensorRange> nodeRanges) {
 
-		firePropertyChange(PROPERTYNAME_NODE_RANGES, this.nodeRanges, this.nodeRanges = nodeRanges);
+		firePropertyChange(PROPERTYNAME_NODE_RANGES, this.nodeRanges, this.nodeRanges = new HashMap<Integer, NodeSensorRange>(nodeRanges));
 
 	}
 

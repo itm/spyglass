@@ -43,34 +43,34 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 	public static final String PROPERTYNAME_GRID_ELEMENT_HEIGHT = "gridElementHeight";
 
 	@Element(required=false)
-	private int gridElementHeight = 1;
+	private volatile int gridElementHeight = 1;
 
 	@Element(required=false)
-	private int gridElementWidth = 1;
+	private volatile  int gridElementWidth = 1;
 
 	@Element(required=false)
-	private int gridLowerLeftPointX = 0;
+	private volatile  int gridLowerLeftPointX = 0;
 
 	@Element(required=false)
-	private int gridLowerLeftPointY = 0;
+	private volatile  int gridLowerLeftPointY = 0;
 
 	@ElementArray(required=false)
-	private int[] lineColorRGB = { 0, 0, 0 };
+	private  volatile int[] lineColorRGB = { 0, 0, 0 };
 
 	@Element(required=false)
-	private float lineWidth = 1;
+	private volatile  float lineWidth = 1;
 
 	@Element(required=false)
-	private boolean lockGridElementsSquare = true;
+	private  volatile boolean lockGridElementsSquare = true;
 
 	@Element(required=false)
-	private boolean lockNumberOfRowsNCols = true;
+	private volatile  boolean lockNumberOfRowsNCols = true;
 
 	@Element(required=false)
-	private int numCols = 1;
+	private  volatile int numCols = 1;
 
 	@Element(required=false)
-	private int numRows = 1;
+	private volatile  int numRows = 1;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -180,9 +180,9 @@ public class GridPainterXMLConfig extends PluginXMLConfig {
 	 *            the lineColorRGB to set
 	 */
 	public void setLineColorRGB(final int[] lineColor) {
-		final int[] oldValue = this.lineColorRGB.clone();
-		this.lineColorRGB = lineColor;
-		firePropertyChange(PROPERTYNAME_LINE_COLOR_R_G_B, oldValue, lineColorRGB);
+		final int[] oldValue = this.lineColorRGB;
+		this.lineColorRGB = lineColor.clone();
+		firePropertyChange(PROPERTYNAME_LINE_COLOR_R_G_B, oldValue, lineColorRGB.clone());
 	}
 
 	// --------------------------------------------------------------------------------

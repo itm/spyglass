@@ -59,56 +59,56 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 
 	public static final String PROPERTYNAME_K = "k";
 
-	@Element(required=false)
-	private float defaultValue = 3;
+	@Element(required = false)
+	private volatile float defaultValue = 3;
 
-	@Element(required=false)
-	private int gridElementHeight = 1;
+	@Element(required = false)
+	private volatile int gridElementHeight = 1;
 
-	@Element(required=false)
-	private int gridElementWidth = 1;
+	@Element(required = false)
+	private volatile int gridElementWidth = 1;
 
-	@Element(required=false)
-	private int lowerLeftX = 0;
+	@Element(required = false)
+	private volatile int lowerLeftX = 0;
 
-	@Element(required=false)
-	private int lowerLeftY = 0;
+	@Element(required = false)
+	private volatile int lowerLeftY = 0;
 
-	@Element(required=false)
-	private boolean lockGridElementSquare = true;
+	@Element(required = false)
+	private volatile boolean lockGridElementSquare = true;
 
-	@Element(required=false)
-	private boolean lockNumberOfRowsNCols = true;
+	@Element(required = false)
+	private volatile boolean lockNumberOfRowsNCols = true;
 
-	@ElementArray(required=false)
-	private int[] maxColorRGB = { 0, 0, 0 };
+	@ElementArray(required = false)
+	private volatile int[] maxColorRGB = { 0, 0, 0 };
 
-	@Element(required=false)
-	private float maxValue = 1;
+	@Element(required = false)
+	private volatile float maxValue = 1;
 
-	@ElementArray(required=false)
-	private int[] minColorRGB = { 255, 255, 255 };
+	@ElementArray(required = false)
+	private volatile int[] minColorRGB = { 255, 255, 255 };
 
-	@Element(required=false)
-	private float minValue = 0;
+	@Element(required = false)
+	private volatile float minValue = 0;
 
-	@Element(required=false)
-	private int width = 1;
+	@Element(required = false)
+	private volatile int width = 1;
 
-	@Element(required=false)
-	private int numFramePointsHorizontal = 3;
+	@Element(required = false)
+	private volatile int numFramePointsHorizontal = 3;
 
-	@Element(required=false)
-	private int numFramePointsVertical = 3;
+	@Element(required = false)
+	private volatile int numFramePointsVertical = 3;
 
-	@Element(required=false)
-	private int height = 1;
+	@Element(required = false)
+	private volatile int height = 1;
 
-	@Element(required=false)
-	private int refreshInterval = 10;
+	@Element(required = false)
+	private volatile int refreshInterval = 10;
 
-	@Element(required=false)
-	private int k = 3;
+	@Element(required = false)
+	private volatile int k = 3;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -244,7 +244,7 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 * @return the maxColorRGB
 	 */
 	public int[] getMaxColorRGB() {
-		return maxColorRGB;
+		return maxColorRGB.clone();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -280,7 +280,7 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 * @return the minColorRGB
 	 */
 	public int[] getMinColorRGB() {
-		return minColorRGB;
+		return minColorRGB.clone();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -307,7 +307,7 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 *            the minValue to set
 	 */
 	public void setMinValue(final float minValue) {
-		;
+
 		firePropertyChange(PROPERTYNAME_MIN_VALUE, this.minValue, this.minValue = minValue);
 	}
 
@@ -409,11 +409,19 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 		firePropertyChange(PROPERTYNAME_REFRESH_INTERVAL, this.refreshInterval, this.refreshInterval = refreshInterval);
 	}
 
+	/**
+	 * @return the k value for k-NN
+	 */
 	public int getK() {
 		return k;
 	}
 
+	/**
+	 * @param k
+	 *            value for k-NN
+	 */
 	public void setK(final int k) {
-		firePropertyChange(PROPERTYNAME_K, this.k, this.k = k);	}
+		firePropertyChange(PROPERTYNAME_K, this.k, this.k = k);
+	}
 
 }

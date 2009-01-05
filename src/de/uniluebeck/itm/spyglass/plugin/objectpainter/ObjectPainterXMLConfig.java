@@ -18,7 +18,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * Instances of this class contain the configuration parameters of a {@link ObjectPainterPlugin}
  * 
- * @author Sebastian Ebers
+ * @author Sebastian Ebers, Dariush Forouher
  * 
  */
 public class ObjectPainterXMLConfig extends PluginXMLConfig {
@@ -40,35 +40,35 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public static final String PROPERTYNAME_UPDATE_INTERVAL = "updateInterval";
 
 	@Element(required=false)
-	private String imageFileName = "images/icons/brokenImageLink.png";
+	private volatile String imageFileName = "images/icons/brokenImageLink.png";
 
 	@Element(required=false)
-	private int imageSizeX = 0;
+	private volatile  int imageSizeX = 0;
 
 	@Element(required=false)
-	private int imageSizeY = 0;
+	private volatile  int imageSizeY = 0;
 
 	@Element(required=false)
-	private boolean keepProportions = true;
+	private volatile  boolean keepProportions = true;
 
 	@Element(required=false)
-	private boolean drawLine = true;
+	private volatile  boolean drawLine = true;
 
 	@Element(required=false)
-	private boolean packetType3D = false;
+	private  volatile boolean packetType3D = false;
 
 	@ElementArray(required=false)
-	private int[] lineColor = new int[] { 255, 0, 0 };
+	private volatile  int[] lineColor = new int[] { 255, 0, 0 };
 
 	@Element(required=false)
-	private int updateInterval = 500;
+	private volatile  int updateInterval = 500;
 
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
 	 */
-	public int getImageSizeX() {
+	public  int getImageSizeX() {
 		return imageSizeX;
 	}
 
@@ -76,7 +76,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @param imageSizeX
 	 */
-	public void setImageSizeX(final int imageSizeX) {
+	public  void setImageSizeX(final int imageSizeX) {
 		final int oldValue = this.imageSizeX;
 		this.imageSizeX = imageSizeX;
 		firePropertyChange(PROPERTYNAME_IMAGE_SIZE_X, oldValue, this.imageSizeX);
@@ -86,7 +86,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return
 	 */
-	public int getImageSizeY() {
+	public  int getImageSizeY() {
 		return imageSizeY;
 	}
 
@@ -94,7 +94,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @param imageSizeY
 	 */
-	public void setImageSizeY(final int imageSizeY) {
+	public  void setImageSizeY(final int imageSizeY) {
 		final int oldValue = this.imageSizeY;
 		this.imageSizeY = imageSizeY;
 		firePropertyChange(PROPERTYNAME_IMAGE_SIZE_Y, oldValue, this.imageSizeY);
@@ -104,7 +104,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return
 	 */
-	public boolean isPacketType3D() {
+	public  boolean isPacketType3D() {
 		return packetType3D;
 	}
 
@@ -112,7 +112,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @param drawLine
 	 */
-	public void setPacketType3D(final boolean packetType3D) {
+	public  void setPacketType3D(final boolean packetType3D) {
 		final boolean oldValue = this.packetType3D;
 		this.packetType3D = packetType3D;
 		firePropertyChange(PROPERTYNAME_PACKET_TYPE_3D, oldValue, packetType3D);
@@ -122,7 +122,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return
 	 */
-	public boolean isDrawLine() {
+	public  boolean isDrawLine() {
 		return drawLine;
 	}
 
@@ -130,7 +130,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @param drawLine
 	 */
-	public void setDrawLine(final boolean drawLine) {
+	public  void setDrawLine(final boolean drawLine) {
 		final boolean oldValue = this.drawLine;
 		this.drawLine = drawLine;
 		firePropertyChange(PROPERTYNAME_DRAW_LINE, oldValue, drawLine);
@@ -140,7 +140,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return
 	 */
-	public boolean isKeepProportions() {
+	public  boolean isKeepProportions() {
 		return keepProportions;
 	}
 
@@ -148,31 +148,32 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @param keepProportions
 	 */
-	public void setKeepProportions(final boolean keepProportions) {
+	public  void setKeepProportions(final boolean keepProportions) {
 		final boolean oldValue = this.keepProportions;
 		this.keepProportions = keepProportions;
 		firePropertyChange(PROPERTYNAME_KEEP_PROPORTIONS, oldValue, keepProportions);
 	}
 
-	public int[] getLineColor() {
-		return lineColor;
+	public  int[] getLineColor() {
+		return lineColor.clone();
 	}
 
-	public RGB getLineColorRGB() {
-		return new RGB(lineColor[0], lineColor[1], lineColor[2]);
+	public  RGB getLineColorRGB() {
+		final int[] copy = lineColor; // since lineColor may be replaced in the meantime
+		return new RGB(copy[0], copy[1], copy[2]);
 	}
 
-	public void setLineColor(final int[] color) {
+	public  void setLineColor(final int[] color) {
 		final int[] oldValue = this.lineColor;
-		this.lineColor = color;
-		firePropertyChange(PROPERTYNAME_LINE_COLOR, oldValue, color);
+		this.lineColor = color.clone();
+		firePropertyChange(PROPERTYNAME_LINE_COLOR, oldValue, lineColor);
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the imageFileName
 	 */
-	public String getImageFileName() {
+	public  String getImageFileName() {
 		return imageFileName;
 	}
 
@@ -181,16 +182,16 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	 * @param imageFileName
 	 *            the imageFileName to set
 	 */
-	public void setImageFileName(final String imageFileName) {
+	public  void setImageFileName(final String imageFileName) {
 
 		firePropertyChange(PROPERTYNAME_IMAGE_FILE_NAME, this.imageFileName, this.imageFileName = imageFileName);
 	}
 
-	public int getUpdateInterval() {
+	public  int getUpdateInterval() {
 		return updateInterval;
 	}
 
-	public void setUpdateInterval(final int updateInterval) {
+	public  void setUpdateInterval(final int updateInterval) {
 		firePropertyChange(PROPERTYNAME_UPDATE_INTERVAL, this.updateInterval, this.updateInterval = updateInterval);
 	}
 

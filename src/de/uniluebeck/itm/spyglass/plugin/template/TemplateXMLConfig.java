@@ -19,6 +19,12 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * It has (additionally to the ones defined in PluginXMLConfig) one parameter,
  * "someParameter".
  * 
+ * A note to thread-safety: objects of this class may be used by different threads,
+ * so have to put some memory barriers in place to make sure that changes
+ * propagate correctly to other threads. In simple cases like this declaring a variable
+ * volatile may be sufficient. but as it can be seen in more complex plugins 
+ * synchronized blocks may become necessary.
+ * 
  * @author Dariush Forouher
  */
 public class TemplateXMLConfig extends PluginXMLConfig {
@@ -26,7 +32,7 @@ public class TemplateXMLConfig extends PluginXMLConfig {
 	public static final String PROPERTYNAME_SOME_PARAMETER = "someParameter";
 
 	@Element(required=false)
-	private int someParameter = 42;
+	private volatile int someParameter = 42;
 
 	
 	// --------------------------------------------------------------------------------

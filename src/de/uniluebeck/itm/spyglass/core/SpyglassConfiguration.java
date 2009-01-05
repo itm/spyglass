@@ -34,28 +34,33 @@ import de.uniluebeck.itm.spyglass.xmlconfig.XMLConfig;
 @Root(strict=true)
 public class SpyglassConfiguration extends XMLConfig {
 	
-	@Element(name = "packetReader")
-	private PacketReader packetReader = new PacketRecorder();;
-	
-	@Element(name = "instances")
-	private PluginManager pluginManager = new PluginManager();
-	
-	@Element(name = "generalSettings")
-	private GeneralSettingsXMLConfig generalSettings = new GeneralSettingsXMLConfig();
-	
-	@ElementList(name = "defaults")
-	private Collection<Plugin> defaults = new LinkedList<Plugin>();
-	
-	// --------------------------------------------------------------------------------
 	/**
-	 * @param generalSettings
-	 *            the generalSettings to set
+	 * The current packetReader.
+	 * 
+	 * Must be declared volatile since it can be replaced at runtime.
 	 */
-	public void setGeneralSettings(final GeneralSettingsXMLConfig generalSettings) {
-		final GeneralSettingsXMLConfig old = this.generalSettings;
-		this.generalSettings = generalSettings;
-		firePropertyChange("generalSettings", old, this.generalSettings);
-	}
+	@Element(name = "packetReader")
+	private volatile PacketReader packetReader = new PacketRecorder();;
+	
+	/**
+	 * The one and only plugin manager
+	 */
+	@Element(name = "instances")
+	private final PluginManager pluginManager = new PluginManager();
+	
+	/**
+	 * some general settings
+	 */
+	@Element(name = "generalSettings")
+	private final GeneralSettingsXMLConfig generalSettings = new GeneralSettingsXMLConfig();
+	
+	/**
+	 * The default configurations for all plugins
+	 * 
+	 * Must be declared volatile since it can be replaced at runtime.
+	 */
+	@ElementList(name = "defaults")
+	private volatile Collection<Plugin> defaults = new LinkedList<Plugin>();
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -109,19 +114,6 @@ public class SpyglassConfiguration extends XMLConfig {
 		
 		return null;
 		
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Sets the instance which manages the plug-ins
-	 * 
-	 * @param pluginManager
-	 *            the instance which manages the plug-ins
-	 */
-	public void setPluginManager(final PluginManager pluginManager) {
-		final PluginManager oldPM = this.pluginManager;
-		this.pluginManager = pluginManager;
-		firePropertyChange("pluginManager", oldPM, this.pluginManager);
 	}
 	
 	// --------------------------------------------------------------------------------

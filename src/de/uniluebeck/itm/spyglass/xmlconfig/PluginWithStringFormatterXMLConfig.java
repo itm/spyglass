@@ -15,10 +15,10 @@ public abstract class PluginWithStringFormatterXMLConfig extends PluginXMLConfig
 	public static final String PROPERTYNAME_STRING_FORMATTERS = "stringFormatters";
 
 	@ElementMap(entry = "stringFormatter", key = "nodeID", attribute = true, valueType = String.class, required = false)
-	private HashMap<Integer, String> stringFormatters = new HashMap<Integer, String>();
+	private volatile HashMap<Integer, String> stringFormatters = new HashMap<Integer, String>();
 
 	@Element(required = false)
-	private String defaultStringFormatter = null;
+	private volatile String defaultStringFormatter = "";
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -37,8 +37,9 @@ public abstract class PluginWithStringFormatterXMLConfig extends PluginXMLConfig
 	 *         matching object was created previously.
 	 */
 	public StringFormatter getStringFormatter(final int semanticType) {
-		if (stringFormatters.containsKey(semanticType)) {
-			return new StringFormatter(stringFormatters.get(semanticType));
+		final HashMap<Integer, String> copy = this.stringFormatters; // since it may be replaced while this method runs
+		if (copy.containsKey(semanticType)) {
+			return new StringFormatter(copy.get(semanticType));
 		}
 		return null;
 	}
@@ -52,7 +53,7 @@ public abstract class PluginWithStringFormatterXMLConfig extends PluginXMLConfig
 	public void setStringFormatters(final HashMap<Integer, String> stringFormatters) {
 		final Map<Integer, String> oldValue = this.stringFormatters;
 		this.stringFormatters = (HashMap<Integer, String>) stringFormatters.clone();
-		firePropertyChange(PROPERTYNAME_STRING_FORMATTERS, oldValue, stringFormatters);
+		firePropertyChange(PROPERTYNAME_STRING_FORMATTERS, oldValue, this.stringFormatters);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -73,16 +74,4 @@ public abstract class PluginWithStringFormatterXMLConfig extends PluginXMLConfig
 		this.defaultStringFormatter = defaultStringFormatter;
 		firePropertyChange(PROPERTYNAME_DEFAULT_STRING_FORMATTER, oldValue, defaultStringFormatter);
 	}
-
-	protected boolean equals(final PluginWithStringFormatterXMLConfig o) {
-		return (defaultStringFormatter != null) && defaultStringFormatter.equals(o.defaultStringFormatter)
-				&& stringFormatters.equals(o.stringFormatters);
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		stringFormatters.clear();
-		super.finalize();
-	}
-
 }

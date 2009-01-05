@@ -21,6 +21,11 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
  * Instances of this class contain the configuration parameters of a
  * {@link SimpleNodePainterXMLConfig}
  * 
+ * NOTE: the data in this class is protected by synchronized, rather than volatile.
+ * the reason behind this is that making complicated methods like 
+ * putExtendedInformationActive(int, boolean) thread-safe by volatile would be too 
+ * error-prone. -- Dariush
+ * 
  * @author Sebastian Ebers
  * 
  */
@@ -53,7 +58,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	 * 
 	 * @return <code>true</code> if a node's the extended information is to be shown
 	 */
-	public boolean isExtendedInformationActive(final int nodeID) {
+	public synchronized boolean isExtendedInformationActive(final int nodeID) {
 		final Boolean isActive = isExtendenInformationActive.get(nodeID);
 
 		// if there is no entry for a certain node in the map, yet, use the default behavior
@@ -69,7 +74,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	 * @param isExtendendActive
 	 *            if <code>true</code> the node's the extended information is to be shown
 	 */
-	public void putExtendedInformationActive(final int nodeID, final boolean isExtendendActive) {
+	public synchronized void putExtendedInformationActive(final int nodeID, final boolean isExtendendActive) {
 		isExtendenInformationActive.put(nodeID, isExtendendActive);
 	}
 
@@ -77,7 +82,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	/**
 	 * @return the lineColorRGB
 	 */
-	public int[] getLineColorRGB() {
+	public synchronized int[] getLineColorRGB() {
 		return lineColorRGB.clone();
 
 	}
@@ -87,7 +92,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	 * @param lineColorRGB
 	 *            the lineColorRGB to set
 	 */
-	public void setLineColorRGB(final int[] lineColorRGB) {
+	public synchronized void setLineColorRGB(final int[] lineColorRGB) {
 		final int[] oldvalue = this.lineColorRGB.clone();
 		this.lineColorRGB = lineColorRGB;
 		firePropertyChange(PROPERTYNAME_LINE_COLOR_R_G_B, oldvalue, lineColorRGB);
@@ -97,7 +102,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	/**
 	 * @return the lineWidth
 	 */
-	public int getLineWidth() {
+	public synchronized int getLineWidth() {
 		return lineWidth;
 	}
 
@@ -106,7 +111,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	 * @param lineWidth
 	 *            the lineWidth to set
 	 */
-	public void setLineWidth(final int lineWidth) {
+	public synchronized void setLineWidth(final int lineWidth) {
 		final int oldvalue = this.lineWidth;
 		this.lineWidth = lineWidth;
 		firePropertyChange(PROPERTYNAME_LINE_WIDTH, oldvalue, lineWidth);
@@ -116,7 +121,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	/**
 	 * @return the getExtendedDefaultValue
 	 */
-	public boolean getExtendedDefaultValue() {
+	public synchronized boolean getExtendedDefaultValue() {
 		return isExtendedDefaultValue;
 	}
 
@@ -125,7 +130,7 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	 * @param isExtendedDefaultValue
 	 *            the isExtendedDefaultValue to set
 	 */
-	public void setExtendedDefaultValue(final boolean isExtendedDefaultValue) {
+	public synchronized void setExtendedDefaultValue(final boolean isExtendedDefaultValue) {
 		final boolean oldValue = this.isExtendedDefaultValue;
 		this.isExtendedDefaultValue = isExtendedDefaultValue;
 		firePropertyChange(PROPERTYNAME_EXTENDED_DEFAULT_VALUE, oldValue, isExtendedDefaultValue);

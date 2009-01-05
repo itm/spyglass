@@ -52,7 +52,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return the semanticTypes4Neighborhoods
 	 */
-	public int[] getSemanticTypes4Neighborhoods() {
+	public synchronized int[] getSemanticTypes4Neighborhoods() {
 		return semanticTypes4Neighborhoods;
 	}
 
@@ -64,7 +64,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 *            tSets the semantic types of packages which provide information about neighborhood
 	 *            relations.
 	 */
-	public void setSemanticTypes4Neighborhoods(final int[] semanticTypes4Neighborhoods) {
+	public synchronized void setSemanticTypes4Neighborhoods(final int[] semanticTypes4Neighborhoods) {
 		firePropertyChange(PROPERTYNAME_SEMANTIC_TYPES4_NEIGHBORHOODS, this.semanticTypes4Neighborhoods,
 				this.semanticTypes4Neighborhoods = semanticTypes4Neighborhoods);
 	}
@@ -73,7 +73,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return the showNodeDegree
 	 */
-	public boolean isShowNodeDegree() {
+	public synchronized boolean isShowNodeDegree() {
 		return showNodeDegree;
 	}
 
@@ -82,7 +82,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 * @param showNodeDegree
 	 *            the showNodeDegree to set
 	 */
-	public void setShowNodeDegree(final boolean showNodeDegree) {
+	public synchronized void setShowNodeDegree(final boolean showNodeDegree) {
 
 		firePropertyChange(PROPERTYNAME_SHOW_NODE_DEGREE, this.showNodeDegree, this.showNodeDegree = showNodeDegree);
 	}
@@ -91,7 +91,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return the showNumNodes
 	 */
-	public boolean isShowNumNodes() {
+	public synchronized boolean isShowNumNodes() {
 		return showNumNodes;
 	}
 
@@ -100,7 +100,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 * @param showNumNodes
 	 *            the showNumNodes to set
 	 */
-	public void setShowNumNodes(final boolean showNumNodes) {
+	public synchronized void setShowNumNodes(final boolean showNumNodes) {
 		firePropertyChange(PROPERTYNAME_SHOW_NUM_NODES, this.showNumNodes, this.showNumNodes = showNumNodes);
 	}
 
@@ -109,7 +109,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 * @param semanticType
 	 * @return the statisticalInformationEvaluators
 	 */
-	public StatisticalInformationEvaluator getStatisticalInformationEvaluators4Type(final int semanticType) {
+	public synchronized StatisticalInformationEvaluator getStatisticalInformationEvaluators4Type(final int semanticType) {
 		for (final StatisticalInformationEvaluator sfs : statisticalInformationEvaluators) {
 			if (sfs.getSemanticType() == semanticType) {
 				return sfs;
@@ -122,7 +122,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return the statisticalInformationEvaluators
 	 */
-	public Set<StatisticalInformationEvaluator> getStatisticalInformationEvaluators() {
+	public synchronized Set<StatisticalInformationEvaluator> getStatisticalInformationEvaluators() {
 		return statisticalInformationEvaluators;
 	}
 
@@ -131,7 +131,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 * @param statisticalInformationEvaluators
 	 *            the statisticalInformationEvaluators to set
 	 */
-	public void setStatisticalInformationEvaluators(final Set<StatisticalInformationEvaluator> statisticalInformationEvaluators) {
+	public synchronized void setStatisticalInformationEvaluators(final Set<StatisticalInformationEvaluator> statisticalInformationEvaluators) {
 		// these extensive operations are necessary to prevent dependencies when creating new
 		// instances of the associated plug-in
 		final Set<StatisticalInformationEvaluator> oldValue = new TreeSet<StatisticalInformationEvaluator>(this.statisticalInformationEvaluators);

@@ -37,22 +37,22 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public static final String PROPERTYNAME_ALL_SEMANTIC_TYPES = "allSemanticTypes";
 
 	@Element(name = PROPERTYNAME_ACTIVE, required = false)
-	private boolean active = true;
+	private volatile boolean active = true;
 
 	@Element(name = PROPERTYNAME_VISIBLE, required = false)
-	private boolean visible = true;
+	private volatile boolean visible = true;
 
 	@Element(name = PROPERTYNAME_NAME, required = false)
-	private String name = "default";
+	private volatile String name = "default";
 
 	/**
 	 * Timeout (in seconds)
 	 */
 	@Element(name = PROPERTYNAME_TIMEOUT, required = false)
-	private int timeout = 0;
+	private volatile int timeout = 0;
 
 	@ElementArray(name = PROPERTYNAME_SEMANTIC_TYPES, required = false)
-	private int[] semanticTypes = new int[] { -1 };
+	private volatile int[] semanticTypes = new int[] { -1 };
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -142,7 +142,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 * 
 	 * @return the semanticTypes
 	 */
-	public int[] getSemanticTypes() {
+	public synchronized int[] getSemanticTypes() {
 		return semanticTypes.clone();
 	}
 
@@ -154,7 +154,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 *            the semantic type to be tested
 	 * @return <code>true</code>, if the given integer is in the list of semantic types.
 	 */
-	public boolean containsSemanticType(final int type) {
+	public synchronized boolean containsSemanticType(final int type) {
 		if (this.isAllSemanticTypes()) {
 			return true;
 		}
@@ -172,7 +172,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 * @param semanticTypes
 	 *            the semanticTypes to set
 	 */
-	public void setSemanticTypes(final int[] semanticTypes) {
+	public synchronized void setSemanticTypes(final int[] semanticTypes) {
 		final int[] oldvalue = this.semanticTypes;
 
 		// If "-1" is in the list, reduce it to that number
@@ -180,9 +180,9 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		if (Arrays.binarySearch(semanticTypes, -1) >= 0) {
 			this.semanticTypes = new int[] { -1 };
 		} else {
-			this.semanticTypes = semanticTypes;
+			this.semanticTypes = semanticTypes.clone();
 		}
-		firePropertyChange(PROPERTYNAME_SEMANTIC_TYPES, oldvalue, semanticTypes);
+		firePropertyChange(PROPERTYNAME_SEMANTIC_TYPES, oldvalue, this.semanticTypes);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	 * @return <code>true</code> if the plug-in is interested all packages independent of the
 	 *         packet's semantic type
 	 */
-	public boolean isAllSemanticTypes() {
+	public synchronized boolean isAllSemanticTypes() {
 		return (semanticTypes.length == 1) && (semanticTypes[0] == -1);
 	}
 

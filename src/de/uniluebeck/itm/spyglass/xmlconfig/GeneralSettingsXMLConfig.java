@@ -23,7 +23,7 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 	 * if <code>true</code> a ruler is shown in the graphical user interface
 	 */
 	@Element(required=false)
-	private boolean showRuler = true;
+	private volatile boolean showRuler = true;
 	
 	/**
 	 * defines the metric settings
@@ -36,20 +36,20 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 	 * interface). The unit is just for information purposes. It is not processed in any way.
 	 */
 	@Element(required=false)
-	private String timeUnit = "s";
+	private volatile String timeUnit = "s";
 	
 	/**
 	 * the time's scale(important when showing the results of received packets on the graphical user
 	 * interface)
 	 */
 	@Element(required=false)
-	private float timeScale = 1;
+	private volatile float timeScale = 1;
 	
 	/**
 	 * the delay used when processing recorded packets TODO: wrong!
 	 */
 	@Element(required=false)
-	private long packetDeliveryInitialDelay = 1000;
+	private volatile long packetDeliveryInitialDelay = 1000;
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -68,15 +68,6 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 		final boolean oldValue = this.showRuler;
 		this.showRuler = showRuler;
 		firePropertyChange("showRuler", oldValue, showRuler);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param metrics
-	 *            the metrics to set
-	 */
-	public void setMetrics(final MetricsXMLConfig metrics) {
-		this.metrics.overwriteWith(metrics);
 	}
 	
 	// --------------------------------------------------------------------------------

@@ -30,13 +30,13 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	public static final String PROPERTYNAME_DIMENSION = "dimension";
 
 	@Element(name = PROPERTYNAME_DIMENSION, required = false)
-	private int dimension = 2;
+	private volatile int dimension = 2;
 
 	@ElementArray(name = PROPERTYNAME_LINE_COLOR_R_G_B, required = false)
-	private int[] lineColorRGB = { 0, 0, 0 };
+	private volatile int[] lineColorRGB = { 0, 0, 0 };
 
 	@Element(name = PROPERTYNAME_LINE_WIDTH, required = false)
-	private int lineWidth = 1;
+	private volatile int lineWidth = 1;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -62,7 +62,7 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	 * @return the lineColorRGB
 	 */
 	public int[] getLineColorRGB() {
-		return lineColorRGB;
+		return lineColorRGB.clone();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ public class VectorSequencePainterXMLConfig extends PluginXMLConfig {
 	 */
 	public void setLineColorRGB(final int[] lineColorRGB) {
 
-		firePropertyChange(PROPERTYNAME_LINE_COLOR_R_G_B, this.lineColorRGB, this.lineColorRGB = lineColorRGB);
+		firePropertyChange(PROPERTYNAME_LINE_COLOR_R_G_B, this.lineColorRGB, this.lineColorRGB = lineColorRGB.clone());
 
 	}
 
