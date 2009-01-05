@@ -37,18 +37,21 @@ public class SampleChooser {
 		// log.debug("Generating new packet.");
 		
 		/*
-		 * Put the probabilities of the samples in an array, for more convinient access.
+		 * Put the probabilities of the samples in an array, for more convenient access.
 		 */
 		final double[] pr = new double[samples.size()];
-		for (int i = 0; i < samples.size() - 1; i++) {
-			final double prob = samples.get(i).getProbability();
+		double sum = 0;
+		for (int i = 0; i < samples.size(); i++) {
+			pr[i] = samples.get(i).getProbability();
+			sum += pr[i];
+		}
+
+		for (int i = 0; i < samples.size(); i++) {
+			pr[i] /= sum;
 			if (i > 0) {
-				pr[i] = pr[i - 1] + prob;
-			} else {
-				pr[i] = prob;
+				pr[i] = pr[i - 1] + pr[i];
 			}
 		}
-		pr[pr.length - 1] = 1;
 		
 		// roll the dice
 		final double randomNumber = new Random().nextDouble();

@@ -133,7 +133,7 @@ public class IShellSocketSink extends Sink {
 	public void sendPacket(final byte[] packet) throws Exception {
 		
 		if (this.clients.size() > 0) {
-			log.debug("Sending a packet...");
+			//log.debug("Sending a packet...");
 		}
 		
 		// Iterate over all clients and send each the packet.
@@ -164,7 +164,7 @@ public class IShellSocketSink extends Sink {
 	 */
 	private void sendPacketOverSocket(final Socket s, final byte[] packet) throws IOException {
 		
-		log.debug("Sending a packet to " + s);
+		//log.debug("Sending a packet to " + s);
 		
 		// enough for the worstcase, isn't usually needed.
 		final ByteBuffer buf = ByteBuffer.allocate(2 * packet.length + 20);
