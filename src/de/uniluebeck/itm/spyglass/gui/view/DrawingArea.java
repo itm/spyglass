@@ -598,9 +598,14 @@ public class DrawingArea extends Canvas {
 		fireDrawingAreaTransformEvent();
 		
 		// redraw the canvas
-		// TODO: find a way to call gc.copyArea(srcX, srcY, width, height, destX, destY, paint)
-		// instead
 		redraw();
+
+		// This is an optimized alternative to above command.
+		// Unfortunatly it results in graphical errors, likely resulted
+		// by approximations in the transformation matrix
+//		final GC gc = new GC(this);
+//		gc.copyArea(0, 0, getDrawingRectangle().getWidth(), getDrawingRectangle().getHeight(), pixelX, pixelY, true);
+//		gc.dispose();
 		
 		syncScrollBars();
 	}
