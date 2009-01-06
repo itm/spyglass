@@ -124,7 +124,7 @@ public class Spyglass {
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-		
+
 		// shutdown all plugins
 		for (final Plugin p : pluginManager.getPlugins()) {
 			p.shutdown();
@@ -282,6 +282,7 @@ public class Spyglass {
 	public void reset() {
 		try {
 			packetReader.reset();
+			log.debug("The PacketReader was sucessfully resetted");
 		} catch (final IOException e) {
 			log.error("Error while trying to reset the packet reader", e);
 		}
@@ -291,9 +292,11 @@ public class Spyglass {
 		for (final Plugin plugin : plugins) {
 			if (!((plugin instanceof NodePositionerPlugin) && plugin.isActive())) {
 				plugin.reset();
+				log.debug("The plug-in named '" + plugin.getInstanceName() + "' was sucessfully resetted");
 			}
 		}
 		pluginManager.getNodePositioner().reset();
+		log.debug("The node positioner '" + pluginManager.getNodePositioner().getInstanceName() + "' was sucessfully resetted");
 	}
 
 }

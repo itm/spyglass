@@ -79,7 +79,6 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 				}
 
 			}
-
 			// the queue might still be empty in case of a requested reset
 			packet = queue.poll();
 		}
@@ -117,6 +116,6 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 		synchronized (queue) {
 			queue.clear();
 		}
-
 	}
+
 }

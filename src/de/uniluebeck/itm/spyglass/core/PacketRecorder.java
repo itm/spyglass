@@ -438,72 +438,75 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 			Thread.sleep(1000);
 			isResetting = false;
 		}
+		SpyglassPacket packet = null;
 
-		// get a mutex lock which will prevent the input stream to be accessed externally
-		synchronized (inputStreamMutex) {
+		// this do while is needed, to guarantee that valid packets are returned if no
+		// misconfiguration was detected
+		do {
 
-			// if a file was chosen as input source ...
-			if (readFromFile) {
+			// get a mutex lock which will prevent the input stream to be accessed externally
+			synchronized (inputStreamMutex) {
 
-				SpyglassPacket packet = null;
+				// if a file was chosen as input source ...
+				if (readFromFile) {
 
-				// get the input stream which will deliver the packets
-				InputStream playbackFileReader = null;
-				if ((getGateway() == null) || ((playbackFileReader = getGateway().getInputStream()) == null)) {
-					// initialize it by instructions of the user since it was not set previously
-					setPlayBackFile();
-				}
+					// get the input stream which will deliver the packets
+					InputStream playbackFileReader = null;
+					if ((getGateway() == null) || ((playbackFileReader = getGateway().getInputStream()) == null)) {
+						// initialize it by instructions of the user since it was not set previously
+						setPlayBackFile();
+					}
 
-				// if the input stream is still not available generate an error message
-				if (playbackFileReader == null) {
-					log.error("The gateway which delivers the packets was not initialized correcly.\r\n" + "Please specify the input source.");
-					return null;
-				}
-
-				// get the next packet from the input stream
-				try {
-					final int next;
-					byte[] packetData;
-					if ((next = playbackFileReader.read()) != -1) {
-						packetData = new byte[next];
-						playbackFileReader.read(packetData);
-						packet = PacketFactory.createInstance(packetData);
-					} else if (!endofFileReachedMessageShown) {
-						Display.getDefault().syncExec(new Runnable() {
-							@Override
-							public void run() {
-								MessageDialog.openInformation(null, "No more data", "The end of the playback file was reached!");
-							}
-						});
-						endofFileReachedMessageShown = true;
+					// if the input stream is still not available generate an error message
+					if (playbackFileReader == null) {
+						log.error("The gateway which delivers the packets was not initialized correcly.\r\n" + "Please specify the input source.");
 						return null;
 					}
 
-				} catch (final IOException e) {
-					log.error("Error while reading a new packet...", e);
+					// get the next packet from the input stream
+					try {
+						final int next;
+						byte[] packetData;
+						if ((next = playbackFileReader.read()) != -1) {
+							packetData = new byte[next];
+							playbackFileReader.read(packetData);
+							packet = PacketFactory.createInstance(packetData);
+						} else if (!endofFileReachedMessageShown) {
+							Display.getDefault().syncExec(new Runnable() {
+								@Override
+								public void run() {
+									MessageDialog.openInformation(null, "No more data", "The end of the playback file was reached!");
+								}
+							});
+							endofFileReachedMessageShown = true;
+							inputStreamMutex.wait();
+						}
+
+					} catch (final IOException e) {
+						log.error("Error while reading a new packet...", e);
+					}
+
+					// Hold back the packet at least for delayMillis
+					final long now = System.currentTimeMillis();
+					final long diff = now - lastPlaybackPacketTimestamp;
+					if (diff < delayMillies) {
+						Thread.sleep(delayMillies - diff);
+					}
+					lastPlaybackPacketTimestamp = System.currentTimeMillis();
+
+					// this is done to enable the user to cut the packet stream read from a file
+					handlePacket(packet);
+
+				} else {
+					// if the packets are not read from the file, use the overridden method of the
+					// super
+					// class. The functionality is the same but it uses a different packet queue.
+					packet = super.getNextPacket();
 				}
-
-				// Hold back the packet at least for delayMillies
-				final long now = System.currentTimeMillis();
-				final long diff = now - lastPlaybackPacketTimestamp;
-				if (diff < delayMillies) {
-					Thread.sleep(delayMillies - diff);
-				}
-				lastPlaybackPacketTimestamp = System.currentTimeMillis();
-
-				// this is done to enable the user to cut the packet stream read from a file
-				handlePacket(packet);
-
-				return packet;
-
 			}
+		} while (packet == null);
 
-		}
-
-		// if the packets are not read from the file, use the overridden method of the super
-		// class. The functionality is the same but it uses a different packet queue.
-		return super.getNextPacket();
-
+		return packet;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -537,8 +540,17 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 		} else {
 			readFromFile = true;
 			endofFileReachedMessageShown = false;
+			// the super class needs to be reseted because it may sleep while holding the
+			// inputStreamMutex lock
+			try {
+				super.reset();
+			} catch (final IOException e) {
+				log.error("", e);
+			}
 		}
-
+		synchronized (inputStreamMutex) {
+			inputStreamMutex.notifyAll();
+		}
 		return readFromFile;
 	}
 
@@ -709,6 +721,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 					((FileReaderGateway) gw).reset();
 				}
 			}
+			inputStreamMutex.notifyAll();
 		}
 	}
 
