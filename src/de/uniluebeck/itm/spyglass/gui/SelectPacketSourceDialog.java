@@ -193,7 +193,6 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 			setIShell();
 			super.okPressed();
 		}
-
 	}
 
 	// --------------------------------------------------------------------------------

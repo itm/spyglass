@@ -278,7 +278,7 @@ public class ConfigStore extends PropertyBean {
 		final PacketReader pr = spyglassConfig.getPacketReader();
 		if (pr instanceof PacketRecorder) {
 			((PacketRecorder) pr).setReadFromFile(false);
-			((PacketRecorder) pr).enableRecording(false);
+			((PacketRecorder) pr).setRecording(false);
 		}
 
 		log.debug("Overwriting config.");

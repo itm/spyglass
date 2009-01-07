@@ -31,6 +31,9 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	 */
 	private Deque<SpyglassPacket> queue = new ArrayDeque<SpyglassPacket>(50);
 
+	/** Indicates whether the object should skip waiting for the arrival of a new packet */
+	private volatile boolean skipWaiting = false;
+
 	private static final Logger log = SpyglassLoggerFactory.getLogger(IShellToSpyGlassPacketBroker.class);
 
 	// --------------------------------------------------------------------------------
@@ -69,7 +72,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 		SpyglassPacket packet = null;
 
 		// Loop until we have a packet.
-		while (packet == null) {
+		while ((packet == null) && !skipWaiting) {
 
 			synchronized (queue) {
 
@@ -82,6 +85,9 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 			// the queue might still be empty in case of a requested reset
 			packet = queue.poll();
 		}
+
+		skipWaiting = false;
+
 		return packet;
 
 	}
@@ -107,6 +113,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	public void reset() throws IOException {
 		// prevent threads to be waiting for the queue forever...
 		try {
+			skipWaiting = true;
 			synchronized (queue) {
 				queue.notifyAll();
 			}
