@@ -7,27 +7,29 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
-public class NodeSensorRangePreferencePage extends
-		PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> {
-	
-	public NodeSensorRangePreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> {
+
+	public NodeSensorRangePreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
 	}
-	
-	public NodeSensorRangePreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass, final NodeSensorRangePlugin plugin) {
+
+	public NodeSensorRangePreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final NodeSensorRangePlugin plugin) {
 		super(dialog, spyglass, plugin, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
 	}
-	
+
 	@Override
 	protected Composite createContents(final Composite parent) {
-		return super.createMS2Warning(parent); // TODO: plugin-specific options
+		final Composite composite = createContentsInternal(parent);
+		final NodeSensorRangeOptionsComposite optionsComposite = new NodeSensorRangeOptionsComposite(composite);
+
+		optionsComposite.setDatabinding(dbc, config, this);
+
+		return composite;
 	}
-	
+
 	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return NodeSensorRangePlugin.class;
 	}
-	
+
 }
