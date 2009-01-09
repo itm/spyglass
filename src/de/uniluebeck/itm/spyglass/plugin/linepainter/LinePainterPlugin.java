@@ -41,6 +41,10 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
+// --------------------------------------------------------------------------------
+/**
+ * @author Daniel Bimschas
+ */
 public class LinePainterPlugin extends RelationPainterPlugin implements PropertyChangeListener, NodePositionListener {
 
 	@Element(name = "parameters")

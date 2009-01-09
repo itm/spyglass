@@ -29,6 +29,10 @@ public class AbsolutePosition extends AbstractPosition {
 		super(x, y, z);
 	}
 
+	public AbsolutePosition(final int x, final int y) {
+		super(x, y, 0);
+	}
+
 	@Override
 	public AbsolutePosition clone() {
 		return new AbsolutePosition(x, y, z);

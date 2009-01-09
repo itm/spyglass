@@ -64,8 +64,6 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 	private Button buttonOptions;
 
-	private DataBindingContext dbc;
-
 	private NodeSensorRangeXMLConfig config;
 
 	{
@@ -138,7 +136,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 						final String boxText = radius.getText();
 						final String string = event.text;
 						try {
-							Float.parseFloat(boxText.concat(string));
+							Integer.parseInt(boxText.concat(string));
 						} catch (final NumberFormatException exc) {
 							event.doit = false;
 						}
@@ -148,7 +146,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 					@Override
 					public void modifyText(final ModifyEvent e) {
 						final boolean empty = "".equals(radius.getText());
-						((ConeRange) range).setConeRadius(empty ? 0f : Float.parseFloat(radius.getText()));
+						((ConeRange) range).setConeRadius(empty ? 0 : Integer.parseInt(radius.getText()));
 					}
 				});
 				radius.setText(String.valueOf(((ConeRange) range).getConeRadius()));
@@ -329,7 +327,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 						final String boxText = width.getText();
 						final String string = event.text;
 						try {
-							Float.parseFloat(boxText.concat(string));
+							Integer.parseInt(boxText.concat(string));
 						} catch (final NumberFormatException exc) {
 							event.doit = false;
 						}
@@ -339,7 +337,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 					@Override
 					public void modifyText(final ModifyEvent e) {
 						final boolean empty = "".equals(width.getText());
-						((RectangleRange) range).setRectangleWidth(empty ? 0f : Float.parseFloat(width.getText()));
+						((RectangleRange) range).setRectangleWidth(empty ? 0 : Integer.parseInt(width.getText()));
 					}
 				});
 				width.setText(String.valueOf(((RectangleRange) range).getRectangleWidth()));
@@ -363,7 +361,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 						final String boxText = height.getText();
 						final String string = event.text;
 						try {
-							Float.parseFloat(boxText.concat(string));
+							Integer.parseInt(boxText.concat(string));
 						} catch (final NumberFormatException exc) {
 							event.doit = false;
 						}
@@ -373,7 +371,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 					@Override
 					public void modifyText(final ModifyEvent e) {
 						final boolean empty = "".equals(height.getText());
-						((RectangleRange) range).setRectangleHeight(empty ? 0f : Float.parseFloat(height.getText()));
+						((RectangleRange) range).setRectangleHeight(empty ? 0 : Integer.parseInt(height.getText()));
 					}
 				});
 				height.setText(String.valueOf(((RectangleRange) range).getRectangleHeight()));
@@ -536,7 +534,6 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 	public void setDatabinding(final DataBindingContext dbc, final NodeSensorRangeXMLConfig config, final NodeSensorRangePreferencePage page) {
 
 		this.page = page;
-		this.dbc = dbc;
 		this.config = config;
 
 		IObservableValue obsModel;

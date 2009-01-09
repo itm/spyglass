@@ -59,7 +59,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		private float coneOrientation = 0;
 
 		@Element(name = PROPERTYNAME_CONE_RADIUS, required = false)
-		private float coneRadius = 0;
+		private int coneRadius = 0;
 
 		@Element(name = PROPERTYNAME_CONE_VIEWANGLE, required = false)
 		private float coneViewAngle = 0;
@@ -68,7 +68,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 
 		}
 
-		public ConeRange(final byte orientation, final float radius, final float viewAngle) {
+		public ConeRange(final float orientation, final int radius, final float viewAngle) {
 			this.coneOrientation = orientation;
 			this.coneRadius = radius;
 			this.coneViewAngle = viewAngle;
@@ -78,7 +78,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			return coneOrientation;
 		}
 
-		public float getConeRadius() {
+		public int getConeRadius() {
 			return coneRadius;
 		}
 
@@ -92,7 +92,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			firePropertyChange(PROPERTYNAME_CONE_ORIENTATION, old, this);
 		}
 
-		public void setConeRadius(final float radius) {
+		public void setConeRadius(final int radius) {
 			final float old = this.coneRadius;
 			this.coneRadius = radius;
 			firePropertyChange(PROPERTYNAME_CONE_RADIUS, old, this);
@@ -120,25 +120,25 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	public static class RectangleRange extends NodeSensorRange {
 
 		@Element(name = PROPERTYNAME_RECTANGLE_HEIGHT, required = false)
-		private float rectangleHeight = 0;
+		private int rectangleHeight = 0;
 
 		@Element(name = PROPERTYNAME_RECTANGLE_ORIENTATION, required = false)
 		private float rectangleOrientation = 0;
 
 		@Element(name = PROPERTYNAME_RECTANGLE_WIDTH, required = false)
-		private float rectangleWidth = 0;
+		private int rectangleWidth = 0;
 
 		public RectangleRange() {
 
 		}
 
-		public RectangleRange(final byte orientation, final float width, final float height) {
+		public RectangleRange(final float orientation, final int width, final int height) {
 			this.rectangleHeight = height;
 			this.rectangleOrientation = orientation;
 			this.rectangleWidth = width;
 		}
 
-		public float getRectangleHeight() {
+		public int getRectangleHeight() {
 			return rectangleHeight;
 		}
 
@@ -146,11 +146,11 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			return rectangleOrientation;
 		}
 
-		public float getRectangleWidth() {
+		public int getRectangleWidth() {
 			return rectangleWidth;
 		}
 
-		public void setRectangleHeight(final float height) {
+		public void setRectangleHeight(final int height) {
 			final float old = this.rectangleHeight;
 			this.rectangleHeight = height;
 			firePropertyChange(PROPERTYNAME_RECTANGLE_HEIGHT, old, this);
@@ -162,7 +162,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			firePropertyChange(PROPERTYNAME_RECTANGLE_ORIENTATION, old, this);
 		}
 
-		public void setRectangleWidth(final float width) {
+		public void setRectangleWidth(final int width) {
 			final float old = this.rectangleWidth;
 			this.rectangleWidth = width;
 			firePropertyChange(PROPERTYNAME_RECTANGLE_WIDTH, old, this);
