@@ -26,23 +26,21 @@ import org.apache.log4j.net.SocketAppender;
  * @author Sebastian Ebers
  */
 public class SpyglassLoggerFactory {
-	
+
 	private static long timestamp = new Date().getTime();
-	private static final String fileNameLog = "." + File.separator + "logs" + File.separator
-			+ timestamp + "_messages.log";
-	private static PatternLayout patternLayout = new PatternLayout(
-			"%-9d{HH:mm:ss} [%t] %-8p %-20c{1} - %m%n");
+	private static final String fileNameLog = "." + File.separator + "logs" + File.separator + timestamp + "_messages.log";
+	private static PatternLayout patternLayout = new PatternLayout("%-9d{HH:mm:ss} %-8p %-20c{1} - %m%n");
 	private static PatternLayout fileLoggerLayout = patternLayout;
-	
+
 	private static Map<String, Logger> loggerMap = new HashMap<String, Logger>();
 	private static Level loglevel = Level.DEBUG;
-	
+
 	/** Indicates if the logged messages have to be written to a file */
-	public static boolean writeLogfile = false;
-	
+	public static boolean writeLogfile = true;
+
 	/** Indicates if the logged messages have to be written to a socket */
 	public static boolean write2Socket = false;
-	
+
 	/**
 	 * Returns an object to log messages which can be related to a certain class
 	 * 
@@ -55,7 +53,7 @@ public class SpyglassLoggerFactory {
 		Logger logger = null;
 		try {
 			if ((logger = loggerMap.get(clazz.getName())) == null) {
-				logger = new SpyglassLogger(clazz);// Logger.getLogger(clazz);
+				logger = new SpyglassLogger(clazz);
 				if (writeLogfile) {
 					logger.addAppender(new FileAppender(fileLoggerLayout, fileNameLog));
 				}
@@ -70,5 +68,5 @@ public class SpyglassLoggerFactory {
 		}
 		return logger;
 	}
-	
+
 }
