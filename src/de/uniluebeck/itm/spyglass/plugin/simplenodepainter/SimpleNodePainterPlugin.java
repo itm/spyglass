@@ -43,6 +43,7 @@ import de.uniluebeck.itm.spyglass.plugin.nodepainter.NodePainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -317,7 +318,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			}
 
 		} catch (final IllegalArgumentException e) {
-			log.error(e);
+			((SpyglassLogger) log).error(e, false);
 		} catch (final Exception e) {
 			log.error("An error occured while processing a packet's contents using a StringFormatter", e);
 		}
