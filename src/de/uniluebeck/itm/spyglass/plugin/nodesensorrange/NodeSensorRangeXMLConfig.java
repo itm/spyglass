@@ -31,22 +31,22 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	public static class CircleRange extends NodeSensorRange {
 
 		@Element(name = PROPERTYNAME_CIRCLE_RADIUS, required = false)
-		private float circleRadius = 0;
+		private int circleRadius = 100;
 
 		public CircleRange() {
 
 		}
 
-		public CircleRange(final float radius) {
+		public CircleRange(final int radius) {
 			this.circleRadius = radius;
 		}
 
-		public float getCircleRadius() {
+		public int getCircleRadius() {
 			return circleRadius;
 		}
 
-		public void setCircleRadius(final float radius) {
-			final float old = this.circleRadius;
+		public void setCircleRadius(final int radius) {
+			final int old = this.circleRadius;
 			this.circleRadius = radius;
 			firePropertyChange(PROPERTYNAME_CIRCLE_RADIUS, old, this);
 		}
@@ -56,25 +56,25 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	public static class ConeRange extends NodeSensorRange {
 
 		@Element(name = PROPERTYNAME_CONE_ORIENTATION, required = false)
-		private float coneOrientation = 0;
+		private int coneOrientation = 0;
 
 		@Element(name = PROPERTYNAME_CONE_RADIUS, required = false)
-		private int coneRadius = 0;
+		private int coneRadius = 100;
 
 		@Element(name = PROPERTYNAME_CONE_VIEWANGLE, required = false)
-		private float coneViewAngle = 0;
+		private int coneViewAngle = 45;
 
 		public ConeRange() {
 
 		}
 
-		public ConeRange(final float orientation, final int radius, final float viewAngle) {
+		public ConeRange(final int orientation, final int radius, final int viewAngle) {
 			this.coneOrientation = orientation;
 			this.coneRadius = radius;
 			this.coneViewAngle = viewAngle;
 		}
 
-		public float getConeOrientation() {
+		public int getConeOrientation() {
 			return coneOrientation;
 		}
 
@@ -82,26 +82,85 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			return coneRadius;
 		}
 
-		public float getConeViewAngle() {
+		public int getConeViewAngle() {
 			return coneViewAngle;
 		}
 
-		public void setConeOrientation(final float orientation) {
-			final float old = this.coneOrientation;
+		public void setConeOrientation(final int orientation) {
+			final int old = this.coneOrientation;
 			this.coneOrientation = orientation;
 			firePropertyChange(PROPERTYNAME_CONE_ORIENTATION, old, this);
 		}
 
 		public void setConeRadius(final int radius) {
-			final float old = this.coneRadius;
+			final int old = this.coneRadius;
 			this.coneRadius = radius;
 			firePropertyChange(PROPERTYNAME_CONE_RADIUS, old, this);
 		}
 
-		public void setConeViewAngle(final float viewAngle) {
-			final float old = this.coneViewAngle;
+		public void setConeViewAngle(final int viewAngle) {
+			final int old = this.coneViewAngle;
 			this.coneViewAngle = viewAngle;
 			firePropertyChange(PROPERTYNAME_CONE_VIEWANGLE, old, this);
+		}
+
+	}
+
+	public static class Config extends PropertyBean {
+
+		@Element(name = PROPERTYNAME_BACKGROUND_ALPHA, required = false)
+		private int backgroundAlpha = 30;
+
+		@ElementArray(name = PROPERTYNAME_BACKGROUND_R_G_B, required = false)
+		private int[] backgroundRGB = { 0, 255, 0 };
+
+		@ElementArray(name = PROPERTYNAME_COLOR_R_G_B, required = false)
+		private int[] colorRGB = { 0, 0, 0 };
+
+		@Element(name = PROPERTYNAME_RANGE, required = false)
+		private NodeSensorRange range = new CircleRange();
+
+		@Element(name = PROPERTYNAME_RANGE_TYPE, required = false)
+		private String rangeType = "Circle";
+
+		public int getBackgroundAlpha() {
+			return backgroundAlpha;
+		}
+
+		public int[] getBackgroundRGB() {
+			return backgroundRGB;
+		}
+
+		public int[] getColorRGB() {
+			return colorRGB;
+		}
+
+		public NodeSensorRange getRange() {
+			return range;
+		}
+
+		public String getRangeType() {
+			return rangeType;
+		}
+
+		public void setBackgroundAlpha(final int backgroundAlpha) {
+			firePropertyChange(PROPERTYNAME_BACKGROUND_ALPHA, this.backgroundAlpha, this.backgroundAlpha = backgroundAlpha);
+		}
+
+		public void setBackgroundRGB(final int[] backgroundRGB) {
+			firePropertyChange(PROPERTYNAME_BACKGROUND_R_G_B, this.backgroundRGB, this.backgroundRGB = backgroundRGB);
+		}
+
+		public void setColorRGB(final int[] colorRGB) {
+			firePropertyChange(PROPERTYNAME_COLOR_R_G_B, this.colorRGB, this.colorRGB = colorRGB);
+		}
+
+		public void setRange(final NodeSensorRange range) {
+			firePropertyChange(PROPERTYNAME_RANGE, this.range, this.range = range);
+		}
+
+		public void setRangeType(final String rangeType) {
+			firePropertyChange(PROPERTYNAME_RANGE_TYPE, this.rangeType, this.rangeType = rangeType);
 		}
 
 	}
@@ -120,19 +179,19 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	public static class RectangleRange extends NodeSensorRange {
 
 		@Element(name = PROPERTYNAME_RECTANGLE_HEIGHT, required = false)
-		private int rectangleHeight = 0;
+		private int rectangleHeight = 100;
 
 		@Element(name = PROPERTYNAME_RECTANGLE_ORIENTATION, required = false)
-		private float rectangleOrientation = 0;
+		private int rectangleOrientation = 45;
 
 		@Element(name = PROPERTYNAME_RECTANGLE_WIDTH, required = false)
-		private int rectangleWidth = 0;
+		private int rectangleWidth = 100;
 
 		public RectangleRange() {
 
 		}
 
-		public RectangleRange(final float orientation, final int width, final int height) {
+		public RectangleRange(final int orientation, final int width, final int height) {
 			this.rectangleHeight = height;
 			this.rectangleOrientation = orientation;
 			this.rectangleWidth = width;
@@ -142,7 +201,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			return rectangleHeight;
 		}
 
-		public float getRectangleOrientation() {
+		public int getRectangleOrientation() {
 			return rectangleOrientation;
 		}
 
@@ -150,27 +209,33 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			return rectangleWidth;
 		}
 
-		public void setRectangleHeight(final int height) {
-			final float old = this.rectangleHeight;
-			this.rectangleHeight = height;
+		public void setRectangleHeight(final int rectangleHeight) {
+			final int old = this.rectangleHeight;
+			this.rectangleHeight = rectangleHeight;
 			firePropertyChange(PROPERTYNAME_RECTANGLE_HEIGHT, old, this);
 		}
 
-		public void setRectangleOrientation(final float orientation) {
-			final float old = this.rectangleOrientation;
-			this.rectangleOrientation = orientation;
+		public void setRectangleOrientation(final int rectangleOrientation) {
+			final int old = this.rectangleOrientation;
+			this.rectangleOrientation = rectangleOrientation;
 			firePropertyChange(PROPERTYNAME_RECTANGLE_ORIENTATION, old, this);
 		}
 
-		public void setRectangleWidth(final int width) {
-			final float old = this.rectangleWidth;
-			this.rectangleWidth = width;
+		public void setRectangleWidth(final int rectangleWidth) {
+			final int old = this.rectangleWidth;
+			this.rectangleWidth = rectangleWidth;
 			firePropertyChange(PROPERTYNAME_RECTANGLE_WIDTH, old, this);
 		}
 
 	}
 
+	public static final String PROPERTYNAME_BACKGROUND_ALPHA = "backgroundAlpha";
+
+	public static final String PROPERTYNAME_BACKGROUND_R_G_B = "backgroundRGB";
+
 	public static final String PROPERTYNAME_CIRCLE_RADIUS = "circleRadius";
+
+	public static final String PROPERTYNAME_COLOR_R_G_B = "colorRGB";
 
 	public static final String PROPERTYNAME_CONE_ORIENTATION = "coneOrientation";
 
@@ -178,13 +243,13 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 
 	public static final String PROPERTYNAME_CONE_VIEWANGLE = "coneViewAngle";
 
-	public static final String PROPERTYNAME_DEFAULT_COLOR_R_G_B = "defaultColorRGB";
-
-	public static final String PROPERTYNAME_DEFAULT_RANGE = "defaultRange";
-
-	public static final String PROPERTYNAME_DEFAULT_RANGE_TYPE = "defaultRangeType";
+	public static final String PROPERTYNAME_DEFAULT_CONFIG = "defaultConfig";
 
 	public static final String PROPERTYNAME_NODE_RANGES = "nodeRanges";
+
+	public static final String PROPERTYNAME_RANGE = "range";
+
+	public static final String PROPERTYNAME_RANGE_TYPE = "rangeType";
 
 	public static final String PROPERTYNAME_RECTANGLE_HEIGHT = "rectangleHeight";
 
@@ -194,21 +259,20 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 
 	public static final String PROPERTYVALUE_RANGE_TYPE_CIRCLE = "Circle";
 
-	public static final String PROPERTYVALUE_RANGE_TYPE_RECTANGLE = "Rectangle";
-
 	public static final String PROPERTYVALUE_RANGE_TYPE_CONE = "Cone";
 
-	@ElementArray(name = PROPERTYNAME_DEFAULT_COLOR_R_G_B, required = false)
-	private int[] defaultColorRGB = { 0, 0, 0 };
+	public static final String PROPERTYVALUE_RANGE_TYPE_RECTANGLE = "Rectangle";
 
-	@Element(name = PROPERTYNAME_DEFAULT_RANGE, required = false)
-	private NodeSensorRange defaultRange = new CircleRange(1);
-
-	@Element(name = PROPERTYNAME_DEFAULT_RANGE_TYPE, required = false)
-	private String defaultRangeType = "Circle";
+	@Element(name = PROPERTYNAME_DEFAULT_CONFIG, required = false)
+	private final Config defaultConfig = new Config();
 
 	@ElementMap(entry = PROPERTYNAME_NODE_RANGES, key = "nodeID", attribute = true, valueType = NodeSensorRange.class, required = false)
 	private HashMap<Integer, NodeSensorRange> nodeRanges = new HashMap<Integer, NodeSensorRange>();
+
+	public void addNodeRange(final int nodeId, final NodeSensorRange range) {
+		nodeRanges.put(nodeId, range);
+		range.addPropertyChangeListener(this);
+	}
 
 	public boolean equals(final NodeSensorRangeXMLConfig o) {
 		if (!super.equals(o)) {
@@ -217,42 +281,17 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		return nodeRanges.equals((o).nodeRanges);
 	}
 
-	public int[] getDefaultColorRGB() {
-		return defaultColorRGB;
-	}
-
-	public NodeSensorRange getDefaultRange() {
-		return defaultRange;
-	}
-
-	public String getDefaultRangeType() {
-		return defaultRangeType;
-	}
-
-	public void setDefaultRangeType(final String defaultRangeType) {
-		firePropertyChange(PROPERTYNAME_DEFAULT_RANGE_TYPE, this.defaultRangeType, this.defaultRangeType = defaultRangeType);
-	}
-
-	public void setDefaultColorRGB(final int[] colorRGB) {
-		firePropertyChange(PROPERTYNAME_DEFAULT_COLOR_R_G_B, this.defaultColorRGB, this.defaultColorRGB = colorRGB);
-	}
-
-	public void setDefaultRange(final NodeSensorRange defaultRange) {
-		firePropertyChange(PROPERTYNAME_DEFAULT_RANGE, this.defaultRange, this.defaultRange = defaultRange);
-	}
-
-	public void addNodeRange(final int nodeId, final NodeSensorRange range) {
-		nodeRanges.put(nodeId, range);
-		range.addPropertyChangeListener(this);
-	}
-
-	public void removeNodeRange(final int nodeId) {
-		nodeRanges.remove(nodeId).removePropertyChangeListener(this);
+	public Config getDefaultConfig() {
+		return defaultConfig;
 	}
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
 		firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+	}
+
+	public void removeNodeRange(final int nodeId) {
+		nodeRanges.remove(nodeId).removePropertyChangeListener(this);
 	}
 
 }

@@ -14,4 +14,16 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
  */
 public abstract class NodeSensorRangeDrawingObject extends DrawingObject {
 
+	protected int backgroundAlpha = 255;
+
+	public int getBackgroundAlpha() {
+		return backgroundAlpha;
+	}
+
+	public void setBackgroundAlpha(final int backgroundAlpha) {
+		this.backgroundAlpha = backgroundAlpha;
+	}
+
+	public abstract void setRange(NodeSensorRangeXMLConfig.NodeSensorRange range);
+
 }

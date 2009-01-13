@@ -8,8 +8,11 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.swt.graphics.RGB;
 import org.simpleframework.xml.Element;
@@ -27,6 +30,7 @@ import de.uniluebeck.itm.spyglass.plugin.QuadTree;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.CircleRange;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.ConeRange;
+import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.Config;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.NodeSensorRange;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.RectangleRange;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
@@ -39,62 +43,18 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 
-	@Element(name = "parameters")
-	private final NodeSensorRangeXMLConfig xmlConfig;
-
-	private Layer layer = new QuadTree();
-
-	public NodeSensorRangePlugin() {
-		super(false);
-		xmlConfig = new NodeSensorRangeXMLConfig();
-	}
-
-	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
-	@Override
-	public PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
-		return new NodeSensorRangePreferencePage(dialog, spyglass, this);
-	}
-
 	public static PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
 			final Spyglass spyglass) {
 		return new NodeSensorRangePreferencePage(dialog, spyglass);
-	}
-
-	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
-		return layer.getDrawingObjects(area);
 	}
 
 	public static String getHumanReadableName() {
 		return "NodeSensorRange";
 	}
 
-	@Override
-	public PluginXMLConfig getXMLConfig() {
-		return xmlConfig;
-	}
+	private Hashtable<Integer, NodeSensorRangeDrawingObject> dos = new Hashtable<Integer, NodeSensorRangeDrawingObject>();
 
-	@Override
-	public void handlePacket(final SpyglassPacket packet) {
-		// since the plug-in is not interested in packets, nothing has to be
-		// done here
-	}
-
-	@Override
-	protected void processPacket(final SpyglassPacket packet) {
-		// since the plug-in is not interested in packets, nothing has to be
-		// done here
-	}
-
-	@Override
-	public void reset() {
-		dos.clear();
-		layer.clear();
-	}
+	private Layer layer = new QuadTree();
 
 	private NodePositionListener nodePositionListener = new NodePositionListener() {
 		@Override
@@ -113,87 +73,119 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 		}
 	};
 
-	private NodeSensorRangeDrawingObject createDefaultNodeRangeDrawingObject(final AbsolutePosition position) {
+	@Element(name = "parameters")
+	private final NodeSensorRangeXMLConfig xmlConfig;
 
-		NodeSensorRangeDrawingObject drawingObject;
-		final NodeSensorRange defaultRange = xmlConfig.getDefaultRange();
-		final int[] color = xmlConfig.getDefaultColorRGB();
-
-		if ((defaultRange == null) || (defaultRange instanceof CircleRange)) {
-
-			final NodeSensorRangeCircle circle = new NodeSensorRangeCircle();
-			final CircleRange range = (CircleRange) defaultRange;
-
-			circle.setColor(new RGB(color[0], color[1], color[2]));
-			circle.setRadius(range.getCircleRadius());
-			circle.setPosition(position);
-
-			drawingObject = circle;
-
-		} else if (defaultRange instanceof RectangleRange) {
-
-			final NodeSensorRangeRectangle rect = new NodeSensorRangeRectangle();
-			final RectangleRange range = (RectangleRange) defaultRange;
-
-			rect.setColor(new RGB(color[0], color[1], color[2]));
-			rect.setWidth(range.getRectangleWidth());
-			rect.setHeight(range.getRectangleHeight());
-			rect.setOrientation(range.getRectangleOrientation());
-			rect.setPosition(position);
-
-			drawingObject = rect;
-
-		} else if (defaultRange instanceof ConeRange) {
-
-			final NodeSensorRangeCone cone = new NodeSensorRangeCone();
-			final ConeRange range = (ConeRange) defaultRange;
-
-			cone.setColor(new RGB(color[0], color[1], color[2]));
-			cone.setOrientation(range.getConeOrientation());
-			cone.setPosition(position);
-			cone.setRadius(range.getConeRadius());
-			cone.setViewAngle(range.getConeViewAngle());
-
-			drawingObject = cone;
-
-		} else {
-
-			throw new RuntimeException("Unexpected case.");
-
-		}
-
-		return drawingObject;
+	public NodeSensorRangePlugin() {
+		super(false);
+		xmlConfig = new NodeSensorRangeXMLConfig();
 	}
-
-	private Hashtable<Integer, NodeSensorRangeDrawingObject> dos = new Hashtable<Integer, NodeSensorRangeDrawingObject>();
 
 	private void add(final int node, final NodeSensorRangeDrawingObject drawingObject) {
 		dos.put(node, drawingObject);
 		layer.addOrUpdate(drawingObject);
+		fireDrawingObjectAdded(drawingObject);
+	}
+
+	private NodeSensorRangeCircle createCircle(final CircleRange range) {
+
+		final NodeSensorRangeCircle circle = new NodeSensorRangeCircle();
+		circle.setRadius(range.getCircleRadius());
+		return circle;
+
+	}
+
+	private NodeSensorRangeCone createCone(final ConeRange range) {
+
+		final NodeSensorRangeCone cone = new NodeSensorRangeCone();
+		cone.setOrientation(range.getConeOrientation());
+		cone.setRadius(range.getConeRadius());
+		cone.setViewAngle(range.getConeViewAngle());
+		return cone;
+
+	}
+
+	private NodeSensorRangeDrawingObject createNodeRangeDrawingObject(final Config config, final AbsolutePosition position) {
+
+		NodeSensorRangeDrawingObject drawingObject;
+		final NodeSensorRange defaultRange = config.getRange();
+		final int[] background = config.getBackgroundRGB();
+		final int[] foreground = config.getColorRGB();
+		final RGB foregroundRGB = new RGB(foreground[0], foreground[1], foreground[2]);
+		final RGB backgroundRGB = new RGB(background[0], background[1], background[2]);
+
+		final boolean isRectangle = defaultRange instanceof RectangleRange;
+		final boolean isCone = defaultRange instanceof ConeRange;
+
+		drawingObject = isRectangle ? createRectangle((RectangleRange) defaultRange) : isCone ? createCone((ConeRange) defaultRange)
+				: createCircle((CircleRange) defaultRange);
+
+		drawingObject.setPosition(position);
+		drawingObject.setColor(foregroundRGB);
+		drawingObject.setBgColor(backgroundRGB);
+
+		return drawingObject;
+	}
+
+	@Override
+	public PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
+		return new NodeSensorRangePreferencePage(dialog, spyglass, this);
+	}
+
+	private NodeSensorRangeRectangle createRectangle(final RectangleRange range) {
+
+		final NodeSensorRangeRectangle rect = new NodeSensorRangeRectangle();
+		rect.setWidth(range.getRectangleWidth());
+		rect.setHeight(range.getRectangleHeight());
+		rect.setOrientation(range.getRectangleOrientation());
+		return rect;
+
+	}
+
+	@Override
+	public void finalize() throws Throwable {
+		super.finalize();
 	}
 
 	private NodeSensorRangeDrawingObject get(final int node) {
 		return dos.get(node);
 	}
 
-	private NodeSensorRangeDrawingObject remove(final int node) {
+	@Override
+	public List<DrawingObject> getAutoZoomDrawingObjects() {
+		return layer.getDrawingObjects();
+	}
 
-		final NodeSensorRangeDrawingObject drawingObject;
+	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+		return layer.getDrawingObjects(area);
+	}
 
-		drawingObject = dos.get(node);
-		layer.remove(drawingObject);
-		dos.remove(node);
+	@Override
+	public PluginXMLConfig getXMLConfig() {
+		return xmlConfig;
+	}
 
-		return drawingObject;
+	@Override
+	public void handlePacket(final SpyglassPacket packet) {
+		// since the plug-in is not interested in packets, nothing has to be
+		// done here
+	}
 
+	@Override
+	public void init(final PluginManager pluginManager) {
+		super.init(pluginManager);
+		pluginManager.addNodePositionListener(nodePositionListener);
+		xmlConfig.addPropertyChangeListener(defaultConfigPropertyChangeListener);
+		xmlConfig.getDefaultConfig().addPropertyChangeListener(defaultConfigPropertyChangeListener);
 	}
 
 	private void onNodeAdded(final int node, final AbsolutePosition newPosition) {
-		final NodeSensorRangeDrawingObject nrdo = createDefaultNodeRangeDrawingObject(newPosition);
+
+		final NodeSensorRangeDrawingObject nrdo = createNodeRangeDrawingObject(xmlConfig.getDefaultConfig(), newPosition);
 		add(node, nrdo);
 		fireDrawingObjectAdded(nrdo);
 
-		System.out.println("added " + node);
 	}
 
 	private void onNodeMoved(final int node, final AbsolutePosition oldPosition, final AbsolutePosition newPosition) {
@@ -206,13 +198,9 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 			drawingObject.setPosition(newPosition);
 			fireDrawingObjectChanged(drawingObject, oldBoundingBox);
 
-			System.out.println("moved node " + node);
-
 		} else {
 
 			onNodeAdded(node, newPosition);
-
-			System.out.println("added in onmove " + node);
 
 		}
 
@@ -220,22 +208,125 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 
 	private void onNodeRemoved(final int node, final AbsolutePosition oldPosition) {
 		fireDrawingObjectRemoved(remove(node));
-		System.out.println("removed node " + node);
 	}
 
 	@Override
-	public void init(final PluginManager manager) {
-		manager.addNodePositionListener(nodePositionListener);
+	protected void processPacket(final SpyglassPacket packet) {
+		// since the plug-in is not interested in packets, nothing has to be
+		// done here
+	}
+
+	private PropertyChangeListener defaultConfigPropertyChangeListener = new PropertyChangeListener() {
+		public void propertyChange(final PropertyChangeEvent e) {
+
+			if (NodeSensorRangeXMLConfig.PROPERTYNAME_DEFAULT_CONFIG.equals(e.getPropertyName())) {
+				onDefaultConfigChanged((Config) e.getOldValue(), (Config) e.getNewValue());
+				return;
+			}
+
+			else if (NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE.equals(e.getPropertyName())) {
+				onDefaultConfigRangeChanged(e.getPropertyName(), (NodeSensorRange) e.getOldValue(), (NodeSensorRange) e.getNewValue());
+				return;
+			}
+
+			throw new RuntimeException("Unexpected property: " + e.getPropertyName());
+		}
+	};
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param propertyName
+	 * @param oldValue
+	 * @param newValue
+	 */
+	private void onDefaultConfigRangeChanged(final String propertyName, final NodeSensorRange oldValue, final NodeSensorRange newValue) {
+
+		final boolean isRangeRectangle = newValue instanceof RectangleRange;
+		final boolean isRangeCone = newValue instanceof ConeRange;
+
+		NodeSensorRangeDrawingObject oldDob;
+
+		final Integer[] nodes = dos.keySet().toArray(new Integer[dos.size()]);
+
+		layer.clear();
+
+		for (final int node : nodes) {
+
+			oldDob = dos.get(node);
+
+			final NodeSensorRangeDrawingObject newDob = isRangeRectangle ? new NodeSensorRangeRectangle() : isRangeCone ? new NodeSensorRangeCone()
+					: new NodeSensorRangeCircle();
+
+			newDob.setBackgroundAlpha(oldDob.getBackgroundAlpha());
+			newDob.setBgColor(oldDob.getBgColor());
+			newDob.setColor(oldDob.getColor());
+			newDob.setPosition(oldDob.getPosition(), false);
+			newDob.setRange(newValue);
+
+			dos.put(node, newDob);
+			layer.remove(oldDob);
+			fireDrawingObjectRemoved(oldDob);
+			layer.addOrUpdate(newDob);
+			fireDrawingObjectAdded(newDob);
+
+		}
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param newConfig
+	 * @param newConfig
+	 */
+	private void onDefaultConfigChanged(final Config oldValue, final Config newConfig) {
+
+		oldValue.removePropertyChangeListener(defaultConfigPropertyChangeListener);
+		newConfig.addPropertyChangeListener(defaultConfigPropertyChangeListener);
+
+		// get lock for the plugin so that the following code-block is atomatic
+		synchronized (this) {
+
+			final Set<Integer> nodeSet = dos.keySet();
+
+			dos.clear();
+			layer.clear();
+
+			AbsolutePosition position;
+
+			for (final int node : nodeSet) {
+
+				position = pluginManager.getNodePositioner().getPosition(node);
+				add(node, createNodeRangeDrawingObject(newConfig, position));
+
+			}
+
+		}
+
+	}
+
+	private NodeSensorRangeDrawingObject remove(final int node) {
+
+		final NodeSensorRangeDrawingObject drawingObject;
+
+		drawingObject = dos.get(node);
+		layer.remove(drawingObject);
+		dos.remove(node);
+
+		fireDrawingObjectRemoved(drawingObject);
+
+		return drawingObject;
+
+	}
+
+	@Override
+	public void reset() {
+		dos.clear();
+		layer.clear();
 	}
 
 	@Override
 	protected void updateLayer() {
 		// since the plug-in is not interested in packets, nothing has to be
 		// done here
-	}
-
-	@Override
-	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		return layer.getDrawingObjects();
 	}
 }

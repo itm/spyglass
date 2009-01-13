@@ -6,10 +6,12 @@ package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.CircleRange;
+import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.NodeSensorRange;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
@@ -21,26 +23,14 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
  */
 public class NodeSensorRangeCircle extends NodeSensorRangeDrawingObject {
 
-	private float radius = 1;
+	private int radius = 1;
 
-	private RGB color = new RGB(0, 0, 0);
-
-	public float getRadius() {
+	public int getRadius() {
 		return radius;
 	}
 
-	public void setRadius(final float radius) {
+	public void setRadius(final int radius) {
 		this.radius = radius;
-	}
-
-	@Override
-	public RGB getColor() {
-		return color;
-	}
-
-	@Override
-	public void setColor(final RGB color) {
-		this.color = color;
 	}
 
 	@Override
@@ -48,9 +38,10 @@ public class NodeSensorRangeCircle extends NodeSensorRangeDrawingObject {
 
 		final AbsoluteRectangle box = new AbsoluteRectangle();
 
-		box.setUpperLeft(new AbsolutePosition(getPosition().x - (int) radius - 5, getPosition().y - (int) radius - 5));
-		box.setWidth((2 * (int) radius) + 10);
-		box.setHeight((2 * (int) radius) + 10);
+		// make it a little larger so that errors from rounding aren't so bad
+		box.setUpperLeft(new AbsolutePosition(getPosition().x - radius - 5, getPosition().y - radius - 5));
+		box.setWidth(2 * radius + 10);
+		box.setHeight(2 * radius + 10);
 
 		return box;
 
@@ -59,54 +50,60 @@ public class NodeSensorRangeCircle extends NodeSensorRangeDrawingObject {
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 
-		// calculate "real" bounding box (bounding box from calculateBoundingBox is a little larger)
-		final AbsoluteRectangle realBox = new AbsoluteRectangle();
-		realBox.setUpperLeft(new AbsolutePosition(getPosition().x - (int) radius, getPosition().y - (int) radius));
-		realBox.setWidth(2 * (int) radius);
-		realBox.setHeight(2 * (int) radius);
+		// calculate the real size of the bounding box
+		final AbsoluteRectangle absRect = new AbsoluteRectangle(getPosition(), radius * 2, radius * 2);
+		final PixelRectangle pxRect = drawingArea.absRect2PixelRect(absRect);
+		final PixelPosition pxPos = pxRect.getUpperLeft();
 
-		// get positions
-		final PixelPosition pxPos = drawingArea.absPoint2PixelPoint(getPosition());
-		final PixelRectangle pxRealBoundingBox = drawingArea.absRect2PixelRect(realBox);
+		drawCircle(gc, pxPos.x, pxPos.y, pxRect.getHeight() / 2);
+		drawBoundingBox(drawingArea, gc);
 
-		// save GC values
+	}
+
+	private void drawCircle(final GC gc, final int x, final int y, final int radius) {
+
+		// initialize OS resources
+		final Transform oldTransform = new Transform(Display.getDefault());
+		final Transform transform = new Transform(Display.getDefault());
+		final Color foreground = new Color(Display.getDefault(), getColor());
+		final Color background = new Color(Display.getDefault(), getBgColor());
+
+		// save the old GC status
+		gc.getTransform(oldTransform);
 		final int oldAlpha = gc.getAlpha();
 		final Color oldForeground = gc.getForeground();
 		final Color oldBackground = gc.getBackground();
-		final int oldLineWidth = gc.getLineWidth();
 
-		// create colors
-		final Color bgColor = new Color(Display.getDefault(), 0, 140, 0);
-		final Color lineColor = new Color(Display.getDefault(), color.red, color.green, color.blue);
+		// set colors
+		gc.setForeground(foreground);
+		gc.setBackground(background);
 
-		// calculate parameters for circle
-		final int x = pxPos.x - (pxRealBoundingBox.getWidth() / 2);
-		final int y = pxPos.y - (pxRealBoundingBox.getHeight() / 2);
-		final int width = pxRealBoundingBox.getWidth();
-		final int height = pxRealBoundingBox.getHeight();
-		final int startAngle = 0;
-		final int arcAngle = 360;
+		// translate so that x,y is 0,0 of coordinate system
+		transform.translate(x, y);
+		gc.setTransform(transform);
 
-		// draw background
-		gc.setBackground(bgColor);
-		gc.setAlpha(40);
-		gc.fillArc(x, y, width, height, startAngle, arcAngle);
-
-		// draw line
-		gc.setLineWidth(1);
-		gc.setForeground(lineColor);
+		// do the drawing
+		gc.setAlpha(backgroundAlpha);
+		gc.fillArc(-radius, -radius, radius * 2, radius * 2, 0, 360);
 		gc.setAlpha(255);
-		gc.drawArc(x, y, width, height, startAngle, arcAngle);
+		gc.drawArc(-radius, -radius, radius * 2, radius * 2, 0, 360);
 
-		// restore GC values
+		// restore old GC status
+		gc.setAlpha(oldAlpha);
+		gc.setTransform(oldTransform);
 		gc.setForeground(oldForeground);
 		gc.setBackground(oldBackground);
-		gc.setAlpha(oldAlpha);
-		gc.setLineWidth(oldLineWidth);
 
-		// dispose resources
-		bgColor.dispose();
-		lineColor.dispose();
-
+		// dispose OS resources
+		oldTransform.dispose();
+		transform.dispose();
+		foreground.dispose();
+		background.dispose();
 	}
+
+	@Override
+	public void setRange(final NodeSensorRange range) {
+		this.radius = ((CircleRange) range).getCircleRadius();
+	}
+
 }
