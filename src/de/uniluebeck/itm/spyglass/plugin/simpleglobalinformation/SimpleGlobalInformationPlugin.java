@@ -69,14 +69,14 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	private String avgNodeDegString;
 
 	/**
-	 * The widget where the information to be shown are placed in
-	 */
-	private SimpleGlobalInformationWidget widget;
-
-	/**
 	 * Object performing the statistical operation to determine the average node degree
 	 */
 	private StatisticalOperation avgNodeDegEvaluator;
+
+	/**
+	 * The widget where the information to be shown are placed in
+	 */
+	private SimpleGlobalInformationWidget widget;
 
 	/**
 	 * A list of semantic types of packages which provide information about neighborhood
@@ -187,7 +187,6 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 			} catch (final SpyglassPacketException e) {
 				log.error("Error parsing a packet in the " + getHumanReadableName()
 						+ ".\r\nPlease check the values in the StringFormatter for semantic type " + packetSemanticType + "!", e, false);
-				sfs.setDescription(sfs.getDescription() + " NaN");
 			}
 
 			synchronized (widget) {
@@ -224,16 +223,14 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	@Override
 	public void reset() {
-		if (widget != null) {
-			widget.getDisplay().asyncExec(new Runnable() {
-				// ------------------------------------------------------------------------
-				@SuppressWarnings("synthetic-access")
-				@Override
-				public void run() {
-					widget.clear();
-				}
-			});
+
+		final Set<StatisticalInformationEvaluator> sfSettings = xmlConfig.getStatisticalInformationEvaluators();
+		for (final StatisticalInformationEvaluator statisticalInformationEvaluator : sfSettings) {
+			statisticalInformationEvaluator.reset();
 		}
+		avgNodeDegEvaluator.reset();
+		avgNodeDegString = "avg. node degree: ";
+		refreshNodeCounts();
 	}
 
 	@Override
@@ -410,13 +407,9 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		 */
 		public void createOrUpdateLabel(final StatisticalInformationEvaluator siEvaluator) {
 			synchronized (sfLabels) {
-				String text = siEvaluator.getDescription();
+				final String text = siEvaluator.getDescription() + " " + siEvaluator.getValue();
 				Label label = sfLabels.get(siEvaluator);
-				// null cannot be handled by a label. However, its semantic is the same as the empty
-				// string
-				if (text == null) {
-					text = "";
-				}
+
 				if (label == null) {
 					label = new Label(this, SWT.NONE);
 					sfLabels.put(siEvaluator, label);

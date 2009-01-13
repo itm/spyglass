@@ -8,6 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.xmlconfig;
 
+import java.text.DecimalFormat;
+
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
 
@@ -30,19 +32,58 @@ import de.uniluebeck.itm.spyglass.util.StringFormatter;
  */
 public class StatisticalInformationEvaluator extends PropertyBean implements Comparable<StatisticalInformationEvaluator> {
 
+	/**
+	 * Object logging messages
+	 */
+	private static final Logger log = SpyglassLoggerFactory.getLogger(StatisticalInformationEvaluator.class);
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * The semantic type of packets which will be evaluated by this object
+	 */
 	@Element(name = "semanticType")
 	private int semanticType = -1;
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * A textual description of the information gained by this object
+	 */
 	@Element(name = "description", required = false)
 	private String description = "";
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * A {@link StringFormatter} expression used to extract the information which is needed for the
+	 * statistical evaluation from a provided packet
+	 */
 	@Element(name = "expression", required = false)
 	private String expression = "";
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * The statistical operation to be performed
+	 */
 	@Element(name = "operations")
 	private STATISTICAL_OPERATIONS operation = STATISTICAL_OPERATIONS.SUM;
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Object used to extract a value which is needed for the statistical evaluation from a provided
+	 * packet
+	 */
 	private StringFormatter stringFormatter;
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * The latest computed value based on the selected statistical operation
+	 */
+	private volatile String value;
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Object which actually performs the statistical computation of the value
+	 */
+	private StatisticalOperation operationExecutor;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -72,15 +113,16 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 		MEDIAN
 	}
 
-	private static final Logger log = SpyglassLoggerFactory.getLogger(StatisticalInformationEvaluator.class);
-
-	private StatisticalOperation operationExecutor;
-
+	// --------------------------------------------------------------------------------
 	/**
 	 * Protected constructor to be used by the XML framework
 	 */
 	protected StatisticalInformationEvaluator() {
-		// nothing to do here
+		description = "";
+		expression = "";
+		value = "";
+		operation = STATISTICAL_OPERATIONS.SUM;
+		operationExecutor = new StatisticalOperation(10, operation);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -91,11 +133,8 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	 *            the semantic type of packets which will be evaluated
 	 */
 	public StatisticalInformationEvaluator(final int semanticType) {
+		this();
 		this.semanticType = semanticType;
-		description = "";
-		expression = "";
-		operation = STATISTICAL_OPERATIONS.SUM;
-		operationExecutor = new StatisticalOperation(10, operation);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -230,7 +269,18 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	public void setOperation(final STATISTICAL_OPERATIONS operation) {
 		final STATISTICAL_OPERATIONS oldValue = this.operation;
 		this.operation = operation;
+		value = new DecimalFormat("0.0#").format(operationExecutor.getValue(operation));
 		firePropertyChange("operation", oldValue, operation);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the statistically computed value
+	 * 
+	 * @return the statistically computed value
+	 */
+	public String getValue() {
+		return value;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -258,6 +308,7 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 		return -1;
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public boolean equals(final Object other) {
 		if (other instanceof StatisticalInformationEvaluator) {
@@ -285,16 +336,26 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	 */
 	public String parse(final SpyglassPacket packet) throws SpyglassPacketException {
 		try {
-			final int value = Integer.valueOf(stringFormatter.parse(packet));
-			final int computetValue = (int) operationExecutor.addValue(value);
-			return description + " " + computetValue;
+			final int val = Integer.valueOf(stringFormatter.parse(packet));
+			value = new DecimalFormat("0.0#").format(operationExecutor.addValue(val));
+			return description + " " + value;
 		} catch (final Exception e) {
+			value = "NaN";
 			throw new SpyglassPacketException("A packet coult not be evaluated in StatisticalInformationEvaluator");
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public String toString() {
 		return "ST: " + semanticType + " " + description + " " + expression + " " + operation.toString();
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Resets the calculated statistical value
+	 */
+	public void reset() {
+		operationExecutor.reset();
 	}
 }

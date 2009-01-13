@@ -14,7 +14,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STAT
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class perform statistical operations on an array of buffered buffer.
+ * Instances of this class perform statistical operations on an array of buffered values.
  * 
  * @author Sebastian Ebers
  * 
@@ -39,6 +39,7 @@ public class StatisticalOperation {
 	public StatisticalOperation(final int bufferSize, final STATISTICAL_OPERATIONS defaultOperation) {
 		buffer = new float[bufferSize];
 		maxValidFieldValue = 0;
+		pointer = 0;
 		this.defaultOperation = defaultOperation;
 		this.bufferSize = bufferSize;
 	}
@@ -51,7 +52,7 @@ public class StatisticalOperation {
 	 *            the value to add
 	 * @return the result of the statistical operation which is applianced on the buffer.
 	 */
-	public float addValue(final float value) {
+	public synchronized float addValue(final float value) {
 		buffer[pointer++] = value;
 		pointer = pointer % bufferSize;
 		if (maxValidFieldValue < buffer.length) {
@@ -68,7 +69,7 @@ public class StatisticalOperation {
 	 *            the statistical operation to use
 	 * @return the value a statistical operation calculated using the buffered buffer
 	 */
-	public final float getValue(final STATISTICAL_OPERATIONS operation) {
+	public synchronized final float getValue(final STATISTICAL_OPERATIONS operation) {
 		switch (operation) {
 			case AVG:
 				return getAverageValue();
@@ -167,6 +168,16 @@ public class StatisticalOperation {
 			return sum / maxValidFieldValue;
 		}
 		return sum;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Resets the buffer
+	 */
+	public synchronized void reset() {
+		pointer = 0;
+		maxValidFieldValue = 0;
+		buffer[0] = 0;
 	}
 
 }
