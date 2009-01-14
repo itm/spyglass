@@ -8,8 +8,10 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -95,25 +97,36 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 			return;
 		}
 		
-		final Iterator<Integer> it = lastSeen.keySet().iterator();
-		while (it.hasNext()) {
-			final int id = it.next();
-			if (lastSeen.get(id) != null) {
-				final long time = lastSeen.get(id);
-				if (System.currentTimeMillis() - time > config.getTimeout()*1000) {
-					
-					final AbsolutePosition oldPos = positionMap.get(id);;
-					synchronized (mutex) {
+		final List<NodePositionEvent> list = new ArrayList<NodePositionEvent>();
+		
+		// we have to aquire the mutex to ensure that lastSeen isn't modified
+		synchronized (mutex) {
+			
+			final Iterator<Integer> it = lastSeen.keySet().iterator();
+			while (it.hasNext()) {
+				final int id = it.next();
+				if (lastSeen.get(id) != null) {
+					final long time = lastSeen.get(id);
+					if (System.currentTimeMillis() - time > config.getTimeout()*1000) {
+						
+						final AbsolutePosition oldPos = positionMap.get(id);;
+
 						positionMap.remove(id);
 						it.remove();
-					}
-					log.debug("Removed node "+ id + " after timeout.");
-					pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.REMOVED, oldPos, null));
 
+						log.debug("Removed node "+ id + " after timeout.");
+						list.add(new NodePositionEvent(id, NodePositionEvent.Change.REMOVED, oldPos, null));
+						
+					}
 				}
 			}
+			
 		}
 		
+		// fire the events after we release the lock
+		for (final NodePositionEvent nodePositionEvent : list) {
+			pluginManager.fireNodePositionEvent(nodePositionEvent);
+		}
 
 	}
 		
