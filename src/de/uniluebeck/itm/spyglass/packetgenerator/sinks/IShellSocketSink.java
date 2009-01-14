@@ -102,6 +102,10 @@ public class IShellSocketSink extends Sink {
 	 */
 	private class SocketListener extends Thread {
 		
+		public SocketListener() {
+			this.setName("PacketGenerator.IShellSocketSink");
+		}
+		
 		@Override
 		public void run() {
 			log.info("Server listening at port " + port);

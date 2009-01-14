@@ -28,6 +28,7 @@ import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginFactory;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
@@ -51,14 +52,14 @@ public class ConfigStore extends PropertyBean {
 	 * @author Dariush Forouher
 	 *
 	 */
-	private final class AsyncStoreThread extends Thread {
+	private final class AsyncStoreRunnable implements Runnable {
 
 		@Override
 		public void run() {
 
 			log.debug("Async-Store thread started.");
 
-			while (!isInterrupted())
+			while (!Thread.currentThread().isInterrupted())
 			{
 				try {
 					
@@ -72,13 +73,13 @@ public class ConfigStore extends PropertyBean {
 
 					// sleep for one second to wait for other calls which have not to be
 					// processed for that reason
-					sleep(1000);
+					Thread.sleep(1000);
 	
 				} catch (final InterruptedException e) {
-					this.interrupt();
+					Thread.currentThread().interrupt();
 					
 				} finally {
-					if (!this.isInterrupted()) {
+					if (!Thread.currentThread().isInterrupted()) {
 						
 						// allow new store requests to be made
 						storePending = false;
@@ -102,7 +103,7 @@ public class ConfigStore extends PropertyBean {
 	private final Object storePendingMutex = new Object();
 
 	/** Thread for async stores */
-	private final Thread storeThread = new AsyncStoreThread();
+	private final Thread storeThread = new Thread(new AsyncStoreRunnable(),"ConfigStore-Thread");
 	
 	// --------------------------------------------------------------------------
 	/**
@@ -231,7 +232,8 @@ public class ConfigStore extends PropertyBean {
 		SpyglassConfiguration newConfig;
 		newConfig = new SpyglassConfiguration();
 		final Collection<Plugin> defaultPlugins = new HashSet<Plugin>();
-		for (final Class<? extends Plugin> p : newConfig.getPluginManager().getAvailablePluginTypes()) {
+		newConfig.getPluginManager();
+		for (final Class<? extends Plugin> p : PluginManager.getAvailablePluginTypes()) {
 			defaultPlugins.add(PluginFactory.createDefaultInstance(p));
 		}
 		newConfig.setDefaultPlugins(defaultPlugins);
@@ -328,8 +330,9 @@ public class ConfigStore extends PropertyBean {
 		final Serializer serializer = new Persister();
 		final SpyglassConfiguration config = serializer.read(SpyglassConfiguration.class, configFile);
 
+		config.getPluginManager();
 		// if there is a default config missing, add it
-		for (final Class<? extends Plugin> clazz : config.getPluginManager().getAvailablePluginTypes()) {
+		for (final Class<? extends Plugin> clazz : PluginManager.getAvailablePluginTypes()) {
 			if (config.getDefaultConfig(clazz) == null) {
 				final ArrayList<Plugin> set = new ArrayList<Plugin>(config.getDefaultPlugins());
 				set.add(PluginFactory.createDefaultInstance(clazz));

@@ -55,6 +55,10 @@ public class PacketGeneratorIShellPlugin extends Plugin {
 	 */
 	private class GeneratorThread extends Thread {
 		
+		public GeneratorThread() {
+			this.setName("PacketGeneratorThread");
+		}
+		
 		@Override
 		public void run() {
 			

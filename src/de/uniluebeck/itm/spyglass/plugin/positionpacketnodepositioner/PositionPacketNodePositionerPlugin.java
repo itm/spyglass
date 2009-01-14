@@ -46,7 +46,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	/**
 	 * Time for scheduling packet removals
 	 */
-	private Timer timer = new Timer();
+	private final Timer timer = new Timer("PositionPacketNodePositioner NodeTimeout-Timer");
 
 	/**
 	 * Hashmap containing the position information.
@@ -61,7 +61,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	/**
 	 * Mutex to protect lastSeen and positionMap
 	 */
-	private Object mutex = new Object();
+	private final Object mutex = new Object();
 	
 	/**
 	 * Constructor
