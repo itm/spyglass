@@ -8,15 +8,15 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
  * @author Dariush Forouher
  */
 public class SpyglassPacket {
-	
+
 	/**
 	 * 
 	 */
 	public static final int EXPECTED_PACKET_SIZE = 19;
-	
+
 	/** The packets raw data */
 	private byte[] rawData;
-	
+
 	/**
 	 * Deserializes a Spyglass Packet.
 	 * 
@@ -26,7 +26,7 @@ public class SpyglassPacket {
 	void deserialize() throws SpyglassPacketException {
 		deserialize(rawData);
 	}
-	
+
 	/**
 	 * Deserializes a Spyglass Packet
 	 * 
@@ -37,13 +37,13 @@ public class SpyglassPacket {
 	 */
 	void deserialize(final byte[] buf) throws SpyglassPacketException {
 		rawData = buf;
-		
+
 		if (deserializeUint16(rawData[0], rawData[1]) + 2 != rawData.length) {
 			throw new SpyglassPacketException("Wrong SpyglassPacket-Size");
 		}
-		
+
 	}
-	
+
 	/**
 	 * Deserializes a serialized uint8.
 	 * 
@@ -56,7 +56,7 @@ public class SpyglassPacket {
 		// Masked because a byte is signed in Java.
 		return b & 0xff;
 	}
-	
+
 	/**
 	 * Deserializes a serialized uint16.
 	 * 
@@ -70,7 +70,7 @@ public class SpyglassPacket {
 	protected int deserializeUint16(final byte b0, final byte b1) {
 		return (((b1 & 0xFF) & 0xFFFF) | (((b0 & 0xFF) << 8) & 0xFFFF));
 	}
-	
+
 	/**
 	 * Deserializes a serialized int16.
 	 * 
@@ -87,7 +87,7 @@ public class SpyglassPacket {
 		final int i1 = (b1 & 0xFF);
 		return (i1 | (i0 << 8));
 	}
-	
+
 	/**
 	 * Deserializes a serialized uint32.
 	 * 
@@ -113,14 +113,14 @@ public class SpyglassPacket {
 		final long ret = (i3 | (i2 << 8) | (i1 << 16) | (i0 << 24));
 		return ret;
 	}
-	
+
 	/**
 	 * Deserializes a serialized Int64.
 	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 */
-	protected long deserializeInt64(final byte b0, final byte b1, final byte b2, final byte b3,
-			final byte b4, final byte b5, final byte b6, final byte b7) {
+	protected long deserializeInt64(final byte b0, final byte b1, final byte b2, final byte b3, final byte b4, final byte b5, final byte b6,
+			final byte b7) {
 		final long i0 = b0;
 		final long i1 = (b1 & 0xFF);
 		final long i2 = (b2 & 0xFF);
@@ -130,11 +130,10 @@ public class SpyglassPacket {
 		final long i6 = (b6 & 0xFF);
 		final long i7 = (b7 & 0xFF);
 		// Masked because a byte is signed in Java.
-		final long ret = (i7 | (i6 << 8) | (i5 << 16) | (i4 << 24) | (i3 << 32) | (i2 << 40)
-				| (i1 << 48) | (i0 << 56));
+		final long ret = (i7 | (i6 << 8) | (i5 << 16) | (i4 << 24) | (i3 << 32) | (i2 << 40) | (i1 << 48) | (i0 << 56));
 		return ret;
 	}
-	
+
 	/**
 	 * Deserializes a serialized Float.
 	 * 
@@ -147,20 +146,19 @@ public class SpyglassPacket {
 		final int i3 = (b3 & 0xFF);
 		final int ret = (i3 | (i2 << 8) | (i1 << 16) | (i0 << 24));
 		return Float.intBitsToFloat(ret);
-		
+
 	}
-	
+
 	/**
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @see de.uniluebeck.itm.spyglass.packet.Packet#toString()
 	 */
 	@Override
 	public String toString() {
-		return "length:" + getLength() + ", syntax_type:" + getSyntaxType() + ", semantic_type:"
-				+ getSemanticType() + ", sender_id:" + getSenderId() + ",time: "
-				+ getTime().toString() + ", Position:" + getPosition();
+		return "length:" + getLength() + ", syntax_type:" + getSyntaxType() + ", semantic_type:" + getSemanticType() + ", sender_id:" + getSenderId()
+				+ ",time: " + getTime().toString() + ", Position:" + getPosition();
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param rawData
@@ -175,7 +173,7 @@ public class SpyglassPacket {
 			throw new SpyglassPacketException("Resetting the packets contents is not allowed");
 		}
 	}
-	
+
 	/**
 	 * Property getter
 	 * 
@@ -185,7 +183,7 @@ public class SpyglassPacket {
 	public int getLength() {
 		return deserializeUint16(rawData[0], rawData[1]);
 	}
-	
+
 	/**
 	 * Property getter
 	 * 
@@ -195,7 +193,7 @@ public class SpyglassPacket {
 	public SyntaxTypes getSyntaxType() {
 		return SyntaxTypes.toEnum(deserializeUint8(rawData[3]));
 	}
-	
+
 	/**
 	 * Property getter
 	 * 
@@ -205,7 +203,7 @@ public class SpyglassPacket {
 	public int getSemanticType() {
 		return deserializeUint8(rawData[4]);
 	}
-	
+
 	/**
 	 * Property getter
 	 * 
@@ -215,7 +213,7 @@ public class SpyglassPacket {
 	public int getSenderId() {
 		return deserializeUint16(rawData[5], rawData[6]);
 	}
-	
+
 	/**
 	 * Property getter
 	 * 
@@ -228,7 +226,7 @@ public class SpyglassPacket {
 		time.ms_ = deserializeUint16(rawData[11], rawData[12]);
 		return time;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Property getter
@@ -238,7 +236,7 @@ public class SpyglassPacket {
 	public int getVersion() {
 		return deserializeUint8(rawData[2]);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the position
@@ -249,7 +247,7 @@ public class SpyglassPacket {
 		final int z = deserializeInt16(rawData[17], rawData[18]);
 		return new AbsolutePosition(x, y, z);
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -264,7 +262,7 @@ public class SpyglassPacket {
 		}
 		return null;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the header
@@ -277,7 +275,14 @@ public class SpyglassPacket {
 		}
 		return null;
 	}
-	
+
+	/**
+	 * @return the whole packet data (header + payload) as a byte array
+	 */
+	public byte[] getPacketData() {
+		return this.rawData;
+	}
+
 	/**
 	 * Returns the serialized the packet
 	 * 
@@ -290,5 +295,5 @@ public class SpyglassPacket {
 		// return buffer;
 		return rawData;
 	}
-	
+
 }

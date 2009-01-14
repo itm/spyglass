@@ -32,13 +32,13 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
  * 
  */
 public class StringFormatter {
-	
+
 	private static final Pattern notNumeric = Pattern.compile("[^0-9]");
-	
+
 	private final String origFormatExpression;
 	private final String formatExpression;
 	private String resultString = "";
-	
+
 	/**
 	 * The parameter of the constructor must be a String containing an expression. If the expression
 	 * is invalid, an IllegalArgumentException will be thrown. An expression is unvalid, if it
@@ -57,26 +57,25 @@ public class StringFormatter {
 	 *             if the expression is invalid
 	 */
 	public StringFormatter(String pFormatExpression) throws IllegalArgumentException {
-		
+
 		origFormatExpression = pFormatExpression + "";
-		
+
 		// temporarily replace "%%" with "percent_twice" to avoid trouble
 		final String tmp = "percent_twice";
 		pFormatExpression = pFormatExpression.replaceAll("%%", tmp);
-		
+
 		// test if the given expression is valid and throw an exception
 		// otherwise
-		
-		if (pFormatExpression.matches(".*%[^uUif%].*")
-				|| pFormatExpression.matches(".*%[uUif][^0-9].*")
-				|| pFormatExpression.matches(".*%") || pFormatExpression.matches(".*%[uUif]")) {
+
+		if (pFormatExpression.matches(".*%[^uUif%].*") || pFormatExpression.matches(".*%[uUif][^0-9].*") || pFormatExpression.matches(".*%")
+				|| pFormatExpression.matches(".*%[uUif]")) {
 			final String msg = "StringFormatterExpression '" + pFormatExpression + "' is invalid";
 			throw new IllegalArgumentException(msg);
 		}
-		
+
 		this.formatExpression = convertLineBreaks(pFormatExpression);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * This method parses the given Packet and returns a String corresponding to the expression
@@ -92,7 +91,8 @@ public class StringFormatter {
 	 */
 	public String parse(final SpyglassPacket packet) throws IllegalArgumentException {
 		String result = "";
-		final byte[] content = packet.getPayload();
+		// final byte[] content = packet.getPayload();
+		final byte[] content = packet.getPacketData();
 		String tmpExp = this.formatExpression;
 		// first part of result is given by expression as substring until the
 		// first occurence of "%"
@@ -101,26 +101,26 @@ public class StringFormatter {
 		while (index != -1) {
 			// write substring until first occurence of "%" to the result string
 			result += tmpExp.substring(0, index);
-			
+
 			// shorten the remaining expression until first occurence of "%"
 			tmpExp = tmpExp.substring(index);
-			
+
 			// identify the offset of the value in the data packet
 			indexNotNum = indexOfNonNumeric(tmpExp.substring(2)) + 2;
-			
+
 			int offset;
 			if (indexNotNum == 1) {
 				offset = Integer.parseInt(tmpExp.substring(2));
 			} else {
 				offset = Integer.parseInt(tmpExp.substring(2, indexNotNum));
 			}
-			
+
 			// identify the type of data in the packet and add the data to the
 			// result string
 			byte[] b;
 			ByteBuffer bb;
 			switch (tmpExp.charAt(1)) {
-				
+
 				// uint8 (1 byte):
 				case 'u':
 					b = new byte[2];
@@ -136,7 +136,7 @@ public class StringFormatter {
 						result += "<packet without payload>";
 					}
 					break;
-				
+
 				// uint32 (4 bytes):
 				case 'U':
 					b = new byte[8];
@@ -157,7 +157,7 @@ public class StringFormatter {
 						result += "<packet without payload>";
 					}
 					break;
-				
+
 				// int16 (2 bytes in two�s complement):
 				case 'i':
 					b = new byte[2];
@@ -173,7 +173,7 @@ public class StringFormatter {
 						result += "<packet without payload>";
 					}
 					break;
-				
+
 				// float (4 bytes as IEEE 754 single precision floating point
 				// value ):
 				case 'f':
@@ -192,26 +192,26 @@ public class StringFormatter {
 					}
 					break;
 			}
-			
+
 			// shorten the remainig expression until the end of the offset
 			// definition
 			tmpExp = tmpExp.substring(indexNotNum);
-			
+
 			// find out the index of the next "%" in the remainig expression
 			index = tmpExp.indexOf("%");
 		}
-		
+
 		// add the text behind the last "%" of the given expression to the
 		// result
 		if (indexNotNum != 1) {
 			result += tmpExp;
 		}
-		
+
 		result = result.replaceAll("percent_twice", "%");
 		resultString = result;
 		return resultString;
 	}
-	
+
 	private static int indexOfNonNumeric(final String lookIn) {
 		final Matcher m = notNumeric.matcher(lookIn);
 		if (m.find()) {
@@ -220,7 +220,7 @@ public class StringFormatter {
 			return -1;
 		}
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the original expression, from which this formatter was build from.
@@ -230,7 +230,7 @@ public class StringFormatter {
 	public String getOrigExpression() {
 		return origFormatExpression;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Converts the line breaks the user intended to create in the created to "real" ones which are
@@ -246,12 +246,12 @@ public class StringFormatter {
 		str = str.replace("\\r", "<br>");
 		return str.replace("<br>", "\r\n");
 	}
-	
+
 	@Override
 	public String toString() {
 		return resultString;
 	}
-	
+
 	/**
 	 * Main method for testing
 	 * 
@@ -265,7 +265,7 @@ public class StringFormatter {
 				"Wert 1 (uint8): %u0, Wert 2 (uint32): %U4, Wert 3 (int16): %i8, Wert 4 (float): %f10 und noch Text");
 		// final StringFormatter test = new StringFormatter("");
 		final SpyglassPacket packet = new SpyglassPacket();
-		
+
 		final byte[] content = { -128, 0, 0, 0, -1, -1, -1, -1, -128, 0, 65, -109, 51, 51 };
 		// final byte[] content = { -128, 0, 0, 0, -1, -1, -1, -1, -128, 0, 65 };
 		// final byte[] content = { 0, -2, -1, -1, -1, -1, 49, 0, 0, 10 };
@@ -277,5 +277,5 @@ public class StringFormatter {
 			System.out.println(result);
 		}
 	}
-	
+
 }
