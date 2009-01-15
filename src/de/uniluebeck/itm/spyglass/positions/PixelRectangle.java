@@ -20,8 +20,7 @@ public class PixelRectangle extends AbstractRectangle {
 	}
 	
 	public PixelRectangle(final Rectangle other) {
-		super();
-		this.rectangle = other;
+		super(other);
 	}
 	
 	public PixelRectangle(final int x, final int y, final int width, final int height) {
@@ -36,6 +35,7 @@ public class PixelRectangle extends AbstractRectangle {
 	/**
 	 * @return the upper left point
 	 */
+	@Override
 	@Element(name = "upperLeft")
 	public PixelPosition getUpperLeft() {
 		return new PixelPosition(rectangle.x, rectangle.y);

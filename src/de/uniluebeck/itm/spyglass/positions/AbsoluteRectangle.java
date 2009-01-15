@@ -1,5 +1,6 @@
 package de.uniluebeck.itm.spyglass.positions;
 
+import org.eclipse.swt.graphics.Rectangle;
 import org.simpleframework.xml.Element;
 
 /**
@@ -18,6 +19,10 @@ public class AbsoluteRectangle extends AbstractRectangle {
 		super(other);
 	}
 	
+	public AbsoluteRectangle(final Rectangle other) {
+		super(other);
+	}
+	
 	public AbsoluteRectangle(final int x, final int y, final int width, final int height) {
 		super(x, y, width, height);
 	}
@@ -30,6 +35,7 @@ public class AbsoluteRectangle extends AbstractRectangle {
 	/**
 	 * @return the upper left point
 	 */
+	@Override
 	@Element(name = "upperLeft")
 	public AbsolutePosition getUpperLeft() {
 		return new AbsolutePosition(rectangle.x, rectangle.y, 0);

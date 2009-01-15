@@ -1027,4 +1027,12 @@ public class DrawingArea extends Canvas {
 		this.canvasOutOfMapColor.dispose();
 	}
 	
+
+	/**
+	 * Returns a copy of the transformation matrix used to transform coordinates from the 
+	 * absolute reference frame to the pixel reference frame.
+	 */
+	public AffineTransform getTransform() {
+		return new AffineTransform(at);
+	}
 }

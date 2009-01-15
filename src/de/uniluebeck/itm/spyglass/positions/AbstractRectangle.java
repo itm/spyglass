@@ -1,5 +1,8 @@
 package de.uniluebeck.itm.spyglass.positions;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.simpleframework.xml.Attribute;
@@ -66,6 +69,11 @@ public abstract class AbstractRectangle {
 		this.rectangle = new Rectangle(other.rectangle.x, other.rectangle.y, other.rectangle.width, other.rectangle.height);
 	}
 
+	public AbstractRectangle(final Rectangle other) {
+		this.rectangle = new Rectangle(other.x, other.y, other.width, other.height);
+	}
+
+
 	public boolean contains(final int x, final int y) {
 		return this.rectangle.contains(x, y);
 	}
@@ -107,5 +115,34 @@ public abstract class AbstractRectangle {
 	public String toString() {
 		return this.rectangle.toString();
 	}
+	
+	public abstract AbstractPosition getUpperLeft();
+	
+	/**
+	 * Performs the given Transformation on this Rectangle.
+	 * 
+	 * @param a transform
+	 */
+	public void transform(final AffineTransform at) {
+
+		final Rectangle newRect = new Rectangle(0,0,0,0);
+		
+		final Point2D upLeft = at.transform(this.getUpperLeft().toPoint2D(), null);
+		newRect.x = (int) Math.floor(upLeft.getX());
+		newRect.y = (int) Math.floor(upLeft.getY());
+		
+		final Point2D lowerRightAbs = new Point2D.Double(this.getUpperLeft().x + this.getWidth(), this.getUpperLeft().y + this.getHeight());
+		final Point2D lRight = at.transform(lowerRightAbs, null);
+
+		final int lowerRightX = (int) Math.floor(lRight.getX() + 1);
+		final int lowerRightY = (int) Math.floor(lRight.getY() + 1);
+		
+		newRect.width = Math.abs(lowerRightX - newRect.x);
+		newRect.height = Math.abs(newRect.y - lowerRightY);
+		
+		this.rectangle = newRect;
+
+	}
+
 
 }

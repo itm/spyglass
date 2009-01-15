@@ -1,8 +1,10 @@
 package de.uniluebeck.itm.spyglass.drawing.primitive;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Rectangle;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
@@ -13,7 +15,7 @@ public class Image extends DrawingObject {
 	
 	private final static Logger log = Logger.getLogger(Image.class);
 	
-	private org.eclipse.swt.graphics.Image image;
+	private final org.eclipse.swt.graphics.Image image;
 	
 	private int imageSizeX;
 	
@@ -52,17 +54,63 @@ public class Image extends DrawingObject {
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 		
-		final PixelRectangle rect = drawingArea.absRect2PixelRect(getBoundingBox());
-		final Rectangle bounds = image.getBounds();
+		// Transform from Image coordinate system to absolute coordinate system
+		final AffineTransform transform = AffineTransform.getScaleInstance(imageSizeX/((double)image.getBounds().width), imageSizeY/((double)image.getBounds().height));
+		transform.preConcatenate(AffineTransform.getTranslateInstance(this.getPosition().x, this.getPosition().y));
 		
+		// multiply transform from drawing area. now "transform" transforms from image coordinates to pixel coordinates
+		transform.preConcatenate(drawingArea.getTransform());
+
+		// the inverse matrix. it transforms from pixel coordinates to image coordinates
+		AffineTransform invTransform;
 		try {
-			
-			gc.drawImage(image, 0, 0, bounds.width, bounds.height, rect.getUpperLeft().x, rect
-					.getUpperLeft().y, rect.getWidth(), rect.getHeight());
-			
-		} catch (final Exception e) {
-			log.error("Error while painting Image: " + e, e);
+			invTransform = transform.createInverse();
+		} catch (final NoninvertibleTransformException e) {
+			throw new RuntimeException("BUG", e);
 		}
+		
+		final PixelRectangle clippingArea = new PixelRectangle(gc.getClipping());
+
+		// the pixel area that actually has to be redrawn...
+		PixelRectangle imageSrcArea = drawingArea.absRect2PixelRect(getBoundingBox()).intersection(clippingArea);
+		// ... transformed into the corresponding area in the image
+		imageSrcArea.transform(invTransform);
+
+		// this is a hack to avoid strange graphical errors. enlarge the image size if possible
+		final int safetyMargin = 2;
+		imageSrcArea.rectangle.x -= safetyMargin;
+		imageSrcArea.rectangle.y -= safetyMargin;
+		imageSrcArea.rectangle.width += 2 * safetyMargin;
+		imageSrcArea.rectangle.height += 2 * safetyMargin;
+		
+		// but make sure that we don't overstep the limits of the original image
+		imageSrcArea =  imageSrcArea.intersection(new PixelRectangle(image.getBounds()));
+
+		// the destination area on the drawing area - calculated *from* the imageSrcArea to avoid numerical problems
+		final PixelRectangle imageDestArea = new PixelRectangle(imageSrcArea);
+		imageDestArea.transform(transform);
+		
+		gc.drawImage(image,
+				imageSrcArea.getUpperLeft().x,
+				imageSrcArea.getUpperLeft().y,
+				imageSrcArea.getWidth(),
+				imageSrcArea.getHeight(),
+				imageDestArea.getUpperLeft().x,
+				imageDestArea.getUpperLeft().y,
+				imageDestArea.getWidth(),
+				imageDestArea.getHeight());
+
+		// Old drawing code. Has performance problems
+//		gc.drawImage(image,
+//				0,
+//				0,
+//				image.getBounds().width,
+//				image.getBounds().height,
+//				drawingArea.absRect2PixelRect(getBoundingBox()).getUpperLeft().x,
+//				drawingArea.absRect2PixelRect(getBoundingBox()).getUpperLeft().y,
+//				drawingArea.absRect2PixelRect(getBoundingBox()).getWidth(),
+//				drawingArea.absRect2PixelRect(getBoundingBox()).getHeight());
+
 		
 	}
 	
@@ -78,5 +126,4 @@ public class Image extends DrawingObject {
 	protected AbsoluteRectangle calculateBoundingBox() {
 		return new AbsoluteRectangle(this.getPosition(), imageSizeX, imageSizeY);
 	}
-	
 }
