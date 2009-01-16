@@ -71,8 +71,12 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	private final String recordDirectory = new File("./record/").getAbsoluteFile().toString();
 
 	// ----------------------------------------------------------------
-	/** The time stamp of the last packed read from the readFromFile file */
+	/** The time stamp of the last packed delivery when reading from a file */
 	private long lastPlaybackPacketTimestamp = -1;
+
+	// ----------------------------------------------------------------
+	/** The time stamp of the last packed read from a file */
+	private long lastPlaybackPacketDeliveryTimestamp = -1;
 
 	// ----------------------------------------------------------------
 	/**
@@ -92,6 +96,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	public PacketRecorder() {
 		recordingQueue = new ConcurrentLinkedQueue<SpyglassPacket>();
 		readFromFile = false;
+		delayMillies = 0;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -447,6 +452,9 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	 */
 	private SpyglassPacket getNextPlaybackPacket() throws SpyglassPacketException, InterruptedException {
 
+		SpyglassPacket packet = null;
+
+		// TODO: Is it necessary to hold the lock that long?
 		// get a mutual exclusion lock which will prevent the input stream to be accessed externally
 		synchronized (inputStreamMutex) {
 
@@ -463,20 +471,53 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 				return null;
 			}
 
-			final SpyglassPacket packet = getNextPacketFromInputStream(playbackFileReader);
+			packet = getNextPacketFromInputStream(playbackFileReader);
+		}
 
-			// Hold back the packet at least for delayMillis
-			final long now = System.currentTimeMillis();
-			final long diff = now - lastPlaybackPacketTimestamp;
-			if (diff < delayMillies) {
-				Thread.sleep(delayMillies - diff);
-			}
-			lastPlaybackPacketTimestamp = System.currentTimeMillis();
+		// Hold back the packet at least for delayMillis
+		final long now = System.currentTimeMillis();
+		final long sleep1 = delayMillies - (now - lastPlaybackPacketDeliveryTimestamp);
+		if (sleep1 > 0) {
+			Thread.sleep(sleep1);
+		}
+		if (packet != null) {
+			final long currentPacketTimestamp = packet.getTime().getMillis();
+			final long alreadyWaited = System.currentTimeMillis() - lastPlaybackPacketDeliveryTimestamp;
+			elapsPacketTimestampDifference(currentPacketTimestamp, alreadyWaited);
 
 			// this is done to enable the user to cut the packet stream read from a file
 			handlePacket(packet);
+			lastPlaybackPacketDeliveryTimestamp = System.currentTimeMillis();
+		}
 
-			return packet;
+		return packet;
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sleeps until the time difference between the last packet which was delivered and the current
+	 * one's is elapsed. The time difference is computed by comparing the two packet's time stamps.<br>
+	 * If the time stamp is smaller than the one of the last packet, it will not be stored.
+	 * Technically, the 'last' packet may not be the last packet but the one which had the biggest
+	 * time stamp from the ones which were already delivered!
+	 * 
+	 * @param currentPacketTimestamp
+	 *            the currently processed packet's time stamp
+	 * @param alreadyWaited
+	 *            the time which already elapsed
+	 * @throws InterruptedException
+	 */
+	private void elapsPacketTimestampDifference(final long currentPacketTimestamp, final long alreadyWaited) throws InterruptedException {
+		if (lastPlaybackPacketTimestamp != -1) {
+			final long packetDiff = currentPacketTimestamp - lastPlaybackPacketTimestamp;
+			// may be the packets where received in the wrong order...
+			if (packetDiff > 0) {
+				if (packetDiff - alreadyWaited > 0) {
+					Thread.sleep(packetDiff - alreadyWaited);
+				}
+				lastPlaybackPacketTimestamp = currentPacketTimestamp;
+			}
 		}
 	}
 
@@ -684,6 +725,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	@Override
 	public void reset() throws IOException {
 		log.info("Reset requested");
+		delayMillies = 0;
 		super.reset();
 		synchronized (inputStreamMutex) {
 
@@ -702,6 +744,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 
 			// setPlayback(false);
 			recordFileString = null;
+			lastPlaybackPacketDeliveryTimestamp = -1;
 			lastPlaybackPacketTimestamp = -1;
 			lastSelectedRecordFilePath = null;
 			getPacketQueue().clear();

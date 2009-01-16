@@ -40,7 +40,6 @@ public abstract class PacketReader extends PropertyBean {
 	protected int delayMillies = 1000;
 
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * Returns a new packet, once it arrives. It will never return null, but block until it has
 	 * something to return.

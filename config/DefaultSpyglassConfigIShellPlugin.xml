@@ -1,6 +1,9 @@
 <spyglassConfiguration>
    <packetReader class="de.uniluebeck.itm.spyglass.core.PacketRecorder">
-      <delayMillies>1000</delayMillies>
+      <gateway class="de.uniluebeck.itm.spyglass.gateway.FileReaderGateway">
+         <file>/home/sebers/DATEN_D/usbstick/Daten/Batten/Uni/Master/FleGSenS/Workspace/SpyglassPure/record/largeTestcase.rec</file>
+      </gateway>
+      <delayMillies>0</delayMillies>
    </packetReader>
    <instances>
       <plugins class="java.util.ArrayList">
@@ -65,20 +68,7 @@
                </semanticTypes4Neighborhoods>
                <showNodeDegree>true</showNodeDegree>
                <showNumNodes>true</showNumNodes>
-               <statisticalInformationEvaluators class="java.util.TreeSet">
-                  <statisticalInformationEvaluator>
-                     <semanticType>1</semanticType>
-                     <description>Test2</description>
-                     <expression>%3</expression>
-                     <operations>MAX</operations>
-                  </statisticalInformationEvaluator>
-                  <statisticalInformationEvaluator>
-                     <semanticType>2</semanticType>
-                     <description>df</description>
-                     <expression>%U5</expression>
-                     <operations>MIN</operations>
-                  </statisticalInformationEvaluator>
-               </statisticalInformationEvaluators>
+               <statisticalInformationEvaluators class="java.util.TreeSet"/>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin">
@@ -91,6 +81,7 @@
                   <int>11</int>
                </semanticTypes>
                <stringFormatters/>
+               <defaultStringFormatter></defaultStringFormatter>
                <lineColorRGB length="3">
                   <int>0</int>
                   <int>0</int>
@@ -363,6 +354,7 @@
                <int>-1</int>
             </semanticTypes>
             <stringFormatters/>
+            <defaultStringFormatter></defaultStringFormatter>
             <lineColorRGB length="3">
                <int>0</int>
                <int>0</int>
@@ -398,6 +390,23 @@
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
+            <defaultConfig>
+               <backgroundAlpha>30</backgroundAlpha>
+               <backgroundRGB length="3">
+                  <int>0</int>
+                  <int>255</int>
+                  <int>0</int>
+               </backgroundRGB>
+               <colorRGB length="3">
+                  <int>0</int>
+                  <int>0</int>
+                  <int>0</int>
+               </colorRGB>
+               <range class="de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig$CircleRange">
+                  <circleRadius>100</circleRadius>
+               </range>
+               <rangeType>Circle</rangeType>
+            </defaultConfig>
             <nodeRanges/>
          </parameters>
       </plugin>
