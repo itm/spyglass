@@ -262,11 +262,13 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	}
 
 	private void newDP(final Double defaultValue, final AbsolutePosition pos) {
-		final DataPoint p = new DataPoint();
-		p.isFramepoint = true;
-		p.value = defaultValue;
-		p.position = pos;
-		this.dataStore.add(p);
+		synchronized (dataStore) {
+			final DataPoint p = new DataPoint();
+			p.isFramepoint = true;
+			p.value = defaultValue;
+			p.position = pos;
+			this.dataStore.add(p);
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -285,24 +287,28 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				break;
 			case REMOVED: {
 				// remove the node from the datastore
-				final Iterator<DataPoint> it = dataStore.iterator();
-				while (it.hasNext()) {
-					final DataPoint p = it.next();
-					if (!p.isFramepoint && (p.nodeID == e.node)) {
-						it.remove();
+				synchronized (dataStore) {
+					final Iterator<DataPoint> it = dataStore.iterator();
+					while (it.hasNext()) {
+						final DataPoint p = it.next();
+						if (!p.isFramepoint && (p.nodeID == e.node)) {
+							it.remove();
+						}
 					}
 				}
 				break;
 			}
 			case MOVED: {
-				final Iterator<DataPoint> it = dataStore.iterator();
-				while (it.hasNext()) {
-					final DataPoint p = it.next();
-					if (!p.isFramepoint && (p.nodeID == e.node)) {
-						p.position = e.newPosition;
+				synchronized (dataStore) {
+					final Iterator<DataPoint> it = dataStore.iterator();
+					while (it.hasNext()) {
+						final DataPoint p = it.next();
+						if (!p.isFramepoint && (p.nodeID == e.node)) {
+							p.position = e.newPosition;
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
 
