@@ -243,7 +243,7 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return the maxColorRGB
 	 */
-	public int[] getMaxColorRGB() {
+	public synchronized int[] getMaxColorRGB() {
 		return maxColorRGB.clone();
 	}
 
@@ -252,7 +252,7 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 * @param maxColorRGB
 	 *            the maxColorRGB to set
 	 */
-	public void setMaxColorRGB(final int[] maxColorRGB) {
+	public synchronized void setMaxColorRGB(final int[] maxColorRGB) {
 
 		firePropertyChange(PROPERTYNAME_MAX_COLOR_R_G_B, this.maxColorRGB, this.maxColorRGB = maxColorRGB.clone());
 	}
@@ -279,7 +279,7 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return the minColorRGB
 	 */
-	public int[] getMinColorRGB() {
+	public synchronized int[] getMinColorRGB() {
 		return minColorRGB.clone();
 	}
 
@@ -288,7 +288,7 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 * @param minColorRGB
 	 *            the minColorRGB to set
 	 */
-	public void setMinColorRGB(final int[] minColorRGB) {
+	public synchronized void setMinColorRGB(final int[] minColorRGB) {
 
 		firePropertyChange(PROPERTYNAME_MIN_COLOR_R_G_B, this.minColorRGB, this.minColorRGB = minColorRGB.clone());
 	}

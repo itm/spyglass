@@ -154,16 +154,16 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 		firePropertyChange(PROPERTYNAME_KEEP_PROPORTIONS, oldValue, keepProportions);
 	}
 
-	public  int[] getLineColor() {
+	public synchronized int[] getLineColor() {
 		return lineColor.clone();
 	}
 
-	public  RGB getLineColorRGB() {
+	public synchronized RGB getLineColorRGB() {
 		final int[] copy = lineColor; // since lineColor may be replaced in the meantime
 		return new RGB(copy[0], copy[1], copy[2]);
 	}
 
-	public  void setLineColor(final int[] color) {
+	public synchronized void setLineColor(final int[] color) {
 		final int[] oldValue = this.lineColor;
 		this.lineColor = color.clone();
 		firePropertyChange(PROPERTYNAME_LINE_COLOR, oldValue, lineColor);
