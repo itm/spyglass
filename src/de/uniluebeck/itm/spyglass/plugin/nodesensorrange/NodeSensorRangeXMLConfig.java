@@ -41,6 +41,10 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			this.circleRadius = radius;
 		}
 
+		public CircleRange(final CircleRange other) {
+			this(other.circleRadius);
+		}
+
 		public int getCircleRadius() {
 			return circleRadius;
 		}
@@ -49,6 +53,11 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			final int old = this.circleRadius;
 			this.circleRadius = radius;
 			firePropertyChange(PROPERTYNAME_CIRCLE_RADIUS, old, this);
+		}
+
+		@Override
+		protected NodeSensorRange clone() {
+			return new CircleRange(this);
 		}
 
 	}
@@ -72,6 +81,10 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			this.coneOrientation = orientation;
 			this.coneRadius = radius;
 			this.coneViewAngle = viewAngle;
+		}
+
+		public ConeRange(final ConeRange other) {
+			this(other.coneOrientation, other.coneRadius, other.coneViewAngle);
 		}
 
 		public int getConeOrientation() {
@@ -104,9 +117,17 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			firePropertyChange(PROPERTYNAME_CONE_VIEWANGLE, old, this);
 		}
 
+		@Override
+		protected NodeSensorRange clone() {
+			return new ConeRange(this);
+		}
+
 	}
 
 	public static class Config extends PropertyBean {
+
+		@Element(name = PROPERTYNAME_LINE_WIDTH, required = false)
+		private int lineWidth = 1;
 
 		@Element(name = PROPERTYNAME_BACKGROUND_ALPHA, required = false)
 		private int backgroundAlpha = 30;
@@ -122,6 +143,44 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 
 		@Element(name = PROPERTYNAME_RANGE_TYPE, required = false)
 		private String rangeType = "Circle";
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Constructor
+		 */
+		public Config() {
+			// nothing to do
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Constructor
+		 * 
+		 * @param backgroundAlpha
+		 * @param backgroundRGB
+		 * @param colorRGB
+		 * @param range
+		 * @param rangeType
+		 */
+		public Config(final int backgroundAlpha, final int[] backgroundRGB, final int[] colorRGB, final NodeSensorRange range, final String rangeType) {
+			super();
+			this.backgroundAlpha = backgroundAlpha;
+			this.backgroundRGB = backgroundRGB;
+			this.colorRGB = colorRGB;
+			this.range = range;
+			this.rangeType = rangeType;
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Copy constructor. Makes a deep copy.
+		 * 
+		 * @param other
+		 *            object to copy values from
+		 */
+		public Config(final Config other) {
+			this(other.backgroundAlpha, other.backgroundRGB, other.colorRGB, other.range.clone(), other.rangeType);
+		}
 
 		public int getBackgroundAlpha() {
 			return backgroundAlpha;
@@ -141,6 +200,14 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 
 		public String getRangeType() {
 			return rangeType;
+		}
+
+		public int getLineWidth() {
+			return lineWidth;
+		}
+
+		public void setLineWidth(final int lineWidth) {
+			firePropertyChange(PROPERTYNAME_LINE_WIDTH, this.lineWidth, this.lineWidth = lineWidth);
 		}
 
 		public void setBackgroundAlpha(final int backgroundAlpha) {
@@ -163,6 +230,11 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			firePropertyChange(PROPERTYNAME_RANGE_TYPE, this.rangeType, this.rangeType = rangeType);
 		}
 
+		@Override
+		protected Config clone() {
+			return new Config(this);
+		}
+
 	}
 
 	// --------------------------------------------------------------------------------
@@ -173,6 +245,9 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	 * @author Daniel Bimschas
 	 */
 	public static abstract class NodeSensorRange extends PropertyBean {
+
+		@Override
+		protected abstract NodeSensorRange clone();
 
 	}
 
@@ -188,13 +263,17 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		private int rectangleWidth = 100;
 
 		public RectangleRange() {
-
+			// nothing to do
 		}
 
 		public RectangleRange(final int orientation, final int width, final int height) {
 			this.rectangleHeight = height;
 			this.rectangleOrientation = orientation;
 			this.rectangleWidth = width;
+		}
+
+		public RectangleRange(final RectangleRange other) {
+			this(other.rectangleOrientation, other.rectangleWidth, other.rectangleHeight);
 		}
 
 		public int getRectangleHeight() {
@@ -227,7 +306,14 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			firePropertyChange(PROPERTYNAME_RECTANGLE_WIDTH, old, this);
 		}
 
+		@Override
+		protected NodeSensorRange clone() {
+			return new RectangleRange(this);
+		}
+
 	}
+
+	public static final String PROPERTYNAME_LINE_WIDTH = "lineWidth";
 
 	public static final String PROPERTYNAME_BACKGROUND_ALPHA = "backgroundAlpha";
 

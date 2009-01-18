@@ -471,7 +471,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	/**
 	 * Register a new DrawingObjectListener.
 	 * 
-	 * The listener will be called everyt ime a new drawing object is added to the layer, removed
+	 * The listener will be called every time a new drawing object is added to the layer, removed
 	 * from it, or modified.
 	 * 
 	 * @param listener

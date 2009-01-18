@@ -72,10 +72,11 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 			case CONE:
 				final int radius = rangeType == RangeType.CIRCLE ? ((CircleRange) config.getRange()).getCircleRadius() : ((ConeRange) config
 						.getRange()).getConeRadius();
-				// make it a little larger so that errors from rounding aren't so bad
-				box.setUpperLeft(new AbsolutePosition(getPosition().x - radius - 5, getPosition().y - radius - 5));
-				box.setWidth(2 * radius + 10);
-				box.setHeight(2 * radius + 10);
+				final int lineWidth = config.getLineWidth();
+				// make it a little larger so that lineWidth fragments aren't so bad
+				box.setUpperLeft(new AbsolutePosition(getPosition().x - radius - lineWidth * 5, getPosition().y - radius - lineWidth * 5));
+				box.setWidth(2 * radius + 10 * lineWidth);
+				box.setHeight(2 * radius + 10 * lineWidth);
 				return box;
 
 			case RECTANGLE:
@@ -143,6 +144,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 
 		// get config values
 		final int backgroundAlpha = config.getBackgroundAlpha();
+		final int lineWidth = config.getLineWidth();
 
 		// initialize OS resources
 		final Transform oldTransform = new Transform(Display.getDefault());
@@ -155,10 +157,12 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		final int oldAlpha = gc.getAlpha();
 		final Color oldForeground = gc.getForeground();
 		final Color oldBackground = gc.getBackground();
+		final int oldLineWidth = gc.getLineWidth();
 
-		// set colors
+		// set colors and so
 		gc.setForeground(foreground);
 		gc.setBackground(background);
+		gc.setLineWidth(lineWidth);
 
 		// translate so that x,y is 0,0 of coordinate system
 		transform.translate(x, y);
@@ -171,6 +175,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		gc.drawArc(-radius, -radius, radius * 2, radius * 2, 0, 360);
 
 		// restore old GC status
+		gc.setLineWidth(oldLineWidth);
 		gc.setAlpha(oldAlpha);
 		gc.setTransform(oldTransform);
 		gc.setForeground(oldForeground);
@@ -202,6 +207,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		final int backgroundAlpha = config.getBackgroundAlpha();
 		final int orientation = ((ConeRange) config.getRange()).getConeOrientation();
 		final int viewAngle = ((ConeRange) config.getRange()).getConeViewAngle();
+		final int lineWidth = config.getLineWidth();
 
 		// initialize OS resources
 		final Transform oldTransform = new Transform(Display.getDefault());
@@ -214,10 +220,12 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		final int oldAlpha = gc.getAlpha();
 		final Color oldForeground = gc.getForeground();
 		final Color oldBackground = gc.getBackground();
+		final int oldLineWidth = gc.getLineWidth();
 
-		// set colors
+		// set colors and so
 		gc.setForeground(foreground);
 		gc.setBackground(background);
+		gc.setLineWidth(lineWidth);
 
 		// translate so that x,y is 0,0 of coordinate system
 		transform.translate(x, y);
@@ -236,6 +244,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		gc.drawLine(0, 0, radius, 0);
 
 		// restore old GC status
+		gc.setLineWidth(oldLineWidth);
 		gc.setAlpha(oldAlpha);
 		gc.setTransform(oldTransform);
 		gc.setForeground(oldForeground);
@@ -266,6 +275,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		// get config values
 		final int backgroundAlpha = config.getBackgroundAlpha();
 		final int orientation = ((RectangleRange) config.getRange()).getRectangleOrientation();
+		final int lineWidth = config.getLineWidth();
 
 		// initialize OS resources
 		final Transform oldTransform = new Transform(Display.getDefault());
@@ -277,21 +287,26 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		gc.getTransform(oldTransform);
 		final Color oldForeground = gc.getForeground();
 		final Color oldBackground = gc.getBackground();
+		final int oldLineWidth = gc.getLineWidth();
 
 		// translate to the center of the rectangle
 		transform.translate(x + (width / 2), y + (height / 2));
 		transform.rotate(-orientation);
 		gc.setTransform(transform);
 
-		// do the drawing
+		// set colors and so
 		gc.setBackground(background);
 		gc.setForeground(foreground);
+		gc.setLineWidth(lineWidth);
+
+		// do the drawing
 		gc.setAlpha(backgroundAlpha);
 		gc.fillRectangle(-(width / 2), -(height / 2), width, height);
 		gc.setAlpha(255);
 		gc.drawRectangle(-(width / 2), -(height / 2), width, height);
 
 		// restore old GC values
+		gc.setLineWidth(oldLineWidth);
 		gc.setTransform(oldTransform);
 		gc.setForeground(oldForeground);
 		gc.setBackground(oldBackground);
@@ -322,6 +337,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		if (isRange) {
 			rangeType = e.getNewValue() instanceof RectangleRange ? RangeType.RECTANGLE : e.getNewValue() instanceof CircleRange ? RangeType.CIRCLE
 					: RangeType.CONE;
+			updateBoundingBox();
 		} else if (isBackground) {
 			final int[] color = (int[]) e.getNewValue();
 			setBgColor(new RGB(color[0], color[1], color[2]));

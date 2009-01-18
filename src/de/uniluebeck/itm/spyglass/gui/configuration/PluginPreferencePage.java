@@ -44,11 +44,10 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  * @param <T>
  */
-public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig>
-		extends PreferencePage {
-	
+public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig> extends PreferencePage {
+
 	private static Logger log = SpyglassLoggerFactory.getLogger(PluginPreferencePage.class);
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Enumeration. Decides, if the surrounding PluginPreferencesWidget represents an Type or an
@@ -57,7 +56,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	protected enum PrefType {
 		INSTANCE, TYPE
 	}
-	
+
 	protected enum BasicOptions {
 		/**
 		 * Show all Fields in the the optionsGroup Basic
@@ -79,11 +78,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		 * Show all Fields except fields for handling semantic types in the the optionsGroup Basic
 		 */
 		ALL_BUT_SEMANTIC_TYPES
-		
+
 	}
-	
+
 	BasicOptions basicOptions = BasicOptions.ALL;
-	
+
 	private final SelectionListener buttonSelectionListener = new SelectionAdapter() {
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
@@ -102,20 +101,20 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			}
 		}
 	};
-	
+
 	/**
 	 * This listener is called whenever someone modifies a field, which is observed by databinding
 	 */
 	private final IChangeListener formGotDirtyListener = new IChangeListener() {
-		
+
 		@Override
 		public void handleChange(final ChangeEvent event) {
-			
+
 			markFormDirty();
-			
+
 		}
 	};
-	
+
 	/**
 	 * This flag indicates if the page contains unsaved changes (or, correcty, has been touched in
 	 * some way).
@@ -125,12 +124,12 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * appropriate.
 	 */
 	private boolean formIsDirty = false;
-	
+
 	/**
 	 * Reference to the plugin instance. may be null if PrefType==TYPE.
 	 */
 	protected final PluginClass plugin;
-	
+
 	/**
 	 * Temporal config. it contains the current settings on the preference page, before the the user
 	 * pressed "Apply".
@@ -138,49 +137,49 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * This field is final, since databinding listens to events from this object specifically.
 	 */
 	protected final ConfigClass config;
-	
+
 	/**
 	 * is this page representing an plugin type or instance?
 	 */
 	protected PrefType type;
-	
+
 	/**
 	 * reference to spyglass
 	 */
 	protected final Spyglass spyglass;
-	
+
 	/**
 	 * databindingcontext. may be null before createContents() is called.
 	 */
 	protected DataBindingContext dbc = null;
-	
+
 	/**
 	 * reference to the dialog
 	 */
 	private final PluginPreferenceDialog dialog;
-	
+
 	/**
 	 * Image that is displayed in the top of the window.
 	 */
 	private Image image;
-	
+
 	final PropertyChangeListener propertyChangeListener;
-	
+
 	private class Buttons {
-		
+
 		private Button restoreButton;
 		private Button restoreDefaultsButton;
 		private Button saveAsDefaultButton;
 		private Button deleteButton;
 		private Button createInstanceButton;
 		private Button applyButton;
-		
+
 	}
-	
+
 	private Buttons buttons = new Buttons();
-	
+
 	private BasicGroupComposite basicGroup;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Create a preference page for editing the defaultsconfiguration of an plugin type.
@@ -188,8 +187,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @param cs
 	 */
 	@SuppressWarnings("unchecked")
-	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,
-			final BasicOptions basicOptions) {
+	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final BasicOptions basicOptions) {
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.TYPE;
@@ -197,19 +195,19 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.spyglass = spyglass;
 		this.basicOptions = basicOptions;
 		this.plugin = null;
-		
+
 		// propertyChangeListener not needed since it's used for
 		// instances updating their labels in preference tree
 		this.propertyChangeListener = null;
-		
+
 		// This is fine
 		config = (ConfigClass) spyglass.getConfigStore().getSpyglassConfig().getDefaultConfig(this.getPluginClass());
 		if (config == null) {
 			// this page represents an abstract plugin type. so no config here
 		}
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Create a preference page for editing the configuration of an plugin instance.
@@ -218,8 +216,8 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @param plugin
 	 */
 	@SuppressWarnings("unchecked")
-	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,
-			final PluginClass plugin, final BasicOptions basicOptions) {
+	public PluginPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final PluginClass plugin,
+			final BasicOptions basicOptions) {
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.INSTANCE;
@@ -227,49 +225,46 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.spyglass = spyglass;
 		this.plugin = plugin;
 		this.basicOptions = basicOptions;
-		
+
 		this.config = (ConfigClass) plugin.getXMLConfig();
-		
+
 		this.propertyChangeListener = new PropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
 				dialog.onPluginInstancePropertyChange();
 			}
 		};
-		
+
 		this.config.addPropertyChangeListener("active", propertyChangeListener);
 		this.config.addPropertyChangeListener("visible", propertyChangeListener);
 		this.config.addPropertyChangeListener("name", propertyChangeListener);
-		
+
 	}
-	
+
 	@Override
 	protected void contributeButtons(final Composite parent) {
-		
+
 		if (this.config == null) {
 			// this means that the plugin type is abstract
 			return;
 		}
-		
+
 		if (type == PrefType.INSTANCE) {
-			
+
 			buttons.deleteButton = createButton(parent, "Delete Instance", buttonSelectionListener);
 			buttons.restoreButton = createButton(parent, "Restore Values", buttonSelectionListener);
 			buttons.applyButton = createButton(parent, "Apply", buttonSelectionListener);
-			
+
 			if (!this.isValid()) {
 				buttons.applyButton.setEnabled(false);
 			}
-			
+
 		} else {
-			
-			buttons.restoreDefaultsButton = createButton(parent, "Restore Defaults",
-					buttonSelectionListener);
-			buttons.saveAsDefaultButton = createButton(parent, "Save as Default",
-					buttonSelectionListener);
-			buttons.createInstanceButton = createButton(parent, "Create Instance",
-					buttonSelectionListener);
-			
+
+			buttons.restoreDefaultsButton = createButton(parent, "Restore Defaults", buttonSelectionListener);
+			buttons.saveAsDefaultButton = createButton(parent, "Save as Default", buttonSelectionListener);
+			buttons.createInstanceButton = createButton(parent, "Create Instance", buttonSelectionListener);
+
 			if (!this.isValid()) {
 				buttons.saveAsDefaultButton.setEnabled(false);
 			}
@@ -277,37 +272,37 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 				buttons.createInstanceButton.setEnabled(false);
 			}
 		}
-		
+
 	}
-	
+
 	protected final Realm getRealm() {
 		return SWTObservables.getRealm(getControl().getDisplay());
 	}
-	
+
 	@Override
 	protected Composite createContents(final Composite parent) {
 		return createContentsInternal(parent);
 	}
-	
+
 	@Override
 	public void createControl(final Composite parent) {
 		super.createControl(parent);
 		resetDirtyFlag();
 	}
-	
+
 	protected Composite createContentsInternal(final Composite parent) {
 		final Composite composite = createComposite(parent);
-		
+
 		if (this.config == null) {
 			// this means that the plugin type is abstract
 			return composite;
 		}
-		
+
 		dbc = new DataBindingContext(getRealm());
-		
+
 		// Add a Listener to each binding, so we get informed if the user modifies a field.
 		dbc.getBindings().addListChangeListener(new IListChangeListener() {
-			
+
 			@Override
 			public void handleListChange(final ListChangeEvent event) {
 				for (final ListDiffEntry e : event.diff.getDifferences()) {
@@ -319,19 +314,18 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 					}
 				}
 			}
-			
+
 		});
-		
+
 		addErrorBinding();
-		
+
 		basicGroup = new BasicGroupComposite(composite, SWT.NONE);
 		basicGroup.disableUnwantedElements(basicOptions);
-		basicGroup.setDatabinding(dbc, config, this.plugin, this.spyglass.getPluginManager(), this
-				.isInstancePage());
-		
+		basicGroup.setDatabinding(dbc, config, this.plugin, this.spyglass.getPluginManager(), this.isInstancePage());
+
 		return composite;
 	}
-	
+
 	/**
 	 * Adds the handler to the ValidationStatus provider of the DataBindingCotext. Whenever the
 	 * validation status changes, the handler will update the errorString displayed to the user and
@@ -341,18 +335,18 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * 
 	 */
 	private void addErrorBinding() {
-		final AggregateValidationStatus aggregateStatus = new AggregateValidationStatus(getRealm(),
-				dbc.getValidationStatusProviders(), AggregateValidationStatus.MAX_SEVERITY);
-		
+		final AggregateValidationStatus aggregateStatus = new AggregateValidationStatus(getRealm(), dbc.getValidationStatusProviders(),
+				AggregateValidationStatus.MAX_SEVERITY);
+
 		aggregateStatus.addValueChangeListener(new IValueChangeListener() {
 			public void handleValueChange(final ValueChangeEvent event) {
 				final Status valStatus = (Status) aggregateStatus.getValue();
-				
+
 				setValid(valStatus.isOK());
-				
+
 				if (valStatus.isOK()) {
 					setErrorMessage(null);
-					
+
 					if (buttons.applyButton != null) {
 						buttons.applyButton.setEnabled(true);
 					}
@@ -374,14 +368,13 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 						buttons.saveAsDefaultButton.setEnabled(false);
 					}
 				}
-				
+
 			}
 		});
-		
+
 	}
-	
-	private Button createButton(final Composite parent, final String label,
-			final SelectionListener selectionListener) {
+
+	private Button createButton(final Composite parent, final String label, final SelectionListener selectionListener) {
 		((GridLayout) parent.getLayout()).numColumns++;
 		final Button button = new Button(parent, SWT.PUSH);
 		button.setText(label);
@@ -390,7 +383,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		setButtonLayoutData(button);
 		return button;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Does the form contain unsaved data? The return value of this method is only an indicator, IOW
@@ -403,15 +396,15 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	public boolean hasUnsavedChanges() {
 		return formIsDirty;
 	}
-	
+
 	private void resetDirtyFlag() {
 		formIsDirty = false;
-		
+
 		if (this.config == null) {
 			// this means that the plugin type is abstract
 			return;
 		}
-		
+
 		if (this.isInstancePage()) {
 			buttons.applyButton.setEnabled(false);
 			buttons.restoreButton.setEnabled(false);
@@ -420,7 +413,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			buttons.saveAsDefaultButton.setEnabled(false);
 		}
 	}
-	
+
 	/**
 	 * Transfers the form data into the model.
 	 */
@@ -433,9 +426,9 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		} else {
 			this.storeToModel();
 		}
-		
+
 	}
-	
+
 	/**
 	 * Store the form data into the model
 	 * 
@@ -447,7 +440,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.dbc.updateTargets();
 		resetDirtyFlag();
 	}
-	
+
 	/**
 	 * ReStore the form data from the model
 	 * 
@@ -455,48 +448,46 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 */
 	protected void loadFromModel() {
 		log.debug("Restoring form from model");
-		
+
 		this.dbc.updateTargets();
-		
+
 		// update the models (with the already existent values)
 		// this is necessary to (re)validate the values in case of erroneous values already existent
 		// in the configuration
 		this.dbc.updateModels();
 		resetDirtyFlag();
 	}
-	
+
 	private final void performCreateInstance() {
 		log.info("Pressed button create");
-		
+
 		// First save data.
 		this.performApply();
-		
+
 		if (!this.isValid()) {
 			MessageDialog.openError(this.getShell(), "Can not store changes",
 					"Could not store your changes. There are still errors remaining in the form.");
 		} else {
-			
+
 			spyglass.getPluginManager().createNewPlugin(getPluginClass(), config);
 		}
 	}
-	
+
 	/**
 	 * Delete the plugin
 	 */
 	private final void performDelete() {
 		log.info("Pressed button Delete");
-		
-		final boolean ok = MessageDialog.openQuestion(getShell(), "Remove plugin instance",
-				"Are you sure you want to remove the plugin instance?");
+
+		final boolean ok = MessageDialog.openQuestion(getShell(), "Remove plugin instance", "Are you sure you want to remove the plugin instance?");
 		if (ok) {
 			final boolean ret = spyglass.getPluginManager().removePlugin(this.plugin);
 			if (!ret) {
-				MessageDialog.openError(this.getShell(), "Cannot delete plugin",
-						"Could not delete the plugin.");
+				MessageDialog.openError(this.getShell(), "Cannot delete plugin", "Could not delete the plugin.");
 			}
 		}
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -506,7 +497,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		log.info("Pressed button restore");
 		loadFromModel();
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return
@@ -517,11 +508,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		final Class<? extends Plugin> pluginClass = this.getPluginClass();
 		final PluginXMLConfig defaults = spyglass.getConfigStore().getSpyglassConfig().getDefaultConfig(pluginClass);
 		this.config.overwriteWith(defaults);
-		
+
 		this.loadFromModel();
-		
+
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Checks if this is an instance page or a type page.
@@ -532,7 +523,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	public final boolean isInstancePage() {
 		return type == PrefType.INSTANCE;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the <code>Plugin</code> instance associated with this page.
@@ -544,7 +535,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	public final Plugin getPlugin() {
 		return plugin;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the class-Object of the plugin this preference page is associated with. Needed for
@@ -553,7 +544,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * @return the class-Object of the plugin this preference page is associated with
 	 */
 	public abstract Class<? extends Plugin> getPluginClass();
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the class-Object of the plugins' PluginXMLConfig this preference page is associated
@@ -565,7 +556,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	public final Class<? extends PluginXMLConfig> getConfigClass() {
 		return this.config.getClass();
 	}
-	
+
 	protected Composite createComposite(final Composite parent) {
 		final Composite c = new Composite(parent, SWT.NONE);
 		c.setLayout(new GridLayout(1, true));
@@ -575,7 +566,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		c.setLayoutData(gridData);
 		return c;
 	}
-	
+
 	public void removePropertyChangeListeners() {
 		if (config != null) {
 			config.removePropertyChangeListener("active", propertyChangeListener);
@@ -583,25 +574,25 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			config.removePropertyChangeListener("name", propertyChangeListener);
 		}
 	}
-	
+
 	@Override
 	public void dispose() {
 		removePropertyChangeListeners();
 	}
-	
+
 	public void setImage(final Image image) {
 		this.image = image;
 	}
-	
+
 	@Override
 	public Image getImage() {
 		return image;
 	}
-	
+
 	public Composite createMS2Warning(final Composite parent) {
-		
+
 		final Composite composite = createContentsInternal(parent);
-		
+
 		final GridData groupData = new GridData(SWT.TOP, SWT.LEFT, true, true);
 		groupData.horizontalAlignment = GridData.FILL;
 		groupData.verticalAlignment = GridData.FILL;
@@ -609,7 +600,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		group.setLayoutData(groupData);
 		group.setLayout(new GridLayout());
 		group.setText("More information");
-		
+
 		final GridData labelData = new GridData();
 		labelData.verticalAlignment = SWT.TOP;
 		labelData.horizontalAlignment = SWT.LEFT;
@@ -617,30 +608,38 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		label.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
 		label.setText("This plugin is to be implemented for Milestone 2 and is not yet working.");
 		label.setLayoutData(labelData);
-		
+
 		return parent;
-		
+
 	}
-	
+
 	/**
 	 * Calling this method marks the form dirty (and thus enables the "Apply" button)
 	 */
 	public void markFormDirty() {
 		formIsDirty = true;
-		
+
 		if ((config == null) || !isValid()) {
 			// this means that the plugin type is abstractor contains errors
 			return;
 		}
-		
+
 		if (isInstancePage()) {
-			buttons.applyButton.setEnabled(true);
-			buttons.restoreButton.setEnabled(true);
+			if (buttons.applyButton != null) {
+				buttons.applyButton.setEnabled(true);
+			}
+			if (buttons.restoreButton != null) {
+				buttons.restoreButton.setEnabled(true);
+			}
 		} else {
-			buttons.restoreDefaultsButton.setEnabled(true);
-			buttons.saveAsDefaultButton.setEnabled(true);
+			if (buttons.restoreDefaultsButton != null) {
+				buttons.restoreDefaultsButton.setEnabled(true);
+			}
+			if (buttons.saveAsDefaultButton != null) {
+				buttons.saveAsDefaultButton.setEnabled(true);
+			}
 		}
-		
+
 	}
-	
+
 }

@@ -105,6 +105,16 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 		super.init(pluginManager);
 		pluginManager.addNodePositionListener(nodePositionListener);
 
+		// add NodeSensorRangeDrawingObjects for all existing nodes
+		for (final int node : pluginManager.getNodePositioner().getNodeList()) {
+			onNodeAdded(node, pluginManager.getNodePositioner().getPosition(node));
+		}
+
+	}
+
+	@Override
+	public void shutdown() {
+		pluginManager.removeNodePositionListener(nodePositionListener);
 	}
 
 	private void onNodeAdded(final int node, final AbsolutePosition newPosition) {

@@ -37,7 +37,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
-	
+
 	private static Logger log = SpyglassLoggerFactory.getLogger(PositionPacketNodePositionerPlugin.class);
 
 	@Element(name = "parameters")
@@ -62,74 +62,74 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	 * Mutex to protect lastSeen and positionMap
 	 */
 	private final Object mutex = new Object();
-	
+
 	/**
 	 * Constructor
 	 */
 	public PositionPacketNodePositionerPlugin() {
 		config = new PositionPacketNodePositionerXMLConfig();
-		
-		// Check every second for old nodes 
+
+		// Check every second for old nodes
 		timer.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
 				removeOldNodes();
 			}
-			
+
 		}, 1000, 100);
 	}
 
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
-		
+
 		synchronized (mutex) {
 			return positionMap.get(nodeId);
 		}
 	}
 
-	/** 
+	/**
 	 * Remove nodes which have timed out.
 	 */
 	private void removeOldNodes() {
-		
-		if (config.getTimeout()==0) {
+
+		if (config.getTimeout() == 0) {
 			return;
 		}
-		
+
 		final List<NodePositionEvent> list = new ArrayList<NodePositionEvent>();
-		
+
 		// we have to aquire the mutex to ensure that lastSeen isn't modified
 		synchronized (mutex) {
-			
+
 			final Iterator<Integer> it = lastSeen.keySet().iterator();
 			while (it.hasNext()) {
 				final int id = it.next();
 				if (lastSeen.get(id) != null) {
 					final long time = lastSeen.get(id);
-					if (System.currentTimeMillis() - time > config.getTimeout()*1000) {
-						
-						final AbsolutePosition oldPos = positionMap.get(id);;
+					if (System.currentTimeMillis() - time > config.getTimeout() * 1000) {
+
+						final AbsolutePosition oldPos = positionMap.get(id);
+						;
 
 						positionMap.remove(id);
 						it.remove();
 
-						log.debug("Removed node "+ id + " after timeout.");
+						log.debug("Removed node " + id + " after timeout.");
 						list.add(new NodePositionEvent(id, NodePositionEvent.Change.REMOVED, oldPos, null));
-						
+
 					}
 				}
 			}
-			
+
 		}
-		
+
 		// fire the events after we release the lock
 		for (final NodePositionEvent nodePositionEvent : list) {
 			pluginManager.fireNodePositionEvent(nodePositionEvent);
 		}
 
 	}
-		
 
 	@Override
 	public PluginPreferencePage<PositionPacketNodePositionerPlugin, PositionPacketNodePositionerXMLConfig> createPreferencePage(
@@ -173,8 +173,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 		// only send events when the position really changes.
 		if (oldPos == null) {
 			pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.ADDED, null, newPos));
-		}
-		else if (!oldPos.equals(newPos)) {
+		} else if (!oldPos.equals(newPos)) {
 			pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.MOVED, oldPos, newPos));
 		}
 
@@ -208,6 +207,13 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	@Override
 	public boolean offersMetric() {
 		return true;
+	}
+
+	@Override
+	public List<Integer> getNodeList() {
+		synchronized (mutex) {
+			return new ArrayList<Integer>(this.positionMap.keySet());
+		}
 	}
 
 }

@@ -53,6 +53,7 @@ import de.uniluebeck.itm.spyglass.gui.actions.LoadConfigurationAction;
 import de.uniluebeck.itm.spyglass.gui.actions.StoreConfigurationAction;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -79,12 +80,18 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			addPageChangedListener(this);
 		}
 
-		@Override
-		protected boolean showPage(final IPreferenceNode node) {
-			informIfUnsavedChanges();
+		private boolean internalShowPage(final IPreferenceNode node, final boolean testForUnsavedChanges) {
+			if (testForUnsavedChanges) {
+				informIfUnsavedChanges();
+			}
 			final GridData data = (GridData) getTreeViewer().getControl().getLayoutData();
 			data.widthHint = 220;
 			return super.showPage(node);
+		}
+
+		@Override
+		protected boolean showPage(final IPreferenceNode node) {
+			return internalShowPage(node, true);
 		}
 
 		private SelectionListener menuSelectionListener = new SelectionListener() {
@@ -268,23 +275,23 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		}
 
 		public void selectPluginManagerPreferenceNode() {
-			selectPreferenceNodeInternal(pluginManagerPreferenceNode.getId());
+			selectPreferenceNodeInternal(pluginManagerPreferenceNode.getId(), true);
 		}
 
 		public void selectPreferenceNode(final Plugin p) {
-			selectPreferenceNodeInternal(getPreferenceNodeId(p));
+			selectPreferenceNodeInternal(getPreferenceNodeId(p), true);
 		}
 
-		public void selectPreferenceNode(final Class<? extends Plugin> clazz) {
-			selectPreferenceNodeInternal(clazz.getCanonicalName());
+		public void selectPreferenceNode(final Class<? extends Plugin> clazz, final boolean testForUnsavedValues) {
+			selectPreferenceNodeInternal(clazz.getCanonicalName(), testForUnsavedValues);
 		}
 
-		private void selectPreferenceNodeInternal(final String nodeId) {
+		private void selectPreferenceNodeInternal(final String nodeId, final boolean testForUnsavedChanges) {
 			final IPreferenceNode node = findNodeMatching(nodeId);
 			if (node.getPage() == null) {
 				node.createPage();
 			}
-			showPage(node);
+			internalShowPage(node, testForUnsavedChanges);
 			getTreeViewer().setSelection(new StructuredSelection(node), true);
 			getTreeViewer().refresh();
 		}
@@ -524,7 +531,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		preferenceManager.addToRoot(generalPreferenceNode);
 		preferenceManager.addToRoot(pluginManagerPreferenceNode);
 
-		final List<Class<? extends Plugin>> pluginTypes = spyglass.getPluginManager().getAvailablePluginTypes();
+		spyglass.getPluginManager();
+		final List<Class<? extends Plugin>> pluginTypes = PluginManager.getAvailablePluginTypes();
 
 		addPreferenceNodesRecursive(buildClassTree(pluginTypes), pluginManagerPreferenceNode);
 
@@ -748,7 +756,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 	private void onPluginRemoved(final Plugin p) {
 		removePreferenceNode(instancePreferenceNodes.get(p), preferenceManager.getRootSubNodes());
-		preferenceDialog.selectPreferenceNode(p.getClass());
+		preferenceDialog.selectPreferenceNode(p.getClass(), false);
 	}
 
 	private boolean removePreferenceNode(final IPreferenceNode node, final IPreferenceNode[] parentNodes) {

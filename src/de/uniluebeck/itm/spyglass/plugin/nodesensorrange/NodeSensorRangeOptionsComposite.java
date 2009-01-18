@@ -4,9 +4,14 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.ISWTObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
@@ -27,6 +32,7 @@ import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -36,6 +42,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
+import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ArrayToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
@@ -52,6 +59,56 @@ import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfi
  */
 public class NodeSensorRangeOptionsComposite extends Composite {
 
+	public class ConfigWrapper extends PropertyBean implements PropertyChangeListener {
+
+		public static final String PROPERTYNAME_CONFIG = "config";
+
+		private Config config;
+
+		public ConfigWrapper() {
+			// nothing to do
+		}
+
+		public Config getConfig() {
+			return config;
+		}
+
+		public void setConfig(final Config config) {
+
+			// remove listener from old config instance
+			if (this.config != null) {
+				this.config.removePropertyChangeListener(NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE, this);
+			}
+
+			firePropertyChange(PROPERTYNAME_CONFIG, this.config, this.config = config);
+
+			// add listener to new config instance
+			this.config.addPropertyChangeListener(NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE, this);
+
+		}
+
+		@Override
+		public void propertyChange(final PropertyChangeEvent e) {
+
+			// if the property range type changes also change the range programmatically
+			// this will have another change event as result
+			if (NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE.equals(e.getPropertyName())) {
+
+				final String rangeType = (String) e.getNewValue();
+
+				final boolean isCircle = NodeSensorRangeXMLConfig.PROPERTYVALUE_RANGE_TYPE_CIRCLE.equals(rangeType);
+				final boolean isCone = NodeSensorRangeXMLConfig.PROPERTYVALUE_RANGE_TYPE_CONE.equals(rangeType);
+
+				config.setRange(isCircle ? new CircleRange() : isCone ? new ConeRange() : new RectangleRange());
+
+			}
+
+			throw new RuntimeException("Unexpected case.");
+
+		}
+
+	}
+
 	private NodeSensorRangePreferencePage page;
 
 	private Group groupDefaultRange;
@@ -66,15 +123,17 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 	private Button buttonOptions;
 
-	private NodeSensorRangeXMLConfig config;
-
 	private Button buttonBackgroundColor;
 
 	private CLabel defaultRangeBackgroundColor;
 
 	private Text defaultBackgroundAlphaTransparency;
 
-	private Config defaultConfig;
+	private ConfigWrapper defaultConfigWrapper;
+
+	private DataBindingContext dbc;
+
+	private Text defaultLineWidth;
 
 	{
 		// Register as a resource user - SWTResourceManager will
@@ -373,6 +432,19 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 				{
 					// first line
 					label = new Label(groupDefaultRange, SWT.NONE);
+					label.setText("Line Width");
+
+					data = new GridData();
+					data.widthHint = 40;
+					data.horizontalSpan = 2;
+
+					defaultLineWidth = new Text(groupDefaultRange, SWT.BORDER);
+					defaultLineWidth.setLayoutData(data);
+
+				}
+				{
+					// second line
+					label = new Label(groupDefaultRange, SWT.NONE);
 					label.setText("Line Color");
 
 					data = new GridData();
@@ -400,7 +472,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 					});
 				}
 				{
-					// second line
+					// third line
 					label = new Label(groupDefaultRange, SWT.NONE);
 					label.setText("Background Color");
 
@@ -429,7 +501,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 					});
 				}
 				{
-					// second line
+					// fourth line
 					label = new Label(groupDefaultRange, SWT.NONE);
 					label.setText("Background Alpha Transparency");
 
@@ -444,7 +516,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 				}
 				{
-					// fourth line
+					// fifth line
 					label = new Label(groupDefaultRange, SWT.NONE);
 					label.setText("Type");
 
@@ -473,21 +545,21 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 							final boolean isCircle = NodeSensorRangeXMLConfig.PROPERTYVALUE_RANGE_TYPE_CIRCLE.equals(selectedRangeType);
 							final boolean isCone = NodeSensorRangeXMLConfig.PROPERTYVALUE_RANGE_TYPE_CONE.equals(selectedRangeType);
-							final NodeSensorRange defaultRange = defaultConfig.getRange();
+							final NodeSensorRange defaultRange = defaultConfigWrapper.getConfig().getRange();
 
 							if (isCircle) {
-								dialogConfig = defaultRange instanceof CircleRange ? defaultRange : new CircleRange();
+								dialogConfig = defaultRange instanceof CircleRange ? defaultRange.clone() : new CircleRange();
 								dialog = new CircleDialog(getShell(), dialogConfig);
 							} else if (isCone) {
-								dialogConfig = defaultRange instanceof ConeRange ? defaultRange : new ConeRange();
+								dialogConfig = defaultRange instanceof ConeRange ? defaultRange.clone() : new ConeRange();
 								dialog = new ConeDialog(getShell(), dialogConfig);
 							} else {
-								dialogConfig = defaultRange instanceof RectangleRange ? defaultRange : new RectangleRange();
+								dialogConfig = defaultRange instanceof RectangleRange ? defaultRange.clone() : new RectangleRange();
 								dialog = new RectangleDialog(getShell(), dialogConfig);
 							}
 
 							if (Window.OK == dialog.open()) {
-								defaultConfig.setRange(dialog.range);
+								defaultConfigWrapper.getConfig().setRange(dialog.range);
 							}
 
 						}
@@ -515,60 +587,117 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 	}
 
+	private Binding defaultRangeTypeBinding;
+
+	private Binding defaultRangeForegroundColorBinding;
+
+	private Binding defaultRangeBackgroundColorBinding;
+
+	private Binding defaultBackgroundAlphaTransparencyBinding;
+
+	private Binding defaultRangeBinding;
+
+	private Binding defaultLineWidthBinding;
+
+	private PropertyChangeListener defaultConfigPropertyChangeListener = new PropertyChangeListener() {
+		@Override
+		public void propertyChange(final PropertyChangeEvent evt) {
+
+			// only property that can change is the default config
+			// the new config is a new instance of class Config
+
+			// unregister old data binding if it was set from old Config instance
+			if (evt.getOldValue() != null) {
+
+				dbc.removeBinding(defaultBackgroundAlphaTransparencyBinding);
+				dbc.removeBinding(defaultRangeBackgroundColorBinding);
+				dbc.removeBinding(defaultRangeBinding);
+				dbc.removeBinding(defaultRangeForegroundColorBinding);
+				dbc.removeBinding(defaultRangeTypeBinding);
+				dbc.removeBinding(defaultLineWidthBinding);
+
+			}
+
+			IObservableValue obsModel;
+			ISWTObservableValue obsWidget;
+			UpdateValueStrategy usTargetToModel;
+			UpdateValueStrategy usModelToTarget;
+			final Realm realm = dbc.getValidationRealm();
+			final Config config = (Config) evt.getNewValue();
+
+			{
+				obsWidget = SWTObservables.observeText(defaultLineWidth, SWT.Modify);
+				obsModel = BeansObservables.observeValue(realm, config, NodeSensorRangeXMLConfig.PROPERTYNAME_LINE_WIDTH);
+				usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+				usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE));
+				defaultLineWidthBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+			}
+			{
+				obsWidget = SWTObservables.observeSelection(defaultRangeType);
+				obsModel = BeansObservables.observeValue(realm, config, NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE);
+				usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+				defaultRangeTypeBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+			}
+			{
+				obsWidget = SWTObservables.observeBackground(defaultRangeForegroundColor);
+				obsModel = BeansObservables.observeValue(realm, config, NodeSensorRangeXMLConfig.PROPERTYNAME_COLOR_R_G_B);
+				usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+				usTargetToModel.setConverter(new ColorToArrayConverter());
+				usModelToTarget = new UpdateValueStrategy();
+				usModelToTarget.setConverter(new ArrayToColorConverter(Display.getDefault()));
+				defaultRangeForegroundColorBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
+			}
+			{
+				obsWidget = SWTObservables.observeBackground(defaultRangeBackgroundColor);
+				obsModel = BeansObservables.observeValue(realm, config, NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_R_G_B);
+				usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+				usTargetToModel.setConverter(new ColorToArrayConverter());
+				usModelToTarget = new UpdateValueStrategy();
+				usModelToTarget.setConverter(new ArrayToColorConverter(Display.getDefault()));
+				defaultRangeBackgroundColorBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
+			}
+			{
+				obsWidget = SWTObservables.observeText(defaultBackgroundAlphaTransparency, SWT.Modify);
+				obsModel = BeansObservables.observeValue(realm, config, NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_ALPHA);
+				usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+				usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(0, 255));
+				defaultBackgroundAlphaTransparencyBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+			}
+			// {
+			// final IObservableValue observeValue =
+			// BeansObservables.observeValue(dbc.getValidationRealm(),
+			// defaultConfigWrapper.getConfig(),
+			// NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE);
+			// obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), evt.getNewValue(),
+			// NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE);
+			// usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			// dbc.bindValue(observeValue, obsModel, usTargetToModel, null);
+			// }
+
+		}
+	};
+
 	public void setDatabinding(final DataBindingContext dbc, final NodeSensorRangeXMLConfig config, final NodeSensorRangePreferencePage page) {
 
 		this.page = page;
-		this.config = config;
-		this.defaultConfig = config.getDefaultConfig();
+		this.dbc = dbc;
 
-		IObservableValue obsModel;
-		ISWTObservableValue obsWidget;
-		UpdateValueStrategy usTargetToModel;
-		UpdateValueStrategy usModelToTarget;
+		// The options composite contains a clone of the original config and works on it, so that
+		// the clone can later be used as the plug-in config after the user pressed apply.
+		this.defaultConfigWrapper = new ConfigWrapper();
+		this.defaultConfigWrapper.setConfig(config.getDefaultConfig().clone());
+
+		defaultConfigWrapper.addPropertyChangeListener(ConfigWrapper.PROPERTYNAME_CONFIG, defaultConfigPropertyChangeListener);
+
+		final IObservableValue obsValue;
+		final IObservableValue obsModel;
+		final Realm realm = dbc.getValidationRealm();
 
 		{
-			obsWidget = SWTObservables.observeSelection(defaultRangeType);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), defaultConfig, NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE);
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
-		}
-		{
-			obsWidget = SWTObservables.observeBackground(defaultRangeForegroundColor);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config.getDefaultConfig(),
-					NodeSensorRangeXMLConfig.PROPERTYNAME_COLOR_R_G_B);
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			usTargetToModel.setConverter(new ColorToArrayConverter());
-			usModelToTarget = new UpdateValueStrategy();
-			usModelToTarget.setConverter(new ArrayToColorConverter(this.getDisplay()));
-			dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
-		}
-		{
-			obsWidget = SWTObservables.observeBackground(defaultRangeBackgroundColor);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config.getDefaultConfig(),
-					NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_R_G_B);
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			usTargetToModel.setConverter(new ColorToArrayConverter());
-			usModelToTarget = new UpdateValueStrategy();
-			usModelToTarget.setConverter(new ArrayToColorConverter(this.getDisplay()));
-			dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
-		}
-		{
-			obsWidget = SWTObservables.observeText(defaultBackgroundAlphaTransparency, SWT.Modify);
-			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config.getDefaultConfig(),
-					NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_ALPHA);
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(0, 255));
-			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
-		}
-		{
-			final IObservableValue observeValue = BeansObservables.observeValue(dbc.getValidationRealm(), defaultConfig,
-					NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE);
-			obsModel = BeansObservables
-					.observeValue(dbc.getValidationRealm(), config.getDefaultConfig(), NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE);
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			dbc.bindValue(observeValue, obsModel, usTargetToModel, null);
+			obsValue = BeansObservables.observeValue(realm, defaultConfigWrapper, ConfigWrapper.PROPERTYNAME_CONFIG);
+			obsModel = BeansObservables.observeValue(realm, config, NodeSensorRangeXMLConfig.PROPERTYNAME_DEFAULT_CONFIG);
+			dbc.bindValue(obsValue, obsModel, null, null);
 		}
 
 	}
-
 }

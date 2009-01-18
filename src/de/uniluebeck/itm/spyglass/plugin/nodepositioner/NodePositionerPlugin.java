@@ -8,6 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.nodepositioner;
 
+import java.util.List;
+
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 
@@ -44,6 +46,15 @@ public abstract class NodePositionerPlugin extends Plugin {
 	 * @return the number of nodes which are currently active
 	 */
 	public abstract int getNumNodes();
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns a list of all nodes that this NodePositionPlugin currently has location information
+	 * for
+	 * 
+	 * @return a list of node-IDs
+	 */
+	public abstract List<Integer> getNodeList();
 
 	// --------------------------------------------------------------------------------
 	/**

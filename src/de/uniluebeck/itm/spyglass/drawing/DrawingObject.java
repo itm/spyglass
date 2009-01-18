@@ -78,10 +78,8 @@ public abstract class DrawingObject {
 	public void setPosition(final AbsolutePosition position, final boolean fireBoundingBoxChangeEvent) {
 
 		this.position = position;
-		updateBoundingBox();
-		if (fireBoundingBoxChangeEvent) {
-			fireBoundingBoxChangeEvent();
-		}
+		updateBoundingBox(fireBoundingBoxChangeEvent);
+
 	}
 
 	// --------------------------------------------------------------------------------
