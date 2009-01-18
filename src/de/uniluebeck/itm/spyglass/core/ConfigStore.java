@@ -154,7 +154,7 @@ public class ConfigStore extends PropertyBean {
 		boolean newFile = false;
 		// create the file if necessary
 		if (!f.exists()) {
-			if (!f.getParentFile().mkdirs()) {
+			if (!f.getParentFile().exists() && !f.getParentFile().mkdirs()) {
 				throw new IOException("Could not create directory "+f.getParent());
 			}
 			f.createNewFile();
