@@ -7,6 +7,8 @@
  */
 package de.uniluebeck.itm.spyglass.plugin;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.EventListener;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -87,6 +89,29 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	public Plugin() {
 		this(true);
 	}
+	
+	// --------------------------------------------------------------------------------
+	
+	/**
+	 * Start/STop the consumer-thread when the plugin is activated/deactivated.
+	 */
+	private PropertyChangeListener propertyActiveListener = new PropertyChangeListener() {
+
+		@Override
+		public void propertyChange(final PropertyChangeEvent evt) {
+
+			// start/stop the consumer thread when the plugin is activated/deactivated.
+			final Boolean oldValue = (Boolean) evt.getOldValue();
+			final Boolean newValue = (Boolean) evt.getNewValue();
+			if ((oldValue != newValue) && (newValue == true)) {
+				startPacketConsumerThread();
+			} else if ((oldValue != newValue) && (newValue == false)) {
+				stopPacketConsumerThread();
+			}
+		}
+		
+	};
+	
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -158,19 +183,6 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	public final void setActive(final boolean isActive) {
 		getXMLConfig().setActive(isActive);
-
-		// TODO: Should be done via Events
-		// TODO: call reset()?
-
-		if (packetQueue != null) {
-			// if the plug-in is deactivated, stop the thread if it is currenrly
-			// running. Otherwise, start it
-			if (!isActive()) {
-				stopPacketConsumerThread();
-			} else {
-				startPacketConsumerThread();
-			}
-		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -189,32 +201,35 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 		this.pluginManager = manager;
 
-		// if the plug-in has a packet queue, it is maintained by a separate
-		// thread. This thread has to be started on activation and stopped on
-		// deactivation
-		if (packetQueue != null) {
-			// if the plug-in is deactivated, stop the thread if it is currenrly
-			// running. Otherwise, start it
-			if (!isActive()) {
-				stopPacketConsumerThread();
-			} else {
-				startPacketConsumerThread();
-			}
+		if (isActive()) {
+			startPacketConsumerThread();
 		}
+		
+		// add a property change listener to the config
+		getXMLConfig().addPropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, propertyActiveListener);
+		
 	}
 
 	/**
-	 * Stops the thread which consumes the packets available in the packet queue
+	 * Stops the thread which consumes the packets available in the packet queue.
+	 * waits until the thread is clinically dead.
 	 */
 	private void stopPacketConsumerThread() {
-		if ((packetConsumerThread != null) && !packetConsumerThread.isInterrupted()) {
+		if (packetConsumerThread != null) {
 			try {
 				packetConsumerThread.interrupt();
-				log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName() + " stopped successfully.");
-			} catch (final RuntimeException e) {
-				log.error("An error occured while trying to stop the plug-in's thread", e);
+				packetConsumerThread.join();
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
 			}
 		}
+	}
+	
+	/**
+	 * Is the packetConsumerThread currently running?
+	 */
+	private boolean isPacketConsumerThreadRunning() {
+		return (packetConsumerThread != null) && packetConsumerThread.isAlive();
 	}
 
 	/**
@@ -222,19 +237,25 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	private void startPacketConsumerThread() {
 
-		if ((packetConsumerThread == null) || packetConsumerThread.isInterrupted()) {
-			try {
-				// since a thread cannot be restarted, a new one has to be
-				// created
-				packetConsumerThread = new Thread(this, "PacketConsumerThread[" + this.getClass().getSimpleName() + "]");
-				packetConsumerThread.setDaemon(true);
-				packetConsumerThread.start();
-
-				log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName() + " started successfully.");
-			} catch (final RuntimeException e) {
-				log.error("An error occured while trying to start the plug-in's thread", e);
-			}
+		if (packetQueue == null) {
+			return;
 		}
+		
+		if (isPacketConsumerThreadRunning())
+		{
+			// don't do anything if the old one is alive and well
+			if (!packetConsumerThread.isInterrupted()) {
+				return;
+			}
+			
+			// otherwise first kill the zombie
+			stopPacketConsumerThread();
+		}
+			
+		// since a thread cannot be restarted, a new one has to be
+		// created
+		packetConsumerThread = new Thread(this, "PacketConsumerThread[" + this.getClass().getSimpleName() + "]");
+		packetConsumerThread.start();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -370,26 +391,28 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Concurrently processes packets which are available in the packet queue and update's the quad
-	 * tree.
+	 * Concurrently processes packets which are available in the packet queue and update's the plugin's
+	 * data structures
 	 */
 	public final void run() {
 
+		log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName() + " started successfully.");
+
 		while (!packetConsumerThread.isInterrupted()) {
-			final SpyglassPacket p = getPacketFromQueue(true);
-			if (p != null) {
-				try {
-					processPacket(p);
-					updateLayer();
-				} catch (final InterruptedException e) {
-					log.error("An exception occured while processing a packet in Plugin '" + getInstanceName() + "'", e);
-					packetConsumerThread.interrupt();
-				} catch (final Exception e) {
-					log.error("An exception occured while processing a packet in Plugin '" + getInstanceName() + "'", e);
-				}
+			try {
+				final SpyglassPacket p = getPacketFromQueue();
+				processPacket(p);
+				updateLayer();
+			} catch (final InterruptedException e) {
+				packetConsumerThread.interrupt();
+			} catch (final Exception e) {
+				log.error("An exception occured while processing a packet in Plugin '" + getInstanceName() + "'", e);
 			}
 		}
-		packetConsumerThread = null;
+		
+
+		log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName() + " stopped.");
+		
 	}
 
 	// --------------------------------------------------------------------------------
@@ -414,31 +437,27 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	}
 
 	/**
-	 * Retrieves and removes the head of the packet queue, or returns <tt>null</tt> if it is empty.<br>
-	 * Note that this is done in an extra thread. If an {@link InterruptedException} occurs,
-	 * <code>null</code> might be returned no matter if the parameter <tt>wait</tt> is set or not.
-	 * 
-	 * @param wait
-	 *            indicates whether or not the caller wants to wait for a packet if the packet queue
-	 *            is currently empty
-	 * @return the head of the packet queue, or <tt>null</tt> if it is empty
-	 */
-	private final SpyglassPacket getPacketFromQueue(final boolean wait) {
+	 * Retrieves and removes the head of the packet queue.
 
-		synchronized (packetQueue) {
-			// wait for the arrival of a new packet if the packet queue is
-			// empty, and the caller want's to wait
-			if (wait && packetQueue.isEmpty()) {
-				try {
+	 * This method blocks until a new packet arrives and will never return null.
+	 * 
+	 * @return the head of the packet queue
+	 * @throws InterruptedException if an interrupt occured while waiting for a new packet
+	 */
+	private final SpyglassPacket getPacketFromQueue() throws InterruptedException {
+
+		while (!Thread.currentThread().isInterrupted()) {
+			synchronized (packetQueue) {
+				// wait for the arrival of a new packet if the packet queue is
+				// empty, and the caller want's to wait
+				if (packetQueue.isEmpty()) {
 					packetQueue.wait();
-				} catch (final InterruptedException e) {
-					log.info(getInstanceName()
-							+ ": The packet consumer thread was interrupted while waiting for a notification of the arrival of a new packet");
-					packetConsumerThread.interrupt();
+				} else {
+					return packetQueue.poll();
 				}
 			}
-			return packetQueue.poll();
 		}
+		throw new InterruptedException();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -544,8 +563,11 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @throws Exception any kind of exception
 	 */
 	public void shutdown() throws Exception {
+		
+		getXMLConfig().removePropertyChangeListener(propertyActiveListener);
+
 		// stop the consumer thread
 		stopPacketConsumerThread();
 	}
-
+	
 }
