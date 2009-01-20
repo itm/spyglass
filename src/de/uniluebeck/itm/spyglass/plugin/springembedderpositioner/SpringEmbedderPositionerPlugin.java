@@ -30,11 +30,6 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	}
 
 	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
-	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
 		// TODO Auto-generated method stub
 		return null;

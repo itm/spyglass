@@ -169,7 +169,8 @@ public class QuadTree implements Layer, BoundingBoxChangeListener {
 						if (e.getBoundingBox().intersects(box)) {
 							list.add(e);
 						}
-					} catch (final Throwable t) {
+					} catch (final Exception t) {
+						// XXX ???
 						// System.out.println("bla" + t);
 					}
 				}

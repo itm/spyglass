@@ -97,7 +97,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @param packet
 	 *            The packet object to handle.
 	 */
-	public void handlePacket(final SpyglassPacket packet) {
+	public void handlePacket(final SpyglassPacket packet) throws InterruptedException {
 		// if the packet is not null, check if its semantic type is one of
 		// those, the plug-in is interested in
 		if (isActive()) {

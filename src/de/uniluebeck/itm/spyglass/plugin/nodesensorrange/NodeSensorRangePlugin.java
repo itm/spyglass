@@ -75,11 +75,6 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 
 	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
-	@Override
 	public List<DrawingObject> getAutoZoomDrawingObjects() {
 		return data.getDrawingObjects();
 	}

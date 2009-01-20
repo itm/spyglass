@@ -10,6 +10,8 @@ package de.uniluebeck.itm.spyglass.util;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -52,7 +54,7 @@ public class Tools {
 				}
 			}
 
-		} catch (final Throwable t) {
+		} catch (final SocketException t) {
 			log.error("Unable to retrieve external ips: " + t, t);
 
 			try {
@@ -64,7 +66,7 @@ public class Tools {
 				for (int i = 0; i < ia.length; i++) {
 					ips.add(ia[i].getHostAddress());
 				}
-			} catch (final Throwable t2) {
+			} catch (final UnknownHostException t2) {
 				log.error("Also unable to retrieve external ips: " + t2, t2);
 			}
 
@@ -127,17 +129,6 @@ public class Tools {
 
 		log.debug("IP " + ip + " is an " + (external ? "external" : "internal") + " address");
 		return external;
-	}
-
-	// -------------------------------------------------------------------------
-	/**
-	 * @param millis
-	 */
-	public static void sleep(final long millis) {
-		try {
-			Thread.sleep(millis);
-		} catch (final Throwable e) {
-		}
 	}
 
 	// -------------------------------------------------------------------------
@@ -321,21 +312,6 @@ public class Tools {
 			s.append(m.get(o));
 		}
 		return s.toString();
-	}
-
-	// -------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public static int toInteger(final String s, final int defaultValue) {
-		int retVal = defaultValue;
-
-		try {
-			retVal = Integer.parseInt(s);
-		} catch (final Throwable t) {
-		}
-
-		return retVal;
 	}
 
 	// -------------------------------------------------------------------------

@@ -48,11 +48,6 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	}
 	
 	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-	
-	@Override
 	public PluginPreferencePage<ImagePainterPlugin, ImagePainterXMLConfig> createPreferencePage(
 			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new ImagePainterPreferencePage(dialog, spyglass, this);

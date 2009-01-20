@@ -53,11 +53,6 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	}
 
 	@Override
-	public void finalize() throws Throwable {
-		super.finalize();
-	}
-
-	@Override
 	public PluginPreferencePage<VectorSequencePainterPlugin, VectorSequencePainterXMLConfig> createPreferencePage(
 			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new VectorSequencePainterPreferencePage(dialog, spyglass, this);
