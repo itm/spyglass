@@ -31,6 +31,7 @@ import com.cloudgarden.resource.SWTResourceManager;
 import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.FileReadableValidator;
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
 public class ImagePainterOptionsComposite extends Composite {
@@ -231,6 +232,7 @@ public class ImagePainterOptionsComposite extends Composite {
 
 						img = new Image(null, newFileName);
 						imgRatio = (float) img.getImageData().width / (float) img.getImageData().height;
+						updateLock();
 						img.dispose();
 
 					} catch (final SWTException swtException) {
@@ -324,12 +326,14 @@ public class ImagePainterOptionsComposite extends Composite {
 			obsWidget = SWTObservables.observeText(imageSizeWidthText, SWT.Modify);
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ImagePainterXMLConfig.PROPERTYNAME_IMAGE_SIZE_X);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeText(imageSizeHeightText, SWT.Modify);
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ImagePainterXMLConfig.PROPERTYNAME_IMAGE_SIZE_Y);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
