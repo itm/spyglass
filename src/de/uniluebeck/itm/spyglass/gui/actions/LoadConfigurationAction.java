@@ -49,6 +49,8 @@ public class LoadConfigurationAction extends Action {
 			// first we have to load the new config, to avoid that it is overwritten in the meantime
 			try {
 				spyglass.getConfigStore().importConfig(f);
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
 			} catch (final Exception e) {
 				log.error("Could not load the config.", e);
 				return false;

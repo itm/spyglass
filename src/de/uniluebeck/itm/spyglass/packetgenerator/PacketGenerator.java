@@ -110,8 +110,7 @@ public class PacketGenerator {
 			try {
 				Thread.sleep(1000 / this.packetsPerSecond);
 			} catch (final InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Thread.currentThread().interrupt();
 			}
 		}
 		

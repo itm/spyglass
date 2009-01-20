@@ -172,6 +172,8 @@ public class ConfigStore extends PropertyBean {
 
 			try {
 				newConfig = ConfigStore.load(f);
+			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
 			} catch (final Exception e) {
 				log.error("Unable to load configuration input:\r\nThe configuration file '" + f + "' is invalid! I'll move"
 						+ " the broken one away and start with a fresh config", e);
@@ -384,6 +386,8 @@ public class ConfigStore extends PropertyBean {
 			
 		} catch (final IOException e) {
 			log.error("Unable to store configuration output: Error while writing the file!", e);
+		} catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
 		} catch (final Exception e) {
 			log.error("Unable to store configuration output: " + e.getMessage(), e);
 		}

@@ -112,13 +112,9 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	@Override
 	public void reset() throws IOException {
 		// prevent threads to be waiting for the queue forever...
-		try {
-			skipWaiting = true;
-			synchronized (queue) {
-				queue.notifyAll();
-			}
-		} catch (final Exception e) {
-			log.error(e, e);
+		skipWaiting = true;
+		synchronized (queue) {
+			queue.notifyAll();
 		}
 		synchronized (queue) {
 			queue.clear();

@@ -17,7 +17,6 @@ import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
-import de.uniluebeck.itm.spyglass.util.Tools;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 
 // ------------------------------------------------------------------------------
@@ -97,7 +96,12 @@ public class PacketProducerTask implements Runnable {
 		log.debug("Producer task staring.");
 
 		synchronized (mutex) {
-			Tools.sleep(initialDelayMs);
+			try {
+				Thread.sleep(initialDelayMs);
+			} catch (final InterruptedException e) {
+				log.debug("PacketReader has been interrupted, shutting down.");
+				Thread.currentThread().interrupt();
+			}
 		}
 
 		while (!Thread.currentThread().isInterrupted()) {

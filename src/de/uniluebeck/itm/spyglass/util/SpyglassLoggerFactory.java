@@ -9,6 +9,7 @@
 package de.uniluebeck.itm.spyglass.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class SpyglassLoggerFactory {
 				logger.setLevel(loglevel);
 				loggerMap.put(clazz.getName(), logger);
 			}
-		} catch (final Exception e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return logger;

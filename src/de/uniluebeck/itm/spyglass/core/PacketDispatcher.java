@@ -68,8 +68,9 @@ public class PacketDispatcher {
 	 * 
 	 * @param packet
 	 *            The packet object to be distributed.
+	 * @throws InterruptedException 
 	 */
-	public void dispatchPacket(final SpyglassPacket packet) {
+	public void dispatchPacket(final SpyglassPacket packet) throws InterruptedException {
 		if (packet == null) {
 			return;
 		}
@@ -98,8 +99,8 @@ public class PacketDispatcher {
 			}
 			try {
 				plugin.handlePacket(packet);
-			} catch (final Throwable t) {
-				log.error("The plugin " + plugin + " could not handle a packet : " + t, t);
+			} catch (final RuntimeException e) {
+				log.error("The plugin " + plugin + " could not handle a packet : " + e, e);
 			}
 		}
 	}

@@ -319,7 +319,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 		} catch (final IllegalArgumentException e) {
 			((SpyglassLogger) log).error(e, false);
-		} catch (final Exception e) {
+		} catch (final RuntimeException e) {
 			log.error("An error occured while processing a packet's contents using a StringFormatter", e);
 		}
 		return needsUpdate;
@@ -502,6 +502,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 				} catch (final InterruptedException e) {
 					log.error("Sleeping was interrupted while waiting to perform a refresh of the configuration parameters");
+					Thread.currentThread().interrupt();
 				} catch (final Exception e) {
 					log.error(e, e);
 				} finally {

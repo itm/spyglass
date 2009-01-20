@@ -36,7 +36,7 @@ public class EventDispatcher {
 	}
 
 	@Override
-	public void finalize() throws Throwable {
+	public void finalize() {
 		pluginManager = null;
 		drawingArea = null;
 	}

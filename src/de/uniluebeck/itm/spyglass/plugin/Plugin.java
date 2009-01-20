@@ -219,7 +219,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			try {
 				packetConsumerThread.interrupt();
 				log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName() + " stopped successfully.");
-			} catch (final Exception e) {
+			} catch (final RuntimeException e) {
 				log.error("An error occured while trying to stop the plug-in's thread", e);
 			}
 		}
@@ -239,7 +239,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 				packetConsumerThread.start();
 
 				log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName() + " started successfully.");
-			} catch (final Exception e) {
+			} catch (final RuntimeException e) {
 				log.error("An error occured while trying to start the plug-in's thread", e);
 			}
 		}
@@ -409,7 +409,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			if (p != null) {
 				try {
 					processPacket(p);
-				} catch (final Exception e) {
+				} catch (final RuntimeException e) {
 					log.error("An exception occured while processing a packet in Plugin '" + getInstanceName() + "'", e);
 				}
 				updateLayer();
