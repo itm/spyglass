@@ -59,9 +59,7 @@ public class SpyglassApp {
 		// Control
 		new UIController(spyglass, appWindow);
 		
-		// Start visualization
-
-		spyglass.setVisualizationRunning(true);
+		// Start Spyglass
 		spyglass.start();
 		
 		// SWT message loop

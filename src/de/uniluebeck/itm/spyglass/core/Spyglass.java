@@ -42,8 +42,6 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 public class Spyglass {
 	private static Logger log = SpyglassLoggerFactory.getLogger(Spyglass.class);
 
-	// private static final String CONFIG_FILE = "config.xml";
-
 	private PacketDispatcher packetDispatcher = null;
 
 	private PluginManager pluginManager = null;
@@ -52,12 +50,10 @@ public class Spyglass {
 
 	private PacketProducerTask packetProducerTask = null;
 
-	private ExecutorService executor = Executors.newFixedThreadPool(2);
-
 	/**
-	 * TODO: Define exactly what this should do
+	 * Contains the packetProducerTask
 	 */
-	private boolean visualizationRunning = true;
+	private ExecutorService executor = Executors.newFixedThreadPool(1);
 
 	private final ConfigStore configStore;
 
@@ -87,7 +83,7 @@ public class Spyglass {
 		packetReader = configStore.getSpyglassConfig().getPacketReader();
 
 		packetDispatcher = new PacketDispatcher(this);
-		setVisualizationRunning(true);
+
 		packetProducerTask = new PacketProducerTask(this, configStore.getSpyglassConfig().getGeneralSettings().getPacketDeliveryInitialDelay());
 
 		configStore.getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
@@ -113,11 +109,13 @@ public class Spyglass {
 	public void start() {
 		log.debug("Starting visualization and packetProducer Task");
 		executor.execute(packetProducerTask);
-		executor.shutdown();
 	}
 
 	public void shutdown() {
-		setVisualizationRunning(false);
+		// Shutdown the packetProducerTask
+		executor.shutdownNow();
+		
+		// TODO: not sure if this will even be executed, since were shutting down the configStore right after
 		configStore.store();
 		try {
 			configStore.shutdown();
@@ -158,17 +156,6 @@ public class Spyglass {
 		pluginManager.init();
 	}
 
-	// --------------------------------------------------------------------------
-	// ------
-	public boolean isVisualizationRunning() {
-		return visualizationRunning;
-	}
-
-	// --------------------------------------------------------------------------
-	// ------
-	public void setVisualizationRunning(final boolean visualizationRunning) {
-		this.visualizationRunning = visualizationRunning;
-	}
 
 	// --------------------------------------------------------------------------
 	// ------

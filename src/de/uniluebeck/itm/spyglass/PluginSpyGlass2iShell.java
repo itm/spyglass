@@ -142,8 +142,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		// addToolBarAction(new LoadConfigurationAction(spyglass));
 		// addToolBarAction(new StoreConfigurationAction(spyglass));
 
-		// Start visualization
-		spyglass.setVisualizationRunning(true);
+		// Start Spyglass
 		spyglass.start();
 
 		return new int[] { SPYGLASS_PACKET_TYPE };

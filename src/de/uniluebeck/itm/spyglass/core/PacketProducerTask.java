@@ -30,7 +30,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
  * <code>packetCache</code> member of the Spyglass class). This thread stop when the
  * <code>visualizationRunning</code> member of the Spyglass class is set to false.
  * 
- * @author Dariush Forouher (?)
+ * @author Dariush Forouher
  * @author Sebastian Ebers
  */
 public class PacketProducerTask implements Runnable {
@@ -100,7 +100,7 @@ public class PacketProducerTask implements Runnable {
 			Tools.sleep(initialDelayMs);
 		}
 
-		while (spyglass.isVisualizationRunning()) {
+		while (!Thread.currentThread().isInterrupted()) {
 
 			try {
 				synchronized (paused) {
@@ -117,16 +117,11 @@ public class PacketProducerTask implements Runnable {
 					continue;
 				}
 
-				if (!spyglass.isVisualizationRunning()) {
-					break;
-				}
-
-				log.debug("Added packet: " + packet);
-
 				spyglass.getPacketDispatcher().dispatchPacket(packet);
 
 			} catch (final InterruptedException e) {
-				log.error("PacketReader has been interrupted.", e);
+				log.debug("PacketReader has been interrupted, shutting down.");
+				Thread.currentThread().interrupt();
 			} catch (final SpyglassPacketException e) {
 				log.error("Could not receive a packet from the packetReader.", e);
 			}
