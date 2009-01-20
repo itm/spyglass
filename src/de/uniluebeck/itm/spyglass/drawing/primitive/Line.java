@@ -63,7 +63,8 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 
 			gc.setClipping(clipping);
 			gc.drawLine(start.x, start.y, end.x, end.y);
-			System.out.println("(" + start.x + ", " + start.y + ", " + end.x + ", " + end.y + ")");
+			// System.out.println("(" + start.x + ", " + start.y + ", " + end.x + ", " + end.y +
+			// ")");
 
 		}
 
