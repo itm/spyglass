@@ -96,8 +96,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * 
 	 * @param packet
 	 *            The packet object to handle.
+	 * @param InterruptedException if an interrupt occured while this method was called.
+	 * @param Exception if any exception occured.
 	 */
-	public void handlePacket(final SpyglassPacket packet) throws InterruptedException {
+	public void handlePacket(final SpyglassPacket packet) throws Exception {
 		// if the packet is not null, check if its semantic type is one of
 		// those, the plug-in is interested in
 		if (isActive()) {
@@ -173,16 +175,6 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns whether the plug-ins packet consumer thread is currently running
-	 * 
-	 * @return whether the plug-ins packet consumer thread is currently running
-	 */
-	public boolean isThreadRunning() {
-		return ((packetConsumerThread != null) && packetConsumerThread.isAlive() && !packetConsumerThread.isInterrupted());
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
 	 * Initializes the plugin. It is called right after the plugin has been instanciated and the
 	 * configuration of the plugin is set.
 	 * 
@@ -193,7 +185,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * 
 	 * @see PluginXMLConfig#getActive()
 	 */
-	public void init(final PluginManager manager) {
+	public void init(final PluginManager manager) throws Exception {
 
 		this.pluginManager = manager;
 
@@ -256,32 +248,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 *            the <code>Spyglass</code> instance
 	 * 
 	 * @return a widget which can be used to configure the plug-in
+	 * @throws an exception when the page could not be created. this will result in a user-visible error message
 	 */
 	public abstract PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass);
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Creates and returns a widget which can be used to configure the plug-in's type.<br>
-	 * Since the type does not need to provide information about configuration options of a certain
-	 * plug-in instance this method can be called in a static way.
-	 * 
-	 * @param dialog
-	 *            the <code>PluginPreferenceDialog</code> instance the preference page is displayed
-	 *            in
-	 * @param spyglass
-	 *            the <code>Spyglass</code> instance
-	 * 
-	 * @return a widget which can be used to configure the plug-in's type
-	 * @throws UnsupportedOperationException
-	 *             if this operation is called on an abstract superclass of a plug-in
-	 */
-	public static PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createTypePreferencePage(
-			@SuppressWarnings("unused") final PluginPreferenceDialog dialog, @SuppressWarnings("unused") final Spyglass spyglass)
-			throws UnsupportedOperationException {
-		throw new UnsupportedOperationException(
-				"This method must only be called on subclasses and must be implemented in every instantiable subclass.");
-	}
+			final Spyglass spyglass) throws Exception;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -309,13 +279,17 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	/**
 	 * Handles a mouse event
 	 * 
+	 * This method is called from the SWT Display thread. So this method should return as quickly as
+	 * possible, to avoid user-visible delays.
+	 * 
 	 * @param e
 	 *            the mouse event
 	 * @param drawingArea
 	 *            the drawing area in which the event occured
 	 * @return <code>true</code> if the plug-in could handle the event, <code>false</code> otherwise
+	 * @throws Exception any kind of exception
 	 */
-	public boolean handleEvent(@SuppressWarnings("unused") final MouseEvent e, @SuppressWarnings("unused") final DrawingArea drawingArea) {
+	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) throws Exception {
 		return false;
 	}
 
@@ -339,8 +313,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * 
 	 * @param packet
 	 *            the packet
+	 * @throws Exception any kind of exception
 	 */
-	protected abstract void processPacket(SpyglassPacket packet);
+	protected abstract void processPacket(SpyglassPacket packet) throws Exception;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -358,8 +333,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * Updates the quad tree after all sensible information provided by a packet have been
 	 * processed. This method should be processed quickly since the graphical user interface has to
 	 * wait while the quad tree is updated.
+	 * 
+	 * @throws Exception if anything bad happens.
 	 */
-	protected abstract void updateLayer();
+	protected abstract void updateLayer() throws Exception;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -386,15 +363,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @see java.text.Collator#compare(String, String)
 	 * @since 1.2
 	 */
-	public int compareTo(final Plugin p) {
+	public final int compareTo(final Plugin p) {
 
-		// if (p instanceof Plugin) {
-		// final String s1 = getInstanceName();
-		// final String s2 = (p).getInstanceName();
-		// final int result = s1.compareToIgnoreCase(s2);
 		return getInstanceName().compareToIgnoreCase(p.getInstanceName());
-		// }
-		// return 0;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -409,10 +380,13 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			if (p != null) {
 				try {
 					processPacket(p);
-				} catch (final RuntimeException e) {
+					updateLayer();
+				} catch (final InterruptedException e) {
+					log.error("An exception occured while processing a packet in Plugin '" + getInstanceName() + "'", e);
+					packetConsumerThread.interrupt();
+				} catch (final Exception e) {
 					log.error("An exception occured while processing a packet in Plugin '" + getInstanceName() + "'", e);
 				}
-				updateLayer();
 			}
 		}
 		packetConsumerThread = null;
@@ -428,7 +402,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @throws NullPointerException
 	 *             if the specified packet is null
 	 */
-	protected boolean enqueuePacket(final SpyglassPacket packet) {
+	protected final boolean enqueuePacket(final SpyglassPacket packet) {
 		boolean success = false;
 		if (isActive()) {
 			synchronized (packetQueue) {
@@ -449,7 +423,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 *            is currently empty
 	 * @return the head of the packet queue, or <tt>null</tt> if it is empty
 	 */
-	private SpyglassPacket getPacketFromQueue(final boolean wait) {
+	private final SpyglassPacket getPacketFromQueue(final boolean wait) {
 
 		synchronized (packetQueue) {
 			// wait for the arrival of a new packet if the packet queue is
@@ -477,7 +451,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @param listener
 	 *            a DrawingObjectListener
 	 */
-	public void addDrawingObjectListener(final DrawingObjectListener listener) {
+	public final void addDrawingObjectListener(final DrawingObjectListener listener) {
 		listeners.add(DrawingObjectListener.class, listener);
 	}
 
@@ -488,7 +462,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @param listener
 	 *            an existing DrawingObjectListener
 	 */
-	public void removeDrawingObjectListener(final DrawingObjectListener listener) {
+	public final void removeDrawingObjectListener(final DrawingObjectListener listener) {
 		listeners.remove(DrawingObjectListener.class, listener);
 	}
 
@@ -556,7 +530,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * 
 	 * @return the responsible plug-in manager
 	 */
-	protected PluginManager getPluginManager() {
+	protected final PluginManager getPluginManager() {
 		return pluginManager;
 	}
 
@@ -567,8 +541,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * purpose is to clean up behind, kill (eventually) remaining threads and unregister any
 	 * listeners (if necessary).
 	 * 
+	 * @throws Exception any kind of exception
 	 */
-	public void shutdown() {
+	public void shutdown() throws Exception {
 		// stop the consumer thread
 		stopPacketConsumerThread();
 	}

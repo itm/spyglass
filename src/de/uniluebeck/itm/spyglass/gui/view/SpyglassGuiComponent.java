@@ -61,7 +61,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	 *            the arguments
 	 * @throws IOException
 	 */
-	public static void main(final String[] args) throws IOException {
+	public static void main(final String[] args) throws Exception {
 		showGUI();
 	}
 
@@ -71,7 +71,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	 * 
 	 * @throws IOException
 	 */
-	public static void showGUI() throws IOException {
+	public static void showGUI() throws Exception {
 		final Display display = Display.getDefault();
 		final Shell shell = new Shell(display);
 		final SpyglassGuiComponent inst = new SpyglassGuiComponent(shell, SWT.NULL, new Spyglass());

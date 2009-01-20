@@ -154,7 +154,7 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	}
 
 	@Override
-	public void shutdown() {
+	public void shutdown() throws Exception {
 		super.shutdown();
 
 		// shutdown the timer (don't bother to clean up the DrawingObjects)

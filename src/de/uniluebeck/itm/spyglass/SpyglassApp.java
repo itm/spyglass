@@ -34,7 +34,7 @@ public class SpyglassApp {
 	 * @throws IOException 
 	 * 
 	 */
-	public SpyglassApp() throws IOException {
+	public SpyglassApp() throws Exception {
 		log.info("New SpyGlass instance.");
 		
 		// GUI
@@ -79,7 +79,7 @@ public class SpyglassApp {
 	 * @throws IOException 
 	 * 
 	 */
-	public static void main(final String[] args) throws IOException {
+	public static void main(final String[] args) throws Exception {
 		log.info("Starting SpyGlass app.");
 		new SpyglassApp();
 	}

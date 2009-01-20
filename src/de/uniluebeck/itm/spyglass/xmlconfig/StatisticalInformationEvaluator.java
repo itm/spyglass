@@ -339,7 +339,7 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 			final int val = Integer.valueOf(stringFormatter.parse(packet));
 			value = new DecimalFormat("0.0#").format(operationExecutor.addValue(val));
 			return description + " " + value;
-		} catch (final Exception e) {
+		} catch (final RuntimeException e) {
 			value = "NaN";
 			throw new SpyglassPacketException("A packet coult not be evaluated in StatisticalInformationEvaluator");
 		}

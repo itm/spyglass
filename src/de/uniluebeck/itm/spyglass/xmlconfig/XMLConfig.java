@@ -42,7 +42,7 @@ public abstract class XMLConfig extends PropertyBean {
 					
 					final Object newValue = getter.invoke(other);
 					setter.invoke(this, newValue);
-					
+
 				} catch (final NoSuchMethodException e) {
 					throw new RuntimeException("Could not find corresponding getter method to "
 							+ setter.getName() + " in class " + clazz.getName(), e);

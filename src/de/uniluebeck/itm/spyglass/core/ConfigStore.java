@@ -146,9 +146,10 @@ public class ConfigStore extends PropertyBean {
 	/**
 	 * Reads the configuration from an hard-coded standard-path (which is stored internally in this
 	 * class)
+	 * @throws Exception 
 	 * 
 	 */
-	public ConfigStore() throws IOException {
+	public ConfigStore() throws Exception {
 		final File f = SpyglassEnvironment.getConfigFilePath();
 
 		boolean newFile = false;
@@ -229,8 +230,9 @@ public class ConfigStore extends PropertyBean {
 	/**
 	 * Create a Spyglass Configuration with default values and one PostionPacketNodePositioner as
 	 * the only plugin.
+	 * @throws Exception 
 	 */
-	private static SpyglassConfiguration createDefaultSpyglassConfig() {
+	private static SpyglassConfiguration createDefaultSpyglassConfig() throws Exception {
 		SpyglassConfiguration newConfig;
 		newConfig = new SpyglassConfiguration();
 		final Collection<Plugin> defaultPlugins = new HashSet<Plugin>();

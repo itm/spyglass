@@ -102,7 +102,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	// --------------------------------------------------------------------------------
 	@Override
-	public void init(final PluginManager manager) {
+	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
 		pcl = new PropertyChangeListener() {
 			@Override
@@ -205,7 +205,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	// --------------------------------------------------------------------------------
 	@Override
-	public void shutdown() {
+	public void shutdown() throws Exception {
 		super.shutdown();
 		if ((widget != null) && !widget.isDisposed()) {
 			widget.getDisplay().asyncExec(new Runnable() {

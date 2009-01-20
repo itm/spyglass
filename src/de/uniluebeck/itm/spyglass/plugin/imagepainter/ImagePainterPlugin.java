@@ -98,7 +98,7 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	}
 	
 	@Override
-	public void init(final PluginManager manager) {
+	public void init(final PluginManager manager) throws Exception {
 		
 		super.init(manager);
 		

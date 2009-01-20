@@ -98,7 +98,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	}
 
 	@Override
-	public void init(final PluginManager manager) {
+	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
 
 		this.map = new Map(xmlConfig, this);
@@ -112,7 +112,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 	
 	@Override
-	public void shutdown() {
+	public void shutdown() throws Exception {
 		super.shutdown();
 		
 		this.pluginManager.removeNodePositionListener(this);

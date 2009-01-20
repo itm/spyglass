@@ -66,7 +66,7 @@ public class Spyglass {
 	 * @throws IOException
 	 * 
 	 */
-	public Spyglass() throws IOException {
+	public Spyglass() throws Exception {
 		configStore = new ConfigStore();
 		init();
 	}
@@ -125,7 +125,11 @@ public class Spyglass {
 
 		// shutdown all plugins
 		for (final Plugin p : pluginManager.getPlugins()) {
-			p.shutdown();
+			try {
+				p.shutdown();
+			} catch (final Exception e) {
+				log.warn("The plugin could not be shut down properly. Continuing anyway.",e);
+			}
 		}
 
 		log.info("All plugin-threads stopped");

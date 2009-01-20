@@ -255,7 +255,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	}
 
 	@Override
-	public void init(final PluginManager manager) {
+	public void init(final PluginManager manager) throws Exception {
 
 		super.init(manager);
 

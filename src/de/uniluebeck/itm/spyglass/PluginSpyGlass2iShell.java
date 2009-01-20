@@ -12,7 +12,6 @@ import ishell.util.IconTheme;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.custom.CTabItem;
@@ -104,7 +103,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		// create Model
 		try {
 			spyglass = new Spyglass();
-		} catch (final IOException e1) {
+		} catch (final Exception e1) {
 			// TODO What should we do now?
 			log.error("", e1);
 			return new int[] {};

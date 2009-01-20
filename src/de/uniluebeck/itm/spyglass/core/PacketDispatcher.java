@@ -83,7 +83,12 @@ public class PacketDispatcher {
 		// An exception like this has to be handled differently
 		final NodePositionerPlugin np = pluginManager.getNodePositioner();
 		log.debug("Dispatching packet[" + packet + "] to NodePositioner " + np);
-		np.handlePacket(packet);
+		
+		try {
+			np.handlePacket(packet);
+		} catch (final Exception e1) {
+			log.error("Plugin "+np+" threw an exception while handling the packet "+packet,e1);
+		}
 
 		final List<Plugin> plugins = pluginManager.getActivePlugins();
 		if (plugins == null) {
@@ -99,8 +104,8 @@ public class PacketDispatcher {
 			}
 			try {
 				plugin.handlePacket(packet);
-			} catch (final RuntimeException e) {
-				log.error("The plugin " + plugin + " could not handle a packet : " + e, e);
+			} catch (final Exception e) {
+				log.error("Plugin "+plugin+" threw an exception while handling the packet "+packet,e);
 			}
 		}
 	}

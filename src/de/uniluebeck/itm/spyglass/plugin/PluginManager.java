@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -285,9 +286,15 @@ public class PluginManager {
 		// This is a workaround, since simple-xml does not call the setPlugins()
 		// method
 		synchronized (plugins) {
-			for (final Plugin p : plugins) {
-				connectPlugin(p);
-				log.debug(p.getInstanceName());
+			final Iterator<Plugin> it = plugins.iterator();
+			while(it.hasNext()) {
+				final Plugin p = it.next();
+				try {
+					connectPlugin(p);
+				} catch (final Exception e) {
+					log.error("Could not connect plugin "+p+" with the plugin manager. Dropping the plugin.",e);
+					it.remove();
+				}
 			}
 		}
 		log.debug("All plug-ins loaded and connected");
@@ -299,8 +306,9 @@ public class PluginManager {
 	 * 
 	 * @param plugin
 	 *            the plug-in to be connected
+	 * @throws Exception 
 	 */
-	private void connectPlugin(final Plugin plugin) {
+	private void connectPlugin(final Plugin plugin) throws Exception {
 		// If the plug-in is a NodePositioner, we have to act when the plug-in is activated
 		// (to disable all other plug-ins)
 		if (plugin instanceof NodePositionerPlugin) {
@@ -340,8 +348,9 @@ public class PluginManager {
 	 * 
 	 * @param plugin
 	 *            The plug-in object to be added.
+	 * @throws Exception when the plugin could not be created.
 	 */
-	private void addPlugin(final Plugin plugin) {
+	private void addPlugin(final Plugin plugin) throws Exception {
 		this.connectPlugin(plugin);
 
 		if (!plugins.contains(plugin)) {
@@ -589,7 +598,11 @@ public class PluginManager {
 		// as replacement.
 		plugin.setActive(false);
 
-		plugin.shutdown();
+		try {
+			plugin.shutdown();
+		} catch (final Exception e) {
+			log.warn("The plugin could not be shut down properly. Continuing anyway.",e);
+		}
 
 		synchronized (plugins) {
 			plugins.remove(plugin);
@@ -678,8 +691,9 @@ public class PluginManager {
 	 * @param config
 	 *            the plug-in's configuration parameters
 	 * @return the new instance of a plug-in
+	 * @throws Exception when the plugin could not be created.
 	 */
-	public Plugin createNewPlugin(final Class<? extends Plugin> clazz, final PluginXMLConfig config) {
+	public Plugin createNewPlugin(final Class<? extends Plugin> clazz, final PluginXMLConfig config) throws Exception {
 		final Plugin plugin;
 		if (config != null) {
 			plugin = PluginFactory.createInstance(config, clazz);

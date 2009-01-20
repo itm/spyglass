@@ -469,7 +469,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 					"Could not store your changes. There are still errors remaining in the form.");
 		} else {
 
-			spyglass.getPluginManager().createNewPlugin(getPluginClass(), config);
+			try {
+				spyglass.getPluginManager().createNewPlugin(getPluginClass(), config);
+			} catch (final Exception e) {
+				log.error("Could not create the requested plugin.",e);
+			}
 		}
 	}
 

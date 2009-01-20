@@ -110,7 +110,7 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 	}
 
 	@Override
-	public void init(final PluginManager manager) {
+	public void init(final PluginManager manager) throws Exception {
 
 		super.init(manager);
 		xmlConfig.addPropertyChangeListener(this);

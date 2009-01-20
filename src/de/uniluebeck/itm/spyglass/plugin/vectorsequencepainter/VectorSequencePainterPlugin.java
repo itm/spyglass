@@ -154,7 +154,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	}
 
 	@Override
-	public void init(final PluginManager manager) {
+	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
 		xmlConfig.addPropertyChangeListener(this);
 		handleTimeoutChangeEvent(xmlConfig.getTimeout());

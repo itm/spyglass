@@ -95,7 +95,7 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 
 	@Override
-	public void init(final PluginManager pluginManager) {
+	public void init(final PluginManager pluginManager) throws Exception {
 
 		super.init(pluginManager);
 		pluginManager.addNodePositionListener(nodePositionListener);

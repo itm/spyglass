@@ -120,7 +120,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	// --------------------------------------------------------------------------------
 	@Override
-	public void init(final PluginManager manager) {
+	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
 		npcl = new NodePositionListener() {
 			@SuppressWarnings("synthetic-access")
@@ -165,7 +165,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	// --------------------------------------------------------------------------------
 	@Override
-	public void shutdown() {
+	public void shutdown() throws Exception {
 		super.shutdown();
 		getPluginManager().removeNodePositionListener(npcl);
 		xmlConfig.removePropertyChangeListener(pcl);

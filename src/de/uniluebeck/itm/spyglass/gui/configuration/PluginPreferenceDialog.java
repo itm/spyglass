@@ -538,7 +538,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 	};
 
-	private PluginPreferenceNode createInstancePreferenceNode(final Plugin p) {
+	private PluginPreferenceNode createInstancePreferenceNode(final Plugin p) throws Exception {
 		final PluginPreferenceNode node = new PluginPreferenceNode(getPreferenceNodeId(p), p.createPreferencePage(this, spyglass), p);
 		// add to hashmap (needed for lookup when removing instances)
 		instancePreferenceNodes.put(p, node);
@@ -568,30 +568,30 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 		final CustomPreferenceNode preferenceNode;
 
-		try {
+		// add nodes for abstract and instantiable but not instantiated plugins
+		preferenceNode = createTypePreferenceNode(classTree.clazz);
+		parentPreferenceNode.add(preferenceNode);
 
-			// add nodes for abstract and instantiable but not instantiated plugins
-			preferenceNode = createTypePreferenceNode(classTree.clazz);
-			parentPreferenceNode.add(preferenceNode);
+		// add nodes for instantiated plugins
+		for (final Plugin p : spyglass.getPluginManager().getPluginInstances(classTree.clazz, false)) {
 
-			// add nodes for instantiated plugins
-			for (final Plugin p : spyglass.getPluginManager().getPluginInstances(classTree.clazz, false)) {
+			try {
 
 				// add to parent tree node
 				preferenceNode.add(createInstancePreferenceNode(p));
 
+			} catch (final Exception e) {
+				log.error("An error occured while adding the preference page for plugin "+p+". I'll ignore this plugin.", e);
 			}
 
-			for (final ClassTree ct : classTree.sons) {
-
-				addPreferenceNodesRecursive(ct, preferenceNode);
-
-			}
-
-		} catch (final Exception e) {
-			log.error("", e);
-			return;
 		}
+
+		for (final ClassTree ct : classTree.sons) {
+
+			addPreferenceNodesRecursive(ct, preferenceNode);
+
+		}
+
 
 	}
 
@@ -750,7 +750,11 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	}
 
 	private void onPluginAdded(final Plugin p) {
-		typePreferenceNodes.get(p.getClass()).add(createInstancePreferenceNode(p));
+		try {
+			typePreferenceNodes.get(p.getClass()).add(createInstancePreferenceNode(p));
+		} catch (final Exception e) {
+			log.error("The preference page of plugin "+p+" could not be created.",e);
+		}
 		preferenceDialog.getTreeViewer().refresh();
 	}
 
