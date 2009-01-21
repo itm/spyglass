@@ -12,6 +12,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -191,7 +193,22 @@ public class DrawingArea extends Canvas {
 		
 		addPaintListener(paintListener);
 		
+		addDisposeListener(disposeListener);
+		
 	}
+	
+	/**
+	 * Dispose children
+	 */
+	private DisposeListener disposeListener = new DisposeListener() {
+
+		@Override
+		public void widgetDisposed(final DisposeEvent e) {
+			canvasBgColor.dispose();
+			canvasOutOfMapColor.dispose();
+		}
+		
+	};
 	
 	/**
 	 * PaintListener
@@ -284,7 +301,7 @@ public class DrawingArea extends Canvas {
 		
 		@Override
 		public void keyPressed(final KeyEvent arg0) {
-			log.debug("pressed" + arg0);
+			//log.debug("pressed" + arg0);
 			if (arg0.keyCode == 16777219) {
 				move(MOVE_OFFSET, 0);
 			}
@@ -332,9 +349,6 @@ public class DrawingArea extends Canvas {
 		
 		@Override
 		public void controlResized(final ControlEvent e) {
-			log.debug("Control resized: " + e);
-			
-			log.debug("New canvas: " + getClientArea());
 			
 			if (!isValidTransformation(new AffineTransform(at))) {
 				log.error("Resizing resulted in illegal transform. Resetting matrix.");
@@ -988,7 +1002,6 @@ public class DrawingArea extends Canvas {
 			return;
 		}
 		
-		log.debug("Added new listener: " + listener);
 		listeners.add(DrawingAreaTransformListener.class, listener);
 	}
 	
@@ -1000,7 +1013,6 @@ public class DrawingArea extends Canvas {
 			return;
 		}
 		
-		log.debug("Removing listener: " + listener);
 		listeners.remove(DrawingAreaTransformListener.class, listener);
 	}
 	
@@ -1011,7 +1023,7 @@ public class DrawingArea extends Canvas {
 		// Get listeners
 		final EventListener[] list = listeners.getListeners(DrawingAreaTransformListener.class);
 		
-		log.debug("Fire redraw event");
+//		log.debug("Fire redraw event");
 		
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
@@ -1019,14 +1031,6 @@ public class DrawingArea extends Canvas {
 					.handleEvent(new DrawingAreaTransformEvent(this));
 		}
 	}
-	
-	@Override
-	public void dispose() {
-		super.dispose();
-		this.canvasBgColor.dispose();
-		this.canvasOutOfMapColor.dispose();
-	}
-	
 
 	/**
 	 * Returns a copy of the transformation matrix used to transform coordinates from the 

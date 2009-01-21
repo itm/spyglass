@@ -101,6 +101,7 @@ public class UIController {
 
 		// Add paint listener to the canvas
 		appWindow.getGui().getDrawingArea().addPaintListener(paintListener);
+		appWindow.getGui().getDrawingArea().addPaintListener(paintRulerListener);
 
 		/*
 		 * mouse button events - are forwarded to plugins
@@ -121,9 +122,29 @@ public class UIController {
 
 		spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().addPropertyChangeListener(rulerPropertyListener);
 
-		appWindow.getGui().getDrawingArea().addPaintListener(paintRulerListener);
 	}
 
+	/**
+	 * Must be called during shutdown. Should be called before model and view are destroyed.
+	 * 
+	 * Removes all existing listeners.
+	 */
+	public void shutdown() {
+		// Note: We don't have to unregister listeners to Widgets, since they
+		// are automatically removed when the widget is disposed
+		
+		final List<Plugin> plugins = spyglass.getPluginManager().getPlugins();
+		for (final Plugin p : plugins) {
+			if (p instanceof Drawable) {
+				p.removeDrawingObjectListener(drawingObjectListener);
+			}
+		}
+		spyglass.getPluginManager().removePluginListChangeListener(pluginListChangeListener);
+		spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().removePropertyChangeListener(rulerPropertyListener);
+		
+		log.debug("UIController shut down.");
+	}
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * Draw all drawing objects inside the bounding box <code>area</code> from the plugin

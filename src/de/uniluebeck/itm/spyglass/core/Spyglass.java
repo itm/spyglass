@@ -10,21 +10,16 @@ package de.uniluebeck.itm.spyglass.core;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
-import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
-import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
-import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
@@ -102,37 +97,35 @@ public class Spyglass {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * Starts the visualization by starting a packet producer and a visualization thread.
+	 * Starts the packet dispatching
 	 */
 	public void start() {
-		log.debug("Starting visualization and packetProducer Task");
+		log.debug("Starting packetProducer Task");
 		executor.execute(packetProducerTask);
 	}
 
-	// --------------------------------------------------------------------------
 	public void shutdown() {
 		// Shutdown the packetProducerTask
 		executor.shutdownNow();
-
-		// TODO: not sure if this will even be executed, since were shutting down the configStore
-		// right after
+		
+		// TODO: not sure if this will even be executed, since were shutting down the configStore right after
 		configStore.store();
 		try {
 			configStore.shutdown();
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-
+	
 		// shutdown all plugins
 		for (final Plugin p : pluginManager.getPlugins()) {
 			try {
 				p.shutdown();
 			} catch (final Exception e) {
-				log.warn("The plugin could not be shut down properly. Continuing anyway.", e);
+				log.warn("The plugin could not be shut down properly. Continuing anyway.",e);
 			}
 		}
-
-		log.info("All plugin-threads stopped");
+	
+		log.debug("All plugin-threads stopped");
 	}
 
 	// --------------------------------------------------------------------------
@@ -187,76 +180,6 @@ public class Spyglass {
 	 */
 	public PacketProducerTask getPacketProducerTask() {
 		return packetProducerTask;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * This method gets the bounding boxes of all visible drawingObjects
-	 */
-	public AbsoluteRectangle getBoundingBox() {
-		final List<Plugin> list = getPluginManager().getVisibleActivePlugins();
-
-		final List<DrawingObject> dobs = new ArrayList<DrawingObject>();
-
-		for (final Plugin plugin : list) {
-			if (plugin instanceof Drawable) {
-				final Drawable plugin2 = (Drawable) plugin;
-
-				// XXX: this should be no hot path, so no big worry.
-				dobs.addAll(plugin2.getDrawingObjects(DrawingArea.getGlobalBoundingBox()));
-			}
-		}
-
-		AbsoluteRectangle maxRect = new AbsoluteRectangle();
-
-		for (final DrawingObject drawingObject : dobs) {
-			final AbsoluteRectangle nextRect = drawingObject.getBoundingBox();
-			if (nextRect == null) {
-				continue;
-			}
-
-			if (maxRect == null) {
-				maxRect = nextRect;
-			} else {
-				maxRect = maxRect.union(nextRect);
-			}
-		}
-		return maxRect;
-	};
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * This method gets the bounding boxes of all visible drawingObjects (which are applicable for
-	 * AutoZoom and scrollbars) and merges them.
-	 */
-	public AbsoluteRectangle getAutoZoomBoundingBox() {
-		final List<Plugin> list = getPluginManager().getVisibleActivePlugins();
-
-		final List<DrawingObject> dobs = new ArrayList<DrawingObject>();
-
-		for (final Plugin plugin : list) {
-			if (plugin instanceof Drawable) {
-				final Drawable plugin2 = (Drawable) plugin;
-
-				dobs.addAll(plugin2.getAutoZoomDrawingObjects());
-			}
-		}
-
-		AbsoluteRectangle maxRect = new AbsoluteRectangle();
-
-		for (final DrawingObject drawingObject : dobs) {
-			final AbsoluteRectangle nextRect = drawingObject.getBoundingBox();
-			if (nextRect == null) {
-				continue;
-			}
-
-			if (maxRect == null) {
-				maxRect = nextRect;
-			} else {
-				maxRect = maxRect.union(nextRect);
-			}
-		}
-		return maxRect;
 	}
 
 	// --------------------------------------------------------------------------------

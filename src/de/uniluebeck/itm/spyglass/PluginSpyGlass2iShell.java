@@ -15,8 +15,6 @@ import java.beans.PropertyChangeListener;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.custom.CTabItem;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
@@ -66,11 +64,14 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 
 	private static final int SPYGLASS_PACKET_TYPE = 0x91;
 
-	private Composite container;
-
 	private Spyglass spyglass = null;
 
+	private UIController controller = null;
+
+	
 	private IShellToSpyGlassPacketBroker packetBroker;
+
+	private AppWindow appWindow = null;
 
 	// --------------------------------------------------------------------------
 	/**
@@ -84,50 +85,43 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		tabItem.setToolTipText(getName());
 		tabItem.setImage(IconTheme.lookup("system-search"));
 
-		container = this.getTabContainer(true);
+		final Composite container = this.getTabContainer(true);
 		container.setLayout(new FillLayout());
-		container.addControlListener(new ControlListener() {
 
-			@Override
-			public void controlMoved(final ControlEvent e) {
-				// Nothing to do
-			}
-
-			@Override
-			public void controlResized(final ControlEvent e) {
-				log.debug("Control resized, received event: " + e);
-				// TODO Adapt zoom
-			}
-		});
-
-		// create Model
 		try {
+			// create Model
 			spyglass = new Spyglass();
-		} catch (final Exception e1) {
-			// TODO What should we do now?
-			log.error("", e1);
-			return new int[] {};
+
+			connectPacketBroker();
+
+			// create view
+			appWindow = new AppWindow(spyglass, container);
+
+			// create Control
+			controller = new UIController(spyglass, appWindow);
+
+			// add tooltip icons
+			addIcons(container);
+
+			// Start Spyglass
+			spyglass.start();
+			
+		} catch (final Exception e) {
+			log.error("Could not initialize plugin \"Spyglass\" because of an very early error.", e);
+			
+			// remove spyglass tab
+			this.removeTabItem();
+			this.shutdown();
+			return new int[] { };
 		}
+		
+		log.info("Spyglass ready.");
 
-		// save the packet broker for later
-		// XXX: can we really assume this cast?
-		packetBroker = (IShellToSpyGlassPacketBroker) spyglass.getPacketReader();
+		return new int[] { SPYGLASS_PACKET_TYPE };
 
-		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent evt) {
-				if (evt.getPropertyName().equals("packetReader")) {
-					packetBroker = (IShellToSpyGlassPacketBroker) spyglass.getConfigStore().getSpyglassConfig().getPacketReader();
-				}
-			}
-		});
+	}
 
-		// create View
-		final AppWindow appWindow = new AppWindow(spyglass, container);
-
-		// create Control
-		new UIController(spyglass, appWindow);
-
+	private void addIcons(final Composite container) {
 		// Add Toolbar Actions
 		addToolBarAction(new PlaySelectInputAction(container.getShell(), spyglass));
 		addToolBarAction(new PlayPlayPauseAction(spyglass));
@@ -140,11 +134,22 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		addToolBarAction(new OpenPreferencesAction(container.getShell(), spyglass));
 		// addToolBarAction(new LoadConfigurationAction(spyglass));
 		// addToolBarAction(new StoreConfigurationAction(spyglass));
+	}
 
-		// Start Spyglass
-		spyglass.start();
+	private void connectPacketBroker() {
+		// save the packet broker for later
 
-		return new int[] { SPYGLASS_PACKET_TYPE };
+		// XXX: can we really assume this cast?
+		packetBroker = (IShellToSpyGlassPacketBroker) spyglass.getPacketReader();
+
+		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent evt) {
+				if (evt.getPropertyName().equals("packetReader")) {
+					packetBroker = (IShellToSpyGlassPacketBroker) spyglass.getConfigStore().getSpyglassConfig().getPacketReader();
+				}
+			}
+		});
 	}
 
 	// --------------------------------------------------------------------------
@@ -174,18 +179,30 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * TODO: shutdown of the other thread doesn't work correctly...
+	 * Shutdown all components of spyglass
 	 */
 	@Override
 	public void shutdown() {
 
-		// if SpyGlass was not started correctly it might still be null
-		if (spyglass != null) {
-			spyglass.shutdown();
+		// Destroy the components in the reverse direction if which they were created.
+		
+		if (controller != null) {
+			controller.shutdown();
+			controller = null;
 		}
 
-		spyglass = null;
-		container = null;
+		if (appWindow != null) {
+			appWindow.dispose();
+			appWindow = null;
+		}
+
+		if (spyglass != null) {
+			spyglass.shutdown();
+			spyglass = null;
+		}
+		
+		// TODO: what to do with packet broker?
+		
 		log.info("SpyGlass end. Done.");
 	}
 

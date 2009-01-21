@@ -78,5 +78,11 @@ public class AppWindow {
 	public void setDisplay(final Display display) {
 		this.display = display;
 	}
+	
+	public void dispose() {
+		if (gui != null) {
+			gui.dispose();
+		}
+	}
 
 }
