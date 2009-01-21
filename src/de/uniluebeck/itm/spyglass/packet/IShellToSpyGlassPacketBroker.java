@@ -36,6 +36,8 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 
 	private static final Logger log = SpyglassLoggerFactory.getLogger(IShellToSpyGlassPacketBroker.class);
 
+	private volatile int queuedElements;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -87,6 +89,9 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 		}
 
 		skipWaiting = false;
+		if (packet != null) {
+			log.debug("Number of queued elements: " + (--queuedElements));
+		}
 
 		return packet;
 
@@ -103,6 +108,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	 */
 	public void push(final SpyglassPacket packet) {
 		synchronized (queue) {
+			log.debug("Number of queued elements: " + (++queuedElements));
 			log.debug("Push packet into the queue");
 			queue.push(packet);
 			queue.notifyAll(); // wake up all waiting threads
@@ -118,6 +124,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 		}
 		synchronized (queue) {
 			queue.clear();
+			queuedElements = 0;
 		}
 	}
 

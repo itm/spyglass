@@ -89,9 +89,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	public Plugin() {
 		this(true);
 	}
-	
+
 	// --------------------------------------------------------------------------------
-	
+
 	/**
 	 * Start/STop the consumer-thread when the plugin is activated/deactivated.
 	 */
@@ -109,9 +109,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 				stopPacketConsumerThread();
 			}
 		}
-		
+
 	};
-	
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -121,8 +120,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * 
 	 * @param packet
 	 *            The packet object to handle.
-	 * @param InterruptedException if an interrupt occured while this method was called.
-	 * @param Exception if any exception occured.
+	 * @param InterruptedException
+	 *            if an interrupt occured while this method was called.
+	 * @param Exception
+	 *            if any exception occured.
 	 */
 	public void handlePacket(final SpyglassPacket packet) throws Exception {
 		// if the packet is not null, check if its semantic type is one of
@@ -204,15 +205,15 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		if (isActive()) {
 			startPacketConsumerThread();
 		}
-		
+
 		// add a property change listener to the config
 		getXMLConfig().addPropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, propertyActiveListener);
-		
+
 	}
 
 	/**
-	 * Stops the thread which consumes the packets available in the packet queue.
-	 * waits until the thread is clinically dead.
+	 * Stops the thread which consumes the packets available in the packet queue. waits until the
+	 * thread is clinically dead.
 	 */
 	private void stopPacketConsumerThread() {
 		if (packetConsumerThread != null) {
@@ -224,7 +225,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			}
 		}
 	}
-	
+
 	/**
 	 * Is the packetConsumerThread currently running?
 	 */
@@ -240,18 +241,17 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		if (packetQueue == null) {
 			return;
 		}
-		
-		if (isPacketConsumerThreadRunning())
-		{
+
+		if (isPacketConsumerThreadRunning()) {
 			// don't do anything if the old one is alive and well
 			if (!packetConsumerThread.isInterrupted()) {
 				return;
 			}
-			
+
 			// otherwise first kill the zombie
 			stopPacketConsumerThread();
 		}
-			
+
 		// since a thread cannot be restarted, a new one has to be
 		// created
 		packetConsumerThread = new Thread(this, "PacketConsumerThread[" + this.getClass().getSimpleName() + "]");
@@ -269,7 +269,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 *            the <code>Spyglass</code> instance
 	 * 
 	 * @return a widget which can be used to configure the plug-in
-	 * @throws an exception when the page could not be created. this will result in a user-visible error message
+	 * @throws an
+	 *             exception when the page could not be created. this will result in a user-visible
+	 *             error message
 	 */
 	public abstract PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
 			final Spyglass spyglass) throws Exception;
@@ -308,7 +310,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @param drawingArea
 	 *            the drawing area in which the event occured
 	 * @return <code>true</code> if the plug-in could handle the event, <code>false</code> otherwise
-	 * @throws Exception any kind of exception
+	 * @throws Exception
+	 *             any kind of exception
 	 */
 	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) throws Exception {
 		return false;
@@ -334,7 +337,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * 
 	 * @param packet
 	 *            the packet
-	 * @throws Exception any kind of exception
+	 * @throws Exception
+	 *             any kind of exception
 	 */
 	protected abstract void processPacket(SpyglassPacket packet) throws Exception;
 
@@ -355,7 +359,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * processed. This method should be processed quickly since the graphical user interface has to
 	 * wait while the quad tree is updated.
 	 * 
-	 * @throws Exception if anything bad happens.
+	 * @throws Exception
+	 *             if anything bad happens.
 	 */
 	protected abstract void updateLayer() throws Exception;
 
@@ -391,8 +396,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Concurrently processes packets which are available in the packet queue and update's the plugin's
-	 * data structures
+	 * Concurrently processes packets which are available in the packet queue and update's the
+	 * plugin's data structures
 	 */
 	public final void run() {
 
@@ -409,10 +414,11 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 				log.error("An exception occured while processing a packet in Plugin '" + getInstanceName() + "'", e);
 			}
 		}
-		
-
+		synchronized (packetQueue) {
+			packetQueue.clear();
+		}
 		log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName() + " stopped.");
-		
+
 	}
 
 	// --------------------------------------------------------------------------------
@@ -438,11 +444,12 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	/**
 	 * Retrieves and removes the head of the packet queue.
-
+	 * 
 	 * This method blocks until a new packet arrives and will never return null.
 	 * 
 	 * @return the head of the packet queue
-	 * @throws InterruptedException if an interrupt occured while waiting for a new packet
+	 * @throws InterruptedException
+	 *             if an interrupt occured while waiting for a new packet
 	 */
 	private final SpyglassPacket getPacketFromQueue() throws InterruptedException {
 
@@ -560,14 +567,15 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * purpose is to clean up behind, kill (eventually) remaining threads and unregister any
 	 * listeners (if necessary).
 	 * 
-	 * @throws Exception any kind of exception
+	 * @throws Exception
+	 *             any kind of exception
 	 */
 	public void shutdown() throws Exception {
-		
+
 		getXMLConfig().removePropertyChangeListener(propertyActiveListener);
 
 		// stop the consumer thread
 		stopPacketConsumerThread();
 	}
-	
+
 }

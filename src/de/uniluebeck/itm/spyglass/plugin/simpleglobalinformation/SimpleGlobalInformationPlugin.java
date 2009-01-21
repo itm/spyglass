@@ -16,7 +16,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
@@ -89,6 +92,12 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	 */
 	private PropertyChangeListener pcl;
 
+	private StatisticalOperation statistics;
+
+	private AtomicInteger numPackets;
+
+	private volatile long totalPacketCount = 0;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -111,6 +120,29 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 			}
 		};
 		xmlConfig.addPropertyChangeListener(pcl);
+
+		numPackets = new AtomicInteger(0);
+		statistics = new StatisticalOperation(10, STATISTICAL_OPERATIONS.AVG);
+
+		new Timer(true).schedule(new TimerTask() {
+
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void run() {
+				final int val = numPackets.getAndSet(0);
+				synchronized (widget) {
+					widget.getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							widget.createOrUpdateTotalPacketCount("# Packets: " + totalPacketCount);
+							widget.createOrUpdatePacketsPerSecond("# PPS: " + new DecimalFormat("0.00").format(statistics.addValue(val)) + " (" + val
+									+ " last sec.)");
+						}
+					});
+				}
+
+			}
+		}, 1000, 1000);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -165,6 +197,9 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
+
+		numPackets.incrementAndGet();
+		++totalPacketCount;
 
 		// if the widget was not initialized, yet, nothing is to do here
 		if ((widget == null) || (widget.getDisplay() == null)) {
@@ -336,6 +371,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 		private Label labelNumNodes;
 		private Label labelAVGNodeDegree;
+		private Label labelTotalNodeCount;
+		private Label labelPacketsPerSecond;
 		private Map<StatisticalInformationEvaluator, Label> sfLabels = new TreeMap<StatisticalInformationEvaluator, Label>();
 
 		// --------------------------------------------------------------------------------
@@ -351,6 +388,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 			super(parent, style);
 			final GridLayout layout = new GridLayout();
 			this.setLayout(layout);
+			createOrUpdateTotalPacketCount("# Packets:");
+			createOrUpdatePacketsPerSecond("# Packets per Second:");
 		}
 
 		// --------------------------------------------------------------------------------
@@ -368,6 +407,26 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 			}
 			labelNumNodes.setText(num);
 			labelNumNodes.pack();
+			pack();
+			super.getParent().redraw();
+		}
+
+		public void createOrUpdateTotalPacketCount(final String cnt) {
+			if (labelTotalNodeCount == null) {
+				labelTotalNodeCount = new Label(this, SWT.NONE);
+			}
+			labelTotalNodeCount.setText(cnt);
+			labelTotalNodeCount.pack();
+			pack();
+			super.getParent().redraw();
+		}
+
+		public void createOrUpdatePacketsPerSecond(final String cnt) {
+			if (labelPacketsPerSecond == null) {
+				labelPacketsPerSecond = new Label(this, SWT.NONE);
+			}
+			labelPacketsPerSecond.setText(String.valueOf(cnt));
+			labelPacketsPerSecond.pack();
 			pack();
 			super.getParent().redraw();
 		}
