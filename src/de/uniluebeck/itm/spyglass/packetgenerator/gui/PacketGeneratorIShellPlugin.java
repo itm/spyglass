@@ -82,7 +82,6 @@ public class PacketGeneratorIShellPlugin extends Plugin {
 	public int[] init() {
 		
 		final CTabItem tabItem = getTabItem(getName());
-		tabItem.setToolTipText(getName());
 		tabItem.setImage(IconTheme.lookup("system-search"));
 		
 		final Composite container = this.getTabContainer(true);

@@ -82,7 +82,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		// iShell init (called on each plug-in start)
 
 		final CTabItem tabItem = getTabItem(getName());
-		tabItem.setToolTipText(getName());
 		tabItem.setImage(IconTheme.lookup("system-search"));
 
 		final Composite container = this.getTabContainer(true);
