@@ -183,6 +183,12 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	@Override
 	public void shutdown() {
 
+		log.debug("Terminating spyglass...");
+		
+		if (appWindow.getGui().isDisposed()) {
+			log.debug("GUI already gone...");
+		}
+		
 		// Destroy the components in the reverse direction if which they were created.
 		
 		if (controller != null) {

@@ -398,8 +398,14 @@ public class Node extends DrawingObject {
 			display.syncExec(new Runnable() {
 				@SuppressWarnings("synthetic-access")
 				public void run() {
+					
 					final DrawingArea drawingArea = getDrawingArea();
 
+					// the drawingArea might have been disposed while we were waiting
+					if ((drawingArea != null) && drawingArea.isDisposed()) {
+						return;
+					}
+					
 					// to prevent NPEs
 					AbsolutePosition pos = getPosition();
 					if (pos == null) {

@@ -228,6 +228,12 @@ public class UIController {
 
 				@Override
 				public void run() {
+					
+					// the drawingarea might have been disposed while we were waiting
+					if (getAppWindow().getGui().getDrawingArea().isDisposed()) {
+						return;
+					}
+					
 					final AbsoluteRectangle absBBox = dob.getBoundingBox();
 					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea().absRect2PixelRect(absBBox);
 
@@ -245,6 +251,12 @@ public class UIController {
 
 				@Override
 				public void run() {
+
+					// the drawingarea might have been disposed while we were waiting
+					if (getAppWindow().getGui().getDrawingArea().isDisposed()) {
+						return;
+					}
+
 					// the old area of the drawing object
 					if (oldBoundingBox != null) {
 						final PixelRectangle pxBBoxOld = getAppWindow().getGui().getDrawingArea().absRect2PixelRect(oldBoundingBox);
@@ -269,6 +281,12 @@ public class UIController {
 
 				@Override
 				public void run() {
+					
+					// the drawingarea might have been disposed while we were waiting
+					if (getAppWindow().getGui().getDrawingArea().isDisposed()) {
+						return;
+					}
+
 					final AbsoluteRectangle absBBox = dob.getBoundingBox();
 					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea().absRect2PixelRect(absBBox);
 

@@ -93,6 +93,11 @@ public class ZoomCompleteMapAction extends Action {
 						
 						@Override
 						public void run() {
+							// the drawingArea might have been disposed while we were waiting
+							if ((drawingArea != null) && drawingArea.isDisposed()) {
+								return;
+							}
+							
 							drawingArea.autoZoom(maxRect);
 							
 						}

@@ -194,6 +194,11 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 					@SuppressWarnings("synthetic-access")
 					@Override
 					public void run() {
+						// the widget might have been disposed while we were waiting
+						if (widget.isDisposed()) {
+							return;
+						}
+						
 						widget.createOrUpdateLabel(sfs);
 					}
 				});
@@ -213,6 +218,11 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
+					// the widget might have been disposed while we were waiting
+					if (widget.isDisposed()) {
+						return;
+					}
+					
 					widget.clear();
 					((GlobalInformationWidget) widget.getParent()).setShow(false);
 				}
@@ -254,6 +264,11 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
+					// the widget might have been disposed while we were waiting
+					if (widget.isDisposed()) {
+						return;
+					}
+					
 					final Collection<StatisticalInformationEvaluator> sfss = new LinkedList<StatisticalInformationEvaluator>();
 					for (final StatisticalInformationEvaluator sfs : sfSettings) {
 						sfss.add(sfs);
@@ -282,6 +297,11 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
+					
+					// the widget might have been disposed while we were waiting
+					if (widget.isDisposed()) {
+						return;
+					}
 
 					if (isActive()) {
 

@@ -230,6 +230,11 @@ public class GlobalInformationBar {
 				@Override
 				public void run() {
 					// synchronized (widgets) {
+					
+					// the widget might have been disposed while we were waiting
+					if (widget.isDisposed()) {
+						return;
+					}
 
 					// for (final GlobalInformationWidget widget : widgets) {
 					final ExpandItem item = widget.getExpandItem();

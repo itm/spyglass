@@ -109,6 +109,11 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 		Display.getDefault().syncExec(new Runnable() {
 			@Override
 			public void run() {
+				
+				// the drawingArea might have been disposed while we were waiting
+				if ((drawingArea != null) && drawingArea.isDisposed()) {
+					return;
+				}
 
 				if (drawingArea == null) {
 
