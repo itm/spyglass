@@ -454,7 +454,6 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 
 		SpyglassPacket packet = null;
 
-		// TODO: Is it necessary to hold the lock that long?
 		// get a mutual exclusion lock which will prevent the input stream to be accessed externally
 		synchronized (inputStreamMutex) {
 

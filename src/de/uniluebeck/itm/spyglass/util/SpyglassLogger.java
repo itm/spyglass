@@ -10,6 +10,7 @@ package de.uniluebeck.itm.spyglass.util;
 
 import java.util.Enumeration;
 import java.util.ResourceBundle;
+import java.util.Vector;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -17,8 +18,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggerRepository;
 import org.apache.log4j.spi.LoggingEvent;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+
+import de.uniluebeck.itm.spyglass.gui.CheckboxErrorDialog;
 
 // --------------------------------------------------------------------------------
 /**
@@ -28,6 +30,8 @@ import org.eclipse.swt.widgets.Display;
  * 
  */
 public class SpyglassLogger extends Logger {
+
+	private Vector<String> messagesToHide;
 
 	private Logger log;
 
@@ -41,6 +45,7 @@ public class SpyglassLogger extends Logger {
 	public SpyglassLogger(final Class<?> clazz) {
 		super(clazz.getName());
 		log = Logger.getLogger(clazz);
+		messagesToHide = new Vector<String>();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -121,14 +126,20 @@ public class SpyglassLogger extends Logger {
 	 * @param showErrorMessageDialog
 	 *            if <code>true</code> an error message dialog window will be shown
 	 */
-	public void error(final Object message, final Throwable t, final boolean showErrorMessageDialog) {
+	public void error(final Object message, final Throwable t, boolean showErrorMessageDialog) {
 		log.error(message, t);
+		if (showErrorMessageDialog && messagesToHide.contains(message.toString())) {
+			showErrorMessageDialog = false;
+		}
 		if (showErrorMessageDialog) {
 			Display.getDefault().syncExec(new Runnable() {
 
+				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
-					MessageDialog.openError(null, "An error occured", message.toString());
+					if (CheckboxErrorDialog.openError(null, "An error occured", message.toString(), t)) {
+						messagesToHide.add(message.toString());
+					}
 				}
 			});
 		}
@@ -184,14 +195,21 @@ public class SpyglassLogger extends Logger {
 	 * @param showErrorMessageDialog
 	 *            if <code>true</code> an error message dialog window will be shown
 	 */
-	public void error(final Object message, final boolean showErrorMessageDialog) {
+	public void error(final Object message, boolean showErrorMessageDialog) {
 		log.error(message);
+		if (showErrorMessageDialog && messagesToHide.contains(message.toString())) {
+			showErrorMessageDialog = false;
+		}
 		if (showErrorMessageDialog) {
 			Display.getDefault().syncExec(new Runnable() {
 
+				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
-					MessageDialog.openError(null, "An error occured", message.toString());
+					// MessageDialog.openError(null, "An error occured", message.toString());
+					if (CheckboxErrorDialog.openError(null, "An error occured", message.toString())) {
+						messagesToHide.add(message.toString());
+					}
 				}
 			});
 		}
@@ -233,14 +251,20 @@ public class SpyglassLogger extends Logger {
 	 *            if <code>true</code> an error message dialog window will be shown
 	 */
 
-	public void fatal(final Object message, final Throwable t, final boolean showErrorMessageDialog) {
+	public void fatal(final Object message, final Throwable t, boolean showErrorMessageDialog) {
 		log.fatal(message, t);
+		if (showErrorMessageDialog && messagesToHide.contains(message.toString())) {
+			showErrorMessageDialog = false;
+		}
 		if (showErrorMessageDialog) {
 			Display.getDefault().syncExec(new Runnable() {
 
+				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
-					MessageDialog.openError(null, "Critical error", message.toString());
+					if (CheckboxErrorDialog.openError(null, "Critical error in plug-in", message.toString(), t)) {
+						messagesToHide.add(message.toString());
+					}
 				}
 			});
 		}
@@ -295,14 +319,20 @@ public class SpyglassLogger extends Logger {
 	 * @param showErrorMessageDialog
 	 *            if <code>true</code> an error message dialog window will be shown
 	 */
-	public void fatal(final Object message, final boolean showErrorMessageDialog) {
+	public void fatal(final Object message, boolean showErrorMessageDialog) {
 		log.fatal(message);
+		if (showErrorMessageDialog && messagesToHide.contains(message.toString())) {
+			showErrorMessageDialog = false;
+		}
 		if (showErrorMessageDialog) {
 			Display.getDefault().syncExec(new Runnable() {
 
+				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
-					MessageDialog.openError(null, "Critical error", message.toString());
+					if (CheckboxErrorDialog.openError(null, "Critical error in plug-in", message.toString())) {
+						messagesToHide.add(message.toString());
+					}
 				}
 			});
 		}

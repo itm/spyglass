@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -35,7 +36,6 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.packet.Uint16ListPacket;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.globalinformation.GlobalInformationPlugin;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.Tools;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -55,7 +55,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	/**
 	 * An object which logs messages
 	 */
-	private static final SpyglassLogger log = (SpyglassLogger) SpyglassLoggerFactory.getLogger(SimpleGlobalInformationPlugin.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(SimpleGlobalInformationPlugin.class);
 
 	/**
 	 * The configuration
@@ -186,7 +186,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				sfs.parse(packet);
 			} catch (final SpyglassPacketException e) {
 				log.error("Error parsing a packet in the " + getHumanReadableName()
-						+ ".\r\nPlease check the values in the StringFormatter for semantic type " + packetSemanticType + "!", e, false);
+						+ ".\r\nPlease check the values in the StringFormatter for semantic type " + packetSemanticType + "!", e);
 			}
 
 			synchronized (widget) {
