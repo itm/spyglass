@@ -28,7 +28,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
-// --
+
 /**
  * Spyglass is an application for visualizing network packets coming from an arbitrary source,
  * defined by a gateway instance. This class is the core of the Spyglass program. It reads the XML
@@ -72,7 +72,6 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * 
 	 */
@@ -102,7 +101,6 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * Starts the visualization by starting a packet producer and a visualization thread.
 	 */
@@ -111,11 +109,13 @@ public class Spyglass {
 		executor.execute(packetProducerTask);
 	}
 
+	// --------------------------------------------------------------------------
 	public void shutdown() {
 		// Shutdown the packetProducerTask
 		executor.shutdownNow();
-		
-		// TODO: not sure if this will even be executed, since were shutting down the configStore right after
+
+		// TODO: not sure if this will even be executed, since were shutting down the configStore
+		// right after
 		configStore.store();
 		try {
 			configStore.shutdown();
@@ -128,7 +128,7 @@ public class Spyglass {
 			try {
 				p.shutdown();
 			} catch (final Exception e) {
-				log.warn("The plugin could not be shut down properly. Continuing anyway.",e);
+				log.warn("The plugin could not be shut down properly. Continuing anyway.", e);
 			}
 		}
 
@@ -136,33 +136,27 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
-	// -------
 	public PacketDispatcher getPacketDispatcher() {
 		return packetDispatcher;
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	public void setPacketDispatcher(final PacketDispatcher packetDispatcher) {
 		this.packetDispatcher = packetDispatcher;
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	public PluginManager getPluginManager() {
 		return pluginManager;
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	public void setPluginManager(final PluginManager pluginManager) {
 		this.pluginManager = pluginManager;
 		pluginManager.init();
 	}
 
-
 	// --------------------------------------------------------------------------
-	// ------
 	public PacketReader getPacketReader() {
 		return packetReader;
 	}
@@ -178,13 +172,11 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	public void setPacketReader(final PacketReader packetReader) {
 		this.packetReader = packetReader;
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	public ConfigStore getConfigStore() {
 		return configStore;
 	}
@@ -232,6 +224,7 @@ public class Spyglass {
 		return maxRect;
 	};
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * This method gets the bounding boxes of all visible drawingObjects (which are applicable for
 	 * AutoZoom and scrollbars) and merges them.
@@ -272,6 +265,7 @@ public class Spyglass {
 	 */
 	public void reset() {
 		try {
+			log.debug("The PacketReader will be resetted now");
 			packetReader.reset();
 			log.debug("The PacketReader was sucessfully resetted");
 		} catch (final IOException e) {
@@ -282,10 +276,12 @@ public class Spyglass {
 		final List<Plugin> plugins = pluginManager.getPlugins();
 		for (final Plugin plugin : plugins) {
 			if (!((plugin instanceof NodePositionerPlugin) && plugin.isActive())) {
+				log.debug("The plug-in named '" + plugin.getInstanceName() + "' will be resetted now");
 				plugin.reset();
 				log.debug("The plug-in named '" + plugin.getInstanceName() + "' was sucessfully resetted");
 			}
 		}
+		log.debug("The node positioner '" + pluginManager.getNodePositioner().getInstanceName() + "' will be resetted now");
 		pluginManager.getNodePositioner().reset();
 		log.debug("The node positioner '" + pluginManager.getNodePositioner().getInstanceName() + "' was sucessfully resetted");
 	}

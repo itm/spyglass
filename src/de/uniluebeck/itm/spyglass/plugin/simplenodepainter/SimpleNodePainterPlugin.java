@@ -625,6 +625,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
 		synchronized (layer) {
 			drawingObjects.addAll(layer.getDrawingObjects());
+			// TODO (SE) remove this workaround when the layer's bug concerning the removal of
+			// elements is fixed
+			layer.clear();
 		}
 
 		synchronized (nodeSemanticTypes) {
@@ -632,7 +635,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 
 		synchronized (obsoleteObjects) {
-			obsoleteObjects.addAll(layer.getDrawingObjects());
+			obsoleteObjects.addAll(drawingObjects);
 			updateLayer();
 		}
 
@@ -669,8 +672,24 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				layer.addOrUpdate(drawingObject);
 			}
 
-			for (final DrawingObject drawingObject : obsolete) {
-				layer.remove(drawingObject);
+			if (obsolete.size() > 0) {
+				// TODO (SE) Remove the debugging comments
+				log.debug("========================================================================");
+				for (final DrawingObject drawingObject : obsolete) {
+					log.debug("Remove from QuadTree: " + drawingObject);
+					if (!layer.remove(drawingObject)) {
+						log.debug("Object " + drawingObject + " was not found in QuadTree");
+					}
+				}
+				final int size = layer.getDrawingObjects().size();
+				if (size > 0) {
+					log.debug(size + " remain in the QuadTree: ");
+					for (final DrawingObject drawingObject : layer.getDrawingObjects()) {
+						log.debug(drawingObject + " " + drawingObject.getBoundingBox());
+					}
+				} else {
+					log.debug("All objects removed successfully!");
+				}
 			}
 		}
 
@@ -686,7 +705,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 		for (final DrawingObject drawingObject : obsolete) {
 			fireDrawingObjectRemoved(drawingObject);
+			log.debug("Calling fireDrawingObjectRemoved(" + drawingObject + " " + drawingObject.getBoundingBox() + ")");
 			boundingBoxes.remove(drawingObject);
+		}
+		if (obsolete.size() > 0) {
+			log.debug("========================================================================");
 		}
 
 	}
