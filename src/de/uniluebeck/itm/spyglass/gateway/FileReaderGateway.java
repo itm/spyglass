@@ -28,10 +28,11 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 public class FileReaderGateway implements Gateway {
 	private static Logger log = SpyglassLoggerFactory.getLogger(FileReaderGateway.class);
 
+	@Element(name = "file", required = false)
 	private File file = null;
 
 	private InputStream inputStream = null;
-
+	
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -47,7 +48,6 @@ public class FileReaderGateway implements Gateway {
 	/**
 	 * 
 	 */
-	@Element(name = "file", required = false)
 	public File getFile() {
 		return file;
 	}
@@ -60,7 +60,6 @@ public class FileReaderGateway implements Gateway {
 	 * @param file
 	 *            the input file
 	 */
-	@Element(name = "file", required = false)
 	public void setFile(final File file) {
 		this.file = file;
 
@@ -73,9 +72,9 @@ public class FileReaderGateway implements Gateway {
 				inputStream = new FileInputStream(file);
 			}
 		} catch (final FileNotFoundException e) {
-			log.error("File[" + file + "] not found" + e, e);
+			log.error("File[" + file + "] not found.", e);
 		} catch (final IOException e) {
-			log.error("Error while setting an input file.\r\nPlease close the pallication and try again.", e);
+			log.error("Error while setting an input file. Please close the pallication and try again.", e);
 		}
 	}
 
