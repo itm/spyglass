@@ -109,6 +109,8 @@ public class PacketDispatcher {
 			}
 			try {
 				plugin.handlePacket(packet);
+			} catch (final InterruptedException e) {
+				throw e; // we don't handle this
 			} catch (final Exception e) {
 				log.error("Plugin "+plugin+" threw an exception while handling the packet "+packet,e);
 			}

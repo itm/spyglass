@@ -10,8 +10,7 @@ package de.uniluebeck.itm.spyglass.plugin;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.EventListener;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.event.EventListenerList;
 
@@ -51,7 +50,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * The queue where packets are dropped by the packet dispatcher and which is maintained
 	 * concurrently
 	 */
-	private ConcurrentLinkedQueue<SpyglassPacket> packetQueue = null;
+	private LinkedBlockingQueue<SpyglassPacket> packetQueue = null;
 
 	/** The thread used to consume packets from the packet queue */
 	private Thread packetConsumerThread;
@@ -79,15 +78,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	public Plugin(final boolean needsPacketQueue) {
 		if (needsPacketQueue) {
-			packetQueue = new ConcurrentLinkedQueue<SpyglassPacket>();
+			packetQueue = new LinkedBlockingQueue<SpyglassPacket>();
 		}
-	}
-
-	/**
-	 * Constructor creating a temporal storage for incoming packages
-	 */
-	public Plugin() {
-		this(true);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -128,23 +120,24 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	public void handlePacket(final SpyglassPacket packet) throws Exception {
 		// if the packet is not null, check if its semantic type is one of
 		// those, the plug-in is interested in
-		if (isActive()) {
 
-			if (!getXMLConfig().isAllSemanticTypes()) {
-				final int[] mySemanticTypes = getXMLConfig().getSemanticTypes();
-				final int packetSemanticType = packet.getSemanticType();
-				for (int i = 0; i < mySemanticTypes.length; i++) {
-					// if the packets semantic type matches ...
-					if (mySemanticTypes[i] == packetSemanticType) {
-						// put it into the packet queue (the process which fetches
-						// from the queue afterwards will be notified automatically)
-						enqueuePacket(packet);
-						break;
-					}
+		if (!getXMLConfig().isAllSemanticTypes()) {
+			final int[] mySemanticTypes = getXMLConfig().getSemanticTypes();
+			final int packetSemanticType = packet.getSemanticType();
+			for (int i = 0; i < mySemanticTypes.length; i++) {
+				// if the packets semantic type matches ...
+				
+				// TODO: this can be done more efficiently...
+				
+				if (mySemanticTypes[i] == packetSemanticType) {
+					// put it into the packet queue (the process which fetches
+					// from the queue afterwards will be notified automatically)
+					packetQueue.put(packet);
+					break;
 				}
-			} else {
-				enqueuePacket(packet);
 			}
+		} else {
+			packetQueue.put(packet);
 		}
 	}
 
@@ -175,9 +168,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	public final void reset() {
 		if (packetQueue != null) {
-			synchronized (packetQueue) {
-				packetQueue.clear();
-			}
+			packetQueue.clear();
 		}
 		resetPlugin();
 	}
@@ -420,66 +411,24 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 		while (!packetConsumerThread.isInterrupted()) {
 			try {
-				final SpyglassPacket p = getPacketFromQueue();
+				
+				// waits for the arrival of a new packet
+				final SpyglassPacket p = packetQueue.take();
+
 				processPacket(p);
 				updateLayer();
+				
 			} catch (final InterruptedException e) {
 				packetConsumerThread.interrupt();
 			} catch (final Exception e) {
 				log.error("An exception occured while processing a packet in Plugin '" + getInstanceName() + "'", e);
 			}
 		}
-		synchronized (packetQueue) {
-			packetQueue.clear();
-		}
+
+		packetQueue.clear();
+		
 		log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName() + " stopped.");
 
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Inserts the specified packet at the tail of the packet queue.
-	 * 
-	 * @param packet
-	 *            a packet
-	 * @return <tt>true</tt> (as specified by {@link Queue#offer})
-	 * @throws NullPointerException
-	 *             if the specified packet is null
-	 */
-	protected final boolean enqueuePacket(final SpyglassPacket packet) {
-		boolean success = false;
-		if (isActive()) {
-			synchronized (packetQueue) {
-				success = packetQueue.offer(packet);
-				packetQueue.notify();
-			}
-		}
-		return success;
-	}
-
-	/**
-	 * Retrieves and removes the head of the packet queue.
-	 * 
-	 * This method blocks until a new packet arrives and will never return null.
-	 * 
-	 * @return the head of the packet queue
-	 * @throws InterruptedException
-	 *             if an interrupt occured while waiting for a new packet
-	 */
-	private final SpyglassPacket getPacketFromQueue() throws InterruptedException {
-
-		while (!Thread.currentThread().isInterrupted()) {
-			synchronized (packetQueue) {
-				// wait for the arrival of a new packet if the packet queue is
-				// empty, and the caller want's to wait
-				if (packetQueue.isEmpty()) {
-					packetQueue.wait();
-				} else {
-					return packetQueue.poll();
-				}
-			}
-		}
-		throw new InterruptedException();
 	}
 
 	// --------------------------------------------------------------------------------
