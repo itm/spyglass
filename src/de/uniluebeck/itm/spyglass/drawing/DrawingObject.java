@@ -10,7 +10,6 @@ package de.uniluebeck.itm.spyglass.drawing;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -32,18 +31,18 @@ public abstract class DrawingObject {
 	private static final SpyglassLogger log = (SpyglassLogger) SpyglassLoggerFactory.getLogger(DrawingObject.class);
 
 	/** The position of the object's upper left point */
-	protected AbsolutePosition position = new AbsolutePosition(0, 0, 0);
+	private AbsolutePosition position = new AbsolutePosition(0, 0, 0);
 
 	private Set<BoundingBoxChangeListener> changeListeners = new HashSet<BoundingBoxChangeListener>();
 
 	/** The object's bounding box */
-	protected AbsoluteRectangle boundingBox;
+	private AbsoluteRectangle boundingBox;
 
 	/** The object's foreground color */
-	protected RGB color = new RGB(200, 0, 0);
+	private RGB color = new RGB(200, 0, 0);
 
 	/** The object's background color */
-	protected RGB bgColor = new RGB(255, 255, 255);
+	private RGB bgColor = new RGB(255, 255, 255);
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -88,8 +87,10 @@ public abstract class DrawingObject {
 	 * the box has actually changed
 	 */
 	protected void fireBoundingBoxChangeEvent() {
-		for (final BoundingBoxChangeListener listener : changeListeners) {
-			listener.onBoundingBoxChanged(this);
+		synchronized (changeListeners) {
+			for (final BoundingBoxChangeListener listener : changeListeners) {
+				listener.onBoundingBoxChanged(this);
+			}
 		}
 	}
 
@@ -211,7 +212,9 @@ public abstract class DrawingObject {
 	 *            a listener for changes concerning the object's bounding box
 	 */
 	public void addBoundingBoxChangedListener(final BoundingBoxChangeListener listener) {
-		this.changeListeners.add(listener);
+		synchronized (changeListeners) {
+			this.changeListeners.add(listener);
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -222,7 +225,9 @@ public abstract class DrawingObject {
 	 *            a listener for changes concerning the object's bounding box
 	 */
 	public void removeBoundingBoxChangeListener(final BoundingBoxChangeListener listener) {
-		this.changeListeners.remove(listener);
+		synchronized (changeListeners) {
+			this.changeListeners.remove(listener);
+		}
 	}
 
 	/**
@@ -243,17 +248,9 @@ public abstract class DrawingObject {
 	 */
 	protected final void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
 		final AbsoluteRectangle oldBox = this.boundingBox;
-		try {
-			boundingBox = calculateBoundingBox();
-			if (fireBoundingBoxChangeEvent && ((oldBox != null) || !boundingBox.equals(oldBox))) {
-				fireBoundingBoxChangeEvent();
-			}
-		} catch (final SWTException e) {
-			if (e.getMessage().contains("Widget is disposed")) {
-				log.warn("A boundingBox could not determined correctly: " + e);
-			} else {
-				log.error(e, e, false);
-			}
+		boundingBox = calculateBoundingBox();
+		if (fireBoundingBoxChangeEvent && ((oldBox != null) || !boundingBox.equals(oldBox))) {
+			fireBoundingBoxChangeEvent();
 		}
 	}
 

@@ -55,7 +55,7 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 		final PixelPosition start = drawingArea.absPoint2PixelPoint(this.getPosition());
 		final PixelPosition end = drawingArea.absPoint2PixelPoint(this.getEnd());
 		final Rectangle clipping = gc.getClipping();
-		final PixelRectangle pxBoundingBox = drawingArea.absRect2PixelRect(boundingBox);
+		final PixelRectangle pxBoundingBox = drawingArea.absRect2PixelRect(getBoundingBox());
 
 		// should evade some unnecessary painting, not all, but it's better than nothing
 		if (pxBoundingBox.rectangle.intersects(clipping)) {
@@ -105,17 +105,17 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 
-		if (drawingArea == null) {
+		if ((drawingArea == null) || drawingArea.isDisposed()) {
 
-			final int upperLeftX = Math.min(lineEnd.x, position.x) - (lineWidth / 2);
-			final int upperLeftY = Math.min(lineEnd.y, position.y) - (lineWidth / 2);
-			final int width = Math.abs(lineEnd.x - position.x) + lineWidth;
-			final int height = Math.abs(lineEnd.y - position.y) + lineWidth;
-			boundingBox = new AbsoluteRectangle(upperLeftX, upperLeftY, width, height);
+			final int upperLeftX = Math.min(lineEnd.x, getPosition().x) - (lineWidth / 2);
+			final int upperLeftY = Math.min(lineEnd.y, getPosition().y) - (lineWidth / 2);
+			final int width = Math.abs(lineEnd.x - getPosition().x) + lineWidth;
+			final int height = Math.abs(lineEnd.y - getPosition().y) + lineWidth;
+			return new AbsoluteRectangle(upperLeftX, upperLeftY, width, height);
 
-		} else if (!drawingArea.isDisposed()) {
+		} else {
 
-			final PixelPosition pos = drawingArea.absPoint2PixelPoint(position);
+			final PixelPosition pos = drawingArea.absPoint2PixelPoint(getPosition());
 			final PixelPosition end = drawingArea.absPoint2PixelPoint(lineEnd);
 		
 			final int bbUpperLeftX = Math.min(end.x, pos.x) - ((int) Math.ceil((((double) lineWidth) / 2)));
@@ -126,18 +126,16 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 		
 			final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidth, bbHeight);
 		
-			boundingBox = drawingArea.pixelRect2AbsRect(bbArea);
+			return drawingArea.pixelRect2AbsRect(bbArea);
 
 		}
 		
-		return boundingBox;
-
 	}
 
 	public boolean equals(final Line other) {
-		final AbsolutePosition op = other.position;
+		final AbsolutePosition op = other.getPosition();
 		final AbsolutePosition oe = other.lineEnd;
-		final AbsolutePosition p = position;
+		final AbsolutePosition p = getPosition();
 		final AbsolutePosition e = lineEnd;
 		return ((p.x == op.x) && (p.y == op.y) && (p.z == op.z) && (e.x == oe.x) && (e.y == oe.y) && (e.z == oe.z))
 				|| ((p.x == oe.x) && (p.y == oe.y) && (p.z == oe.z) && (e.x == op.x) && (e.y == op.y) && (e.z == op.z));
