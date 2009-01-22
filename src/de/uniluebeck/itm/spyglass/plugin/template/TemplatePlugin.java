@@ -31,25 +31,26 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  * By inheritance it is a BackgroundPainter.
  * 
- * Look also for the other classes in this java package. These classes (a Plugin, an XMLConfig and
- * a PreferencePage) represent the minimum any plugin writer must implement. 
+ * Look also for the other classes in this java package. These classes (a Plugin, an XMLConfig and a
+ * PreferencePage) represent the minimum any plugin writer must implement.
  * 
  * To activate this Plugin, you have to add it to PluginManager.availablePluginsTypes
  * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyChangeListener {
 
 	/**
-	 * Our configuration. Plugin and configuration are coupled tightly together (one-2-one relationship)
+	 * Our configuration. Plugin and configuration are coupled tightly together (one-2-one
+	 * relationship)
 	 */
 	@Element(name = "parameters")
 	private final TemplateXMLConfig xmlConfig = new TemplateXMLConfig();
 
 	/**
-	 * The Datastructure where to store DrawingObjects. If this plugin would not draw anything
-	 * on the DrawingArea, the layer could be ommited.
+	 * The Datastructure where to store DrawingObjects. If this plugin would not draw anything on
+	 * the DrawingArea, the layer could be ommited.
 	 */
 	private final Layer layer = new QuadTree();
 
@@ -61,8 +62,7 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 	}
 
 	@Override
-	public PluginPreferencePage<TemplatePlugin, TemplateXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
-			final Spyglass spyglass) {
+	public PluginPreferencePage<TemplatePlugin, TemplateXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new TemplatePreferencePage(dialog, spyglass, this);
 	}
 
@@ -86,7 +86,6 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 		return xmlConfig;
 	}
 
-
 	@Override
 	protected void processPacket(final SpyglassPacket p) {
 
@@ -95,7 +94,7 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 	}
 
 	@Override
-	public void reset() {
+	protected void resetPlugin() {
 		synchronized (layer) {
 			layer.clear();
 		}
@@ -114,7 +113,7 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 
 		super.init(manager);
 		xmlConfig.addPropertyChangeListener(this);
-	
+
 	}
 
 	@Override
@@ -134,6 +133,5 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 	public void propertyChange(final PropertyChangeEvent event) {
 		// Some parameter in the config file has been modified.
 	}
-
 
 }

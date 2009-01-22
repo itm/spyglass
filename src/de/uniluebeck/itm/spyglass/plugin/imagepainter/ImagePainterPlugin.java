@@ -29,14 +29,14 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class ImagePainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener {
-	
+
 	@Element(name = "parameters")
 	private final ImagePainterXMLConfig xmlConfig;
-	
+
 	private final Layer layer;
-	
+
 	private Image image;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -46,73 +46,73 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 		xmlConfig = new ImagePainterXMLConfig();
 		layer = new QuadTree();
 	}
-	
+
 	@Override
-	public PluginPreferencePage<ImagePainterPlugin, ImagePainterXMLConfig> createPreferencePage(
-			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+	public PluginPreferencePage<ImagePainterPlugin, ImagePainterXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		return new ImagePainterPreferencePage(dialog, spyglass, this);
 	}
-	
-	public static PluginPreferencePage<ImagePainterPlugin, ImagePainterXMLConfig> createTypePreferencePage(
-			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
+
+	public static PluginPreferencePage<ImagePainterPlugin, ImagePainterXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
+			final Spyglass spyglass) {
 		return new ImagePainterPreferencePage(dialog, spyglass);
 	}
-	
+
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		synchronized (layer) {
 			return layer.getDrawingObjects(area);
 		}
 	}
-	
+
 	public static String getHumanReadableName() {
 		return "ImagePainter";
 	}
-	
+
 	@Override
 	public PluginXMLConfig getXMLConfig() {
 		return xmlConfig;
 	}
-	
+
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
 		// since the plug-in is not interested in packets, nothing has to be
 		// done here
 	}
-	
+
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
 		// since the plug-in is not interested in packets, nothing has to be
 		// done here
 	}
-	
+
 	@Override
-	public void reset() {
+	protected void resetPlugin() {
 		// nothing to do since this plugin doesn't keep any data
 		// in memory to reset
 	}
-	
+
 	@Override
 	protected void updateLayer() {
 		// since the plug-in is not interested in packets, nothing has to be
 		// done here
 	}
-	
+
 	@Override
 	public void init(final PluginManager manager) throws Exception {
-		
+
 		super.init(manager);
-		
+
 		// adding this listener here so it is called
 		// on programm startup (doesn't work in constructor!)
 		xmlConfig.addPropertyChangeListener(this);
-		
+
 		// dito
 		loadImage();
-		
+
 	}
-	
+
 	private void loadImage() {
-		
+
 		if (image != null) {
 			synchronized (layer) {
 				layer.remove(image);
@@ -120,33 +120,33 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 			}
 		}
 		fireDrawingObjectRemoved(image);
-		
+
 		try {
 			image = new Image(xmlConfig.getImageFileName());
 		} catch (final RuntimeException e) {
 			image = new Image("images/icons/brokenImageLink.png");
 		}
-		
+
 		final int sizeX = xmlConfig.getImageSizeX();
 		final int sizeY = xmlConfig.getImageSizeY();
 		final int llX = xmlConfig.getLowerLeftX();
 		final int llY = xmlConfig.getLowerLeftY();
-		
+
 		final AbsolutePosition position = new AbsolutePosition(llX, llY, 0);
 		image.setPosition(position);
 		image.setImageSizeX(sizeX);
 		image.setImageSizeY(sizeY);
-		
+
 		synchronized (layer) {
 			layer.addOrUpdate(image);
 		}
 		fireDrawingObjectAdded(image);
-		
+
 	}
-	
+
 	@Override
 	public void propertyChange(final PropertyChangeEvent e) {
 		loadImage();
 	}
-	
+
 }

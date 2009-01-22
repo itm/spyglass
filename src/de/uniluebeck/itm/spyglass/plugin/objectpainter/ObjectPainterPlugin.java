@@ -54,7 +54,7 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	 * List of trajectories. Each trajectory is a TimerTask in our timer.
 	 */
 	final List<Trajectory> trajectories = Collections.synchronizedList(new ArrayList<Trajectory>());
-	
+
 	final Layer layer = new QuadTree();
 
 	// --------------------------------------------------------------------------------
@@ -121,15 +121,15 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 
 		this.trajectories.add(t);
 		timer.schedule(t, 0, config.getUpdateInterval());
-		
+
 		// NOTE: the trajectories stay in the list until the plugin is shut down. but
 		// this doesn't really matter (except that it takes a small amount of mememory)
 		// since the list is only used on reset().
 	}
 
 	@Override
-	public void reset() {
-		
+	protected void resetPlugin() {
+
 		synchronized (trajectories) {
 			for (final Trajectory t : this.trajectories) {
 				t.cancel();
@@ -160,9 +160,9 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 		// shutdown the timer (don't bother to clean up the DrawingObjects)
 		timer.cancel();
 	}
-	
+
 	/* Methods needed for scope-reasons */
-	
+
 	void fireDrawingObjectChangedInternal(final DrawingObject dob, final AbsoluteRectangle rect) {
 		fireDrawingObjectChanged(dob, rect);
 	}

@@ -292,7 +292,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	}
 
 	@Override
-	public void reset() {
+	protected void resetPlugin() {
 
 		final Set<StatisticalInformationEvaluator> sfSettings = xmlConfig.getStatisticalInformationEvaluators();
 		for (final StatisticalInformationEvaluator statisticalInformationEvaluator : sfSettings) {

@@ -89,7 +89,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	}
 
 	@Override
-	public void reset() {
+	protected void resetPlugin() {
 		// clear the drawing object
 		synchronized (dataStore) {
 			dataStore.clear();
@@ -110,11 +110,10 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		updateFramepoints();
 	}
 
-	
 	@Override
 	public void shutdown() throws Exception {
 		super.shutdown();
-		
+
 		this.pluginManager.removeNodePositionListener(this);
 		this.xmlConfig.removePropertyChangeListener(this);
 	}

@@ -62,7 +62,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	}
 
 	@Override
-	public void reset() {
+	protected void resetPlugin() {
 		// TODO Auto-generated method stub
 
 	}

@@ -237,7 +237,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	}
 
 	@Override
-	public void reset() {
+	protected void resetPlugin() {
 		newSequences.clear();
 		for (final Sequence s : sequences) {
 			removedSequences.push(s);

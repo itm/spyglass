@@ -173,7 +173,22 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * Resets the plug-in's state i.e. removing all objects from the QuadTree, clearing the packet
 	 * queue and setting all member variables to default.
 	 */
-	public abstract void reset();
+	public final void reset() {
+		if (packetQueue != null) {
+			synchronized (packetQueue) {
+				packetQueue.clear();
+			}
+		}
+		resetPlugin();
+	}
+
+	/**
+	 * Resets the plug-in's state i.e. removing all objects from the QuadTree and setting all member
+	 * variables to default.<br>
+	 * Note that the queue where packets are buffered before they are actually processed by the
+	 * plug-in will not be touched here.
+	 */
+	protected abstract void resetPlugin();
 
 	// --------------------------------------------------------------------------------
 	/**

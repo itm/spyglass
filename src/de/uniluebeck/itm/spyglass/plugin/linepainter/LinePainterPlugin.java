@@ -205,7 +205,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	}
 
 	@Override
-	public void reset() {
+	protected void resetPlugin() {
 		removedEdges.addAll(edgeTimes.keySet());
 		edgeTimes.clear();
 		newEdges.clear();

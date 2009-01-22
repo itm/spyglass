@@ -616,7 +616,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	// --------------------------------------------------------------------------------
 	@Override
-	public void reset() {
+	protected void resetPlugin() {
 
 		synchronized (updatedObjects) {
 			updatedObjects.clear();

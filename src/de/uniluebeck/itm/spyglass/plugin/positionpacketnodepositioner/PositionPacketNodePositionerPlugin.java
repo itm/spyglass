@@ -185,7 +185,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	}
 
 	@Override
-	public void reset() {
+	protected void resetPlugin() {
 		synchronized (mutex) {
 			this.positionMap.clear();
 		}

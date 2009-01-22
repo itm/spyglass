@@ -152,7 +152,7 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 
 	@Override
-	public void reset() {
+	protected void resetPlugin() {
 		data.clear();
 	}
 

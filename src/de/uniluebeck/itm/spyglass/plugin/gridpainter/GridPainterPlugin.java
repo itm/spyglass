@@ -85,7 +85,7 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 	}
 
 	@Override
-	public void reset() {
+	protected void resetPlugin() {
 		// TODO Auto-generated method stub
 
 	}
