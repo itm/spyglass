@@ -8,6 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS;
@@ -26,6 +27,7 @@ public class StatisticalOperation {
 	private int maxValidFieldValue;
 	private int bufferSize;
 	private STATISTICAL_OPERATIONS defaultOperation;
+	private DecimalFormat format;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -37,11 +39,27 @@ public class StatisticalOperation {
 	 *            the statistical operation to be used by default
 	 */
 	public StatisticalOperation(final int bufferSize, final STATISTICAL_OPERATIONS defaultOperation) {
+		this(bufferSize, defaultOperation, null);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param bufferSize
+	 *            the size of the buffer
+	 * @param defaultOperation
+	 *            the statistical operation to be used by default
+	 * @param format
+	 *            the format to be used when returning the current value
+	 */
+	public StatisticalOperation(final int bufferSize, final STATISTICAL_OPERATIONS defaultOperation, final DecimalFormat format) {
 		buffer = new float[bufferSize];
 		maxValidFieldValue = 0;
 		pointer = 0;
 		this.defaultOperation = defaultOperation;
 		this.bufferSize = bufferSize;
+		this.format = format;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -63,6 +81,18 @@ public class StatisticalOperation {
 
 	// --------------------------------------------------------------------------------
 	/**
+	 * Returns the value a statistical operation calculated using the buffered buffer and the
+	 * default statistical operation
+	 * 
+	 * @return the value a statistical operation calculated using the buffered buffer and the
+	 *         default statistical operation
+	 */
+	public synchronized final float getValue() {
+		return getValue(defaultOperation);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
 	 * Returns the value a statistical operation calculated using the buffered buffer
 	 * 
 	 * @param operation
@@ -70,6 +100,7 @@ public class StatisticalOperation {
 	 * @return the value a statistical operation calculated using the buffered buffer
 	 */
 	public synchronized final float getValue(final STATISTICAL_OPERATIONS operation) {
+		final float value = 0.0f;
 		switch (operation) {
 			case AVG:
 				return getAverageValue();
@@ -87,6 +118,54 @@ public class StatisticalOperation {
 				return getSum();
 		}
 		return 0.0f;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the value a statistical operation calculated using the buffered buffer and the
+	 * default statistical operation.<br>
+	 * The value will be formatted according to the format which was provided when calling the
+	 * constructor.
+	 * 
+	 * @return the value a statistical operation calculated using the buffered buffer and the
+	 *         default statistical operation
+	 */
+	public synchronized final String getValueFormatted() {
+		return getValueFormatted(defaultOperation);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the value a statistical operation calculated using the buffered buffer.<br>
+	 * The value will be formatted according to the format which was provided when calling the
+	 * constructor.
+	 * 
+	 * @param operation
+	 *            the statistical operation to use
+	 * @return the value a statistical operation calculated using the buffered buffer
+	 */
+	public synchronized final String getValueFormatted(final STATISTICAL_OPERATIONS operation) {
+		float value = 0.0f;
+		switch (operation) {
+			case AVG:
+				value = getAverageValue();
+				break;
+			case MAX:
+				value = getMaxValue();
+				break;
+			case MIN:
+				value = getMinValue();
+				break;
+			case MEDIAN:
+				value = getMedianValue();
+				break;
+			case SUM:
+				value = getSum();
+		}
+		if (format != null) {
+			return format.format(value);
+		}
+		return String.valueOf(value);
 	}
 
 	// --------------------------------------------------------------------------------

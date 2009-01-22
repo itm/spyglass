@@ -140,7 +140,8 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 				initGlobalInformationBar(wrapper, spyglass);
 			}
 
-			form.setWeights(new int[] { 85, 15 });
+			// 83% drawing area 17% global information bar
+			form.setWeights(new int[] { 83, 17 });
 
 		} catch (final Exception e) {
 			log.error(e, e);

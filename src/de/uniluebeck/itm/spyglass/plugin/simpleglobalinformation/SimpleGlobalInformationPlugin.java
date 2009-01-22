@@ -92,11 +92,9 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	 */
 	private PropertyChangeListener pcl;
 
-	private StatisticalOperation statistics;
+	private volatile long totalPacketCount;
 
 	private AtomicInteger numPackets;
-
-	private volatile long totalPacketCount = 0;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -107,6 +105,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		avgNodeDegEvaluator = new StatisticalOperation(10, STATISTICAL_OPERATIONS.AVG);
 		avgNodeDegString = "avg. node degree: ";
 		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
+		numPackets = new AtomicInteger(0);
+		totalPacketCount = 0;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -121,22 +121,47 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		};
 		xmlConfig.addPropertyChangeListener(pcl);
 
-		numPackets = new AtomicInteger(0);
-		statistics = new StatisticalOperation(10, STATISTICAL_OPERATIONS.AVG);
-
 		new Timer(true).schedule(new TimerTask() {
+
+			private int times = 0;
+			private String perSec = "";
+			private String per30Sec = "     ";
+			private String per60Sec = "     ";
+			private boolean skipTimesCount = false;
+			private StatisticalOperation statistics30sec = new StatisticalOperation(30, STATISTICAL_OPERATIONS.AVG, new DecimalFormat("0.00"));
+			private StatisticalOperation statistics60sec = new StatisticalOperation(60, STATISTICAL_OPERATIONS.AVG, new DecimalFormat("0.00"));
 
 			@SuppressWarnings("synthetic-access")
 			@Override
 			public void run() {
 				final int val = numPackets.getAndSet(0);
+
+				perSec = new DecimalFormat("0.00").format(val);
+				statistics30sec.addValue(val);
+				statistics60sec.addValue(val);
+
+				if (!skipTimesCount) {
+					if ((++times) >= 30) {
+						per30Sec = statistics30sec.getValueFormatted();
+					}
+
+					if ((times) >= 60) {
+						per60Sec = statistics60sec.getValueFormatted();
+						skipTimesCount = true;
+					}
+				} else {
+					per30Sec = statistics30sec.getValueFormatted();
+					per60Sec = statistics60sec.getValueFormatted();
+				}
+
+				final String pps = "# PPS: [ " + perSec + " | " + per30Sec + " | " + per60Sec + " ]";
+
 				synchronized (widget) {
 					widget.getDisplay().asyncExec(new Runnable() {
 						@Override
 						public void run() {
 							widget.createOrUpdateTotalPacketCount("# Packets: " + totalPacketCount);
-							widget.createOrUpdatePacketsPerSecond("# PPS: " + new DecimalFormat("0.00").format(statistics.addValue(val)) + " (" + val
-									+ " last sec.)");
+							widget.createOrUpdatePacketsPerSecond(pps);
 						}
 					});
 				}
@@ -233,7 +258,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 						if (widget.isDisposed()) {
 							return;
 						}
-						
+
 						widget.createOrUpdateLabel(sfs);
 					}
 				});
@@ -257,7 +282,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 					if (widget.isDisposed()) {
 						return;
 					}
-					
+
 					widget.clear();
 					((GlobalInformationWidget) widget.getParent()).setShow(false);
 				}
@@ -303,7 +328,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 					if (widget.isDisposed()) {
 						return;
 					}
-					
+
 					final Collection<StatisticalInformationEvaluator> sfss = new LinkedList<StatisticalInformationEvaluator>();
 					for (final StatisticalInformationEvaluator sfs : sfSettings) {
 						sfss.add(sfs);
@@ -326,13 +351,13 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 		final String numNodes = "# Nodes: " + getPluginManager().getNodePositioner().getNumNodes();
 
-		if (!widget.isDisposed()) {
+		if ((widget != null) && !widget.isDisposed()) {
 			widget.getDisplay().asyncExec(new Runnable() {
 
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
-					
+
 					// the widget might have been disposed while we were waiting
 					if (widget.isDisposed()) {
 						return;
@@ -371,7 +396,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 		private Label labelNumNodes;
 		private Label labelAVGNodeDegree;
-		private Label labelTotalNodeCount;
+		private Label labelTotalPacketCount;
 		private Label labelPacketsPerSecond;
 		private Map<StatisticalInformationEvaluator, Label> sfLabels = new TreeMap<StatisticalInformationEvaluator, Label>();
 
@@ -404,6 +429,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		public void createOrUpdateNumNodes(final String num) {
 			if (labelNumNodes == null) {
 				labelNumNodes = new Label(this, SWT.NONE);
+				labelNumNodes.setToolTipText("The number of currently active nodes");
 			}
 			labelNumNodes.setText(num);
 			labelNumNodes.pack();
@@ -412,11 +438,12 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		}
 
 		public void createOrUpdateTotalPacketCount(final String cnt) {
-			if (labelTotalNodeCount == null) {
-				labelTotalNodeCount = new Label(this, SWT.NONE);
+			if (labelTotalPacketCount == null) {
+				labelTotalPacketCount = new Label(this, SWT.NONE);
+				labelTotalPacketCount.setToolTipText("The total number of received packets");
 			}
-			labelTotalNodeCount.setText(cnt);
-			labelTotalNodeCount.pack();
+			labelTotalPacketCount.setText(cnt);
+			labelTotalPacketCount.pack();
 			pack();
 			super.getParent().redraw();
 		}
@@ -424,6 +451,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		public void createOrUpdatePacketsPerSecond(final String cnt) {
 			if (labelPacketsPerSecond == null) {
 				labelPacketsPerSecond = new Label(this, SWT.NONE);
+				labelPacketsPerSecond.setToolTipText("Packets/second averaged over the last [1|30|60] seconds");
 			}
 			labelPacketsPerSecond.setText(String.valueOf(cnt));
 			labelPacketsPerSecond.pack();
@@ -456,6 +484,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		public void createOrUpdateAVGNodeDeg(final String text) {
 			if (labelAVGNodeDegree == null) {
 				labelAVGNodeDegree = new Label(this, SWT.NONE);
+				labelAVGNodeDegree.setToolTipText("The average number of neighbors per node");
 			}
 			labelAVGNodeDegree.setText(text);
 			labelAVGNodeDegree.pack();
