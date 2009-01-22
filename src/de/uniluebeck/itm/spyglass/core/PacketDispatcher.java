@@ -82,7 +82,10 @@ public class PacketDispatcher {
 		// note positionen which can handle packets all the time!)
 		// An exception like this has to be handled differently
 		final NodePositionerPlugin np = pluginManager.getNodePositioner();
-		log.debug("Dispatching packet[" + packet + "] to NodePositioner " + np);
+		
+		if (log.isDebugEnabled()) {
+			log.debug("Dispatching packet[" + packet + "] to NodePositioner " + np);
+		}
 		
 		try {
 			np.handlePacket(packet);
@@ -95,7 +98,9 @@ public class PacketDispatcher {
 			return;
 		}
 
-		log.debug("Dispatching packet[" + packet + "] to plugins: " + Tools.toString(plugins));
+		if (log.isDebugEnabled()) {
+			log.debug("Dispatching packet[" + packet + "] to plugins: " + Tools.toString(plugins));
+		}
 
 		for (final Plugin plugin : plugins) {
 			// We handled the active NodePositioner already

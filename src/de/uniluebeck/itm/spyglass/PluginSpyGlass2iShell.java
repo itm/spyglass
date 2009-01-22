@@ -157,8 +157,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	 */
 	@Override
 	public void receivePacket(final MessagePacket packet) {
-		log.debug("receivePacket called from iShell");
-
+	
 		if (isPaused()) {
 			return;
 		}
@@ -170,7 +169,9 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			return;
 		}
 
-		log.debug("Received Packet in Spyglass from iShell: " + spyglassPacket);
+		if (log.isDebugEnabled()) {
+			log.debug("Received Packet in Spyglass from iShell: " + spyglassPacket);
+		}
 		// spyglass.getPacketRecorder().handlePacket(spyglassPacket);
 		packetBroker.push(spyglassPacket);
 
