@@ -400,10 +400,11 @@ public class Node extends DrawingObject {
 		if (pos == null) {
 			pos = new AbsolutePosition(0, 0, 0);
 		}
-		if (drawingArea == null) {
-			setBoundingBox(new AbsoluteRectangle(pos, 1, 1));
 		
-		} else if (!drawingArea.isDisposed()) {
+		if ((drawingArea == null) || drawingArea.isDisposed()) {
+			return new AbsoluteRectangle(pos, 1, 1);
+		
+		} else {
 		
 			// get the information to be displayed
 			final String string = getInformationString();
@@ -430,13 +431,12 @@ public class Node extends DrawingObject {
 			final int bbHeight = height + 2 * lineWidth;
 			final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht + 1, bbHeight + 1);
 
-			setBoundingBox(getDrawingArea().pixelRect2AbsRect(bbArea));
-
 			gc.dispose();
 			i.dispose();
 
+			return getDrawingArea().pixelRect2AbsRect(bbArea);
+
 		}
 		
-		return getBoundingBox();
 	}
 }
