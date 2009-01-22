@@ -28,6 +28,7 @@ public class PlaySelectInputAction extends Action {
 		log.debug("Pressed Button PLAY_SELECT_INPUT.");
 		if (new SelectPacketSourceDialog(parentShell, spyglass).open() == Window.OK) {
 			spyglass.reset();
+			spyglass.getConfigStore().store();
 		}
 
 	}
