@@ -46,7 +46,8 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * information about the dimensions of the drawing area and offers methods to transform between
  * reference frames.
  * 
- * Attention: Methods of this class MUST only be invoked from the SWT-GUI thread!
+ * Attention: Methods of this class MUST only be invoked from the SWT-GUI thread,
+ * unless explicitly stated otherwise! 
  * 
  * @author Dariush Forouher
  */
@@ -78,6 +79,11 @@ public class DrawingArea extends Canvas {
 	 * Note: Access to the transform is not protected since the class is not thread-safe.
 	 */
 	private AffineTransform at = new AffineTransform();
+
+	/**
+	 * Mutex to synchronize access to "at"
+	 */
+	private Object transformMutex = new Object();
 	
 	/**
 	 * Limitation of the zoom. Any zoom level which completely shows this rectangle will be considered forbidden.
@@ -153,7 +159,7 @@ public class DrawingArea extends Canvas {
 		init();
 		
 	}
-	
+		
 	private void init() {
 		setBackground(canvasBgColor);
 		
@@ -349,14 +355,18 @@ public class DrawingArea extends Canvas {
 		
 		@Override
 		public void controlResized(final ControlEvent e) {
-			
-			if (!isValidTransformation(new AffineTransform(at))) {
+			boolean isValid;
+			synchronized (transformMutex) {
+				isValid = isValidTransformation(at); 
+			}
+
+			if (!isValid) {
 				log.error("Resizing resulted in illegal transform. Resetting matrix.");
 				
 				// there is a redraw() in here
 				adjustToValidMatrix();
 			}
-			
+
 			syncScrollBars();
 			
 		}
@@ -417,17 +427,19 @@ public class DrawingArea extends Canvas {
 	/**
 	 * Maps a point from the absolute reference frame to the reference frame of the drawing area.
 	 * 
+	 * This method is thread-safe.
 	 * 
 	 * @param absPoint
 	 *            a point in the absolute reference frame
 	 * @return the determined reference frame of the drawing area
 	 */
 	public PixelPosition absPoint2PixelPoint(final AbsolutePosition absPoint) {
-		this.checkWidget();
 		
-		final Point2D pxPoint = at.transform(absPoint.toPoint2D(), null);
+		synchronized (transformMutex) {
+			final Point2D pxPoint = at.transform(absPoint.toPoint2D(), null);
+			return new PixelPosition(pxPoint);
+		}
 		
-		return new PixelPosition(pxPoint);
 	}
 	
 	/**
@@ -436,32 +448,36 @@ public class DrawingArea extends Canvas {
 	 * It is guaranteed that the resulting pixel rectangle will contain at least the area of the
 	 * original absolute rectangle (iow: the rounding is always done to the outside).
 	 * 
+	 * This method is thread-safe.
+	 * 
 	 * @param absRect
 	 */
 	public PixelRectangle absRect2PixelRect(final AbsoluteRectangle absRect) {
-		this.checkWidget();
 		
 		final PixelRectangle rect = new PixelRectangle();
 		
-		Point2D a = at.transform(absRect.getUpperLeft().toPoint2D(), null);
-		final PixelPosition upperLeftPx = new PixelPosition(a);
-		rect.setUpperLeft(upperLeftPx);
-		
-		final AbsolutePosition lowerRightAbs = new AbsolutePosition();
-		lowerRightAbs.x = absRect.getUpperLeft().x + absRect.getWidth();
-		lowerRightAbs.y = absRect.getUpperLeft().y + absRect.getHeight();
-		a = at.transform(lowerRightAbs.toPoint2D(), null);
-		final PixelPosition lowerRightPx = new PixelPosition((int) Math.floor(a.getX() + 1),
-				(int) Math.floor(a.getY() + 1));
-		
-		rect.setWidth(Math.abs(lowerRightPx.x - upperLeftPx.x));
-		rect.setHeight(Math.abs(upperLeftPx.y - lowerRightPx.y));
+		synchronized (transformMutex) {
+			Point2D a = at.transform(absRect.getUpperLeft().toPoint2D(), null);
+			final PixelPosition upperLeftPx = new PixelPosition(a);
+			rect.setUpperLeft(upperLeftPx);
+			
+			final AbsolutePosition lowerRightAbs = new AbsolutePosition();
+			lowerRightAbs.x = absRect.getUpperLeft().x + absRect.getWidth();
+			lowerRightAbs.y = absRect.getUpperLeft().y + absRect.getHeight();
+			a = at.transform(lowerRightAbs.toPoint2D(), null);
+			final PixelPosition lowerRightPx = new PixelPosition((int) Math.floor(a.getX() + 1),
+					(int) Math.floor(a.getY() + 1));
+
+			rect.setWidth(Math.abs(lowerRightPx.x - upperLeftPx.x));
+			rect.setHeight(Math.abs(upperLeftPx.y - lowerRightPx.y));
+		}		
 		
 		return rect;
 		
 	}
 	
-	public PixelRectangle absRect2PixelRectOrig(final AbsoluteRectangle absRect) {
+	// TODO
+	private PixelRectangle absRect2PixelRectOrig(final AbsoluteRectangle absRect) {
 		this.checkWidget();
 		
 		final PixelRectangle rect = new PixelRectangle();
@@ -525,11 +541,12 @@ public class DrawingArea extends Canvas {
 		this.checkWidget();
 		
 		try {
-			
-			final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(),
-					this.getDrawingRectangle().getHeight());
-			final Point2D lowerRight2D = at.inverseTransform(lowerRight, null);
-			return new AbsolutePosition(lowerRight2D);
+			synchronized (transformMutex) {
+				final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(),
+						this.getDrawingRectangle().getHeight());
+				final Point2D lowerRight2D = at.inverseTransform(lowerRight, null);
+				return new AbsolutePosition(lowerRight2D);
+			}
 			
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
@@ -543,12 +560,13 @@ public class DrawingArea extends Canvas {
 		this.checkWidget();
 		
 		try {
+			synchronized (transformMutex) {
 			
-			final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(),
-					this.getDrawingRectangle().getHeight());
-			final Point2D lowerRight2D = at.inverseTransform(lowerRight, null);
-			return lowerRight2D;
-			
+				final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(),
+						this.getDrawingRectangle().getHeight());
+				final Point2D lowerRight2D = at.inverseTransform(lowerRight, null);
+				return lowerRight2D;
+			}
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
 		}
@@ -556,15 +574,18 @@ public class DrawingArea extends Canvas {
 	
 	/**
 	 * return the absolute point represented by the upper left point of the drawing area.
+	 *
+	 * This method is thread-safe.
+	 * 
 	 */
 	public AbsolutePosition getUpperLeft() {
-		this.checkWidget();
 		
 		try {
-			
-			final Point2D upperLeft2D = at.inverseTransform(new Point2D.Double(0, 0), null);
-			return new AbsolutePosition(upperLeft2D);
-			
+			synchronized (transformMutex) {
+				
+				final Point2D upperLeft2D = at.inverseTransform(new Point2D.Double(0, 0), null);
+				return new AbsolutePosition(upperLeft2D);
+			}
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
 		}
@@ -572,15 +593,18 @@ public class DrawingArea extends Canvas {
 	
 	/**
 	 * return the absolute point represented by the upper left point of the drawing area.
+	 * 
+	 * This method is thread-safe.
+	 * 
 	 */
 	public Point2D getUpperLeftPrecise() {
-		this.checkWidget();
 		
 		try {
-			
-			final Point2D upperLeft2D = at.inverseTransform(new Point2D.Double(0, 0), null);
-			return upperLeft2D;
-			
+			synchronized (transformMutex) {
+	
+				final Point2D upperLeft2D = at.inverseTransform(new Point2D.Double(0, 0), null);
+				return upperLeft2D;
+			}
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
 		}
@@ -595,19 +619,23 @@ public class DrawingArea extends Canvas {
 	public void move(final int pixelX, final int pixelY) {
 		this.checkWidget();
 		
-		final AffineTransform atCopy = new AffineTransform(at);
-		
-		// Build the translation matrix
-		final AffineTransform sca = AffineTransform.getTranslateInstance(pixelX, pixelY);
-		
-		atCopy.preConcatenate(sca);
-		
-		if (!isValidTransformation(atCopy)) {
-			return;
+		final AffineTransform atCopy;
+		synchronized (transformMutex) {
+			
+			atCopy = new AffineTransform(at);
+
+			// Build the translation matrix
+			final AffineTransform sca = AffineTransform.getTranslateInstance(pixelX, pixelY);
+			
+			atCopy.preConcatenate(sca);
+			
+			if (!isValidTransformation(atCopy)) {
+				return;
+			}
+			
+			// add the translation matrix to the transformation matrix.
+			at = atCopy;
 		}
-		
-		// add the translation matrix to the transformation matrix.
-		at = atCopy;
 		
 		fireDrawingAreaTransformEvent();
 		
@@ -660,16 +688,18 @@ public class DrawingArea extends Canvas {
 	/**
 	 * Maps a point from the reference frame of the drawing are to the absolute reference frame.
 	 * 
+	 * This method is thread-safe.
+	 * 
 	 * @param point
 	 *            a point in the reference frame of the drawing area
 	 */
 	public AbsolutePosition pixelPoint2AbsPoint(final PixelPosition point) {
-		this.checkWidget();
 		
 		try {
-			
-			final Point2D a = at.inverseTransform(point.toPoint2D(), null);
-			return new AbsolutePosition(a);
+			synchronized (transformMutex) {
+				final Point2D a = at.inverseTransform(point.toPoint2D(), null);
+				return new AbsolutePosition(a);
+			}
 			
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
@@ -682,29 +712,32 @@ public class DrawingArea extends Canvas {
 	 * It is guaranteed that the resulting absolute rectangle will contain at least the area of the
 	 * original pixel rectangle (iow: the rounding is always done to the outside).
 	 * 
+	 * This method is thread-safe.
+	 * 
 	 * @param rect
 	 */
 	public AbsoluteRectangle pixelRect2AbsRect(final PixelRectangle rect) {
-		this.checkWidget();
 		
 		try {
-			final AbsoluteRectangle absRect = new AbsoluteRectangle();
-			
-			Point2D a = at.inverseTransform(rect.getUpperLeft().toPoint2D(), null);
-			final AbsolutePosition upperLeftAbs = new AbsolutePosition(a);
-			absRect.setUpperLeft(upperLeftAbs);
-			
-			final PixelPosition lowerRight = new PixelPosition();
-			lowerRight.x = rect.getUpperLeft().x + rect.getWidth();
-			lowerRight.y = rect.getUpperLeft().y + rect.getHeight();
-			a = at.inverseTransform(lowerRight.toPoint2D(), null);
-			final AbsolutePosition lowerRightAbs = new AbsolutePosition((int) Math
-					.floor(a.getX() + 1), (int) Math.floor(a.getY() + 1), 0);
-			
-			absRect.setWidth(Math.abs(lowerRightAbs.x - upperLeftAbs.x));
-			absRect.setHeight(Math.abs(upperLeftAbs.y - lowerRightAbs.y));
-			
-			return absRect;
+			synchronized (transformMutex) {
+				final AbsoluteRectangle absRect = new AbsoluteRectangle();
+				
+				Point2D a = at.inverseTransform(rect.getUpperLeft().toPoint2D(), null);
+				final AbsolutePosition upperLeftAbs = new AbsolutePosition(a);
+				absRect.setUpperLeft(upperLeftAbs);
+				
+				final PixelPosition lowerRight = new PixelPosition();
+				lowerRight.x = rect.getUpperLeft().x + rect.getWidth();
+				lowerRight.y = rect.getUpperLeft().y + rect.getHeight();
+				a = at.inverseTransform(lowerRight.toPoint2D(), null);
+				final AbsolutePosition lowerRightAbs = new AbsolutePosition((int) Math
+						.floor(a.getX() + 1), (int) Math.floor(a.getY() + 1), 0);
+				
+				absRect.setWidth(Math.abs(lowerRightAbs.x - upperLeftAbs.x));
+				absRect.setHeight(Math.abs(upperLeftAbs.y - lowerRightAbs.y));
+				
+				return absRect;
+			}
 			
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
@@ -715,11 +748,15 @@ public class DrawingArea extends Canvas {
 	/**
 	 * Returns the current zoom level. The zoom level can take any value in the range 0-ZOOM_MAX.
 	 * 
+	 * This method is thread-safe.
+	 * 
 	 */
 	public double getZoom() {
-		this.checkWidget();
 		
-		return at.getScaleX();
+		synchronized (transformMutex) {
+			return at.getScaleX();
+			
+		}
 	}
 	
 	// --------------------------------------------------------------------------------
@@ -764,34 +801,37 @@ public class DrawingArea extends Canvas {
 	private void zoom(final int px, final int py, final double factor) {
 		
 		try {
-			// The centerpoint of the zoom (where the user clicked)
-			final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
-			
-			// Build the scale matrix
-			final AffineTransform sca = new AffineTransform();
-			sca.translate(a.getX(), a.getY());
-			sca.scale(factor, factor);
-			sca.translate(-a.getX(), -a.getY());
-			
-			final AffineTransform atTemp = new AffineTransform(at);
-			atTemp.concatenate(sca);
-			if (!isValidTransformation(atTemp)) {
-				return;
+
+			synchronized (transformMutex) {
+				// The centerpoint of the zoom (where the user clicked)
+				final Point2D a = at.inverseTransform(new Point2D.Float(px, py), null);
+				
+				// Build the scale matrix
+				final AffineTransform sca = new AffineTransform();
+				sca.translate(a.getX(), a.getY());
+				sca.scale(factor, factor);
+				sca.translate(-a.getX(), -a.getY());
+				
+				final AffineTransform atTemp = new AffineTransform(at);
+				atTemp.concatenate(sca);
+				if (!isValidTransformation(atTemp)) {
+					return;
+				}
+				// Abort if we leave a defined interval of allowed zoom levels
+				// This is partly because the QuadTree cannot handle it if it is asked
+				// to return objects outside its boundingBox.
+				//
+				// TODO: This isn't the perfect solution, as it depends on the size
+				// of the Spyglass Window to be "regular size".
+				final AffineTransform at2 = (AffineTransform) at.clone();
+				at2.concatenate(sca);
+				if ((at2.getScaleX() > ZOOM_MAX)) {
+					return;
+				}
+				
+				// add the scale matrix to the transformation matrix.
+				at.concatenate(sca);
 			}
-			// Abort if we leave a defined interval of allowed zoom levels
-			// This is partly because the QuadTree cannot handle it if it is asked
-			// to return objects outside its boundingBox.
-			//
-			// TODO: This isn't the perfect solution, as it depends on the size
-			// of the Spyglass Window to be "regular size".
-			final AffineTransform at2 = (AffineTransform) at.clone();
-			at2.concatenate(sca);
-			if ((at2.getScaleX() > ZOOM_MAX)) {
-				return;
-			}
-			
-			// add the scale matrix to the transformation matrix.
-			at.concatenate(sca);
 			
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
@@ -868,8 +908,10 @@ public class DrawingArea extends Canvas {
 		
 		newAt.preConcatenate(AffineTransform.getTranslateInstance(deltaX / 2, deltaY / 2));
 		
-		// replace the matrix
-		this.at = newAt;
+		synchronized (transformMutex) {
+			// replace the matrix
+			this.at = newAt;
+		}
 		
 		fireDrawingAreaTransformEvent();
 		
@@ -882,6 +924,9 @@ public class DrawingArea extends Canvas {
 	/**
 	 * Returns the global bounding box describing the whole world. (absolute coordinates outside
 	 * this bounding box can be considered an error.)
+	 * 
+	 * This method is thread-safe.
+	 * 
 	 */
 	public static AbsoluteRectangle getGlobalBoundingBox() {
 		
@@ -900,7 +945,11 @@ public class DrawingArea extends Canvas {
 	 */
 	private void adjustToValidMatrix() {
 		
-		AffineTransform atCopy = new AffineTransform(at);
+		AffineTransform atCopy;
+		
+		synchronized (transformMutex) {
+			atCopy = new AffineTransform(at);
+		}
 		
 		while (!isValidTransformation(atCopy)) {
 			log.debug("Zooming in to get back in into the global BBox.");
@@ -932,8 +981,10 @@ public class DrawingArea extends Canvas {
 			}
 			
 		}
-		
-		at = atCopy;
+		// TODO: what about the gap betweeen the two synchr. blocks?
+		synchronized (transformMutex) {
+			at = atCopy;
+		}
 		
 		fireDrawingAreaTransformEvent();
 		
@@ -952,7 +1003,9 @@ public class DrawingArea extends Canvas {
 		final double select = scrollBar.getSelection();
 		final double diff = ty - select - WORLD_UPPER_LEFT_Y;
 		
-		at.concatenate(AffineTransform.getTranslateInstance(0, diff));
+		synchronized (transformMutex) {
+			at.concatenate(AffineTransform.getTranslateInstance(0, diff));
+		}
 		
 		fireDrawingAreaTransformEvent();
 		
@@ -971,7 +1024,9 @@ public class DrawingArea extends Canvas {
 		final double select = scrollBar.getSelection();
 		final double diff = tx - select - WORLD_UPPER_LEFT_X;
 		
-		at.concatenate(AffineTransform.getTranslateInstance(diff, 0));
+		synchronized (transformMutex) {
+			at.concatenate(AffineTransform.getTranslateInstance(diff, 0));
+		}
 		
 		fireDrawingAreaTransformEvent();
 		
@@ -996,6 +1051,8 @@ public class DrawingArea extends Canvas {
 	 * 
 	 * This listener can be used to listen for changes in zoom or movement of the drawing area.
 	 * 
+	 * This method is thread-safe.
+	 * 
 	 */
 	public void addDrawingAreaTransformListener(final DrawingAreaTransformListener listener) {
 		if (listener == null) {
@@ -1007,6 +1064,9 @@ public class DrawingArea extends Canvas {
 	
 	/**
 	 * Remove the given listener.
+	 * 
+	 * This method is thread-safe.
+	 * 
 	 */
 	public void removeDrawingAreaTransformListener(final DrawingAreaTransformListener listener) {
 		if (listener == null) {
@@ -1035,8 +1095,13 @@ public class DrawingArea extends Canvas {
 	/**
 	 * Returns a copy of the transformation matrix used to transform coordinates from the 
 	 * absolute reference frame to the pixel reference frame.
+	 * 
+	 * This method is thread-safe.
+	 * 
 	 */
 	public AffineTransform getTransform() {
-		return new AffineTransform(at);
+		synchronized (transformMutex) {
+			return new AffineTransform(at);			
+		}
 	}
 }

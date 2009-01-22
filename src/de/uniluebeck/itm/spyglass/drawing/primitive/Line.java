@@ -10,7 +10,6 @@ package de.uniluebeck.itm.spyglass.drawing.primitive;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
@@ -106,41 +105,31 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				
-				// the drawingArea might have been disposed while we were waiting
-				if ((drawingArea != null) && drawingArea.isDisposed()) {
-					return;
-				}
+		if (drawingArea == null) {
 
-				if (drawingArea == null) {
+			final int upperLeftX = Math.min(lineEnd.x, position.x) - (lineWidth / 2);
+			final int upperLeftY = Math.min(lineEnd.y, position.y) - (lineWidth / 2);
+			final int width = Math.abs(lineEnd.x - position.x) + lineWidth;
+			final int height = Math.abs(lineEnd.y - position.y) + lineWidth;
+			boundingBox = new AbsoluteRectangle(upperLeftX, upperLeftY, width, height);
 
-					final int upperLeftX = Math.min(lineEnd.x, position.x) - (lineWidth / 2);
-					final int upperLeftY = Math.min(lineEnd.y, position.y) - (lineWidth / 2);
-					final int width = Math.abs(lineEnd.x - position.x) + lineWidth;
-					final int height = Math.abs(lineEnd.y - position.y) + lineWidth;
-					boundingBox = new AbsoluteRectangle(upperLeftX, upperLeftY, width, height);
-					return;
-				}
+		} else if (!drawingArea.isDisposed()) {
 
-				final PixelPosition pos = drawingArea.absPoint2PixelPoint(position);
-				final PixelPosition end = drawingArea.absPoint2PixelPoint(lineEnd);
+			final PixelPosition pos = drawingArea.absPoint2PixelPoint(position);
+			final PixelPosition end = drawingArea.absPoint2PixelPoint(lineEnd);
+		
+			final int bbUpperLeftX = Math.min(end.x, pos.x) - ((int) Math.ceil((((double) lineWidth) / 2)));
+			final int bbUpperLeftY = Math.min(end.y, pos.y) - ((int) Math.ceil((((double) lineWidth) / 2)));
+		
+			final int bbWidth = Math.abs(end.x - pos.x) + lineWidth;
+			final int bbHeight = Math.abs(end.y - pos.y) + lineWidth;
+		
+			final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidth, bbHeight);
+		
+			boundingBox = drawingArea.pixelRect2AbsRect(bbArea);
 
-				final int bbUpperLeftX = Math.min(end.x, pos.x) - ((int) Math.ceil((((double) lineWidth) / 2)));
-				final int bbUpperLeftY = Math.min(end.y, pos.y) - ((int) Math.ceil((((double) lineWidth) / 2)));
-
-				final int bbWidth = Math.abs(end.x - pos.x) + lineWidth;
-				final int bbHeight = Math.abs(end.y - pos.y) + lineWidth;
-
-				final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidth, bbHeight);
-
-				boundingBox = drawingArea.pixelRect2AbsRect(bbArea);
-
-			}
-		});
-
+		}
+		
 		return boundingBox;
 
 	}

@@ -3,9 +3,9 @@ package de.uniluebeck.itm.spyglass.drawing.primitive;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
@@ -393,60 +393,50 @@ public class Node extends DrawingObject {
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 
-		final Display display = Display.getDefault();
-		if ((display != null) && !display.isDisposed()) {
-			display.syncExec(new Runnable() {
-				@SuppressWarnings("synthetic-access")
-				public void run() {
-					
-					final DrawingArea drawingArea = getDrawingArea();
-
-					// the drawingArea might have been disposed while we were waiting
-					if ((drawingArea != null) && drawingArea.isDisposed()) {
-						return;
-					}
-					
-					// to prevent NPEs
-					AbsolutePosition pos = getPosition();
-					if (pos == null) {
-						pos = new AbsolutePosition(0, 0, 0);
-					}
-					if (drawingArea == null) {
-						setBoundingBox(new AbsoluteRectangle(pos, 1, 1));
-						return;
-					}
-					// get the information to be displayed
-					final String string = getInformationString();
-					final int lineWidth = getLineWidth();
-					// determine the size parameters of the rectangle which represents the node
-					// in respect to the sting to be displayed
-					final GC gc = new GC(Display.getCurrent());
-					final Point size = gc.textExtent(string);
-					final int width = size.x + lineWidth + 3; // +3: see above
-					final int height = size.y + lineWidth + 3;
-
-					final PixelPosition upperLeft = getDrawingArea().absPoint2PixelPoint(pos);
-
-					// since the rectangle's line is spread according to its width with the
-					// actual position in it's center, the upper left position of the bounding box
-					// has to adapt to this
-					final int bbUpperLeftX = upperLeft.x;
-					final int bbUpperLeftY = upperLeft.y;
-
-					// the line width has to be counted twice because two lines with the same
-					// width are drawn on the drawing area
-					final int bbWidht = width + 2 * lineWidth;
-					final int bbHeight = height + 2 * lineWidth;
-					final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht + 1, bbHeight + 1);
-
-					setBoundingBox(getDrawingArea().pixelRect2AbsRect(bbArea));
-
-					gc.dispose();
-
-				}
-			});
+		final DrawingArea drawingArea = getDrawingArea();
+		
+		// to prevent NPEs
+		AbsolutePosition pos = getPosition();
+		if (pos == null) {
+			pos = new AbsolutePosition(0, 0, 0);
 		}
+		if (drawingArea == null) {
+			setBoundingBox(new AbsoluteRectangle(pos, 1, 1));
+		
+		} else if (!drawingArea.isDisposed()) {
+		
+			// get the information to be displayed
+			final String string = getInformationString();
+			final int lineWidth = getLineWidth();
+			// determine the size parameters of the rectangle which represents the node
+			// in respect to the sting to be displayed
+			final org.eclipse.swt.graphics.Image i = new Image(null, 1,1);
+			final GC gc = new GC(i);
+			final Point size = gc.textExtent(string);
+			final int width = size.x + lineWidth + 3; // +3: see above
+			final int height = size.y + lineWidth + 3;
 
+			final PixelPosition upperLeft = getDrawingArea().absPoint2PixelPoint(pos);
+
+			// since the rectangle's line is spread according to its width with the
+			// actual position in it's center, the upper left position of the bounding box
+			// has to adapt to this
+			final int bbUpperLeftX = upperLeft.x;
+			final int bbUpperLeftY = upperLeft.y;
+
+			// the line width has to be counted twice because two lines with the same
+			// width are drawn on the drawing area
+			final int bbWidht = width + 2 * lineWidth;
+			final int bbHeight = height + 2 * lineWidth;
+			final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht + 1, bbHeight + 1);
+
+			setBoundingBox(getDrawingArea().pixelRect2AbsRect(bbArea));
+
+			gc.dispose();
+			i.dispose();
+
+		}
+		
 		return getBoundingBox();
 	}
 }
