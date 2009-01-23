@@ -7,8 +7,7 @@
  */
 package de.uniluebeck.itm.spyglass.drawing;
 
-import java.util.HashSet;
-import java.util.Set;
+import javax.swing.event.EventListenerList;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -33,7 +32,7 @@ public abstract class DrawingObject {
 	/** The position of the object's upper left point */
 	private AbsolutePosition position = new AbsolutePosition(0, 0, 0);
 
-	private Set<BoundingBoxChangeListener> changeListeners = new HashSet<BoundingBoxChangeListener>();
+	private EventListenerList changeListeners = new EventListenerList();
 
 	/** The object's bounding box */
 	private AbsoluteRectangle boundingBox;
@@ -87,11 +86,14 @@ public abstract class DrawingObject {
 	 * the box has actually changed
 	 */
 	protected void fireBoundingBoxChangeEvent() {
-		synchronized (changeListeners) {
-			for (final BoundingBoxChangeListener listener : changeListeners) {
-				listener.onBoundingBoxChanged(this);
-			}
+		// Get listeners
+		final BoundingBoxChangeListener[] list = changeListeners.getListeners(BoundingBoxChangeListener.class);
+		
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
+			(list[i]).onBoundingBoxChanged(this);
 		}
+
 	}
 
 	// --------------------------------------------------------------------------------
@@ -212,9 +214,7 @@ public abstract class DrawingObject {
 	 *            a listener for changes concerning the object's bounding box
 	 */
 	public void addBoundingBoxChangedListener(final BoundingBoxChangeListener listener) {
-		synchronized (changeListeners) {
-			this.changeListeners.add(listener);
-		}
+		this.changeListeners.add(BoundingBoxChangeListener.class, listener);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -225,9 +225,7 @@ public abstract class DrawingObject {
 	 *            a listener for changes concerning the object's bounding box
 	 */
 	public void removeBoundingBoxChangeListener(final BoundingBoxChangeListener listener) {
-		synchronized (changeListeners) {
-			this.changeListeners.remove(listener);
-		}
+		this.changeListeners.remove(BoundingBoxChangeListener.class, listener);
 	}
 
 	/**
