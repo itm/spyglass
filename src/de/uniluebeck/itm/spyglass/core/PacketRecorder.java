@@ -170,6 +170,13 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	 */
 	private boolean isWritable(final File file) {
 		// check if it is a file at all (this should always be the case but we want to make sure)
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (final IOException e) {
+				log.error("The recording file could not be created", e);
+			}
+		}
 		if (!file.isFile()) {
 			Display.getDefault().asyncExec(new Runnable() {
 				@Override
