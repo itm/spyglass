@@ -123,8 +123,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		};
 		xmlConfig.addPropertyChangeListener(pcl);
 
-		new Timer(true).schedule((statsTimerTask = new StatsTimerTask()), 1000, 1000);
-
+		new Timer("SGI-Statistics", true).schedule((statsTimerTask = new StatsTimerTask()), 1000, 1000);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -593,15 +592,17 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 			final String pps = "# PPS: [ " + perSec + " | " + per30Sec + " | " + per60Sec + " ]";
 
-			synchronized (widget) {
-				if (!widget.isDisposed()) {
-					widget.getDisplay().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							widget.createOrUpdateTotalPacketCount("# Packets: " + totalPacketCount);
-							widget.createOrUpdatePacketsPerSecond(pps);
-						}
-					});
+			if (widget != null) {
+				synchronized (widget) {
+					if (!widget.isDisposed()) {
+						widget.getDisplay().asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								widget.createOrUpdateTotalPacketCount("# Packets: " + totalPacketCount);
+								widget.createOrUpdatePacketsPerSecond(pps);
+							}
+						});
+					}
 				}
 			}
 		}
