@@ -52,10 +52,12 @@ public class UIController {
 	private Spyglass spyglass = null;
 
 	private final Display display;
+	
+	private final static boolean ENABLE_DRAW_PROFILING = true;
 
 	/** User events will be dispatched here */
 	private EventDispatcher eventDispatcher;
-
+	
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -160,12 +162,8 @@ public class UIController {
 	private void renderPlugin(final GC gc, final Drawable plugin, final AbsoluteRectangle area) {
 
 		final List<DrawingObject> dos = new LinkedList<DrawingObject>(plugin.getDrawingObjects(area));
-		if (dos != null) {
-			for (final DrawingObject object : dos) {
-				object.draw(appWindow.getGui().getDrawingArea(), gc);
-			}
-		} else {
-			log.error("The plugin " + plugin + " did not provide any drawing objects!");
+		for (final DrawingObject object : dos) {
+			object.draw(appWindow.getGui().getDrawingArea(), gc);
 		}
 	}
 
@@ -316,6 +314,8 @@ public class UIController {
 		@Override
 		public void paintControl(final PaintEvent e) {
 
+			final long time = System.nanoTime();
+			
 			final PixelRectangle pxArea = new PixelRectangle(e.gc.getClipping().x, e.gc.getClipping().y, e.gc.getClipping().width,
 					e.gc.getClipping().height);
 
@@ -329,6 +329,16 @@ public class UIController {
 				}
 			}
 
+			if (ENABLE_DRAW_PROFILING) {
+				final long time2 = System.nanoTime();
+				final double pxCount = pxArea.getHeight() * pxArea.getWidth();
+				final boolean clipping = !appWindow.getGui().getDrawingArea().getClientArea().equals(pxArea.rectangle);
+				if (clipping) {
+					log.info( String.format("Partial redraw (%.0f px). Time: %.03f ms (%.0f ns per pixel).",pxCount, (time2-time)/1000000d,((time2-time)/pxCount)));
+				} else {
+					log.info( String.format("Complete redraw. Time: %.03f ms (%.0f ns per pixel).",(time2-time)/1000000d,((time2-time)/pxCount)));
+				}
+			}
 		}
 	};
 
