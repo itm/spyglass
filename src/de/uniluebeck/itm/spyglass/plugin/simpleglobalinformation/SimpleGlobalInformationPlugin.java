@@ -96,6 +96,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	private AtomicInteger numPackets;
 
+	private StatsTimerTask statsTimerTask;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -121,53 +123,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		};
 		xmlConfig.addPropertyChangeListener(pcl);
 
-		new Timer(true).schedule(new TimerTask() {
+		new Timer(true).schedule((statsTimerTask = new StatsTimerTask()), 1000, 1000);
 
-			private int times = 0;
-			private String perSec = "";
-			private String per30Sec = "     ";
-			private String per60Sec = "     ";
-			private boolean skipTimesCount = false;
-			private StatisticalOperation statistics30sec = new StatisticalOperation(30, STATISTICAL_OPERATIONS.AVG, new DecimalFormat("0.00"));
-			private StatisticalOperation statistics60sec = new StatisticalOperation(60, STATISTICAL_OPERATIONS.AVG, new DecimalFormat("0.00"));
-
-			@SuppressWarnings("synthetic-access")
-			@Override
-			public void run() {
-				final int val = numPackets.getAndSet(0);
-
-				perSec = new DecimalFormat("0.00").format(val);
-				statistics30sec.addValue(val);
-				statistics60sec.addValue(val);
-
-				if (!skipTimesCount) {
-					if ((++times) >= 30) {
-						per30Sec = statistics30sec.getValueFormatted();
-					}
-
-					if ((times) >= 60) {
-						per60Sec = statistics60sec.getValueFormatted();
-						skipTimesCount = true;
-					}
-				} else {
-					per30Sec = statistics30sec.getValueFormatted();
-					per60Sec = statistics60sec.getValueFormatted();
-				}
-
-				final String pps = "# PPS: [ " + perSec + " | " + per30Sec + " | " + per60Sec + " ]";
-
-				synchronized (widget) {
-					widget.getDisplay().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							widget.createOrUpdateTotalPacketCount("# Packets: " + totalPacketCount);
-							widget.createOrUpdatePacketsPerSecond(pps);
-						}
-					});
-				}
-
-			}
-		}, 1000, 1000);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -250,18 +207,21 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 			}
 
 			synchronized (widget) {
-				widget.getDisplay().syncExec(new Runnable() {
-					@SuppressWarnings("synthetic-access")
-					@Override
-					public void run() {
-						// the widget might have been disposed while we were waiting
-						if (widget.isDisposed()) {
-							return;
-						}
+				if (!widget.isDisposed()) {
+					widget.getDisplay().syncExec(new Runnable() {
+						@SuppressWarnings("synthetic-access")
+						@Override
+						public void run() {
+							// the widget might have been disposed while we were waiting
+							if (widget.isDisposed()) {
+								return;
+							}
 
-						widget.createOrUpdateLabel(sfs);
-					}
-				});
+							widget.createOrUpdateLabel(sfs);
+						}
+					});
+				}
+
 			}
 
 		}
@@ -300,6 +260,9 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		}
 		avgNodeDegEvaluator.reset();
 		avgNodeDegString = "avg. node degree: ";
+		numPackets.set(0);
+		totalPacketCount = 0;
+		statsTimerTask.reset();
 		refreshNodeCounts();
 	}
 
@@ -594,6 +557,67 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 			}
 		}
 
+	}
+
+	private class StatsTimerTask extends TimerTask {
+		private int times = 0;
+		private String perSec = "";
+		private String per30Sec = "     ";
+		private String per60Sec = "     ";
+		private StatisticalOperation statistics30sec = new StatisticalOperation(30, STATISTICAL_OPERATIONS.AVG, new DecimalFormat("0.00"));
+		private StatisticalOperation statistics60sec = new StatisticalOperation(60, STATISTICAL_OPERATIONS.AVG, new DecimalFormat("0.00"));
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Constructor
+		 */
+		public StatsTimerTask() {
+			super();
+		}
+
+		@SuppressWarnings("synthetic-access")
+		@Override
+		public synchronized void run() {
+			final int val = numPackets.getAndSet(0);
+
+			perSec = new DecimalFormat("0.00").format(val);
+			statistics30sec.addValue(val);
+			statistics60sec.addValue(val);
+
+			if ((times) >= 59) {
+				per60Sec = statistics60sec.getValueFormatted();
+				per30Sec = statistics30sec.getValueFormatted();
+			} else if ((++times) >= 30) {
+				per30Sec = statistics30sec.getValueFormatted();
+			}
+
+			final String pps = "# PPS: [ " + perSec + " | " + per30Sec + " | " + per60Sec + " ]";
+
+			synchronized (widget) {
+				if (!widget.isDisposed()) {
+					widget.getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							widget.createOrUpdateTotalPacketCount("# Packets: " + totalPacketCount);
+							widget.createOrUpdatePacketsPerSecond(pps);
+						}
+					});
+				}
+			}
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Resets the timer tasks statistical values
+		 */
+		public synchronized void reset() {
+			times = 0;
+			statistics30sec.reset();
+			statistics60sec.reset();
+			perSec = "     ";
+			per30Sec = "     ";
+			per60Sec = "     ";
+		}
 	}
 
 }
