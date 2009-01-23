@@ -183,7 +183,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		++totalPacketCount;
 
 		// if the widget was not initialized, yet, nothing is to do here
-		if ((widget == null) || (widget.getDisplay() == null)) {
+		if ((widget == null) || (widget.isDisposed()) || (widget.getDisplay() == null)) {
 			return;
 		}
 
