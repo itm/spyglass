@@ -9,11 +9,12 @@
 package de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
@@ -37,7 +38,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
-
+	
 	private static Logger log = SpyglassLoggerFactory.getLogger(PositionPacketNodePositionerPlugin.class);
 
 	@Element(name = "parameters")
@@ -50,18 +51,11 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 	/**
 	 * Hashmap containing the position information.
+	 * 
+	 * Set concurrency level to "2", since only two threads (PacketHandler and the TimeoutTimer)
+	 * will modify the map.
 	 */
-	private final HashMap<Integer, AbsolutePosition> positionMap = new HashMap<Integer, AbsolutePosition>();
-
-	/**
-	 * System time, when the node has been last seen.
-	 */
-	private final HashMap<Integer, Long> lastSeen = new HashMap<Integer, Long>();
-
-	/**
-	 * Mutex to protect lastSeen and positionMap
-	 */
-	private final Object mutex = new Object();
+	private final Map<Integer, PositionData> nodeMap = new ConcurrentHashMap<Integer, PositionData>(16,0.75f,2);
 
 	/**
 	 * Constructor
@@ -83,9 +77,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
 
-		synchronized (mutex) {
-			return positionMap.get(nodeId);
-		}
+		return nodeMap.get(nodeId).position;
 	}
 
 	/**
@@ -99,32 +91,26 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 		final List<NodePositionEvent> list = new ArrayList<NodePositionEvent>();
 
-		// we have to aquire the mutex to ensure that lastSeen isn't modified
-		synchronized (mutex) {
+		final Iterator<Integer> it = nodeMap.keySet().iterator();
+		while (it.hasNext()) {
+			final int id = it.next();
+			final PositionData data = nodeMap.get(id);
+			if (data != null) {
+				final long time = data.lastSeen;
+				if (System.currentTimeMillis() - time > config.getTimeout() * 1000) {
 
-			final Iterator<Integer> it = lastSeen.keySet().iterator();
-			while (it.hasNext()) {
-				final int id = it.next();
-				if (lastSeen.get(id) != null) {
-					final long time = lastSeen.get(id);
-					if (System.currentTimeMillis() - time > config.getTimeout() * 1000) {
+					final AbsolutePosition oldPos = data.position;
+					
+					// remove the element from our map
+					it.remove();
 
-						final AbsolutePosition oldPos = positionMap.get(id);
-						;
+					log.debug("Removed node " + id + " after timeout.");
+					list.add(new NodePositionEvent(id, NodePositionEvent.Change.REMOVED, oldPos, null));
 
-						positionMap.remove(id);
-						it.remove();
-
-						log.debug("Removed node " + id + " after timeout.");
-						list.add(new NodePositionEvent(id, NodePositionEvent.Change.REMOVED, oldPos, null));
-
-					}
 				}
 			}
-
 		}
 
-		// fire the events after we release the lock
 		for (final NodePositionEvent nodePositionEvent : list) {
 			pluginManager.fireNodePositionEvent(nodePositionEvent);
 		}
@@ -160,21 +146,21 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 		final int id = packet.getSenderId();
 
+		// check if we already know about this noed
+		final PositionData oldData = nodeMap.get(id);
+		
 		final AbsolutePosition newPos = packet.getPosition().clone();
-		final AbsolutePosition oldPos = positionMap.get(id);
 
-		synchronized (mutex) {
-
-			this.lastSeen.put(id, System.currentTimeMillis());
-			this.positionMap.put(id, newPos);
-
-		}
+		// Just overwrite the old PositionData object
+		this.nodeMap.put(id, new PositionData(newPos, System.currentTimeMillis()));
+		
+		// TODO: Optimization: combine multiple events into one object
 
 		// only send events when the position really changes.
-		if (oldPos == null) {
+		if (oldData == null) {
 			pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.ADDED, null, newPos));
-		} else if (!oldPos.equals(newPos)) {
-			pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.MOVED, oldPos, newPos));
+		} else if (!oldData.position.equals(newPos)) {
+			pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.MOVED, oldData.position, newPos));
 		}
 
 	}
@@ -186,9 +172,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	protected void resetPlugin() {
-		synchronized (mutex) {
-			this.positionMap.clear();
-		}
+		this.nodeMap.clear();
 	}
 
 	@Override
@@ -199,9 +183,8 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	@Override
 	public int getNumNodes() {
 
-		synchronized (mutex) {
-			return this.positionMap.size();
-		}
+		return this.nodeMap.size();
+		
 	}
 
 	@Override
@@ -211,9 +194,17 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public List<Integer> getNodeList() {
-		synchronized (mutex) {
-			return new ArrayList<Integer>(this.positionMap.keySet());
-		}
+		return new ArrayList<Integer>(this.nodeMap.keySet());
+	}
+	
+	// --------------------------------------------------------------------------------
+	/* (non-Javadoc)
+	 * @see de.uniluebeck.itm.spyglass.plugin.Plugin#shutdown()
+	 */
+	@Override
+	public void shutdown() throws Exception {
+		super.shutdown();
+		this.timer.cancel();
 	}
 
 }
