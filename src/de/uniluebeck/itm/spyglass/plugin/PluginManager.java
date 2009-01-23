@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.event.EventListenerList;
 
@@ -67,7 +66,20 @@ public class PluginManager {
 	 */
 	private List<Plugin> plugins = Collections.synchronizedList(pluginsInternal);
 
-	private final Set<PluginListChangeListener> pluginListChangeListeners = Collections.synchronizedSet(new HashSet<PluginListChangeListener>());
+	// --------------------------------------------------------------------------
+	/**
+	 * Registered listerers (of different types) 
+	 */
+	private final EventListenerList listeners = new EventListenerList();
+
+	// --------------------------------------------------------------------------
+	/**
+	 * List of plug-ins that are currently being removed
+	 * 
+	 * (this is currently only used to make sure, that such a plug-in wont be elected as new active
+	 * node positioner)
+	 */
+	private final List<Plugin> removePending = new ArrayList<Plugin>();
 
 	private static final List<Class<? extends Plugin>> availablePluginsTypes = new ArrayList<Class<? extends Plugin>>();
 
@@ -126,21 +138,6 @@ public class PluginManager {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * List of plug-ins that are currently being removed
-	 * 
-	 * (this is currently only used to make sure, that such a plug-in wont be elected as new active
-	 * node positioner)
-	 */
-	private final List<Plugin> removePending = new ArrayList<Plugin>();
-
-	// --------------------------------------------------------------------------
-	/**
-	 * Listerers for the NodePositionListener
-	 */
-	private final EventListenerList nodePositionListeners = new EventListenerList();
-
-	// --------------------------------------------------------------------------
-	/**
 	 * Returns all plug-ins which are currently administered by this instance and which are marked
 	 * as 'active'
 	 * 
@@ -168,7 +165,7 @@ public class PluginManager {
 	 *            the listener to add
 	 */
 	public void addPluginListChangeListener(final PluginListChangeListener listener) {
-		pluginListChangeListeners.add(listener);
+		listeners.add(PluginListChangeListener.class, listener);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -181,7 +178,7 @@ public class PluginManager {
 	 */
 	public void addPluginListChangeListeners(final List<PluginListChangeListener> listeners) {
 		for (final PluginListChangeListener listener : listeners) {
-			pluginListChangeListeners.add(listener);
+			this.listeners.add(PluginListChangeListener.class, listener);
 		}
 
 	}
@@ -194,7 +191,7 @@ public class PluginManager {
 	 *            the listener to add
 	 */
 	public void removePluginListChangeListener(final PluginListChangeListener listener) {
-		pluginListChangeListeners.remove(listener);
+		listeners.remove(PluginListChangeListener.class, listener);
 	}
 
 	// --------------------------------------------------------------------------
@@ -643,7 +640,7 @@ public class PluginManager {
 	 *            a listener to be added to the already existing ones
 	 */
 	public void addNodePositionListener(final NodePositionListener listener) {
-		nodePositionListeners.add(NodePositionListener.class, listener);
+		listeners.add(NodePositionListener.class, listener);
 	}
 
 	// --------------------------------------------------------------------------
@@ -654,7 +651,7 @@ public class PluginManager {
 	 *            the listener to be removed
 	 */
 	public void removeNodePositionListener(final NodePositionListener listener) {
-		nodePositionListeners.remove(NodePositionListener.class, listener);
+		listeners.remove(NodePositionListener.class, listener);
 	}
 
 	// --------------------------------------------------------------------------
@@ -670,7 +667,7 @@ public class PluginManager {
 	 */
 	public void fireNodePositionEvent(final NodePositionEvent event) {
 		// Get listeners
-		final EventListener[] list = nodePositionListeners.getListeners(NodePositionListener.class);
+		final EventListener[] list = listeners.getListeners(NodePositionListener.class);
 
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
@@ -737,13 +734,9 @@ public class PluginManager {
 	 */
 	private void firePluginListChangedEvent(final Plugin p, final ListChangeEvent what) {
 
-		// TODO: This is a workaround. The real solution is to make sure the
-		// eventListerList ist multithreading safe.
-		final Set<PluginListChangeListener> copySet;
-		synchronized (pluginListChangeListeners) {
-			copySet = new HashSet<PluginListChangeListener>(pluginListChangeListeners);
-		}
-		for (final PluginListChangeListener listener : copySet) {
+		final PluginListChangeListener[] list = this.listeners.getListeners(PluginListChangeListener.class);
+		
+		for (final PluginListChangeListener listener : list) {
 			listener.pluginListChanged(p, what);
 		}
 	}
