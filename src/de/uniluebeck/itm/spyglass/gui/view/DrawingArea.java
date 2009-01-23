@@ -3,7 +3,6 @@ package de.uniluebeck.itm.spyglass.gui.view;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
-import java.util.EventListener;
 
 import javax.swing.event.EventListenerList;
 
@@ -111,7 +110,7 @@ public class DrawingArea extends Canvas {
 	private static final int WORLD_HEIGHT = 2 * ((int) Math.pow(2, 15));
 	
 	/**
-	 * Listerers for the DrawingAreaTransformEvent.
+	 * Listerńers for the DrawingAreaTransformEvent.
 	 */
 	private final EventListenerList listeners = new EventListenerList();
 	
@@ -136,7 +135,7 @@ public class DrawingArea extends Canvas {
 	private volatile boolean mouseDragInProgress = false;
 	
 	/**
-	 * the starting point of the movement buisness.
+	 * the starting point of the movement business.
 	 */
 	private volatile PixelPosition mouseDragStartPosition = null;
 	
@@ -474,26 +473,6 @@ public class DrawingArea extends Canvas {
 		
 		return rect;
 		
-	}
-	
-	// TODO
-	private PixelRectangle absRect2PixelRectOrig(final AbsoluteRectangle absRect) {
-		this.checkWidget();
-		
-		final PixelRectangle rect = new PixelRectangle();
-		
-		final PixelPosition upperLeft = this.absPoint2PixelPoint(absRect.getUpperLeft());
-		rect.setUpperLeft(upperLeft);
-		
-		final AbsolutePosition lowerRightAbs = new AbsolutePosition();
-		lowerRightAbs.x = absRect.getUpperLeft().x + absRect.getWidth();
-		lowerRightAbs.y = absRect.getUpperLeft().y + absRect.getHeight();
-		final PixelPosition lowerRight = this.absPoint2PixelPoint(lowerRightAbs);
-		
-		rect.setWidth(Math.abs(upperLeft.x - lowerRight.x));
-		rect.setHeight(Math.abs(upperLeft.y - lowerRight.y));
-		
-		return rect;
 	}
 	
 	/**
@@ -1058,7 +1037,6 @@ public class DrawingArea extends Canvas {
 		if (listener == null) {
 			return;
 		}
-		
 		listeners.add(DrawingAreaTransformListener.class, listener);
 	}
 	
@@ -1081,14 +1059,11 @@ public class DrawingArea extends Canvas {
 	 */
 	private void fireDrawingAreaTransformEvent() {
 		// Get listeners
-		final EventListener[] list = listeners.getListeners(DrawingAreaTransformListener.class);
-		
-//		log.debug("Fire redraw event");
+		final DrawingAreaTransformListener[] list = listeners.getListeners(DrawingAreaTransformListener.class);
 		
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
-			((DrawingAreaTransformListener) list[i])
-					.handleEvent(new DrawingAreaTransformEvent(this));
+			(list[i]).handleEvent(new DrawingAreaTransformEvent(this));
 		}
 	}
 
