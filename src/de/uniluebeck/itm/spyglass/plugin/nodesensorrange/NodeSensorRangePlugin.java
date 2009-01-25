@@ -43,6 +43,7 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	private NodePositionListener nodePositionListener = new NodePositionListener() {
 		@Override
 		public void handleEvent(final NodePositionEvent e) {
+			
 			switch (e.change) {
 				case ADDED:
 					onNodeAdded(e.node, e.newPosition);
@@ -117,8 +118,13 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 		final NodeSensorRangeDrawingObject nrdo = new NodeSensorRangeDrawingObject(this, xmlConfig.getDefaultConfig());
 		nrdo.setPosition(newPosition);
 		data.add(node, nrdo);
-		fireDrawingObjectAdded(nrdo);
-
+		
+		
+		// don't cause a redraw if we're inactive
+		if (isActive()) {
+			fireDrawingObjectAdded(nrdo);
+		}
+		
 	}
 
 	private void onNodeMoved(final int node, final AbsolutePosition oldPosition, final AbsolutePosition newPosition) {
@@ -129,7 +135,9 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 
 			final AbsoluteRectangle oldBoundingBox = drawingObject.getBoundingBox();
 			drawingObject.setPosition(newPosition);
-			fireDrawingObjectChanged(drawingObject, oldBoundingBox);
+			if (isActive()) {
+				fireDrawingObjectChanged(drawingObject, oldBoundingBox);
+			}
 
 		} else {
 
@@ -142,7 +150,12 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 
 	private void onNodeRemoved(final int node, final AbsolutePosition oldPosition) {
-		fireDrawingObjectRemoved(data.remove(node));
+
+		// don't cause a redraw if we're inactive
+		if (isActive()) {
+			fireDrawingObjectRemoved(data.remove(node));
+		}
+		
 	}
 
 	@Override
@@ -163,6 +176,11 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 
 	void internalFireDrawingObjectChanged(final NodeSensorRangeDrawingObject nodeSensorRangeDrawingObject) {
-		fireDrawingObjectChanged(nodeSensorRangeDrawingObject, nodeSensorRangeDrawingObject.getBoundingBox());
+		
+		// don't cause a redraw if we're inactive
+		if (isActive()) {
+			fireDrawingObjectChanged(nodeSensorRangeDrawingObject, nodeSensorRangeDrawingObject.getBoundingBox());
+		}
+		
 	}
 }
