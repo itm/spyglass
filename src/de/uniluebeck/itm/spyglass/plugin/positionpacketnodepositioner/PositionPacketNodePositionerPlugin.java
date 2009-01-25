@@ -32,8 +32,6 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * Default node positioner. it reads the position information from the incoming packets.
  * 
- * TODO: add a time to give precise events when a node is removed.
- * 
  * @author Dariush Forouher
  * 
  */
@@ -76,8 +74,8 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
-
-		return nodeMap.get(nodeId).position;
+		final PositionData d = nodeMap.get(nodeId);
+		return d != null ? d.position : null;
 	}
 
 	/**
@@ -182,9 +180,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public int getNumNodes() {
-
 		return this.nodeMap.size();
-		
 	}
 
 	@Override
