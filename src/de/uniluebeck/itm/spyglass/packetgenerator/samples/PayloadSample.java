@@ -47,6 +47,19 @@ public class PayloadSample extends Sample {
 	@Element(required=false)
 	private Position position = new Position("0","0","0");
 	
+	public PayloadSample() {
+		super();
+	}
+
+	public PayloadSample(final String syntaxType, final String semanticTypes, final String payload, final String nodeIDs, final Position position) {
+		super();
+		this.syntaxType = syntaxType;
+		this.semanticTypes = semanticTypes;
+		this.payload = payload;
+		this.nodeIDs = nodeIDs;
+		this.position = position;
+	}
+
 	public String getSyntaxType() {
 		return syntaxType;
 	}
