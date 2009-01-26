@@ -13,7 +13,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
  * @author Dariush Forouher
  *
  */
-public class DataPoint {
+public class DataPoint implements Comparable<DataPoint> {
 	
 	/**
 	 * Is this a framepoint
@@ -35,4 +35,27 @@ public class DataPoint {
 	 */
 	public double value = 0;
 
+	@Override
+	public boolean equals(final Object o) {
+		if (o instanceof DataPoint) {
+			return this.nodeID == ((DataPoint)o).nodeID;
+		} else {
+			return false;
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+	/* (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(final DataPoint o) {
+		return nodeID-o.nodeID;
+	}
+	
+	@Override
+	public int hashCode() {
+		return nodeID;
+	}
+	
 }

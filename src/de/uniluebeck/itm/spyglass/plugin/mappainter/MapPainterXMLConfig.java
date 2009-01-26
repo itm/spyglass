@@ -25,7 +25,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class MapPainterXMLConfig extends PluginXMLConfig {
 
-	public static final String PROPERTYNAME_REFRESH_INTERVAL = "refreshInterval";
+	public static final String PROPERTYNAME_REFRESH_FREQUENCY = "refreshFrequency";
 
 	public static final String PROPERTYNAME_HEIGHT = "height";
 
@@ -105,7 +105,7 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	private volatile int height = 1;
 
 	@Element(required = false)
-	private volatile int refreshInterval = 10;
+	private volatile int refreshFrequency = 1;
 
 	@Element(required = false)
 	private volatile int k = 3;
@@ -395,8 +395,8 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	/**
 	 * @return the refreshInterval
 	 */
-	public int getRefreshInterval() {
-		return refreshInterval;
+	public int getRefreshFrequency() {
+		return refreshFrequency;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -404,9 +404,9 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	 * @param refreshInterval
 	 *            the refreshInterval to set
 	 */
-	public void setRefreshInterval(final int refreshInterval) {
+	public void setRefreshFrequency(final int refreshInterval) {
 
-		firePropertyChange(PROPERTYNAME_REFRESH_INTERVAL, this.refreshInterval, this.refreshInterval = refreshInterval);
+		firePropertyChange(PROPERTYNAME_REFRESH_FREQUENCY, this.refreshFrequency, this.refreshFrequency = refreshInterval);
 	}
 
 	/**
@@ -423,5 +423,20 @@ public class MapPainterXMLConfig extends PluginXMLConfig {
 	public void setK(final int k) {
 		firePropertyChange(PROPERTYNAME_K, this.k, this.k = k);
 	}
+	
+	/**
+	 * returns the number of rows of the map
+	 */
+	public int getRows() {
+		return (int)Math.ceil((getHeight() / (double)getGridElementHeight()));
+	}
+
+	/**
+	 * returns the number of columns of the map
+	 */
+	public int getCols() {
+		return (int)Math.ceil((getWidth() / (double)getGridElementWidth()));
+	}
+
 
 }

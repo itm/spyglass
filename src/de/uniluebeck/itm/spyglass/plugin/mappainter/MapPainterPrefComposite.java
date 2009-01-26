@@ -32,6 +32,7 @@ import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverte
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
+
 public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 
 	{
@@ -64,6 +65,9 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 	private Label label7;
 	private Button button1;
 	private Label label8space;
+	private Text text1;
+	private Label label19;
+	private Label label17;
 	private Label label11;
 	private Label label18;
 	private Text kNN;
@@ -130,19 +134,29 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 		try {
 			final GridLayout thisLayout = new GridLayout(1, true);
 
+			final GridData groupLData = new GridData();
+			groupLData.horizontalAlignment = GridData.FILL;
+			groupLData.verticalAlignment = GridData.FILL;
+			groupLData.grabExcessHorizontalSpace = true;
+			groupLData.grabExcessVerticalSpace = true;
+			this.setLayoutData(groupLData);
+
 			this.setLayout(thisLayout);
-			this.setSize(654, 379);
+			this.setSize(931, 545);
 
 			{
 				group1 = new Group(this, SWT.NONE);
 				final GridLayout group1Layout = new GridLayout();
-				group1Layout.numColumns = 7;
 				group1.setLayout(group1Layout);
+
 				final GridData group1LData = new GridData();
-				group1LData.grabExcessHorizontalSpace = true;
 				group1LData.horizontalAlignment = GridData.FILL;
-				group1LData.heightHint = 153;
+				group1Layout.numColumns = 7;
+				group1LData.verticalAlignment = GridData.FILL;
+				group1LData.widthHint = 440;
+				group1LData.grabExcessVerticalSpace = true;
 				group1.setLayoutData(group1LData);
+				
 				group1.setText("Layout");
 				{
 					label7 = new Label(group1, SWT.NONE);
@@ -312,7 +326,10 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 				final GridData group2LData = new GridData();
 				group2LData.horizontalAlignment = GridData.FILL;
 				group2LData.grabExcessHorizontalSpace = true;
-				group2LData.heightHint = 174;
+				group2LData.heightHint = 228;
+				group2LData.verticalAlignment = GridData.FILL;
+				group2LData.widthHint = 640;
+				group2LData.grabExcessVerticalSpace = true;
 				group2.setLayoutData(group2LData);
 				group2.setText("Data");
 				{
@@ -321,8 +338,10 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 				}
 				{
 					final GridData minValueLData = new GridData();
-					minValueLData.widthHint = 70;
+					minValueLData.widthHint = 82;
 					minValueLData.heightHint = 17;
+					minValueLData.verticalAlignment = GridData.BEGINNING;
+					minValueLData.horizontalAlignment = GridData.BEGINNING;
 					minValue = new Text(group2, SWT.BORDER);
 					minValue.setLayoutData(minValueLData);
 				}
@@ -330,8 +349,10 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 					minValueColor = new CLabel(group2, SWT.BORDER);
 					final GridData cLabel1LData = new GridData();
 					cLabel1LData.heightHint = 23;
-					cLabel1LData.horizontalAlignment = GridData.FILL;
+					cLabel1LData.horizontalAlignment = GridData.BEGINNING;
 					cLabel1LData.horizontalSpan = 2;
+					cLabel1LData.verticalAlignment = GridData.BEGINNING;
+					cLabel1LData.widthHint = 97;
 					minValueColor.setLayoutData(cLabel1LData);
 				}
 				{
@@ -371,7 +392,9 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 					button4 = new Button(group2, SWT.PUSH | SWT.CENTER);
 					final GridData button4LData = new GridData();
 					button4LData.heightHint = 29;
-					button4LData.horizontalAlignment = GridData.FILL;
+					button4LData.horizontalAlignment = GridData.BEGINNING;
+					button4LData.verticalAlignment = GridData.BEGINNING;
+					button4LData.widthHint = 102;
 					button4.setLayoutData(button4LData);
 					button4.setText("Change color");
 					button4.addSelectionListener(new SelectionAdapter() {
@@ -418,7 +441,8 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 					framePointsY = new Text(group2, SWT.BORDER);
 					final GridData framePointsYLData = new GridData();
 					framePointsYLData.heightHint = 17;
-					framePointsYLData.horizontalAlignment = GridData.FILL;
+					framePointsYLData.horizontalAlignment = GridData.BEGINNING;
+					framePointsYLData.verticalAlignment = GridData.BEGINNING;
 					framePointsY.setLayoutData(framePointsYLData);
 				}
 				{
@@ -426,6 +450,8 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 					final GridData label18LData = new GridData();
 					label18LData.widthHint = 17;
 					label18LData.heightHint = 17;
+					label18LData.verticalAlignment = GridData.BEGINNING;
+					label18LData.horizontalAlignment = GridData.BEGINNING;
 					label18.setLayoutData(label18LData);
 					label18.setText(" ");
 				}
@@ -436,10 +462,35 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 				{
 					kNN = new Text(group2, SWT.BORDER);
 					final GridData text1LData = new GridData();
-					text1LData.widthHint = 36;
+					text1LData.widthHint = 83;
 					text1LData.heightHint = 17;
+					text1LData.verticalAlignment = GridData.BEGINNING;
+					text1LData.horizontalAlignment = GridData.BEGINNING;
 					kNN.setLayoutData(text1LData);
 					kNN.setText("k");
+				}
+				{
+					final GridData label19LData = new GridData();
+					label19LData.verticalAlignment = GridData.BEGINNING;
+					label19LData.horizontalAlignment = GridData.BEGINNING;
+					label19LData.horizontalSpan = 3;
+					label19LData.heightHint = 17;
+					label19LData.grabExcessHorizontalSpace = true;
+					label19 = new Label(group2, SWT.NONE);
+					label19.setLayoutData(label19LData);
+				}
+				{
+					label17 = new Label(group2, SWT.NONE);
+					label17.setText("Update frequency (1/s): ");
+				}
+				{
+					final GridData text1LData = new GridData();
+					text1LData.verticalAlignment = GridData.BEGINNING;
+					text1LData.horizontalAlignment = GridData.BEGINNING;
+					text1LData.widthHint = 84;
+					text1LData.heightHint = 17;
+					text1 = new Text(group2, SWT.BORDER);
+					text1.setLayoutData(text1LData);
 				}
 			}
 
@@ -533,6 +584,12 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 			dbc.bindValue(SWTObservables.observeText(this.kNN, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					MapPainterXMLConfig.PROPERTYNAME_K), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
 					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+
+		}
+		{
+			dbc.bindValue(SWTObservables.observeText(this.text1, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					MapPainterXMLConfig.PROPERTYNAME_REFRESH_FREQUENCY), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new IntegerRangeValidator(1, 25)), null);
 
 		}
 		{

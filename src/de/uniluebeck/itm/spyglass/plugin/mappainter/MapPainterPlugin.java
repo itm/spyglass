@@ -10,8 +10,11 @@ package de.uniluebeck.itm.spyglass.plugin.mappainter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
@@ -20,8 +23,6 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
-import de.uniluebeck.itm.spyglass.layer.Layer;
-import de.uniluebeck.itm.spyglass.layer.QuadTree;
 import de.uniluebeck.itm.spyglass.packet.FloatListPacket;
 import de.uniluebeck.itm.spyglass.packet.IntListPacket;
 import de.uniluebeck.itm.spyglass.packet.LongListPacket;
@@ -42,19 +43,16 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	@Element(name = "parameters")
 	private final MapPainterXMLConfig xmlConfig = new MapPainterXMLConfig();;
 
-	/**
-	 * The layer. it contains only one static element, so it isn't really necessary. but since the
-	 * QuadTree already has some nice features like boundingBox comparison, we use it for
-	 * convenience.
-	 */
-	private final Layer layer = new QuadTree();
-
 	DataStore dataStore = new DataStore();
 
 	/**
 	 * The drawing object representing the map.
 	 */
 	private Map map = null;
+	
+	private volatile boolean dataChanged = true;
+	
+	private Timer timer = new Timer("MapPainter-Timer");
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -76,7 +74,11 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	}
 
 	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
-		return layer.getDrawingObjects(area);
+		if (area.intersects(map.getBoundingBox())) {
+			return Collections.singletonList((DrawingObject)map);
+		} else {
+			return Collections.emptyList();
+		}
 	}
 
 	public static String getHumanReadableName() {
@@ -101,18 +103,28 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
 
-		this.map = new Map(xmlConfig, this);
-		layer.addOrUpdate(map);
+		createMap();
+
 		xmlConfig.addPropertyChangeListener(this);
-
 		manager.addNodePositionListener(this);
+		
+		timer.schedule( new TimerTask() {
 
-		updateFramepoints();
+			@Override
+			public void run() {
+				
+				updateMatrix();
+			}
+			
+		}, 0, 1000/xmlConfig.getRefreshFrequency());
+
 	}
 
 	@Override
 	public void shutdown() throws Exception {
 		super.shutdown();
+		
+		timer.cancel();
 
 		this.pluginManager.removeNodePositionListener(this);
 		this.xmlConfig.removePropertyChangeListener(this);
@@ -184,14 +196,16 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 		// update the map
 		if (!Double.isNaN(value)) {
+			final DataPoint e = new DataPoint();
+			e.isFramepoint = false;
+			e.position = position;
+			e.nodeID = packet.getSenderId();
+			e.value = value;
+
 			synchronized (dataStore) {
-				final DataPoint e = new DataPoint();
-				e.isFramepoint = false;
-				e.position = position;
-				e.nodeID = packet.getSenderId();
-				e.value = value;
 				dataStore.add(e);
 			}
+			this.dataChanged = true;
 
 		}
 
@@ -199,75 +213,30 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 	@Override
 	protected void updateLayer() {
-		// TODO: should the redraw be delayed for performance reasons?
-		fireDrawingObjectChanged(map, null);
+		// nothing to do
 	}
 
+	/**
+	 * We synchronize to ensure that the restart of the timer and stuff
+	 * won't happen twice
+	 */
 	@Override
-	public void propertyChange(final PropertyChangeEvent evt) {
+	public synchronized void propertyChange(final PropertyChangeEvent evt) {
 
-		updateFramepoints();
+		timer.cancel();
+		createMap();
+		
+		timer = new Timer("MapPainter-Timer");
+		timer.schedule( new TimerTask() {
 
-		// now cause a redraw
-		fireDrawingObjectChanged(map, null);
-	}
-
-	private void updateFramepoints() {
-		// Update the framepoints
-		synchronized (dataStore) {
-
-			// kill all old framepoints
-			final Iterator<DataPoint> it = dataStore.iterator();
-			while (it.hasNext()) {
-				if (it.next().isFramepoint) {
-					it.remove();
-				}
+			@Override
+			public void run() {
+				
+				updateMatrix();
 			}
-
-			// add framepoints horizontally
-			final float numFramePointsHorizontal = xmlConfig.getNumFramePointsHorizontal();
-			final int width = xmlConfig.getBoundingBox().getWidth();
-			final int height = xmlConfig.getBoundingBox().getHeight();
-			final AbsolutePosition upperLeft = xmlConfig.getBoundingBox().getUpperLeft().clone();
-			final Double defaultValue = new Double(xmlConfig.getDefaultValue());
-
-			for (int i = 0; i < numFramePointsHorizontal; i++) {
-				final AbsolutePosition pos = upperLeft.clone();
-				pos.x += i / (numFramePointsHorizontal - 1) * width;
-				newDP(defaultValue, pos);
-			}
-			for (int i = 0; i < numFramePointsHorizontal; i++) {
-				final AbsolutePosition pos = upperLeft.clone();
-				pos.x += i / (numFramePointsHorizontal - 1) * width;
-				pos.y += height;
-				newDP(defaultValue, pos);
-			}
-
-			// add framepoints vertically
-			final float numFramePointsVertical = xmlConfig.getNumFramePointsVertical();
-			for (int i = 0; i < numFramePointsVertical; i++) {
-				final AbsolutePosition pos = upperLeft.clone();
-				pos.y += i / (numFramePointsVertical - 1) * height;
-				newDP(defaultValue, pos);
-			}
-			for (int i = 0; i < numFramePointsVertical; i++) {
-				final AbsolutePosition pos = upperLeft.clone();
-				pos.y += i / (numFramePointsVertical - 1) * height;
-				pos.x += width;
-				newDP(defaultValue, pos);
-			}
-
-		}
-	}
-
-	private void newDP(final Double defaultValue, final AbsolutePosition pos) {
-		synchronized (dataStore) {
-			final DataPoint p = new DataPoint();
-			p.isFramepoint = true;
-			p.value = defaultValue;
-			p.position = pos;
-			this.dataStore.add(p);
-		}
+			
+		}, 0, 1000/xmlConfig.getRefreshFrequency());
+		
 	}
 
 	// --------------------------------------------------------------------------------
@@ -310,7 +279,137 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				}
 			}
 		}
+	
+	}
 
+	/**
+	 * Create a new Map object. 
+	 */
+	private void createMap() {
+		map = new Map(xmlConfig);
+
+		updateFramepoints();
+
+		// now cause a redraw
+		fireDrawingObjectChanged(map, null);
+	}
+
+	private void updateFramepoints() {
+		// Update the framepoints
+		synchronized (dataStore) {
+
+			// kill all old framepoints
+			final Iterator<DataPoint> it = dataStore.iterator();
+			while (it.hasNext()) {
+				if (it.next().isFramepoint) {
+					it.remove();
+				}
+			}
+
+			// add framepoints horizontally
+			final float numFramePointsHorizontal = xmlConfig.getNumFramePointsHorizontal();
+			final int width = xmlConfig.getBoundingBox().getWidth();
+			final int height = xmlConfig.getBoundingBox().getHeight();
+			final AbsolutePosition upperLeft = xmlConfig.getBoundingBox().getUpperLeft().clone();
+			final Double defaultValue = new Double(xmlConfig.getDefaultValue());
+
+			for (int i = 0; i < numFramePointsHorizontal; i++) {
+				final AbsolutePosition pos = upperLeft.clone();
+				pos.x += i / (numFramePointsHorizontal - 1) * width;
+				newFramepoint(defaultValue, pos);
+			}
+			for (int i = 0; i < numFramePointsHorizontal; i++) {
+				final AbsolutePosition pos = upperLeft.clone();
+				pos.x += i / (numFramePointsHorizontal - 1) * width;
+				pos.y += height;
+				newFramepoint(defaultValue, pos);
+			}
+
+			// add framepoints vertically
+			final float numFramePointsVertical = xmlConfig.getNumFramePointsVertical();
+			for (int i = 0; i < numFramePointsVertical; i++) {
+				final AbsolutePosition pos = upperLeft.clone();
+				pos.y += i / (numFramePointsVertical - 1) * height;
+				newFramepoint(defaultValue, pos);
+			}
+			for (int i = 0; i < numFramePointsVertical; i++) {
+				final AbsolutePosition pos = upperLeft.clone();
+				pos.y += i / (numFramePointsVertical - 1) * height;
+				pos.x += width;
+				newFramepoint(defaultValue, pos);
+			}
+
+		}
+	}
+
+	/**
+	 * Add a new framepoint to the data store
+	 */
+	private void newFramepoint(final Double defaultValue, final AbsolutePosition pos) {
+		final DataPoint p = new DataPoint();
+		p.isFramepoint = true;
+		p.value = defaultValue;
+		p.position = pos;
+		synchronized (dataStore) {
+			this.dataStore.add(p);
+		}
+	}
+
+	/**
+	 * Calculate the value at the given point in space based on sourrounding nodes.
+	 */
+	private double calculateValue(final AbsolutePosition point) {
+		final List<DataPoint> neighbors;
+		synchronized (dataStore) {
+			neighbors = dataStore.kNN(point, xmlConfig.getK());
+		}
+		
+		double sum = 0;
+		for (final DataPoint dataPoint : neighbors) {
+			sum += dataPoint.value;
+		}
+		sum /= neighbors.size();
+		
+		return sum;
+	}
+
+	/**
+	 * Update the matrix. After we're done, cause a redraw.
+	 * 
+	 * Note, that we only lock shortly over the map. although this may
+	 * result in short-time graphical errors (when a redraw occurs while this method is still running)
+	 * it has the advantage of avoiding longtime blocking of the SWT-Thread when the draw() method tries
+	 * to aquire the lock. 
+	 */
+	private void updateMatrix() {
+		if (!dataChanged) {
+			return;
+		}
+
+		dataChanged = false;
+		
+		final AbsoluteRectangle drawRect = new AbsoluteRectangle();
+		drawRect.setHeight(xmlConfig.getGridElementHeight());
+		drawRect.setWidth(xmlConfig.getGridElementWidth());
+
+		for(int row=0; row<xmlConfig.getRows(); row++) {
+			for(int col=0; col<xmlConfig.getCols(); col++) {
+
+				final AbsolutePosition newPos = new AbsolutePosition();
+				newPos.x = col*xmlConfig.getGridElementWidth() + xmlConfig.getLowerLeftX();
+				newPos.y = row*xmlConfig.getGridElementHeight() + xmlConfig.getLowerLeftY();
+				drawRect.setUpperLeft(newPos);
+
+				final double average = calculateValue(drawRect.getCenter());
+				synchronized (map.getMatrix()) {
+					map.getMatrix()[row][col]=average;
+				}
+				
+			}
+			
+		}
+		
+		fireDrawingObjectChanged(map, null);
 	}
 
 }

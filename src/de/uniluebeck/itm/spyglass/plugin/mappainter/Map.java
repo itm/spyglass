@@ -1,9 +1,5 @@
 package de.uniluebeck.itm.spyglass.plugin.mappainter;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -13,7 +9,6 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
-import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
@@ -30,24 +25,27 @@ public class Map extends DrawingObject {
 	private static final boolean DEBUG = false;
 	
 	/**
-	 * Reference to the corresponding config
+	 * This matrix contains the values which will be then converted to colors and drawn.
+	 * 
+	 * storage format is: dataMatrix[row][column]
 	 */
-	private final MapPainterXMLConfig config;
-	
-	final private MapPainterPlugin plugin;
-	
-	Map(final MapPainterXMLConfig config, final MapPainterPlugin plugin) {
-		this.config = config;
-		this.plugin = plugin;
-		
-		config.addPropertyChangeListener(new PropertyChangeListener() {
-			
-			@Override
-			public void propertyChange(final PropertyChangeEvent evt) {
-				updateBoundingBox();
-			}
-			
-		});
+	private final double[][] dataMatrix;
+
+	private MapPainterXMLConfig xmlConfig;
+
+	public Map(final MapPainterXMLConfig config) {
+		this.xmlConfig = config;
+		this.dataMatrix = new double[config.getRows()][config.getCols()];
+		this.setPosition(config.getLowerLeft());
+	}
+
+	/**
+	 * This matrix contains the values which will be then converted to colors and drawn.
+	 * 
+	 *  Note that access to this array should be synchronized to ensure a memory barrier
+	 */
+	public double[][] getMatrix() {
+		return this.dataMatrix;
 	}
 	
 	@Override
@@ -57,40 +55,26 @@ public class Map extends DrawingObject {
 		
 		final AbsoluteRectangle clippingArea = drawingArea.pixelRect2AbsRect(clippAreaPx);
 		
-		if (DEBUG) {
-			final Color boxColor = new Color(null, 0, 0, 0);
-			gc.setBackground(boxColor);
-			for (final DataPoint p : plugin.dataStore) {
-				final PixelPosition px = drawingArea.absPoint2PixelPoint(p.position);
-				gc.fillRectangle(px.x - 5, px.y - 5, 10, 10);
-			}
-			boxColor.dispose();
-		}
-		
 		final AbsoluteRectangle drawRect = new AbsoluteRectangle();
-		final AbsolutePosition curUL = config.getLowerLeft();
-		while (curUL.y <= config.getLowerLeft().y + config.getHeight()
-				- config.getGridElementHeight()) {
-			while (curUL.x <= config.getLowerLeft().x + config.getWidth()
-					- config.getGridElementWidth()) {
-				
-				drawRect.setHeight(config.getGridElementHeight());
-				drawRect.setWidth(config.getGridElementWidth());
-				drawRect.setUpperLeft(curUL);
-				
+		drawRect.setHeight(xmlConfig.getGridElementHeight());
+		drawRect.setWidth(xmlConfig.getGridElementWidth());
+		
+		for(int row=0; row<xmlConfig.getRows(); row++) {
+			for(int col=0; col<xmlConfig.getCols(); col++) {
+				final AbsolutePosition newPos = new AbsolutePosition();
+				newPos.x = col*xmlConfig.getGridElementWidth() + xmlConfig.getLowerLeftX();
+				newPos.y = row*xmlConfig.getGridElementHeight() + xmlConfig.getLowerLeftY();
+				drawRect.setUpperLeft(newPos);
+
 				// Clipping
 				if (clippingArea.intersects(drawRect)) {
 				
-					drawElement(drawingArea, gc, drawRect);
+					drawElement(drawingArea, gc, drawRect, row, col);
 					
 				}
-
-				curUL.x += config.getGridElementWidth();
-
+				
 			}
 			
-			curUL.x = config.getLowerLeft().x;
-			curUL.y += config.getGridElementWidth();
 		}
 		
 		if (DEBUG) {
@@ -101,10 +85,13 @@ public class Map extends DrawingObject {
 	/**
 	 * Draw the Element drawRect.
 	 */
-	private void drawElement(final DrawingArea drawingArea, final GC gc, final AbsoluteRectangle drawRect) {
+	private void drawElement(final DrawingArea drawingArea, final GC gc, final AbsoluteRectangle drawRect, final int row, final int col) {
 		final PixelRectangle pxRect = drawingArea.absRect2PixelRect(drawRect);
 		
-		final double average = calculateValue(drawRect.getCenter());
+		final double average;
+		synchronized (dataMatrix) {
+			average = dataMatrix[row][col];
+		}
 		final RGB avgColor = calculateColor(average);
 		final Color color = new Color(gc.getDevice(), avgColor);
 
@@ -125,14 +112,14 @@ public class Map extends DrawingObject {
 	private RGB calculateColor(final double value) {
 		
 		// normalize value between minValue and maxValue to the range [0;1]
-		final double lambda = (value - config.getMinValue())
-				/ (config.getMaxValue() - config.getMinValue());
+		final double lambda = (value - xmlConfig.getMinValue())
+				/ (xmlConfig.getMaxValue() - xmlConfig.getMinValue());
 		
 		// Calculate new Color
 		final int[] rgb = new int[3];
 		for (int k = 0; k < 3; k++) {
-			final double d = config.getMinColorRGB()[k] + lambda
-					* (config.getMaxColorRGB()[k] - config.getMinColorRGB()[k]);
+			final double d = xmlConfig.getMinColorRGB()[k] + lambda
+					* (xmlConfig.getMaxColorRGB()[k] - xmlConfig.getMinColorRGB()[k]);
 			
 			if (d < 0) {
 				rgb[k] = 0;
@@ -146,32 +133,15 @@ public class Map extends DrawingObject {
 		// log.debug(String.format("Element %s with value %f gets color [%d,%d,%d]; lambda=%f",
 		// centerPoint, average, rgb[0], rgb[1], rgb[2], lambda));
 		
+//		final Random r = new Random();
+//		return new RGB(r.nextInt(256), r.nextInt(256), r.nextInt(256));
 		return new RGB(rgb[0], rgb[1], rgb[2]);
-		// final Random r = new Random();
-		// return new RGB(r.nextInt(256), r.nextInt(256), r.nextInt(256));
 		
 	}
-	
-	/**
-	 * Calculate the value at the given point in space based on sourrounding nodes.
-	 */
-	private double calculateValue(final AbsolutePosition point) {
-		final List<DataPoint> neighbors;
-		synchronized (plugin.dataStore) {
-			neighbors = plugin.dataStore.kNN(point, config.getK());
-		}
-		
-		double sum = 0;
-		for (final DataPoint dataPoint : neighbors) {
-			sum += dataPoint.value;
-		}
-		sum /= neighbors.size();
-		
-		return sum;
-	}
+
 	
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
-		return config.getBoundingBox();
+		return xmlConfig.getBoundingBox();
 	}
 }
