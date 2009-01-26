@@ -24,6 +24,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -78,7 +79,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	public Plugin(final boolean needsPacketQueue) {
 		if (needsPacketQueue) {
-			packetQueue = new LinkedBlockingQueue<SpyglassPacket>();
+			packetQueue = new LinkedBlockingQueue<SpyglassPacket>(10);
 		}
 	}
 
@@ -416,7 +417,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 				final SpyglassPacket p = packetQueue.take();
 
 				processPacket(p);
-				updateLayer();
+				if (this instanceof SimpleGlobalInformationPlugin) {
+					updateLayer();
+				}
 				
 			} catch (final InterruptedException e) {
 				packetConsumerThread.interrupt();

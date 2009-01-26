@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.plugin;
+package de.uniluebeck.itm.spyglass.layer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,7 +11,6 @@ import org.eclipse.swt.graphics.Point;
 
 import de.uniluebeck.itm.spyglass.drawing.BoundingBoxChangeListener;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 public class QuadTree implements Layer, BoundingBoxChangeListener {
