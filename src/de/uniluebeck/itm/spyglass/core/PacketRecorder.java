@@ -27,7 +27,6 @@ import de.uniluebeck.itm.spyglass.packet.PacketFactory;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
@@ -461,15 +460,8 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 
 		SpyglassPacket packet = null;
 		synchronized (gatewayMutex) {
-			try {
 
-				packet = getNextPacketFromInputStream(getGateway().getInputStream());
-
-			} catch (final InterruptedException e) {
-				((SpyglassLogger) log).error("Beauty sleep inerrupted while dreaming of new packages", e, false);
-			} catch (final Exception e) {
-				log.error("The PacketReader is misconfigured!\r\n Maybe the file is not set or not accessible.", e);
-			}
+			packet = getNextPacketFromInputStream(getGateway().getInputStream());
 
 			if (packet != null) {
 				delay(packet);
