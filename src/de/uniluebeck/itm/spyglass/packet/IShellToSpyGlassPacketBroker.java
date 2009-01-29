@@ -120,11 +120,9 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 		// prevent threads to be waiting for the queue forever...
 		skipWaiting = true;
 		synchronized (queue) {
-			queue.notifyAll();
-		}
-		synchronized (queue) {
 			queue.clear();
 			queuedElements = 0;
+			queue.notifyAll();
 		}
 	}
 

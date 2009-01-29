@@ -27,6 +27,7 @@ import de.uniluebeck.itm.spyglass.packet.PacketFactory;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
@@ -71,14 +72,6 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	private final String recordDirectory = new File("./record/").getAbsoluteFile().toString();
 
 	// ----------------------------------------------------------------
-	/** The time stamp of the last packed delivery when reading from a file */
-	private long lastPlaybackPacketTimestamp = -1;
-
-	// ----------------------------------------------------------------
-	/** The time stamp of the last packed read from a file */
-	private long lastPlaybackPacketDeliveryTimestamp = -1;
-
-	// ----------------------------------------------------------------
 	/**
 	 * The string to the file which was last selected by the user for recording (this will be needed
 	 * to check whether the user has to be asked to append content)
@@ -86,8 +79,16 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	private String lastSelectedRecordFilePath = null;
 
 	// --------------------------------------------------------------------------------
-	/** Object to secure packet reading and manipulations at the input source */
-	private Object inputStreamMutex = new Object();
+	/** Object to secure packet reading and manipulations at the input gateway */
+	private Object gatewayMutex = new Object();
+
+	// ----------------------------------------------------------------
+	/** The time stamp of the last packed delivery when reading from a file */
+	private long lastPlaybackPacketTimestamp = -1;
+
+	// ----------------------------------------------------------------
+	/** The time stamp of the last packed read from a file */
+	private long lastPlaybackPacketDeliveryTimestamp = -1;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -445,13 +446,12 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 				packet = super.getNextPacket();
 			}
 		} while (packet == null);
-
 		return packet;
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the next packet which is found in the currently selected playback file
+	 * Returns the next packet from the currently selected playback file
 	 * 
 	 * @return a {@link SpyglassPacket}
 	 * @throws SpyglassPacketException
@@ -460,70 +460,63 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	private SpyglassPacket getNextPlaybackPacket() throws SpyglassPacketException, InterruptedException {
 
 		SpyglassPacket packet = null;
+		synchronized (gatewayMutex) {
+			try {
 
-		// get a mutual exclusion lock which will prevent the input stream to be accessed externally
-		synchronized (inputStreamMutex) {
+				packet = getNextPacketFromInputStream(getGateway().getInputStream());
 
-			// get the input stream which will deliver the packets
-			InputStream playbackFileReader = null;
-			if ((getGateway() == null) || ((playbackFileReader = getGateway().getInputStream()) == null)) {
-				// initialize it by instructions of the user since it was not set previously
-				setPlayBackFile(selectPlayBackFileByUser());
+			} catch (final InterruptedException e) {
+				((SpyglassLogger) log).error("Beauty sleep inerrupted while dreaming of new packages", e, false);
+			} catch (final Exception e) {
+				log.error("The PacketReader is misconfigured!\r\n Maybe the file is not set or not accessible.", e);
 			}
 
-			// if the input stream is still not available generate an error message
-			if (playbackFileReader == null) {
-				log.error("The gateway which delivers the packets was not initialized correcly.\r\n" + "Please specify the input source.");
-				return null;
+			if (packet != null) {
+				delay(packet);
 			}
-
-			packet = getNextPacketFromInputStream(playbackFileReader);
 		}
-
-		// Hold back the packet at least for delayMillis
-		final long now = System.currentTimeMillis();
-		final long sleep1 = delayMillies - (now - lastPlaybackPacketDeliveryTimestamp);
-		if (sleep1 > 0) {
-			Thread.sleep(sleep1);
-		}
-		if (packet != null) {
-			final long currentPacketTimestamp = packet.getTime().getMillis();
-			final long alreadyWaited = System.currentTimeMillis() - lastPlaybackPacketDeliveryTimestamp;
-			elapsPacketTimestampDifference(currentPacketTimestamp, alreadyWaited);
-
-			// this is done to enable the user to cut the packet stream read from a file
-			handlePacket(packet);
-			lastPlaybackPacketDeliveryTimestamp = System.currentTimeMillis();
-		}
-
+		// this is done to enable the user to cut the packet stream read from a file
+		handlePacket(packet);
 		return packet;
 
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Sleeps until the time difference between the last packet which was delivered and the current
-	 * one's is elapsed. The time difference is computed by comparing the two packet's time stamps.<br>
-	 * If the time stamp is smaller than the one of the last packet, it will not be stored.
-	 * Technically, the 'last' packet may not be the last packet but the one which had the biggest
-	 * time stamp from the ones which were already delivered!
+	 * Waits until either the configured delay time or the time difference between the the previous
+	 * and the current packet's time stamps is elapsed. Eventually the provided packet will be
+	 * returned.
 	 * 
-	 * @param currentPacketTimestamp
-	 *            the currently processed packet's time stamp
-	 * @param alreadyWaited
-	 *            the time which already elapsed
+	 * @param packet
+	 *            the packet to be delayed
 	 * @throws InterruptedException
 	 */
-	private void elapsPacketTimestampDifference(final long currentPacketTimestamp, final long alreadyWaited) throws InterruptedException {
-		if (lastPlaybackPacketTimestamp != -1) {
-			final long packetDiff = currentPacketTimestamp - lastPlaybackPacketTimestamp;
-			// may be the packets where received in the wrong order...
-			if (packetDiff > 0) {
-				if (packetDiff - alreadyWaited > 0) {
-					Thread.sleep(packetDiff - alreadyWaited);
+	private void delay(final SpyglassPacket packet) throws InterruptedException {
+		synchronized (gatewayMutex) {
+			final long currentPacketTimestamp = packet.getTime().getMillis();
+
+			if ((lastPlaybackPacketDeliveryTimestamp != -1) && (lastPlaybackPacketTimestamp != -1)) {
+
+				final long packetDiff = currentPacketTimestamp - lastPlaybackPacketTimestamp;
+
+				// this time elapsed because of the applications processing time
+				final long alreadyWaited = System.currentTimeMillis() - lastPlaybackPacketDeliveryTimestamp;
+
+				final long sleepMillis = (packetDiff > delayMillies) ? packetDiff - alreadyWaited : delayMillies - alreadyWaited;
+
+				lastPlaybackPacketTimestamp = currentPacketTimestamp;
+
+				// wait either for the configured delay or the time stamp difference between two
+				// packets to elapse before forwarding the packet
+				if (sleepMillis > 0) {
+					gatewayMutex.wait(sleepMillis);
 				}
+			} else {
+				// this lines of code have to be redundant here because the values must not be set
+				// when the current thread woke up because of a reset
 				lastPlaybackPacketTimestamp = currentPacketTimestamp;
 			}
+			lastPlaybackPacketDeliveryTimestamp = System.currentTimeMillis();
 		}
 	}
 
@@ -540,25 +533,28 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	private SpyglassPacket getNextPacketFromInputStream(final InputStream playbackFileReader) throws SpyglassPacketException, InterruptedException {
 
 		SpyglassPacket packet = null;
-		try {
-			final int next;
-			byte[] packetData;
-			if ((next = playbackFileReader.read()) != -1) {
-				packetData = new byte[next];
-				playbackFileReader.read(packetData);
-				packet = PacketFactory.createInstance(packetData);
-			} else {
-				Display.getDefault().syncExec(new Runnable() {
-					@Override
-					public void run() {
-						MessageDialog.openInformation(null, "No more data", "The end of the playback file was reached!");
-					}
-				});
-				inputStreamMutex.wait();
-			}
+		synchronized (gatewayMutex) {
 
-		} catch (final IOException e) {
-			log.error("Error while reading a new packet...", e);
+			try {
+				final int next;
+				byte[] packetData;
+				if ((next = playbackFileReader.read()) != -1) {
+					packetData = new byte[next];
+					playbackFileReader.read(packetData);
+					packet = PacketFactory.createInstance(packetData);
+				} else {
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							MessageDialog.openInformation(null, "No more data", "The end of the playback file was reached!");
+						}
+					});
+					gatewayMutex.wait();
+				}
+
+			} catch (final IOException e) {
+				log.error("Error while reading a new packet...", e);
+			}
 		}
 		return packet;
 	}
@@ -597,9 +593,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 				readFromFile = true;
 			}
 		}
-		synchronized (inputStreamMutex) {
-			inputStreamMutex.notifyAll();
-		}
+
 		return readFromFile;
 	}
 
@@ -674,7 +668,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 			if (!isConflictingFileSelected) {
 
 				// get a mutex lock which will prevent the input stream to be accessed externally
-				synchronized (inputStreamMutex) {
+				synchronized (gatewayMutex) {
 					// check whether the current Gateway is capable of processing a file
 					Gateway gw = getGateway();
 					if ((gw == null) || (!(gw instanceof FileReaderGateway))) {
@@ -731,10 +725,8 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	@Override
 	public void reset() throws IOException {
 		log.info("Reset requested");
-		delayMillies = 0;
 		super.reset();
-		synchronized (inputStreamMutex) {
-
+		synchronized (gatewayMutex) {
 			if (isReadFromFile() && !isRecord()) {
 				MessageDialog.openInformation(null, "Reset Playbak", "The playback will be started from the beginning of the file.");
 			}
@@ -747,11 +739,8 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 			else if (isRecord()) {
 				setRecording(!MessageDialog.openQuestion(null, "Reset Recorder", "Do you want to disable recording?"));
 			}
-
 			// setPlayback(false);
 			recordFileString = null;
-			lastPlaybackPacketDeliveryTimestamp = -1;
-			lastPlaybackPacketTimestamp = -1;
 			lastSelectedRecordFilePath = null;
 			getPacketQueue().clear();
 			if (isReadFromFile()) {
@@ -762,26 +751,33 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 					}
 				}
 			}
-			inputStreamMutex.notifyAll();
+
+			lastPlaybackPacketDeliveryTimestamp = -1;
+			lastPlaybackPacketTimestamp = -1;
+			delayMillies = 0;
+
+			gatewayMutex.notifyAll();
 		}
+
+		log.info("Reset done");
 	}
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param args
-	 * @throws IOException
-	 * @throws SpyglassPacketException
-	 * @throws InterruptedException
-	 */
-	public static void main(final String[] args) throws IOException, SpyglassPacketException, InterruptedException {
-		final PacketRecorder recorder = new PacketRecorder();
-		recorder.setDelayMillies(0);
-		recorder.setPlayBackFile("record/record1.rec");
-		SpyglassPacket packet = null;
-		int i = 0;
-		while ((packet = recorder.getNextPacket()) != null) {
-			log.debug(packet.getSenderId() + " Nr: " + (++i));
-		}
-	}
-
+	// // --------------------------------------------------------------------------------
+	// /**
+	// * @param args
+	// * @throws IOException
+	// * @throws SpyglassPacketException
+	// * @throws InterruptedException
+	// */
+	// public static void main(final String[] args) throws IOException, SpyglassPacketException,
+	// InterruptedException {
+	// final PacketRecorder recorder = new PacketRecorder();
+	// recorder.setDelayMillies(0);
+	// recorder.setPlayBackFile("record/record1.rec");
+	// SpyglassPacket packet = null;
+	// int i = 0;
+	// while ((packet = recorder.getNextPacket()) != null) {
+	// System.out.println(packet.getSenderId() + " Nr: " + (++i));
+	// }
+	// }
 }

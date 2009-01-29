@@ -135,6 +135,7 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 			public void handleEvent(final Event event) {
 				final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
 				fd.setFilterExtensions(new String[] { "*.rec" });
+				fd.setFilterPath(new File("./record/").getAbsoluteFile().toString());
 				final String path = fd.open();
 				if (path != null) {
 					textPath2File.setText(path);
