@@ -246,6 +246,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				updatedObjects.add(node);
 			}
 		}
+		updateLayer();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -697,8 +698,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		for (final DrawingObject drawingObject : update) {
 			if ((oldBB = boundingBoxes.get(drawingObject)) != null) {
 				fireDrawingObjectChanged(drawingObject, oldBB);
+				System.out.println("============UPDATE================ " + drawingObject.getBoundingBox());
 			} else {
 				fireDrawingObjectAdded(drawingObject);
+				System.out.println("============ADD================= " + drawingObject.getBoundingBox());
 			}
 			boundingBoxes.put(drawingObject, new AbsoluteRectangle(drawingObject.getBoundingBox()));
 		}
