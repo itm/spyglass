@@ -74,7 +74,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	/**
 	 * Object performing the statistical operation to determine the average node degree
 	 */
-	private StatisticalOperation avgNodeDegEvaluator;
+	private IDBasedStatisticalOperation avgNodeDegEvaluator;
 
 	/**
 	 * The widget where the information to be shown are placed in
@@ -104,7 +104,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	 */
 	public SimpleGlobalInformationPlugin() {
 		xmlConfig = new SimpleGlobalInformationXMLConfig();
-		avgNodeDegEvaluator = new StatisticalOperation(10, STATISTICAL_OPERATIONS.AVG);
+		avgNodeDegEvaluator = new IDBasedStatisticalOperation(STATISTICAL_OPERATIONS.AVG);
 		avgNodeDegString = "avg. node degree: ";
 		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
 		numPackets = new AtomicInteger(0);
@@ -162,6 +162,16 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		return new SimpleGlobalInformationPreferencePage(dialog, spyglass, this);
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns a widget used for the configuration of an instance of this class
+	 * 
+	 * @param dialog
+	 *            the dialog where the widget is attached
+	 * @param spyglass
+	 *            a Spyglass instance
+	 * @return a widget used for the configuration of an instance of this class
+	 */
 	public static PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> createTypePreferencePage(
 			final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new SimpleGlobalInformationPreferencePage(dialog, spyglass);
@@ -191,8 +201,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 		if (semanticTypes4Neighborhoods.contains(packetSemanticType) && (packet instanceof Uint16ListPacket)) {
 			avgNodeDegString = "avg. node degree: "
-					+ new DecimalFormat("0.0#").format(avgNodeDegEvaluator
-							.addValue(((Uint16ListPacket) packet).getNeighborhoodPacketNodeIDs().size()));
+					+ new DecimalFormat("0.0#").format(avgNodeDegEvaluator.addValue(packet.getSenderId(), ((Uint16ListPacket) packet)
+							.getNeighborhoodPacketNodeIDs().size()));
 		}
 
 		final StatisticalInformationEvaluator sfs = xmlConfig.getStatisticalInformationEvaluators4Type(packetSemanticType);
@@ -563,8 +573,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		private String perSec = "";
 		private String per30Sec = "     ";
 		private String per60Sec = "     ";
-		private StatisticalOperation statistics30sec = new StatisticalOperation(30, STATISTICAL_OPERATIONS.AVG, new DecimalFormat("0.00"));
-		private StatisticalOperation statistics60sec = new StatisticalOperation(60, STATISTICAL_OPERATIONS.AVG, new DecimalFormat("0.00"));
+		private StatisticalOperation statistics30sec = new StatisticalOperation(30, STATISTICAL_OPERATIONS.AVG);
+		private StatisticalOperation statistics60sec = new StatisticalOperation(60, STATISTICAL_OPERATIONS.AVG);
 
 		// --------------------------------------------------------------------------------
 		/**
@@ -584,10 +594,10 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 			statistics60sec.addValue(val);
 
 			if ((times) >= 59) {
-				per60Sec = statistics60sec.getValueFormatted();
-				per30Sec = statistics30sec.getValueFormatted();
+				per60Sec = new DecimalFormat("0.00").format(statistics60sec.getValue());
+				per30Sec = new DecimalFormat("0.00").format(statistics30sec.getValue());
 			} else if ((++times) >= 30) {
-				per30Sec = statistics30sec.getValueFormatted();
+				per30Sec = new DecimalFormat("0.00").format(statistics30sec.getValue());
 			}
 
 			final String pps = "# PPS: [ " + perSec + " | " + per30Sec + " | " + per60Sec + " ]";

@@ -1,14 +1,13 @@
-/*
- * -------------------------------------------------------------------------------- This file is
- * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
- * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
- * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
- * SpyGlass source tree for further details.
- * --------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------------------
+ * This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details.
+ * ---------------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
-import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS;
@@ -27,7 +26,6 @@ public class StatisticalOperation {
 	private int maxValidFieldValue;
 	private int bufferSize;
 	private STATISTICAL_OPERATIONS defaultOperation;
-	private DecimalFormat format;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -39,27 +37,32 @@ public class StatisticalOperation {
 	 *            the statistical operation to be used by default
 	 */
 	public StatisticalOperation(final int bufferSize, final STATISTICAL_OPERATIONS defaultOperation) {
-		this(bufferSize, defaultOperation, null);
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Constructor
-	 * 
-	 * @param bufferSize
-	 *            the size of the buffer
-	 * @param defaultOperation
-	 *            the statistical operation to be used by default
-	 * @param format
-	 *            the format to be used when returning the current value
-	 */
-	public StatisticalOperation(final int bufferSize, final STATISTICAL_OPERATIONS defaultOperation, final DecimalFormat format) {
 		buffer = new float[bufferSize];
 		maxValidFieldValue = 0;
 		pointer = 0;
 		this.defaultOperation = defaultOperation;
 		this.bufferSize = bufferSize;
-		this.format = format;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the operation used by default when calculating a statistical value
+	 * 
+	 * @return the operation used by default when calculating a statistical value
+	 */
+	public STATISTICAL_OPERATIONS getDefaultOperation() {
+		return defaultOperation;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the operation used by default when calculating a statistical value
+	 * 
+	 * @param defaultOperation
+	 *            the operation used by default when calculating a statistical value
+	 */
+	public void setDefaultOperation(final STATISTICAL_OPERATIONS defaultOperation) {
+		this.defaultOperation = defaultOperation;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -81,10 +84,10 @@ public class StatisticalOperation {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the value a statistical operation calculated using the buffered buffer and the
+	 * Returns the value a statistical operation calculated using the buffered values and the
 	 * default statistical operation
 	 * 
-	 * @return the value a statistical operation calculated using the buffered buffer and the
+	 * @return the value a statistical operation calculated using the buffered values and the
 	 *         default statistical operation
 	 */
 	public synchronized final float getValue() {
@@ -93,14 +96,13 @@ public class StatisticalOperation {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the value a statistical operation calculated using the buffered buffer
+	 * Returns the value a statistical operation calculated using the buffered values
 	 * 
 	 * @param operation
 	 *            the statistical operation to use
-	 * @return the value a statistical operation calculated using the buffered buffer
+	 * @return the value a statistical operation calculated using the buffered values
 	 */
 	public synchronized final float getValue(final STATISTICAL_OPERATIONS operation) {
-		final float value = 0.0f;
 		switch (operation) {
 			case AVG:
 				return getAverageValue();
@@ -122,50 +124,47 @@ public class StatisticalOperation {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the value a statistical operation calculated using the buffered buffer and the
-	 * default statistical operation.<br>
-	 * The value will be formatted according to the format which was provided when calling the
-	 * constructor.
+	 * Returns the value a statistical operation calculated using a provided array of values and the
+	 * default statistical operation
 	 * 
-	 * @return the value a statistical operation calculated using the buffered buffer and the
+	 * @param values
+	 *            an array of values
+	 * @return the value a statistical operation calculated using a provided array of values and the
 	 *         default statistical operation
 	 */
-	public synchronized final String getValueFormatted() {
-		return getValueFormatted(defaultOperation);
+	public synchronized final float getValue(final float[] values) {
+		return getValue(defaultOperation, values);
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the value a statistical operation calculated using the buffered buffer.<br>
-	 * The value will be formatted according to the format which was provided when calling the
-	 * constructor.
+	 * Returns the value a statistical operation calculated using a provided array of values
 	 * 
 	 * @param operation
 	 *            the statistical operation to use
-	 * @return the value a statistical operation calculated using the buffered buffer
+	 * @param values
+	 *            an array of values
+	 * @return the value a statistical operation calculated using a provided array of values
 	 */
-	public synchronized final String getValueFormatted(final STATISTICAL_OPERATIONS operation) {
-		float value = 0.0f;
-		switch (operation) {
-			case AVG:
-				value = getAverageValue();
-				break;
-			case MAX:
-				value = getMaxValue();
-				break;
-			case MIN:
-				value = getMinValue();
-				break;
-			case MEDIAN:
-				value = getMedianValue();
-				break;
-			case SUM:
-				value = getSum();
-		}
-		if (format != null) {
-			return format.format(value);
-		}
-		return String.valueOf(value);
+	public synchronized final float getValue(final STATISTICAL_OPERATIONS operation, final float[] values) {
+
+		// backup the object's values
+		final float[] tmpBuffer = new float[buffer.length];
+		System.arraycopy(buffer, 0, tmpBuffer, 0, buffer.length);
+		final int tmpValidFieldValue = maxValidFieldValue;
+
+		// switch the object's values wit the provided ones
+		maxValidFieldValue = values.length;
+		buffer = values;
+		final float result = getValue(operation);
+
+		// restore the object's original values
+		maxValidFieldValue = tmpValidFieldValue;
+		buffer = tmpBuffer;
+
+		// and return the result
+		return result;
+
 	}
 
 	// --------------------------------------------------------------------------------

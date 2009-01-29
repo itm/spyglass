@@ -754,10 +754,12 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 			lastPlaybackPacketTimestamp = -1;
 			lastSelectedRecordFilePath = null;
 			getPacketQueue().clear();
-			Gateway gw = null;
-			if ((gw = getGateway()) != null) {
-				if (gw instanceof FileReaderGateway) {
-					((FileReaderGateway) gw).reset();
+			if (isReadFromFile()) {
+				Gateway gw = null;
+				if ((gw = getGateway()) != null) {
+					if (gw instanceof FileReaderGateway) {
+						((FileReaderGateway) gw).reset();
+					}
 				}
 			}
 			inputStreamMutex.notifyAll();
