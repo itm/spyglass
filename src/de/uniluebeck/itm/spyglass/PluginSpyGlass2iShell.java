@@ -89,6 +89,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 
 		try {
 			// create Model
+			SpyglassEnvironment.setIShellPlugin(true);
 			spyglass = new Spyglass();
 
 			connectPacketBroker();

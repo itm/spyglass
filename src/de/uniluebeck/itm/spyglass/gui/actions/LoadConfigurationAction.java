@@ -1,6 +1,7 @@
 package de.uniluebeck.itm.spyglass.gui.actions;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -56,7 +57,12 @@ public class LoadConfigurationAction extends Action {
 				return false;
 			}
 
-			SpyglassEnvironment.setConfigFilePath(f);
+			try {
+				SpyglassEnvironment.setConfigFilePath(f);
+				SpyglassEnvironment.setConfigFileWorkingDirectory(f.getParent());
+			} catch (final IOException e) {
+				log.error("Could not store the new config path in my property file.",e);
+			}
 			return true;
 		}
 		return false;

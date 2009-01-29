@@ -60,7 +60,12 @@ public class StoreConfigurationAction extends Action {
 			spyglass.getConfigStore().exportConfig(file);
 
 			// this is our new config file
-			SpyglassEnvironment.setConfigFilePath(file);
+			try {
+				SpyglassEnvironment.setConfigFilePath(file);
+				SpyglassEnvironment.setConfigFileWorkingDirectory(file.getParent());
+			} catch (final IOException e) {
+				log.error("Could not store the new config path in my property file.",e);
+			}
 
 		}
 	};

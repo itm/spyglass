@@ -51,6 +51,7 @@ public class SpyglassApp {
 		shell.open();
 		
 		// Model
+		SpyglassEnvironment.setIShellPlugin(false);
 		final Spyglass spyglass = new Spyglass();
 		
 		// View
