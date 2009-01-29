@@ -88,10 +88,10 @@ public class SpyglassEnvironment {
 			final InputStream input = new FileInputStream(f);
 			
 			props.load(input);
-			props.setProperty(PROPERTY_CONFIG_ISHELL, "config2/DefaultSpyglassConfigIShellPlugin.xml");
-			props.setProperty(PROPERTY_CONFIG_STANDALONE, "config2/DefaultSpyglassConfigStandalone.xml");
-			props.setProperty(PROPERTY_CONFIG_FILE_WORKING_DIR, "");
-			props.setProperty(PROPERTY_CONFIG_FILE_IMAGE_DIR, "");
+			props.setProperty(PROPERTY_CONFIG_ISHELL, "config/DefaultSpyglassConfigIShellPlugin.xml");
+			props.setProperty(PROPERTY_CONFIG_STANDALONE, "config/DefaultSpyglassConfigStandalone.xml");
+			props.setProperty(PROPERTY_CONFIG_FILE_WORKING_DIR, "config/");
+			props.setProperty(PROPERTY_CONFIG_FILE_IMAGE_DIR, "image/");
 			storeProps(props);
 		}
 	}
