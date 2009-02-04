@@ -394,49 +394,47 @@ public class Node extends DrawingObject {
 	protected AbsoluteRectangle calculateBoundingBox() {
 
 		final DrawingArea drawingArea = getDrawingArea();
-		
+
 		// to prevent NPEs
 		AbsolutePosition pos = getPosition();
 		if (pos == null) {
 			pos = new AbsolutePosition(0, 0, 0);
 		}
-		
+
+		// if no drawing area is available yet, the bounding box is to be set quite small
 		if ((drawingArea == null) || drawingArea.isDisposed()) {
-			return new AbsoluteRectangle(pos, 1, 1);
-		
-		} else {
-		
-			// get the information to be displayed
-			final String string = getInformationString();
-			final int lineWidth = getLineWidth();
-			// determine the size parameters of the rectangle which represents the node
-			// in respect to the sting to be displayed
-			final org.eclipse.swt.graphics.Image i = new Image(null, 1,1);
-			final GC gc = new GC(i);
-			final Point size = gc.textExtent(string);
-			final int width = size.x + lineWidth + 3; // +3: see above
-			final int height = size.y + lineWidth + 3;
-
-			final PixelPosition upperLeft = getDrawingArea().absPoint2PixelPoint(pos);
-
-			// since the rectangle's line is spread according to its width with the
-			// actual position in it's center, the upper left position of the bounding box
-			// has to adapt to this
-			final int bbUpperLeftX = upperLeft.x;
-			final int bbUpperLeftY = upperLeft.y;
-
-			// the line width has to be counted twice because two lines with the same
-			// width are drawn on the drawing area
-			final int bbWidht = width + 2 * lineWidth;
-			final int bbHeight = height + 2 * lineWidth;
-			final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht + 1, bbHeight + 1);
-
-			gc.dispose();
-			i.dispose();
-
-			return getDrawingArea().pixelRect2AbsRect(bbArea);
-
+			return new AbsoluteRectangle(pos, 0, 0);
 		}
-		
+
+		// get the information to be displayed
+		final String string = getInformationString();
+		final int lineWidth = getLineWidth();
+		// determine the size parameters of the rectangle which represents the node
+		// in respect to the sting to be displayed
+		final org.eclipse.swt.graphics.Image i = new Image(null, 1, 1);
+		final GC gc = new GC(i);
+		final Point size = gc.textExtent(string);
+		final int width = size.x + lineWidth + 3; // +3: see above
+		final int height = size.y + lineWidth + 3;
+
+		final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(pos);
+
+		// since the rectangle's line is spread according to its width with the
+		// actual position in it's center, the upper left position of the bounding box
+		// has to adapt to this
+		final int bbUpperLeftX = upperLeft.x;
+		final int bbUpperLeftY = upperLeft.y;
+
+		// the line width has to be counted twice because two lines with the same
+		// width are drawn on the drawing area
+		final int bbWidht = width + 2 * lineWidth;
+		final int bbHeight = height + 2 * lineWidth;
+		final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidht + 1, bbHeight + 1);
+
+		gc.dispose();
+		i.dispose();
+
+		return getDrawingArea().pixelRect2AbsRect(bbArea);
+
 	}
 }
