@@ -74,7 +74,7 @@ public class Spyglass {
 		// Create and inject objects
 		setPluginManager(configStore.getSpyglassConfig().getPluginManager());
 
-		packetReader = configStore.getSpyglassConfig().getPacketReader();
+		setPacketReader(configStore.getSpyglassConfig().getPacketReader());
 
 		packetDispatcher = new PacketDispatcher(this);
 
@@ -166,6 +166,7 @@ public class Spyglass {
 
 	// --------------------------------------------------------------------------
 	public void setPacketReader(final PacketReader packetReader) {
+		packetReader.init(this);
 		this.packetReader = packetReader;
 	}
 

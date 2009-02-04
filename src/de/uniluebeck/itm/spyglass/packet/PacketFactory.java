@@ -1,5 +1,9 @@
 package de.uniluebeck.itm.spyglass.packet;
 
+import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
+import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
+
 /**
  * Factory to create SpyglassPacket objects from raw packets.
  * 
@@ -7,6 +11,12 @@ package de.uniluebeck.itm.spyglass.packet;
  * 
  */
 public class PacketFactory {
+	
+	private Spyglass spyglass;
+	
+	public PacketFactory(final Spyglass spyglass) {
+		this.spyglass = spyglass;
+	}
 	
 	/**
 	 * Create a new SpyglassPacket from the given raw packet.
@@ -16,7 +26,7 @@ public class PacketFactory {
 	 * @throws SpyglassPacketException
 	 *             if this is no valid Spyglass packet.
 	 */
-	public static SpyglassPacket createInstance(final byte[] data) throws SpyglassPacketException {
+	public SpyglassPacket createInstance(final byte[] data) throws SpyglassPacketException {
 		try {
 			final SyntaxTypes syntaxType = SyntaxTypes.toEnum(data[3]);
 			
@@ -49,6 +59,8 @@ public class PacketFactory {
 			}
 			
 			packet.deserialize(data);
+
+			fixPosition(packet);
 			
 			return packet;
 			
@@ -56,5 +68,18 @@ public class PacketFactory {
 			throw new SpyglassPacketException(e);
 		}
 		
+	}
+
+	/**
+	 * Apply the scale and offset values from general settings
+	 */
+	private void fixPosition(final SpyglassPacket packet) {
+		final MetricsXMLConfig conf = spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getMetrics();
+		final AbsolutePosition pos = packet.getPosition();
+		pos.x += conf.getAbs2metricOffsetX();
+		pos.y += conf.getAbs2metricOffsetY();
+		pos.x *= conf.getAbs2metricFactorX();
+		pos.y *= conf.getAbs2metricFactorY();
+		packet.setPosition(pos);
 	}
 }

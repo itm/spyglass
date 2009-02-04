@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.FileDialog;
 import de.uniluebeck.itm.spyglass.gateway.FileReaderGateway;
 import de.uniluebeck.itm.spyglass.gateway.Gateway;
 import de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketBroker;
-import de.uniluebeck.itm.spyglass.packet.PacketFactory;
 import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
@@ -533,7 +532,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 				if ((next = playbackFileReader.read()) != -1) {
 					packetData = new byte[next];
 					playbackFileReader.read(packetData);
-					packet = PacketFactory.createInstance(packetData);
+					packet = factory.createInstance(packetData);
 				} else {
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override

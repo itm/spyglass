@@ -13,6 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Node;
 import de.uniluebeck.itm.spyglass.packet.PacketFactory;
@@ -44,6 +45,7 @@ public class QuadTreePerfTest {
 	 */
 	final int RUNS = 10;
 	
+	private PacketFactory factory;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -52,6 +54,8 @@ public class QuadTreePerfTest {
 	@Before
 	public void setUp() throws Exception {
 		createSamples();
+		
+		factory = new PacketFactory(new Spyglass());
 	}
 
 	private void createSamples() throws SpyglassPacketException, ParseException {
@@ -63,7 +67,7 @@ public class QuadTreePerfTest {
 		final Sample s = new PayloadSample("uint16list", "1", "0000","1-1000", new Position("0-1000", "0-1000", "0"));
 		
 		for(int i=0; i<OBJECTS_PER_RUN; i++) {
-			final SpyglassPacket packet = PacketFactory.createInstance(s.generatePacket());
+			final SpyglassPacket packet = factory.createInstance(s.generatePacket());
 			final Node n = new Node(packet.getSenderId(), "bla");
 			n.setPosition(packet.getPosition());
 			dobs.add(n);

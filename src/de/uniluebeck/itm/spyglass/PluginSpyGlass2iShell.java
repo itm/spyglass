@@ -65,6 +65,8 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	private static final int SPYGLASS_PACKET_TYPE = 0x91;
 
 	private Spyglass spyglass = null;
+	
+	private PacketFactory factory;
 
 	private UIController controller = null;
 
@@ -105,6 +107,8 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 
 			// Start Spyglass
 			spyglass.start();
+			
+			factory = new PacketFactory(spyglass);
 			
 		} catch (final Exception e) {
 			log.error("Could not initialize plugin \"Spyglass\" because of an very early error.", e);
@@ -164,7 +168,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		}
 		SpyglassPacket spyglassPacket = null;
 		try {
-			spyglassPacket = PacketFactory.createInstance(packet.getContent());
+			spyglassPacket = factory.createInstance(packet.getContent());
 		} catch (final SpyglassPacketException e) {
 			log.error("Illegal Packet, could not deserialize it.", e);
 			return;

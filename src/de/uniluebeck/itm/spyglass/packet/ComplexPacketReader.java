@@ -32,7 +32,7 @@ public class ComplexPacketReader extends PacketReader {
 	private InputStream playbackFileReader = null;
 
 	private long lastPacketTimestamp = -1;
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
@@ -46,7 +46,7 @@ public class ComplexPacketReader extends PacketReader {
 		if (playbackFileReader == null) {
 			playbackFileReader = getGateway().getInputStream();
 		}
-
+		
 		SpyglassPacket packet = null;
 		try {
 
@@ -56,7 +56,7 @@ public class ComplexPacketReader extends PacketReader {
 				packetData = new byte[next];
 				log.debug(next);
 				playbackFileReader.read(packetData);
-				packet = PacketFactory.createInstance(packetData);
+				packet = factory.createInstance(packetData);
 			}
 
 		} catch (final IOException e) {

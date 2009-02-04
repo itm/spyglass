@@ -45,7 +45,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	public IShellToSpyGlassPacketBroker() {
 		super();
 	}
-
+	
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor

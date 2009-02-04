@@ -40,7 +40,7 @@ public class SpyglassConfiguration extends XMLConfig {
 	 * Must be declared volatile since it can be replaced at runtime.
 	 */
 	@Element(name = "packetReader")
-	private volatile PacketReader packetReader = new PacketRecorder();;
+	private volatile PacketReader packetReader = new PacketRecorder();
 	
 	/**
 	 * The one and only plugin manager

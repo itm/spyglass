@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import org.simpleframework.xml.Element;
 
+import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gateway.Gateway;
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 
@@ -38,6 +39,16 @@ public abstract class PacketReader extends PropertyBean {
 	 */
 	@Element(name = "delayMillies", required = false)
 	protected int delayMillies = 1000;
+	
+	protected PacketFactory factory;
+
+	protected PacketReader() {
+		this.factory = null;
+	}
+	
+	public void init(final Spyglass spyglass) {
+		this.factory = new PacketFactory(spyglass);
+	}
 
 	// --------------------------------------------------------------------------
 	/**

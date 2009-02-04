@@ -5,6 +5,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 /**
  * Generic Spyglass packet.
  * 
+ * @author Nils Glombitza
  * @author Dariush Forouher
  */
 public class SpyglassPacket {
@@ -16,6 +17,12 @@ public class SpyglassPacket {
 
 	/** The packets raw data */
 	private byte[] rawData;
+	
+	/**
+	 * The PacketFactory may set a new position, which incorporates the given
+	 * scale and offset values.
+	 */
+	private AbsolutePosition overwritePosition = null;
 
 	/**
 	 * Deserializes a Spyglass Packet.
@@ -236,16 +243,28 @@ public class SpyglassPacket {
 	public int getVersion() {
 		return deserializeUint8(rawData[2]);
 	}
+	
+	/**
+	 * Overwrites the position with the given one. The underlying rawData
+	 * stays unaffected.
+	 */
+	void setPosition(final AbsolutePosition newPos) {
+		this.overwritePosition = newPos;
+	}
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the position
 	 */
 	public AbsolutePosition getPosition() {
-		final int x = deserializeInt16(rawData[13], rawData[14]);
-		final int y = deserializeInt16(rawData[15], rawData[16]);
-		final int z = deserializeInt16(rawData[17], rawData[18]);
-		return new AbsolutePosition(x, y, z);
+		if (overwritePosition != null) {
+			return overwritePosition.clone();
+		} else {
+			final int x = deserializeInt16(rawData[13], rawData[14]);
+			final int y = deserializeInt16(rawData[15], rawData[16]);
+			final int z = deserializeInt16(rawData[17], rawData[18]);
+			return new AbsolutePosition(x, y, z);
+		}
 	}
 
 	// --------------------------------------------------------------------------

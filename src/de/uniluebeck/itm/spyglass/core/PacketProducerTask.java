@@ -35,11 +35,9 @@ import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 public class PacketProducerTask implements Runnable {
 	private final Logger log = SpyglassLoggerFactory.getLogger(PacketProducerTask.class);
 
-	// private Deque<Packet> packetCache = null;
-
 	private PacketReader packetReader = null;
 
-	private Spyglass spyglass = null;
+	private final Spyglass spyglass;
 
 	private long initialDelayMs;
 
@@ -120,7 +118,7 @@ public class PacketProducerTask implements Runnable {
 					log.error("Received a null packet from the PacketReader. Skipping it!");
 					continue;
 				}
-
+				
 				spyglass.getPacketDispatcher().dispatchPacket(packet);
 
 			} catch (final InterruptedException e) {
