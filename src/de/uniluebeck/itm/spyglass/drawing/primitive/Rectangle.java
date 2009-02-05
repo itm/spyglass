@@ -12,6 +12,7 @@ import org.eclipse.swt.graphics.GC;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
@@ -21,23 +22,23 @@ import de.uniluebeck.itm.spyglass.positions.PixelPosition;
  */
 public class Rectangle extends DrawingObject {
 
-	private int width = 10;
-
+	/**
+	 * 
+	 */
 	private int height = 10;
 
+	/**
+	 * 
+	 */
 	private int lineWidth = 1;
 
-	public int getLineWidth() {
-		return lineWidth;
-	}
-
-	public void setLineWidth(final int lineWidth) {
-		this.lineWidth = lineWidth;
-	}
+	/**
+	 * 
+	 */
+	private int width = 10;
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
 	 */
 	public Rectangle() {
 		super();
@@ -45,53 +46,20 @@ public class Rectangle extends DrawingObject {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
 	 */
-	public int getWidth() {
-		return width;
+	public Rectangle(final int x, final int y, final int width, final int height) {
+		setPosition(new AbsolutePosition(x, y));
+		setWidth(width);
+		setHeight(height);
 	}
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public void setWidth(final int width) {
-		setWidth(width, true);
-	}
-
-	public void setWidth(final int width, final boolean fireBoundingBoxChangeEvent) {
-		this.width = width;
-		updateBoundingBox(fireBoundingBoxChangeEvent);
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public int getHeight() {
-		return height;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
-	public void setHeight(final int height) {
-		setHeight(height, true);
-	}
-
-	public void setHeight(final int height, final boolean fireBoundingBoxChangeEvent) {
-		this.height = height;
-		updateBoundingBox(fireBoundingBoxChangeEvent);
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * 
-	 */
 	@Override
-	public String toString() {
-		return getBoundingBox().rectangle.toString();
+	protected AbsoluteRectangle calculateBoundingBox() {
+		return new AbsoluteRectangle(getPosition(), width, height);
 	}
 
 	@Override
@@ -111,9 +79,77 @@ public class Rectangle extends DrawingObject {
 		bg.dispose();
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getHeight() {
+		return height;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getLineWidth() {
+		return lineWidth;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public int getWidth() {
+		return width;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param height
+	 */
+	public void setHeight(final int height) {
+		setHeight(height, true);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param height
+	 * @param fireBoundingBoxChangeEvent
+	 */
+	public void setHeight(final int height, final boolean fireBoundingBoxChangeEvent) {
+		this.height = height;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param lineWidth
+	 */
+	public void setLineWidth(final int lineWidth) {
+		this.lineWidth = lineWidth;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param width
+	 */
+	public void setWidth(final int width) {
+		setWidth(width, true);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param width
+	 * @param fireBoundingBoxChangeEvent
+	 */
+	public void setWidth(final int width, final boolean fireBoundingBoxChangeEvent) {
+		this.width = width;
+		updateBoundingBox(fireBoundingBoxChangeEvent);
+	}
+
 	@Override
-	protected AbsoluteRectangle calculateBoundingBox() {
-		return new AbsoluteRectangle(getPosition(), width, height);
+	public String toString() {
+		return getBoundingBox().rectangle.toString();
 	}
 
 }

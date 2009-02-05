@@ -25,19 +25,19 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 		}
 	}
 
-	private final Object lock = new Object();
-
 	private final Map<DrawingObject, Integer> insertionOrder;
 
 	private int insertionOrderLargest;
 
 	private int insertionOrderSmallest;
 
+	private final Object lock = new Object();
+
 	private final DrawingObjectComparator sorter;
 
-	private final ISWTQuadTree<DrawingObject> tree;
-
 	private final boolean threadSafe;
+
+	private final ISWTQuadTree<DrawingObject> tree;
 
 	public QuadTree(final int originX, final int originY, final int totalSideLength, final int minSideLength, final int capacity,
 			final boolean threadSafe) {

@@ -55,7 +55,7 @@ public interface Layer {
 		 */
 		public static Layer createQuadTreeLayer(final boolean threadSafe) {
 
-			final int totalSideLength = (int) Math.pow(2, 16);
+			final int totalSideLength = (int) Math.pow(2, 17);
 			final int originX = -(totalSideLength / 2);
 			final int originY = -(totalSideLength / 2);
 			final int minSideLength = 32; // 2^6

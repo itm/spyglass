@@ -431,6 +431,43 @@ public class QuadTreeTest {
 
 	}
 
+	/**
+	 * Tests if items that lie exactly on the outer border line of the QuadTrees bounding box work.
+	 */
+	@Test
+	public void borderTest() {
+
+		final Rectangle rectBorderLeft = new Rectangle(upperLeftX, upperLeftY + (height / 2), rectWidth, rectHeight);
+		final Rectangle rectBorderTop = new Rectangle(upperLeftX + (width / 2), upperLeftY, rectWidth, rectHeight);
+		final Rectangle rectBorderRight = new Rectangle(upperLeftX + width, upperLeftY + (height / 2), rectWidth, rectHeight);
+		final Rectangle rectBorderBottom = new Rectangle(upperLeftX + (width / 2), upperLeftY + height, rectWidth, rectHeight);
+
+		try {
+			tree.add(rectBorderLeft);
+		} catch (final RuntimeException e) {
+			assertTrue(false);
+		}
+
+		try {
+			tree.add(rectBorderTop);
+		} catch (final RuntimeException e) {
+			assertTrue(false);
+		}
+
+		try {
+			tree.add(rectBorderRight);
+		} catch (final RuntimeException e) {
+			assertTrue(false);
+		}
+
+		try {
+			tree.add(rectBorderBottom);
+		} catch (final RuntimeException e) {
+			assertTrue(false);
+		}
+
+	}
+
 	@Test
 	public void zoomingTest() {
 
