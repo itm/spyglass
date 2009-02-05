@@ -228,7 +228,7 @@ public class UIController {
 		@Override
 		public void drawingObjectAdded(final DrawingObject dob) {
 
-			log.warn("Redraw caused by "+dob);
+			log.debug("Redraw caused by "+dob);
 			
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
@@ -253,7 +253,7 @@ public class UIController {
 		@Override
 		public void drawingObjectChanged(final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
 
-			log.warn("Redraw caused by "+dob);
+			log.debug("Redraw caused by "+dob);
 
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
@@ -285,7 +285,7 @@ public class UIController {
 		@Override
 		public void drawingObjectRemoved(final DrawingObject dob) {
 
-			log.warn("Redraw caused by "+dob);
+			log.debug("Redraw caused by "+dob);
 			
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
@@ -347,9 +347,9 @@ public class UIController {
 				final double pxCount = pxArea.getHeight() * pxArea.getWidth();
 				final boolean clipping = !appWindow.getGui().getDrawingArea().getClientArea().equals(pxArea.rectangle);
 				if (clipping) {
-					log.info( String.format("Partial redraw (%.0f px). Time: %.03f ms (%.0f ns per pixel).",pxCount, (time2-time)/1000000d,((time2-time)/pxCount)));
+					log.debug( String.format("Partial redraw (%.0f px). Time: %.03f ms (%.0f ns per pixel).",pxCount, (time2-time)/1000000d,((time2-time)/pxCount)));
 				} else {
-					log.info( String.format("Complete redraw. Time: %.03f ms (%.0f ns per pixel).",(time2-time)/1000000d,((time2-time)/pxCount)));
+					log.debug( String.format("Complete redraw. Time: %.03f ms (%.0f ns per pixel).",(time2-time)/1000000d,((time2-time)/pxCount)));
 				}
 			}
 		}
