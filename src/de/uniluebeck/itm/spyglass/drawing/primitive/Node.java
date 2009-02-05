@@ -63,6 +63,7 @@ public class Node extends DrawingObject {
 		@Override
 		public void handleEvent(final DrawingAreaTransformEvent e) {
 			setDrawingArea(e.drawingArea);
+			updateBoundingBox();
 		}
 	};
 
@@ -179,7 +180,6 @@ public class Node extends DrawingObject {
 		synchronized (drawingAreaMutex) {
 			this.drawingArea = drawingArea;
 		}
-		updateBoundingBox();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -304,8 +304,13 @@ public class Node extends DrawingObject {
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 
 		try {
-			setDrawingArea(drawingArea);
-
+			if (this.drawingArea == null) {
+				setDrawingArea(drawingArea);
+				updateBoundingBox();
+			} else {
+				setDrawingArea(drawingArea);
+			}
+			
 			if (!listenerConnected) {
 				listenerConnected = true;
 				drawingArea.addDrawingAreaTransformListener(this.drawingAreaListener);
@@ -339,7 +344,6 @@ public class Node extends DrawingObject {
 			// determine the bounding box (this time use the objects upper left point and not the
 			// adapted one
 			// boundingBox = determineBoundingBox(drawingArea, upperLeft, lineWidth, width, height);
-			updateBoundingBox();
 
 			// the new rectangle starts at the determined upper left position. Its with and height
 			// was determined in respect to the text which is to be displayed
@@ -349,7 +353,7 @@ public class Node extends DrawingObject {
 
 			// place the string inside the rectangle with respect to the side effects of the line
 			// width (see above)
-			gc.drawText(string, 3 + upperLeftRect.x + lineWidth / 2, 3 + upperLeftRect.y + lineWidth / 2);
+			gc.drawText(string, 3 + upperLeftRect.x + lineWidth / 2, 3 + upperLeftRect.y + lineWidth / 2,true);
 
 			// draw an oval to indicate that the objects location is the rectangles upper left edge
 			gc.setLineWidth(lineWidth + 1);
@@ -365,6 +369,7 @@ public class Node extends DrawingObject {
 				log.error(e, e, false);
 			}
 		}
+		
 	}
 
 	// --------------------------------------------------------------------------------
