@@ -80,6 +80,20 @@ public class PacketFactory {
 		pos.y += conf.getAbs2metricOffsetY();
 		pos.x *= conf.getAbs2metricFactorX();
 		pos.y *= conf.getAbs2metricFactorY();
+		
+		if (pos.x >= Math.pow(2, 15)) {
+			pos.x = (int) Math.pow(2, 15)-1;
+		}
+		if (pos.y >= Math.pow(2, 15)) {
+			pos.y = (int) Math.pow(2, 15)-1;
+		}
+		if (pos.x <= -Math.pow(2, 15)) {
+			pos.x = (int) -Math.pow(2, 15)+1;
+		}
+		if (pos.y <= -Math.pow(2, 15)) {
+			pos.y = (int) -Math.pow(2, 15)+1;
+		}
+		
 		packet.setPosition(pos);
 	}
 }
