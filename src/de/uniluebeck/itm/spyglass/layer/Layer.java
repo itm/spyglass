@@ -69,7 +69,9 @@ public interface Layer {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Adds a DrawingObject to the layer.
+	 * Adds a DrawingObject to the layer.<br>
+	 * Note that there will be no check whether the object is already located in the layer or not.<br>
+	 * Be aware that adding an object multiple times might eventually lead to errors.
 	 * 
 	 * @param d
 	 */

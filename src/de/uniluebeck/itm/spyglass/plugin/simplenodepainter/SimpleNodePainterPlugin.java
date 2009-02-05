@@ -117,6 +117,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	private volatile Boolean refreshPending = false;
 
+	private Object nodeUpdateMutex = new Object();
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -254,10 +256,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		// if the description was changed, an update is needed
 		if (parsePayloadByStringFormatters(packet)) {
 
-			// get the instance of the node's visualization
-			final Node node = getMatchingNodeObject(nodeID);
-			node.setDescription(stringFormatterResultCache.get(nodeID));
-
 			// add the packet's semantic type to the ones associated with the node
 			synchronized (nodeSemanticTypes) {
 				if (nodeSemanticTypes.get(nodeID) == null) {
@@ -267,8 +265,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				nodeSemanticTypes.get(nodeID).add(packet.getSemanticType());
 			}
 
-			// add the object to the one which have to be (re)drawn ...
 			synchronized (updatedObjects) {
+				// get the instance of the node's visualization
+				final Node node = getMatchingNodeObject(nodeID);
+				node.setDescription(stringFormatterResultCache.get(nodeID));
 				updatedObjects.add(node);
 			}
 		}
@@ -292,11 +292,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			}
 		}
 
-		// get the instance of the node's visualization
-		final Node node = getMatchingNodeObject(nodeID);
-		node.setPosition(position);
-
 		synchronized (updatedObjects) {
+			// get the instance of the node's visualization
+			final Node node = getMatchingNodeObject(nodeID);
+			node.setPosition(position);
 			updatedObjects.add(node);
 		}
 		updateLayer();
@@ -459,6 +458,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 		final Node no = new Node(nodeID, "Node " + nodeID, "", isExtended, lineColorRGB, lineWidth, drawingArea, getPluginManager()
 				.getNodePositioner().getPosition(nodeID));
+
+		synchronized (layer) {
+			layer.add(no);
+		}
 
 		return no;
 	}
@@ -681,9 +684,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
 		synchronized (layer) {
 			drawingObjects.addAll(layer.getDrawingObjects());
-			// TODO (SE) remove this workaround when the layer's bug concerning the removal of
-			// elements is fixed
-			layer.clear();
 		}
 
 		synchronized (nodeSemanticTypes) {
@@ -704,13 +704,13 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 		// copy all objects which have to be updated in a separate List and
 		// clear the original list
-		final List<DrawingObject> update = new LinkedList<DrawingObject>();
+		final Set<DrawingObject> update = new HashSet<DrawingObject>();
 		synchronized (updatedObjects) {
 			update.addAll(updatedObjects);
 			updatedObjects.clear();
 		}
 
-		final List<DrawingObject> obsolete = new LinkedList<DrawingObject>();
+		final Set<DrawingObject> obsolete = new HashSet<DrawingObject>();
 		synchronized (obsoleteObjects) {
 			obsolete.addAll(obsoleteObjects);
 			obsoleteObjects.clear();
@@ -725,14 +725,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 		// catch the layer's lock and update the objects
 		synchronized (layer) {
-			for (final DrawingObject drawingObject : update) {
-				layer.add(drawingObject);
-			}
-
 			if (obsolete.size() > 0) {
-				for (final DrawingObject drawingObject : obsolete) {
-					layer.remove(drawingObject);
-				}
+				layer.removeAll(obsolete);
 			}
 		}
 
