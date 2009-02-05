@@ -47,6 +47,14 @@ public class PayloadSample extends Sample {
 	@Element(required=false)
 	private Position position = new Position("0","0","0");
 	
+	/**
+	 * Optional timestamp of the node
+	 * if unspecified, current systemtime will be used. 
+	 */
+	@Element(required=false)
+	private long timestamp = -1;
+
+	
 	public PayloadSample() {
 		super();
 	}
@@ -228,7 +236,14 @@ public class PayloadSample extends Sample {
 		buf.put(this.getRandomSemanticType()); // SemanticType
 		buf.putShort(getRandomNodeID()); // Node ID
 		
-		final long time = System.currentTimeMillis(); // Timestamp
+		// Timestamp
+		final long time;
+		if (timestamp >= 0) {
+			time = timestamp;
+		} else {
+			time = System.currentTimeMillis();
+		}
+			
 		buf.putInt((int) (time / 1000));
 		buf.putShort((short) (time % 1000));
 		
