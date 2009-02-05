@@ -26,6 +26,8 @@ import de.uniluebeck.itm.spyglass.core.EventDispatcher;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformEvent;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformListener;
 import de.uniluebeck.itm.spyglass.gui.view.RulerArea;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.DrawingObjectListener;
@@ -103,7 +105,12 @@ public class UIController {
 
 		// Add paint listener to the canvas
 		appWindow.getGui().getDrawingArea().addPaintListener(paintListener);
-		appWindow.getGui().getDrawingArea().addPaintListener(paintRulerListener);
+
+		// EventHandler for the rulers
+		appWindow.getGui().getDrawingArea().addDrawingAreaTransformListener(drawingAreaTransformListener);
+		appWindow.getGui().getRulerH().addPaintListener(paintRulerListener);
+		appWindow.getGui().getRulerV().addPaintListener(paintRulerListener);
+		appWindow.getGui().getUnitArea().addPaintListener(paintRulerListener);
 
 		/*
 		 * mouse button events - are forwarded to plugins
@@ -221,6 +228,8 @@ public class UIController {
 		@Override
 		public void drawingObjectAdded(final DrawingObject dob) {
 
+			log.warn("Redraw caused by "+dob);
+			
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
 
@@ -243,6 +252,8 @@ public class UIController {
 
 		@Override
 		public void drawingObjectChanged(final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
+
+			log.warn("Redraw caused by "+dob);
 
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
@@ -274,6 +285,8 @@ public class UIController {
 		@Override
 		public void drawingObjectRemoved(final DrawingObject dob) {
 
+			log.warn("Redraw caused by "+dob);
+			
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
 
@@ -372,39 +385,44 @@ public class UIController {
 
 		}
 	};
-
-	/**
-	 * Renders the visible plug-in's.<br>
-	 * The plug-ins provide objects which are drawn into the drawing area.
-	 * 
-	 * @param gc
-	 *            the graphic context used to actually draw the provided objects
-	 * @see DrawingObject
-	 */
+	
 	private PaintListener paintRulerListener = new PaintListener() {
 
 		@Override
 		public void paintControl(final PaintEvent e) {
 
-			final String unit = spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getMetrics().getUnit();
-
 			final Point2D upperLeft = appWindow.getGui().getDrawingArea().getUpperLeftPrecise();
 			final Point2D lowerRight = appWindow.getGui().getDrawingArea().getLowerRightPrecise();
 			final PixelRectangle pxRect = appWindow.getGui().getDrawingArea().getDrawingRectangle();
 
-			GC gc = new GC(appWindow.getGui().getRulerH());
-			appWindow.getGui().getRulerH().drawRuler(pxRect, upperLeft, lowerRight, gc, RulerArea.HORIZONTAL);
-			gc.dispose();
-
-			gc = new GC(appWindow.getGui().getRulerV());
-			appWindow.getGui().getRulerV().drawRuler(pxRect, upperLeft, lowerRight, gc, RulerArea.VERTICAL);
-			gc.dispose();
-
-			gc = new GC(appWindow.getGui().getUnitArea());
-			appWindow.getGui().getUnitArea().drawUnit(gc, unit);
-			gc.dispose();
-
+			// this paintListener is used for all three areas. so we have to check
+			// which one we're supposed to redraw...
+			if (e.widget == appWindow.getGui().getRulerH()) {
+				appWindow.getGui().getRulerH().drawRuler(pxRect, upperLeft, lowerRight, e.gc, RulerArea.HORIZONTAL);
+			} else if (e.widget == appWindow.getGui().getRulerV()) {
+				appWindow.getGui().getRulerV().drawRuler(pxRect, upperLeft, lowerRight, e.gc, RulerArea.VERTICAL);
+			} else {
+				final String unit = spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getMetrics().getUnit();
+				appWindow.getGui().getUnitArea().drawUnit(e.gc, unit);
+			}
 		}
 	};
+	
+	/**
+	 *  
+	 */
+	private DrawingAreaTransformListener drawingAreaTransformListener = new DrawingAreaTransformListener() {
+
+		@Override
+		public void handleEvent(final DrawingAreaTransformEvent e) {
+			
+			// we are already in the SWT-Thread
+			appWindow.getGui().getRulerH().redraw();
+			appWindow.getGui().getRulerV().redraw();
+			
+		}
+	};
+	
+	
 
 }
