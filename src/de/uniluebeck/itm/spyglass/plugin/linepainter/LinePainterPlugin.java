@@ -14,10 +14,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -29,7 +31,6 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.layer.Layer;
-import de.uniluebeck.itm.spyglass.layer.QuadTree;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.Uint16ListPacket;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionEvent;
@@ -39,6 +40,8 @@ import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.relationpainter.RelationPainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
+import de.uniluebeck.itm.spyglass.util.StringFormatter;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -57,7 +60,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		super();
 
 		xmlConfig = new LinePainterXMLConfig();
-		layer = new QuadTree();
+		layer = Layer.Factory.createQuadTreeLayer();
 
 	}
 
@@ -72,10 +75,8 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		return new LinePainterPreferencePage(dialog, spyglass);
 	}
 
-	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
-		synchronized (layer) {
-			return layer.getDrawingObjects(area);
-		}
+	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+		return layer.getDrawingObjects(area);
 	}
 
 	public static String getHumanReadableName() {
@@ -125,6 +126,8 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	private List<Edge> newEdges = Collections.synchronizedList(new LinkedList<Edge>());
 
 	private List<Edge> removedEdges = Collections.synchronizedList(new LinkedList<Edge>());
+
+	private StringFormatter defaultStringFormatter;
 
 	public void updateEdgeTime(final Edge edge) {
 		edgeTimes.put(edge, System.currentTimeMillis());
@@ -190,6 +193,16 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 					final int[] color = xmlConfig.getLineColorRGB();
 					e.line.setColor(new RGB(color[0], color[1], color[2]));
 					e.line.setLineWidth(xmlConfig.getLineWidth());
+
+					// check if there's a string formatter especially for this
+					// semantic type and use it if so, otherwise use default
+					// string formatter
+					if (stringFormatters.get(p.getSemanticType()) != null) {
+						e.line.setStringFormatterResult(stringFormatters.get(p.getSemanticType()).parse(p), false);
+					} else {
+						e.line.setStringFormatterResult(defaultStringFormatter.parse(p), false);
+					}
+
 					addEdge(e);
 
 				} else {
@@ -227,13 +240,9 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 			while (newEdges.size() > 0) {
 				line = newEdges.get(0).line;
 				newEdges.remove(0);
-				layer.addOrUpdate(line);
+				layer.add(line);
 				addedLines.add(line);
 			}
-
-		}
-
-		synchronized (layer) {
 
 			while (removedEdges.size() > 0) {
 				line = removedEdges.get(0).line;
@@ -259,6 +268,9 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 		super.init(manager);
 
+		defaultStringFormatter = new StringFormatter(xmlConfig.getDefaultStringFormatter());
+		stringFormatters = new Hashtable<Integer, StringFormatter>();
+		setStringFormatters(xmlConfig.getStringFormatters());
 		xmlConfig.addPropertyChangeListener(this);
 		pluginManager.addNodePositionListener(this);
 
@@ -275,13 +287,12 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	}
 
 	@Override
-	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		synchronized (layer) {
-			return layer.getDrawingObjects();
-		}
+	public Set<DrawingObject> getAutoZoomDrawingObjects() {
+		return layer.getDrawingObjects();
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void propertyChange(final PropertyChangeEvent event) {
 		if (LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B.equals(event.getPropertyName())) {
 			updateLineColor((int[]) event.getNewValue());
@@ -289,7 +300,28 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 			updateLineWidth((Integer) event.getNewValue());
 		} else if (PluginXMLConfig.PROPERTYNAME_TIMEOUT.equals(event.getPropertyName())) {
 			handleTimeoutChange((Integer) event.getNewValue());
+		} else if (PluginWithStringFormatterXMLConfig.PROPERTYNAME_STRING_FORMATTERS.equals(event.getPropertyName())) {
+			handleStringFormattersChange((Map<Integer, String>) event.getNewValue());
+		} else if (PluginWithStringFormatterXMLConfig.PROPERTYNAME_DEFAULT_STRING_FORMATTER.equals(event.getPropertyName())) {
+			handleDefaultStringFormatterChange((String) event.getNewValue());
 		}
+	}
+
+	private void handleDefaultStringFormatterChange(final String defaultStringFormatterExpr) {
+		this.defaultStringFormatter = new StringFormatter(defaultStringFormatterExpr);
+	}
+
+	private Hashtable<Integer, StringFormatter> stringFormatters = new Hashtable<Integer, StringFormatter>();
+
+	private void setStringFormatters(final Map<Integer, String> newValue) {
+		this.stringFormatters.clear();
+		for (final int semanticType : newValue.keySet()) {
+			this.stringFormatters.put(semanticType, new StringFormatter(newValue.get(semanticType)));
+		}
+	}
+
+	private void handleStringFormattersChange(final Map<Integer, String> newValue) {
+		setStringFormatters(newValue);
 	}
 
 	private Timer timer;

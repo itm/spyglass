@@ -162,6 +162,8 @@ public class LinePainterOptionsComposite extends Composite {
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 
+		stringFormatter.setDataBinding(dbc, config);
+
 	}
 
 }

@@ -8,7 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.plugin;
 
-import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
@@ -49,7 +50,7 @@ public interface Drawable {
 	 *            are placed
 	 * @return the objects the plug-in wants to be drawn on the GUI
 	 */
-	public abstract List<DrawingObject> getDrawingObjects(AbsoluteRectangle area);
+	public abstract SortedSet<DrawingObject> getDrawingObjects(AbsoluteRectangle area);
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -64,6 +65,6 @@ public interface Drawable {
 	 * 
 	 * @return all DrawingObjects which shall be considered by the auto-zoom function.
 	 */
-	public abstract List<DrawingObject> getAutoZoomDrawingObjects();
+	public abstract Set<DrawingObject> getAutoZoomDrawingObjects();
 
 }

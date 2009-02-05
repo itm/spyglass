@@ -12,6 +12,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 import java.util.Timer;
 
 import org.apache.log4j.Logger;
@@ -22,7 +24,6 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.layer.Layer;
-import de.uniluebeck.itm.spyglass.layer.QuadTree;
 import de.uniluebeck.itm.spyglass.packet.Int16ListPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.Int16ListPacket.TrajectorySection;
@@ -55,7 +56,7 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	 */
 	final List<Trajectory> trajectories = Collections.synchronizedList(new ArrayList<Trajectory>());
 
-	final Layer layer = new QuadTree();
+	final Layer layer = Layer.Factory.createQuadTreeLayer();
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -77,10 +78,8 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 		return new ObjectPainterPreferencePage(dialog, spyglass);
 	}
 
-	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
-		synchronized (layer) {
-			return layer.getDrawingObjects(area);
-		}
+	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+		return layer.getDrawingObjects(area);
 	}
 
 	public static String getHumanReadableName() {
@@ -147,10 +146,8 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	}
 
 	@Override
-	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		synchronized (layer) {
-			return layer.getDrawingObjects();
-		}
+	public Set<DrawingObject> getAutoZoomDrawingObjects() {
+		return layer.getDrawingObjects();
 	}
 
 	@Override

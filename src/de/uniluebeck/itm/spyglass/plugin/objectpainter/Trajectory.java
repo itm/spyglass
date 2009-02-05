@@ -66,13 +66,13 @@ public class Trajectory extends TimerTask {
 		// Draw lines
 		for (final DrawingObject d : lines) {
 			synchronized (this.plugin.layer) {
-				this.plugin.layer.addOrUpdate(d);
+				this.plugin.layer.add(d);
 			}
 			this.plugin.fireDrawingObjectAddedInternal(d);
 		}
 	
 		synchronized (this.plugin.layer) {
-			this.plugin.layer.addOrUpdate(image);
+			this.plugin.layer.add(image);
 		}
 		this.plugin.fireDrawingObjectAddedInternal(image);
 	

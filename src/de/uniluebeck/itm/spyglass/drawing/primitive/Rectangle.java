@@ -91,8 +91,7 @@ public class Rectangle extends DrawingObject {
 	 */
 	@Override
 	public String toString() {
-		// TODO Implement
-		return super.toString();
+		return getBoundingBox().rectangle.toString();
 	}
 
 	@Override

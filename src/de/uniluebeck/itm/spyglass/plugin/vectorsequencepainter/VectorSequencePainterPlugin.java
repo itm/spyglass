@@ -17,9 +17,11 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -31,7 +33,6 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.layer.Layer;
-import de.uniluebeck.itm.spyglass.layer.QuadTree;
 import de.uniluebeck.itm.spyglass.packet.Int16ListPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.NeedsMetric;
@@ -39,14 +40,19 @@ import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.relationpainter.RelationPainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class VectorSequencePainterPlugin extends RelationPainterPlugin implements NeedsMetric, PropertyChangeListener {
 
+	private static final Logger log = SpyglassLoggerFactory.getLogger(VectorSequencePainterPlugin.class);
+
 	@Element(name = "parameters")
 	private final VectorSequencePainterXMLConfig xmlConfig;
 
-	private Layer layer = new QuadTree();
+	private final Object lock = new Object();
+
+	private Layer layer = Layer.Factory.createQuadTreeLayer();
 
 	public VectorSequencePainterPlugin() {
 		xmlConfig = new VectorSequencePainterXMLConfig();
@@ -63,7 +69,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 		return new VectorSequencePainterPreferencePage(dialog, spyglass);
 	}
 
-	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		return layer.getDrawingObjects(area);
 	}
 
@@ -136,21 +142,24 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	private Timer timer;
 
 	private void handleTimeout() {
-		final long now = System.currentTimeMillis();
-		final long timeout = (1000 * xmlConfig.getTimeout());
-		long diff;
-		synchronized (removedSequences) {
-			synchronized (sequences) {
-				for (final Sequence s : sequenceTimes.keySet()) {
-					diff = (now - sequenceTimes.get(s));
-					if (diff > timeout) {
-						sequences.remove(s);
-						removedSequences.add(s);
+		synchronized (lock) {
+
+			final long now = System.currentTimeMillis();
+			final long timeout = (1000 * xmlConfig.getTimeout());
+			long diff;
+
+			for (final Sequence s : sequences) {
+				diff = (now - sequenceTimes.get(s));
+				if (diff > timeout) {
+					if (!sequences.remove(s)) {
+						log.fatal("Unexpected case.");
 					}
+					removedSequences.add(s);
 				}
 			}
+
+			updateLayer();
 		}
-		updateLayer();
 	}
 
 	@Override
@@ -158,6 +167,13 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 		super.init(manager);
 		xmlConfig.addPropertyChangeListener(this);
 		handleTimeoutChangeEvent(xmlConfig.getTimeout());
+	}
+
+	@Override
+	public void shutdown() throws Exception {
+		super.shutdown();
+		xmlConfig.removePropertyChangeListener(this);
+		reset();
 	}
 
 	private Sequence getEqualSequence(final Sequence seq) {
@@ -179,22 +195,26 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 
 			try {
 
-				if (dimension == 2) {
-					coordinateList = packet.getCoordinates2D();
-				} else {
-					coordinateList = packet.getCoordinates3D();
+				synchronized (lock) {
+
+					if (dimension == 2) {
+						coordinateList = packet.getCoordinates2D();
+					} else {
+						coordinateList = packet.getCoordinates3D();
+					}
+
+					final Sequence sequence = new Sequence(coordinateList);
+					Sequence eqSeq = getEqualSequence(sequence);
+
+					if (eqSeq == null) {
+						sequences.add(sequence);
+						newSequences.push(sequence);
+						eqSeq = sequence;
+					}
+
+					sequenceTimes.put(eqSeq, System.currentTimeMillis());
+
 				}
-
-				final Sequence sequence = new Sequence(coordinateList);
-				Sequence eqSeq = getEqualSequence(sequence);
-
-				if (eqSeq == null) {
-					sequences.add(sequence);
-					newSequences.push(sequence);
-					eqSeq = sequence;
-				}
-
-				sequenceTimes.put(eqSeq, System.currentTimeMillis());
 
 			} catch (final ParseException e) {
 
@@ -238,34 +258,49 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 
 	@Override
 	protected void resetPlugin() {
-		newSequences.clear();
-		for (final Sequence s : sequences) {
-			removedSequences.push(s);
+
+		synchronized (lock) {
+
+			newSequences.clear();
+
+			for (final Sequence s : sequences) {
+				removedSequences.push(s);
+			}
+			sequences.clear();
+
+			updateLayer();
+
 		}
-		sequences.clear();
-		updateLayer();
+
 	}
 
 	@Override
 	protected void updateLayer() {
 
-		synchronized (layer) {
+		synchronized (lock) {
 
 			Sequence s;
 
 			while (newSequences.size() > 0) {
 				s = newSequences.poll();
 				for (final Line l : s.lines) {
-					layer.addOrUpdate(l);
+					layer.add(l);
 					fireDrawingObjectAdded(l);
 				}
 			}
 
 			while (removedSequences.size() > 0) {
 				s = removedSequences.poll();
+				final Set<DrawingObject> dos = layer.getDrawingObjects();
 				for (final Line l : s.lines) {
-					layer.remove(l);
-					fireDrawingObjectRemoved(l);
+					if (dos.contains(l)) {
+						try {
+							layer.remove(l);
+						} catch (final RuntimeException e) {
+							System.out.println("bla");
+						}
+						fireDrawingObjectRemoved(l);
+					}
 				}
 			}
 
@@ -274,7 +309,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	}
 
 	@Override
-	public List<DrawingObject> getAutoZoomDrawingObjects() {
+	public Set<DrawingObject> getAutoZoomDrawingObjects() {
 		return layer.getDrawingObjects();
 	}
 
@@ -339,7 +374,9 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	 * @param width
 	 */
 	private void handleLineWidthChangeEvent(final int width) {
-		synchronized (sequences) {
+
+		synchronized (lock) {
+
 			for (final Sequence s : sequences) {
 				for (final Line l : s.lines) {
 					final AbsoluteRectangle oldBoundingBox = l.getBoundingBox();
@@ -347,8 +384,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 					fireDrawingObjectChanged(l, oldBoundingBox);
 				}
 			}
-		}
-		synchronized (newSequences) {
+
 			for (final Sequence s : newSequences) {
 				for (final Line l : s.lines) {
 					final AbsoluteRectangle oldBoundingBox = l.getBoundingBox();
@@ -356,7 +392,9 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 					fireDrawingObjectChanged(l, oldBoundingBox);
 				}
 			}
+
 		}
+
 	}
 
 	// --------------------------------------------------------------------------------
@@ -364,21 +402,24 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	 * @param newValue
 	 */
 	private void handleColorChangeEvent(final int[] color) {
-		synchronized (sequences) {
+
+		synchronized (lock) {
+
 			for (final Sequence s : sequences) {
 				for (final Line l : s.lines) {
 					l.setColor(new RGB(color[0], color[1], color[2]));
 					fireDrawingObjectChanged(l, l.getBoundingBox());
 				}
 			}
-		}
-		synchronized (newSequences) {
+
 			for (final Sequence s : newSequences) {
 				for (final Line l : s.lines) {
 					l.setColor(new RGB(color[0], color[1], color[2]));
 					fireDrawingObjectChanged(l, l.getBoundingBox());
 				}
 			}
+
 		}
+
 	}
 }

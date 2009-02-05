@@ -10,11 +10,12 @@ package de.uniluebeck.itm.spyglass.plugin.mappainter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
@@ -49,9 +50,9 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	 * The drawing object representing the map.
 	 */
 	private Map map = null;
-	
+
 	private volatile boolean dataChanged = true;
-	
+
 	private Timer timer = new Timer("MapPainter-Timer");
 
 	// --------------------------------------------------------------------------------
@@ -73,11 +74,13 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		return new MapPainterPreferencePage(dialog, spyglass);
 	}
 
-	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		if (area.intersects(map.getBoundingBox())) {
-			return Collections.singletonList((DrawingObject)map);
+			final TreeSet<DrawingObject> set = new TreeSet<DrawingObject>();
+			set.add(map);
+			return set;
 		} else {
-			return Collections.emptyList();
+			return new TreeSet<DrawingObject>();
 		}
 	}
 
@@ -107,23 +110,23 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 		xmlConfig.addPropertyChangeListener(this);
 		manager.addNodePositionListener(this);
-		
-		timer.schedule( new TimerTask() {
+
+		timer.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
-				
+
 				updateMatrix();
 			}
-			
-		}, 0, 1000/xmlConfig.getRefreshFrequency());
+
+		}, 0, 1000 / xmlConfig.getRefreshFrequency());
 
 	}
 
 	@Override
 	public void shutdown() throws Exception {
 		super.shutdown();
-		
+
 		timer.cancel();
 
 		this.pluginManager.removeNodePositionListener(this);
@@ -217,26 +220,25 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	}
 
 	/**
-	 * We synchronize to ensure that the restart of the timer and stuff
-	 * won't happen twice
+	 * We synchronize to ensure that the restart of the timer and stuff won't happen twice
 	 */
 	@Override
 	public synchronized void propertyChange(final PropertyChangeEvent evt) {
 
 		timer.cancel();
 		createMap();
-		
+
 		timer = new Timer("MapPainter-Timer");
-		timer.schedule( new TimerTask() {
+		timer.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
-				
+
 				updateMatrix();
 			}
-			
-		}, 0, 1000/xmlConfig.getRefreshFrequency());
-		
+
+		}, 0, 1000 / xmlConfig.getRefreshFrequency());
+
 	}
 
 	// --------------------------------------------------------------------------------
@@ -279,11 +281,11 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				}
 			}
 		}
-	
+
 	}
 
 	/**
-	 * Create a new Map object. 
+	 * Create a new Map object.
 	 */
 	private void createMap() {
 		map = new Map(xmlConfig);
@@ -363,23 +365,23 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		synchronized (dataStore) {
 			neighbors = dataStore.kNN(point, xmlConfig.getK());
 		}
-		
+
 		double sum = 0;
 		for (final DataPoint dataPoint : neighbors) {
 			sum += dataPoint.value;
 		}
 		sum /= neighbors.size();
-		
+
 		return sum;
 	}
 
 	/**
 	 * Update the matrix. After we're done, cause a redraw.
 	 * 
-	 * Note, that we only lock shortly over the map. although this may
-	 * result in short-time graphical errors (when a redraw occurs while this method is still running)
-	 * it has the advantage of avoiding longtime blocking of the SWT-Thread when the draw() method tries
-	 * to aquire the lock. 
+	 * Note, that we only lock shortly over the map. although this may result in short-time
+	 * graphical errors (when a redraw occurs while this method is still running) it has the
+	 * advantage of avoiding longtime blocking of the SWT-Thread when the draw() method tries to
+	 * aquire the lock.
 	 */
 	private void updateMatrix() {
 		if (!dataChanged) {
@@ -387,28 +389,28 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		}
 
 		dataChanged = false;
-		
+
 		final AbsoluteRectangle drawRect = new AbsoluteRectangle();
 		drawRect.setHeight(xmlConfig.getGridElementHeight());
 		drawRect.setWidth(xmlConfig.getGridElementWidth());
 
-		for(int row=0; row<xmlConfig.getRows(); row++) {
-			for(int col=0; col<xmlConfig.getCols(); col++) {
+		for (int row = 0; row < xmlConfig.getRows(); row++) {
+			for (int col = 0; col < xmlConfig.getCols(); col++) {
 
 				final AbsolutePosition newPos = new AbsolutePosition();
-				newPos.x = col*xmlConfig.getGridElementWidth() + xmlConfig.getLowerLeftX();
-				newPos.y = row*xmlConfig.getGridElementHeight() + xmlConfig.getLowerLeftY();
+				newPos.x = col * xmlConfig.getGridElementWidth() + xmlConfig.getLowerLeftX();
+				newPos.y = row * xmlConfig.getGridElementHeight() + xmlConfig.getLowerLeftY();
 				drawRect.setUpperLeft(newPos);
 
 				final double average = calculateValue(drawRect.getCenter());
 				synchronized (map.getMatrix()) {
-					map.getMatrix()[row][col]=average;
+					map.getMatrix()[row][col] = average;
 				}
-				
+
 			}
-			
+
 		}
-		
+
 		fireDrawingObjectChanged(map, null);
 	}
 

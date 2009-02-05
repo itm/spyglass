@@ -84,14 +84,16 @@ public abstract class DrawingObject {
 	/**
 	 * Informs all listeners which registered for changes of the drawing objects bounding box that
 	 * the box has actually changed
+	 * 
+	 * @param oldBox
 	 */
-	protected void fireBoundingBoxChangeEvent() {
+	protected void fireBoundingBoxChangeEvent(final AbsoluteRectangle oldBox) {
 		// Get listeners
 		final BoundingBoxChangeListener[] list = changeListeners.getListeners(BoundingBoxChangeListener.class);
-		
+
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
-			(list[i]).onBoundingBoxChanged(this);
+			(list[i]).onBoundingBoxChanged(this, oldBox);
 		}
 
 	}
@@ -149,7 +151,7 @@ public abstract class DrawingObject {
 	public String toString(final int tabCount) {
 		final StringBuffer buff = new StringBuffer();
 		for (int i = 0; i < tabCount; i++) {
-			buff.append("\t");
+			buff.append("--");
 		}
 		buff.append(toString());
 		return buff.toString();
@@ -214,7 +216,15 @@ public abstract class DrawingObject {
 	 *            a listener for changes concerning the object's bounding box
 	 */
 	public void addBoundingBoxChangedListener(final BoundingBoxChangeListener listener) {
-		this.changeListeners.add(BoundingBoxChangeListener.class, listener);
+		boolean alreadyIn = false;
+		for (final BoundingBoxChangeListener bbcl : this.changeListeners.getListeners(BoundingBoxChangeListener.class)) {
+			if (bbcl == listener) {
+				alreadyIn = true;
+			}
+		}
+		if (!alreadyIn) {
+			this.changeListeners.add(BoundingBoxChangeListener.class, listener);
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -248,7 +258,7 @@ public abstract class DrawingObject {
 		final AbsoluteRectangle oldBox = this.boundingBox;
 		boundingBox = calculateBoundingBox();
 		if (fireBoundingBoxChangeEvent && ((oldBox != null) || !boundingBox.equals(oldBox))) {
-			fireBoundingBoxChangeEvent();
+			fireBoundingBoxChangeEvent(oldBox);
 		}
 	}
 

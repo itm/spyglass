@@ -110,7 +110,7 @@
                <active>true</active>
                <visible>true</visible>
                <name>default10</name>
-               <timeout>-1</timeout>
+               <timeout>0</timeout>
                <semanticTypes length="1">
                   <int>11</int>
                </semanticTypes>
@@ -146,7 +146,7 @@
                <active>true</active>
                <visible>true</visible>
                <name>NodePainter</name>
-               <timeout>-1</timeout>
+               <timeout>0</timeout>
                <semanticTypes length="1">
                   <int>1</int>
                </semanticTypes>
@@ -308,7 +308,7 @@
             <active>true</active>
             <visible>true</visible>
             <name>default</name>
-            <timeout>-1</timeout>
+            <timeout>0</timeout>
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
@@ -343,7 +343,7 @@
             <active>true</active>
             <visible>true</visible>
             <name>default9</name>
-            <timeout>-1</timeout>
+            <timeout>0</timeout>
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
@@ -355,7 +355,7 @@
             <active>true</active>
             <visible>true</visible>
             <name>default10</name>
-            <timeout>-1</timeout>
+            <timeout>0</timeout>
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
@@ -373,7 +373,7 @@
             <active>true</active>
             <visible>true</visible>
             <name>default11</name>
-            <timeout>-1</timeout>
+            <timeout>0</timeout>
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
@@ -391,7 +391,7 @@
             <active>true</active>
             <visible>true</visible>
             <name>default</name>
-            <timeout>-1</timeout>
+            <timeout>0</timeout>
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>

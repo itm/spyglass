@@ -8,7 +8,7 @@
 package de.uniluebeck.itm.spyglass.plugin.backgroundpainter;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
@@ -20,7 +20,7 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
  * 
  */
 public abstract class BackgroundPainterPlugin extends Plugin implements Drawable {
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor<br>
@@ -32,25 +32,25 @@ public abstract class BackgroundPainterPlugin extends Plugin implements Drawable
 	public BackgroundPainterPlugin(final boolean needsPacketQueue) {
 		super(needsPacketQueue);
 	}
-	
+
 	public final int getTimeout() {
 		return getXMLConfig().getTimeout();
 	}
-	
+
 	public static String getHumanReadableName() {
 		return "BackgroundPainter";
 	}
-	
+
 	/**
 	 * As a general rule, BackgroundPainter DrawingObjects should not be considered for AutoZoom.
 	 * (Since putting a large Image or Grid in the Background would render the AutoZoom feature
 	 * useless).
 	 */
 	@Override
-	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		return Collections.emptyList();
+	public Set<DrawingObject> getAutoZoomDrawingObjects() {
+		return Collections.emptySet();
 	}
-	
+
 	@Override
 	public String toString() {
 		return BackgroundPainterPlugin.getHumanReadableName() + "." + this.getInstanceName();

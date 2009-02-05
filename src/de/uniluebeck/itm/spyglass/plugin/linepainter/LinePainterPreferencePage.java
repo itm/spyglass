@@ -9,6 +9,8 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
 public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> {
 
+	private LinePainterOptionsComposite optionsComposite;
+
 	public LinePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL);
 	}
@@ -18,11 +20,18 @@ public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterP
 	}
 
 	@Override
+	protected void loadFromModel() {
+		super.loadFromModel();
+		optionsComposite.stringFormatter.connectTableWithData(dbc, config.getStringFormatters());
+	}
+
+	@Override
 	protected Composite createContents(final Composite parent) {
 		final Composite composite = createContentsInternal(parent);
-		final LinePainterOptionsComposite optionsComposite = new LinePainterOptionsComposite(composite);
 
+		optionsComposite = new LinePainterOptionsComposite(composite);
 		optionsComposite.setDatabinding(dbc, config, this);
+		optionsComposite.stringFormatter.connectTableWithData(dbc, config.getStringFormatters());
 
 		return composite;
 	}

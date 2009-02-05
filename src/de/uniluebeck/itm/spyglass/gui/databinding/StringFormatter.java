@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import de.uniluebeck.itm.spyglass.gui.databinding.WrappedSet.ObservableEntry;
-import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPreferencePage;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -144,7 +143,7 @@ public class StringFormatter {
 		}
 	}
 
-	public void setDataBinding(final DataBindingContext dbc, final PluginXMLConfig config, final SimpleNodePainterPreferencePage page) {
+	public void setDataBinding(final DataBindingContext dbc, final PluginXMLConfig config) {
 
 		// default string fmt
 

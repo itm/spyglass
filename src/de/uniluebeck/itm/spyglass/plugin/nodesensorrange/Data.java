@@ -5,11 +5,11 @@
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
 import java.util.Hashtable;
-import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.layer.Layer;
-import de.uniluebeck.itm.spyglass.layer.QuadTree;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 // --------------------------------------------------------------------------------
@@ -21,11 +21,11 @@ public class Data {
 
 	private Hashtable<Integer, NodeSensorRangeDrawingObject> dos = new Hashtable<Integer, NodeSensorRangeDrawingObject>();
 
-	private Layer layer = new QuadTree();
+	private Layer layer = Layer.Factory.createQuadTreeLayer();
 
 	public synchronized void add(final int node, final NodeSensorRangeDrawingObject drawingObject) {
 		dos.put(node, drawingObject);
-		layer.addOrUpdate(drawingObject);
+		layer.add(drawingObject);
 	}
 
 	public synchronized NodeSensorRangeDrawingObject get(final int node) {
@@ -53,7 +53,7 @@ public class Data {
 	/**
 	 * Delegate method for {@link Layer#getDrawingObjects()}
 	 */
-	public List<DrawingObject> getDrawingObjects() {
+	public Set<DrawingObject> getDrawingObjects() {
 		return layer.getDrawingObjects();
 	}
 
@@ -61,7 +61,7 @@ public class Data {
 	/**
 	 * Delegate method for {@link Layer#getDrawingObjects(AbsoluteRectangle)}
 	 */
-	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		return layer.getDrawingObjects(area);
 	}
 

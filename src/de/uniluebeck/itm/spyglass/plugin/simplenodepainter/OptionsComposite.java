@@ -199,7 +199,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 		dbc.bindValue(SWTObservables.observeBackground(colorExample), observableColor, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
 				.setConverter(new ColorToArrayConverter()), new UpdateValueStrategy().setConverter(new ArrayToColorConverter(this.getDisplay())));
 
-		stringFormatter.setDataBinding(dbc, config, page);
+		stringFormatter.setDataBinding(dbc, config);
 
 	}
 

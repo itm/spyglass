@@ -10,7 +10,7 @@ package de.uniluebeck.itm.spyglass.plugin.imagepainter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
+import java.util.SortedSet;
 
 import org.simpleframework.xml.Element;
 
@@ -20,7 +20,6 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Image;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.layer.Layer;
-import de.uniluebeck.itm.spyglass.layer.QuadTree;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
@@ -44,7 +43,7 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 	public ImagePainterPlugin() {
 		super(false);
 		xmlConfig = new ImagePainterXMLConfig();
-		layer = new QuadTree();
+		layer = Layer.Factory.createQuadTreeLayer();
 	}
 
 	@Override
@@ -58,10 +57,8 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 		return new ImagePainterPreferencePage(dialog, spyglass);
 	}
 
-	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
-		synchronized (layer) {
-			return layer.getDrawingObjects(area);
-		}
+	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+		return layer.getDrawingObjects(area);
 	}
 
 	public static String getHumanReadableName() {
@@ -138,7 +135,7 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 		image.setImageSizeY(sizeY);
 
 		synchronized (layer) {
-			layer.addOrUpdate(image);
+			layer.add(image);
 		}
 		fireDrawingObjectAdded(image);
 

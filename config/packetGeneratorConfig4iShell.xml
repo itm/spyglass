@@ -3,7 +3,7 @@
 <packetGenerator>
 
 	<!-- number of nodes sent per second -->
-	<packetsPerSecond>1</packetsPerSecond>
+	<packetsPerSecond>30</packetsPerSecond>
 
 	<!-- Sinks which will handle each generated packet. -->
 	<sinks>
@@ -69,7 +69,7 @@
 				<nodeIDs>3</nodeIDs>
 				<syntaxType>uint16List</syntaxType>
 				<semanticTypes>11</semanticTypes>
-				<position x="1000" y="-1000" z="0"/>
+				<position x="10000" y="-10000" z="0"/>
 				<payload>0001</payload>
 			</sample>
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
@@ -164,6 +164,7 @@
 				<payload>0001</payload>
 			</sample>
 			
+			<!-- VectorSequencePainter test case -->
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>demo sample7</name>
 				<probability>0.05</probability>

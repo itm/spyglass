@@ -28,23 +28,23 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * @author dariush
- *
+ * 
  */
 public class QuadTreePerfTest {
-	
+
 	private static final Logger log = SpyglassLoggerFactory.getLogger(QuadTreePerfTest.class);
 
 	private ArrayList<DrawingObject> dobs = null;
-	
+
 	final int OBJECTS_PER_RUN = 10000;
-	
+
 	final int PAUSE_AFTER_NUM_PACKETS = 1000;
 
 	/**
 	 * How often should the "moveNodes" test be repeated?
 	 */
 	final int RUNS = 10;
-	
+
 	private PacketFactory factory;
 
 	// --------------------------------------------------------------------------------
@@ -53,20 +53,19 @@ public class QuadTreePerfTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		createSamples();
-		
 		factory = new PacketFactory(new Spyglass());
+		createSamples();
 	}
 
 	private void createSamples() throws SpyglassPacketException, ParseException {
 		dobs = new ArrayList<DrawingObject>();
 
 		log.warn("Generating samples...");
-		
+
 		// borrow from the packetGenerator
-		final Sample s = new PayloadSample("uint16list", "1", "0000","1-1000", new Position("0-1000", "0-1000", "0"));
-		
-		for(int i=0; i<OBJECTS_PER_RUN; i++) {
+		final Sample s = new PayloadSample("uint16list", "1", "0000", "1-1000", new Position("0-1000", "0-1000", "0"));
+
+		for (int i = 0; i < OBJECTS_PER_RUN; i++) {
 			final SpyglassPacket packet = factory.createInstance(s.generatePacket());
 			final Node n = new Node(packet.getSenderId(), "bla");
 			n.setPosition(packet.getPosition());
@@ -86,25 +85,29 @@ public class QuadTreePerfTest {
 	}
 
 	/**
-	 * Test method for {@link de.uniluebeck.itm.spyglass.layer.SimpleLayer#addOrUpdate(de.uniluebeck.itm.spyglass.drawing.DrawingObject)}.
+	 * Test method for
+	 * {@link de.uniluebeck.itm.spyglass.layer.SimpleLayer#add(de.uniluebeck.itm.spyglass.drawing.DrawingObject)}
+	 * .
 	 */
 	@Test
 	public void testAddQuadTree() {
-		final Layer layer = new QuadTree();
-		
+		final Layer layer = Layer.Factory.createQuadTreeLayer();
+
 		performAddTest(layer);
-		
+
 	}
-	
+
 	/**
-	 * Test method for {@link de.uniluebeck.itm.spyglass.layer.SimpleLayer#addOrUpdate(de.uniluebeck.itm.spyglass.drawing.DrawingObject)}.
+	 * Test method for
+	 * {@link de.uniluebeck.itm.spyglass.layer.SimpleLayer#add(de.uniluebeck.itm.spyglass.drawing.DrawingObject)}
+	 * .
 	 */
 	@Test
 	public void testAddSimpleLayer() {
 		final Layer layer = new SimpleLayer();
-		
+
 		performAddTest(layer);
-		
+
 	}
 
 	@Test
@@ -112,27 +115,27 @@ public class QuadTreePerfTest {
 		final Layer layer = new SimpleLayer();
 
 		performMoveTest(layer);
-		
+
 	}
-	
+
 	@Test
 	public void testMoveQuadTree() {
-		final Layer layer = new QuadTree();
+		final Layer layer = Layer.Factory.createQuadTreeLayer();
 
 		performMoveTest(layer);
-		
+
 	}
 
 	private void performAddTest(final Layer layer) {
 		long start = System.nanoTime();
 		int lastLog = 0;
-		for (int i=0; i<OBJECTS_PER_RUN; i++) {
-			layer.addOrUpdate(dobs.get(i));
-			
-			if (i/PAUSE_AFTER_NUM_PACKETS>lastLog) {
+		for (int i = 0; i < OBJECTS_PER_RUN; i++) {
+			layer.add(dobs.get(i));
+
+			if (i / PAUSE_AFTER_NUM_PACKETS > lastLog) {
 				final long stop = System.nanoTime();
-				log.warn(String.format("%s: Time needed for adding 1000 nodes: %f ms",layer.getClass().getSimpleName(), (stop-start)/1000000d));
-				lastLog = i/PAUSE_AFTER_NUM_PACKETS;
+				log.warn(String.format("%s: Time needed for adding 1000 nodes: %f ms", layer.getClass().getSimpleName(), (stop - start) / 1000000d));
+				lastLog = i / PAUSE_AFTER_NUM_PACKETS;
 				start = System.nanoTime();
 			}
 		}
@@ -141,28 +144,28 @@ public class QuadTreePerfTest {
 
 	private void performMoveTest(final Layer layer) {
 		final Random r = new Random();
-		
+
 		// first add a couple of objects to the layer
-		for (int i=0; i<PAUSE_AFTER_NUM_PACKETS; i++) {
-			layer.addOrUpdate(dobs.get(i));
+		for (int i = 0; i < PAUSE_AFTER_NUM_PACKETS; i++) {
+			layer.add(dobs.get(i));
 		}
 
 		// now move them around
-		for (int k=0; k<RUNS; k++) {
+		for (int k = 0; k < RUNS; k++) {
 
 			final long start = System.nanoTime();
 
-			for (int i=0; i<PAUSE_AFTER_NUM_PACKETS; i++) {
+			for (int i = 0; i < PAUSE_AFTER_NUM_PACKETS; i++) {
 				final DrawingObject d = dobs.get(i);
 
 				// move the node to a new position
 				final int x = r.nextInt(1000);
 				final int y = r.nextInt(1000);
-				d.setPosition(new AbsolutePosition(x,y,0));
+				d.setPosition(new AbsolutePosition(x, y, 0));
 			}
 
 			final long stop = System.nanoTime();
-			log.warn(String.format("%s: Time needed for moving 1000 nodes: %f ms",layer.getClass().getSimpleName(), (stop-start)/1000000d));
+			log.warn(String.format("%s: Time needed for moving 1000 nodes: %f ms", layer.getClass().getSimpleName(), (stop - start) / 1000000d));
 
 		}
 

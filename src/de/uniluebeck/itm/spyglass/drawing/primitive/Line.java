@@ -34,7 +34,7 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 
 	private boolean listenerConnected = false;
 
-	private DrawingArea drawingArea;
+	protected DrawingArea drawingArea;
 
 	public Line() {
 		super();
@@ -42,6 +42,8 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
+
+		this.drawingArea = drawingArea;
 
 		if (!listenerConnected) {
 			listenerConnected = true;

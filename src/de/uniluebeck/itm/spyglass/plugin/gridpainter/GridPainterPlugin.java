@@ -10,7 +10,7 @@ package de.uniluebeck.itm.spyglass.plugin.gridpainter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
+import java.util.SortedSet;
 
 import org.eclipse.swt.graphics.RGB;
 import org.simpleframework.xml.Element;
@@ -21,7 +21,6 @@ import de.uniluebeck.itm.spyglass.drawing.Grid;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.layer.Layer;
-import de.uniluebeck.itm.spyglass.layer.QuadTree;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
@@ -45,7 +44,7 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 	public GridPainterPlugin() {
 		super(false);
 		xmlConfig = new GridPainterXMLConfig();
-		layer = new QuadTree();
+		layer = Layer.Factory.createQuadTreeLayer();
 	}
 
 	@Override
@@ -59,7 +58,7 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 		return new GridPainterPreferencePage(dialog, spyglass);
 	}
 
-	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		return layer.getDrawingObjects(area);
 	}
 
@@ -116,11 +115,12 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 	}
 
 	private void updateGrid() {
-
-		synchronized (layer) {
-			layer.remove(grid);
+		if (grid != null) {
+			synchronized (layer) {
+				layer.remove(grid);
+			}
+			fireDrawingObjectRemoved(grid);
 		}
-		fireDrawingObjectRemoved(grid);
 
 		grid = new Grid();
 		final int[] lineColor = xmlConfig.getLineColorRGB();
@@ -133,7 +133,7 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 		grid.setNumRows(xmlConfig.getNumRows());
 
 		synchronized (layer) {
-			layer.addOrUpdate(grid);
+			layer.add(grid);
 		}
 
 		fireDrawingObjectAdded(grid);

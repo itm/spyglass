@@ -8,7 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
-import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import org.simpleframework.xml.Element;
 
@@ -43,7 +44,7 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	private NodePositionListener nodePositionListener = new NodePositionListener() {
 		@Override
 		public void handleEvent(final NodePositionEvent e) {
-			
+
 			switch (e.change) {
 				case ADDED:
 					onNodeAdded(e.node, e.newPosition);
@@ -76,11 +77,11 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 
 	@Override
-	public List<DrawingObject> getAutoZoomDrawingObjects() {
+	public Set<DrawingObject> getAutoZoomDrawingObjects() {
 		return data.getDrawingObjects();
 	}
 
-	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		return data.getDrawingObjects(area);
 	}
 
@@ -118,13 +119,12 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 		final NodeSensorRangeDrawingObject nrdo = new NodeSensorRangeDrawingObject(this, xmlConfig.getDefaultConfig());
 		nrdo.setPosition(newPosition);
 		data.add(node, nrdo);
-		
-		
+
 		// don't cause a redraw if we're inactive
 		if (isActive()) {
 			fireDrawingObjectAdded(nrdo);
 		}
-		
+
 	}
 
 	private void onNodeMoved(final int node, final AbsolutePosition oldPosition, final AbsolutePosition newPosition) {
@@ -155,7 +155,7 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 		if (isActive()) {
 			fireDrawingObjectRemoved(data.remove(node));
 		}
-		
+
 	}
 
 	@Override
@@ -176,11 +176,11 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 
 	void internalFireDrawingObjectChanged(final NodeSensorRangeDrawingObject nodeSensorRangeDrawingObject) {
-		
+
 		// don't cause a redraw if we're inactive
 		if (isActive()) {
 			fireDrawingObjectChanged(nodeSensorRangeDrawingObject, nodeSensorRangeDrawingObject.getBoundingBox());
 		}
-		
+
 	}
 }

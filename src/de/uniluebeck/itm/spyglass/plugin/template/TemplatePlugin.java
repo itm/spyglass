@@ -10,7 +10,8 @@ package de.uniluebeck.itm.spyglass.plugin.template;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 import org.simpleframework.xml.Element;
 
@@ -19,7 +20,6 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.layer.Layer;
-import de.uniluebeck.itm.spyglass.layer.QuadTree;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
@@ -52,7 +52,7 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 	 * The Datastructure where to store DrawingObjects. If this plugin would not draw anything on
 	 * the DrawingArea, the layer could be ommited.
 	 */
-	private final Layer layer = new QuadTree();
+	private final Layer layer = Layer.Factory.createQuadTreeLayer();
 
 	public TemplatePlugin() {
 
@@ -71,10 +71,8 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 		return new TemplatePreferencePage(dialog, spyglass);
 	}
 
-	public List<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
-		synchronized (layer) {
-			return layer.getDrawingObjects(area);
-		}
+	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+		return layer.getDrawingObjects(area);
 	}
 
 	public static String getHumanReadableName() {
@@ -123,10 +121,8 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 	}
 
 	@Override
-	public List<DrawingObject> getAutoZoomDrawingObjects() {
-		synchronized (layer) {
-			return layer.getDrawingObjects();
-		}
+	public Set<DrawingObject> getAutoZoomDrawingObjects() {
+		return layer.getDrawingObjects();
 	}
 
 	@Override
