@@ -17,8 +17,6 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
@@ -26,8 +24,6 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * position and a color, given by the RGB components in a R8G8B8 format.
  */
 public abstract class DrawingObject {
-
-	private static final SpyglassLogger log = (SpyglassLogger) SpyglassLoggerFactory.getLogger(DrawingObject.class);
 
 	/** The position of the object's upper left point */
 	private AbsolutePosition position = new AbsolutePosition(0, 0, 0);
@@ -42,6 +38,13 @@ public abstract class DrawingObject {
 
 	/** The object's background color */
 	private RGB bgColor = new RGB(255, 255, 255);
+
+	/**
+	 * This mutex is necessary since a change of the bounding box needs to be reported to registered
+	 * listeners. A change means that there is an "old" and a new bounding box. Determining the old
+	 * and the new one is to be done in one atomic step which will be achieved by using this lock
+	 */
+	private Object updateBBMutex = new Object();
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -254,10 +257,13 @@ public abstract class DrawingObject {
 	 * @param fireBoundingBoxChangeEvent
 	 *            indicate that the listeners should be notified.
 	 */
-	protected final void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
-		final AbsoluteRectangle oldBox = this.boundingBox;
-		boundingBox = calculateBoundingBox();
-		if (fireBoundingBoxChangeEvent && ((oldBox != null) || !boundingBox.equals(oldBox))) {
+	protected synchronized final void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
+		AbsoluteRectangle oldBox = null;
+		synchronized (updateBBMutex) {
+			oldBox = this.boundingBox;
+			boundingBox = calculateBoundingBox();
+		}
+		if ((fireBoundingBoxChangeEvent && (oldBox == null)) || ((oldBox != null) && !boundingBox.equals(oldBox))) {
 			fireBoundingBoxChangeEvent(oldBox);
 		}
 	}

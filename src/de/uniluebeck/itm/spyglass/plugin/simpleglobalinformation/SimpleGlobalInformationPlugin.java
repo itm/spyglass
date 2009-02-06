@@ -291,13 +291,13 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		refreshNodeCounts();
 		final Set<StatisticalInformationEvaluator> sfSettings = xmlConfig.getStatisticalInformationEvaluators();
 
-		if (sfSettings != null) {
+		if ((sfSettings != null) && (widget != null)) {
 			widget.getDisplay().asyncExec(new Runnable() {
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
 					// the widget might have been disposed while we were waiting
-					if (widget.isDisposed()) {
+					if ((widget == null) || widget.isDisposed()) {
 						return;
 					}
 

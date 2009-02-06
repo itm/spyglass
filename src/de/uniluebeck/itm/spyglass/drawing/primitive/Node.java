@@ -177,8 +177,11 @@ public class Node extends DrawingObject {
 	 *            the drawingArea to set
 	 */
 	void setDrawingArea(final DrawingArea drawingArea) {
-		synchronized (drawingAreaMutex) {
-			this.drawingArea = drawingArea;
+		if ((this.drawingArea == null) || !this.drawingArea.equals(drawingArea)) {
+			synchronized (drawingAreaMutex) {
+				this.drawingArea = drawingArea;
+			}
+			updateBoundingBox();
 		}
 	}
 
@@ -310,7 +313,7 @@ public class Node extends DrawingObject {
 			} else {
 				setDrawingArea(drawingArea);
 			}
-			
+
 			if (!listenerConnected) {
 				listenerConnected = true;
 				drawingArea.addDrawingAreaTransformListener(this.drawingAreaListener);
@@ -341,10 +344,6 @@ public class Node extends DrawingObject {
 			// the rectangle's upper left edge represents the object location, it has to be adapted
 			final PixelPosition upperLeftRect = new PixelPosition(upperLeft.x + lineWidth / 2, upperLeft.y + lineWidth / 2);
 
-			// determine the bounding box (this time use the objects upper left point and not the
-			// adapted one
-			// boundingBox = determineBoundingBox(drawingArea, upperLeft, lineWidth, width, height);
-
 			// the new rectangle starts at the determined upper left position. Its with and height
 			// was determined in respect to the text which is to be displayed
 			final PixelRectangle pxRect = new PixelRectangle(upperLeftRect, width, height);
@@ -353,7 +352,7 @@ public class Node extends DrawingObject {
 
 			// place the string inside the rectangle with respect to the side effects of the line
 			// width (see above)
-			gc.drawText(string, 3 + upperLeftRect.x + lineWidth / 2, 3 + upperLeftRect.y + lineWidth / 2,true);
+			gc.drawText(string, 3 + upperLeftRect.x + lineWidth / 2, 3 + upperLeftRect.y + lineWidth / 2, true);
 
 			// draw an oval to indicate that the objects location is the rectangles upper left edge
 			gc.setLineWidth(lineWidth + 1);
@@ -369,7 +368,7 @@ public class Node extends DrawingObject {
 				log.error(e, e, false);
 			}
 		}
-		
+
 	}
 
 	// --------------------------------------------------------------------------------
