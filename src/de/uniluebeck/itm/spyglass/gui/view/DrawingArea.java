@@ -828,22 +828,22 @@ public class DrawingArea extends Canvas {
 	/**
 	 * Zoom in and implicitly asume that the center of the drawing area is the scale center.
 	 */
-	public void zoomIn() {
+	public void zoomIn(final double factor) {
 		this.checkWidget();
 		
-		this.zoomIn(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle()
-				.getHeight() / 2);
+		this.zoom(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle()
+				.getHeight() / 2, factor);
 		
 	}
 	
 	/**
 	 * Zoom out and implicitly asume that the center of the drawing area is the scale center.
 	 */
-	public void zoomOut() {
+	public void zoomOut(final double factor) {
 		this.checkWidget();
 		
-		this.zoomOut(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle()
-				.getHeight() / 2);
+		this.zoom(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle()
+				.getHeight() / 2, 1/factor);
 		
 	}
 	

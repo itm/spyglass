@@ -20,15 +20,6 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.UIController;
-import de.uniluebeck.itm.spyglass.gui.actions.OpenPreferencesAction;
-import de.uniluebeck.itm.spyglass.gui.actions.PlayPlayPauseAction;
-import de.uniluebeck.itm.spyglass.gui.actions.PlayResetAction;
-import de.uniluebeck.itm.spyglass.gui.actions.PlaySelectInputAction;
-import de.uniluebeck.itm.spyglass.gui.actions.RecordRecordAction;
-import de.uniluebeck.itm.spyglass.gui.actions.RecordSelectOutputAction;
-import de.uniluebeck.itm.spyglass.gui.actions.ZoomCompleteMapAction;
-import de.uniluebeck.itm.spyglass.gui.actions.ZoomInAction;
-import de.uniluebeck.itm.spyglass.gui.actions.ZoomOutAction;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketBroker;
 import de.uniluebeck.itm.spyglass.packet.PacketFactory;
@@ -70,10 +61,11 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 
 	private UIController controller = null;
 
-	
 	private IShellToSpyGlassPacketBroker packetBroker;
 
 	private AppWindow appWindow = null;
+	
+	private ToolbarHandler toolbarStuff = null;
 
 	// --------------------------------------------------------------------------
 	/**
@@ -103,8 +95,8 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			controller = new UIController(spyglass, appWindow);
 
 			// add tooltip icons
-			addIcons(container);
-
+			toolbarStuff = new ToolbarHandler(getCoolBar(), spyglass, appWindow);
+			
 			// Start Spyglass
 			spyglass.start();
 			
@@ -123,21 +115,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 
 		return new int[] { SPYGLASS_PACKET_TYPE };
 
-	}
-
-	private void addIcons(final Composite container) {
-		// Add Toolbar Actions
-		addToolBarAction(new PlaySelectInputAction(container.getShell(), spyglass));
-		addToolBarAction(new PlayPlayPauseAction(spyglass));
-		addToolBarAction(new PlayResetAction(spyglass));
-		addToolBarAction(new RecordSelectOutputAction(spyglass));
-		addToolBarAction(new RecordRecordAction(spyglass));
-		addToolBarAction(new ZoomInAction(appWindow.getGui().getDrawingArea()));
-		addToolBarAction(new ZoomOutAction(appWindow.getGui().getDrawingArea()));
-		addToolBarAction(new ZoomCompleteMapAction(spyglass, appWindow.getGui().getDrawingArea()));
-		addToolBarAction(new OpenPreferencesAction(container.getShell(), spyglass));
-		// addToolBarAction(new LoadConfigurationAction(spyglass));
-		// addToolBarAction(new StoreConfigurationAction(spyglass));
 	}
 
 	private void connectPacketBroker() {
@@ -200,6 +177,11 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		if (controller != null) {
 			controller.shutdown();
 			controller = null;
+		}
+
+		if (toolbarStuff != null) {
+			toolbarStuff.dispose();
+			toolbarStuff = null;
 		}
 
 		if (appWindow != null) {
