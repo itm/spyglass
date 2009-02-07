@@ -1,5 +1,6 @@
 package de.uniluebeck.itm.spyglass.layer;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -203,7 +204,7 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 	 * @see de.uniluebeck.itm.spyglass.layer.Layer#removeAll(java.util.Set)
 	 */
 	@Override
-	public void removeAll(final Set<DrawingObject> dos) {
+	public void removeAll(final Collection<DrawingObject> dos) {
 		if (threadSafe) {
 			synchronized (lock) {
 				for (final DrawingObject dob : dos) {

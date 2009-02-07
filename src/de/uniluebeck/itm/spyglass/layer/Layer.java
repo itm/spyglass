@@ -7,6 +7,7 @@
  */
 package de.uniluebeck.itm.spyglass.layer;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -184,6 +185,6 @@ public interface Layer {
 	 * @param dos
 	 *            the drawing objects to remove
 	 */
-	public void removeAll(final Set<DrawingObject> dos);
+	public void removeAll(final Collection<DrawingObject> dos);
 
 }

@@ -5,6 +5,7 @@
 package de.uniluebeck.itm.spyglass.layer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
@@ -192,7 +193,7 @@ public class SimpleLayer implements Layer, BoundingBoxChangeListener {
 	 * @see de.uniluebeck.itm.spyglass.layer.Layer#removeAll(java.util.Set)
 	 */
 	@Override
-	public void removeAll(final Set<DrawingObject> dos) {
+	public void removeAll(final Collection<DrawingObject> dos) {
 		for (final DrawingObject dob : dos) {
 			remove(dob);
 		}

@@ -80,15 +80,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	private final Layer layer;
 
 	/**
-	 * Objects which have recently been updated and which needs to be updated in the quad tree as
-	 * well (which is done in {@link SimpleNodePainterPlugin#updateLayer()}
-	 */
-	private final Set<DrawingObject> updatedObjects;
-
-	/** Objects which are not needed any longer */
-	private final Set<DrawingObject> obsoleteObjects;
-
-	/**
 	 * Buffers StringFormatter result strings associated with nodes and semantic types.<br>
 	 * The first map's key is the node's identifier and the second ones the semantic type.<br>
 	 * The results have to be concatenated before they can be displayed.
@@ -106,9 +97,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 */
 	private Map<Integer, Collection<Integer>> nodeSemanticTypes;
 
-	/** Temporarily stores the bounding boxes which are used during redraw events */
-	private Map<DrawingObject, AbsoluteRectangle> boundingBoxes;
-
 	/** Listens for changes of the nodes' positions */
 	private NodePositionListener npcl;
 
@@ -116,8 +104,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	private PropertyChangeListener pcl;
 
 	private volatile Boolean refreshPending = false;
-
-	private Object nodeUpdateMutex = new Object();
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -127,11 +113,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		super();
 		xmlConfig = new SimpleNodePainterXMLConfig();
 		layer = Layer.Factory.createQuadTreeLayer();
-		updatedObjects = new HashSet<DrawingObject>();
-		obsoleteObjects = new HashSet<DrawingObject>();
 		stringFormatterResults = new TreeMap<Integer, Map<Integer, String>>();
 		stringFormatterResultCache = new ConcurrentHashMap<Integer, String>();
-		boundingBoxes = new ConcurrentHashMap<DrawingObject, AbsoluteRectangle>();
 		nodeSemanticTypes = new HashMap<Integer, Collection<Integer>>();
 	}
 
@@ -167,7 +150,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					synchronized (layer) {
 						for (final DrawingObject drawingObject : layer.getDrawingObjects()) {
 							fireDrawingObjectRemoved(drawingObject);
-							boundingBoxes.remove(drawingObject);
 						}
 					}
 				}
@@ -196,11 +178,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		synchronized (layer) {
 			layer.clear();
 		}
-		synchronized (updatedObjects) {
-			updatedObjects.clear();
-		}
 		stringFormatterResults.clear();
-		boundingBoxes.clear();
 		xmlConfig.finalize();
 	}
 
@@ -265,12 +243,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				nodeSemanticTypes.get(nodeID).add(packet.getSemanticType());
 			}
 
-			synchronized (updatedObjects) {
-				// get the instance of the node's visualization
-				final Node node = getMatchingNodeObject(nodeID);
-				node.setDescription(stringFormatterResultCache.get(nodeID));
-				updatedObjects.add(node);
-			}
+			// get the instance of the node's visualization
+			final Node node = getMatchingNodeObject(nodeID);
+			final AbsoluteRectangle oldBB = new AbsoluteRectangle(node.getBoundingBox());
+			node.setDescription(stringFormatterResultCache.get(nodeID));
+			fireDrawingObjectChanged(node, oldBB);
 		}
 	}
 
@@ -292,13 +269,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			}
 		}
 
-		synchronized (updatedObjects) {
-			// get the instance of the node's visualization
-			final Node node = getMatchingNodeObject(nodeID);
-			node.setPosition(position);
-			updatedObjects.add(node);
-		}
-		updateLayer();
+		// get the instance of the node's visualization
+		final Node node = getMatchingNodeObject(nodeID);
+		final AbsoluteRectangle bb = new AbsoluteRectangle(node.getBoundingBox());
+		node.setPosition(position);
+		fireDrawingObjectChanged(node, bb);
 
 	}
 
@@ -409,9 +384,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		// considered
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
 
-		synchronized (updatedObjects) {
-			drawingObjects.addAll(updatedObjects);
-		}
 		synchronized (layer) {
 			drawingObjects.addAll(layer.getDrawingObjects());
 		}
@@ -608,21 +580,20 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 				// otherwise it needs to be updated
 				final String stringFormatterResult = stringFormatterResultCache.get(nodeID);
+				final AbsoluteRectangle oldBB = new AbsoluteRectangle(node.getBoundingBox());
 				node.update("Node " + nodeID, stringFormatterResult, xmlConfig.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(),
 						xmlConfig.getLineWidth());
-
+				fireDrawingObjectChanged(node, oldBB);
 			}
 		}
 
-		// put all nodes which have to be removed into the designated data structure
-		synchronized (obsoleteObjects) {
-			obsoleteObjects.addAll(obsoleteNodes);
+		synchronized (layer) {
+			layer.removeAll(obsoleteNodes);
 		}
 
 		// put all nodes which have to be removed into the designated data structure
-		drawingObjects.removeAll(obsoleteNodes);
-		synchronized (updatedObjects) {
-			updatedObjects.addAll(drawingObjects);
+		for (final DrawingObject node : obsoleteNodes) {
+			fireDrawingObjectRemoved(node);
 		}
 
 		// and update the layer
@@ -677,22 +648,19 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	@Override
 	protected void resetPlugin() {
 
-		synchronized (updatedObjects) {
-			updatedObjects.clear();
-		}
-
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
-		synchronized (layer) {
-			drawingObjects.addAll(layer.getDrawingObjects());
-		}
 
 		synchronized (nodeSemanticTypes) {
 			nodeSemanticTypes.clear();
 		}
 
-		synchronized (obsoleteObjects) {
-			obsoleteObjects.addAll(drawingObjects);
-			updateLayer();
+		synchronized (layer) {
+			drawingObjects.addAll(layer.getDrawingObjects());
+			layer.clear();
+		}
+
+		for (final DrawingObject drawingObject : drawingObjects) {
+			fireDrawingObjectRemoved(drawingObject);
 		}
 
 		stringFormatterResults.clear();
@@ -701,52 +669,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	// --------------------------------------------------------------------------------
 	@Override
 	protected void updateLayer() {
-
-		// copy all objects which have to be updated in a separate List and
-		// clear the original list
-		final Set<DrawingObject> update = new HashSet<DrawingObject>();
-		synchronized (updatedObjects) {
-			update.addAll(updatedObjects);
-			updatedObjects.clear();
-		}
-
-		final Set<DrawingObject> obsolete = new HashSet<DrawingObject>();
-		synchronized (obsoleteObjects) {
-			obsolete.addAll(obsoleteObjects);
-			obsoleteObjects.clear();
-		}
-
-		// if no drawing objects are available, there is no need to get the
-		// layer's lock
-		if ((update.size() == 0) && (obsolete.size() == 0)) {
-			return;
-		}
-		AbsoluteRectangle oldBB;
-
-		// catch the layer's lock and update the objects
-		synchronized (layer) {
-			if (obsolete.size() > 0) {
-				layer.removeAll(obsolete);
-			}
-		}
-
-		if (isVisible()) {
-
-			// after the lock was returned it is time to update the display ...
-			for (final DrawingObject drawingObject : update) {
-				if ((oldBB = boundingBoxes.get(drawingObject)) != null) {
-					fireDrawingObjectChanged(drawingObject, oldBB);
-				} else {
-					fireDrawingObjectAdded(drawingObject);
-				}
-				boundingBoxes.put(drawingObject, drawingObject.getBoundingBox());
-			}
-
-			for (final DrawingObject drawingObject : obsolete) {
-				fireDrawingObjectRemoved(drawingObject);
-				boundingBoxes.remove(drawingObject);
-			}
-		}
+		// nothing to do here
 	}
 
 	// --------------------------------------------------------------------------------
@@ -819,12 +742,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if ((drawingObject instanceof Node) && (((Node) drawingObject).getNodeID() == nodeID)) {
 
 				// if the object was found, put it into the set of objects to be removed
-				synchronized (obsoleteObjects) {
-					obsoleteObjects.add(drawingObject);
+				synchronized (layer) {
+					layer.remove(drawingObject);
 				}
-
-				// remove the object by calling updateQuadTree() and return
-				updateLayer();
+				fireDrawingObjectRemoved(drawingObject);
 				return;
 			}
 		}
@@ -857,13 +778,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				// check if the object is representing a node
 				if (drawingObject instanceof Node) {
 					// if so, toggle its extension state
-					final Node no = (Node) drawingObject;
-					no.setExtended(!no.isExtended());
-					xmlConfig.putExtendedInformationActive(no.getNodeID(), no.isExtended());
-					synchronized (updatedObjects) {
-						updatedObjects.add(no);
-					}
-					updateLayer();
+					final Node node = (Node) drawingObject;
+					final AbsoluteRectangle oldBB = new AbsoluteRectangle(node.getBoundingBox());
+					node.setExtended(!node.isExtended());
+					xmlConfig.putExtendedInformationActive(node.getNodeID(), node.isExtended());
+					fireDrawingObjectChanged(node, oldBB);
 				}
 				return true;
 			}
@@ -893,8 +812,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if (bbox.contains(clickPoint)) {
 				synchronized (layer) {
 					layer.bringToFront(drawingObject);
-					// since the old and the new bounding box are equal, the map needs no update
-					fireDrawingObjectChanged(drawingObject, boundingBoxes.get(drawingObject));
+					// since the old and the new bounding box are equal ...
+					fireDrawingObjectAdded(drawingObject);
 				}
 				return true;
 			}
@@ -924,12 +843,13 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if (bbox.contains(clickPoint)) {
 				synchronized (layer) {
 					layer.pushBack(drawingObject);
-					// since the old and the new bounding box are equal, the map needs no update
-					fireDrawingObjectChanged(drawingObject, boundingBoxes.get(drawingObject));
+					// since the old and the new bounding box are equal ...
+					fireDrawingObjectAdded(drawingObject);
 				}
 				return true;
 			}
 		}
 		return false;
 	}
+
 }

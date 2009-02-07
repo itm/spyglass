@@ -60,6 +60,7 @@ public class Node extends DrawingObject {
 	 */
 	private DrawingAreaTransformListener drawingAreaListener = new DrawingAreaTransformListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void handleEvent(final DrawingAreaTransformEvent e) {
 			setDrawingArea(e.drawingArea);
@@ -175,13 +176,12 @@ public class Node extends DrawingObject {
 	 * @param drawingArea
 	 *            the drawingArea to set
 	 */
-	void setDrawingArea(final DrawingArea drawingArea) {
-		if ((this.drawingArea == null) || !this.drawingArea.equals(drawingArea)) {
-			synchronized (this) {
-				this.drawingArea = drawingArea;
-			}
-			updateBoundingBox();
+	private void setDrawingArea(final DrawingArea drawingArea) {
+		synchronized (this) {
+			this.drawingArea = drawingArea;
 		}
+		updateBoundingBox();
+
 	}
 
 	// --------------------------------------------------------------------------------
@@ -306,9 +306,9 @@ public class Node extends DrawingObject {
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 
 		try {
-
-			setDrawingArea(drawingArea);
-
+			if ((this.drawingArea == null) || !this.drawingArea.equals(drawingArea)) {
+				setDrawingArea(drawingArea);
+			}
 			if (!listenerConnected) {
 				listenerConnected = true;
 				drawingArea.addDrawingAreaTransformListener(this.drawingAreaListener);
