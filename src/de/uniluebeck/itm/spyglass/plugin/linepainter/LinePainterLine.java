@@ -2,9 +2,9 @@ package de.uniluebeck.itm.spyglass.plugin.linepainter;
 
 import org.eclipse.jface.util.Geometry;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
@@ -51,22 +51,14 @@ public class LinePainterLine extends Line {
 
 		final AbsoluteRectangle lineBBox = super.calculateBoundingBox();
 
-		final Display display = Display.getDefault();
-		if ((display != null) && !display.isDisposed()) {
-			display.syncExec(new Runnable() {
-
-				@Override
-				public void run() {
-					final GC gc = new GC(Display.getDefault());
-					final Point extent = gc.textExtent(stringFormatterResult);
-					final Point position = determineStringFormatterPosition(lineBBox);
-					final Rectangle textRect = new Rectangle(position.x, position.y, extent.x + 10, extent.y + 5);
-					setBoundingBox(new AbsoluteRectangle(lineBBox.rectangle.union(textRect)));
-					gc.dispose();
-				}
-
-			});
-		}
+		final Image i = new Image(null, 1,1);
+		final GC gc = new GC(i);
+		final Point extent = gc.textExtent(stringFormatterResult);
+		final Point position = determineStringFormatterPosition(lineBBox);
+		final Rectangle textRect = new Rectangle(position.x, position.y, extent.x + 10, extent.y + 5);
+		setBoundingBox(new AbsoluteRectangle(lineBBox.rectangle.union(textRect)));
+		gc.dispose();
+		i.dispose();
 
 		return getBoundingBox();
 
