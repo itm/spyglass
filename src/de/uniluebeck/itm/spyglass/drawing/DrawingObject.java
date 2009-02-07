@@ -39,13 +39,6 @@ public abstract class DrawingObject {
 	/** The object's background color */
 	private RGB bgColor = new RGB(255, 255, 255);
 
-	/**
-	 * This mutex is necessary since a change of the bounding box needs to be reported to registered
-	 * listeners. A change means that there is an "old" and a new bounding box. Determining the old
-	 * and the new one is to be done in one atomic step which will be achieved by using this lock
-	 */
-	private Object updateBBMutex = new Object();
-
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the position of the upper left point of the <code>DrawingObject</code>.
@@ -257,12 +250,19 @@ public abstract class DrawingObject {
 	 * @param fireBoundingBoxChangeEvent
 	 *            indicate that the listeners should be notified.
 	 */
-	protected  final void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
+	protected final void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
+
 		AbsoluteRectangle oldBox = null;
-		synchronized (updateBBMutex) {
+
+		// This mutex is necessary since a change of the bounding box needs to be reported to
+		// registered listeners. A change means that there is an "old" and a new bounding box.
+		// Determining the old and the new one is to be done in one atomic step which will be
+		// achieved by using this lock
+		synchronized (this) {
 			oldBox = this.boundingBox;
 			boundingBox = calculateBoundingBox();
 		}
+
 		if ((fireBoundingBoxChangeEvent && (oldBox == null)) || ((oldBox != null) && !boundingBox.equals(oldBox))) {
 			fireBoundingBoxChangeEvent(oldBox);
 		}
