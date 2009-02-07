@@ -808,7 +808,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				synchronized (layer) {
 					layer.bringToFront(drawingObject);
 					// since the old and the new bounding box are equal ...
-					fireDrawingObjectAdded(drawingObject);
+					fireDrawingObjectChanged(drawingObject, null);
 				}
 				return true;
 			}
@@ -839,7 +839,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				synchronized (layer) {
 					layer.pushBack(drawingObject);
 					// since the old and the new bounding box are equal ...
-					fireDrawingObjectAdded(drawingObject);
+					fireDrawingObjectChanged(drawingObject,null);
 				}
 				return true;
 			}
