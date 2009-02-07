@@ -602,17 +602,18 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 			final String pps = "# PPS: [ " + perSec + " | " + per30Sec + " | " + per60Sec + " ]";
 
-			if (widget != null) {
+			if ((widget != null) && (!widget.isDisposed())) {
 				synchronized (widget) {
-					if (!widget.isDisposed()) {
-						widget.getDisplay().asyncExec(new Runnable() {
-							@Override
-							public void run() {
+					widget.getDisplay().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							if ((widget != null) && !widget.isDisposed()) {
 								widget.createOrUpdateTotalPacketCount("# Packets: " + totalPacketCount);
 								widget.createOrUpdatePacketsPerSecond(pps);
 							}
-						});
-					}
+						}
+					});
+
 				}
 			}
 		}

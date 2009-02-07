@@ -63,7 +63,6 @@ public class Node extends DrawingObject {
 		@Override
 		public void handleEvent(final DrawingAreaTransformEvent e) {
 			setDrawingArea(e.drawingArea);
-			updateBoundingBox();
 		}
 	};
 
@@ -181,7 +180,7 @@ public class Node extends DrawingObject {
 			synchronized (drawingAreaMutex) {
 				this.drawingArea = drawingArea;
 			}
-			updateBoundingBox();
+			// updateBoundingBox();
 		}
 	}
 
@@ -307,12 +306,8 @@ public class Node extends DrawingObject {
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 
 		try {
-			if (this.drawingArea == null) {
-				setDrawingArea(drawingArea);
-				updateBoundingBox();
-			} else {
-				setDrawingArea(drawingArea);
-			}
+
+			setDrawingArea(drawingArea);
 
 			if (!listenerConnected) {
 				listenerConnected = true;
