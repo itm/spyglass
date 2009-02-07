@@ -597,7 +597,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 
 		// and update the layer
-		updateLayer();
+		// XXX: method does not exist any more!
+		//updateLayer();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -664,12 +665,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 
 		stringFormatterResults.clear();
-	}
-
-	// --------------------------------------------------------------------------------
-	@Override
-	protected void updateLayer() {
-		// nothing to do here
 	}
 
 	// --------------------------------------------------------------------------------

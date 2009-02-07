@@ -169,12 +169,6 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 		data.clear();
 	}
 
-	@Override
-	protected void updateLayer() {
-		// since the plug-in is not interested in packets, nothing has to be
-		// done here
-	}
-
 	void internalFireDrawingObjectChanged(final NodeSensorRangeDrawingObject nodeSensorRangeDrawingObject) {
 
 		// don't cause a redraw if we're inactive

@@ -68,12 +68,6 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	}
 
 	@Override
-	protected void updateLayer() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public int getNumNodes() {
 		// TODO Auto-generated method stub
 		return 0;

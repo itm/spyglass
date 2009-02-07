@@ -99,14 +99,6 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 	}
 
 	@Override
-	protected void updateLayer() {
-
-		// If you want to modify the Layer, do it here.
-		// (dont forget to lock it first ;)
-
-	}
-
-	@Override
 	public void init(final PluginManager manager) throws Exception {
 
 		super.init(manager);

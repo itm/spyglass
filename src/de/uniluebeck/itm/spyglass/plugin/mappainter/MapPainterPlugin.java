@@ -214,11 +214,6 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 	}
 
-	@Override
-	protected void updateLayer() {
-		// nothing to do
-	}
-
 	/**
 	 * We synchronize to ensure that the restart of the timer and stuff won't happen twice
 	 */

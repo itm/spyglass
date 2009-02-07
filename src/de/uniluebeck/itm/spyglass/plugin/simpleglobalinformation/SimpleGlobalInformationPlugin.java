@@ -275,11 +275,6 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		refreshNodeCounts();
 	}
 
-	@Override
-	protected void updateLayer() {
-		// nothing to do here
-	}
-
 	// --------------------------------------------------------------------------------
 	/**
 	 * Performs internal refreshments of the configuration parameters.<br>

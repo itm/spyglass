@@ -364,17 +364,6 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Updates the quad tree after all sensible information provided by a packet have been
-	 * processed. This method should be processed quickly since the graphical user interface has to
-	 * wait while the quad tree is updated.
-	 * 
-	 * @throws Exception
-	 *             if anything bad happens.
-	 */
-	protected abstract void updateLayer() throws Exception;
-
-	// --------------------------------------------------------------------------------
-	/**
 	 * This method returns an identification string representing the plug-in. it is primarily used
 	 * for identifiing plug-ins (and which classes they are instantiated of) in log messages.
 	 */
@@ -419,7 +408,6 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 				final SpyglassPacket p = packetQueue.take();
 
 				processPacket(p);
-				updateLayer();
 
 			} catch (final InterruptedException e) {
 				packetConsumerThread.interrupt();

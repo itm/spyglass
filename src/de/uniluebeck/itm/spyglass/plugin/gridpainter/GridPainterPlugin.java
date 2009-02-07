@@ -90,12 +90,6 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 	}
 
 	@Override
-	protected void updateLayer() {
-		// since the plug-in is not interested in packets, nothing has to be
-		// done here
-	}
-
-	@Override
 	public void init(final PluginManager manager) throws Exception {
 
 		super.init(manager);

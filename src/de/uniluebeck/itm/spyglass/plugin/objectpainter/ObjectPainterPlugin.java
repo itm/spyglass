@@ -141,11 +141,6 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	}
 
 	@Override
-	protected void updateLayer() {
-		// nothing to do here
-	}
-
-	@Override
 	public Set<DrawingObject> getAutoZoomDrawingObjects() {
 		return layer.getDrawingObjects();
 	}

@@ -174,11 +174,6 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	}
 
 	@Override
-	protected void updateLayer() {
-		// is never called.
-	}
-
-	@Override
 	public int getNumNodes() {
 		return this.nodeMap.size();
 	}

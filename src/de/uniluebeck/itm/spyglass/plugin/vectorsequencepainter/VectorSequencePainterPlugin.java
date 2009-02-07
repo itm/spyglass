@@ -253,6 +253,8 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 
 			}
 		}
+		
+		updateLayer();
 
 	}
 
@@ -274,8 +276,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 
 	}
 
-	@Override
-	protected void updateLayer() {
+	private void updateLayer() {
 
 		synchronized (lock) {
 

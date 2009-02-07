@@ -214,6 +214,8 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 			}
 
 		}
+		
+		updateLayer();
 
 	}
 
@@ -228,8 +230,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		updateLayer();
 	}
 
-	@Override
-	protected void updateLayer() {
+	private void updateLayer() {
 
 		LinePainterLine line;
 		final List<LinePainterLine> addedLines = new ArrayList<LinePainterLine>();
