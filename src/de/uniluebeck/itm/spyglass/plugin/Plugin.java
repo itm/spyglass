@@ -85,10 +85,11 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 
 	/**
-	 * Start/STop the consumer-thread when the plugin is activated/deactivated.
+	 * Start/STop the consumer-thread when the plug-in is activated/deactivated.
 	 */
 	private PropertyChangeListener propertyActiveListener = new PropertyChangeListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
 
@@ -112,10 +113,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * 
 	 * @param packet
 	 *            The packet object to handle.
-	 * @param InterruptedException
-	 *            if an interrupt occured while this method was called.
-	 * @param Exception
-	 *            if any exception occured.
+	 * @throws InterruptedException
+	 *             if an interrupt occures while this method was called.
+	 * @throws Exception
+	 *             if any other exception occures.
 	 */
 	public void handlePacket(final SpyglassPacket packet) throws Exception {
 		// if the packet is not null, check if its semantic type is one of
@@ -126,9 +127,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			final int packetSemanticType = packet.getSemanticType();
 			for (int i = 0; i < mySemanticTypes.length; i++) {
 				// if the packets semantic type matches ...
-				
+
 				// TODO: this can be done more efficiently...
-				
+
 				if (mySemanticTypes[i] == packetSemanticType) {
 					// put it into the packet queue (the process which fetches
 					// from the queue afterwards will be notified automatically)
@@ -194,13 +195,14 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Initializes the plugin. It is called right after the plugin has been instanciated and the
-	 * configuration of the plugin is set.
+	 * Initializes the plug-in. It is called right after the plug-in has been instantiated and the
+	 * configuration of the plug-in is set.
 	 * 
 	 * This methods starts the consumer thread, if necessary.
 	 * 
 	 * @param manager
 	 *            reference to the parent PluginManager
+	 * @throws Exception
 	 * 
 	 * @see PluginXMLConfig#getActive()
 	 */
@@ -275,9 +277,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 *            the <code>Spyglass</code> instance
 	 * 
 	 * @return a widget which can be used to configure the plug-in
-	 * @throws an
-	 *             exception when the page could not be created. this will result in a user-visible
-	 *             error message
+	 * @throws Exception
+	 *             an exception when the page could not be created. this will result in a
+	 *             user-visible error message
 	 */
 	public abstract PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
 			final Spyglass spyglass) throws Exception;
@@ -319,7 +321,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @throws Exception
 	 *             any kind of exception
 	 */
-	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) throws Exception {
+	public boolean handleEvent(@SuppressWarnings("unused") final MouseEvent e, @SuppressWarnings("unused") final DrawingArea drawingArea)
+			throws Exception {
 		return false;
 	}
 
@@ -372,8 +375,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * This method returns an identification string representing the plugin. it is primarily used
-	 * for identifiing plugins (and which classes they are instanciated of) in log messages.
+	 * This method returns an identification string representing the plug-in. it is primarily used
+	 * for identifiing plug-ins (and which classes they are instantiated of) in log messages.
 	 */
 	@Override
 	public abstract String toString();
@@ -411,13 +414,13 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 		while (!packetConsumerThread.isInterrupted()) {
 			try {
-				
+
 				// waits for the arrival of a new packet
 				final SpyglassPacket p = packetQueue.take();
 
 				processPacket(p);
 				updateLayer();
-				
+
 			} catch (final InterruptedException e) {
 				packetConsumerThread.interrupt();
 			} catch (final Exception e) {
@@ -426,7 +429,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		}
 
 		packetQueue.clear();
-		
+
 		log.debug("The PacketConsumerThread of the plug-in named '" + getInstanceName() + " stopped.");
 
 	}
@@ -458,7 +461,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Fire a DrawingObjectChanged event.
+	 * Fire a DrawingObjectChanged event.<br>
+	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
 	 * 
 	 * @param dob
 	 *            The DrawingObject, which has been modified
@@ -467,50 +471,59 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 *            drawing object occupies (at least) the same space as before the modification).
 	 */
 	protected final void fireDrawingObjectChanged(final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
-		// Get listeners
-		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
 
-		// Fire the event (call-back method)
-		for (int i = list.length - 1; i >= 0; i -= 1) {
-			if (oldBoundingBox != null) {
-				((DrawingObjectListener) list[i]).drawingObjectChanged(dob, oldBoundingBox);
-			} else {
-				((DrawingObjectListener) list[i]).drawingObjectChanged(dob, dob.getBoundingBox());
+		if (isActive() && isVisible()) {
+			// Get listeners
+			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+
+			// Fire the event (call-back method)
+			for (int i = list.length - 1; i >= 0; i -= 1) {
+				if (oldBoundingBox != null) {
+					((DrawingObjectListener) list[i]).drawingObjectChanged(dob, oldBoundingBox);
+				} else {
+					((DrawingObjectListener) list[i]).drawingObjectChanged(dob, dob.getBoundingBox());
+				}
 			}
 		}
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Fire a DrawingObjectAdded event.
+	 * Fire a DrawingObjectAdded event.<br>
+	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
 	 * 
 	 * @param dob
 	 *            The DrawingObject, which has been added
 	 */
 	protected final void fireDrawingObjectAdded(final DrawingObject dob) {
-		// Get listeners
-		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+		if (isActive() && isVisible()) {
+			// Get listeners
+			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
 
-		// Fire the event (call-back method)
-		for (int i = list.length - 1; i >= 0; i -= 1) {
-			((DrawingObjectListener) list[i]).drawingObjectAdded(dob);
+			// Fire the event (call-back method)
+			for (int i = list.length - 1; i >= 0; i -= 1) {
+				((DrawingObjectListener) list[i]).drawingObjectAdded(dob);
+			}
 		}
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Fire a DrawingObjectRemoved event.
+	 * Fire a DrawingObjectRemoved event.<br>
+	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
 	 * 
 	 * @param dob
 	 *            The DrawingObject, which has been removed
 	 */
 	protected final void fireDrawingObjectRemoved(final DrawingObject dob) {
-		// Get listeners
-		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+		if (isActive() && isVisible()) {
+			// Get listeners
+			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
 
-		// Fire the event (call-back method)
-		for (int i = list.length - 1; i >= 0; i -= 1) {
-			((DrawingObjectListener) list[i]).drawingObjectRemoved(dob);
+			// Fire the event (call-back method)
+			for (int i = list.length - 1; i >= 0; i -= 1) {
+				((DrawingObjectListener) list[i]).drawingObjectRemoved(dob);
+			}
 		}
 	}
 
@@ -525,9 +538,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	}
 
 	/**
-	 * Is called before the plugin is removed or before spyglass shuts down.
+	 * Is called before the plug-in is removed or before spyglass shuts down.
 	 * 
-	 * This method will be called exactly once, at the end of the lifetime of the plugin. It's
+	 * This method will be called exactly once, at the end of the lifetime of the plug-in. It's
 	 * purpose is to clean up behind, kill (eventually) remaining threads and unregister any
 	 * listeners (if necessary).
 	 * 
