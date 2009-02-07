@@ -257,7 +257,7 @@ public abstract class DrawingObject {
 	 * @param fireBoundingBoxChangeEvent
 	 *            indicate that the listeners should be notified.
 	 */
-	protected synchronized final void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
+	protected  final void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
 		AbsoluteRectangle oldBox = null;
 		synchronized (updateBBMutex) {
 			oldBox = this.boundingBox;
