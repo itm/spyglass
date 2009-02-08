@@ -1,0 +1,102 @@
+<!-- a sample configuration file for the packet generator
+ -->
+<packetGenerator>
+
+	<!-- number of nodes sent per second -->
+	<packetsPerSecond>1</packetsPerSecond>
+
+	<!-- Sinks which will handle each generated packet. -->
+	<sinks>
+		<!-- this sink opens a socket, from which iShell can fetch the packets. -->
+		<sink class="de.uniluebeck.itm.spyglass.packetgenerator.sinks.IShellSocketSink">
+			<ip>0.0.0.0</ip>
+			<port>8472</port>
+			<iShellSourceNode>1</iShellSourceNode>
+		</sink>
+		<!-- this sink writes the packets into the given file. -->
+		<sink class="de.uniluebeck.itm.spyglass.packetgenerator.sinks.FileSink">
+			<filename>generator.txt</filename>
+			<append>false</append>
+		</sink>
+
+	</sinks>
+
+	<sampleChooser>
+		<!-- list of samples from which the packets are generated. each sample
+		 ! has a given probability of being selected. when editing this file you
+		 ! must make sure that the probabilities add up to 1.0 ! -->
+		<samples>
+			<!-- The PayloadSample is currently the only available sampleType.
+			 ! it creates a packet header based on the abstract data given below
+			 ! and adds an raw payload. -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<!-- this field is not used. -->
+				<name>demo sample1</name>
+				
+				<!-- the probability that this sample is selected -->
+				<probability>0.2</probability>
+				
+				<!-- a list of node IDs. the IDs can be seperated by commata. additionally
+				 ! they can be given as a range. for each packet a node ID is randomly selected.
+				 ! -->				 
+				<nodeIDs>1</nodeIDs>
+				
+				<!-- the syntaxType. -->
+				<syntaxType>uint16List</syntaxType>
+				
+				<!-- a list of semantic types. the types can be seperated by commata. additionally
+				 ! they can be given as a range. for each packet a type is randomly selected.
+				 ! -->				 
+				<semanticTypes>9</semanticTypes>
+				
+				<!-- the position of the packets. as with the nodeIDs and the semanticTypes,
+				 ! lists or ranges can be given. -->
+				<position x="40-100" y="6-10" z="0"/>
+				
+				<!-- the payload in hexadecimal -->
+				<payload>00020003</payload>
+			</sample>
+			
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample2</name>
+				<probability>0.2</probability>
+				<nodeIDs>2</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>9</semanticTypes>
+				<position x="40-100" y="6-10" z="0"/>
+				<payload>00010003</payload>
+			</sample>
+			
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample3</name>
+				<probability>0.2</probability>
+				<nodeIDs>3</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>9</semanticTypes>
+				<position x="40-100" y="6-10" z="0"/>
+				<payload>0001000200040005</payload>
+			</sample>
+			
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample4</name>
+				<probability>0.2</probability>
+				<nodeIDs>4</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>9</semanticTypes>
+				<position x="40-100" y="6-10" z="0"/>
+				<payload>00030005</payload>
+			</sample>
+			
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>demo sample5</name>
+				<probability>0.2</probability>
+				<nodeIDs>5</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>9</semanticTypes>
+				<position x="40-100" y="6-10" z="0"/>
+				<payload>00030004</payload>
+			</sample>
+		</samples>
+	</sampleChooser>
+	
+</packetGenerator>
