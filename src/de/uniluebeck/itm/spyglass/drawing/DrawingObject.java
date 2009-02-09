@@ -12,6 +12,7 @@ import javax.swing.event.EventListenerList;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
@@ -252,19 +253,43 @@ public abstract class DrawingObject {
 	 */
 	protected final void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
 
-		AbsoluteRectangle oldBox = null;
+		final AbsoluteRectangle oldBox = new AbsoluteRectangle();
 
-		// This mutex is necessary since a change of the bounding box needs to be reported to
-		// registered listeners. A change means that there is an "old" and a new bounding box.
-		// Determining the old and the new one is to be done in one atomic step which will be
-		// achieved by using this lock
-		synchronized (this) {
-			oldBox = this.boundingBox;
-			boundingBox = calculateBoundingBox();
-		}
+		final Display display = Display.getDefault();
+		if ((display != null) && !display.isDisposed()) {
+			display.syncExec(new Runnable() {
+				// --------------------------------------------------------------------------------
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see java.lang.Runnable#run()
+				 */
+				@SuppressWarnings("synthetic-access")
+				@Override
+				public void run() {
 
-		if ((fireBoundingBoxChangeEvent && (oldBox == null)) || ((oldBox != null) && !boundingBox.equals(oldBox))) {
-			fireBoundingBoxChangeEvent(oldBox);
+					if (display.isDisposed()) {
+						return;
+					}
+
+					// This mutex is necessary since a change of the bounding box needs to be
+					// reported to registered listeners. A change means that there is an "old"
+					// and a new bounding box.
+					// Determining the old and the new one is to be done in one atomic step which
+					// will be achieved by using this lock
+					synchronized (this) {
+						if (boundingBox != null) {
+							oldBox.inherit(boundingBox);
+						}
+						boundingBox = calculateBoundingBox();
+					}
+
+				}
+			});
+
+			if ((fireBoundingBoxChangeEvent && (oldBox == null)) || ((oldBox != null) && !boundingBox.equals(oldBox))) {
+				fireBoundingBoxChangeEvent(oldBox);
+			}
 		}
 	}
 

@@ -105,6 +105,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	private volatile Boolean refreshPending = false;
 
+	private Map<Integer, Node> nodes = new HashMap<Integer, Node>();
+
+	private DrawingArea drawingArea = null;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -148,7 +152,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				// if the plug-in is no longer visible, hide its graphical objects
 				else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_VISIBLE) && !((Boolean) evt.getNewValue())) {
 					synchronized (layer) {
-						for (final DrawingObject drawingObject : layer.getDrawingObjects()) {
+						for (final DrawingObject drawingObject : nodes.values()) {
 							fireDrawingObjectRemoved(drawingObject);
 						}
 					}
@@ -177,6 +181,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		super.finalize();
 		synchronized (layer) {
 			layer.clear();
+			nodes.clear();
 		}
 		stringFormatterResults.clear();
 		xmlConfig.finalize();
@@ -380,28 +385,13 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 */
 	private synchronized Node getMatchingNodeObject(final int nodeID) {
 
-		// all drawing objects which are currently in the layer or to be updated have to be
-		// considered
-		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
-
-		synchronized (layer) {
-			drawingObjects.addAll(layer.getDrawingObjects());
-		}
-
 		Node node = null;
-		DrawingArea drawingArea = null;
-
-		// if there is already an instance of the node's visualization
-		// available it has to be updated
-		for (final DrawingObject drawingObject : drawingObjects) {
-			if (drawingObject instanceof Node) {
-				node = (Node) drawingObject;
-				drawingArea = node.getDrawingArea();
-
-				// if the matching node is found ...
-				if (node.getNodeID() == nodeID) {
-					return node;
+		synchronized (layer) {
+			if ((node = nodes.get(nodeID)) != null) {
+				if (drawingArea == null) {
+					drawingArea = node.getDrawingArea();
 				}
+				return node;
 			}
 		}
 
@@ -428,14 +418,15 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
 
-		final Node no = new Node(nodeID, "Node " + nodeID, "", isExtended, lineColorRGB, lineWidth, drawingArea, getPluginManager()
+		final Node node = new Node(nodeID, "Node " + nodeID, "", isExtended, lineColorRGB, lineWidth, drawingArea, getPluginManager()
 				.getNodePositioner().getPosition(nodeID));
 
 		synchronized (layer) {
-			layer.add(no);
+			layer.add(node);
+			nodes.put(nodeID, node);
 		}
 
-		return no;
+		return node;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -558,12 +549,12 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		// delete all cached string formatter results which are no longer needed
 		purgeStringFormatterResults();
 
-		final List<DrawingObject> obsoleteNodes = new LinkedList<DrawingObject>();
+		final List<Node> obsoleteNodes = new LinkedList<Node>();
 
 		// get all drawing objects from the layer
 		final List<DrawingObject> drawingObjects = new LinkedList<DrawingObject>();
 		synchronized (layer) {
-			drawingObjects.addAll(layer.getDrawingObjects());
+			drawingObjects.addAll(nodes.values());
 		}
 
 		// process and update or remove all objects which represent nodes
@@ -584,21 +575,21 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				node.update("Node " + nodeID, stringFormatterResult, xmlConfig.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(),
 						xmlConfig.getLineWidth());
 				fireDrawingObjectChanged(node, oldBB);
+
 			}
 		}
 
 		synchronized (layer) {
-			layer.removeAll(obsoleteNodes);
+			for (final Node node : obsoleteNodes) {
+				layer.remove(node);
+				nodes.remove(node.getNodeID());
+			}
 		}
 
 		// put all nodes which have to be removed into the designated data structure
 		for (final DrawingObject node : obsoleteNodes) {
 			fireDrawingObjectRemoved(node);
 		}
-
-		// and update the layer
-		// XXX: method does not exist any more!
-		//updateLayer();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -658,6 +649,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		synchronized (layer) {
 			drawingObjects.addAll(layer.getDrawingObjects());
 			layer.clear();
+			nodes.clear();
 		}
 
 		for (final DrawingObject drawingObject : drawingObjects) {
@@ -721,29 +713,24 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	private void handleNodeTimeout(final int nodeID) {
 
 		// get all the layer's drawing objects
-		final List<DrawingObject> dos = new LinkedList<DrawingObject>();
+		Node node = null;
 		synchronized (layer) {
-			dos.addAll(layer.getDrawingObjects());
-		}
-
-		// since the node does not exist any more, its list of associated semantic types can
-		// be removed
-		synchronized (nodeSemanticTypes) {
-			nodeSemanticTypes.remove(nodeID);
-		}
-
-		// look for the node object with the matching identifier
-		for (final DrawingObject drawingObject : dos) {
-			if ((drawingObject instanceof Node) && (((Node) drawingObject).getNodeID() == nodeID)) {
-
-				// if the object was found, put it into the set of objects to be removed
-				synchronized (layer) {
-					layer.remove(drawingObject);
-				}
-				fireDrawingObjectRemoved(drawingObject);
-				return;
+			if ((node = nodes.get(nodeID)) != null) {
+				layer.remove(node);
+				nodes.remove(nodeID);
 			}
+
 		}
+
+		if (node != null) {
+			// since the node does not exist any more, its list of associated semantic types can
+			// be removed
+			synchronized (nodeSemanticTypes) {
+				nodeSemanticTypes.remove(nodeID);
+			}
+
+		}
+
 	}
 
 	// --------------------------------------------------------------------------------
@@ -838,8 +825,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if (bbox.contains(clickPoint)) {
 				synchronized (layer) {
 					layer.pushBack(drawingObject);
+
 					// since the old and the new bounding box are equal ...
-					fireDrawingObjectChanged(drawingObject,null);
+					fireDrawingObjectChanged(drawingObject, null);
 				}
 				return true;
 			}

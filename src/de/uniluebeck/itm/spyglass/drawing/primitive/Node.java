@@ -6,7 +6,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
@@ -41,8 +40,6 @@ public class Node extends DrawingObject {
 
 	private int lineWidth;
 
-	// private Object drawingAreaMutex = new Object();
-
 	private DrawingArea drawingArea;
 
 	/**
@@ -64,14 +61,7 @@ public class Node extends DrawingObject {
 		@SuppressWarnings("synthetic-access")
 		@Override
 		public void handleEvent(final DrawingAreaTransformEvent e) {
-			final Display display = Display.getDefault();
-			if ((display != null) && display.isDisposed()) {
-				display.syncExec(new Runnable() {
-					public void run() {
-						updateBoundingBox();
-					}
-				});
-			}
+			updateBoundingBox();
 		}
 	};
 
