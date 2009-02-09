@@ -11,6 +11,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.window.ApplicationWindow;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.DeviceData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -31,20 +32,21 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 public class SpyglassApp extends ApplicationWindow {
 	private static Logger log = SpyglassLoggerFactory.getLogger(SpyglassApp.class);
 	
-	Spyglass spyglass;
-	
-	AppWindow appWindow;
-	
-	UIController uic;
+	private Spyglass spyglass;
+		
+	private UIController uic;
 	
 	// -------------------------------------------------------------------------
 	/**
 	 * @throws IOException 
 	 * 
 	 */
-	public SpyglassApp(final Shell shell) throws Exception {
+	public SpyglassApp(final Shell shell) {
 		super(shell);
 		this.setBlockOnOpen(true);
+		addMenuBar();
+		addStatusLine();
+		addToolBar(SWT.None);
 
 	}
 	
@@ -55,18 +57,20 @@ public class SpyglassApp extends ApplicationWindow {
 		SpyglassEnvironment.setIShellPlugin(false);
 		try {
 			spyglass = new Spyglass();
+
+			// View
+			final AppWindow appWindow = new AppWindow(spyglass, getShell());
 			
+			// Control
+			uic = new UIController(spyglass, appWindow);
+			
+			new ToolbarHandler(getToolBarManager(), spyglass, appWindow);
+
 		} catch (final Exception e) {
 			// TODO Auto-generated catch block
 			log.error("",e);
 		}
 		
-		// View
-		final AppWindow appWindow = new AppWindow(spyglass, getShell());
-		
-		// Control
-		new UIController(spyglass, appWindow);
-
 		return parent;
 	}
 
@@ -81,7 +85,13 @@ public class SpyglassApp extends ApplicationWindow {
 	
 	public void shutdown() {
 
-		spyglass.shutdown();
+		if (uic != null) {
+			uic.shutdown();
+		}
+
+		if (spyglass != null) {
+			spyglass.shutdown();
+		}
 		
 	}
 
@@ -90,7 +100,7 @@ public class SpyglassApp extends ApplicationWindow {
 	 * @throws IOException 
 	 * 
 	 */
-	public static void main(final String[] args) throws Exception {
+	public static void main(final String[] args) {
 
 		// SWT stuff
 		final DeviceData data = new DeviceData();
@@ -100,9 +110,10 @@ public class SpyglassApp extends ApplicationWindow {
 		final Shell shell = new Shell(display);
 
 		final SpyglassApp app = new SpyglassApp(shell);
-		
+				
 		app.open();
 		app.shutdown();
+		shell.dispose();
 
 	}
 	

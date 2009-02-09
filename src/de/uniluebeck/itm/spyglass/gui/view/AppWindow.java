@@ -9,6 +9,8 @@ package de.uniluebeck.itm.spyglass.gui.view;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.SWTButcherClass;
 import org.eclipse.swt.graphics.Sleak;
 import org.eclipse.swt.widgets.Composite;
@@ -21,7 +23,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 /**
  * 
  */
-public class AppWindow {
+public class AppWindow implements DisposeListener {
 	private static Logger log = SpyglassLoggerFactory.getLogger(AppWindow.class);
 
 	private Display display = null;
@@ -53,6 +55,8 @@ public class AppWindow {
 
 		this.display = parent.getDisplay();
 		gui = new SpyglassGuiComponent(parent, SWT.NULL, spyglass);
+		
+		parent.addDisposeListener(this);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -79,9 +83,14 @@ public class AppWindow {
 		this.display = display;
 	}
 	
-	public void dispose() {
+	// --------------------------------------------------------------------------------
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+	 */
+	@Override
+	public void widgetDisposed(final DisposeEvent e) {
 		if (gui != null) {
-			gui.dispose();
+			this.gui.dispose();
 		}
 	}
 

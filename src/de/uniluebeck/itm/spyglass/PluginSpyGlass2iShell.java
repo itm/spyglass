@@ -184,11 +184,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			toolbarStuff = null;
 		}
 
-		if (appWindow != null) {
-			appWindow.dispose();
-			appWindow = null;
-		}
-
 		if (spyglass != null) {
 			spyglass.shutdown();
 			spyglass = null;

@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -49,7 +50,9 @@ public class ToolbarHandler {
 	 * The coolbar the toolbar is based on
 	 */
 	private CoolBar coolbar;
-	
+
+	private ToolBar toolbar;
+
 	private Spyglass spyglass;
 	private AppWindow appWindow;
 	
@@ -69,19 +72,31 @@ public class ToolbarHandler {
 		this.spyglass = spyglass;
 		this.appWindow = appWindow;
 		
+		man = new ToolBarManager();
+		
+		man.createControl(coolbar);
+		
+		addIcons();
+	}
+
+	public ToolbarHandler(final ToolBarManager man, final Spyglass spyglass, final AppWindow appWindow) {
+		this.spyglass = spyglass;
+		this.appWindow = appWindow;
+		
+		this.man = man;
+
+		this.toolbar = man.getControl();
+
 		addIcons();
 	}
 	
+
 	/**
 	 * Add icons to the given coolbar
 	 */
 	private void addIcons() {
 		
-		man = new ToolBarManager();
-		
-		man.createControl(coolbar);
-		
-		man.add(new PlaySelectInputAction(coolbar.getShell(), spyglass));
+		man.add(new PlaySelectInputAction(man.getControl().getShell(), spyglass));
 		man.add(new PlayPlayPauseAction(spyglass));
 		man.add(new PlayResetAction(spyglass));
 		man.add(new RecordSelectOutputAction(spyglass));
@@ -91,13 +106,16 @@ public class ToolbarHandler {
 		zoomOutAction = new ZoomAction(appWindow.getGui().getDrawingArea(), Type.ZOOM_OUT);
 		man.add(zoomOutAction);
 		man.add(new ZoomCompleteMapAction(spyglass, appWindow.getGui().getDrawingArea()));
-		man.add(new OpenPreferencesAction(coolbar.getShell(), spyglass));
+		man.add(new OpenPreferencesAction(man.getControl().getShell(), spyglass));
 		
 		man.update(false);
 
-		final Point p = man.getControl().computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		final CoolItem item = new CoolItem (coolbar, SWT.NONE);
-		item.setPreferredSize (p);
+		// TODO: this can be done smarter
+		if (coolbar != null) {
+			final Point p = man.getControl().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+			final CoolItem item = new CoolItem (coolbar, SWT.NONE);
+			item.setPreferredSize (p);
+		}
 
 		// save the items for ZoomIn/Out for later
 		zoomInItem = man.getControl().getItems()[5];
