@@ -10,8 +10,10 @@ package de.uniluebeck.itm.spyglass;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.graphics.DeviceData;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -26,63 +28,82 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * Application class for wrapping the Spyglass core class and it's user interface/GUI. It
  * instantiate and injects the core classes that are needed to run the application.
  */
-public class SpyglassApp {
+public class SpyglassApp extends ApplicationWindow {
 	private static Logger log = SpyglassLoggerFactory.getLogger(SpyglassApp.class);
+	
+	Spyglass spyglass;
+	
+	AppWindow appWindow;
+	
+	UIController uic;
 	
 	// -------------------------------------------------------------------------
 	/**
 	 * @throws IOException 
 	 * 
 	 */
-	public SpyglassApp() throws Exception {
-		log.info("New SpyGlass instance.");
-		
-		// GUI
-		final DeviceData data = new DeviceData();
-		data.tracking = true;
-		data.debug = true;
-		final Display display = new Display(data);
-		
-		final Shell shell = new Shell(display);
-		shell.setLayout(new FillLayout());
-		shell.layout();
-		shell.setText("Spyglass");
-		shell.setSize(800, 600);
-		shell.open();
+	public SpyglassApp(final Shell shell) throws Exception {
+		super(shell);
+		this.setBlockOnOpen(true);
+
+	}
+	
+	@Override
+	protected Control createContents(final Composite parent) {
 		
 		// Model
 		SpyglassEnvironment.setIShellPlugin(false);
-		final Spyglass spyglass = new Spyglass();
+		try {
+			spyglass = new Spyglass();
+			
+		} catch (final Exception e) {
+			// TODO Auto-generated catch block
+			log.error("",e);
+		}
 		
 		// View
-		final AppWindow appWindow = new AppWindow(spyglass, shell);
+		final AppWindow appWindow = new AppWindow(spyglass, getShell());
 		
 		// Control
 		new UIController(spyglass, appWindow);
+
+		return parent;
+	}
+
+	@Override
+	protected void configureShell(final Shell shell) {
+		super.configureShell(shell);
 		
-		// Start Spyglass
-		spyglass.start();
+		shell.setText("Spyglass");
+		shell.setSize(800, 600);
 		
-		// SWT message loop
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-		
-		spyglass.shutdown();
-		
-		log.info("SpyGlass end. Done.");
 	}
 	
+	public void shutdown() {
+
+		spyglass.shutdown();
+		
+	}
+
 	// -------------------------------------------------------------------------
 	/**
 	 * @throws IOException 
 	 * 
 	 */
 	public static void main(final String[] args) throws Exception {
-		log.info("Starting SpyGlass app.");
-		new SpyglassApp();
+
+		// SWT stuff
+		final DeviceData data = new DeviceData();
+		data.tracking = true;
+		data.debug = true;
+		final Display display = new Display(data);
+		final Shell shell = new Shell(display);
+
+		final SpyglassApp app = new SpyglassApp(shell);
+		
+		app.open();
+		app.shutdown();
+
 	}
 	
 }
