@@ -66,9 +66,9 @@ public class Node extends DrawingObject {
 		public void handleEvent(final DrawingAreaTransformEvent e) {
 			final Display display = Display.getDefault();
 			if ((display != null) && display.isDisposed()) {
-				display.asyncExec(new Runnable() {
+				display.syncExec(new Runnable() {
 					public void run() {
-						setDrawingArea(e.drawingArea);
+						updateBoundingBox();
 					}
 				});
 			}
@@ -401,6 +401,7 @@ public class Node extends DrawingObject {
 	protected AbsoluteRectangle calculateBoundingBox() {
 
 		synchronized (this) {
+
 			// to prevent NPEs
 			AbsolutePosition pos = getPosition();
 			if (pos == null) {
