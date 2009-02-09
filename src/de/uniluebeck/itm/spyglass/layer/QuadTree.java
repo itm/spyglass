@@ -57,11 +57,17 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 	public void add(final DrawingObject d) {
 		if (threadSafe) {
 			synchronized (lock) {
+				if (insertionOrder.containsKey(d)) {
+					throw new RuntimeException("Don't do double insert, no no ;-)");
+				}
 				d.addBoundingBoxChangedListener(this);
 				insertionOrder.put(d, ++insertionOrderLargest);
 				tree.insertItem(d, d.getBoundingBox().rectangle);
 			}
 		} else {
+			if (insertionOrder.containsKey(d)) {
+				throw new RuntimeException("Don't do double insert, no no ;-)");
+			}
 			d.addBoundingBoxChangedListener(this);
 			insertionOrder.put(d, ++insertionOrderLargest);
 			tree.insertItem(d, d.getBoundingBox().rectangle);
