@@ -119,52 +119,19 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 
 			final PixelPosition pos = drawingArea.absPoint2PixelPoint(getPosition());
 			final PixelPosition end = drawingArea.absPoint2PixelPoint(lineEnd);
-		
+
 			final int bbUpperLeftX = Math.min(end.x, pos.x) - ((int) Math.ceil((((double) lineWidth) / 2)));
 			final int bbUpperLeftY = Math.min(end.y, pos.y) - ((int) Math.ceil((((double) lineWidth) / 2)));
-		
+
 			final int bbWidth = Math.abs(end.x - pos.x) + lineWidth;
 			final int bbHeight = Math.abs(end.y - pos.y) + lineWidth;
-		
+
 			final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidth, bbHeight);
-		
+
 			return drawingArea.pixelRect2AbsRect(bbArea);
 
 		}
-		
-	}
 
-	public boolean equals(final Line other) {
-		final AbsolutePosition op = other.getPosition();
-		final AbsolutePosition oe = other.lineEnd;
-		final AbsolutePosition p = getPosition();
-		final AbsolutePosition e = lineEnd;
-		return ((p.x == op.x) && (p.y == op.y) && (p.z == op.z) && (e.x == oe.x) && (e.y == oe.y) && (e.z == oe.z))
-				|| ((p.x == oe.x) && (p.y == oe.y) && (p.z == oe.z) && (e.x == op.x) && (e.y == op.y) && (e.z == op.z));
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((lineEnd == null) ? 0 : lineEnd.hashCode());
-		result = prime * result + lineWidth;
-		return result;
-	}
-
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final Line other = (Line) obj;
-		return equals(other);
 	}
 
 	@Override

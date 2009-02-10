@@ -9,6 +9,7 @@ package de.uniluebeck.itm.spyglass.plugin;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
 import java.util.EventListener;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -26,6 +27,7 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
+import de.uniluebeck.itm.spyglass.util.Tuple;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
@@ -449,6 +451,39 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
+	 * Fire a DrawingObjectChanged event for all drawing objects in <code>dobs</code>.<br />
+	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
+	 * 
+	 * @param dobs
+	 *            the drawing objects which changed (tuple.first) and the old bounding box of the
+	 *            drawing objects (tuple.second)
+	 */
+	protected final void fireDrawingObjectChanged(final Collection<Tuple<? extends DrawingObject, AbsoluteRectangle>> dobs) {
+
+		if (isActive() && isVisible()) {
+			// Get listeners
+			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+
+			// Fire the event (call-back method)
+			for (int i = list.length - 1; i >= 0; i -= 1) {
+
+				for (final Tuple<? extends DrawingObject, AbsoluteRectangle> dob : dobs) {
+
+					if (dob.second != null) {
+						((DrawingObjectListener) list[i]).drawingObjectChanged(dob.first, dob.second);
+					} else {
+						((DrawingObjectListener) list[i]).drawingObjectChanged(dob.first, dob.first.getBoundingBox());
+					}
+
+				}
+
+			}
+		}
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
 	 * Fire a DrawingObjectChanged event.<br>
 	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
 	 * 
@@ -477,7 +512,28 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Fire a DrawingObjectAdded event.<br>
+	 * Fire a DrawingObjectAdded event for all drawing objects in <code>dobs</code>.<br />
+	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
+	 * 
+	 * @param dobs
+	 */
+	protected final void fireDrawingObjectAdded(final Collection<? extends DrawingObject> dobs) {
+		if (isActive() && isVisible()) {
+			// Get listeners
+			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+
+			// Fire the event (call-back method)
+			for (int i = list.length - 1; i >= 0; i -= 1) {
+				for (final DrawingObject dob : dobs) {
+					((DrawingObjectListener) list[i]).drawingObjectAdded(dob);
+				}
+			}
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Fire a DrawingObjectAdded event.<br />
 	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
 	 * 
 	 * @param dob
@@ -497,7 +553,29 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Fire a DrawingObjectRemoved event.<br>
+	 * Fire a DrawingObjectRemoved event for all drawing objects in <code>dobs</code>.<br />
+	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
+	 * 
+	 * @param dob
+	 *            The DrawingObject, which has been removed
+	 */
+	protected final void fireDrawingObjectRemoved(final Collection<? extends DrawingObject> dobs) {
+		if (isActive() && isVisible()) {
+			// Get listeners
+			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+
+			// Fire the event (call-back method)
+			for (int i = list.length - 1; i >= 0; i -= 1) {
+				for (final DrawingObject dob : dobs) {
+					((DrawingObjectListener) list[i]).drawingObjectRemoved(dob);
+				}
+			}
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Fire a DrawingObjectRemoved event.<br />
 	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
 	 * 
 	 * @param dob
