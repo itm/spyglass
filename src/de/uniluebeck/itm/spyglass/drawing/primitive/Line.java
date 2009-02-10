@@ -40,6 +40,92 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 		super();
 	}
 
+	private static class Point {
+
+		double x, y;
+
+		public Point(final double x, final double y) {
+			this.x = x;
+			this.y = y;
+		}
+
+		@Override
+		public String toString() {
+			return "(" + x + "," + y + ")";
+		}
+
+	}
+
+	private static int outCodes(final Point point, final Rectangle rect) {
+
+		int code = 0;
+
+		if (point.y > rect.y + rect.height) {
+			code += 1; /* code for above */
+		} else if (point.y < rect.y) {
+			code += 2; /* code for below */
+		}
+
+		if (point.x > rect.x + rect.width) {
+			code += 4; /* code for right */
+		} else if (point.x < rect.x) {
+			code += 8; /* code for left */
+		}
+
+		return code;
+
+	}
+
+	private static boolean cohenSutherlandClip(final Point p1, final Point p2, final Rectangle rect) {
+
+		int outCode1, outCode2;
+
+		while (true) {
+
+			outCode1 = outCodes(p1, rect);
+			outCode2 = outCodes(p2, rect);
+
+			// do reject check
+			if ((outCode1 & outCode2) != 0) {
+				return false;
+			}
+
+			// do accept check
+			if ((outCode1 == 0) && (outCode2 == 0)) {
+				return true;
+			}
+
+			if (outCode1 == 0) {
+				double tempCoord;
+				int tempCode;
+				tempCoord = p1.x;
+				p1.x = p2.x;
+				p2.x = tempCoord;
+				tempCoord = p1.y;
+				p1.y = p2.y;
+				p2.y = tempCoord;
+				tempCode = outCode1;
+				outCode1 = outCode2;
+				outCode2 = tempCode;
+			}
+
+			if ((outCode1 & 1) != 0) {
+				p1.x += (p2.x - p1.x) * (rect.y + rect.height - p1.y) / (p2.y - p1.y);
+				p1.y = rect.y + rect.height;
+			} else if ((outCode1 & 2) != 0) {
+				p1.x += (p2.x - p1.x) * (rect.y - p1.y) / (p2.y - p1.y);
+				p1.y = rect.y;
+			} else if ((outCode1 & 4) != 0) {
+				p1.y += (p2.y - p1.y) * (rect.x + rect.width - p1.x) / (p2.x - p1.x);
+				p1.x = rect.x + rect.width;
+			} else if ((outCode1 & 8) != 0) {
+				p1.y += (p2.y - p1.y) * (rect.x - p1.x) / (p2.x - p1.x);
+				p1.x = rect.x;
+			}
+		}
+
+	}
+
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 
@@ -56,16 +142,13 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 
 		final PixelPosition start = drawingArea.absPoint2PixelPoint(this.getPosition());
 		final PixelPosition end = drawingArea.absPoint2PixelPoint(this.getEnd());
-		final Rectangle clipping = gc.getClipping();
-		final PixelRectangle pxBoundingBox = drawingArea.absRect2PixelRect(getBoundingBox());
 
-		// should evade some unnecessary painting, not all, but it's better than nothing
-		if (pxBoundingBox.rectangle.intersects(clipping)) {
+		final Point startPoint = new Point(start.x, start.y);
+		final Point endPoint = new Point(end.x, end.y);
 
-			gc.setClipping(clipping);
-			gc.drawLine(start.x, start.y, end.x, end.y);
-			// System.out.println("(" + start.x + ", " + start.y + ", " + end.x + ", " + end.y +
-			// ")");
+		if (cohenSutherlandClip(startPoint, endPoint, gc.getClipping())) {
+
+			gc.drawLine((int) startPoint.x, (int) startPoint.y, (int) endPoint.x, (int) endPoint.y);
 
 		}
 

@@ -349,11 +349,15 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 			if ((pos1 != null) && (pos2 != null)) {
 
-				e = data.getExistingEdge(senderId, neighboorId);
+				synchronized (lock) {
+					e = data.getExistingEdge(senderId, neighboorId);
+				}
 
 				if (e != null) {
 
-					data.updateEdgeTime(e);
+					synchronized (lock) {
+						data.updateEdgeTime(e);
+					}
 
 				} else {
 
@@ -376,9 +380,11 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 					LinePainterLine addedLine;
 
 					synchronized (lock) {
+
 						data.addEdge(e);
 						layer.add(e.line);
 						addedLine = e.line;
+
 					}
 
 					// fire the event outside of the synchronized block
