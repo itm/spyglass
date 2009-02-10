@@ -37,6 +37,7 @@ import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // ------------------------------------------------------------------------------
 // --
@@ -117,13 +118,19 @@ public class UIController {
 		 */
 		appWindow.getGui().getDrawingArea().addMouseListener(mouseListener);
 
-		/*
-		 * Add DrawingObjectListeners to all current and future plug-ins (used for knowing when to
-		 * update the drawing area)
-		 */
 		final List<Plugin> plugins = spyglass.getPluginManager().getPlugins();
 		for (final Plugin p : plugins) {
 			if (p instanceof Drawable) {
+
+				/*
+				 * Add property listener, to listen to visibility/acitivty changes
+				 */
+				p.getXMLConfig().addPropertyChangeListener(this.pluginPropertyListener);
+
+				/*
+				 * Add DrawingObjectListeners to all current and future plug-ins (used for knowing when to
+				 * update the drawing area)
+				 */
 				p.addDrawingObjectListener(drawingObjectListener);
 			}
 		}
@@ -359,16 +366,35 @@ public class UIController {
 	/**
 	 * Listener for changes in the configuration of an plug-in.<br>
 	 */
-	PropertyChangeListener pluginPropertyListener = new PropertyChangeListener() {
+	private PropertyChangeListener pluginPropertyListener = new PropertyChangeListener() {
 
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
 
-			// if the config of any plugin changes, better redraw the entire screen.
-			// TODO: in a perfect world this should be unneseccary, since the plugins would
-			// have done this themselves.
-			appWindow.getGui().getDrawingArea().redraw();
+			/**
+			 * Redraw the entire screen if visibilty or activity of a plugin
+			 * changes.
+			 */
+			if (evt.getPropertyName().equalsIgnoreCase(PluginXMLConfig.PROPERTYNAME_ACTIVE)
+					|| evt.getPropertyName().equalsIgnoreCase(PluginXMLConfig.PROPERTYNAME_VISIBLE)) {
+
+				display.asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+
+						if (!appWindow.getGui().getDrawingArea().isDisposed()) {
+							appWindow.getGui().getDrawingArea().redraw();
+						}
+
+					}
+				});
+					
+			}
+
+				
 		}
+			
 	};
 
 	// ----------------------------------------------------------------
@@ -376,7 +402,7 @@ public class UIController {
 	 * Listener for change of visibility of ruler
 	 */
 
-	PropertyChangeListener rulerPropertyListener = new PropertyChangeListener() {
+	private PropertyChangeListener rulerPropertyListener = new PropertyChangeListener() {
 
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
