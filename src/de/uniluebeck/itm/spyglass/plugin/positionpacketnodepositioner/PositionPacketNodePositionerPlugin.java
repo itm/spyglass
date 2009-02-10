@@ -24,6 +24,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionEvent;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
@@ -45,7 +46,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	/**
 	 * Time for scheduling packet removals
 	 */
-	private final Timer timer = new Timer("PositionPacketNodePositioner NodeTimeout-Timer");
+	private Timer timer = null;
 
 	/**
 	 * Hashmap containing the position information.
@@ -60,6 +61,13 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	 */
 	public PositionPacketNodePositionerPlugin() {
 		config = new PositionPacketNodePositionerXMLConfig();
+	}
+
+	@Override
+	public void init(final PluginManager manager) throws Exception {
+		super.init(manager);
+		
+		timer = new Timer("PositionPacketNodePositioner NodeTimeout-Timer");
 
 		// Check every second for old nodes
 		timer.schedule(new TimerTask() {
@@ -70,6 +78,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 			}
 
 		}, 1000, 100);
+
 	}
 
 	@Override

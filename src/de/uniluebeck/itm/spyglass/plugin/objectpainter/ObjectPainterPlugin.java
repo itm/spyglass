@@ -28,6 +28,7 @@ import de.uniluebeck.itm.spyglass.packet.Int16ListPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.Int16ListPacket.TrajectorySection;
 import de.uniluebeck.itm.spyglass.plugin.NeedsMetric;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
@@ -49,7 +50,7 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	/**
 	 * Timer used for updating the trajectories
 	 */
-	private final Timer timer = new Timer();
+	private Timer timer = null;
 
 	/**
 	 * List of trajectories. Each trajectory is a TimerTask in our timer.
@@ -89,6 +90,13 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	@Override
 	public ObjectPainterXMLConfig getXMLConfig() {
 		return config;
+	}
+
+	@Override
+	public void init(final PluginManager manager) throws Exception {
+		super.init(manager);
+		
+		timer = new Timer("ObjectPainter-Timer");
 	}
 
 	@Override

@@ -174,6 +174,9 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 		super.shutdown();
 		xmlConfig.removePropertyChangeListener(this);
 		reset();
+		if (timer != null) {
+			timer.cancel();
+		}
 	}
 
 	private Sequence getEqualSequence(final Sequence seq) {
@@ -423,4 +426,6 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 		}
 
 	}
+	
+	
 }

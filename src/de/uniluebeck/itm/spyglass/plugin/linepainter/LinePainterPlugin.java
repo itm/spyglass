@@ -436,7 +436,8 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	}
 
 	@Override
-	public void shutdown() {
+	public void shutdown() throws Exception {
+		super.shutdown();
 
 		xmlConfig.removePropertyChangeListener(this);
 		pluginManager.removeNodePositionListener(this);
@@ -450,6 +451,10 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		}
 
 		fireDrawingObjectRemoved(dos);
+		
+		if (timer != null) {
+			timer.cancel();
+		}
 
 	}
 

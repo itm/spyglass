@@ -53,7 +53,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 	private volatile boolean dataChanged = true;
 
-	private Timer timer = new Timer("MapPainter-Timer");
+	private Timer timer = null;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -105,6 +105,8 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	@Override
 	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
+		
+		timer = new Timer("MapPainter-Timer");
 
 		createMap();
 

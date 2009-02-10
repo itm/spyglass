@@ -26,6 +26,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionEvent;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionData;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
@@ -45,8 +46,8 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 	private Map<Integer, Vector<Integer>> neighbours = new ConcurrentHashMap<Integer, Vector<Integer>>(16, 0.75f, 1);
 
-	private final Timer timeoutTimer = new Timer("SpringEmbedderPositioner NodeTimeout-Timer");
-	private final Timer repositionTimer = new Timer("SpringEmbedderPositioner Reposition-Timer");
+	private Timer timeoutTimer = null;
+	private Timer repositionTimer = null;
 
 	/**
 	 * Hashmap containing the position information.
@@ -58,6 +59,15 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 	public SpringEmbedderPositionerPlugin() {
 		xmlConfig = new SpringEmbedderPositionerXMLConfig();
+
+	}
+
+	@Override
+	public void init(final PluginManager manager) throws Exception {
+		super.init(manager);
+
+		timeoutTimer = new Timer("SpringEmbedderPositioner NodeTimeout-Timer");
+		repositionTimer = new Timer("SpringEmbedderPositioner Reposition-Timer");
 
 		// Check every second for old nodes
 		timeoutTimer.schedule(new TimerTask() {
@@ -79,6 +89,14 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 		}, 1000, 100);
 
+	}
+
+	@Override
+	public void shutdown() throws Exception {
+		super.shutdown();
+		
+		this.timeoutTimer.cancel();
+		this.repositionTimer.cancel();
 	}
 
 	@Override
