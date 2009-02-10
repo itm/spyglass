@@ -42,6 +42,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -876,4 +877,19 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	public void selectPreferencePage(final Plugin p) {
 		preferenceDialog.selectPreferenceNode(p);
 	}
+	
+	public static void main(final String[] args) {
+		try {
+			final Display display = Display.getDefault();
+			final Shell shell = new Shell(display);
+			final Spyglass sg = new Spyglass();
+			final PluginPreferenceDialog inst = new PluginPreferenceDialog(shell, sg);
+			inst.open();
+			sg.shutdown();
+		} catch (final Exception e) {
+			log.error("Error while spyglassing.",e);
+		}
+	}
+
+
 }
