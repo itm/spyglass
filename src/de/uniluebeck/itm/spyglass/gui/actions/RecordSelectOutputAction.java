@@ -34,12 +34,12 @@ public class RecordSelectOutputAction extends Action {
 	
 	@Override
 	public String getToolTipText() {
-		return "Select Output";
+		return "Select output file";
 	}
 	
 	@Override
 	public String getText() {
-		return "Select Output";
+		return "Select output file";
 	}
 	
 	@Override

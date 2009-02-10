@@ -40,7 +40,7 @@ public class PlayPlayPauseAction extends Action {
 	
 	@Override
 	public String getText() {
-		return isPaused ? "Play" : "Pause";
+		return isPaused ? "Resume" : "Pause";
 	}
 	
 	@Override

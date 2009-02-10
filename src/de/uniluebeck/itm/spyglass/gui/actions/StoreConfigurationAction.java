@@ -72,7 +72,7 @@ public class StoreConfigurationAction extends Action {
 	
 	@Override
 	public String getText() {
-		return "Store Configuration";
+		return "&Save file";
 	}
 	
 	@Override

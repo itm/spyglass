@@ -83,7 +83,7 @@ public class RecordRecordAction extends Action {
 	
 	@Override
 	public String getToolTipText() {
-		return isRecording ? "Pause" : "Record";
+		return isRecording ? "Pause recording" : "Start recording";
 	}
 	
 	@Override

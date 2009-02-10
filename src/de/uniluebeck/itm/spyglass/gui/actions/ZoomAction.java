@@ -9,6 +9,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Display;
 
+import de.uniluebeck.itm.spyglass.SpyglassApp;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
@@ -38,6 +39,8 @@ public class ZoomAction extends Action implements IPropertyChangeListener {
 	}
 	
 	private final DrawingArea drawingArea;
+	
+	private final SpyglassApp app;
 
 	private final Type type;
 
@@ -67,23 +70,43 @@ public class ZoomAction extends Action implements IPropertyChangeListener {
 	
 	public ZoomAction(final DrawingArea da, final Type type) {
 		this.drawingArea = da;
+		app = null;
+		this.type = type;
+
+		this.addPropertyChangeListener(this);
+	}
+
+	public ZoomAction(final SpyglassApp da, final Type type) {
+		this.app = da;
+		drawingArea = null;
 		this.type = type;
 
 		this.addPropertyChangeListener(this);
 	}
 	
+
 	@Override
 	public void run() {
-		// do nothing
+		
+		if (app != null) {
+			switch (type) {
+				case ZOOM_IN:
+					app.getDrawingArea().zoomIn(DrawingArea.ZOOM_FACTOR);
+					break;
+				case ZOOM_OUT:
+					app.getDrawingArea().zoomOut(DrawingArea.ZOOM_FACTOR);
+					break;
+			}
+		}
 	};
 	
 	@Override
 	public String getText() {
 		switch (type) {
 			case ZOOM_IN:
-				return "Zoom In";
+				return "Zoom &in";
 			case ZOOM_OUT:
-				return "Zoom Out";
+				return "Zoom &out";
 		}
 		return "";
 	}

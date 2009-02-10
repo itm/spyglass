@@ -26,7 +26,7 @@ public class OpenPreferencesAction extends Action {
 	
 	@Override
 	public String getText() {
-		return "Open Preferences";
+		return "&Preferences";
 	}
 	
 	@Override

@@ -63,7 +63,7 @@ public class DrawingArea extends Canvas {
 	/**
 	 * Scale factor applied while zooming.
 	 */
-	private final double ZOOM_FACTOR = 1.1;
+	public final static double ZOOM_FACTOR = 1.1;
 	
 	/**
 	 * Maximum zoom level allowed (since world-coordinates are integer, there is no point in

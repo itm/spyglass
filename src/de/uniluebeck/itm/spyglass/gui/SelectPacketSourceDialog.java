@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 import de.uniluebeck.itm.spyglass.core.PacketRecorder;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gateway.FileReaderGateway;
@@ -115,6 +116,11 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 
 		buttonFile = new Button(group1, SWT.RADIO);
 		buttonFile.setText("File");
+
+		// disable the button if we're running standalone
+		if (!SpyglassEnvironment.isIshellPlugin()) {
+			buttoniShell.setEnabled(false);
+		}
 
 		final Composite wrapper = new Composite(group1, SWT.BORDER);
 		wrapper.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, false, false));

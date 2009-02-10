@@ -37,6 +37,8 @@ public class SpyglassEnvironment {
 	private static final String PROPERTY_CONFIG_FILE_IMAGE_DIR = "image_dir";
 	private static final String PROPERTY_CONFIG_ISHELL = "configfile_ishell";
 	private static final String PROPERTY_CONFIG_STANDALONE = "configfile_standalone";
+	private static final String PROPERTY_CONFIG_STANDALONE_SIZE_X = "screensize_x";
+	private static final String PROPERTY_CONFIG_STANDALONE_SIZE_Y = "screensize_y";
 
 	/**
 	 * our property store
@@ -92,6 +94,8 @@ public class SpyglassEnvironment {
 			props.setProperty(PROPERTY_CONFIG_STANDALONE, "config/DefaultSpyglassConfigStandalone.xml");
 			props.setProperty(PROPERTY_CONFIG_FILE_WORKING_DIR, "config/");
 			props.setProperty(PROPERTY_CONFIG_FILE_IMAGE_DIR, "image/");
+			props.setProperty(PROPERTY_CONFIG_STANDALONE_SIZE_X, "800");
+			props.setProperty(PROPERTY_CONFIG_STANDALONE_SIZE_Y, "600");
 			storeProps(props);
 		}
 	}
@@ -108,7 +112,7 @@ public class SpyglassEnvironment {
 	/**
 	 * Returns true, if Spyglass is running as an iShell Plugin
 	 */
-	static boolean isIshellPlugin() {
+	public static boolean isIshellPlugin() {
 		return isIShellPlugin;
 	}
 	
@@ -122,6 +126,36 @@ public class SpyglassEnvironment {
 		} else {
 			return new File(props.getProperty(PROPERTY_CONFIG_STANDALONE));
 		}
+	}
+
+	/**
+	 * size of window
+	 */
+	public static int getWindowSizeX() {
+		return Integer.parseInt(props.getProperty(PROPERTY_CONFIG_STANDALONE_SIZE_X));
+	}
+
+	/**
+	 * size of window
+	 */
+	public static int getWindowSizeY() {
+		return Integer.parseInt(props.getProperty(PROPERTY_CONFIG_STANDALONE_SIZE_Y));
+	}
+
+	/**
+	 * size of window
+	 */
+	public static void setWindowSizeX(final int size) throws IOException  {
+		props.setProperty(PROPERTY_CONFIG_STANDALONE_SIZE_X, size+"");
+		storeProps(props);
+	}
+
+	/**
+	 * size of window
+	 */
+	public static void setWindowSizeY(final int size) throws IOException  {
+		props.setProperty(PROPERTY_CONFIG_STANDALONE_SIZE_Y, size+"");
+		storeProps(props);
 	}
 
 	/**

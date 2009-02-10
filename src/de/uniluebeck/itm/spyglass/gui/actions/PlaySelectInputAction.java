@@ -35,12 +35,12 @@ public class PlaySelectInputAction extends Action {
 
 	@Override
 	public String getText() {
-		return "Select Input";
+		return "Select input";
 	}
 
 	@Override
 	public String getToolTipText() {
-		return "Select Input";
+		return "Select input";
 	}
 
 	@Override

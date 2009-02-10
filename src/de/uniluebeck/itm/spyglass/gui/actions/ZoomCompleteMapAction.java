@@ -8,6 +8,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 
+import de.uniluebeck.itm.spyglass.SpyglassApp;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
@@ -33,8 +34,10 @@ public class ZoomCompleteMapAction extends Action {
 	
 	private final Spyglass spyglass;
 	
-	private final DrawingArea drawingArea;
+	private  DrawingArea drawingArea;
 	
+	private final SpyglassApp app;
+
 	/**
 	 * This Listener is called when the drawingArea is redrawn.
 	 */
@@ -50,11 +53,18 @@ public class ZoomCompleteMapAction extends Action {
 		}
 		
 	};
-	
-	public ZoomCompleteMapAction(final Spyglass spyglass, final DrawingArea drawingArea) {
+
+	public ZoomCompleteMapAction( final Spyglass spyglass, final DrawingArea drawingArea) {
 		this.spyglass = spyglass;
 		this.drawingArea = drawingArea;
+		this.app = null;
 		drawingArea.addPaintListener(spyglassListener);
+	}
+	
+	public ZoomCompleteMapAction(final SpyglassApp da, final Spyglass spyglass) {
+		this.app = da;
+		this.spyglass = spyglass;
+		this.drawingArea = null;
 	}
 	
 	/**
@@ -117,7 +127,7 @@ public class ZoomCompleteMapAction extends Action {
 			
 			// allow a new thread to be created
 			t = null;
-			
+		
 			// log.debug("Stopped ZOOM_COMPLETE_MAP thread.");
 		}
 
@@ -160,6 +170,12 @@ public class ZoomCompleteMapAction extends Action {
 	public void run() {
 		log.debug("Pressed button ZOOM_COMPLETE_MAP.");
 		
+		if ((app != null) && (drawingArea == null)) {
+			drawingArea = app.getDrawingArea();
+			drawingArea.addPaintListener(spyglassListener);
+		}
+		
+
 		// Only start one thread at a time
 		if (t == null) {
 			

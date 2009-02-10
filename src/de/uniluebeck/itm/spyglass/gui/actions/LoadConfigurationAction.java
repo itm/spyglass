@@ -70,7 +70,7 @@ public class LoadConfigurationAction extends Action {
 
 	@Override
 	public String getText() {
-		return "Load Configuration";
+		return "&Open file";
 	}
 
 	@Override
