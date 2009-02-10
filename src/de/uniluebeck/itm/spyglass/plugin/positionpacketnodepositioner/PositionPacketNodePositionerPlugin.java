@@ -36,7 +36,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * 
  */
 public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
-	
+
 	private static Logger log = SpyglassLoggerFactory.getLogger(PositionPacketNodePositionerPlugin.class);
 
 	@Element(name = "parameters")
@@ -53,7 +53,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	 * Set concurrency level to "2", since only two threads (PacketHandler and the TimeoutTimer)
 	 * will modify the map.
 	 */
-	private final Map<Integer, PositionData> nodeMap = new ConcurrentHashMap<Integer, PositionData>(16,0.75f,2);
+	private final Map<Integer, PositionData> nodeMap = new ConcurrentHashMap<Integer, PositionData>(16, 0.75f, 2);
 
 	/**
 	 * Constructor
@@ -98,7 +98,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 				if (System.currentTimeMillis() - time > config.getTimeout() * 1000) {
 
 					final AbsolutePosition oldPos = data.position;
-					
+
 					// remove the element from our map
 					it.remove();
 
@@ -144,14 +144,14 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 		final int id = packet.getSenderId();
 
-		// check if we already know about this noed
+		// check if we already know about this node
 		final PositionData oldData = nodeMap.get(id);
-		
+
 		final AbsolutePosition newPos = packet.getPosition().clone();
 
 		// Just overwrite the old PositionData object
 		this.nodeMap.put(id, new PositionData(newPos, System.currentTimeMillis()));
-		
+
 		// TODO: Optimization: combine multiple events into one object
 
 		// only send events when the position really changes.
@@ -187,9 +187,11 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	public List<Integer> getNodeList() {
 		return new ArrayList<Integer>(this.nodeMap.keySet());
 	}
-	
+
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.uniluebeck.itm.spyglass.plugin.Plugin#shutdown()
 	 */
 	@Override

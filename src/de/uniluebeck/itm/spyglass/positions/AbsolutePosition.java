@@ -43,23 +43,50 @@ public class AbsolutePosition extends AbstractPosition {
 	 * 
 	 */
 	@Override
-	public AbsolutePosition mult(final double d) {
-		return new AbsolutePosition((int) (x * d), (int) (y * d), (int) (z * d));
+	public void mult(final double d) {
+		x = this.mult(x, d);
+		y = this.mult(y, d);
+		z = this.mult(z, d);
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public AbsolutePosition add(final AbsolutePosition p) {
-		return new AbsolutePosition(x + p.x, y + p.y, z + p.z);
+	@Override
+	public void add(final AbstractPosition p) {
+		x = this.add(x, p.x);
+		y = this.add(y, p.y);
+		z = this.add(z, p.z);
 	}
 
 	/**
 	 * 
 	 */
-	public double getDistance(final AbsolutePosition other) {
+	public double getEuclideanDistance(final AbsolutePosition other) {
 		return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2) + Math.pow(this.z - other.z, 2));
+	}
+
+	public AbsolutePosition getDistanceVector(final AbsolutePosition other) {
+		return new AbsolutePosition(other.x - this.x, other.y - this.y, other.z - this.z);
+	}
+
+	private int add(final int a, final int b) {
+		int result = a + b;
+
+		result = Math.min(result, (int) Math.pow(2, 15));
+		result = Math.max(result, (int) -Math.pow(2, 15));
+
+		return result;
+	}
+
+	private int mult(final int a, final double b) {
+		int result = (int) Math.round(a * b);
+
+		result = Math.min(result, (int) Math.pow(2, 15));
+		result = Math.max(result, (int) -Math.pow(2, 15));
+
+		return result;
 	}
 
 }

@@ -11,7 +11,7 @@ import org.eclipse.swt.graphics.Point;
  * @author Dariush Forouher
  */
 public class PixelPosition extends AbstractPosition {
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Create a new instance based on an SWT point.
@@ -21,34 +21,37 @@ public class PixelPosition extends AbstractPosition {
 	public PixelPosition(final Point point) {
 		super(point.x, point.y, 0);
 	}
-	
+
 	public PixelPosition(final int x, final int y) {
 		super(x, y, 0);
 	}
-	
+
 	public PixelPosition(final Point2D point) {
 		super(point);
 	}
-	
+
 	public PixelPosition() {
 		//
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
 	@Override
-	public PixelPosition mult(final double d) {
-		return new PixelPosition((int) (x * d), (int) (y * d));
+	public void mult(final double d) {
+		x = (int) (x * d);
+		y = (int) (y * d);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	public PixelPosition add(final AbsolutePosition p) {
-		return new PixelPosition(x + p.x, y + p.y);
+	@Override
+	public void add(final AbstractPosition p) {
+		x = x + p.x;
+		y = y + p.y;
 	}
-	
+
 }

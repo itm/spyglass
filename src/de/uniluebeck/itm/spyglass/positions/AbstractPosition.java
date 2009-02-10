@@ -64,13 +64,14 @@ public abstract class AbstractPosition implements Cloneable {
 	/**
 	 * 
 	 */
-	public abstract AbstractPosition mult(final double d);
+	public abstract void mult(final double d);
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 */
-	// public abstract AbstractPosition add(final AbstractPosition p);
+	public abstract void add(final AbstractPosition p);
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Indicates whether some other object is "equal to" this one according to their coordinate

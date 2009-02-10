@@ -13,7 +13,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
  * (the nodeID itself is not part of this object)
  * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class PositionData {
 
@@ -21,16 +21,21 @@ public class PositionData {
 	 * Current position of the node
 	 */
 	public AbsolutePosition position;
-	
+
 	/**
 	 * Timestamp (in millies) when the node was last seen.
 	 */
-	public long lastSeen; 
+	public long lastSeen;
 
-	
 	public PositionData(final AbsolutePosition position, final long lastSeen) {
 		super();
 		this.position = position;
 		this.lastSeen = lastSeen;
+	}
+
+	@Override
+	public PositionData clone() {
+		return new PositionData(position, lastSeen);
+
 	}
 }
