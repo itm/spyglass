@@ -1,11 +1,10 @@
 package de.uniluebeck.itm.spyglass.gui.actions;
 
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.window.ApplicationWindow;
 
 public class ExitSpyglassAction extends Action {
 	
-	private final ImageDescriptor imageDescriptor = getImageDescriptor("open_preferences.png");
+//	private final ImageDescriptor imageDescriptor = getImageDescriptor("open_preferences.png");
 	
 	private final ApplicationWindow window;
 	
@@ -25,12 +24,12 @@ public class ExitSpyglassAction extends Action {
 	
 	@Override
 	public String getToolTipText() {
-		return "Open Preferences";
+		return "Exit Spyglass";
 	}
 	
-	@Override
-	public ImageDescriptor getImageDescriptor() {
-		return imageDescriptor;
-	}
+//	@Override
+//	public ImageDescriptor getImageDescriptor() {
+//		return imageDescriptor;
+//	}
 	
 }
