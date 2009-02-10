@@ -128,18 +128,35 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		// private final TextCellEditor cellEditor;
 
+		// private Plugin plugin;
+
 		public NameEditing(final TableViewer viewer) {
 			super(viewer);
 			// cellEditor = new TextCellEditor(viewer.getTable());
+			// cellEditor.addPropertyChangeListener(new IPropertyChangeListener() {
+			// @Override
+			// public void propertyChange(final org.eclipse.jface.util.PropertyChangeEvent event) {
+			// final String name = (String) cellEditor.getValue();
+			// for (final Plugin p : spyglass.getPluginManager().getPlugins()) {
+			// if ((p != plugin) && name.equals(p.getXMLConfig().getName())) {
+			// setValid(false);
+			// setErrorMessage("Plugin names must be unique!");
+			// }
+			// }
+			// setValid(true);
+			// }
+			// });
 		}
 
 		@Override
 		protected boolean canEdit(final Object arg0) {
-			return true;
+			// return true;
+			return false;
 		}
 
 		@Override
 		protected CellEditor getCellEditor(final Object arg0) {
+			// plugin = (Plugin) arg0;
 			// return cellEditor;
 			return null;
 		}
@@ -151,8 +168,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		@Override
 		protected void setValue(final Object arg0, final Object arg1) {
-			// TODO unique name validation (!!!)
-			// ((Plugin) arg0).getXMLConfig().setName((String) arg1);
+			// ((Plugin) arg0).getXMLConfig().setName(((String) arg1));
 			// pluginTableViewer.update(arg0, new String[] { COLUMN_NAME });
 		}
 	}

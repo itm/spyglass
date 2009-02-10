@@ -42,7 +42,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -145,8 +144,11 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		};
 
 		private MenuItem menuItemActivate;
+
 		private MenuItem menuItemVisible;
+
 		private MenuItem menuItemDeactivate;
+
 		private MenuItem menuItemInvisible;
 
 		private MenuItem menuItemDeleteInstance;
@@ -519,7 +521,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		preferenceDialog = new CustomPreferenceDialog(parentShell, preferenceManager);
 		addPreferenceNodes();
 
-	}
+	};
 
 	private void addPreferenceNodes() {
 
@@ -536,21 +538,6 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 		addPreferenceNodesRecursive(buildClassTree(pluginTypes), pluginManagerPreferenceNode);
 
-	};
-
-	private PluginPreferenceNode createInstancePreferenceNode(final Plugin p) throws Exception {
-		final PluginPreferenceNode node = new PluginPreferenceNode(getPreferenceNodeId(p), p.createPreferencePage(this, spyglass), p);
-		// add to hashmap (needed for lookup when removing instances)
-		instancePreferenceNodes.put(p, node);
-		return node;
-	}
-
-	private CustomPreferenceNode createTypePreferenceNode(final Class<? extends Plugin> clazz) {
-		// add to hashmap (needed for lookup when adding instances)
-		final CustomPreferenceNode node = new CustomPreferenceNode(clazz.getCanonicalName(), getPluginName(clazz), getPluginImageDescriptor(),
-				getTypePreferencePage(clazz));
-		typePreferenceNodes.put(clazz, node);
-		return node;
 	}
 
 	private void addPreferenceNodesRecursive(final ClassTree classTree, final PreferenceNode parentPreferenceNode) {
@@ -581,7 +568,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 				preferenceNode.add(createInstancePreferenceNode(p));
 
 			} catch (final Exception e) {
-				log.error("An error occured while adding the preference page for plugin "+p+". I'll ignore this plugin.", e);
+				log.error("An error occured while adding the preference page for plugin " + p + ". I'll ignore this plugin.", e);
 			}
 
 		}
@@ -592,11 +579,6 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 		}
 
-
-	}
-
-	private String getPreferenceNodeId(final Plugin p) {
-		return p.getClass().getCanonicalName() + "_" + p.hashCode();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -662,6 +644,25 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		}
 	}
 
+	private ImageDescriptor createImageDescriptor(final String fileName) {
+		return ImageDescriptor.createFromURL(getResourceUrl(fileName));
+	}
+
+	private PluginPreferenceNode createInstancePreferenceNode(final Plugin p) throws Exception {
+		final PluginPreferenceNode node = new PluginPreferenceNode(getPreferenceNodeId(p), p.createPreferencePage(this, spyglass), p);
+		// add to hashmap (needed for lookup when removing instances)
+		instancePreferenceNodes.put(p, node);
+		return node;
+	}
+
+	private CustomPreferenceNode createTypePreferenceNode(final Class<? extends Plugin> clazz) {
+		// add to hashmap (needed for lookup when adding instances)
+		final CustomPreferenceNode node = new CustomPreferenceNode(clazz.getCanonicalName(), getPluginName(clazz), getPluginImageDescriptor(),
+				getTypePreferencePage(clazz));
+		typePreferenceNodes.put(clazz, node);
+		return node;
+	}
+
 	private ImageDescriptor getPluginImageDescriptor() {
 		return createImageDescriptor("plugin.png");
 	}
@@ -687,6 +688,10 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 	}
 
+	private String getPreferenceNodeId(final Plugin p) {
+		return p.getClass().getCanonicalName() + "_" + p.hashCode();
+	}
+
 	private URL getResourceUrl(final String suffix) {
 		return PluginPreferenceDialog.class.getResource(suffix);
 	}
@@ -696,10 +701,6 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		fd.setFilterExtensions(new String[] { "*.xml" });
 		final String path = fd.open();
 		return path == null ? null : new File(path);
-	}
-
-	private ImageDescriptor createImageDescriptor(final String fileName) {
-		return ImageDescriptor.createFromURL(getResourceUrl(fileName));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -716,79 +717,6 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 		return null;
 
-	}
-
-	private boolean isAbstract(final Class<? extends Plugin> clazz) {
-
-		return Modifier.isAbstract(clazz.getModifiers());
-
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return see {@link org.eclipse.jface.window.Window#open()}
-	 */
-	public int open() {
-		spyglass.getPluginManager().addPluginListChangeListener(this);
-		return preferenceDialog.open();
-	}
-
-	@Override
-	public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
-		switch (what) {
-			case NEW_PLUGIN:
-				onPluginAdded(p);
-				break;
-			case PLUGIN_REMOVED:
-				onPluginRemoved(p);
-				break;
-			case PRIORITY_CHANGED:
-				// nothing to do, since PluginManagerPreferencePage
-				// receives the event itself and refreshes
-				break;
-		}
-	}
-
-	private void onPluginAdded(final Plugin p) {
-		try {
-			typePreferenceNodes.get(p.getClass()).add(createInstancePreferenceNode(p));
-		} catch (final Exception e) {
-			log.error("The preference page of plugin "+p+" could not be created.",e);
-		}
-		preferenceDialog.getTreeViewer().refresh();
-	}
-
-	private void onPluginRemoved(final Plugin p) {
-		removePreferenceNode(instancePreferenceNodes.get(p), preferenceManager.getRootSubNodes());
-		preferenceDialog.selectPreferenceNode(p.getClass(), false);
-	}
-
-	private boolean removePreferenceNode(final IPreferenceNode node, final IPreferenceNode[] parentNodes) {
-		boolean removed;
-		for (final IPreferenceNode parentNode : parentNodes) {
-			if (parentNode == node) {
-				return preferenceManager.remove(parentNode);
-			}
-			removed = removePreferenceNode(node, parentNode);
-			if (removed) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean removePreferenceNode(final IPreferenceNode node, final IPreferenceNode parentNode) {
-		boolean removed;
-		for (final IPreferenceNode pn : parentNode.getSubNodes()) {
-			if (pn == node) {
-				return parentNode.remove(pn);
-			}
-			removed = removePreferenceNode(node, pn);
-			if (removed) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -834,18 +762,6 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		return hashUnsavedChanges;
 	}
 
-	private boolean proceedIfUnsavedChanges() {
-
-		if (hasUnsavedChanges()) {
-			final String message = "The currently opened preference page contains unsaved changes. Are you sure you want to proceed?";
-			final boolean ok = MessageDialog.openQuestion(preferenceDialog.getShell(), "Unsaved changes", message);
-			return ok;
-		}
-
-		return true;
-
-	}
-
 	/**
 	 * Displays an information dialog which reminds the user that there are still unsaved changes at
 	 * a preference page. In respect to the type of the preference page, the user will be offered
@@ -868,23 +784,96 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		}
 	}
 
-	public static void main(final String[] args) {
-		try {
-			final Display display = Display.getDefault();
-			final Shell shell = new Shell(display);
-			final Spyglass sg = new Spyglass();
-			final PluginPreferenceDialog inst = new PluginPreferenceDialog(shell, sg);
-			inst.open();
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
+	private boolean isAbstract(final Class<? extends Plugin> clazz) {
+
+		return Modifier.isAbstract(clazz.getModifiers());
+
 	}
 
-	public void selectPreferencePage(final Plugin p) {
-		preferenceDialog.selectPreferenceNode(p);
+	private void onPluginAdded(final Plugin p) {
+		try {
+			typePreferenceNodes.get(p.getClass()).add(createInstancePreferenceNode(p));
+		} catch (final Exception e) {
+			log.error("The preference page of plugin " + p + " could not be created.", e);
+		}
+		preferenceDialog.getTreeViewer().refresh();
 	}
 
 	public void onPluginInstancePropertyChange() {
 		preferenceDialog.getTreeViewer().refresh(true);
+	}
+
+	private void onPluginRemoved(final Plugin p) {
+		removePreferenceNode(instancePreferenceNodes.get(p), preferenceManager.getRootSubNodes());
+		preferenceDialog.selectPluginManagerPreferenceNode();
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return see {@link org.eclipse.jface.window.Window#open()}
+	 */
+	public int open() {
+		spyglass.getPluginManager().addPluginListChangeListener(this);
+		return preferenceDialog.open();
+	}
+
+	@Override
+	public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
+		switch (what) {
+			case NEW_PLUGIN:
+				onPluginAdded(p);
+				break;
+			case PLUGIN_REMOVED:
+				onPluginRemoved(p);
+				break;
+			case PRIORITY_CHANGED:
+				// nothing to do, since PluginManagerPreferencePage
+				// receives the event itself and refreshes
+				break;
+		}
+	}
+
+	private boolean proceedIfUnsavedChanges() {
+
+		if (hasUnsavedChanges()) {
+			final String message = "The currently opened preference page contains unsaved changes. Are you sure you want to proceed?";
+			final boolean ok = MessageDialog.openQuestion(preferenceDialog.getShell(), "Unsaved changes", message);
+			return ok;
+		}
+
+		return true;
+
+	}
+
+	private boolean removePreferenceNode(final IPreferenceNode node, final IPreferenceNode parentNode) {
+		boolean removed;
+		for (final IPreferenceNode pn : parentNode.getSubNodes()) {
+			if (pn == node) {
+				return parentNode.remove(pn);
+			}
+			removed = removePreferenceNode(node, pn);
+			if (removed) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean removePreferenceNode(final IPreferenceNode node, final IPreferenceNode[] parentNodes) {
+		boolean removed;
+		for (final IPreferenceNode parentNode : parentNodes) {
+			if (parentNode == node) {
+				return preferenceManager.remove(parentNode);
+			}
+			removed = removePreferenceNode(node, parentNode);
+			if (removed) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void selectPreferencePage(final Plugin p) {
+		preferenceDialog.selectPreferenceNode(p);
 	}
 }
