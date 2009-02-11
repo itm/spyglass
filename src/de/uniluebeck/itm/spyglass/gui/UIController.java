@@ -139,7 +139,7 @@ public class UIController {
 				
 				// handle all drawingobjects that already exist
 				for(final DrawingObject dob: ((Drawable)p).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
-					handleDrawingObjectAdded(dob);
+					handleDrawingObjectAdded(p, dob);
 				}
 				
 			}
@@ -210,7 +210,7 @@ public class UIController {
 		}
 	}
 
-	private void handleDrawingObjectAdded(final DrawingObject dob) {
+	private void handleDrawingObjectAdded(final Plugin p, final DrawingObject dob) {
 		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
 	
 		// the drawingarea might have been disposed while we were waiting
@@ -220,33 +220,38 @@ public class UIController {
 		
 		dob.init(da);
 		
-		final AbsoluteRectangle absBBox = dob.getBoundingBox();
-		final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
-	
-		redraw(pxBBox);
+		if (p.isActive() && p.isVisible()) {
+			final AbsoluteRectangle absBBox = dob.getBoundingBox();
+			final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
+		
+			redraw(pxBBox);
+		}
 	}
 
-	private void handleDrawingObjectChanged(final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
+	private void handleDrawingObjectChanged(final Plugin p, final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
 		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
 	
 		// the drawingarea might have been disposed while we were waiting
 		if (da.isDisposed()) {
 			return;
 		}
+
+		if (p.isActive() && p.isVisible()) {
+
+			// the old area of the drawing object
+			if (oldBoundingBox != null) {
+				final PixelRectangle pxBBoxOld = da.absRect2PixelRect(oldBoundingBox);
+				redraw(pxBBoxOld);
+			}
+			// the new area of the drawing object
+			final AbsoluteRectangle absBBox = dob.getBoundingBox();
+			final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
 		
-		// the old area of the drawing object
-		if (oldBoundingBox != null) {
-			final PixelRectangle pxBBoxOld = da.absRect2PixelRect(oldBoundingBox);
-			redraw(pxBBoxOld);
+			redraw(pxBBox);
 		}
-		// the new area of the drawing object
-		final AbsoluteRectangle absBBox = dob.getBoundingBox();
-		final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
-	
-		redraw(pxBBox);
 	}
 
-	private void handleDrawingObjectRemoved(final DrawingObject dob) {
+	private void handleDrawingObjectRemoved(final Plugin p, final DrawingObject dob) {
 		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
 	
 		// the drawingarea might have been disposed while we were waiting
@@ -255,11 +260,14 @@ public class UIController {
 		}
 		
 		dob.destroy();
-	
-		final AbsoluteRectangle absBBox = dob.getBoundingBox();
-		final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
-	
-		redraw(pxBBox);
+
+		if (p.isActive() && p.isVisible()) {
+
+			final AbsoluteRectangle absBBox = dob.getBoundingBox();
+			final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
+		
+			redraw(pxBBox);
+		}
 	}
 
 	private void redraw(final PixelRectangle pxBBox) {
@@ -308,7 +316,7 @@ public class UIController {
 	private DrawingObjectListener drawingObjectListener = new DrawingObjectListener() {
 
 		@Override
-		public void drawingObjectAdded(final DrawingObject dob) {
+		public void drawingObjectAdded(final Plugin p, final DrawingObject dob) {
 
 			log.debug("Redraw caused by "+dob);
 			
@@ -318,14 +326,14 @@ public class UIController {
 				@Override
 				public void run() {
 
-					handleDrawingObjectAdded(dob);
+					handleDrawingObjectAdded(p, dob);
 				}
 			});
 
 		}
 
 		@Override
-		public void drawingObjectChanged(final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
+		public void drawingObjectChanged(final Plugin p, final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
 
 			log.debug("Redraw caused by "+dob);
 
@@ -335,7 +343,7 @@ public class UIController {
 				@Override
 				public void run() {
 
-					handleDrawingObjectChanged(dob, oldBoundingBox);
+					handleDrawingObjectChanged(p, dob, oldBoundingBox);
 
 				}
 			});
@@ -343,7 +351,7 @@ public class UIController {
 		}
 
 		@Override
-		public void drawingObjectRemoved(final DrawingObject dob) {
+		public void drawingObjectRemoved(final Plugin p, final DrawingObject dob) {
 
 			log.debug("Redraw caused by "+dob);
 			
@@ -353,7 +361,7 @@ public class UIController {
 				@Override
 				public void run() {
 
-					handleDrawingObjectRemoved(dob);
+					handleDrawingObjectRemoved(p, dob);
 				}
 			});
 

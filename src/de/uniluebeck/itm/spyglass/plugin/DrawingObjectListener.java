@@ -7,10 +7,10 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 public interface DrawingObjectListener extends EventListener {
 	
-	public void drawingObjectChanged(final DrawingObject dob, final AbsoluteRectangle oldBoundingBox);
+	public void drawingObjectChanged(Plugin p, final DrawingObject dob, final AbsoluteRectangle oldBoundingBox);
 	
-	public void drawingObjectAdded(final DrawingObject dob);
+	public void drawingObjectAdded(Plugin p, final DrawingObject dob);
 	
-	public void drawingObjectRemoved(final DrawingObject dob);
+	public void drawingObjectRemoved(Plugin p, final DrawingObject dob);
 	
 }

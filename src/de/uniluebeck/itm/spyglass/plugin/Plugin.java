@@ -468,11 +468,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 			for (final Tuple<? extends DrawingObject, AbsoluteRectangle> dob : dobs) {
 
-				if (dob.second != null) {
-					((DrawingObjectListener) list[i]).drawingObjectChanged(dob.first, dob.second);
-				} else {
-					((DrawingObjectListener) list[i]).drawingObjectChanged(dob.first, dob.first.getBoundingBox());
-				}
+				((DrawingObjectListener) list[i]).drawingObjectChanged(this, dob.first, dob.second);
 
 			}
 
@@ -498,11 +494,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
-			if (oldBoundingBox != null) {
-				((DrawingObjectListener) list[i]).drawingObjectChanged(dob, oldBoundingBox);
-			} else {
-				((DrawingObjectListener) list[i]).drawingObjectChanged(dob, dob.getBoundingBox());
-			}
+			((DrawingObjectListener) list[i]).drawingObjectChanged(this, dob, oldBoundingBox);
 		}
 	}
 
@@ -520,7 +512,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
 			for (final DrawingObject dob : dobs) {
-				((DrawingObjectListener) list[i]).drawingObjectAdded(dob);
+				((DrawingObjectListener) list[i]).drawingObjectAdded(this, dob);
 			}
 		}
 	}
@@ -539,7 +531,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
-			((DrawingObjectListener) list[i]).drawingObjectAdded(dob);
+			((DrawingObjectListener) list[i]).drawingObjectAdded(this, dob);
 		}
 	}
 
@@ -558,7 +550,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
 			for (final DrawingObject dob : dobs) {
-				((DrawingObjectListener) list[i]).drawingObjectRemoved(dob);
+				((DrawingObjectListener) list[i]).drawingObjectRemoved(this, dob);
 			}
 		}
 	}
@@ -577,7 +569,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 		// Fire the event (call-back method)
 		for (int i = list.length - 1; i >= 0; i -= 1) {
-			((DrawingObjectListener) list[i]).drawingObjectRemoved(dob);
+			((DrawingObjectListener) list[i]).drawingObjectRemoved(this, dob);
 		}
 	}
 
