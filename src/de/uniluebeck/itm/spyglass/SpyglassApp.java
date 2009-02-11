@@ -136,6 +136,8 @@ public class SpyglassApp extends ApplicationWindow {
 		
 		new ToolbarHandler(getToolBarManager(), spyglass, appWindow);
 
+		spyglass.start();
+		
 		return parent;
 	}
 
