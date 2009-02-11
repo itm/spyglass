@@ -56,12 +56,12 @@ public class UIController {
 	private Spyglass spyglass = null;
 
 	private final Display display;
-	
+
 	private final static boolean ENABLE_DRAW_PROFILING = false;
 
 	/** User events will be dispatched here */
 	private EventDispatcher eventDispatcher;
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -85,7 +85,7 @@ public class UIController {
 			public void propertyChange(final PropertyChangeEvent evt) {
 
 				// TODO: what about releasing the old listener?
-				
+
 				/*
 				 * Add DrawingObjectListeners to all current and future plug-ins (used for knowing
 				 * when to update the drawing area)
@@ -132,16 +132,16 @@ public class UIController {
 				p.getXMLConfig().addPropertyChangeListener(this.pluginPropertyListener);
 
 				/*
-				 * Add DrawingObjectListeners to all current and future plug-ins (used for knowing when to
-				 * update the drawing area)
+				 * Add DrawingObjectListeners to all current and future plug-ins (used for knowing
+				 * when to update the drawing area)
 				 */
 				p.addDrawingObjectListener(drawingObjectListener);
-				
+
 				// handle all drawingobjects that already exist
-				for(final DrawingObject dob: ((Drawable)p).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
+				for (final DrawingObject dob : ((Drawable) p).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
 					handleDrawingObjectAdded(p, dob);
 				}
-				
+
 			}
 		}
 		spyglass.getPluginManager().addPluginListChangeListener(pluginListChangeListener);
@@ -158,7 +158,7 @@ public class UIController {
 	public void shutdown() {
 		// Note: We don't have to unregister listeners to Widgets, since they
 		// are automatically removed when the widget is disposed
-		
+
 		final List<Plugin> plugins = spyglass.getPluginManager().getPlugins();
 		for (final Plugin p : plugins) {
 			if (p instanceof Drawable) {
@@ -167,10 +167,10 @@ public class UIController {
 		}
 		spyglass.getPluginManager().removePluginListChangeListener(pluginListChangeListener);
 		spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().removePropertyChangeListener(rulerPropertyListener);
-		
+
 		log.debug("UIController shut down.");
 	}
-	
+
 	// --------------------------------------------------------------------------
 	// ------
 	/**
@@ -196,7 +196,7 @@ public class UIController {
 
 		final List<DrawingObject> dos = new LinkedList<DrawingObject>(plugin.getDrawingObjects(area));
 		for (final DrawingObject object : dos) {
-			
+
 			switch (object.getState()) {
 				case ALIVE:
 					object.draw(appWindow.getGui().getDrawingArea(), gc);
@@ -205,32 +205,32 @@ public class UIController {
 					log.debug(String.format("Plugin %s contains an unitialized drawing object in its layer: %s (skipping it)", plugin, object));
 					break;
 				case ZOMBIE:
-					log.warn(String.format("Plugin %s contains a zombie drawing object in its layer: %s", plugin, object));
+					log.error(String.format("Plugin %s contains a zombie drawing object in its layer: %s", plugin, object));
 			}
 		}
 	}
 
 	private void handleDrawingObjectAdded(final Plugin p, final DrawingObject dob) {
 		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
-	
+
 		// the drawingarea might have been disposed while we were waiting
 		if (da.isDisposed()) {
 			return;
 		}
-		
+
 		dob.init(da);
-		
+
 		if (p.isActive() && p.isVisible()) {
 			final AbsoluteRectangle absBBox = dob.getBoundingBox();
 			final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
-		
+
 			redraw(pxBBox);
 		}
 	}
 
 	private void handleDrawingObjectChanged(final Plugin p, final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
 		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
-	
+
 		// the drawingarea might have been disposed while we were waiting
 		if (da.isDisposed()) {
 			return;
@@ -246,33 +246,32 @@ public class UIController {
 			// the new area of the drawing object
 			final AbsoluteRectangle absBBox = dob.getBoundingBox();
 			final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
-		
+
 			redraw(pxBBox);
 		}
 	}
 
 	private void handleDrawingObjectRemoved(final Plugin p, final DrawingObject dob) {
 		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
-	
+
 		// the drawingarea might have been disposed while we were waiting
 		if (da.isDisposed()) {
 			return;
 		}
-		
+
 		dob.destroy();
 
 		if (p.isActive() && p.isVisible()) {
 
 			final AbsoluteRectangle absBBox = dob.getBoundingBox();
 			final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
-		
+
 			redraw(pxBBox);
 		}
 	}
 
 	private void redraw(final PixelRectangle pxBBox) {
-		appWindow.getGui().getDrawingArea()
-				.redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
+		appWindow.getGui().getDrawingArea().redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
 	}
 
 	private MouseListener mouseListener = new MouseAdapter() {
@@ -303,6 +302,12 @@ public class UIController {
 					case NEW_PLUGIN:
 						p.addDrawingObjectListener(drawingObjectListener);
 						p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
+						
+						// handle all drawingobjects that already exist
+						for (final DrawingObject dob : ((Drawable) p).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
+							handleDrawingObjectAdded(p, dob);
+						}
+						
 						break;
 					case PLUGIN_REMOVED:
 						p.removeDrawingObjectListener(drawingObjectListener);
@@ -318,8 +323,8 @@ public class UIController {
 		@Override
 		public void drawingObjectAdded(final Plugin p, final DrawingObject dob) {
 
-			log.debug("Redraw caused by "+dob);
-			
+			log.debug("Redraw caused by " + dob);
+
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
 
@@ -335,7 +340,7 @@ public class UIController {
 		@Override
 		public void drawingObjectChanged(final Plugin p, final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
 
-			log.debug("Redraw caused by "+dob);
+			log.debug("Redraw caused by " + dob);
 
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
@@ -353,8 +358,8 @@ public class UIController {
 		@Override
 		public void drawingObjectRemoved(final Plugin p, final DrawingObject dob) {
 
-			log.debug("Redraw caused by "+dob);
-			
+			log.debug("Redraw caused by " + dob);
+
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
 
@@ -383,7 +388,7 @@ public class UIController {
 		public void paintControl(final PaintEvent e) {
 
 			final long time = System.nanoTime();
-			
+
 			final PixelRectangle pxArea = new PixelRectangle(e.gc.getClipping().x, e.gc.getClipping().y, e.gc.getClipping().width,
 					e.gc.getClipping().height);
 
@@ -402,9 +407,11 @@ public class UIController {
 				final double pxCount = pxArea.getHeight() * pxArea.getWidth();
 				final boolean clipping = !appWindow.getGui().getDrawingArea().getClientArea().equals(pxArea.rectangle);
 				if (clipping) {
-					log.warn( String.format("Partial redraw (%.0f px). Time: %.03f ms (%.0f ns per pixel).",pxCount, (time2-time)/1000000d,((time2-time)/pxCount)));
+					log.debug(String.format("Partial redraw (%.0f px). Time: %.03f ms (%.0f ns per pixel).", pxCount, (time2 - time) / 1000000d,
+							((time2 - time) / pxCount)));
 				} else {
-					log.warn( String.format("Complete redraw. Time: %.03f ms (%.0f ns per pixel).",(time2-time)/1000000d,((time2-time)/pxCount)));
+					log.debug(String.format("Complete redraw. Time: %.03f ms (%.0f ns per pixel).", (time2 - time) / 1000000d,
+							((time2 - time) / pxCount)));
 				}
 			}
 		}
@@ -420,8 +427,7 @@ public class UIController {
 		public void propertyChange(final PropertyChangeEvent evt) {
 
 			/**
-			 * Redraw the entire screen if visibilty or activity of a plugin
-			 * changes.
+			 * Redraw the entire screen if visibilty or activity of a plugin changes.
 			 */
 			if (evt.getPropertyName().equalsIgnoreCase(PluginXMLConfig.PROPERTYNAME_ACTIVE)
 					|| evt.getPropertyName().equalsIgnoreCase(PluginXMLConfig.PROPERTYNAME_VISIBLE)) {
@@ -437,12 +443,11 @@ public class UIController {
 
 					}
 				});
-					
+
 			}
 
-				
 		}
-			
+
 	};
 
 	// ----------------------------------------------------------------
@@ -459,7 +464,7 @@ public class UIController {
 
 		}
 	};
-	
+
 	private PaintListener paintRulerListener = new PaintListener() {
 
 		@Override
@@ -481,7 +486,7 @@ public class UIController {
 			}
 		}
 	};
-	
+
 	/**
 	 *  
 	 */
@@ -489,14 +494,12 @@ public class UIController {
 
 		@Override
 		public void handleEvent(final DrawingAreaTransformEvent e) {
-			
+
 			// we are already in the SWT-Thread
 			appWindow.getGui().getRulerH().redraw();
 			appWindow.getGui().getRulerV().redraw();
-			
+
 		}
 	};
-	
-	
 
 }
