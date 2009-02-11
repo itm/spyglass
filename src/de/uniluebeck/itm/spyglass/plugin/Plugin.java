@@ -452,7 +452,6 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectChanged event for all drawing objects in <code>dobs</code>.<br />
-	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
 	 * 
 	 * @param dobs
 	 *            the drawing objects which changed (tuple.first) and the old bounding box of the
@@ -479,7 +478,6 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectChanged event.<br>
-	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
 	 * 
 	 * @param dob
 	 *            The DrawingObject, which has been modified
@@ -501,7 +499,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectAdded event for all drawing objects in <code>dobs</code>.<br />
-	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
+	 * 
+	 * NOTE: Before this method is called, the dobs MUST have already been added to the
+	 * Layer! 
 	 * 
 	 * @param dobs
 	 */
@@ -520,7 +520,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectAdded event.<br />
-	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
+	 * 
+	 * NOTE: Before this method is called, the dob MUST have already been added to the
+	 * Layer! 
 	 * 
 	 * @param dob
 	 *            The DrawingObject, which has been added
@@ -538,7 +540,6 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectRemoved event for all drawing objects in <code>dobs</code>.<br />
-	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
 	 * 
 	 * @param dob
 	 *            The DrawingObject, which has been removed
@@ -558,7 +559,6 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectRemoved event.<br />
-	 * Note that the event will only be fired if the plug-in is <strong>active and visible</strong>.
 	 * 
 	 * @param dob
 	 *            The DrawingObject, which has been removed
