@@ -83,7 +83,7 @@ public class Rectangle extends DrawingObject {
 	/**
 	 * @return
 	 */
-	public int getHeight() {
+	public synchronized int getHeight() {
 		return height;
 	}
 
@@ -91,7 +91,7 @@ public class Rectangle extends DrawingObject {
 	/**
 	 * @return
 	 */
-	public int getLineWidth() {
+	public synchronized int getLineWidth() {
 		return lineWidth;
 	}
 
@@ -99,7 +99,7 @@ public class Rectangle extends DrawingObject {
 	/**
 	 * @return
 	 */
-	public int getWidth() {
+	public synchronized int getWidth() {
 		return width;
 	}
 
@@ -117,7 +117,9 @@ public class Rectangle extends DrawingObject {
 	 * @param fireBoundingBoxChangeEvent
 	 */
 	public void setHeight(final int height, final boolean fireBoundingBoxChangeEvent) {
-		this.height = height;
+		synchronized (this) {
+			this.height = height;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 
@@ -125,7 +127,7 @@ public class Rectangle extends DrawingObject {
 	/**
 	 * @param lineWidth
 	 */
-	public void setLineWidth(final int lineWidth) {
+	public synchronized void setLineWidth(final int lineWidth) {
 		this.lineWidth = lineWidth;
 	}
 
@@ -143,7 +145,9 @@ public class Rectangle extends DrawingObject {
 	 * @param fireBoundingBoxChangeEvent
 	 */
 	public void setWidth(final int width, final boolean fireBoundingBoxChangeEvent) {
-		this.width = width;
+		synchronized (this) {
+			this.width = width;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 

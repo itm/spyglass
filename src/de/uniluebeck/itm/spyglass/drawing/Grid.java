@@ -94,7 +94,9 @@ public class Grid extends DrawingObject {
 	}
 
 	public void setGridElementHeight(final int gridElementHeight, final boolean fireBoundBoxChangeEvent) {
-		this.gridElementHeight = gridElementHeight;
+		synchronized (this) {
+			this.gridElementHeight = gridElementHeight;
+		}
 		updateBoundingBox(fireBoundBoxChangeEvent);
 	}
 
@@ -103,11 +105,13 @@ public class Grid extends DrawingObject {
 	}
 
 	public void setGridElementWidth(final int gridElementWidth, final boolean fireBoundingBoxChangeEvent) {
-		this.gridElementWidth = gridElementWidth;
+		synchronized (this) {
+			this.gridElementWidth = gridElementWidth;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 
-	public void setLineWidth(final int lineWidth) {
+	public synchronized void setLineWidth(final int lineWidth) {
 		this.lineWidth = lineWidth;
 	}
 
@@ -116,7 +120,9 @@ public class Grid extends DrawingObject {
 	}
 
 	public void setNumCols(final int numCols, final boolean fireBoundingBoxChangeEvent) {
-		this.numCols = numCols;
+		synchronized (this) {
+			this.numCols = numCols;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 
@@ -125,7 +131,9 @@ public class Grid extends DrawingObject {
 	}
 
 	public void setNumRows(final int numRows, final boolean fireBoundingBoxChangeEvent) {
-		this.numRows = numRows;
+		synchronized (this) {
+			this.numRows = numRows;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 

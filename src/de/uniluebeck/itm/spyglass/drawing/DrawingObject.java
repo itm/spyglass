@@ -9,6 +9,7 @@ package de.uniluebeck.itm.spyglass.drawing;
 
 import javax.swing.event.EventListenerList;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -18,14 +19,54 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
- * Abstract class that represents a drawing object. Every DrawingObject should have an unique id, a
- * position and a color, given by the RGB components in a R8G8B8 format.
+ * Abstract class that represents a drawing object.
+ * 
+ * A drawing object has a lifetime, bounded by the calls to init() and destroy(),
+ * respectively. During this time, the drawingObject is bounded to an drawingArea.
+ * 
+ * All DrawingObjects are guaranteed to be thread-safe. (Implementors of subclasses
+ * should make sure of this too!)
+ *
+ * HOWEVER: Calls to setter-Methods are likely to synchronize with the SWT-Display thread.
+ * So to avoid deadlocks, any caller should not hold any monitors (which could
+ * potentially be obtained by the SWT thread) while calling any setter method.
+ * 
+ * A drawingObject can have only one life, i.e. once it has been destroyed, it cannot
+ * be initialized again.
+ * 
  */
 public abstract class DrawingObject {
 
+	/**
+	 * The state of the drawing object
+	 *
+	 */
+	public enum State {
+		
+		/**
+		 * The drawing object has not been initialized yet.
+		 */
+		INFANT,
+		
+		/**
+		 * The drawing object has been initialized.
+		 */
+		ALIVE,
+		
+		/**
+		 * The drawing object has been destroyed.
+		 */
+		ZOMBIE
+	}
+	
+	protected static Logger log = SpyglassLoggerFactory.getLogger(DrawingObject.class);
+
+	private State state = State.INFANT;
+	
 	/** The position of the object's upper left point */
 	private AbsolutePosition position = new AbsolutePosition(0, 0, 0);
 
@@ -40,14 +81,75 @@ public abstract class DrawingObject {
 	/** The object's background color */
 	private RGB bgColor = new RGB(255, 255, 255);
 
+	private DrawingArea drawingArea = null;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the position of the upper left point of the <code>DrawingObject</code>.
 	 * 
 	 * @return the position of the upper left point of the <code>DrawingObject</code>
 	 */
-	public AbsolutePosition getPosition() {
+	public synchronized AbsolutePosition getPosition() {
 		return position;
+	}
+
+	/**
+	 * This initializes the drawing object.
+	 * 
+	 * It must only be called once.
+	 * 
+	 * Subclasses may overwrite this method if they want to to additional things
+	 * (e.g. add listener to the drawing area).
+	 */
+	public void init(final DrawingArea drawingArea) {
+		synchronized (this) {
+			if (state != State.INFANT) {
+				throw new RuntimeException("Object ether already initialized or already dead!");
+			}
+			this.drawingArea = drawingArea;
+		}
+		updateBoundingBox();
+		
+		// only change the state after we have updated the bounding box
+		synchronized (this) {
+			this.state = State.ALIVE;
+		}
+	}
+
+	/**
+	 * Destroys this drawing object.
+	 * 
+	 * It must only be called after init() and even then only once.
+	 * 
+	 * subclasses may overwrite this method if they want to to additional things
+	 * (e.g. release listener from drawing area).
+	 */
+	public synchronized void destroy() {
+		if (state != State.ALIVE) {
+			throw new RuntimeException("Object ether not yet initialized or already dead!");
+		}
+		
+		this.drawingArea = null;
+		this.state = State.ZOMBIE;
+	}
+
+	/**
+	 * returns a reference to the drawing area. Between the calls to init()
+	 * and destroy(), this method is guaranteed to return a valid reference.
+	 * 
+	 * Before init() or after destroy() are called, this method will return
+	 * null!
+	 */
+	protected synchronized final DrawingArea getDrawingArea() {
+		return drawingArea;
+	}
+	
+	/**
+	 * Returns the state of the drawing object
+	 * 
+	 */
+	public synchronized State getState() {
+		return state;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -71,8 +173,9 @@ public abstract class DrawingObject {
 	 *            indicates whether a changeEvent has to be thrown
 	 */
 	public void setPosition(final AbsolutePosition position, final boolean fireBoundingBoxChangeEvent) {
-
-		this.position = position;
+		synchronized (this) {
+			this.position = position;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 
 	}
@@ -101,7 +204,7 @@ public abstract class DrawingObject {
 	 * 
 	 * @return the instance's foreground color
 	 */
-	public RGB getColor() {
+	public synchronized RGB getColor() {
 		return color;
 	}
 
@@ -111,7 +214,7 @@ public abstract class DrawingObject {
 	 * 
 	 * @return the instance's background color
 	 */
-	public RGB getBgColor() {
+	public synchronized RGB getBgColor() {
 		return bgColor;
 	}
 
@@ -122,7 +225,7 @@ public abstract class DrawingObject {
 	 * @param bgColor
 	 *            the the background color to set
 	 */
-	public void setBgColor(final RGB bgColor) {
+	public synchronized void setBgColor(final RGB bgColor) {
 		this.bgColor = bgColor;
 	}
 
@@ -133,7 +236,7 @@ public abstract class DrawingObject {
 	 * @param color
 	 *            the foreground color to set
 	 */
-	public void setColor(final RGB color) {
+	public synchronized void setColor(final RGB color) {
 		this.color = color;
 	}
 
@@ -180,7 +283,9 @@ public abstract class DrawingObject {
 		if (boundingBox == null) {
 			updateBoundingBox();
 		}
-		return boundingBox;
+		synchronized (this) {
+			return boundingBox;
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -253,60 +358,64 @@ public abstract class DrawingObject {
 	 */
 	protected final void updateBoundingBox(final boolean fireBoundingBoxChangeEvent) {
 
-		final AbsoluteRectangle oldBox = new AbsoluteRectangle();
+		// if init() is not called yet, we cannot return a valid boundingBox
+		// so just return a default one.
+		if ((drawingArea == null) || drawingArea.isDisposed()) {
+			boundingBox = new AbsoluteRectangle(0, 0, 1, 1);
+		} else {
 
-		final Display display = Display.getDefault();
-		if ((display != null) && !display.isDisposed()) {
-			display.syncExec(new Runnable() {
-				// --------------------------------------------------------------------------------
-				/*
-				 * (non-Javadoc)
-				 * 
-				 * @see java.lang.Runnable#run()
-				 */
-				@SuppressWarnings("synthetic-access")
-				@Override
-				public void run() {
+			final AbsoluteRectangle oldBox = new AbsoluteRectangle();
 
-					if (display.isDisposed()) {
-						return;
-					}
+			final Display display = Display.getDefault();
+			if ((display != null) && !display.isDisposed()) {
+				display.syncExec(new Runnable() {
+					// --------------------------------------------------------------------------------
+					/*
+					 * (non-Javadoc)
+					 * 
+					 * @see java.lang.Runnable#run()
+					 */
+					@SuppressWarnings("synthetic-access")
+					@Override
+					public void run() {
 
-					// This mutex is necessary since a change of the bounding box needs to be
-					// reported to registered listeners. A change means that there is an "old"
-					// and a new bounding box.
-					// Determining the old and the new one is to be done in one atomic step which
-					// will be achieved by using this lock
-					synchronized (this) {
-						if (boundingBox != null) {
-							oldBox.inherit(boundingBox);
+						if (display.isDisposed()) {
+							return;
 						}
-						boundingBox = calculateBoundingBox();
+
+						// This mutex is necessary since a change of the bounding box needs to be
+						// reported to registered listeners. A change means that there is an "old"
+						// and a new bounding box.
+						// Determining the old and the new one is to be done in one atomic step
+						// which
+						// will be achieved by using this lock
+						synchronized (this) {
+							if (boundingBox != null) {
+								oldBox.inherit(boundingBox);
+							}
+							boundingBox = calculateBoundingBox();
+						}
+
 					}
+				});
 
+				if ((fireBoundingBoxChangeEvent && (oldBox == null)) || ((oldBox != null) && !boundingBox.equals(oldBox))) {
+					fireBoundingBoxChangeEvent(oldBox);
+				} else {
 				}
-			});
-
-			if ((fireBoundingBoxChangeEvent && (oldBox == null)) || ((oldBox != null) && !boundingBox.equals(oldBox))) {
-				fireBoundingBoxChangeEvent(oldBox);
 			}
 		}
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Sets the bounding box
+	 * Calculates and returns the object's bounding box (and should do nothing else!)
 	 * 
-	 * @param boundingBox
-	 *            the bounding box to set
-	 */
-	protected void setBoundingBox(final AbsoluteRectangle boundingBox) {
-		this.boundingBox = boundingBox;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Calculates and returns the object's bounding box
+	 * It is guaranteed that this method is only called when there is a valid
+	 * drawingArea available and that this method is only called
+	 * 
+	 * a) from within the SWT-Thread
+	 * b) with the monitor to "this" held.
 	 * 
 	 * @return the calculated bounding box
 	 */

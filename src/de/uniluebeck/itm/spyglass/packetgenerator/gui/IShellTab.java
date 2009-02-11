@@ -29,7 +29,7 @@ public class IShellTab extends org.eclipse.swt.widgets.Composite {
 	/**
 	 * The (currently hardcoded) default path to the config file.
 	 */
-	private final String CONFIG_DEFAULT_PATH = "config/packetGeneratorConfigSpringEmbedderTest.xml";
+	private final String CONFIG_DEFAULT_PATH = "config/packetGeneratorConfig4iShell.xml";
 
 	public IShellTab(final org.eclipse.swt.widgets.Composite parent, final PacketGeneratorIShellPlugin plugin) {
 		super(parent, SWT.NULL);

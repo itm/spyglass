@@ -18,7 +18,7 @@ public class LinePainterLine extends Line {
 		super();
 	}
 
-	public String getStringFormatterResult() {
+	public synchronized String getStringFormatterResult() {
 		return stringFormatterResult;
 	}
 
@@ -27,7 +27,9 @@ public class LinePainterLine extends Line {
 	}
 
 	public void setStringFormatterResult(final String stringFormatterResult, final boolean fireBoundingBoxChangeEvent) {
-		this.stringFormatterResult = stringFormatterResult;
+		synchronized (this) {
+			this.stringFormatterResult = stringFormatterResult;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 
@@ -40,10 +42,7 @@ public class LinePainterLine extends Line {
 	}
 
 	private Point determineStringFormatterPosition(final AbsoluteRectangle lineBBox) {
-		if (drawingArea == null) {
-			return new Point(0, 0);
-		}
-		return Geometry.centerPoint(drawingArea.absRect2PixelRect(lineBBox).rectangle);
+		return Geometry.centerPoint(getDrawingArea().absRect2PixelRect(lineBBox).rectangle);
 	}
 
 	@Override
@@ -56,7 +55,6 @@ public class LinePainterLine extends Line {
 		final Point extent = gc.textExtent(stringFormatterResult);
 		final Point position = determineStringFormatterPosition(lineBBox);
 		final Rectangle textRect = new Rectangle(position.x, position.y, extent.x + 10, extent.y + 5);
-		setBoundingBox(new AbsoluteRectangle(lineBBox.rectangle.union(textRect)));
 		gc.dispose();
 		i.dispose();
 

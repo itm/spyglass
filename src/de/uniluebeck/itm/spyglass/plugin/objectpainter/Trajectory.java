@@ -146,7 +146,6 @@ public class Trajectory extends TimerTask {
 				this.plugin.layer.remove(image);
 			}
 			this.plugin.fireDrawingObjectRemovedInternal(image);
-			image.dispose();
 		
 			// Remove lines
 			for (final DrawingObject d : lines) {

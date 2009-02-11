@@ -107,8 +107,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 	private Map<Integer, Node> nodes = new HashMap<Integer, Node>();
 
-	private DrawingArea drawingArea = null;
-
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -388,15 +386,12 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		Node node = null;
 		synchronized (layer) {
 			if ((node = nodes.get(nodeID)) != null) {
-				if (drawingArea == null) {
-					drawingArea = node.getDrawingArea();
-				}
 				return node;
 			}
 		}
 
 		// if not, create and return a new object...
-		return createNodeObject(nodeID, drawingArea);
+		return createNodeObject(nodeID);
 
 	}
 
@@ -410,7 +405,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 *            the area where the node object will be drawn
 	 * @return a new {@link Node} object
 	 */
-	private Node createNodeObject(final int nodeID, final DrawingArea drawingArea) {
+	private Node createNodeObject(final int nodeID) {
 
 		// if the node was existing previously, some useful information might be available
 
@@ -418,7 +413,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
 
-		final Node node = new Node(nodeID, "Node " + nodeID, "", isExtended, lineColorRGB, lineWidth, drawingArea, getPluginManager()
+		final Node node = new Node(nodeID, "Node " + nodeID, "", isExtended, lineColorRGB, lineWidth, getPluginManager()
 				.getNodePositioner().getPosition(nodeID));
 
 		synchronized (layer) {

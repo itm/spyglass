@@ -319,11 +319,11 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 
 	}
 
-	public Config getConfig() {
+	public synchronized Config getConfig() {
 		return config;
 	}
 
-	public void setConfig(final Config config) {
+	public synchronized void setConfig(final Config config) {
 		this.config = config;
 	}
 

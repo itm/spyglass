@@ -12,6 +12,12 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
+/**
+ * A Text.
+ * 
+ * Note: This class has never been used and is likely broken!
+ * 
+ */
 public class Text extends DrawingObject {
 
 	public String text;

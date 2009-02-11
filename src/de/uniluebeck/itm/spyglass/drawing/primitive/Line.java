@@ -32,10 +32,6 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 
 	private int lineWidth = 1;
 
-	private boolean listenerConnected = false;
-
-	protected DrawingArea drawingArea;
-
 	public Line() {
 		super();
 	}
@@ -129,13 +125,6 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 
-		this.drawingArea = drawingArea;
-
-		if (!listenerConnected) {
-			listenerConnected = true;
-			drawingArea.addDrawingAreaTransformListener(this);
-		}
-
 		final Color color = new Color(gc.getDevice(), this.getColor());
 		gc.setForeground(color);
 		gc.setLineWidth(this.getLineWidth());
@@ -156,11 +145,11 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 
 	}
 
-	public AbsolutePosition getEnd() {
+	public synchronized AbsolutePosition getEnd() {
 		return lineEnd;
 	}
 
-	public int getLineWidth() {
+	public synchronized int getLineWidth() {
 		return lineWidth;
 	}
 
@@ -169,7 +158,9 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 	}
 
 	public void setEnd(final AbsolutePosition end, final boolean fireBoundingBoxChangeEvent) {
-		lineEnd = end;
+		synchronized (this) {
+			lineEnd = end;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 
@@ -178,7 +169,9 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 	}
 
 	public void setLineWidth(final int width, final boolean fireBoundingBoxChangeEvent) {
-		this.lineWidth = width;
+		synchronized (this) {
+			this.lineWidth = width;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 
@@ -190,36 +183,36 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 
-		if ((drawingArea == null) || drawingArea.isDisposed()) {
+		final PixelPosition pos = getDrawingArea().absPoint2PixelPoint(getPosition());
+		final PixelPosition end = getDrawingArea().absPoint2PixelPoint(lineEnd);
 
-			final int upperLeftX = Math.min(lineEnd.x, getPosition().x) - (lineWidth / 2);
-			final int upperLeftY = Math.min(lineEnd.y, getPosition().y) - (lineWidth / 2);
-			final int width = Math.abs(lineEnd.x - getPosition().x) + lineWidth;
-			final int height = Math.abs(lineEnd.y - getPosition().y) + lineWidth;
-			return new AbsoluteRectangle(upperLeftX, upperLeftY, width, height);
+		final int bbUpperLeftX = Math.min(end.x, pos.x) - ((int) Math.ceil((((double) lineWidth) / 2)));
+		final int bbUpperLeftY = Math.min(end.y, pos.y) - ((int) Math.ceil((((double) lineWidth) / 2)));
 
-		} else {
+		final int bbWidth = Math.abs(end.x - pos.x) + lineWidth;
+		final int bbHeight = Math.abs(end.y - pos.y) + lineWidth;
 
-			final PixelPosition pos = drawingArea.absPoint2PixelPoint(getPosition());
-			final PixelPosition end = drawingArea.absPoint2PixelPoint(lineEnd);
+		final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidth, bbHeight);
 
-			final int bbUpperLeftX = Math.min(end.x, pos.x) - ((int) Math.ceil((((double) lineWidth) / 2)));
-			final int bbUpperLeftY = Math.min(end.y, pos.y) - ((int) Math.ceil((((double) lineWidth) / 2)));
-
-			final int bbWidth = Math.abs(end.x - pos.x) + lineWidth;
-			final int bbHeight = Math.abs(end.y - pos.y) + lineWidth;
-
-			final PixelRectangle bbArea = new PixelRectangle(bbUpperLeftX, bbUpperLeftY, bbWidth, bbHeight);
-
-			return drawingArea.pixelRect2AbsRect(bbArea);
-
-		}
+		return getDrawingArea().pixelRect2AbsRect(bbArea);
 
 	}
 
 	@Override
 	public void handleEvent(final DrawingAreaTransformEvent e) {
-		drawingArea = e.drawingArea;
 		updateBoundingBox();
 	}
+
+	@Override
+	public void destroy() {
+		getDrawingArea().removeDrawingAreaTransformListener(this);
+		super.destroy();
+	}
+
+	@Override
+	public void init(final DrawingArea drawingArea) {
+		super.init(drawingArea);
+	}
+	
+	
 }

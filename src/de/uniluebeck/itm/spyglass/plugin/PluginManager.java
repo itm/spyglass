@@ -348,14 +348,20 @@ public class PluginManager {
 	 * @throws Exception when the plugin could not be created.
 	 */
 	private void addPlugin(final Plugin plugin) throws Exception {
+		
+		// connects the UIController with the plugin. this must happen
+		// *before* init() is called on the plugin, since the plugin
+		// may add DrawingObjects already there, and the UIController has to be ready
+		firePluginListChangedEvent(plugin, ListChangeEvent.NEW_PLUGIN);
+
 		this.connectPlugin(plugin);
 
-		if (!plugins.contains(plugin)) {
-			plugins.add(plugin);
+		if (plugins.contains(plugin)) {
+			throw new RuntimeException("Plugin already there!");
 		}
+		
+		plugins.add(plugin);
 		log.debug("Added plug-in: " + plugin);
-
-		firePluginListChangedEvent(plugin, ListChangeEvent.NEW_PLUGIN);
 
 	}
 

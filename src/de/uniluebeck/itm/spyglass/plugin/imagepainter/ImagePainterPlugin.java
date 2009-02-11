@@ -107,7 +107,6 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 		if (image != null) {
 			synchronized (layer) {
 				layer.remove(image);
-				image.dispose();
 			}
 		}
 		fireDrawingObjectRemoved(image);

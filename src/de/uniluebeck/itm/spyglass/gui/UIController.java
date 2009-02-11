@@ -26,6 +26,7 @@ import de.uniluebeck.itm.spyglass.core.EventDispatcher;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformEvent;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformListener;
 import de.uniluebeck.itm.spyglass.gui.view.RulerArea;
@@ -56,7 +57,7 @@ public class UIController {
 
 	private final Display display;
 	
-	private final static boolean ENABLE_DRAW_PROFILING = true;
+	private final static boolean ENABLE_DRAW_PROFILING = false;
 
 	/** User events will be dispatched here */
 	private EventDispatcher eventDispatcher;
@@ -82,6 +83,9 @@ public class UIController {
 		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener("pluginManager", new PropertyChangeListener() {
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
+
+				// TODO: what about releasing the old listener?
+				
 				/*
 				 * Add DrawingObjectListeners to all current and future plug-ins (used for knowing
 				 * when to update the drawing area)
@@ -132,6 +136,12 @@ public class UIController {
 				 * update the drawing area)
 				 */
 				p.addDrawingObjectListener(drawingObjectListener);
+				
+				// handle all drawingobjects that already exist
+				for(final DrawingObject dob: ((Drawable)p).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
+					handleDrawingObjectAdded(dob);
+				}
+				
 			}
 		}
 		spyglass.getPluginManager().addPluginListChangeListener(pluginListChangeListener);
@@ -161,6 +171,15 @@ public class UIController {
 		log.debug("UIController shut down.");
 	}
 	
+	// --------------------------------------------------------------------------
+	// ------
+	/**
+	 * 
+	 */
+	private AppWindow getAppWindow() {
+		return appWindow;
+	}
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Draw all drawing objects inside the bounding box <code>area</code> from the plugin
@@ -177,20 +196,76 @@ public class UIController {
 
 		final List<DrawingObject> dos = new LinkedList<DrawingObject>(plugin.getDrawingObjects(area));
 		for (final DrawingObject object : dos) {
-			object.draw(appWindow.getGui().getDrawingArea(), gc);
+			
+			switch (object.getState()) {
+				case ALIVE:
+					object.draw(appWindow.getGui().getDrawingArea(), gc);
+					break;
+				case INFANT:
+					log.debug(String.format("Plugin %s contains an unitialized drawing object in its layer: %s (skipping it)", plugin, object));
+					break;
+				case ZOMBIE:
+					log.warn(String.format("Plugin %s contains a zombie drawing object in its layer: %s", plugin, object));
+			}
 		}
 	}
 
-	// --------------------------------------------------------------------------
-	// ------
-	/**
-	 * 
-	 */
-	public AppWindow getAppWindow() {
-		return appWindow;
+	private void handleDrawingObjectAdded(final DrawingObject dob) {
+		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
+	
+		// the drawingarea might have been disposed while we were waiting
+		if (da.isDisposed()) {
+			return;
+		}
+		
+		dob.init(da);
+		
+		final AbsoluteRectangle absBBox = dob.getBoundingBox();
+		final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
+	
+		redraw(pxBBox);
 	}
 
-	// ----------------------------------------------------------------------------
+	private void handleDrawingObjectChanged(final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
+		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
+	
+		// the drawingarea might have been disposed while we were waiting
+		if (da.isDisposed()) {
+			return;
+		}
+		
+		// the old area of the drawing object
+		if (oldBoundingBox != null) {
+			final PixelRectangle pxBBoxOld = da.absRect2PixelRect(oldBoundingBox);
+			redraw(pxBBoxOld);
+		}
+		// the new area of the drawing object
+		final AbsoluteRectangle absBBox = dob.getBoundingBox();
+		final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
+	
+		redraw(pxBBox);
+	}
+
+	private void handleDrawingObjectRemoved(final DrawingObject dob) {
+		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
+	
+		// the drawingarea might have been disposed while we were waiting
+		if (da.isDisposed()) {
+			return;
+		}
+		
+		dob.destroy();
+	
+		final AbsoluteRectangle absBBox = dob.getBoundingBox();
+		final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
+	
+		redraw(pxBBox);
+	}
+
+	private void redraw(final PixelRectangle pxBBox) {
+		appWindow.getGui().getDrawingArea()
+				.redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
+	}
 
 	private MouseListener mouseListener = new MouseAdapter() {
 
@@ -242,16 +317,8 @@ public class UIController {
 
 				@Override
 				public void run() {
-					
-					// the drawingarea might have been disposed while we were waiting
-					if (getAppWindow().getGui().getDrawingArea().isDisposed()) {
-						return;
-					}
-					
-					final AbsoluteRectangle absBBox = dob.getBoundingBox();
-					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea().absRect2PixelRect(absBBox);
 
-					redraw(pxBBox);
+					handleDrawingObjectAdded(dob);
 				}
 			});
 
@@ -268,21 +335,7 @@ public class UIController {
 				@Override
 				public void run() {
 
-					// the drawingarea might have been disposed while we were waiting
-					if (getAppWindow().getGui().getDrawingArea().isDisposed()) {
-						return;
-					}
-
-					// the old area of the drawing object
-					if (oldBoundingBox != null) {
-						final PixelRectangle pxBBoxOld = getAppWindow().getGui().getDrawingArea().absRect2PixelRect(oldBoundingBox);
-						redraw(pxBBoxOld);
-					}
-					// the new area of the drawing object
-					final AbsoluteRectangle absBBox = dob.getBoundingBox();
-					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea().absRect2PixelRect(absBBox);
-
-					redraw(pxBBox);
+					handleDrawingObjectChanged(dob, oldBoundingBox);
 
 				}
 			});
@@ -299,24 +352,11 @@ public class UIController {
 
 				@Override
 				public void run() {
-					
-					// the drawingarea might have been disposed while we were waiting
-					if (getAppWindow().getGui().getDrawingArea().isDisposed()) {
-						return;
-					}
 
-					final AbsoluteRectangle absBBox = dob.getBoundingBox();
-					final PixelRectangle pxBBox = getAppWindow().getGui().getDrawingArea().absRect2PixelRect(absBBox);
-
-					redraw(pxBBox);
+					handleDrawingObjectRemoved(dob);
 				}
 			});
 
-		}
-
-		private void redraw(final PixelRectangle pxBBox) {
-			appWindow.getGui().getDrawingArea()
-					.redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
 		}
 
 	};
@@ -354,9 +394,9 @@ public class UIController {
 				final double pxCount = pxArea.getHeight() * pxArea.getWidth();
 				final boolean clipping = !appWindow.getGui().getDrawingArea().getClientArea().equals(pxArea.rectangle);
 				if (clipping) {
-					log.debug( String.format("Partial redraw (%.0f px). Time: %.03f ms (%.0f ns per pixel).",pxCount, (time2-time)/1000000d,((time2-time)/pxCount)));
+					log.warn( String.format("Partial redraw (%.0f px). Time: %.03f ms (%.0f ns per pixel).",pxCount, (time2-time)/1000000d,((time2-time)/pxCount)));
 				} else {
-					log.debug( String.format("Complete redraw. Time: %.03f ms (%.0f ns per pixel).",(time2-time)/1000000d,((time2-time)/pxCount)));
+					log.warn( String.format("Complete redraw. Time: %.03f ms (%.0f ns per pixel).",(time2-time)/1000000d,((time2-time)/pxCount)));
 				}
 			}
 		}

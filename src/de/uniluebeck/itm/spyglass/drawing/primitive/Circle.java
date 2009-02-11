@@ -19,6 +19,8 @@ import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
 /**
  * A primitive drawing object, representing a circle.
+ * 
+ * TODO: this class has never been used and is potentially broken!
  */
 @Root
 public class Circle extends DrawingObject {
@@ -38,7 +40,7 @@ public class Circle extends DrawingObject {
 	/**
 	 * 
 	 */
-	public int getDiameter() {
+	public synchronized int getDiameter() {
 		return diameter;
 	}
 
@@ -51,7 +53,9 @@ public class Circle extends DrawingObject {
 	 * 
 	 */
 	public void setDiameter(final int diameter, final boolean fireBoundingBoxChangeEvent) {
-		this.diameter = diameter;
+		synchronized (this) {
+			this.diameter = diameter;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 
@@ -65,11 +69,11 @@ public class Circle extends DrawingObject {
 		return super.toString();
 	}
 
-	public short getLineWidth() {
+	public synchronized short getLineWidth() {
 		return lineWidth;
 	}
 
-	public void setLineWidth(final short lineWidth) {
+	public synchronized void setLineWidth(final short lineWidth) {
 		this.lineWidth = lineWidth;
 	}
 

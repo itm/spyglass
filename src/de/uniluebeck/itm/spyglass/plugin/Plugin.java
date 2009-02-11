@@ -460,24 +460,22 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	protected final void fireDrawingObjectChanged(final Collection<Tuple<? extends DrawingObject, AbsoluteRectangle>> dobs) {
 
-		if (isActive() && isVisible()) {
-			// Get listeners
-			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+		// Get listeners
+		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
 
-			// Fire the event (call-back method)
-			for (int i = list.length - 1; i >= 0; i -= 1) {
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
 
-				for (final Tuple<? extends DrawingObject, AbsoluteRectangle> dob : dobs) {
+			for (final Tuple<? extends DrawingObject, AbsoluteRectangle> dob : dobs) {
 
-					if (dob.second != null) {
-						((DrawingObjectListener) list[i]).drawingObjectChanged(dob.first, dob.second);
-					} else {
-						((DrawingObjectListener) list[i]).drawingObjectChanged(dob.first, dob.first.getBoundingBox());
-					}
-
+				if (dob.second != null) {
+					((DrawingObjectListener) list[i]).drawingObjectChanged(dob.first, dob.second);
+				} else {
+					((DrawingObjectListener) list[i]).drawingObjectChanged(dob.first, dob.first.getBoundingBox());
 				}
 
 			}
+
 		}
 
 	}
@@ -495,17 +493,15 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	protected final void fireDrawingObjectChanged(final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
 
-		if (isActive() && isVisible()) {
-			// Get listeners
-			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+		// Get listeners
+		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
 
-			// Fire the event (call-back method)
-			for (int i = list.length - 1; i >= 0; i -= 1) {
-				if (oldBoundingBox != null) {
-					((DrawingObjectListener) list[i]).drawingObjectChanged(dob, oldBoundingBox);
-				} else {
-					((DrawingObjectListener) list[i]).drawingObjectChanged(dob, dob.getBoundingBox());
-				}
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
+			if (oldBoundingBox != null) {
+				((DrawingObjectListener) list[i]).drawingObjectChanged(dob, oldBoundingBox);
+			} else {
+				((DrawingObjectListener) list[i]).drawingObjectChanged(dob, dob.getBoundingBox());
 			}
 		}
 	}
@@ -518,15 +514,13 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @param dobs
 	 */
 	protected final void fireDrawingObjectAdded(final Collection<? extends DrawingObject> dobs) {
-		if (isActive() && isVisible()) {
-			// Get listeners
-			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+		// Get listeners
+		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
 
-			// Fire the event (call-back method)
-			for (int i = list.length - 1; i >= 0; i -= 1) {
-				for (final DrawingObject dob : dobs) {
-					((DrawingObjectListener) list[i]).drawingObjectAdded(dob);
-				}
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
+			for (final DrawingObject dob : dobs) {
+				((DrawingObjectListener) list[i]).drawingObjectAdded(dob);
 			}
 		}
 	}
@@ -540,14 +534,12 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 *            The DrawingObject, which has been added
 	 */
 	protected final void fireDrawingObjectAdded(final DrawingObject dob) {
-		if (isActive() && isVisible()) {
-			// Get listeners
-			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+		// Get listeners
+		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
 
-			// Fire the event (call-back method)
-			for (int i = list.length - 1; i >= 0; i -= 1) {
-				((DrawingObjectListener) list[i]).drawingObjectAdded(dob);
-			}
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
+			((DrawingObjectListener) list[i]).drawingObjectAdded(dob);
 		}
 	}
 
@@ -560,15 +552,13 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 *            The DrawingObject, which has been removed
 	 */
 	protected final void fireDrawingObjectRemoved(final Collection<? extends DrawingObject> dobs) {
-		if (isActive() && isVisible()) {
-			// Get listeners
-			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+		// Get listeners
+		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
 
-			// Fire the event (call-back method)
-			for (int i = list.length - 1; i >= 0; i -= 1) {
-				for (final DrawingObject dob : dobs) {
-					((DrawingObjectListener) list[i]).drawingObjectRemoved(dob);
-				}
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
+			for (final DrawingObject dob : dobs) {
+				((DrawingObjectListener) list[i]).drawingObjectRemoved(dob);
 			}
 		}
 	}
@@ -582,14 +572,12 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 *            The DrawingObject, which has been removed
 	 */
 	protected final void fireDrawingObjectRemoved(final DrawingObject dob) {
-		if (isActive() && isVisible()) {
-			// Get listeners
-			final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
+		// Get listeners
+		final EventListener[] list = listeners.getListeners(DrawingObjectListener.class);
 
-			// Fire the event (call-back method)
-			for (int i = list.length - 1; i >= 0; i -= 1) {
-				((DrawingObjectListener) list[i]).drawingObjectRemoved(dob);
-			}
+		// Fire the event (call-back method)
+		for (int i = list.length - 1; i >= 0; i -= 1) {
+			((DrawingObjectListener) list[i]).drawingObjectRemoved(dob);
 		}
 	}
 

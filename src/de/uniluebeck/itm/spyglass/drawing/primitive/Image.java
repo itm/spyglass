@@ -25,7 +25,7 @@ public class Image extends DrawingObject {
 		this.image = new org.eclipse.swt.graphics.Image(null, imageFileName);
 	}
 	
-	public int getImageSizeX() {
+	public synchronized int getImageSizeX() {
 		return imageSizeX;
 	}
 	
@@ -34,11 +34,13 @@ public class Image extends DrawingObject {
 	}
 	
 	public void setImageSizeX(final int imageSizeX, final boolean fireBoundingBoxChangeEvent) {
-		this.imageSizeX = imageSizeX;
+		synchronized (this) {
+			this.imageSizeX = imageSizeX;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 	
-	public int getImageSizeY() {
+	public synchronized int getImageSizeY() {
 		return imageSizeY;
 	}
 	
@@ -47,7 +49,9 @@ public class Image extends DrawingObject {
 	}
 	
 	public void setImageSizeY(final int imageSizeY, final boolean fireBoundingBoxChangeEvent) {
-		this.imageSizeY = imageSizeY;
+		synchronized (this) {
+			this.imageSizeY = imageSizeY;
+		}
 		updateBoundingBox(fireBoundingBoxChangeEvent);
 	}
 	
@@ -114,12 +118,13 @@ public class Image extends DrawingObject {
 		
 	}
 	
-	public void dispose() {
-		
+	
+	@Override
+	public void destroy() {
 		if (image != null) {
 			image.dispose();
 		}
-		
+		super.destroy();
 	}
 	
 	@Override

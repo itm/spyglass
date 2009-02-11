@@ -44,7 +44,7 @@ public class Map extends DrawingObject {
 	 * 
 	 *  Note that access to this array should be synchronized to ensure a memory barrier
 	 */
-	public double[][] getMatrix() {
+	public synchronized double[][] getMatrix() {
 		return this.dataMatrix;
 	}
 	
