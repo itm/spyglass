@@ -405,6 +405,8 @@ public abstract class DrawingObject {
 				}
 			}
 		}
+		
+		//log.debug("DO "+this+" has new BB "+this.getBoundingBox());
 	}
 
 	// --------------------------------------------------------------------------------

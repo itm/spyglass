@@ -25,11 +25,12 @@ import org.eclipse.swt.widgets.Display;
 import de.uniluebeck.itm.spyglass.core.EventDispatcher;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.drawing.DrawingObject.State;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.gui.view.RulerArea;
 import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent;
 import de.uniluebeck.itm.spyglass.gui.view.TransformChangedListener;
-import de.uniluebeck.itm.spyglass.gui.view.RulerArea;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.DrawingObjectListener;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -323,7 +324,10 @@ public class UIController {
 		@Override
 		public void drawingObjectAdded(final Plugin p, final DrawingObject dob) {
 
-			log.debug("Redraw caused by " + dob);
+			if (dob.getState() != State.INFANT) {
+				throw new RuntimeException("Can only add fresh new DrawingObjects!");
+			}
+			
 
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
@@ -340,8 +344,10 @@ public class UIController {
 		@Override
 		public void drawingObjectChanged(final Plugin p, final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
 
-			log.debug("Redraw caused by " + dob);
-
+			if (dob.getState() != State.ALIVE) {
+				throw new RuntimeException("Can only redraw alive DrawingObjects!");
+			}
+			
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
 
@@ -358,8 +364,10 @@ public class UIController {
 		@Override
 		public void drawingObjectRemoved(final Plugin p, final DrawingObject dob) {
 
-			log.debug("Redraw caused by " + dob);
-
+			if (dob.getState() != State.ALIVE) {
+				throw new RuntimeException("Can only remove alive DrawingObjects!");
+			}
+			
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
 

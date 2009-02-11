@@ -58,7 +58,7 @@ public class LinePainterLine extends Line {
 		gc.dispose();
 		i.dispose();
 
-		return getBoundingBox();
+		return new AbsoluteRectangle(lineBBox.rectangle.union(textRect));
 
 	}
 }
