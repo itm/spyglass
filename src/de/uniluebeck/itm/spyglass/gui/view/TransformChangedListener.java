@@ -13,7 +13,7 @@ import java.util.EventListener;
 /**
  * Listener for transform change events from the drawing area.
  */
-public interface DrawingAreaTransformListener extends EventListener {
+public interface TransformChangedListener extends EventListener {
 	
 	// --------------------------------------------------------------------------------
 	/**
@@ -22,5 +22,5 @@ public interface DrawingAreaTransformListener extends EventListener {
 	 * 
 	 * @param e
 	 */
-	public void handleEvent(DrawingAreaTransformEvent e);
+	public void handleEvent(TransformChangedEvent e);
 }

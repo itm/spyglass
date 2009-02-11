@@ -27,8 +27,8 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformEvent;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformListener;
+import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent;
+import de.uniluebeck.itm.spyglass.gui.view.TransformChangedListener;
 import de.uniluebeck.itm.spyglass.gui.view.RulerArea;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.DrawingObjectListener;
@@ -490,10 +490,10 @@ public class UIController {
 	/**
 	 *  
 	 */
-	private DrawingAreaTransformListener drawingAreaTransformListener = new DrawingAreaTransformListener() {
+	private TransformChangedListener drawingAreaTransformListener = new TransformChangedListener() {
 
 		@Override
-		public void handleEvent(final DrawingAreaTransformEvent e) {
+		public void handleEvent(final TransformChangedEvent e) {
 
 			// we are already in the SWT-Thread
 			appWindow.getGui().getRulerH().redraw();

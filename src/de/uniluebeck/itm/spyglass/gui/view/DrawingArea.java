@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent.Type;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
@@ -616,7 +617,7 @@ public class DrawingArea extends Canvas {
 			at = atCopy;
 		}
 		
-		fireDrawingAreaTransformEvent();
+		fireTransformEvent(Type.MOVE);
 		
 		// redraw the canvas
 		redraw();
@@ -816,7 +817,7 @@ public class DrawingArea extends Canvas {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
 		}
 		
-		fireDrawingAreaTransformEvent();
+		fireTransformEvent(Type.ZOOM_MOVE);
 		
 		// redraw the canvas
 		redraw();
@@ -892,7 +893,7 @@ public class DrawingArea extends Canvas {
 			this.at = newAt;
 		}
 		
-		fireDrawingAreaTransformEvent();
+		fireTransformEvent(Type.MOVE);
 		
 		// redraw the canvas
 		redraw();
@@ -965,7 +966,7 @@ public class DrawingArea extends Canvas {
 			at = atCopy;
 		}
 		
-		fireDrawingAreaTransformEvent();
+		fireTransformEvent(Type.ZOOM_MOVE);
 		
 		// redraw the canvas
 		redraw();
@@ -986,7 +987,7 @@ public class DrawingArea extends Canvas {
 			at.concatenate(AffineTransform.getTranslateInstance(0, diff));
 		}
 		
-		fireDrawingAreaTransformEvent();
+		fireTransformEvent(Type.MOVE);
 		
 		// redraw the canvas
 		redraw();
@@ -1007,7 +1008,7 @@ public class DrawingArea extends Canvas {
 			at.concatenate(AffineTransform.getTranslateInstance(diff, 0));
 		}
 		
-		fireDrawingAreaTransformEvent();
+		fireTransformEvent(Type.MOVE);
 		
 		// redraw the canvas
 		redraw();
@@ -1033,11 +1034,11 @@ public class DrawingArea extends Canvas {
 	 * This method is thread-safe.
 	 * 
 	 */
-	public void addDrawingAreaTransformListener(final DrawingAreaTransformListener listener) {
+	public void addDrawingAreaTransformListener(final TransformChangedListener listener) {
 		if (listener == null) {
 			return;
 		}
-		listeners.add(DrawingAreaTransformListener.class, listener);
+		listeners.add(TransformChangedListener.class, listener);
 	}
 	
 	/**
@@ -1046,24 +1047,24 @@ public class DrawingArea extends Canvas {
 	 * This method is thread-safe.
 	 * 
 	 */
-	public void removeDrawingAreaTransformListener(final DrawingAreaTransformListener listener) {
+	public void removeDrawingAreaTransformListener(final TransformChangedListener listener) {
 		if (listener == null) {
 			return;
 		}
 		
-		listeners.remove(DrawingAreaTransformListener.class, listener);
+		listeners.remove(TransformChangedListener.class, listener);
 	}
 	
 	/**
 	 * Fires a DrawingAreaTransformEvent.
 	 */
-	private void fireDrawingAreaTransformEvent() {
-		// Get listeners
-		final DrawingAreaTransformListener[] list = listeners.getListeners(DrawingAreaTransformListener.class);
-		
+	private void fireTransformEvent(final TransformChangedEvent.Type type) {
+
+		final TransformChangedEvent event = new TransformChangedEvent(this,type);
+
 		// Fire the event (call-back method)
-		for (int i = list.length - 1; i >= 0; i -= 1) {
-			(list[i]).handleEvent(new DrawingAreaTransformEvent(this));
+		for (final TransformChangedListener l: listeners.getListeners(TransformChangedListener.class)) {
+			l.handleEvent(event);
 		}
 	}
 

@@ -9,8 +9,9 @@ import org.eclipse.swt.graphics.RGB;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformEvent;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformListener;
+import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent;
+import de.uniluebeck.itm.spyglass.gui.view.TransformChangedListener;
+import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent.Type;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
@@ -48,12 +49,16 @@ public class Node extends DrawingObject {
 	 * Note: this hack is only necessary, since a Node "doesn't zoom". Most other DrawingObjects
 	 * don't have to bother.
 	 */
-	private DrawingAreaTransformListener drawingAreaListener = new DrawingAreaTransformListener() {
+	private TransformChangedListener drawingAreaListener = new TransformChangedListener() {
 
 		@SuppressWarnings("synthetic-access")
 		@Override
-		public void handleEvent(final DrawingAreaTransformEvent e) {
-			updateBoundingBox();
+		public void handleEvent(final TransformChangedEvent e) {
+			
+			// don't update the boundingbox if we're only moving
+			if (e.type == Type.ZOOM_MOVE) {
+				updateBoundingBox();
+			}
 		}
 	};
 

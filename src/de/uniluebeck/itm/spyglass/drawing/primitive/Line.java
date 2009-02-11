@@ -14,8 +14,9 @@ import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformEvent;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingAreaTransformListener;
+import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent;
+import de.uniluebeck.itm.spyglass.gui.view.TransformChangedListener;
+import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent.Type;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
@@ -26,7 +27,7 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
  * A primitive drawing object, representing a line.
  */
 @Root
-public class Line extends DrawingObject implements DrawingAreaTransformListener {
+public class Line extends DrawingObject implements TransformChangedListener {
 
 	private AbsolutePosition lineEnd = new AbsolutePosition(1, 0, 0);
 
@@ -199,8 +200,11 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 	}
 
 	@Override
-	public void handleEvent(final DrawingAreaTransformEvent e) {
-		updateBoundingBox();
+	public void handleEvent(final TransformChangedEvent e) {
+		// don't update the boundingbox if we're only moving
+		if (e.type == Type.ZOOM_MOVE) {
+			updateBoundingBox();
+		}
 	}
 
 	@Override
@@ -212,6 +216,7 @@ public class Line extends DrawingObject implements DrawingAreaTransformListener 
 	@Override
 	public void init(final DrawingArea drawingArea) {
 		super.init(drawingArea);
+		getDrawingArea().addDrawingAreaTransformListener(this);
 	}
 	
 	
