@@ -303,12 +303,12 @@ public class UIController {
 					case NEW_PLUGIN:
 						p.addDrawingObjectListener(drawingObjectListener);
 						p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
-						
+
 						// handle all drawingobjects that already exist
 						for (final DrawingObject dob : ((Drawable) p).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
 							handleDrawingObjectAdded(p, dob);
 						}
-						
+
 						break;
 					case PLUGIN_REMOVED:
 						p.removeDrawingObjectListener(drawingObjectListener);
@@ -327,10 +327,9 @@ public class UIController {
 			if (dob.getState() != State.INFANT) {
 				throw new RuntimeException("Can only add fresh new DrawingObjects!");
 			}
-			
 
 			// Redrawing the canvas must happen from the SWT display thread
-			display.asyncExec(new Runnable() {
+			display.syncExec(new Runnable() {
 
 				@Override
 				public void run() {
@@ -347,7 +346,7 @@ public class UIController {
 			if (dob.getState() != State.ALIVE) {
 				throw new RuntimeException("Can only redraw alive DrawingObjects!");
 			}
-			
+
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
 
@@ -367,7 +366,7 @@ public class UIController {
 			if (dob.getState() != State.ALIVE) {
 				throw new RuntimeException("Can only remove alive DrawingObjects!");
 			}
-			
+
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
 

@@ -31,6 +31,7 @@ import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
+import de.uniluebeck.itm.spyglass.drawing.DrawingObject.State;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Node;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
@@ -234,23 +235,28 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 		final int nodeID = packet.getSenderId();
 
+		// since the packet made it to this point, its semantic type is listened to
+		// add the packet's semantic type to the ones associated with the node
+		synchronized (nodeSemanticTypes) {
+			Collection<Integer> existingTypes = nodeSemanticTypes.get(nodeID);
+			if (existingTypes == null) {
+				// create a new set where the semantic types of packages of this node are stored
+				existingTypes = new HashSet<Integer>();
+				nodeSemanticTypes.put(nodeID, existingTypes);
+			}
+			existingTypes.add(packet.getSemanticType());
+		}
+
 		// if the description was changed, an update is needed
 		if (parsePayloadByStringFormatters(packet)) {
-
-			// add the packet's semantic type to the ones associated with the node
-			synchronized (nodeSemanticTypes) {
-				if (nodeSemanticTypes.get(nodeID) == null) {
-					// create a new set where the semantic types of packages of this node are stored
-					nodeSemanticTypes.put(nodeID, new HashSet<Integer>());
-				}
-				nodeSemanticTypes.get(nodeID).add(packet.getSemanticType());
-			}
-
+			// parsePayloadByStringFormatters(packet);
 			// get the instance of the node's visualization
 			final Node node = getMatchingNodeObject(nodeID);
 			final AbsoluteRectangle oldBB = new AbsoluteRectangle(node.getBoundingBox());
 			node.setDescription(stringFormatterResultCache.get(nodeID));
-			fireDrawingObjectChanged(node, oldBB);
+			if (node.getState().equals(State.ALIVE)) {
+				fireDrawingObjectChanged(node, oldBB);
+			}
 		}
 	}
 
@@ -276,7 +282,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final Node node = getMatchingNodeObject(nodeID);
 		final AbsoluteRectangle bb = new AbsoluteRectangle(node.getBoundingBox());
 		node.setPosition(position);
-		fireDrawingObjectChanged(node, bb);
+		if (node.getState().equals(State.ALIVE)) {
+			fireDrawingObjectChanged(node, bb);
+		}
 
 	}
 
@@ -408,19 +416,18 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	private Node createNodeObject(final int nodeID) {
 
 		// if the node was existing previously, some useful information might be available
-
 		final boolean isExtended = xmlConfig.isExtendedInformationActive(nodeID);
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
 
-		final Node node = new Node(nodeID, "Node " + nodeID, "", isExtended, lineColorRGB, lineWidth, getPluginManager()
-				.getNodePositioner().getPosition(nodeID));
+		final Node node = new Node(nodeID, "Node " + nodeID, "", isExtended, lineColorRGB, lineWidth, getPluginManager().getNodePositioner()
+				.getPosition(nodeID));
 
 		synchronized (layer) {
 			layer.add(node);
 			nodes.put(nodeID, node);
 		}
-
+		fireDrawingObjectAdded(node);
 		return node;
 	}
 
