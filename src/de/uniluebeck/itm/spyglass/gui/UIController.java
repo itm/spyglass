@@ -329,7 +329,7 @@ public class UIController {
 			}
 
 			// Redrawing the canvas must happen from the SWT display thread
-			display.syncExec(new Runnable() {
+			display.asyncExec(new Runnable() {
 
 				@Override
 				public void run() {
@@ -342,10 +342,6 @@ public class UIController {
 
 		@Override
 		public void drawingObjectChanged(final Plugin p, final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
-
-			if (dob.getState() != State.ALIVE) {
-				throw new RuntimeException("Can only redraw alive DrawingObjects!");
-			}
 
 			// Redrawing the canvas must happen from the SWT display thread
 			display.asyncExec(new Runnable() {
