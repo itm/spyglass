@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.ScrollBar;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent.Type;
@@ -57,11 +56,6 @@ public class DrawingArea extends Canvas {
 	private static Logger log = SpyglassLoggerFactory.getLogger(DrawingArea.class);
 	
 	/**
-	 * Reference to model
-	 */
-	private Spyglass spyglass;
-	
-	/**
 	 * Scale factor applied while zooming.
 	 */
 	public final static double ZOOM_FACTOR = 1.1;
@@ -72,6 +66,36 @@ public class DrawingArea extends Canvas {
 	 */
 	private final double ZOOM_MAX = 50;
 	
+	/**
+	 * Limitation of the zoom. Any zoom level which completely shows this rectangle will be considered forbidden.
+	 */
+	private static final AbsoluteRectangle MAX_ZOMM_OUT = new AbsoluteRectangle( -((int) Math.pow(2, 17)),  -((int) Math.pow(2, 17)), 2 * ((int) Math.pow(2, 17)), 2 * ((int) Math.pow(2, 17)));
+
+	/**
+	 * x-coordinate of the upper-left point of the world.
+	 */
+	private static final int WORLD_UPPER_LEFT_X = -((int) Math.pow(2, 15));
+
+	/**
+	 * y-coordinate of the upper-left point of the world.
+	 */
+	private static final int WORLD_UPPER_LEFT_Y = -((int) Math.pow(2, 15));
+
+	/**
+	 * width of the world.
+	 */
+	private static final int WORLD_WIDTH = 2 * ((int) Math.pow(2, 15));
+
+	/**
+	 * height of the world.
+	 */
+	private static final int WORLD_HEIGHT = 2 * ((int) Math.pow(2, 15));
+
+	/**
+	 * Number of pixels to be moved when Up/Down/Left/right is pressed.
+	 */
+	private final int MOVE_OFFSET = 20;
+
 	/**
 	 * The transformation matrix. it transforms coordinates from the absolute reference frame to the
 	 * reference frame of the drawing area
@@ -84,31 +108,6 @@ public class DrawingArea extends Canvas {
 	 * Mutex to synchronize access to "at"
 	 */
 	private Object transformMutex = new Object();
-	
-	/**
-	 * Limitation of the zoom. Any zoom level which completely shows this rectangle will be considered forbidden.
-	 */
-	private static final AbsoluteRectangle MAX_ZOMM_OUT = new AbsoluteRectangle( -((int) Math.pow(2, 17)),  -((int) Math.pow(2, 17)), 2 * ((int) Math.pow(2, 17)), 2 * ((int) Math.pow(2, 17)));
-	
-	/**
-	 * x-coordinate of the upper-left point of the world.
-	 */
-	private static final int WORLD_UPPER_LEFT_X = -((int) Math.pow(2, 15));
-	
-	/**
-	 * y-coordinate of the upper-left point of the world.
-	 */
-	private static final int WORLD_UPPER_LEFT_Y = -((int) Math.pow(2, 15));
-	
-	/**
-	 * width of the world.
-	 */
-	private static final int WORLD_WIDTH = 2 * ((int) Math.pow(2, 15));
-	
-	/**
-	 * height of the world.
-	 */
-	private static final int WORLD_HEIGHT = 2 * ((int) Math.pow(2, 15));
 	
 	/**
 	 * Listerńers for the DrawingAreaTransformEvent.
@@ -126,11 +125,6 @@ public class DrawingArea extends Canvas {
 	private final Color canvasBgColor = new Color(getDisplay(), 255, 255, 255);
 	
 	/**
-	 * Number of pixels to be moved when Up/Down/Left/right is pressed.
-	 */
-	private final int MOVE_OFFSET = 20;
-	
-	/**
 	 * True, while the user moves the map via mouse
 	 */
 	private volatile boolean mouseDragInProgress = false;
@@ -139,69 +133,6 @@ public class DrawingArea extends Canvas {
 	 * the starting point of the movement business.
 	 */
 	private volatile PixelPosition mouseDragStartPosition = null;
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * Create a new DrawingArea.
-	 * 
-	 * @param parent
-	 * @param style
-	 * @param spyglass
-	 *            Reference to spyglass.
-	 */
-	public DrawingArea(final Composite parent, final int style, final Spyglass spyglass) {
-		// 
-		super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_BACKGROUND
-				| SWT.DOUBLE_BUFFERED);
-		
-		this.spyglass = spyglass;
-		
-		init();
-		
-	}
-		
-	private void init() {
-		setBackground(canvasBgColor);
-		
-		// handle user events on the canvas (moving, zoom)
-		addMouseListener(mouseListener);
-		addMouseMoveListener(mouseMoveListener);
-		addMouseWheelListener(mouseWheelListener);
-		addKeyListener(keyListener);
-		
-		// handle ScrollBar events
-		getHorizontalBar().addSelectionListener(scrollListenerH);
-		getVerticalBar().addSelectionListener(scrollListenerV);
-		
-		getHorizontalBar().setMinimum(0);
-		getHorizontalBar().setMaximum(WORLD_WIDTH);
-		getHorizontalBar().setPageIncrement(10);
-		getHorizontalBar().setIncrement(1);
-		
-		getVerticalBar().setMinimum(0);
-		getVerticalBar().setMaximum(WORLD_HEIGHT);
-		getVerticalBar().setPageIncrement(10);
-		getVerticalBar().setIncrement(1);
-		
-		addControlListener(this.controlListener);
-		
-		syncScrollBars();
-		
-		// The canvas must not act on mouse wheel events (normally it would move the
-		// scroll bars) since the mouse wheel already controls the zoom.
-		addListener(SWT.MouseWheel, new Listener() {
-			
-			@Override
-			public void handleEvent(final Event event) {
-				event.doit = false;
-			}
-		});
-		
-		addPaintListener(paintListener);
-		
-		addDisposeListener(disposeListener);
-		
-	}
 	
 	/**
 	 * Dispose children
@@ -327,23 +258,11 @@ public class DrawingArea extends Canvas {
 	/**
 	 * handle changes on the horizontal scrollbar
 	 */
-	private final SelectionListener scrollListenerH = new SelectionAdapter() {
+	private final SelectionListener scrollListener = new SelectionAdapter() {
 		
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
-			scrollHorizontally((ScrollBar) e.widget);
-		}
-		
-	};
-	
-	/**
-	 * handle changes on the vertical scrollbar
-	 */
-	private final SelectionListener scrollListenerV = new SelectionAdapter() {
-		
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			scrollVertically((ScrollBar) e.widget);
+			scroll();
 		}
 		
 	};
@@ -389,6 +308,83 @@ public class DrawingArea extends Canvas {
 		}
 	};
 	
+	// --------------------------------------------------------------------------------
+	/**
+	 * Create a new DrawingArea.
+	 * 
+	 * @param parent
+	 * @param style
+	 * @param spyglass
+	 *            Reference to spyglass.
+	 */
+	public DrawingArea(final Composite parent, final int style, final Spyglass spyglass) {
+		// 
+		super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_BACKGROUND
+				| SWT.DOUBLE_BUFFERED);
+		
+		init();
+		
+	}
+
+	private void init() {
+		setBackground(canvasBgColor);
+		
+		initKeyMouse();
+		
+		initScrollBars();
+		
+		addControlListener(this.controlListener);
+		
+		addPaintListener(paintListener);
+		
+		addDisposeListener(disposeListener);
+		
+	}
+
+	/**
+	 * Add Mouse and Key listener
+	 */
+	private void initKeyMouse() {
+		// handle user events on the canvas (moving, zoom)
+		addMouseListener(mouseListener);
+		addMouseMoveListener(mouseMoveListener);
+		addMouseWheelListener(mouseWheelListener);
+		addKeyListener(keyListener);
+	}
+
+	/**
+	 * Configure scroll bars
+	 */
+	private void initScrollBars() {
+		// handle ScrollBar events
+		getHorizontalBar().addSelectionListener(scrollListener);
+		getVerticalBar().addSelectionListener(scrollListener);
+
+		getHorizontalBar().setMinimum(0);
+		getHorizontalBar().setMaximum(WORLD_WIDTH);
+		getHorizontalBar().setPageIncrement(1000);
+		getHorizontalBar().setIncrement(100);
+		
+		getVerticalBar().setMinimum(0);
+		getVerticalBar().setMaximum(WORLD_HEIGHT);
+		getVerticalBar().setPageIncrement(1000);
+		getVerticalBar().setIncrement(100);
+		
+		syncScrollBars();
+		
+		// The canvas must not act on mouse wheel events (normally it would move the
+		// scroll bars) since the mouse wheel already controls the zoom.
+		addListener(SWT.MouseWheel, new Listener() {
+			
+			@Override
+			public void handleEvent(final Event event) {
+				event.doit = false;
+			}
+		});
+		
+	
+	}
+
 	/**
 	 * Draw the background.
 	 * 
@@ -975,16 +971,34 @@ public class DrawingArea extends Canvas {
 	}
 	
 	/**
-	 * Handle a vertical scroll on the given scroll bar
+	 * Handle a scroll event
 	 */
-	private void scrollVertically(final ScrollBar scrollBar) {
+	private void scroll() {
 		
-		final double ty = getUpperLeft().y;
-		final double select = scrollBar.getSelection();
-		final double diff = ty - select - WORLD_UPPER_LEFT_Y;
+		final int selectY = getVerticalBar().getSelection() + WORLD_UPPER_LEFT_Y;
+		final int selectX = getHorizontalBar().getSelection() + WORLD_UPPER_LEFT_X;
 		
+		final AbsolutePosition newPos = new AbsolutePosition(selectX,selectY);
+
+		int dx = getUpperLeft().x-newPos.x;
+		int dy = getUpperLeft().y-newPos.y;
+
+		// don't allow using scrollbars if we're at the border
+		if ((getHorizontalBar().getSelection()==getHorizontalBar().getMinimum()) && (dx < 0)) {
+			dx = 0;
+		}
+		if ((getHorizontalBar().getSelection()==getHorizontalBar().getMaximum()) && (dx > 0)) {
+			dx = 0;
+		}
+		if ((getVerticalBar().getSelection()==getVerticalBar().getMinimum()) && (dy < 0)) {
+			dy = 0;
+		}
+		if ((getVerticalBar().getSelection()==getVerticalBar().getMaximum()) && (dy > 0)) {
+			dy = 0;
+		}
+
 		synchronized (transformMutex) {
-			at.concatenate(AffineTransform.getTranslateInstance(0, diff));
+			at.concatenate(AffineTransform.getTranslateInstance(dx, dy));
 		}
 		
 		fireTransformEvent(Type.MOVE);
@@ -995,35 +1009,15 @@ public class DrawingArea extends Canvas {
 		syncScrollBars();
 	}
 	
-	/**
-	 * Handle a horizontal scroll on the given scroll bar
-	 */
-	private void scrollHorizontally(final ScrollBar scrollBar) {
-		
-		final double tx = getUpperLeft().x;
-		final double select = scrollBar.getSelection();
-		final double diff = tx - select - WORLD_UPPER_LEFT_X;
-		
-		synchronized (transformMutex) {
-			at.concatenate(AffineTransform.getTranslateInstance(diff, 0));
-		}
-		
-		fireTransformEvent(Type.MOVE);
-		
-		// redraw the canvas
-		redraw();
-		
-		syncScrollBars();
-	}
-	
+
 	/**
 	 * Readjust the scrollbars to the current position
 	 */
 	private void syncScrollBars() {
-		
 		getHorizontalBar().setSelection(getUpperLeft().x - WORLD_UPPER_LEFT_X);
-		getVerticalBar().setSelection(getUpperLeft().y - WORLD_UPPER_LEFT_X);
-		
+		getVerticalBar().setSelection(getUpperLeft().y - WORLD_UPPER_LEFT_Y);
+		getHorizontalBar().setThumb(getAbsoluteDrawingRectangle().getWidth());
+		getVerticalBar().setThumb(getAbsoluteDrawingRectangle().getHeight());
 	}
 	
 	/**
