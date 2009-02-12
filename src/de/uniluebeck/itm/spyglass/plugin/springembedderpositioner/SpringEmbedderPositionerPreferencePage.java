@@ -23,7 +23,8 @@ public class SpringEmbedderPositionerPreferencePage extends PluginPreferencePage
 
 		final Composite composite = createContentsInternal(parent);
 
-		final SpringEmbedderPositionerOptionsComposite optionsComposite = new SpringEmbedderPositionerOptionsComposite(composite);
+		final SpringEmbedderPositionerOptionsComposite optionsComposite = new SpringEmbedderPositionerOptionsComposite(composite, this.dbc,
+				this.config);
 
 		return composite;
 	}

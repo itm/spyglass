@@ -4,6 +4,12 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.springembedderpositioner;
 
+import org.eclipse.core.databinding.DataBindingContext;
+import org.eclipse.core.databinding.UpdateValueStrategy;
+import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.jface.databinding.swt.ISWTObservableValue;
+import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -11,6 +17,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
@@ -26,9 +35,23 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 	private Text repulsionFactor;
 	private Text efficiencyFactor;
 
-	public SpringEmbedderPositionerOptionsComposite(final Composite parent) {
+	private DataBindingContext dbc;
+	private SpringEmbedderPositionerXMLConfig config;
+
+	public SpringEmbedderPositionerOptionsComposite(final Composite parent, final DataBindingContext dbc,
+			final SpringEmbedderPositionerXMLConfig config) {
 		super(parent, SWT.NONE);
 		initGui();
+		this.dbc = dbc;
+		this.config = config;
+
+		IObservableValue obsModel;
+		ISWTObservableValue obsWidget;
+
+		obsWidget = SWTObservables.observeText(timeout, SWT.Modify);
+		obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, PluginXMLConfig.PROPERTYNAME_TIMEOUT);
+		dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+				.setAfterConvertValidator(new IntegerRangeValidator(0, Integer.MAX_VALUE)), null);
 	}
 
 	// --------------------------------------------------------------------------------
