@@ -18,12 +18,13 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.DoubleRangeValidator;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
- * @author olli
+ * @author Oliver Kleine
  * 
  */
 public class SpringEmbedderPositionerOptionsComposite extends Composite {
@@ -48,10 +49,46 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 		IObservableValue obsModel;
 		ISWTObservableValue obsWidget;
 
-		obsWidget = SWTObservables.observeText(timeout, SWT.Modify);
-		obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, PluginXMLConfig.PROPERTYNAME_TIMEOUT);
-		dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-				.setAfterConvertValidator(new IntegerRangeValidator(0, Integer.MAX_VALUE)), null);
+		{
+			obsWidget = SWTObservables.observeText(timeout, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, PluginXMLConfig.PROPERTYNAME_TIMEOUT);
+			dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new IntegerRangeValidator(0, Integer.MAX_VALUE)), null);
+		}
+
+		{
+			obsWidget = SWTObservables.observeText(optimumSpringLength, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					SpringEmbedderPositionerXMLConfig.PROPERTYNAME_OPTIMUM_SPRING_LENGTH);
+			dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new IntegerRangeValidator(0, Integer.MAX_VALUE)), null);
+
+		}
+
+		{
+			obsWidget = SWTObservables.observeText(springStiffness, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					SpringEmbedderPositionerXMLConfig.PROPERTYNAME_SPRING_STIFFNESS);
+			dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new DoubleRangeValidator(0, 1)), null);
+		}
+
+		{
+			obsWidget = SWTObservables.observeText(repulsionFactor, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					SpringEmbedderPositionerXMLConfig.PROPERTYNAME_REPULSION_FACTOR);
+			dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new IntegerRangeValidator(0, Integer.MAX_VALUE)), null);
+		}
+
+		{
+			obsWidget = SWTObservables.observeText(efficiencyFactor, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					SpringEmbedderPositionerXMLConfig.PROPERTYNAME_EFFICIENCY_FACTOR);
+			dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setAfterConvertValidator(new DoubleRangeValidator(0, 1)), null);
+		}
+
 	}
 
 	// --------------------------------------------------------------------------------

@@ -287,10 +287,10 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 	private AbsolutePosition springEmbedding(final int id) {
 
-		final double springLength = 200;
-		final double stiffness = 1;
-		final double repFactor = 2000000;
-		final double epsilon = 0.1;
+		final double springLength = xmlConfig.getOptimumSpringLength();
+		final double stiffness = xmlConfig.getSpringStiffness();
+		final double repFactor = xmlConfig.getRepulsionFactor();
+		final double epsilon = xmlConfig.getEfficiencyFactor();
 
 		final PositionData data = nodeMap.get(id);
 
