@@ -32,12 +32,12 @@ public class ComplexPacketReader extends PacketReader {
 	private InputStream playbackFileReader = null;
 
 	private long lastPacketTimestamp = -1;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 * @throws InterruptedException
-	 * @throws Exception
+	 * @throws SpyglassPacketException
 	 * 
 	 */
 	@Override
@@ -46,7 +46,7 @@ public class ComplexPacketReader extends PacketReader {
 		if (playbackFileReader == null) {
 			playbackFileReader = getGateway().getInputStream();
 		}
-		
+
 		SpyglassPacket packet = null;
 		try {
 
@@ -77,6 +77,12 @@ public class ComplexPacketReader extends PacketReader {
 	public void reset() throws IOException {
 		lastPacketTimestamp = -1;
 		playbackFileReader.reset();
+	}
+
+	// --------------------------------------------------------------------------------
+	@Override
+	public void shutdown() throws IOException {
+		reset();
 	}
 
 }

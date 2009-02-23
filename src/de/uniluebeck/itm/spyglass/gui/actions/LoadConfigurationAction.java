@@ -13,6 +13,14 @@ import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
+//--------------------------------------------------------------------------------
+/**
+ * Implementation of an {@link Action} needed for loading a Spyglass configuration.
+ * 
+ * @author Dariush Forouher
+ * @author Sebastian Ebers
+ * 
+ */
 public class LoadConfigurationAction extends Action {
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(LoadConfigurationAction.class);
@@ -21,15 +29,24 @@ public class LoadConfigurationAction extends Action {
 
 	private final Spyglass spyglass;
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param spyglass
+	 *            the spyglass instance
+	 */
 	public LoadConfigurationAction(final Spyglass spyglass) {
 		this.spyglass = spyglass;
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void run() {
 		loadFromFileSystem();
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Loads the configuration from a file which is selected using a {@link FileDialog}
 	 * 
@@ -50,6 +67,7 @@ public class LoadConfigurationAction extends Action {
 			// first we have to load the new config, to avoid that it is overwritten in the meantime
 			try {
 				spyglass.getConfigStore().importConfig(f);
+				spyglass.reset();
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
 			} catch (final Exception e) {
@@ -61,23 +79,26 @@ public class LoadConfigurationAction extends Action {
 				SpyglassEnvironment.setConfigFilePath(f);
 				SpyglassEnvironment.setConfigFileWorkingDirectory(f.getParent());
 			} catch (final IOException e) {
-				log.error("Could not store the new config path in my property file.",e);
+				log.error("Could not store the new config path in my property file.", e);
 			}
 			return true;
 		}
 		return false;
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public String getText() {
 		return "&Open file";
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public String getToolTipText() {
 		return "Load Configuration";
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return imageDescriptor;

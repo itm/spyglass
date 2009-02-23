@@ -12,6 +12,7 @@ import ishell.util.IconTheme;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.custom.CTabItem;
@@ -25,10 +26,10 @@ import de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketBroker;
 import de.uniluebeck.itm.spyglass.packet.PacketFactory;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
-// --
 /**
  * To use this plug-in in iShell, you need to add two option to your iShell configuration file
  * (typically ishell.properties).
@@ -56,7 +57,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	private static final int SPYGLASS_PACKET_TYPE = 0x91;
 
 	private Spyglass spyglass = null;
-	
+
 	private PacketFactory factory;
 
 	private UIController controller = null;
@@ -64,7 +65,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	private IShellToSpyGlassPacketBroker packetBroker;
 
 	private AppWindow appWindow = null;
-	
+
 	private ToolbarHandler toolbarStuff = null;
 
 	// --------------------------------------------------------------------------
@@ -96,21 +97,21 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 
 			// add tooltip icons
 			toolbarStuff = new ToolbarHandler(getCoolBar(), spyglass, appWindow);
-			
+
 			// Start Spyglass
 			spyglass.start();
-			
+
 			factory = new PacketFactory(spyglass);
-			
+
 		} catch (final Exception e) {
 			log.error("Could not initialize plugin \"Spyglass\" because of an very early error.", e);
-			
+
 			// remove spyglass tab
 			this.removeTabItem();
 			this.shutdown();
-			return new int[] { };
+			return new int[] {};
 		}
-		
+
 		log.info("Spyglass ready.");
 
 		return new int[] { SPYGLASS_PACKET_TYPE };
@@ -121,9 +122,11 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		// save the packet broker for later
 
 		// XXX: can we really assume this cast?
+		// according to the new structure and to the method's name - yes, we can!?!
 		packetBroker = (IShellToSpyGlassPacketBroker) spyglass.getPacketReader();
 
 		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
 				if (evt.getPropertyName().equals("packetReader")) {
@@ -139,7 +142,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	 */
 	@Override
 	public void receivePacket(final MessagePacket packet) {
-	
+
 		if (isPaused()) {
 			return;
 		}
@@ -167,13 +170,13 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	public void shutdown() {
 
 		log.debug("Terminating spyglass...");
-		
+
 		if (appWindow.getGui().isDisposed()) {
 			log.debug("GUI already gone...");
 		}
-		
+
 		// Destroy the components in the reverse direction if which they were created.
-		
+
 		if (controller != null) {
 			controller.shutdown();
 			controller = null;
@@ -188,9 +191,14 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			spyglass.shutdown();
 			spyglass = null;
 		}
-		
-		// TODO: what to do with packet broker?
-		
+
+		try {
+			packetBroker.shutdown();
+		} catch (final IOException e) {
+			// since the application is about to exit, there is no need to display this exception
+			((SpyglassLogger) log).error("An error occured while trying to shut down the packet broker.", e, false);
+		}
+
 		log.info("SpyGlass end. Done.");
 	}
 

@@ -635,7 +635,10 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 	private void clickedButtonLoadPreferences() {
 		if (new LoadConfigurationAction(spyglass).loadFromFileSystem()) {
+			log.info("The new configuration was loaded successfully");
 			preferenceDialog.close();
+		} else {
+			log.error("An error occured while loading the configuration");
 		}
 	}
 
@@ -877,7 +880,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	public void selectPreferencePage(final Plugin p) {
 		preferenceDialog.selectPreferenceNode(p);
 	}
-	
+
 	public static void main(final String[] args) {
 		try {
 			final Display display = Display.getDefault();
@@ -887,9 +890,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			inst.open();
 			sg.shutdown();
 		} catch (final Exception e) {
-			log.error("Error while spyglassing.",e);
+			log.error("Error while spyglassing.", e);
 		}
 	}
-
 
 }

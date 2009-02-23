@@ -31,9 +31,9 @@ import de.uniluebeck.itm.spyglass.xmlconfig.XMLConfig;
  * 
  * @author Sebastian Ebers, Daniel Bimschas, Dariush Forouher
  */
-@Root(strict=true)
+@Root(strict = true)
 public class SpyglassConfiguration extends XMLConfig {
-	
+
 	/**
 	 * The current packetReader.
 	 * 
@@ -41,27 +41,27 @@ public class SpyglassConfiguration extends XMLConfig {
 	 */
 	@Element(name = "packetReader")
 	private volatile PacketReader packetReader = new PacketRecorder();
-	
+
 	/**
-	 * The one and only plugin manager
+	 * The one and only plug-in manager
 	 */
 	@Element(name = "instances")
-	private final PluginManager pluginManager = new PluginManager();
-	
+	private PluginManager pluginManager = new PluginManager();
+
 	/**
 	 * some general settings
 	 */
 	@Element(name = "generalSettings")
 	private final GeneralSettingsXMLConfig generalSettings = new GeneralSettingsXMLConfig();
-	
+
 	/**
-	 * The default configurations for all plugins
+	 * The default configurations for all plug-ins
 	 * 
 	 * Must be declared volatile since it can be replaced at runtime.
 	 */
 	@ElementList(name = "defaults")
 	private volatile Collection<Plugin> defaults = new LinkedList<Plugin>();
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the generalSettings
@@ -69,7 +69,7 @@ public class SpyglassConfiguration extends XMLConfig {
 	public GeneralSettingsXMLConfig getGeneralSettings() {
 		return generalSettings;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param defaults
@@ -82,7 +82,7 @@ public class SpyglassConfiguration extends XMLConfig {
 		this.defaults = new LinkedList<Plugin>(defaults);
 		firePropertyChange("defaults", oldDefaults, this.defaults);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns a read-only collection of plug-ins which are configured by default
@@ -94,7 +94,7 @@ public class SpyglassConfiguration extends XMLConfig {
 	public Collection<Plugin> getDefaultPlugins() {
 		return Collections.unmodifiableCollection(defaults);
 	}
-	
+
 	// --------------------------------------------------------------------------
 	/**
 	 * Returns the default configuration parameters of a plug-in
@@ -104,18 +104,33 @@ public class SpyglassConfiguration extends XMLConfig {
 	 * @return the default configuration parameters of a plug-in
 	 */
 	public PluginXMLConfig getDefaultConfig(final Class<? extends Plugin> clazz) {
-		
+
 		final Collection<Plugin> plugins = getDefaultPlugins();
 		for (final Plugin plugin : plugins) {
 			if (plugin.getClass().equals(clazz)) {
 				return plugin.getXMLConfig();
 			}
 		}
-		
+
 		return null;
-		
+
 	}
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the instance which manages the plug-ins
+	 * 
+	 * @param pluginManager
+	 *            the instance which manages the plug-ins
+	 */
+	public void setPluginManager(final PluginManager pluginManager) {
+		// Note: Do NOT remove this method since it will be needed e.g. if a new configuration
+		// overwrites the current one
+		final PluginManager oldPM = this.pluginManager;
+		this.pluginManager = pluginManager;
+		firePropertyChange("pluginManager", oldPM, this.pluginManager);
+	}
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the instance which manages the plug-ins
@@ -125,17 +140,28 @@ public class SpyglassConfiguration extends XMLConfig {
 	public PluginManager getPluginManager() {
 		return pluginManager;
 	}
-	
+
 	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the PacketReader instance which currently provides the packets.
+	 * 
+	 * @return the PacketReader instance which currently provides the packets.
+	 */
 	public PacketReader getPacketReader() {
 		return packetReader;
 	}
-	
+
 	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the PacketReader instance which will provide the packets.
+	 * 
+	 * @param packetReader
+	 *            the PacketReader instance which will provide the packets.
+	 */
 	public void setPacketReader(final PacketReader packetReader) {
 		final PacketReader oldReader = this.packetReader;
 		this.packetReader = packetReader;
 		firePropertyChange("packetReader", oldReader, packetReader);
 	}
-	
+
 }

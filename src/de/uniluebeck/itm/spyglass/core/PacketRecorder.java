@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -87,6 +88,12 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	// ----------------------------------------------------------------
 	/** The time stamp of the last packed read from a file */
 	private long lastPlaybackPacketDeliveryTimestamp = -1;
+
+	/** Indicates whether the recorder should skip waiting for the arrival of a new packet */
+	private AtomicBoolean skipWaiting = new AtomicBoolean(false);
+
+	/** Indicates whether the recorder is shut down or not */
+	private volatile boolean recorderShutDown = false;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -421,11 +428,15 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	// --------------------------------------------------------------------------------
 	@Override
 	public void push(final SpyglassPacket packet) {
-		// the packets could be pushed in the super classes queue but when the readFromFile time
-		// lasts to long, an out of memory exception might occur
-		if (!readFromFile) {
-			handlePacket(packet);
-			super.push(packet);
+		if (!recorderShutDown) {
+			// the packets could be pushed in the super classes queue but when the readFromFile time
+			// lasts to long, an out of memory exception might occur
+			if (!readFromFile) {
+				handlePacket(packet);
+				super.push(packet);
+			}
+		} else {
+			log.warn("The packet will not be pushed into the packet queue since this instance was shut down!");
 		}
 	}
 
@@ -435,15 +446,20 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 
 		SpyglassPacket packet = null;
 
-		// this do while is needed, to guarantee that valid packets are returned
-		do {
-			// if a file was chosen as input source ...
-			if (readFromFile) {
-				packet = getNextPlaybackPacket();
-			} else {
-				packet = super.getNextPacket();
-			}
-		} while (packet == null);
+		if (!recorderShutDown) {
+			// this do while is needed, to guarantee that valid packets are returned
+			do {
+				// if a file was chosen as input source ...
+				if (readFromFile) {
+					packet = getNextPlaybackPacket();
+				} else {
+					packet = super.getNextPacket();
+				}
+			} while ((packet == null) && !skipWaiting.getAndSet(false));
+		} else {
+			log.warn("No packet will be fetched from the queue since this instance was shut down!");
+		}
+
 		return packet;
 	}
 
@@ -716,6 +732,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	@Override
 	public void reset() throws IOException {
 		log.info("Reset requested");
+		skipWaiting.set(true);
 		super.reset();
 		synchronized (gatewayMutex) {
 			if (isReadFromFile() && !isRecord()) {
@@ -751,6 +768,24 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 		}
 
 		log.info("Reset done");
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Shuts the packet recorder down.<br>
+	 * All currently cached packets will be disposed and the thread consuming the packets will be
+	 * stopped. Additionally, all registered listeners will be removed.
+	 * 
+	 * @throws IOException
+	 *             thrown if the resetting of the input fails
+	 */
+	@Override
+	public void shutdown() throws IOException {
+		super.shutdown();
+		recorderShutDown = true;
+		if ((packetConsumerThread != null) && !packetConsumerThread.isInterrupted()) {
+			packetConsumerThread.interrupt();
+		}
 	}
 
 	// // --------------------------------------------------------------------------------

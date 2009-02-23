@@ -11,6 +11,7 @@ import java.beans.PropertyChangeSupport;
  * {@link PropertyBean#firePropertyChange(String, Object, Object)} if a property changes.
  * 
  * @author Dariush Forouher
+ * @author Sebastian Ebers
  * 
  */
 public abstract class PropertyBean {
@@ -116,6 +117,17 @@ public abstract class PropertyBean {
 	 */
 	protected void firePropertyChange(final String propertyName, final Object oldValue, final Object newValue) {
 		propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Removes all registered property change listeners.
+	 */
+	protected void removeAllPropertyChangeListeners() {
+		final PropertyChangeListener[] listeners = propertyChangeSupport.getPropertyChangeListeners();
+		for (int i = 0; i < listeners.length; i++) {
+			removePropertyChangeListener(listeners[i]);
+		}
 	}
 
 }

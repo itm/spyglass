@@ -50,7 +50,7 @@ public class ConfigStore extends PropertyBean {
 	 * Thread, which is responsible for storing into the default config file.
 	 * 
 	 * @author Dariush Forouher
-	 *
+	 * 
 	 */
 	private final class AsyncStoreRunnable implements Runnable {
 
@@ -59,10 +59,9 @@ public class ConfigStore extends PropertyBean {
 
 			log.debug("Async-Store thread started.");
 
-			while (!Thread.currentThread().isInterrupted())
-			{
+			while (!Thread.currentThread().isInterrupted()) {
 				try {
-					
+
 					// wait until we're notified
 					synchronized (storePendingMutex) {
 						if (!storePending) {
@@ -74,16 +73,16 @@ public class ConfigStore extends PropertyBean {
 					// sleep for one second to wait for other calls which have not to be
 					// processed for that reason
 					Thread.sleep(1000);
-	
+
 				} catch (final InterruptedException e) {
 					Thread.currentThread().interrupt();
-					
+
 				} finally {
 					if (!Thread.currentThread().isInterrupted()) {
-						
+
 						// allow new store requests to be made
 						storePending = false;
-						
+
 						storeSync(SpyglassEnvironment.getConfigFilePath());
 					}
 				}
@@ -99,12 +98,12 @@ public class ConfigStore extends PropertyBean {
 
 	/** true, if the config should be written to file. */
 	private volatile boolean storePending = false;
-	
+
 	private final Object storePendingMutex = new Object();
 
 	/** Thread for async stores */
-	private final Thread storeThread = new Thread(new AsyncStoreRunnable(),"ConfigStore-Thread");
-	
+	private final Thread storeThread = new Thread(new AsyncStoreRunnable(), "ConfigStore-Thread");
+
 	// --------------------------------------------------------------------------
 	/**
 	 * Listener for changes in the plug-in list
@@ -146,7 +145,8 @@ public class ConfigStore extends PropertyBean {
 	/**
 	 * Reads the configuration from an hard-coded standard-path (which is stored internally in this
 	 * class)
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 * 
 	 */
 	public ConfigStore() throws Exception {
@@ -156,7 +156,7 @@ public class ConfigStore extends PropertyBean {
 		// create the file if necessary
 		if (!f.exists()) {
 			if (!f.getParentFile().exists() && !f.getParentFile().mkdirs()) {
-				throw new IOException("Could not create directory "+f.getParent());
+				throw new IOException("Could not create directory " + f.getParent());
 			}
 			f.createNewFile();
 			newFile = true;
@@ -168,7 +168,7 @@ public class ConfigStore extends PropertyBean {
 		}
 
 		SpyglassConfiguration newConfig = null;
-		
+
 		if (!newFile) {
 
 			try {
@@ -178,7 +178,7 @@ public class ConfigStore extends PropertyBean {
 			} catch (final Exception e) {
 				log.error("Unable to load configuration input:\r\nThe configuration file '" + f + "' is invalid! I'll move"
 						+ " the broken one away and start with a fresh config", e);
-		
+
 				final boolean ret = f.renameTo(new File(f.getAbsolutePath() + ".save-" + System.currentTimeMillis()));
 				if (!ret) {
 					throw new IOException("Could not move config file out of the way. Stopping.", e);
@@ -199,7 +199,7 @@ public class ConfigStore extends PropertyBean {
 		registerListener();
 
 		storeThread.start();
-		
+
 		// TODO: for Milestone2: register for events from the PacketReader
 	}
 
@@ -230,7 +230,8 @@ public class ConfigStore extends PropertyBean {
 	/**
 	 * Create a Spyglass Configuration with default values and one PostionPacketNodePositioner as
 	 * the only plugin.
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	private static SpyglassConfiguration createDefaultSpyglassConfig() throws Exception {
 		SpyglassConfiguration newConfig;
@@ -266,19 +267,14 @@ public class ConfigStore extends PropertyBean {
 		if (spyglassConfig == null) {
 			throw new IllegalStateException("Cannot import a configuration when we have" + "no working base configuration yet.");
 		}
-		
+
 		final SpyglassConfiguration sgc = ConfigStore.load(file);
+
+		/* get rid of the current configuration, listeners and plug-ins */
 
 		log.debug("Unregistering old listener.");
 		// unregister the old ones
 		unregisterListener();
-
-		log.debug("Stopping plugins.");
-		// destroy the currently active plug-ins since they will be no longer needed
-		for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
-			p.reset();
-			p.shutdown();
-		}
 
 		log.debug("Stopping packet reader.");
 		final PacketReader pr = spyglassConfig.getPacketReader();
@@ -287,15 +283,20 @@ public class ConfigStore extends PropertyBean {
 			((PacketRecorder) pr).setRecording(false);
 		}
 
+		log.debug("Stopping plugins.");
+		// destroy the currently active plug-ins since they will be no longer needed
+		for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
+			p.shutdown();
+		}
+
+		/* now activate the new configuration */
+
 		log.debug("Overwriting config.");
 		spyglassConfig.overwriteWith(sgc);
 
 		log.debug("Registering new listener.");
 		// register the new ones
 		registerListener();
-
-		log.debug("Firing replaceConfiguration event.");
-		firePropertyChange("replaceConfiguration", null, spyglassConfig);
 
 		log.debug("Finished with importing config. Yeah!");
 
@@ -306,9 +307,8 @@ public class ConfigStore extends PropertyBean {
 	/**
 	 * Exports the config into the given file
 	 * 
-	 * Note: Do this synchronized, since users generally don't mind waiting
-	 * on this occasions (lots of programs hang when saving their files after
-	 * explicitly been commanded by the user).
+	 * Note: Do this synchronized, since users generally don't mind waiting on this occasions (lots
+	 * of programs hang when saving their files after explicitly been commanded by the user).
 	 */
 	public void exportConfig(final File file) {
 		storeSync(file);
@@ -349,15 +349,15 @@ public class ConfigStore extends PropertyBean {
 
 	/**
 	 * Store the config into the system-given file.
-	 *
+	 * 
 	 * Stores the configuration in an extra {@link Thread} to improve the performance.<br>
 	 * The storing operation will be delayed for one second. Every call received within this second
 	 * will be ignored.
 	 */
 	public void store() {
 		synchronized (storePendingMutex) {
-		
-			//log.debug("Waking up async-store thread.");
+
+			// log.debug("Waking up async-store thread.");
 			this.storePending = true;
 			this.storePendingMutex.notifyAll();
 		}
@@ -376,16 +376,16 @@ public class ConfigStore extends PropertyBean {
 		log.debug("Storing config to file: " + configFile);
 
 		final StringWriter buf = new StringWriter();
-		
+
 		try {
-	
+
 			// If something happens here, the file will never have been opened.
 			new Persister().write(spyglassConfig, buf);
 
 			final FileWriter writer = new FileWriter(configFile);
 			writer.write(buf.toString());
 			writer.close();
-			
+
 		} catch (final IOException e) {
 			log.error("Unable to store configuration output: Error while writing the file!", e);
 		} catch (final InterruptedException e) {
@@ -395,16 +395,17 @@ public class ConfigStore extends PropertyBean {
 		}
 
 		log.debug("Stored config to file: " + configFile + ".");
-	
+
 	}
 
 	/**
 	 * Notify the ConfigStore that Spyglass is shutting down and thus we should not accept any mre
 	 * store requests.
 	 * 
-	 * This method blocks until  async-store thread has died.
+	 * This method blocks until async-store thread has died.
 	 * 
-	 * @throws InterruptedException if the excecuting thread is interrupted while this method is called.
+	 * @throws InterruptedException
+	 *             if the excecuting thread is interrupted while this method is called.
 	 */
 	public void shutdown() throws InterruptedException {
 

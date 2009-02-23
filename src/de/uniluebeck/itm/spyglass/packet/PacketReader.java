@@ -18,8 +18,8 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 
 // ------------------------------------------------------------------------------
 /**
- * Abstract class for all PacketReader implementations. A PacketReader must provide the next packet
- * with the <code>getNextPacket()</code> method.
+ * Abstract super class for all PacketReader implementations.<br>
+ * Instances of the type PacketReader read packets from different sources including e.g. files.
  * 
  * @author Timo Rumland
  */
@@ -28,24 +28,39 @@ public abstract class PacketReader extends PropertyBean {
 	@Element(name = "gateway", required = false)
 	private Gateway gateway = null;
 
+	// ------------------------------------------------------------------------------
 	/**
 	 * Indicates whether the packets to be provided should be read from a file or to be forwarded
 	 * from iShell
 	 */
 	protected boolean readFromFile = true;
 
+	// ------------------------------------------------------------------------------
 	/**
 	 * Delay between
 	 */
 	@Element(name = "delayMillies", required = false)
 	protected int delayMillies = 1000;
-	
+
+	// ------------------------------------------------------------------------------
+	/** A factory creating packets */
 	protected PacketFactory factory;
 
+	// ------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 */
 	protected PacketReader() {
 		this.factory = null;
 	}
-	
+
+	// ------------------------------------------------------------------------------
+	/**
+	 * Initializes the packet reader.
+	 * 
+	 * @param spyglass
+	 *            the spyglass instance
+	 */
 	public void init(final Spyglass spyglass) {
 		this.factory = new PacketFactory(spyglass);
 	}
@@ -124,6 +139,15 @@ public abstract class PacketReader extends PropertyBean {
 	 *             thrown if the resetting of the input fails
 	 */
 	public abstract void reset() throws IOException;
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Shuts the packet reader down.
+	 * 
+	 * @throws IOException
+	 *             thrown if the resetting of the input fails
+	 */
+	public abstract void shutdown() throws IOException;
 
 	// --------------------------------------------------------------------------------
 	/**

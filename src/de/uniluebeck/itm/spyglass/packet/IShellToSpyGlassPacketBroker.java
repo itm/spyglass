@@ -7,6 +7,7 @@ package de.uniluebeck.itm.spyglass.packet;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Root;
@@ -32,7 +33,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	private Deque<SpyglassPacket> queue = new ArrayDeque<SpyglassPacket>(50);
 
 	/** Indicates whether the object should skip waiting for the arrival of a new packet */
-	private volatile boolean skipWaiting = false;
+	private AtomicBoolean skipWaiting = new AtomicBoolean(false);
 
 	private static final Logger log = SpyglassLoggerFactory.getLogger(IShellToSpyGlassPacketBroker.class);
 
@@ -45,7 +46,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	public IShellToSpyGlassPacketBroker() {
 		super();
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -60,7 +61,8 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Retrieves and removes the last packet of the packet queue.<br>
-	 * If the packet queue is empty, the current thread will be suspended until a packet arrives.
+	 * If the packet queue is empty, the current thread will be suspended until a packet arrives.<br>
+	 * As an exception of the rule, <code>null</code> might be returned in case of an reset.
 	 * 
 	 * @return the tail of the packet queue, or <tt>null</tt> if the packet queue is empty
 	 * @exception SpyglassPacketException
@@ -74,7 +76,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 		SpyglassPacket packet = null;
 
 		// Loop until we have a packet.
-		while ((packet == null) && !skipWaiting) {
+		while ((packet == null) && !skipWaiting.get()) {
 
 			synchronized (queue) {
 
@@ -88,7 +90,7 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 			packet = queue.poll();
 		}
 
-		skipWaiting = false;
+		skipWaiting = new AtomicBoolean(false);
 		if (packet != null) {
 			log.debug("Number of queued elements: " + (--queuedElements));
 		}
@@ -115,10 +117,23 @@ public class IShellToSpyGlassPacketBroker extends PacketReader {
 		}
 	}
 
+	// ------------------------------------------------------------------------------
 	@Override
 	public void reset() throws IOException {
 		// prevent threads to be waiting for the queue forever...
-		skipWaiting = true;
+		skipWaiting = new AtomicBoolean(true);
+		synchronized (queue) {
+			queue.clear();
+			queuedElements = 0;
+			queue.notifyAll();
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+	@Override
+	public void shutdown() throws IOException {
+		removeAllPropertyChangeListeners();
+		skipWaiting = new AtomicBoolean(true);
 		synchronized (queue) {
 			queue.clear();
 			queuedElements = 0;

@@ -115,10 +115,11 @@ public class PacketProducerTask implements Runnable {
 				packet = getPacketReader().getNextPacket();
 
 				if (packet == null) {
-					log.error("Received a null packet from the PacketReader. Skipping it!");
+					log
+							.warn("Received a null packet from the PacketReader which will be skipped! If this occured in case of a reset, everyting is fine");
 					continue;
 				}
-				
+
 				spyglass.getPacketDispatcher().dispatchPacket(packet);
 
 			} catch (final InterruptedException e) {
