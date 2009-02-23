@@ -9,7 +9,6 @@ package de.uniluebeck.itm.spyglass.drawing;
 
 import javax.swing.event.EventListenerList;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -19,54 +18,57 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
  * Abstract class that represents a drawing object.
  * 
- * A drawing object has a lifetime, bounded by the calls to init() and destroy(),
- * respectively. During this time, the drawingObject is bounded to an drawingArea.
+ * A drawing object has a lifetime, bounded by the calls to {@link DrawingObject#init(DrawingArea)}
+ * and {@link DrawingObject#destroy()}, respectively. During this time, the drawingObject is bounded
+ * to an drawingArea.
  * 
- * All DrawingObjects are guaranteed to be thread-safe. (Implementors of subclasses
- * should make sure of this too!)
- *
- * HOWEVER: Calls to setter-Methods are likely to synchronize with the SWT-Display thread.
- * So to avoid deadlocks, any caller should not hold any monitors (which could
- * potentially be obtained by the SWT thread) while calling any setter method.
+ * All DrawingObjects are guaranteed to be thread-safe. (Implementors of subclasses should make sure
+ * of this too!)
  * 
- * A drawingObject can have only one life, i.e. once it has been destroyed, it cannot
- * be initialized again.
+ * HOWEVER: Calls to setter-Methods are likely to synchronize with the SWT-Display thread. So to
+ * avoid deadlocks, any caller should not hold any monitors (which could potentially be obtained by
+ * the SWT thread) while calling any setter method.
+ * 
+ * A drawingObject can have only one life, i.e. once it has been destroyed, it cannot be initialized
+ * again.
+ * 
+ * @author Daniel Bimschas
+ * @author Dariush Forouher
+ * @author Sebastian Ebers
  * 
  */
 public abstract class DrawingObject {
 
 	/**
 	 * The state of the drawing object
-	 *
+	 * 
 	 */
 	public enum State {
-		
+
 		/**
 		 * The drawing object has not been initialized yet.
 		 */
 		INFANT,
-		
+
 		/**
 		 * The drawing object has been initialized.
 		 */
 		ALIVE,
-		
+
 		/**
 		 * The drawing object has been destroyed.
 		 */
 		ZOMBIE
 	}
-	
-	protected static Logger log = SpyglassLoggerFactory.getLogger(DrawingObject.class);
 
+	/** The drawing object's state */
 	private State state = State.INFANT;
-	
+
 	/** The position of the object's upper left point */
 	private AbsolutePosition position = new AbsolutePosition(0, 0, 0);
 
@@ -93,13 +95,17 @@ public abstract class DrawingObject {
 		return position;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * This initializes the drawing object.
 	 * 
 	 * It must only be called once.
 	 * 
-	 * Subclasses may overwrite this method if they want to to additional things
-	 * (e.g. add listener to the drawing area).
+	 * Subclasses may overwrite this method if they want to to additional things (e.g. add listener
+	 * to the drawing area).
+	 * 
+	 * @param drawingArea
+	 *            a reference to the drawing area
 	 */
 	public void init(final DrawingArea drawingArea) {
 		synchronized (this) {
@@ -109,44 +115,51 @@ public abstract class DrawingObject {
 			this.drawingArea = drawingArea;
 		}
 		updateBoundingBox();
-		
+
 		// only change the state after we have updated the bounding box
 		synchronized (this) {
 			this.state = State.ALIVE;
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Destroys this drawing object.
 	 * 
-	 * It must only be called after init() and even then only once.
+	 * It must only be called after {@link DrawingObject#init(DrawingArea)} and even then only once.
 	 * 
-	 * subclasses may overwrite this method if they want to to additional things
-	 * (e.g. release listener from drawing area).
+	 * subclasses may overwrite this method if they want to to additional things (e.g. release
+	 * listener from drawing area).
 	 */
 	public synchronized void destroy() {
 		if (state != State.ALIVE) {
 			throw new RuntimeException("Object ether not yet initialized or already dead!");
 		}
-		
+
 		this.drawingArea = null;
 		this.state = State.ZOMBIE;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * returns a reference to the drawing area. Between the calls to init()
-	 * and destroy(), this method is guaranteed to return a valid reference.
+	 * Returns a reference to the drawing area. Between the calls to
+	 * {@link DrawingObject#init(DrawingArea)} and destroy(), this method is guaranteed to return a
+	 * valid reference.
 	 * 
-	 * Before init() or after destroy() are called, this method will return
-	 * null!
+	 * Before {@link DrawingObject#init(DrawingArea)} or after destroy() are called, this method
+	 * will return null!
+	 * 
+	 * @return a reference to the drawing area
 	 */
 	protected synchronized final DrawingArea getDrawingArea() {
 		return drawingArea;
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the state of the drawing object
 	 * 
+	 * @return the state of the drawing object
 	 */
 	public synchronized State getState() {
 		return state;
@@ -182,20 +195,22 @@ public abstract class DrawingObject {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Informs all listeners which registered for changes of the drawing objects bounding box that
+	 * Informs all listeners which registered for changes of the drawing objects bounding box iff
 	 * the box has actually changed
 	 * 
 	 * @param oldBox
 	 */
-	protected void fireBoundingBoxChangeEvent(final AbsoluteRectangle oldBox) {
-		// Get listeners
-		final BoundingBoxChangeListener[] list = changeListeners.getListeners(BoundingBoxChangeListener.class);
+	private void fireBoundingBoxChangeEvent(final AbsoluteRectangle oldBox) {
 
-		// Fire the event (call-back method)
-		for (int i = list.length - 1; i >= 0; i -= 1) {
-			(list[i]).onBoundingBoxChanged(this, oldBox);
+		if (!boundingBox.equals(oldBox)) {
+			// Get listeners
+			final BoundingBoxChangeListener[] list = changeListeners.getListeners(BoundingBoxChangeListener.class);
+
+			// Fire the event (call-back method)
+			for (int i = list.length - 1; i >= 0; i -= 1) {
+				(list[i]).onBoundingBoxChanged(this, oldBox);
+			}
 		}
-
 	}
 
 	// --------------------------------------------------------------------------------
@@ -340,6 +355,7 @@ public abstract class DrawingObject {
 		this.changeListeners.remove(BoundingBoxChangeListener.class, listener);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Update's the object's bounding box and fires an event which informs all listeners for changes
 	 * concerning the objects bounding box
@@ -348,6 +364,7 @@ public abstract class DrawingObject {
 		updateBoundingBox(true);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Indicates that the bounding box may have changed.
 	 * 
@@ -370,11 +387,6 @@ public abstract class DrawingObject {
 			if ((display != null) && !display.isDisposed()) {
 				display.syncExec(new Runnable() {
 					// --------------------------------------------------------------------------------
-					/*
-					 * (non-Javadoc)
-					 * 
-					 * @see java.lang.Runnable#run()
-					 */
 					@SuppressWarnings("synthetic-access")
 					@Override
 					public void run() {
@@ -387,8 +399,7 @@ public abstract class DrawingObject {
 						// reported to registered listeners. A change means that there is an "old"
 						// and a new bounding box.
 						// Determining the old and the new one is to be done in one atomic step
-						// which
-						// will be achieved by using this lock
+						// which will be achieved by using this lock
 						synchronized (this) {
 							if (boundingBox != null) {
 								oldBox.inherit(boundingBox);
@@ -399,25 +410,21 @@ public abstract class DrawingObject {
 					}
 				});
 
-				if ((fireBoundingBoxChangeEvent && (oldBox == null)) || ((oldBox != null) && !boundingBox.equals(oldBox))) {
+				if (fireBoundingBoxChangeEvent) {
 					fireBoundingBoxChangeEvent(oldBox);
-				} else {
 				}
 			}
 		}
-		
-		//log.debug("DO "+this+" has new BB "+this.getBoundingBox());
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * Calculates and returns the object's bounding box (and should do nothing else!)
 	 * 
-	 * It is guaranteed that this method is only called when there is a valid
-	 * drawingArea available and that this method is only called
+	 * It is guaranteed that this method is only called when there is a valid drawingArea available
+	 * and that this method is only called
 	 * 
-	 * a) from within the SWT-Thread
-	 * b) with the monitor to "this" held.
+	 * a) from within the SWT-Thread b) with the monitor to "this" held.
 	 * 
 	 * @return the calculated bounding box
 	 */
