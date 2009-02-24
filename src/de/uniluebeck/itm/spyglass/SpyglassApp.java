@@ -46,25 +46,24 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class SpyglassApp extends ApplicationWindow {
 	private static Logger log = SpyglassLoggerFactory.getLogger(SpyglassApp.class);
-	
+
 	private Spyglass spyglass;
-		
+
 	private UIController uic;
 
 	private static Shell shell;
 
 	private AppWindow appWindow;
-	
+
 	// -------------------------------------------------------------------------
 	/**
-	 * @throws Exception 
-	 * @throws IOException 
-	 * 
+	 * @throws Exception
 	 */
 	public SpyglassApp(final Shell shell) throws Exception {
 		super(shell);
+		// Model
+		SpyglassEnvironment.setIShellPlugin(false);
 		spyglass = new Spyglass();
-		
 
 		this.setBlockOnOpen(true);
 		addStatusLine();
@@ -76,79 +75,72 @@ public class SpyglassApp extends ApplicationWindow {
 
 	// -------------------------------------------------------------------------
 	/**
-	 * @throws Exception 
-	 * @throws IOException 
 	 * 
 	 */
 	public static void main(final String[] args) {
-	
+
 		// SWT stuff
 		final DeviceData data = new DeviceData();
 		data.tracking = true;
 		data.debug = true;
 		final Display display = new Display(data);
 		shell = new Shell(display);
-	
+
 		SpyglassApp app = null;
 		try {
 			app = new SpyglassApp(shell);
 			app.open();
-			
+
 		} catch (final Exception e) {
-			log.error(e,e);
+			log.error(e, e);
 		} finally {
 			if (app != null) {
 				app.shutdown();
 			}
 		}
-		
-	
+
 	}
 
 	@Override
 	protected MenuManager createMenuManager() {
 		final MenuManager man = super.createMenuManager();
-		
-        final MenuManager fileMenu = createFileMenu();
-        final MenuManager mapMenu = createMapMenu();
-        final MenuManager sourceMenu = createSourceMenu();
-        final MenuManager recordMenu = createRecordMenu();
 
-        man.add(fileMenu);
-        man.add(mapMenu);
-        man.add(sourceMenu);
-        man.add(recordMenu);
-        
-        return man;
+		final MenuManager fileMenu = createFileMenu();
+		final MenuManager mapMenu = createMapMenu();
+		final MenuManager sourceMenu = createSourceMenu();
+		final MenuManager recordMenu = createRecordMenu();
+
+		man.add(fileMenu);
+		man.add(mapMenu);
+		man.add(sourceMenu);
+		man.add(recordMenu);
+
+		return man;
 
 	}
 
 	@Override
 	protected Control createContents(final Composite parent) {
-		
-		// Model
-		SpyglassEnvironment.setIShellPlugin(false);
 
 		appWindow = new AppWindow(spyglass, getShell());
-		
+
 		// Control
 		uic = new UIController(spyglass, appWindow);
-		
+
 		new ToolbarHandler(getToolBarManager(), spyglass, appWindow);
 
 		spyglass.start();
-		
+
 		return parent;
 	}
 
 	@Override
 	protected void configureShell(final Shell shell) {
 		super.configureShell(shell);
-		
+
 		shell.setText("Spyglass");
-		shell.setSize(SpyglassEnvironment.getWindowSizeX(), 
-				SpyglassEnvironment.getWindowSizeY());
-		
+		shell.setSize(SpyglassEnvironment.getWindowSizeX(), SpyglassEnvironment.getWindowSizeY());
+
 		shell.addControlListener(new ControlAdapter() {
 
 			@Override
@@ -158,19 +150,19 @@ public class SpyglassApp extends ApplicationWindow {
 					SpyglassEnvironment.setWindowSizeX(shell.getSize().x);
 					SpyglassEnvironment.setWindowSizeY(shell.getSize().y);
 				} catch (final IOException e1) {
-					log.error(e1,e1);
+					log.error(e1, e1);
 				}
-				
+
 			}
-			
+
 		});
-		
+
 	}
-	
+
 	public DrawingArea getDrawingArea() {
 		return appWindow.getGui().getDrawingArea();
 	}
-	
+
 	public void shutdown() {
 
 		if (uic != null) {
@@ -180,49 +172,48 @@ public class SpyglassApp extends ApplicationWindow {
 		if (spyglass != null) {
 			spyglass.shutdown();
 		}
-		
+
 	}
-	
+
 	private MenuManager createSourceMenu() {
 		final MenuManager sourceMenu = new MenuManager("&Source");
-		
+
 		sourceMenu.add(new PlaySelectInputAction(shell, spyglass));
 		sourceMenu.add(new PlayPlayPauseAction(spyglass));
-		
+
 		return sourceMenu;
 	}
 
-	
 	private MenuManager createRecordMenu() {
 		final MenuManager recordMenu = new MenuManager("&Record");
-		
+
 		recordMenu.add(new RecordSelectOutputAction(spyglass));
 		recordMenu.add(new RecordRecordAction(spyglass));
-		
+
 		return recordMenu;
 	}
 
 	private MenuManager createMapMenu() {
 		final MenuManager mapMenu = new MenuManager("&Map");
-		
+
 		mapMenu.add(new ZoomAction(this, ZoomAction.Type.ZOOM_IN));
 		mapMenu.add(new ZoomAction(this, ZoomAction.Type.ZOOM_OUT));
 		mapMenu.add(new ZoomCompleteMapAction(this, spyglass));
-		
+
 		return mapMenu;
 	}
 
 	private MenuManager createFileMenu() {
 		final MenuManager fileMenu = new MenuManager("&File");
-		
+
 		fileMenu.add(new LoadConfigurationAction(spyglass));
 		fileMenu.add(new StoreConfigurationAction(spyglass));
 		fileMenu.add(new Separator());
 		fileMenu.add(new OpenPreferencesAction(shell, spyglass));
 		fileMenu.add(new Separator());
 		fileMenu.add(new ExitSpyglassAction(this));
-		
+
 		return fileMenu;
 	}
-	
+
 }
