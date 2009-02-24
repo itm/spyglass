@@ -43,16 +43,22 @@ public class LoadConfigurationAction extends Action {
 	// --------------------------------------------------------------------------------
 	@Override
 	public void run() {
-		loadFromFileSystem();
+		try {
+			loadFromFileSystem();
+		} catch (final Exception e) {
+			log.error(e, e);
+		}
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * Loads the configuration from a file which is selected using a {@link FileDialog}
 	 * 
-	 * @return <code>true</code> if the configuration was set successfully
+	 * @return <code>true</code> if the configuration was loaded successfully
+	 * @throws Exception
+	 *             thrown if the configuration is not loaded successfully due to an exception
 	 */
-	public boolean loadFromFileSystem() {
+	public boolean loadFromFileSystem() throws Exception {
 		final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
 		fd.setFilterExtensions(new String[] { "*.xml" });
 		fd.setFilterPath(SpyglassEnvironment.getConfigFileWorkingDirectory());
@@ -71,15 +77,14 @@ public class LoadConfigurationAction extends Action {
 			} catch (final InterruptedException e) {
 				Thread.currentThread().interrupt();
 			} catch (final Exception e) {
-				log.error("Could not load the config.", e);
-				return false;
+				throw new Exception("Could not load the config.", e);
 			}
 
 			try {
 				SpyglassEnvironment.setConfigFilePath(f);
 				SpyglassEnvironment.setConfigFileWorkingDirectory(f.getParent());
 			} catch (final IOException e) {
-				log.error("Could not store the new config path in my property file.", e);
+				throw new IOException("Could not store the new config path in my property file.", e);
 			}
 			return true;
 		}

@@ -23,7 +23,6 @@ import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
-
 /**
  * Spyglass is an application for visualizing network packets coming from an arbitrary source,
  * defined by a gateway instance. This class is the core of the Spyglass program. It reads the XML
@@ -55,10 +54,10 @@ public class Spyglass {
 	// --------------------------------------------------------------------------
 	/**
 	 * Constructor. Invokes the XML configuration reading from the default configuration files.
-	 * Which file is used depends on the context (if spyglass is used as stand alone application or
+	 * Which file is used depends on the context (if Spyglass is used as stand alone application or
 	 * iShell plug-in).
 	 * 
-	 * @throws IOException
+	 * @throws Exception
 	 * 
 	 */
 	public Spyglass() throws Exception {
@@ -68,7 +67,7 @@ public class Spyglass {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * 
+	 * Initializes the Spyglass application
 	 */
 	private void init() {
 		// Create and inject objects
@@ -104,52 +103,91 @@ public class Spyglass {
 		executor.execute(packetProducerTask);
 	}
 
+	// --------------------------------------------------------------------------
+	/**
+	 * Shuts down the Spyglass application.<br>
+	 * All Threads and plug-ins will be stopped.
+	 */
 	public void shutdown() {
 		// Shutdown the packetProducerTask
 		executor.shutdownNow();
-		
-		// TODO: not sure if this will even be executed, since were shutting down the configStore right after
+
+		// TODO: not sure if this will even be executed, since were shutting down the configStore
+		// right after
 		configStore.store();
 		try {
 			configStore.shutdown();
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-	
-		// shutdown all plugins
+
+		// shutdown all plug-ins
 		for (final Plugin p : pluginManager.getPlugins()) {
 			try {
 				p.shutdown();
 			} catch (final Exception e) {
-				log.warn("The plugin could not be shut down properly. Continuing anyway.",e);
+				log.warn("The plugin could not be shut down properly. Continuing anyway.", e);
 			}
 		}
-	
+
 		log.debug("All plugin-threads stopped");
 	}
 
 	// --------------------------------------------------------------------------
+	/**
+	 * Returns the facility which is responsible for dispatching incoming packets to all active
+	 * plug-ins.
+	 * 
+	 * @return the facility which is responsible for dispatching incoming packets to all active
+	 *         plug-ins.
+	 */
 	public PacketDispatcher getPacketDispatcher() {
 		return packetDispatcher;
 	}
 
 	// --------------------------------------------------------------------------
+	/**
+	 * Sets the facility which is responsible for dispatching incoming packets to all active
+	 * plug-ins.
+	 * 
+	 * @param packetDispatcher
+	 *            the facility which is responsible for dispatching incoming packets to all active
+	 *            plug-ins.
+	 */
 	public void setPacketDispatcher(final PacketDispatcher packetDispatcher) {
 		this.packetDispatcher = packetDispatcher;
 	}
 
 	// --------------------------------------------------------------------------
+	/**
+	 * Returns the facility which manages the currently loaded plug-ins
+	 * 
+	 * @return the facility which manages the currently loaded plug-ins
+	 */
 	public PluginManager getPluginManager() {
 		return pluginManager;
 	}
 
 	// --------------------------------------------------------------------------
+	/**
+	 * Sets the facility which manages the currently loaded plug-ins
+	 * 
+	 * @param pluginManager
+	 *            the facility which manages the currently loaded plug-ins
+	 */
 	public void setPluginManager(final PluginManager pluginManager) {
 		this.pluginManager = pluginManager;
 		pluginManager.init();
 	}
 
 	// --------------------------------------------------------------------------
+	/**
+	 * Returns the facility which reads packets to be evaluated from a configurable source (e.g. a
+	 * file)
+	 * 
+	 * @return the facility which reads packets to be evaluated from a configurable source (e.g. a
+	 *         file)
+	 */
 	public PacketReader getPacketReader() {
 		return packetReader;
 	}
@@ -165,12 +203,25 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
+	/**
+	 * Sets the facility which reads packets to be evaluated from a configurable source (e.g. a
+	 * file)
+	 * 
+	 * @param packetReader
+	 *            the facility which reads packets to be evaluated from a configurable source (e.g.
+	 *            a file)
+	 */
 	public void setPacketReader(final PacketReader packetReader) {
 		packetReader.init(this);
 		this.packetReader = packetReader;
 	}
 
 	// --------------------------------------------------------------------------
+	/**
+	 * Returns the facility responsible for loading and storing the application's configuration
+	 * 
+	 * @return the facility responsible for loading and storing the application's configuration
+	 */
 	public ConfigStore getConfigStore() {
 		return configStore;
 	}

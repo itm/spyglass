@@ -634,11 +634,13 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	}
 
 	private void clickedButtonLoadPreferences() {
-		if (new LoadConfigurationAction(spyglass).loadFromFileSystem()) {
-			log.info("The new configuration was loaded successfully");
-			preferenceDialog.close();
-		} else {
-			log.error("An error occured while loading the configuration");
+		try {
+			if (new LoadConfigurationAction(spyglass).loadFromFileSystem()) {
+				log.info("The new configuration was loaded successfully");
+				preferenceDialog.close();
+			}
+		} catch (final Exception e) {
+			log.error(e, e);
 		}
 	}
 

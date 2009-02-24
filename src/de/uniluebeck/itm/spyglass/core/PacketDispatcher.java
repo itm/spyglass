@@ -21,13 +21,13 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.Tools;
 
 // ------------------------------------------------------------------------------
-// --
 /**
- * The InformationDispatch class is responsible for distributing Packet objects to all loaded
- * Spyglass plugins. The distribution process includes iteration over all plugins that the Plugin
- * Manager handles. Please note that the iteration process is not synchronized. That is, if another
- * thread is accessing the plugins list of the Plugin Manager, the distribution of Packets may cause
- * a concurrent modification exception.
+ * Instances of this class are responsible for distributing Packet objects to all active Spyglass
+ * plug-ins.<br>
+ * The distribution process includes iteration over all plug-ins that the {@link PluginManager}
+ * handles. Please note that the iteration process is not synchronized. That is, if another thread
+ * is accessing the plug-ins list of the {@link PluginManager}, the distribution of Packets may
+ * cause a concurrent modification exception.
  */
 public class PacketDispatcher {
 	private static Logger log = SpyglassLoggerFactory.getLogger(PacketDispatcher.class);
@@ -35,14 +35,11 @@ public class PacketDispatcher {
 	private PluginManager pluginManager = null;
 
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * Constructor.
 	 * 
-	 * @param pluginManager
-	 *            The plug-in manager object that is being used to get all loaded plug-ins.
-	 * @param packetRecorder
-	 *            object which records incoming packets
+	 * @param spyglass
+	 *            the application's main class
 	 */
 	public PacketDispatcher(final Spyglass spyglass) {
 		if (spyglass.getPluginManager() == null) {
@@ -53,6 +50,7 @@ public class PacketDispatcher {
 		this.pluginManager = spyglass.getPluginManager();
 
 		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener("pluginManager", new PropertyChangeListener() {
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
 				pluginManager = (PluginManager) evt.getNewValue();
@@ -61,14 +59,13 @@ public class PacketDispatcher {
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * This method distributes the given Packet object to all loaded plugins by invoking the
 	 * <code>handlePacket</code> method of a plugin.
 	 * 
 	 * @param packet
 	 *            The packet object to be distributed.
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public void dispatchPacket(final SpyglassPacket packet) throws InterruptedException {
 		if (packet == null) {
@@ -82,15 +79,15 @@ public class PacketDispatcher {
 		// note positionen which can handle packets all the time!)
 		// An exception like this has to be handled differently
 		final NodePositionerPlugin np = pluginManager.getNodePositioner();
-		
+
 		if (log.isDebugEnabled()) {
 			log.debug("Dispatching packet[" + packet + "] to NodePositioner " + np);
 		}
-		
+
 		try {
 			np.handlePacket(packet);
 		} catch (final Exception e1) {
-			log.error("Plugin "+np+" threw an exception while handling the packet "+packet,e1);
+			log.error("Plugin " + np + " threw an exception while handling the packet " + packet, e1);
 		}
 
 		final List<Plugin> plugins = pluginManager.getActivePlugins();
@@ -112,7 +109,7 @@ public class PacketDispatcher {
 			} catch (final InterruptedException e) {
 				throw e; // we don't handle this
 			} catch (final Exception e) {
-				log.error("Plugin "+plugin+" threw an exception while handling the packet "+packet,e);
+				log.error("Plugin " + plugin + " threw an exception while handling the packet " + packet, e);
 			}
 		}
 	}
