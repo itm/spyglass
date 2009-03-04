@@ -8,6 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.core;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -56,7 +58,7 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	 * The queue where packets are dropped by the packet dispatcher and which is maintained
 	 * concurrently
 	 */
-	private ConcurrentLinkedQueue<SpyglassPacket> recordingQueue = null;
+	private ConcurrentLinkedQueue<SpyglassPacket> recordingQueue = new ConcurrentLinkedQueue<SpyglassPacket>();
 
 	// ----------------------------------------------------------------
 	/** The thread used to consume packets from the packet queue */
@@ -89,20 +91,54 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	/** The time stamp of the last packed read from a file */
 	private long lastPlaybackPacketDeliveryTimestamp = -1;
 
+	// ----------------------------------------------------------------
 	/** Indicates whether the recorder should skip waiting for the arrival of a new packet */
 	private AtomicBoolean skipWaiting = new AtomicBoolean(false);
 
+	// ----------------------------------------------------------------
 	/** Indicates whether the recorder is shut down or not */
 	private volatile boolean recorderShutDown = false;
+
+	// ----------------------------------------------------------------
+	/** Scales the time difference of two successive packets */
+	private volatile float timeScale = 1;
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
 	 */
 	public PacketRecorder() {
-		recordingQueue = new ConcurrentLinkedQueue<SpyglassPacket>();
 		readFromFile = false;
-		delayMillies = 0;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param spyglass
+	 *            the spyglass instance
+	 */
+	@Override
+	public void init(final Spyglass spyglass) {
+
+		super.init(spyglass);
+
+		final SpyglassConfiguration config = spyglass.getConfigStore().getSpyglassConfig();
+
+		if (config.getGeneralSettings() != null) {
+			timeScale = config.getGeneralSettings().getTimeScale();
+		}
+
+		config.getGeneralSettings().addPropertyChangeListener(new PropertyChangeListener() {
+			// --------------------------------------------------------------------------------
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void propertyChange(final PropertyChangeEvent evt) {
+				if (evt.getPropertyName().equals("timeScale")) {
+					timeScale = (Float) evt.getNewValue();
+				}
+			}
+		});
 	}
 
 	// --------------------------------------------------------------------------------
@@ -492,7 +528,10 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 	/**
 	 * Waits until either the configured delay time or the time difference between the the previous
 	 * and the current packet's time stamps is elapsed. Eventually the provided packet will be
-	 * returned.
+	 * returned.<br>
+	 * Note that according to the user defined time scale value, the time difference between the
+	 * previously sent packet and the currently processed one might be compressed, stretched or left
+	 * alone.
 	 * 
 	 * @param packet
 	 *            the packet to be delayed
@@ -504,12 +543,15 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 
 			if ((lastPlaybackPacketDeliveryTimestamp != -1) && (lastPlaybackPacketTimestamp != -1)) {
 
-				final long packetDiff = currentPacketTimestamp - lastPlaybackPacketTimestamp;
+				// this is the time difference between the packets according to their time stamp
+				// considering the time scale value
+				final double packetDiff = (currentPacketTimestamp - lastPlaybackPacketTimestamp) * timeScale;
 
-				// this time elapsed because of the applications processing time
-				final long alreadyWaited = System.currentTimeMillis() - lastPlaybackPacketDeliveryTimestamp;
+				// this time elapsed due to the time used for processing the packets
+				final double alreadyWaited = System.currentTimeMillis() - lastPlaybackPacketDeliveryTimestamp;
 
-				final long sleepMillis = (packetDiff > delayMillies) ? packetDiff - alreadyWaited : delayMillies - alreadyWaited;
+				// this is the time which has to pass before the packet is actually forwarded
+				final long sleepMillis = (packetDiff > delayMillies) ? (long) (packetDiff - alreadyWaited) : (long) (delayMillies - alreadyWaited);
 
 				lastPlaybackPacketTimestamp = currentPacketTimestamp;
 
@@ -762,7 +804,6 @@ public class PacketRecorder extends IShellToSpyGlassPacketBroker {
 
 			lastPlaybackPacketDeliveryTimestamp = -1;
 			lastPlaybackPacketTimestamp = -1;
-			delayMillies = 0;
 
 			gatewayMutex.notifyAll();
 		}

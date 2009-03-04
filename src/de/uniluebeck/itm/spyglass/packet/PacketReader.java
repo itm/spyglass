@@ -40,7 +40,7 @@ public abstract class PacketReader extends PropertyBean {
 	 * Delay between
 	 */
 	@Element(name = "delayMillies", required = false)
-	protected int delayMillies = 1000;
+	protected int delayMillies = 0;
 
 	// ------------------------------------------------------------------------------
 	/** A factory creating packets */
