@@ -17,7 +17,6 @@ import de.uniluebeck.itm.spyglass.packet.PacketReader;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
-import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 
 // ------------------------------------------------------------------------------
 // --
@@ -39,8 +38,6 @@ public class PacketProducerTask implements Runnable {
 
 	private final Spyglass spyglass;
 
-	private long initialDelayMs;
-
 	private Boolean paused = false;
 
 	/** Object to securely access the configuration variables */
@@ -55,9 +52,8 @@ public class PacketProducerTask implements Runnable {
 	 * @param initialDelayMillis
 	 *            the time in milliseconds which has to elapse before producing a new packet
 	 */
-	public PacketProducerTask(final Spyglass spyglass, final long initialDelayMillis) {
+	public PacketProducerTask(final Spyglass spyglass) {
 		this.spyglass = spyglass;
-		this.initialDelayMs = initialDelayMillis;
 
 		// packetCache = spyglass.getPacketCache();
 		packetReader = spyglass.getPacketReader();
@@ -67,13 +63,7 @@ public class PacketProducerTask implements Runnable {
 			@SuppressWarnings("synthetic-access")
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
-				if (evt.getPropertyName().equals("generalSettings")) {
-
-					synchronized (mutex) {
-						initialDelayMs = ((GeneralSettingsXMLConfig) evt.getNewValue()).getPacketDeliveryInitialDelay();
-					}
-
-				} else if (evt.getPropertyName().equals("packetReader")) {
+				if (evt.getPropertyName().equals("packetReader")) {
 					setPacketReader((PacketReader) evt.getNewValue());
 				}
 
@@ -92,15 +82,6 @@ public class PacketProducerTask implements Runnable {
 	public void run() {
 		SpyglassPacket packet = null;
 		log.debug("Producer task staring.");
-
-		synchronized (mutex) {
-			try {
-				Thread.sleep(initialDelayMs);
-			} catch (final InterruptedException e) {
-				log.debug("PacketReader has been interrupted, shutting down.");
-				Thread.currentThread().interrupt();
-			}
-		}
 
 		while (!Thread.currentThread().isInterrupted()) {
 

@@ -77,7 +77,7 @@ public class Spyglass {
 
 		packetDispatcher = new PacketDispatcher(this);
 
-		packetProducerTask = new PacketProducerTask(this, configStore.getSpyglassConfig().getGeneralSettings().getPacketDeliveryInitialDelay());
+		packetProducerTask = new PacketProducerTask(this);
 
 		configStore.getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
 

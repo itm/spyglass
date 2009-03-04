@@ -45,12 +45,6 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 	@Element(required=false)
 	private volatile float timeScale = 1;
 	
-	/**
-	 * the delay used when processing recorded packets TODO: wrong!
-	 */
-	@Element(required=false)
-	private volatile long packetDeliveryInitialDelay = 1000;
-	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the showRuler
@@ -114,25 +108,6 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 		final float oldValue = this.timeScale;
 		this.timeScale = timeScale;
 		firePropertyChange("timeScale", oldValue, timeScale);
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @return the packetDeliveryInitialDelay
-	 */
-	public long getPacketDeliveryInitialDelay() {
-		return packetDeliveryInitialDelay;
-	}
-	
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param packetDeliveryInitialDelay
-	 *            the packetDeliveryInitialDelay to set
-	 */
-	public void setPacketDeliveryInitialDelay(final long packetDeliveryInitialDelay) {
-		final long oldValue = this.packetDeliveryInitialDelay;
-		this.packetDeliveryInitialDelay = packetDeliveryInitialDelay;
-		firePropertyChange("packetDeliveryInitialDelay", oldValue, packetDeliveryInitialDelay);
 	}
 	
 	public void overwriteWith(final GeneralSettingsXMLConfig o) {
