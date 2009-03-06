@@ -51,6 +51,10 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 	@Element(required = false)
 	private volatile double efficiencyFactor = 0.1;
 
+	public SpringEmbedderPositionerXMLConfig() {
+		this.edgeSemanticTypes.add(9);
+	}
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the optimumSpringLength
@@ -133,8 +137,7 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 	 *            the edgeSemanticTypes to set
 	 */
 	public void setEdgeSemanticTypes(final List<Integer> edgeSemanticTypes) {
-		firePropertyChange(PROPERTYNAME_EDGE_SEMANTIC_TYPES, this.edgeSemanticTypes, this.edgeSemanticTypes = new LinkedList<Integer>(
-				edgeSemanticTypes));
-
+		firePropertyChange(PROPERTYNAME_EDGE_SEMANTIC_TYPES, this.edgeSemanticTypes, edgeSemanticTypes);
+		this.edgeSemanticTypes = edgeSemanticTypes;
 	}
 }

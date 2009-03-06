@@ -18,8 +18,11 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import de.uniluebeck.itm.spyglass.gui.databinding.converter.IntListToStringConverter;
+import de.uniluebeck.itm.spyglass.gui.databinding.converter.StringToIntListConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.DoubleRangeValidator;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.StringToIntListValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -89,6 +92,22 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 					.setAfterConvertValidator(new DoubleRangeValidator(0, 1)), null);
 		}
 
+		{
+			obsWidget = SWTObservables.observeText(semType, SWT.Modify);
+			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					SpringEmbedderPositionerXMLConfig.PROPERTYNAME_EDGE_SEMANTIC_TYPES);
+
+			final UpdateValueStrategy strToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+			strToModel.setConverter(new StringToIntListConverter());
+			strToModel.setAfterConvertValidator(new IntegerRangeValidator(-1, 255));
+			strToModel.setAfterGetValidator(new StringToIntListValidator());
+
+			final UpdateValueStrategy strFromModel = new UpdateValueStrategy();
+			strFromModel.setConverter(new IntListToStringConverter());
+
+			dbc.bindValue(obsWidget, obsModel, strToModel, strFromModel);
+		}
+
 	}
 
 	// --------------------------------------------------------------------------------
@@ -155,6 +174,17 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 				semType = new Text(group1, SWT.BORDER);
 				semType.setLayoutData(data5);
 
+				// TODO: Make semtypes for neighbourhood editable
+				semType.setEnabled(false);
+				final GridData data6 = new GridData();
+				data6.horizontalSpan = 3;
+				data6.grabExcessHorizontalSpace = true;
+				data6.horizontalAlignment = SWT.RIGHT;
+
+				final Label label4 = new Label(group1, SWT.NONE);
+				label4.setText("Does currently work with semantictype 9 only");
+				label4.setLayoutData(data6);
+
 			}
 		}
 
@@ -167,11 +197,6 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 
 			// create fields of the group
 			{
-				// private Text optimumSpringLength;
-				// private Text springStiffness;
-				// private Text repulsionFactor;
-				// private Text efficiencyFactor;
-
 				final GridData data = new GridData();
 				data.grabExcessHorizontalSpace = true;
 				data.horizontalAlignment = GridData.FILL;
