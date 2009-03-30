@@ -478,6 +478,22 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		this.spyglass = spyglass;
 		this.pluginPreferenceDialog = pluginPreferenceDialog;
 
+		// add a listener to refresh the table whenever a plugin's property changes
+		spyglass.getPluginManager().addPluginListChangeListener(new PluginListChangeListener() {
+			// --------------------------------------------------------------------------------
+			@Override
+			public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
+				p.getXMLConfig().addPropertyChangeListener(new PropertyChangeListener() {
+					// --------------------------------------------------------------------------------
+					@Override
+					public void propertyChange(final PropertyChangeEvent evt) {
+						pluginTableViewer.refresh();
+					}
+				});
+
+			}
+		});
+
 		noDefaultAndApplyButton();
 	}
 
