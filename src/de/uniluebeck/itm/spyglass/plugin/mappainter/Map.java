@@ -29,7 +29,7 @@ public class Map extends DrawingObject {
 	 * 
 	 * storage format is: dataMatrix[row][column]
 	 */
-	private final double[][] dataMatrix;
+	private double[][] dataMatrix;
 
 	private MapPainterXMLConfig xmlConfig;
 
@@ -46,6 +46,10 @@ public class Map extends DrawingObject {
 	 */
 	public synchronized double[][] getMatrix() {
 		return this.dataMatrix;
+	}
+	
+	public synchronized void setMatrix(final double[][] matrix) {
+		this.dataMatrix = matrix;
 	}
 	
 	@Override

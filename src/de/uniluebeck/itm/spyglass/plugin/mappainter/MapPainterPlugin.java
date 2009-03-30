@@ -75,7 +75,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	}
 
 	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
-		if (area.intersects(map.getBoundingBox())) {
+		if ((map != null) && area.intersects(map.getBoundingBox())) {
 			final TreeSet<DrawingObject> set = new TreeSet<DrawingObject>();
 			set.add(map);
 			return set;
@@ -130,6 +130,11 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		super.shutdown();
 
 		timer.cancel();
+		
+		if (map != null) {
+			fireDrawingObjectRemoved(map);
+			map = null;
+		}
 
 		this.pluginManager.removeNodePositionListener(this);
 		this.xmlConfig.removePropertyChangeListener(this);
@@ -285,12 +290,18 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	 * Create a new Map object.
 	 */
 	private void createMap() {
+		
+		if (map != null) {
+			fireDrawingObjectRemoved(map);
+			map = null;
+		}
+
 		map = new Map(xmlConfig);
 
 		updateFramepoints();
 
 		// now cause a redraw
-		fireDrawingObjectChanged(map, null);
+		fireDrawingObjectAdded(map);
 	}
 
 	private void updateFramepoints() {
@@ -357,10 +368,10 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	/**
 	 * Calculate the value at the given point in space based on sourrounding nodes.
 	 */
-	private double calculateValue(final AbsolutePosition point) {
+	private double calculateValue(final DataStore store, final AbsolutePosition point) {
 		final List<DataPoint> neighbors;
-		synchronized (dataStore) {
-			neighbors = dataStore.kNN(point, xmlConfig.getK());
+		synchronized (store) {
+			neighbors = store.kNN(point, xmlConfig.getK());
 		}
 
 		double sum = 0;
@@ -385,12 +396,18 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 			return;
 		}
 
-		dataChanged = false;
+		final DataStore store;
+		synchronized (dataStore) {
+			store = dataStore.clone();
+			dataChanged = false;
+		}
+
 
 		final AbsoluteRectangle drawRect = new AbsoluteRectangle();
 		drawRect.setHeight(xmlConfig.getGridElementHeight());
 		drawRect.setWidth(xmlConfig.getGridElementWidth());
 
+		final double[][] matrix = new double[xmlConfig.getRows()][xmlConfig.getCols()];
 		for (int row = 0; row < xmlConfig.getRows(); row++) {
 			for (int col = 0; col < xmlConfig.getCols(); col++) {
 
@@ -398,17 +415,15 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				newPos.x = col * xmlConfig.getGridElementWidth() + xmlConfig.getLowerLeftX();
 				newPos.y = row * xmlConfig.getGridElementHeight() + xmlConfig.getLowerLeftY();
 				drawRect.setUpperLeft(newPos);
-
-				final double average = calculateValue(drawRect.getCenter());
-				synchronized (map.getMatrix()) {
-					map.getMatrix()[row][col] = average;
-				}
+				final double average = calculateValue(store, drawRect.getCenter());
+				matrix[row][col] = average;
 
 			}
 
 		}
 
+		map.setMatrix(matrix);
 		fireDrawingObjectChanged(map, null);
 	}
-
+	
 }

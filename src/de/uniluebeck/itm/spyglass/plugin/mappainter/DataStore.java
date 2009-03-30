@@ -63,4 +63,14 @@ public class DataStore extends HashSet<DataPoint> {
 		}
 	}
 
+	@Override
+	public DataStore clone() {
+		final DataStore store = new DataStore();
+		
+		store.addAll(this);
+		
+		return store;
+	}
+
+
 }
