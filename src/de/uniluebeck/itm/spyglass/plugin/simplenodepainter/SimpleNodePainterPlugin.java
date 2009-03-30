@@ -148,15 +148,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					reset();
 				}
 
-				// if the plug-in is no longer visible, hide its graphical objects
-				else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_VISIBLE) && !((Boolean) evt.getNewValue())) {
-					synchronized (layer) {
-						for (final DrawingObject drawingObject : nodes.values()) {
-							fireDrawingObjectRemoved(drawingObject);
-						}
-					}
-				}
-
 				// refresh the configuration parameters no matter what property changed
 				refreshConfigurationParameters();
 

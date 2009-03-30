@@ -37,9 +37,8 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
  * @param <V>
  *            value type of the Hashmap
  */
-public class WrappedSet<K extends Comparable<K>, V> extends
-		AbstractSet<WrappedSet.ObservableEntry<K, V>> {
-	
+public class WrappedSet<K extends Comparable<K>, V> extends AbstractSet<WrappedSet.ObservableEntry<K, V>> {
+
 	/**
 	 * 
 	 * @author dariush
@@ -47,50 +46,50 @@ public class WrappedSet<K extends Comparable<K>, V> extends
 	 * @param <K>
 	 * @param <V>
 	 */
-	public static class ObservableEntry<K extends Comparable<K>, V> extends PropertyBean implements
-			Comparable<ObservableEntry<K, V>> {
-		
+	public static class ObservableEntry<K extends Comparable<K>, V> extends PropertyBean implements Comparable<ObservableEntry<K, V>> {
+
 		private K key;
 		private V value;
-		
+
 		private ObservableEntry() {
 			//
 		}
-		
+
 		public ObservableEntry(final K key, final V value) {
 			this.key = key;
 			this.value = value;
 		}
-		
+
 		public V getValue() {
 			return value;
 		}
-		
+
 		public K getKey() {
 			return key;
 		}
-		
+
 		public void setValue(final V newValue) {
 			final V oldValue = value;
 			this.value = newValue;
 			firePropertyChange("value", oldValue, newValue);
 		}
-		
+
 		public int compareTo(final ObservableEntry<K, V> o) {
 			return (this.getKey()).compareTo(o.getKey());
 		}
-		
+
 		@Override
 		public boolean equals(final Object o) {
 			if (o instanceof ObservableEntry) {
 				final ObservableEntry<?, ?> o2 = (ObservableEntry<?, ?>) o;
-				return o2.getKey().equals(this.getKey()) && o2.getValue().equals(this.getValue());
-			} else {
-				return false;
+				return o2.getKey().equals(this.getKey())
+						&& (((o2.getValue() == null) && (this.getValue() == null)) || o2.getValue().equals(this.getValue()));
 			}
+			return false;
+
 		}
 	}
-	
+
 	/**
 	 * 
 	 * 
@@ -99,43 +98,42 @@ public class WrappedSet<K extends Comparable<K>, V> extends
 	 * @param <K>
 	 * @param <V>
 	 */
-	private static class InternalObservableEntry<K extends Comparable<K>, V> extends
-			ObservableEntry<K, V> {
-		
+	private static class InternalObservableEntry<K extends Comparable<K>, V> extends ObservableEntry<K, V> {
+
 		private Entry<K, V> entry;
-		
+
 		private InternalObservableEntry(final Entry<K, V> entry) {
 			this.entry = entry;
 		}
-		
+
 		@Override
 		public V getValue() {
 			return entry.getValue();
 		}
-		
+
 		@Override
 		public K getKey() {
 			return entry.getKey();
 		}
-		
+
 		@Override
 		public void setValue(final V newValue) {
 			final V oldValue = entry.getValue();
 			entry.setValue(newValue);
 			firePropertyChange("value", oldValue, newValue);
 		}
-		
+
 	}
-	
+
 	final HashMap<Entry<K, V>, ObservableEntry<K, V>> translationMap = new HashMap<Entry<K, V>, ObservableEntry<K, V>>();
 	final Set<Entry<K, V>> entries;
 	final Map<K, V> map;
-	
+
 	public WrappedSet(final Map<K, V> map) {
 		entries = map.entrySet();
 		this.map = map;
 	}
-	
+
 	private ObservableEntry<K, V> mapEntry(final Entry<K, V> entry) {
 		if (!translationMap.containsKey(entry)) {
 			final ObservableEntry<K, V> obsEntry = new InternalObservableEntry<K, V>(entry);
@@ -143,12 +141,12 @@ public class WrappedSet<K extends Comparable<K>, V> extends
 		}
 		return translationMap.get(entry);
 	}
-	
+
 	@Override
 	public boolean add(final ObservableEntry<K, V> e) {
-		
+
 		final boolean containsKey = map.containsKey(e.getKey());
-		
+
 		if (containsKey) {
 			return false;
 		} else {
@@ -156,7 +154,7 @@ public class WrappedSet<K extends Comparable<K>, V> extends
 			return true;
 		}
 	}
-	
+
 	@Override
 	public boolean addAll(final Collection<? extends ObservableEntry<K, V>> collection) {
 		boolean ret = false;
@@ -165,13 +163,13 @@ public class WrappedSet<K extends Comparable<K>, V> extends
 		}
 		return ret;
 	}
-	
+
 	@Override
 	public void clear() {
 		this.map.clear();
-		
+
 	}
-	
+
 	/**
 	 * Return true iff the key exists in the map
 	 */
@@ -184,7 +182,7 @@ public class WrappedSet<K extends Comparable<K>, V> extends
 			return false;
 		}
 	}
-	
+
 	@Override
 	public boolean containsAll(final Collection<?> c) {
 		boolean ret = true;
@@ -193,31 +191,31 @@ public class WrappedSet<K extends Comparable<K>, V> extends
 		}
 		return ret;
 	}
-	
+
 	@Override
 	public boolean isEmpty() {
 		return this.entries.isEmpty();
 	}
-	
+
 	@Override
 	public Iterator<ObservableEntry<K, V>> iterator() {
 		final Iterator<Entry<K, V>> wrappedIterator = entries.iterator();
 		return new Iterator<ObservableEntry<K, V>>() {
-			
+
 			public void remove() {
 				throw new UnsupportedOperationException();
 			}
-			
+
 			public boolean hasNext() {
 				return wrappedIterator.hasNext();
 			}
-			
+
 			public ObservableEntry<K, V> next() {
 				return mapEntry(wrappedIterator.next());
 			}
 		};
 	}
-	
+
 	@Override
 	public boolean remove(final Object o) {
 		if (o instanceof ObservableEntry) {
@@ -226,17 +224,17 @@ public class WrappedSet<K extends Comparable<K>, V> extends
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean retainAll(final Collection<?> c) {
 		throw new UnsupportedOperationException();
 	}
-	
+
 	@Override
 	public int size() {
 		return entries.size();
 	}
-	
+
 	@Override
 	public Object[] toArray() {
 		final Set<ObservableEntry<K, V>> set = new TreeSet<ObservableEntry<K, V>>();
@@ -245,7 +243,7 @@ public class WrappedSet<K extends Comparable<K>, V> extends
 		}
 		return set.toArray();
 	}
-	
+
 	@Override
 	public <T> T[] toArray(final T[] a) {
 		final Set<ObservableEntry<K, V>> set = new TreeSet<ObservableEntry<K, V>>();
@@ -254,5 +252,5 @@ public class WrappedSet<K extends Comparable<K>, V> extends
 		}
 		return set.toArray(a);
 	}
-	
+
 }
