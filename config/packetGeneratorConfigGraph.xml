@@ -1,0 +1,63 @@
+<!-- a sample configuration file for the packet generator
+ -->
+<packetGenerator>
+
+	<!-- number of nodes sent per second -->
+	<packetsPerSecond>30</packetsPerSecond>
+
+	<!-- Sinks which will handle each generated packet. -->
+	<sinks>
+		<!-- this sink opens a socket, from which iShell can fetch the packets. -->
+		<sink class="de.uniluebeck.itm.spyglass.packetgenerator.sinks.IShellSocketSink">
+			<ip>0.0.0.0</ip>
+			<port>8472</port>
+			<iShellSourceNode>1</iShellSourceNode>
+		</sink>
+
+	</sinks>
+
+	<sampleChooser>
+		<!-- list of samples from which the packets are generated. each sample
+		 ! has a given probability of being selected. when editing this file you
+		 ! must make sure that the probabilities add up to 1.0 ! -->
+		<samples>
+			<!-- The PayloadSample is currently the only available sampleType.
+			 ! it creates a packet header based on the abstract data given below
+			 ! and adds an raw payload. -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.GraphSample">
+				<!-- this field is not used. -->
+				<name>demo sample1</name>
+				
+				<!-- the probability that this sample is selected -->
+				<probability>1</probability>
+				
+				<!-- the syntaxType.
+				 ! Note that anything other than uint16List will break the LinePainterPlugin!
+				 !-->
+				<syntaxType>uint16List</syntaxType>
+				
+				<!-- a list of semantic types. the types can be seperated by commata. additionally
+				 ! they can be given as a range. for each packet a type is randomly selected.
+				 ! -->				 
+				<semanticTypes>22</semanticTypes>
+				
+				<!-- the position of the packets. as with the nodeIDs and the semanticTypes,
+				 ! lists or ranges can be given. -->
+				<position x="0-1000" y="0-1000" z="0"/>
+				
+				<!-- Number of neighbors each node has -->
+				<neighborCount>10</neighborCount>
+				
+				<!-- number of nodes in the graph -->
+				<numberOfNodes>100</numberOfNodes>
+				
+				<!-- Random velocity of the nodes (ranges) (plz don't use negative values a.t.m.) -->
+				<velocity x="0-10" y="0-10" z="0"/>
+				
+			</sample>
+
+
+		</samples>
+	</sampleChooser>
+	
+</packetGenerator>
