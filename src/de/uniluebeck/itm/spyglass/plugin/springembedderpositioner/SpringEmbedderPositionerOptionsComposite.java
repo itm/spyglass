@@ -56,7 +56,7 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 			obsWidget = SWTObservables.observeText(timeout, SWT.Modify);
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, PluginXMLConfig.PROPERTYNAME_TIMEOUT);
 			dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(0, Integer.MAX_VALUE)), null);
+					.setAfterConvertValidator(new IntegerRangeValidator("Timeout", 0, Integer.MAX_VALUE)), null);
 		}
 
 		{
@@ -64,7 +64,7 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					SpringEmbedderPositionerXMLConfig.PROPERTYNAME_OPTIMUM_SPRING_LENGTH);
 			dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(0, Integer.MAX_VALUE)), null);
+					.setAfterConvertValidator(new IntegerRangeValidator("Optimum spring length", 0, Integer.MAX_VALUE)), null);
 
 		}
 
@@ -73,7 +73,7 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					SpringEmbedderPositionerXMLConfig.PROPERTYNAME_SPRING_STIFFNESS);
 			dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new DoubleRangeValidator(0, 1)), null);
+					.setAfterConvertValidator(new DoubleRangeValidator("Spring's stiffness", 0, 1)), null);
 		}
 
 		{
@@ -81,7 +81,7 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					SpringEmbedderPositionerXMLConfig.PROPERTYNAME_REPULSION_FACTOR);
 			dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(0, Integer.MAX_VALUE)), null);
+					.setAfterConvertValidator(new IntegerRangeValidator("Repulsion factor", 0, Integer.MAX_VALUE)), null);
 		}
 
 		{
@@ -89,7 +89,7 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					SpringEmbedderPositionerXMLConfig.PROPERTYNAME_EFFICIENCY_FACTOR);
 			dbc.bindValue(obsWidget, obsModel, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new DoubleRangeValidator(0, 1)), null);
+					.setAfterConvertValidator(new DoubleRangeValidator("Efficiency of forces", 0, 1)), null);
 		}
 
 		{
@@ -99,8 +99,8 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 
 			final UpdateValueStrategy strToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			strToModel.setConverter(new StringToIntListConverter());
-			strToModel.setAfterConvertValidator(new IntegerRangeValidator(-1, 255));
-			strToModel.setAfterGetValidator(new StringToIntListValidator());
+			strToModel.setAfterConvertValidator(new IntegerRangeValidator("Semantic type(s) for neighbourhood", -1, 255));
+			strToModel.setAfterGetValidator(new StringToIntListValidator("Semantic type(s) for neighbourhood"));
 
 			final UpdateValueStrategy strFromModel = new UpdateValueStrategy();
 			strFromModel.setConverter(new IntListToStringConverter());

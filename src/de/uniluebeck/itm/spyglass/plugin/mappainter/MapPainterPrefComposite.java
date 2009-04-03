@@ -32,7 +32,6 @@ import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverte
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
-
 public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 
 	{
@@ -156,7 +155,7 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 				group1LData.widthHint = 440;
 				group1LData.grabExcessVerticalSpace = true;
 				group1.setLayoutData(group1LData);
-				
+
 				group1.setText("Layout");
 				{
 					label7 = new Label(group1, SWT.NONE);
@@ -520,25 +519,25 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 		{
 			dbc.bindValue(SWTObservables.observeText(this.width, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					MapPainterXMLConfig.PROPERTYNAME_WIDTH), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+					.setAfterConvertValidator(new IntegerRangeValidator("Width", 1, Integer.MAX_VALUE)), null);
 		}
 		{
 
 			dbc.bindValue(SWTObservables.observeText(this.height, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					MapPainterXMLConfig.PROPERTYNAME_HEIGHT), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+					.setAfterConvertValidator(new IntegerRangeValidator("Height", 1, Integer.MAX_VALUE)), null);
 		}
 		{
 
 			dbc.bindValue(SWTObservables.observeText(this.blockWidth, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					MapPainterXMLConfig.PROPERTYNAME_GRID_ELEMENT_WIDTH), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+					.setAfterConvertValidator(new IntegerRangeValidator("Block width", 1, Integer.MAX_VALUE)), null);
 		}
 		{
 
 			dbc.bindValue(SWTObservables.observeText(this.blockHeight, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					MapPainterXMLConfig.PROPERTYNAME_GRID_ELEMENT_HEIGHT), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+					.setAfterConvertValidator(new IntegerRangeValidator("Block height", 1, Integer.MAX_VALUE)), null);
 
 		}
 		{
@@ -559,13 +558,13 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 		{
 			dbc.bindValue(SWTObservables.observeText(this.framePointsX, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					MapPainterXMLConfig.PROPERTYNAME_NUM_FRAME_POINTS_HORIZONTAL), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+					.setAfterConvertValidator(new IntegerRangeValidator("Framepoints x", 1, Integer.MAX_VALUE)), null);
 
 		}
 		{
 			dbc.bindValue(SWTObservables.observeText(this.framePointsY, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					MapPainterXMLConfig.PROPERTYNAME_NUM_FRAME_POINTS_VERTICAL), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+					.setAfterConvertValidator(new IntegerRangeValidator("Framepoints y", 1, Integer.MAX_VALUE)), null);
 
 		}
 		{
@@ -583,13 +582,13 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 		{
 			dbc.bindValue(SWTObservables.observeText(this.kNN, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					MapPainterXMLConfig.PROPERTYNAME_K), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE)), null);
+					.setAfterConvertValidator(new IntegerRangeValidator("Neighbors (for kNN)", 1, Integer.MAX_VALUE)), null);
 
 		}
 		{
 			dbc.bindValue(SWTObservables.observeText(this.text1, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					MapPainterXMLConfig.PROPERTYNAME_REFRESH_FREQUENCY), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-					.setAfterConvertValidator(new IntegerRangeValidator(1, 25)), null);
+					.setAfterConvertValidator(new IntegerRangeValidator("Update frequency (1/s)", 1, 25)), null);
 
 		}
 		{

@@ -472,7 +472,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			try {
 				spyglass.getPluginManager().createNewPlugin(getPluginClass(), config);
 			} catch (final Exception e) {
-				log.error("Could not create the requested plugin.",e);
+				log.error("Could not create the requested plugin.", e);
 			}
 		}
 	}

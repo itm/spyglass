@@ -133,8 +133,8 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 			final UpdateValueStrategy strFromModel = new UpdateValueStrategy();
 			strFromModel.setConverter(new IntListToStringConverter());
 			strToModel.setConverter(new StringToIntListConverter());
-			strToModel.setAfterConvertValidator(new IntegerRangeValidator(-1, 255));
-			strToModel.setAfterGetValidator(new StringToIntListValidator());
+			strToModel.setAfterConvertValidator(new IntegerRangeValidator("Semantic types", -1, 255));
+			strToModel.setAfterGetValidator(new StringToIntListValidator("Semantic types"));
 			dbc.bindValue(SWTObservables.observeText(this.semanticTypes, SWT.Modify), modelObservable2, strToModel, strFromModel);
 		}
 

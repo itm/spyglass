@@ -27,13 +27,13 @@ import de.uniluebeck.itm.spyglass.gui.databinding.validator.StringRegExValidator
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 
 public class GeneralPreferencesComposite extends org.eclipse.swt.widgets.Composite {
-	
+
 	{
 		// Register as a resource user - SWTResourceManager will
 		// handle the obtaining and disposing of resources
 		SWTResourceManager.registerResourceUser(this);
 	}
-	
+
 	private Group group1;
 	private Label label1;
 	private Label label11length;
@@ -57,7 +57,7 @@ public class GeneralPreferencesComposite extends org.eclipse.swt.widgets.Composi
 	private Text unitLength;
 	private Button showRuler;
 	private Group group2;
-	
+
 	/**
 	 * Auto-generated main method to display this org.eclipse.swt.widgets.Composite inside a new
 	 * Shell.
@@ -65,7 +65,7 @@ public class GeneralPreferencesComposite extends org.eclipse.swt.widgets.Composi
 	public static void main(final String[] args) {
 		showGUI();
 	}
-	
+
 	/**
 	 * Auto-generated method to display this org.eclipse.swt.widgets.Composite inside a new Shell.
 	 */
@@ -90,13 +90,12 @@ public class GeneralPreferencesComposite extends org.eclipse.swt.widgets.Composi
 			}
 		}
 	}
-	
-	public GeneralPreferencesComposite(final org.eclipse.swt.widgets.Composite parent,
-			final int style) {
+
+	public GeneralPreferencesComposite(final org.eclipse.swt.widgets.Composite parent, final int style) {
 		super(parent, style);
 		initGUI();
 	}
-	
+
 	private void initGUI() {
 		try {
 			final GridLayout thisLayout = new GridLayout(1, true);
@@ -197,10 +196,8 @@ public class GeneralPreferencesComposite extends org.eclipse.swt.widgets.Composi
 					linkButtonLData.widthHint = 22;
 					linkButtonLData.heightHint = 56;
 					linkButton.setLayoutData(linkButtonLData);
-					linkButton
-							.setImage(SWTResourceManager
-									.getImage("de/uniluebeck/itm/spyglass/gui/configuration/chain_small_closed.png"));
-					
+					linkButton.setImage(SWTResourceManager.getImage("de/uniluebeck/itm/spyglass/gui/configuration/chain_small_closed.png"));
+
 					linkButton.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(final SelectionEvent evt) {
@@ -208,14 +205,13 @@ public class GeneralPreferencesComposite extends org.eclipse.swt.widgets.Composi
 							 * if pressed, change image/text and change binding between both text
 							 * fields (add binding / remove binding
 							 */
-							final boolean currentlyLocked = config.getMetrics()
-									.getLockAbs2metricFactor();
+							final boolean currentlyLocked = config.getMetrics().getLockAbs2metricFactor();
 							config.getMetrics().setLockAbs2metricFactor(!currentlyLocked);
-							
+
 							updateScaleLink();
-							
+
 						}
-						
+
 					});
 				}
 				{
@@ -360,108 +356,88 @@ public class GeneralPreferencesComposite extends org.eclipse.swt.widgets.Composi
 			e.printStackTrace();
 		}
 	}
-	
+
 	DataBindingContext dbc;
 	GeneralSettingsXMLConfig config;
 	Binding lockBinding;
-	
+
 	public void setDatabinding(final DataBindingContext dbc, final GeneralSettingsXMLConfig config) {
-		
+
 		this.config = config;
 		this.dbc = dbc;
-		
+
 		// unit length
-		
-		final IObservableValue modelObservable2 = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config.getMetrics(), "unit");
-		dbc.bindValue(SWTObservables.observeText(this.unitLength, SWT.Modify), modelObservable2,
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-						.setAfterConvertValidator(new StringRegExValidator(".+",
-								"Please enter a unit.")), new UpdateValueStrategy());
-		
+
+		final IObservableValue modelObservable2 = BeansObservables.observeValue(dbc.getValidationRealm(), config.getMetrics(), "unit");
+		dbc.bindValue(SWTObservables.observeText(this.unitLength, SWT.Modify), modelObservable2, new UpdateValueStrategy(
+				UpdateValueStrategy.POLICY_CONVERT)
+				.setAfterConvertValidator(new StringRegExValidator("Unit of length", ".+", "Please enter a unit.")), new UpdateValueStrategy());
+
 		// showRuler
-		
-		final IObservableValue observableVisible = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "showRuler");
+
+		final IObservableValue observableVisible = BeansObservables.observeValue(dbc.getValidationRealm(), config, "showRuler");
 		dbc.bindValue(SWTObservables.observeSelection(this.showRuler), observableVisible,
 
 		new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
-		
+
 		// unit of time
-		
-		final IObservableValue modelObservable2b = BeansObservables.observeValue(dbc
-				.getValidationRealm(), config, "timeUnit");
-		dbc.bindValue(SWTObservables.observeText(this.unitTime, SWT.Modify), modelObservable2b,
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
-						.setAfterConvertValidator(new StringRegExValidator(".+",
-								"Please enter a unit.")), new UpdateValueStrategy());
-		
+
+		final IObservableValue modelObservable2b = BeansObservables.observeValue(dbc.getValidationRealm(), config, "timeUnit");
+		dbc.bindValue(SWTObservables.observeText(this.unitTime, SWT.Modify), modelObservable2b, new UpdateValueStrategy(
+				UpdateValueStrategy.POLICY_CONVERT).setAfterConvertValidator(new StringRegExValidator("Unit of time", ".+", "Please enter a unit.")),
+				new UpdateValueStrategy());
+
 		// offset X
-		dbc.bindValue(SWTObservables.observeText(this.offsetX, SWT.Modify), BeansObservables
-				.observeValue(dbc.getValidationRealm(), config.getMetrics(), "abs2metricOffsetX"),
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT),
-				new UpdateValueStrategy());
-		
+		dbc.bindValue(SWTObservables.observeText(this.offsetX, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config
+				.getMetrics(), "abs2metricOffsetX"), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), new UpdateValueStrategy());
+
 		// offset Y
-		dbc.bindValue(SWTObservables.observeText(this.offsetY, SWT.Modify), BeansObservables
-				.observeValue(dbc.getValidationRealm(), config.getMetrics(), "abs2metricOffsetY"),
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT),
-				new UpdateValueStrategy());
-		
+		dbc.bindValue(SWTObservables.observeText(this.offsetY, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config
+				.getMetrics(), "abs2metricOffsetY"), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), new UpdateValueStrategy());
+
 		// scale X
-		dbc.bindValue(SWTObservables.observeText(this.scaleX, SWT.Modify), BeansObservables
-				.observeValue(dbc.getValidationRealm(), config.getMetrics(), "abs2metricFactorX"),
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT),
-				new UpdateValueStrategy());
-		
+		dbc.bindValue(SWTObservables.observeText(this.scaleX, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config
+				.getMetrics(), "abs2metricFactorX"), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), new UpdateValueStrategy());
+
 		// scale Y
-		dbc.bindValue(SWTObservables.observeText(this.scaleY, SWT.Modify), BeansObservables
-				.observeValue(dbc.getValidationRealm(), config.getMetrics(), "abs2metricFactorY"),
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT),
-				new UpdateValueStrategy());
-		
+		dbc.bindValue(SWTObservables.observeText(this.scaleY, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config
+				.getMetrics(), "abs2metricFactorY"), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), new UpdateValueStrategy());
+
 		// scale Time
-		dbc.bindValue(SWTObservables.observeText(this.scaleTime, SWT.Modify), BeansObservables
-				.observeValue(dbc.getValidationRealm(), config, "timeScale"),
-				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT),
-				new UpdateValueStrategy());
-		
-		dbc.bindValue(SWTObservables.observeText(this.unitLength, SWT.Modify), SWTObservables
-				.observeText(this.label11length), null, null);
-		dbc.bindValue(SWTObservables.observeText(this.unitLength, SWT.Modify), SWTObservables
-				.observeText(this.label9length), null, null);
-		
+		dbc.bindValue(SWTObservables.observeText(this.scaleTime, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
+				"timeScale"), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), new UpdateValueStrategy());
+
+		dbc.bindValue(SWTObservables.observeText(this.unitLength, SWT.Modify), SWTObservables.observeText(this.label11length), null, null);
+		dbc.bindValue(SWTObservables.observeText(this.unitLength, SWT.Modify), SWTObservables.observeText(this.label9length), null, null);
+
 		updateScaleLink();
-		
+
 	}
-	
+
 	private void updateScaleLink() {
 		final boolean locked = config.getMetrics().getLockAbs2metricFactor();
-		
+
 		if (locked) {
 			scaleY.setText(scaleX.getText());
-			
+
 			if (lockBinding == null) {
-				
+
 				// bind the two fields together
-				lockBinding = dbc.bindValue(SWTObservables.observeText(scaleX, SWT.Modify),
-						SWTObservables.observeText(scaleY, SWT.Modify), null, null);
+				lockBinding = dbc.bindValue(SWTObservables.observeText(scaleX, SWT.Modify), SWTObservables.observeText(scaleY, SWT.Modify), null,
+						null);
 			}
-			
-			linkButton
-					.setImage(SWTResourceManager
-							.getImage("de/uniluebeck/itm/spyglass/gui/configuration/chain_small_closed.png"));
-			
+
+			linkButton.setImage(SWTResourceManager.getImage("de/uniluebeck/itm/spyglass/gui/configuration/chain_small_closed.png"));
+
 		} else {
 			if (lockBinding != null) {
 				// Kill the binding (it will be automatically removed from the dbc)
 				lockBinding.dispose();
 				lockBinding = null;
 			}
-			
-			linkButton.setImage(SWTResourceManager
-					.getImage("de/uniluebeck/itm/spyglass/gui/configuration/chain_small_open.png"));
-			
+
+			linkButton.setImage(SWTResourceManager.getImage("de/uniluebeck/itm/spyglass/gui/configuration/chain_small_open.png"));
+
 		}
 	}
 }

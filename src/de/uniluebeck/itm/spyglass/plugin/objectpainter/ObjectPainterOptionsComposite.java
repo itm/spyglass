@@ -42,19 +42,14 @@ import de.uniluebeck.itm.spyglass.gui.databinding.validator.FileReadableValidato
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
-
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI Builder, which is free
+ * for non-commercial use. If Jigloo is being used commercially (ie, by a corporation, company or
+ * business for any purpose whatever) then you should purchase a license for each developer using
+ * Jigloo. Please visit www.cloudgarden.com for details. Use of Jigloo implies acceptance of these
+ * licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR THIS MACHINE, SO JIGLOO OR THIS
+ * CODE CANNOT BE USED LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
 public class ObjectPainterOptionsComposite extends Composite {
 
 	{
@@ -346,7 +341,7 @@ public class ObjectPainterOptionsComposite extends Composite {
 				label8LData.heightHint = 17;
 				label8LData.horizontalSpan = 5;
 				label8.setLayoutData(label8LData);
-				label8.setFont(SWTResourceManager.getFont("Sans",10,1,false,false));
+				label8.setFont(SWTResourceManager.getFont("Sans", 10, 1, false, false));
 			}
 			{
 				label7 = new Label(group, SWT.NONE);
@@ -398,15 +393,15 @@ public class ObjectPainterOptionsComposite extends Composite {
 		{
 			obsWidget = SWTObservables.observeText(imageSizeWidthText, SWT.Modify);
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ObjectPainterXMLConfig.PROPERTYNAME_IMAGE_SIZE_X);
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setAfterConvertValidator(new IntegerRangeValidator(0,
-					Integer.MAX_VALUE));
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setAfterConvertValidator(new IntegerRangeValidator("Width",
+					0, Integer.MAX_VALUE));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeText(imageSizeHeightText, SWT.Modify);
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ObjectPainterXMLConfig.PROPERTYNAME_IMAGE_SIZE_Y);
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setAfterConvertValidator(new IntegerRangeValidator(0,
-					Integer.MAX_VALUE));
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setAfterConvertValidator(new IntegerRangeValidator(
+					"Height", 0, Integer.MAX_VALUE));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
@@ -435,29 +430,29 @@ public class ObjectPainterOptionsComposite extends Composite {
 							.setConverter(new ArrayToColorConverter(this.getDisplay())));
 		}
 		{
-			final IObservableValue observable = BeansObservables.observeValue(dbc.getValidationRealm(), config, ObjectPainterXMLConfig.PROPERTYNAME_PACKET_TYPE_3D);
-			dbc.bindValue(SWTObservables.observeSelection(combo1), observable,
-					new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setConverter(new Converter("",true) {
+			final IObservableValue observable = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+					ObjectPainterXMLConfig.PROPERTYNAME_PACKET_TYPE_3D);
+			dbc.bindValue(SWTObservables.observeSelection(combo1), observable, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+					.setConverter(new Converter("", true) {
 
 						@Override
 						public Object convert(final Object fromObject) {
 							return fromObject.equals("TrajectoryPacket3D");
 						}
-						
-					}), new UpdateValueStrategy()
-							.setConverter(new Converter(true,"") {
 
-								@Override
-								public Object convert(final Object fromObject) {
-									return ((Boolean)fromObject) ? "TrajectoryPacket3D" : "TrajectoryPacket2D";
-								}}
-							));
+					}), new UpdateValueStrategy().setConverter(new Converter(true, "") {
+
+				@Override
+				public Object convert(final Object fromObject) {
+					return ((Boolean) fromObject) ? "TrajectoryPacket3D" : "TrajectoryPacket2D";
+				}
+			}));
 		}
 		{
 			obsWidget = SWTObservables.observeText(inteval, SWT.Modify);
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ObjectPainterXMLConfig.PROPERTYNAME_UPDATE_INTERVAL);
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setAfterConvertValidator(new IntegerRangeValidator(50,
-					10000));
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setAfterConvertValidator(new IntegerRangeValidator(
+					"Display update interval", 50, 10000));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 

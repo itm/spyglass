@@ -1,3 +1,11 @@
+/*
+ * ------------------------------------------------------------------------------ -- This file is
+ * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
+ * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
+ * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
+ * SpyGlass source tree for further details. ----------------------------------------------
+ * ----------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.databinding.validator;
 
 import java.io.File;
@@ -13,7 +21,7 @@ import org.eclipse.core.runtime.IStatus;
  * 
  */
 public class FileReadableValidator implements IValidator {
-	
+
 	@Override
 	public IStatus validate(final Object value) {
 		if (value instanceof String) {
@@ -26,8 +34,7 @@ public class FileReadableValidator implements IValidator {
 			} else {
 				return ValidationStatus.error("File not readable!");
 			}
-		} else {
-			return ValidationStatus.error("Unknown data!");
 		}
+		return ValidationStatus.error("Unknown data!");
 	}
 }

@@ -629,7 +629,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 				obsWidget = SWTObservables.observeText(defaultLineWidth, SWT.Modify);
 				obsModel = BeansObservables.observeValue(realm, config, NodeSensorRangeXMLConfig.PROPERTYNAME_LINE_WIDTH);
 				usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-				usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE));
+				usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator("Line Width", 1, Integer.MAX_VALUE));
 				defaultLineWidthBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 			}
 			{
@@ -660,7 +660,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 				obsWidget = SWTObservables.observeText(defaultBackgroundAlphaTransparency, SWT.Modify);
 				obsModel = BeansObservables.observeValue(realm, config, NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_ALPHA);
 				usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-				usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(0, 255));
+				usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator("Background Alpha Transparency", 0, 255));
 				defaultBackgroundAlphaTransparencyBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 			}
 			// {

@@ -326,14 +326,14 @@ public class ImagePainterOptionsComposite extends Composite {
 			obsWidget = SWTObservables.observeText(imageSizeWidthText, SWT.Modify);
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ImagePainterXMLConfig.PROPERTYNAME_IMAGE_SIZE_X);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE));
+			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator("Image Size", 1, Integer.MAX_VALUE));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeText(imageSizeHeightText, SWT.Modify);
 			obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), config, ImagePainterXMLConfig.PROPERTYNAME_IMAGE_SIZE_Y);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator(1, Integer.MAX_VALUE));
+			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator("Image Size", 1, Integer.MAX_VALUE));
 			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
