@@ -8,9 +8,9 @@ import org.simpleframework.xml.Attribute;
 // -------------------------------------------------------------------------------- /**
 /**
  * This class represents an abstract position
- * 
+ *
  * @author Dariush Forouher, Sebastian Ebers
- * 
+ *
  */
 public abstract class AbstractPosition implements Cloneable {
 	@Attribute
@@ -31,7 +31,7 @@ public abstract class AbstractPosition implements Cloneable {
 
 	/**
 	 * Create a new AbsolutePosition object based on a Point2D instance.
-	 * 
+	 *
 	 * The z-coordinate is implicitly set to 0.
 	 */
 	public AbstractPosition(final Point2D point) {
@@ -53,7 +53,7 @@ public abstract class AbstractPosition implements Cloneable {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
+	 *
 	 */
 	@Override
 	public String toString() {
@@ -62,13 +62,13 @@ public abstract class AbstractPosition implements Cloneable {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
+	 *
 	 */
 	public abstract void mult(final double d);
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
+	 *
 	 */
 	public abstract void add(final AbstractPosition p);
 
@@ -76,7 +76,7 @@ public abstract class AbstractPosition implements Cloneable {
 	/**
 	 * Indicates whether some other object is "equal to" this one according to their coordinate
 	 * information.
-	 * 
+	 *
 	 * @param obj
 	 *            the reference object with which to compare.
 	 * @return <code>true</code> if this object is the same as the obj argument; <code>false</code>
@@ -84,7 +84,6 @@ public abstract class AbstractPosition implements Cloneable {
 	 */
 	@Override
 	public boolean equals(final Object obj) {
-		obj.equals(new Object());
 		if (obj instanceof AbstractPosition) {
 			final AbstractPosition other = (AbstractPosition) obj;
 			return ((other.x == this.x) && (other.y == this.y) && (other.z == this.z));

@@ -89,52 +89,29 @@ public class Grid extends DrawingObject {
 
 	}
 
-	public void setGridElementHeight(final int gridElementHeight) {
-		setGridElementHeight(gridElementHeight, true);
+	public synchronized void setGridElementHeight(final int gridElementHeight) {
+		this.gridElementHeight = gridElementHeight;
+		markBoundingBoxDirty();
 	}
 
-	public void setGridElementHeight(final int gridElementHeight, final boolean fireBoundBoxChangeEvent) {
-		synchronized (this) {
-			this.gridElementHeight = gridElementHeight;
-		}
-		updateBoundingBox(fireBoundBoxChangeEvent);
-	}
-
-	public void setGridElementWidth(final int gridElementWidth) {
-		setGridElementWidth(gridElementWidth, true);
-	}
-
-	public void setGridElementWidth(final int gridElementWidth, final boolean fireBoundingBoxChangeEvent) {
-		synchronized (this) {
-			this.gridElementWidth = gridElementWidth;
-		}
-		updateBoundingBox(fireBoundingBoxChangeEvent);
+	public synchronized void setGridElementWidth(final int gridElementWidth) {
+		this.gridElementWidth = gridElementWidth;
+		markBoundingBoxDirty();
 	}
 
 	public synchronized void setLineWidth(final int lineWidth) {
 		this.lineWidth = lineWidth;
+		markContentDirty();
 	}
 
-	public void setNumCols(final int numCols) {
-		setNumCols(numCols, true);
+	public synchronized void setNumCols(final int numCols) {
+		this.numCols = numCols;
+		markBoundingBoxDirty();
 	}
 
-	public void setNumCols(final int numCols, final boolean fireBoundingBoxChangeEvent) {
-		synchronized (this) {
-			this.numCols = numCols;
-		}
-		updateBoundingBox(fireBoundingBoxChangeEvent);
-	}
-
-	public void setNumRows(final int numRows) {
-		setNumRows(numRows, true);
-	}
-
-	public void setNumRows(final int numRows, final boolean fireBoundingBoxChangeEvent) {
-		synchronized (this) {
-			this.numRows = numRows;
-		}
-		updateBoundingBox(fireBoundingBoxChangeEvent);
+	public synchronized void setNumRows(final int numRows) {
+		this.numRows = numRows;
+		markBoundingBoxDirty();
 	}
 
 	@Override

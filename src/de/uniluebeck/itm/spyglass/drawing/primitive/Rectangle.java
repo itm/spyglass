@@ -23,17 +23,17 @@ import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 public class Rectangle extends DrawingObject {
 
 	/**
-	 * 
+	 *
 	 */
 	private int height = 10;
 
 	/**
-	 * 
+	 *
 	 */
 	private int lineWidth = 1;
 
 	/**
-	 * 
+	 *
 	 */
 	private int width = 10;
 
@@ -106,21 +106,11 @@ public class Rectangle extends DrawingObject {
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param height
-	 */
-	public void setHeight(final int height) {
-		setHeight(height, true);
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param height
 	 * @param fireBoundingBoxChangeEvent
 	 */
-	public void setHeight(final int height, final boolean fireBoundingBoxChangeEvent) {
-		synchronized (this) {
-			this.height = height;
-		}
-		updateBoundingBox(fireBoundingBoxChangeEvent);
+	public synchronized void setHeight(final int height) {
+		this.height = height;
+		markBoundingBoxDirty();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -129,14 +119,7 @@ public class Rectangle extends DrawingObject {
 	 */
 	public synchronized void setLineWidth(final int lineWidth) {
 		this.lineWidth = lineWidth;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param width
-	 */
-	public void setWidth(final int width) {
-		setWidth(width, true);
+		markContentDirty();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -144,11 +127,9 @@ public class Rectangle extends DrawingObject {
 	 * @param width
 	 * @param fireBoundingBoxChangeEvent
 	 */
-	public void setWidth(final int width, final boolean fireBoundingBoxChangeEvent) {
-		synchronized (this) {
-			this.width = width;
-		}
-		updateBoundingBox(fireBoundingBoxChangeEvent);
+	public void setWidth(final int width) {
+		this.width = width;
+		markBoundingBoxDirty();
 	}
 
 	@Override

@@ -35,10 +35,10 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * ObjectPainter plugin
- * 
- * 
+ *
+ *
  * @author Dariush Forouher
- * 
+ *
  */
 public class ObjectPainterPlugin extends BackgroundPainterPlugin implements NeedsMetric {
 
@@ -95,7 +95,7 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	@Override
 	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
-		
+
 		timer = new Timer("ObjectPainter-Timer");
 	}
 
@@ -162,10 +162,6 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	}
 
 	/* Methods needed for scope-reasons */
-
-	void fireDrawingObjectChangedInternal(final DrawingObject dob, final AbsoluteRectangle rect) {
-		fireDrawingObjectChanged(dob, rect);
-	}
 
 	void fireDrawingObjectAddedInternal(final DrawingObject dob) {
 		fireDrawingObjectAdded(dob);

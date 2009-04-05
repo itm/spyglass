@@ -54,7 +54,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	// --------------------------------------------------------------------------------
 	/**
 	 * Small helper class representing an edge in a graph, denoted by 2-tuple of 2 node IDs.
-	 * 
+	 *
 	 * @author Daniel Bimschas
 	 */
 	private class Edge {
@@ -81,7 +81,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	/**
 	 * A small helper class containing the graph defined by the edges which are read from incoming
 	 * packages.
-	 * 
+	 *
 	 * @author Daniel Bimschas
 	 */
 	private class Data {
@@ -256,12 +256,6 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 			}
 		}
-
-		// fire events outside lock block to avoid deadlocks
-		for (final Tuple<LinePainterLine, AbsoluteRectangle> updatedLine : updatedLines) {
-			fireDrawingObjectChanged(updatedLine.first, updatedLine.second);
-		}
-
 	}
 
 	private void handleStringFormattersChange(final Map<Integer, String> newValue) {
@@ -364,18 +358,18 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 					e = new Edge(senderId, neighboorId);
 
 					e.line = new LinePainterLine();
-					e.line.setPosition(pos1, false);
-					e.line.setEnd(pos2, false);
+					e.line.setPosition(pos1);
+					e.line.setEnd(pos2);
 					final int[] color = xmlConfig.getLineColorRGB();
 					e.line.setColor(new RGB(color[0], color[1], color[2]));
-					e.line.setLineWidth(xmlConfig.getLineWidth(), false);
+					e.line.setLineWidth(xmlConfig.getLineWidth());
 
 					// check if there's a string formatter especially for this
 					// semantic type and use it if so, otherwise use default
 					// string formatter
 					final boolean hasSemanticType = stringFormatters.get(p.getSemanticType()) != null;
 					e.line.setStringFormatterResult(hasSemanticType ? stringFormatters.get(p.getSemanticType()).parse(p) : defaultStringFormatter
-							.parse(p), false);
+							.parse(p));
 
 					LinePainterLine addedLine;
 
@@ -457,7 +451,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		}
 
 		fireDrawingObjectRemoved(dos);
-		
+
 		if (timer != null) {
 			timer.cancel();
 		}
@@ -479,11 +473,6 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 		}
 
-		// fire event outside lock block to avoid deadlocks
-		for (final LinePainterLine line : updatedLines) {
-			fireDrawingObjectChanged(line, line.getBoundingBox());
-		}
-
 	}
 
 	private void updateLineWidth(final int width) {
@@ -499,11 +488,6 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 				line.setLineWidth(width);
 			}
 
-		}
-
-		// fire event outside lock block to avoid deadlocks
-		for (final LinePainterLine line : updatedLines) {
-			fireDrawingObjectChanged(line, line.getBoundingBox());
 		}
 
 	}

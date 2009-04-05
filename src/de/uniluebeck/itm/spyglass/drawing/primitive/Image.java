@@ -12,56 +12,44 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 
 public class Image extends DrawingObject {
-	
+
 	private final static Logger log = Logger.getLogger(Image.class);
-	
+
 	private final org.eclipse.swt.graphics.Image image;
-	
+
 	private int imageSizeX;
-	
+
 	private int imageSizeY;
-	
+
 	public Image(final String imageFileName) {
 		this.image = new org.eclipse.swt.graphics.Image(null, imageFileName);
 	}
-	
+
 	public synchronized int getImageSizeX() {
 		return imageSizeX;
 	}
-	
-	public void setImageSizeX(final int imageSizeX) {
-		setImageSizeX(imageSizeX, true);
+
+	public synchronized void setImageSizeX(final int imageSizeX) {
+		this.imageSizeX = imageSizeX;
+		markBoundingBoxDirty();
 	}
-	
-	public void setImageSizeX(final int imageSizeX, final boolean fireBoundingBoxChangeEvent) {
-		synchronized (this) {
-			this.imageSizeX = imageSizeX;
-		}
-		updateBoundingBox(fireBoundingBoxChangeEvent);
-	}
-	
+
 	public synchronized int getImageSizeY() {
 		return imageSizeY;
 	}
-	
+
 	public void setImageSizeY(final int imageSizeY) {
-		setImageSizeY(imageSizeY, true);
+		this.imageSizeY = imageSizeY;
+		markBoundingBoxDirty();
 	}
-	
-	public void setImageSizeY(final int imageSizeY, final boolean fireBoundingBoxChangeEvent) {
-		synchronized (this) {
-			this.imageSizeY = imageSizeY;
-		}
-		updateBoundingBox(fireBoundingBoxChangeEvent);
-	}
-	
+
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
-		
+
 		// Transform from Image coordinate system to absolute coordinate system
 		final AffineTransform transform = AffineTransform.getScaleInstance(imageSizeX/((double)image.getBounds().width), imageSizeY/((double)image.getBounds().height));
 		transform.preConcatenate(AffineTransform.getTranslateInstance(this.getPosition().x, this.getPosition().y));
-		
+
 		// multiply transform from drawing area. now "transform" transforms from image coordinates to pixel coordinates
 		transform.preConcatenate(drawingArea.getTransform());
 
@@ -72,7 +60,7 @@ public class Image extends DrawingObject {
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("BUG", e);
 		}
-		
+
 		final PixelRectangle clippingArea = new PixelRectangle(gc.getClipping());
 
 		// the pixel area that actually has to be redrawn...
@@ -86,14 +74,14 @@ public class Image extends DrawingObject {
 		imageSrcArea.rectangle.y -= safetyMargin;
 		imageSrcArea.rectangle.width += 2 * safetyMargin;
 		imageSrcArea.rectangle.height += 2 * safetyMargin;
-		
+
 		// but make sure that we don't overstep the limits of the original image
 		imageSrcArea =  imageSrcArea.intersection(new PixelRectangle(image.getBounds()));
 
 		// the destination area on the drawing area - calculated *from* the imageSrcArea to avoid numerical problems
 		final PixelRectangle imageDestArea = new PixelRectangle(imageSrcArea);
 		imageDestArea.transform(transform);
-		
+
 		gc.drawImage(image,
 				imageSrcArea.getUpperLeft().x,
 				imageSrcArea.getUpperLeft().y,
@@ -115,10 +103,10 @@ public class Image extends DrawingObject {
 //				drawingArea.absRect2PixelRect(getBoundingBox()).getWidth(),
 //				drawingArea.absRect2PixelRect(getBoundingBox()).getHeight());
 
-		
+
 	}
-	
-	
+
+
 	@Override
 	public void destroy() {
 		if (image != null) {
@@ -126,7 +114,7 @@ public class Image extends DrawingObject {
 		}
 		super.destroy();
 	}
-	
+
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 		return new AbsoluteRectangle(this.getPosition(), imageSizeX, imageSizeY);

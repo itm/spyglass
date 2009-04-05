@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------
 /**
- * 
+ *
  */
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
@@ -27,7 +27,7 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 // --------------------------------------------------------------------------------
 /**
  * Flag class for DrawingObjects painted by NodeSensorRangePlugin
- * 
+ *
  * @author bimschas
  */
 public class NodeSensorRangeDrawingObject extends DrawingObject implements PropertyChangeListener {
@@ -191,8 +191,8 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param gc
 	 * @param x
 	 *            in pixel coordinates
@@ -337,7 +337,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		if (isRange) {
 			rangeType = e.getNewValue() instanceof RectangleRange ? RangeType.RECTANGLE : e.getNewValue() instanceof CircleRange ? RangeType.CIRCLE
 					: RangeType.CONE;
-			updateBoundingBox();
+			markBoundingBoxDirty();
 		} else if (isBackground) {
 			final int[] color = (int[]) e.getNewValue();
 			setBgColor(new RGB(color[0], color[1], color[2]));
@@ -346,8 +346,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 			setColor(new RGB(color[0], color[1], color[2]));
 		}
 
-		plugin.internalFireDrawingObjectChanged(this);
-
+		markContentDirty();
 	}
 
 }

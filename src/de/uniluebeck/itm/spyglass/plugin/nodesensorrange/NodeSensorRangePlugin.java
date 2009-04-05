@@ -135,9 +135,6 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 
 			final AbsoluteRectangle oldBoundingBox = drawingObject.getBoundingBox();
 			drawingObject.setPosition(newPosition);
-			if (isActive()) {
-				fireDrawingObjectChanged(drawingObject, oldBoundingBox);
-			}
 
 		} else {
 
@@ -169,12 +166,4 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 		data.clear();
 	}
 
-	void internalFireDrawingObjectChanged(final NodeSensorRangeDrawingObject nodeSensorRangeDrawingObject) {
-
-		// don't cause a redraw if we're inactive
-		if (isActive()) {
-			fireDrawingObjectChanged(nodeSensorRangeDrawingObject, nodeSensorRangeDrawingObject.getBoundingBox());
-		}
-
-	}
 }

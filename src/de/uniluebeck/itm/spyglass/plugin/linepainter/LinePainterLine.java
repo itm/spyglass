@@ -22,15 +22,9 @@ public class LinePainterLine extends Line {
 		return stringFormatterResult;
 	}
 
-	public void setStringFormatterResult(final String stringFormatterResult) {
-		setStringFormatterResult(stringFormatterResult, true);
-	}
-
-	public void setStringFormatterResult(final String stringFormatterResult, final boolean fireBoundingBoxChangeEvent) {
-		synchronized (this) {
-			this.stringFormatterResult = stringFormatterResult;
-		}
-		updateBoundingBox(fireBoundingBoxChangeEvent);
+	public synchronized void setStringFormatterResult(final String stringFormatterResult) {
+		this.stringFormatterResult = stringFormatterResult;
+		markBoundingBoxDirty();
 	}
 
 	@Override
@@ -50,15 +44,18 @@ public class LinePainterLine extends Line {
 
 		final AbsoluteRectangle lineBBox = super.calculateBoundingBox();
 
-		final Image i = new Image(null, 1,1);
-		final GC gc = new GC(i);
-		final Point extent = gc.textExtent(stringFormatterResult);
-		final Point position = determineStringFormatterPosition(lineBBox);
-		final Rectangle textRect = new Rectangle(position.x, position.y, extent.x + 10, extent.y + 5);
-		gc.dispose();
-		i.dispose();
-
-		return new AbsoluteRectangle(lineBBox.rectangle.union(textRect));
+		if ((stringFormatterResult != null) && (stringFormatterResult.length()>0)) {
+			final Image i = new Image(null, 1,1);
+			final GC gc = new GC(i);
+			final Point extent = gc.textExtent(stringFormatterResult);
+			final Point position = determineStringFormatterPosition(lineBBox);
+			final Rectangle textRect = new Rectangle(position.x, position.y, extent.x + 10, extent.y + 5);
+			gc.dispose();
+			i.dispose();
+			return new AbsoluteRectangle(lineBBox.rectangle.union(textRect));
+		} else {
+			return new AbsoluteRectangle(lineBBox);
+		}
 
 	}
 }

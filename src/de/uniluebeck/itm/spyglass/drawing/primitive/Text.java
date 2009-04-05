@@ -14,9 +14,9 @@ import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 
 /**
  * A Text.
- * 
+ *
  * Note: This class has never been used and is likely broken!
- * 
+ *
  */
 public class Text extends DrawingObject {
 
@@ -34,8 +34,9 @@ public class Text extends DrawingObject {
 		justification = TextJustification.left;
 	}
 
-	public void setText(final String s) {
+	public synchronized void setText(final String s) {
 		text = s;
+		markContentDirty();
 	}
 
 	public String getText() {
@@ -46,8 +47,9 @@ public class Text extends DrawingObject {
 		return justification;
 	}
 
-	public void setJustification(final TextJustification justification) {
+	public synchronized void setJustification(final TextJustification justification) {
 		this.justification = justification;
+		markContentDirty();
 	}
 
 	@Override

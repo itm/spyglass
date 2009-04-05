@@ -10,6 +10,8 @@ package de.uniluebeck.itm.spyglass.gui;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +26,9 @@ import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.core.EventDispatcher;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.drawing.BoundingBoxChangeListener;
+import de.uniluebeck.itm.spyglass.drawing.BoundingBoxIsDirtyListener;
+import de.uniluebeck.itm.spyglass.drawing.ContentChangedListener;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject.State;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
@@ -31,6 +36,7 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.gui.view.RulerArea;
 import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent;
 import de.uniluebeck.itm.spyglass.gui.view.TransformChangedListener;
+import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent.Type;
 import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.DrawingObjectListener;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -52,21 +58,33 @@ public class UIController {
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(UIController.class);
 
+	private final static boolean ENABLE_DRAW_PROFILING = true;
+
+	/** Number of milliseconds to wait between checking for new boundingBox changes */
+	private final static int REDRAW_PERIOD = 100;
+
 	private AppWindow appWindow = null;
 
 	private Spyglass spyglass = null;
 
 	private final Display display;
 
-	private final static boolean ENABLE_DRAW_PROFILING = false;
-
 	/** User events will be dispatched here */
 	private EventDispatcher eventDispatcher;
+
+	/** List of drawingObjects with outdated boundingboxes */
+	private ArrayList<DrawingObject> drawingObjectsWithDirtyBoundingBox = new ArrayList<DrawingObject>();
+
+	/** map of boundingBoxChangeListeners (we have one for each drawingObject since give it a reference to the owning plugin) */
+	private HashMap<DrawingObject, BoundingBoxChangeListener> bboxChangeListenerMap = new HashMap<DrawingObject, BoundingBoxChangeListener>();
+
+	/** map of contentChangedListeners (we have one for each drawingObject since give it a reference to the owning plugin) */
+	private HashMap<DrawingObject, ContentChangedListener> contentChangeListenerMap = new HashMap<DrawingObject, ContentChangedListener>();
 
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * 
+	 *
 	 */
 	public UIController(final Spyglass spyglass, final AppWindow appWindow) {
 		if ((spyglass == null) || (appWindow == null)) {
@@ -105,7 +123,7 @@ public class UIController {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * 
+	 *
 	 */
 	private void init() {
 
@@ -149,11 +167,21 @@ public class UIController {
 
 		spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().addPropertyChangeListener(rulerPropertyListener);
 
+		display.timerExec(REDRAW_PERIOD, new Runnable() {
+
+			@Override
+			public void run() {
+				updateBoundingBoxes();
+				display.timerExec(REDRAW_PERIOD, this);
+			}
+
+		});
+
 	}
 
 	/**
 	 * Must be called during shutdown. Should be called before model and view are destroyed.
-	 * 
+	 *
 	 * Removes all existing listeners.
 	 */
 	public void shutdown() {
@@ -175,7 +203,7 @@ public class UIController {
 	// --------------------------------------------------------------------------
 	// ------
 	/**
-	 * 
+	 *
 	 */
 	private AppWindow getAppWindow() {
 		return appWindow;
@@ -185,7 +213,7 @@ public class UIController {
 	/**
 	 * Draw all drawing objects inside the bounding box <code>area</code> from the plugin
 	 * <code>plugin</code> on <code>gc</code>.
-	 * 
+	 *
 	 * @param gc
 	 *            a GC
 	 * @param plugin
@@ -200,7 +228,7 @@ public class UIController {
 
 			switch (object.getState()) {
 				case ALIVE:
-					object.draw(appWindow.getGui().getDrawingArea(), gc);
+					object.drawObject(appWindow.getGui().getDrawingArea(), gc);
 					break;
 				case INFANT:
 					log.debug(String.format("Plugin %s contains an unitialized drawing object in its layer: %s (skipping it)", plugin, object));
@@ -211,6 +239,11 @@ public class UIController {
 		}
 	}
 
+	/**
+	 * Stuff to do when a new drawing object arrives on the scene.
+	 *
+	 * TODO: This looks ugly. Clean it up.
+	 */
 	private void handleDrawingObjectAdded(final Plugin p, final DrawingObject dob) {
 		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
 
@@ -219,8 +252,57 @@ public class UIController {
 			return;
 		}
 
+		// Initialize DrawingObject first.
 		dob.init(da);
 
+		// Needed to update the canvas where the old bounding box was
+		final BoundingBoxChangeListener bboxChangeListener = new BoundingBoxChangeListener() {
+
+			@Override
+			public void onBoundingBoxChanged(final DrawingObject updatedDrawingObject, final AbsoluteRectangle oldBox) {
+				handleDrawingObjectChanged(p, oldBox);
+			}
+
+		};
+		// put the listener in a map so we can find it later
+		bboxChangeListenerMap.put(dob, bboxChangeListener);
+		dob.addBoundingBoxChangedListener(bboxChangeListener);
+
+		// Needed to update the canvas if the drawingObject thinks it needs to be repainted.
+		final ContentChangedListener contentChangeListener = new ContentChangedListener() {
+
+			@Override
+			public void onContentChanged(final DrawingObject updatedDrawingObject) {
+
+				// do the redraw synchronously if possible
+				if (Display.getCurrent() != null) {
+					handleDrawingObjectChanged(p, dob.getBoundingBox());
+				} else {
+
+					// Redrawing the canvas must happen from the SWT display thread
+					display.asyncExec(new Runnable() {
+
+						@Override
+						public void run() {
+							if (display.isDisposed()) {
+								return;
+							}
+
+							handleDrawingObjectChanged(p, dob.getBoundingBox());
+						}
+					});
+				}
+			}
+
+		};
+		// put the listener in a map so we can find it later
+		contentChangeListenerMap.put(dob, contentChangeListener);
+		dob.addContentChangedListener(contentChangeListener);
+
+		// needed to synchronize the boundingbox of the drawingObject if the objects wishes so.
+		dob.addBoundingBoxIsDirtyListener(syncListener);
+
+		// now, after all this, redraw the screen where the object now sits.
 		if (p.isActive() && p.isVisible()) {
 			final AbsoluteRectangle absBBox = dob.getBoundingBox();
 			final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
@@ -229,7 +311,7 @@ public class UIController {
 		}
 	}
 
-	private void handleDrawingObjectChanged(final Plugin p, final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
+	private void handleDrawingObjectChanged(final Plugin p, final AbsoluteRectangle boundingBox) {
 		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
 
 		// the drawingarea might have been disposed while we were waiting
@@ -239,14 +321,8 @@ public class UIController {
 
 		if (p.isActive() && p.isVisible()) {
 
-			// the old area of the drawing object
-			if (oldBoundingBox != null) {
-				final PixelRectangle pxBBoxOld = da.absRect2PixelRect(oldBoundingBox);
-				redraw(pxBBoxOld);
-			}
 			// the new area of the drawing object
-			final AbsoluteRectangle absBBox = dob.getBoundingBox();
-			final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
+			final PixelRectangle pxBBox = da.absRect2PixelRect(boundingBox);
 
 			redraw(pxBBox);
 		}
@@ -262,6 +338,13 @@ public class UIController {
 
 		dob.destroy();
 
+		// remove all the listener we have registered before...
+		dob.removeContentChangeListener(contentChangeListenerMap.get(dob));
+		dob.removeBoundingBoxChangeListener(bboxChangeListenerMap.get(dob));
+		dob.removeBoundingBoxIsDirtyListener(syncListener);
+		bboxChangeListenerMap.remove(dob);
+		contentChangeListenerMap.remove(dob);
+
 		if (p.isActive() && p.isVisible()) {
 
 			final AbsoluteRectangle absBBox = dob.getBoundingBox();
@@ -271,9 +354,31 @@ public class UIController {
 		}
 	}
 
+	private void updateBoundingBoxes() {
+		final ArrayList<DrawingObject> copy;
+		synchronized (drawingObjectsWithDirtyBoundingBox) {
+			copy = new ArrayList<DrawingObject>(drawingObjectsWithDirtyBoundingBox);
+	
+		}
+		for(final DrawingObject dob: copy) {
+			dob.syncBoundingBox();
+		}
+	}
+
 	private void redraw(final PixelRectangle pxBBox) {
 		appWindow.getGui().getDrawingArea().redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
 	}
+
+	private BoundingBoxIsDirtyListener syncListener = new BoundingBoxIsDirtyListener() {
+
+		@Override
+		public void syncNeeded(final DrawingObject dob) {
+			synchronized (drawingObjectsWithDirtyBoundingBox) {
+				drawingObjectsWithDirtyBoundingBox.add(dob);
+			}
+		}
+
+	};
 
 	private MouseListener mouseListener = new MouseAdapter() {
 
@@ -306,6 +411,7 @@ public class UIController {
 
 						// handle all drawingobjects that already exist
 						for (final DrawingObject dob : ((Drawable) p).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
+							// TODO: this will break if we are not in SWT thread!
 							handleDrawingObjectAdded(p, dob);
 						}
 
@@ -341,22 +447,6 @@ public class UIController {
 		}
 
 		@Override
-		public void drawingObjectChanged(final Plugin p, final DrawingObject dob, final AbsoluteRectangle oldBoundingBox) {
-
-			// Redrawing the canvas must happen from the SWT display thread
-			display.asyncExec(new Runnable() {
-
-				@Override
-				public void run() {
-
-					handleDrawingObjectChanged(p, dob, oldBoundingBox);
-
-				}
-			});
-
-		}
-
-		@Override
 		public void drawingObjectRemoved(final Plugin p, final DrawingObject dob) {
 
 			if (dob.getState() != State.ALIVE) {
@@ -380,7 +470,7 @@ public class UIController {
 	/**
 	 * Renders the visible plug-in's.<br>
 	 * The plug-ins provide objects which are drawn into the drawing area.
-	 * 
+	 *
 	 * @param gc
 	 *            the graphic context used to actually draw the provided objects
 	 * @see DrawingObject
@@ -491,7 +581,7 @@ public class UIController {
 	};
 
 	/**
-	 *  
+	 *
 	 */
 	private TransformChangedListener drawingAreaTransformListener = new TransformChangedListener() {
 
@@ -501,6 +591,13 @@ public class UIController {
 			// we are already in the SWT-Thread
 			appWindow.getGui().getRulerH().redraw();
 			appWindow.getGui().getRulerV().redraw();
+
+			// On ZOOM we have to flush all outstanding boundingbox changes. Otherwise
+			// the repaint (which will follow soon after this listener finishes)
+			// would work with out-of-date boundingboxes.
+			if (e.type==Type.ZOOM_MOVE) {
+				updateBoundingBoxes();
+			}
 
 		}
 	};

@@ -105,7 +105,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	@Override
 	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
-		
+
 		timer = new Timer("MapPainter-Timer");
 
 		createMap();
@@ -130,7 +130,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		super.shutdown();
 
 		timer.cancel();
-		
+
 		if (map != null) {
 			fireDrawingObjectRemoved(map);
 			map = null;
@@ -246,7 +246,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see
 	 * de.uniluebeck.itm.spyglass.plugin.NodePositionListener#handleEvent(de.uniluebeck.itm.spyglass
 	 * .plugin.NodePositionEvent)
@@ -290,7 +290,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	 * Create a new Map object.
 	 */
 	private void createMap() {
-		
+
 		if (map != null) {
 			fireDrawingObjectRemoved(map);
 			map = null;
@@ -385,7 +385,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 	/**
 	 * Update the matrix. After we're done, cause a redraw.
-	 * 
+	 *
 	 * Note, that we only lock shortly over the map. although this may result in short-time
 	 * graphical errors (when a redraw occurs while this method is still running) it has the
 	 * advantage of avoiding longtime blocking of the SWT-Thread when the draw() method tries to
@@ -423,7 +423,6 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		}
 
 		map.setMatrix(matrix);
-		fireDrawingObjectChanged(map, null);
 	}
-	
+
 }

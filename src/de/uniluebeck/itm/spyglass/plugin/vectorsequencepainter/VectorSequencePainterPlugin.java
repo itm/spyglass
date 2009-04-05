@@ -256,7 +256,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 
 			}
 		}
-		
+
 		updateLayer();
 
 	}
@@ -320,7 +320,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.PropertyChangeEvent)
 	 */
 	@Override
@@ -385,7 +385,6 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 				for (final Line l : s.lines) {
 					final AbsoluteRectangle oldBoundingBox = l.getBoundingBox();
 					l.setLineWidth(width);
-					fireDrawingObjectChanged(l, oldBoundingBox);
 				}
 			}
 
@@ -393,7 +392,6 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 				for (final Line l : s.lines) {
 					final AbsoluteRectangle oldBoundingBox = l.getBoundingBox();
 					l.setLineWidth(width);
-					fireDrawingObjectChanged(l, oldBoundingBox);
 				}
 			}
 
@@ -412,20 +410,18 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 			for (final Sequence s : sequences) {
 				for (final Line l : s.lines) {
 					l.setColor(new RGB(color[0], color[1], color[2]));
-					fireDrawingObjectChanged(l, l.getBoundingBox());
 				}
 			}
 
 			for (final Sequence s : newSequences) {
 				for (final Line l : s.lines) {
 					l.setColor(new RGB(color[0], color[1], color[2]));
-					fireDrawingObjectChanged(l, l.getBoundingBox());
 				}
 			}
 
 		}
 
 	}
-	
-	
+
+
 }

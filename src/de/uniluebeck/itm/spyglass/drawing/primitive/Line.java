@@ -154,26 +154,14 @@ public class Line extends DrawingObject implements TransformChangedListener {
 		return lineWidth;
 	}
 
-	public void setEnd(final AbsolutePosition end) {
-		setEnd(end, true);
-	}
-
-	public void setEnd(final AbsolutePosition end, final boolean fireBoundingBoxChangeEvent) {
-		synchronized (this) {
-			lineEnd = end;
-		}
-		updateBoundingBox(fireBoundingBoxChangeEvent);
+	public synchronized void setEnd(final AbsolutePosition end) {
+		lineEnd = end;
+		markBoundingBoxDirty();
 	}
 
 	public void setLineWidth(final int width) {
-		setLineWidth(width, true);
-	}
-
-	public void setLineWidth(final int width, final boolean fireBoundingBoxChangeEvent) {
-		synchronized (this) {
-			this.lineWidth = width;
-		}
-		updateBoundingBox(fireBoundingBoxChangeEvent);
+		this.lineWidth = width;
+		markBoundingBoxDirty();
 	}
 
 	@Override
@@ -203,7 +191,7 @@ public class Line extends DrawingObject implements TransformChangedListener {
 	public void handleEvent(final TransformChangedEvent e) {
 		// don't update the boundingbox if we're only moving
 		if (e.type == Type.ZOOM_MOVE) {
-			updateBoundingBox();
+			markBoundingBoxDirty();
 		}
 	}
 
@@ -211,6 +199,7 @@ public class Line extends DrawingObject implements TransformChangedListener {
 	public void destroy() {
 		getDrawingArea().removeDrawingAreaTransformListener(this);
 		super.destroy();
+
 	}
 
 	@Override
@@ -218,6 +207,6 @@ public class Line extends DrawingObject implements TransformChangedListener {
 		super.init(drawingArea);
 		getDrawingArea().addDrawingAreaTransformListener(this);
 	}
-	
-	
+
+
 }

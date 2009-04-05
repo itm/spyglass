@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------
 /**
- * 
+ *
  */
 package de.uniluebeck.itm.spyglass.plugin.objectpainter;
 
@@ -32,37 +32,37 @@ public class Trajectory extends TimerTask {
 	private ArrayList<Line> lines = new ArrayList<Line>();
 
 	private Image image = null;
-	
+
 	Trajectory(final ObjectPainterPlugin objectPainterPlugin,final List<TrajectorySection> list, final String filename) {
 		this.plugin = objectPainterPlugin;
 		this.image = new Image(filename);
 		this.list = list;
 		startTime = System.currentTimeMillis();
-	
+
 		// create drawing objects;
 		if (plugin.getXMLConfig().isDrawLine()) {
 			for (final TrajectorySection s : list) {
 				final Line l = new Line();
-				l.setPosition(s.start, false);
-				l.setEnd(s.end, false);
+				l.setPosition(s.start);
+				l.setEnd(s.end);
 				l.setColor(plugin.getXMLConfig().getLineColorRGB());
 				lines.add(l);
 			}
 		}
-	
+
 		final AbsolutePosition pos = list.get(0).start.clone();
-	
+
 		pos.x -= plugin.getXMLConfig().getImageSizeX() / 2;
 		pos.y -= plugin.getXMLConfig().getImageSizeY() / 2;
 		image.setPosition(pos);
 		image.setImageSizeX(plugin.getXMLConfig().getImageSizeX());
 		image.setImageSizeY(plugin.getXMLConfig().getImageSizeY());
-	
+
 		this.init();
 	}
 
 	private void init() {
-		
+
 		// Draw lines
 		for (final DrawingObject d : lines) {
 			synchronized (this.plugin.layer) {
@@ -70,19 +70,19 @@ public class Trajectory extends TimerTask {
 			}
 			this.plugin.fireDrawingObjectAddedInternal(d);
 		}
-	
+
 		synchronized (this.plugin.layer) {
 			this.plugin.layer.add(image);
 		}
 		this.plugin.fireDrawingObjectAddedInternal(image);
-	
+
 		sectionTimestamp = startTime;
 
 	}
-	
+
 	@Override
 	public void run() {
-		
+
 		if (System.currentTimeMillis() - scheduledExecutionTime() >=
 	           50) {
 			return;  // Too late; skip this execution.
@@ -120,15 +120,12 @@ public class Trajectory extends TimerTask {
 		synchronized (this.plugin.layer) {
 			image.setPosition(location);
 			for (final Line l : lines) {
-				this.plugin.layer.pushBack(l);	
+				this.plugin.layer.pushBack(l);
 			}
-			
+
 		}
-
-		this.plugin.fireDrawingObjectChangedInternal(image, oldBBox);
-
 	}
-	
+
 	/**
 	 * Cancel this timer and remove the drawing objects while we're at it.
 	 */
@@ -138,15 +135,15 @@ public class Trajectory extends TimerTask {
 
 		// clean up, before we go
 		if (ret) {
-		
+
 			// XXX: we cannot remove ourself for concurrency-reasons
 			//plugin.trajectories.remove(this);
-			
+
 			synchronized (this.plugin.layer) {
 				this.plugin.layer.remove(image);
 			}
 			this.plugin.fireDrawingObjectRemovedInternal(image);
-		
+
 			// Remove lines
 			for (final DrawingObject d : lines) {
 				synchronized (this.plugin.layer) {
@@ -155,7 +152,7 @@ public class Trajectory extends TimerTask {
 				this.plugin.fireDrawingObjectRemovedInternal(d);
 			}
 		}
-		
+
 		return ret;
 	}
 
