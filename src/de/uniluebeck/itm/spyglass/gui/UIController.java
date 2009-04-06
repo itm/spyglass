@@ -11,9 +11,13 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.events.MouseAdapter;
@@ -73,13 +77,10 @@ public class UIController {
 	private EventDispatcher eventDispatcher;
 
 	/** List of drawingObjects with outdated boundingboxes */
-	private ArrayList<DrawingObject> drawingObjectsWithDirtyBoundingBox = new ArrayList<DrawingObject>();
+	private Set<DrawingObject> drawingObjectsWithDirtyBoundingBox = Collections.synchronizedSet(new HashSet<DrawingObject>());
 
-	/** map of boundingBoxChangeListeners (we have one for each drawingObject since give it a reference to the owning plugin) */
-	private HashMap<DrawingObject, BoundingBoxChangeListener> bboxChangeListenerMap = new HashMap<DrawingObject, BoundingBoxChangeListener>();
-
-	/** map of contentChangedListeners (we have one for each drawingObject since give it a reference to the owning plugin) */
-	private HashMap<DrawingObject, ContentChangedListener> contentChangeListenerMap = new HashMap<DrawingObject, ContentChangedListener>();
+	/** Maps each drawingObject to a plugin */
+	private Map<DrawingObject, Plugin> drawingObjectMap = Collections.synchronizedMap(new HashMap<DrawingObject, Plugin>());
 
 	// --------------------------------------------------------------------------
 	// ------
@@ -90,7 +91,6 @@ public class UIController {
 		if ((spyglass == null) || (appWindow == null)) {
 			throw new IllegalArgumentException();
 		}
-
 		this.spyglass = spyglass;
 		this.appWindow = appWindow;
 		this.eventDispatcher = new EventDispatcher(spyglass.getPluginManager(), appWindow.getGui().getDrawingArea());
@@ -242,7 +242,6 @@ public class UIController {
 	/**
 	 * Stuff to do when a new drawing object arrives on the scene.
 	 *
-	 * TODO: This looks ugly. Clean it up.
 	 */
 	private void handleDrawingObjectAdded(final Plugin p, final DrawingObject dob) {
 		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
@@ -255,48 +254,9 @@ public class UIController {
 		// Initialize DrawingObject first.
 		dob.init(da);
 
-		// Needed to update the canvas where the old bounding box was
-		final BoundingBoxChangeListener bboxChangeListener = new BoundingBoxChangeListener() {
+		drawingObjectMap.put(dob, p);
 
-			@Override
-			public void onBoundingBoxChanged(final DrawingObject updatedDrawingObject, final AbsoluteRectangle oldBox) {
-				handleDrawingObjectChanged(p, oldBox);
-			}
-
-		};
-		// put the listener in a map so we can find it later
-		bboxChangeListenerMap.put(dob, bboxChangeListener);
 		dob.addBoundingBoxChangedListener(bboxChangeListener);
-
-		// Needed to update the canvas if the drawingObject thinks it needs to be repainted.
-		final ContentChangedListener contentChangeListener = new ContentChangedListener() {
-
-			@Override
-			public void onContentChanged(final DrawingObject updatedDrawingObject) {
-
-				// do the redraw synchronously if possible
-				if (Display.getCurrent() != null) {
-					handleDrawingObjectChanged(p, dob.getBoundingBox());
-				} else {
-
-					// Redrawing the canvas must happen from the SWT display thread
-					display.asyncExec(new Runnable() {
-
-						@Override
-						public void run() {
-							if (display.isDisposed()) {
-								return;
-							}
-
-							handleDrawingObjectChanged(p, dob.getBoundingBox());
-						}
-					});
-				}
-			}
-
-		};
-		// put the listener in a map so we can find it later
-		contentChangeListenerMap.put(dob, contentChangeListener);
 		dob.addContentChangedListener(contentChangeListener);
 
 		// needed to synchronize the boundingbox of the drawingObject if the objects wishes so.
@@ -339,11 +299,10 @@ public class UIController {
 		dob.destroy();
 
 		// remove all the listener we have registered before...
-		dob.removeContentChangeListener(contentChangeListenerMap.get(dob));
-		dob.removeBoundingBoxChangeListener(bboxChangeListenerMap.get(dob));
+		dob.removeContentChangeListener(contentChangeListener);
+		dob.removeBoundingBoxChangeListener(bboxChangeListener);
 		dob.removeBoundingBoxIsDirtyListener(syncListener);
-		bboxChangeListenerMap.remove(dob);
-		contentChangeListenerMap.remove(dob);
+		drawingObjectMap.remove(dob);
 
 		if (p.isActive() && p.isVisible()) {
 
@@ -358,10 +317,14 @@ public class UIController {
 		final ArrayList<DrawingObject> copy;
 		synchronized (drawingObjectsWithDirtyBoundingBox) {
 			copy = new ArrayList<DrawingObject>(drawingObjectsWithDirtyBoundingBox);
-	
+			drawingObjectsWithDirtyBoundingBox.clear();
+
 		}
 		for(final DrawingObject dob: copy) {
-			dob.syncBoundingBox();
+			final Plugin p = drawingObjectMap.get(dob);
+			if ((p != null) && p.isActive() && p.isVisible()) {
+				dob.syncBoundingBox();
+			}
 		}
 	}
 
@@ -373,9 +336,43 @@ public class UIController {
 
 		@Override
 		public void syncNeeded(final DrawingObject dob) {
-			synchronized (drawingObjectsWithDirtyBoundingBox) {
-				drawingObjectsWithDirtyBoundingBox.add(dob);
+			drawingObjectsWithDirtyBoundingBox.add(dob);
+		}
+
+	};
+
+	private ContentChangedListener contentChangeListener = new ContentChangedListener() {
+
+		@Override
+		public void onContentChanged(final DrawingObject updatedDrawingObject) {
+
+			// do the redraw synchronously if possible
+			if (Display.getCurrent() != null) {
+				handleDrawingObjectChanged(drawingObjectMap.get(updatedDrawingObject), updatedDrawingObject.getBoundingBox());
+			} else {
+
+				// Redrawing the canvas must happen from the SWT display thread
+				display.asyncExec(new Runnable() {
+
+					@Override
+					public void run() {
+						if (display.isDisposed()) {
+							return;
+						}
+
+						handleDrawingObjectChanged(drawingObjectMap.get(updatedDrawingObject), updatedDrawingObject.getBoundingBox());
+					}
+				});
 			}
+		}
+
+	};
+
+	private BoundingBoxChangeListener bboxChangeListener = new BoundingBoxChangeListener() {
+
+		@Override
+		public void onBoundingBoxChanged(final DrawingObject updatedDrawingObject, final AbsoluteRectangle oldBox) {
+			handleDrawingObjectChanged(drawingObjectMap.get(updatedDrawingObject), oldBox);
 		}
 
 	};
