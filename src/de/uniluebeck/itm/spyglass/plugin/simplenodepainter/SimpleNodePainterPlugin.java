@@ -61,7 +61,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * node's identifier. But additionally, further information which are extracted from the packets of
  * certain semantic types are displayed, too.</li>
  * </ul>
- *
+ * 
  * @author Sebastian Ebers
  */
 public class SimpleNodePainterPlugin extends NodePainterPlugin {
@@ -139,7 +139,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		};
 		manager.addNodePositionListener(npcl);
 		pcl = new PropertyChangeListener() {
-			@SuppressWarnings("synthetic-access")
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
 
@@ -186,7 +185,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns a widget used for the configuration of an instance of this class
-	 *
+	 * 
 	 * @param dialog
 	 *            the dialog where the widget is attached
 	 * @param spyglass
@@ -207,7 +206,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the plug-in's denotation in a human readable style
-	 *
+	 * 
 	 * @return the plug-in's denotation in a human readable style
 	 */
 	public static String getHumanReadableName() {
@@ -238,12 +237,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			existingTypes.add(packet.getSemanticType());
 		}
 
+		// get the instance of the node's visualization
+		final Node node = getMatchingNodeObject(nodeID);
+
 		// if the description was changed, an update is needed
 		if (parsePayloadByStringFormatters(packet)) {
-			// parsePayloadByStringFormatters(packet);
-			// get the instance of the node's visualization
-			final Node node = getMatchingNodeObject(nodeID);
-			final AbsoluteRectangle oldBB = new AbsoluteRectangle(node.getBoundingBox());
 			node.setDescription(stringFormatterResultCache.get(nodeID));
 		}
 	}
@@ -251,7 +249,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the position of a node
-	 *
+	 * 
 	 * @param nodeID
 	 *            the node's identifier
 	 * @param position
@@ -268,7 +266,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 		// get the instance of the node's visualization
 		final Node node = getMatchingNodeObject(nodeID);
-		final AbsoluteRectangle bb = new AbsoluteRectangle(node.getBoundingBox());
 		node.setPosition(position);
 	}
 
@@ -277,7 +274,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * Parses the packets payload using the defined {@link StringFormatter}s.<br>
 	 * If a string formatter exists which gains information from the payload, the {@link Node}
 	 * corresponding to the node which sent the packet will be updated.
-	 *
+	 * 
 	 * @param packet
 	 *            the packet containing the payload
 	 * @return <code>true</code> if a StringFormatter gained information from the payload
@@ -322,7 +319,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * Updates the the part of the string formatter results corresponding to the semantic type.<br>
 	 * If the provided information are already buffered, <code>false</code> will be returned to
 	 * indicate that an update was not necessary.
-	 *
+	 * 
 	 * @param packetSemanticType
 	 *            the semantic type
 	 * @param str
@@ -368,7 +365,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * Returns the instance of a node's visualization<br>
 	 * Note that either a matching instance if found in the quad tree or a new instance is to be
 	 * created and initialized as configured by the default parameters.<br>
-	 *
+	 * 
 	 * @param nodeID
 	 *            the node's identifier
 	 * @return the up to date instance of a node's visualization
@@ -390,7 +387,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Creates and returns a new {@link Node} object
-	 *
+	 * 
 	 * @param nodeID
 	 *            the identifier to be used
 	 * @param drawingArea
@@ -419,7 +416,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	/**
 	 * Updates the result cache of all {@link StringFormatter}s which are associated to a certain
 	 * node
-	 *
+	 * 
 	 * @param nodeID
 	 *            the node's identifier
 	 */
@@ -557,7 +554,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 				// otherwise it needs to be updated
 				final String stringFormatterResult = stringFormatterResultCache.get(nodeID);
-				final AbsoluteRectangle oldBB = new AbsoluteRectangle(node.getBoundingBox());
 				node.update("Node " + nodeID, stringFormatterResult, xmlConfig.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(),
 						xmlConfig.getLineWidth());
 
@@ -580,7 +576,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns if the node is associated to any semantic type
-	 *
+	 * 
 	 * @param node
 	 *            a node
 	 * @return <code>true</code> if the node is associated to a semantic type, <code>false</code>
@@ -693,7 +689,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Handles the timeout of a node - the node will not be painted any longer.
-	 *
+	 * 
 	 * @param nodeID
 	 *            the node's identifier
 	 */
@@ -724,7 +720,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	/**
 	 * Handles a mouse click event which was actually a double click returns <code>true</code> if a
 	 * drawing object was found which bounding box contains the point clicked by the user.
-	 *
+	 * 
 	 * @param drawingObjects
 	 *            the plug-in's drawing objects
 	 * @param clickPoint
@@ -748,7 +744,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				if (drawingObject instanceof Node) {
 					// if so, toggle its extension state
 					final Node node = (Node) drawingObject;
-					final AbsoluteRectangle oldBB = new AbsoluteRectangle(node.getBoundingBox());
 					node.setExtended(!node.isExtended());
 					xmlConfig.putExtendedInformationActive(node.getNodeID(), node.isExtended());
 				}
@@ -762,7 +757,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	/**
 	 * Handles a mouse click event which was not a left click and returns <code>true</code> if a
 	 * drawing object was found which bounding box contains the point clicked by the user.
-	 *
+	 * 
 	 * @param drawingObjects
 	 *            the plug-in's drawing objects
 	 * @param clickPoint
@@ -793,7 +788,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	/**
 	 * Handles a mouse click event which was not a left click and returns <code>true</code> if a
 	 * drawing object was found which bounding box contains the point clicked by the user.
-	 *
+	 * 
 	 * @param drawingObjects
 	 *            the plug-in's drawing objects
 	 * @param clickPoint
