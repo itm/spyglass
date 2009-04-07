@@ -110,7 +110,8 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	}
 
 	@Override
-	public void shutdown() {
+	public void shutdown() throws Exception {
+		super.shutdown();
 		pluginManager.removeNodePositionListener(nodePositionListener);
 	}
 

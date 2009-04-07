@@ -43,6 +43,33 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	/**
+	 * The state of the Plugin
+	 *
+	 */
+	public enum State {
+
+		/**
+		 * The plugin has not been initialized yet.
+		 */
+		INFANT,
+
+		/**
+		 * The plugin has been initialized and is running.
+		 */
+		ALIVE,
+
+		/**
+		 * The plugin has been shut down.
+		 */
+		ZOMBIE
+	}
+
+	/**
+	 * State of the plugin
+	 */
+	private State state = State.INFANT;
+
+	/**
 	 * Reference to the plug-in manager
 	 */
 	protected PluginManager pluginManager;
@@ -209,7 +236,13 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	public void init(final PluginManager manager) throws Exception {
 
+		if (state != State.INFANT) {
+			throw new RuntimeException("Can only initialize new Plugins!");
+		}
+
 		this.pluginManager = manager;
+
+		state = State.ALIVE;
 
 		if (isActive()) {
 			startPacketConsumerThread();
@@ -547,10 +580,22 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	public void shutdown() throws Exception {
 
+		if (state != State.ALIVE) {
+			throw new RuntimeException("Can only kill alive plugins!");
+		}
+
+		state = State.ZOMBIE;
+
 		getXMLConfig().removePropertyChangeListener(propertyActiveListener);
 
 		// stop the consumer thread
 		stopPacketConsumerThread();
 	}
 
+	/**
+	 * Returns the state of the plugin.
+	 */
+	public final State getState() {
+		return state;
+	}
 }

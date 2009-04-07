@@ -111,6 +111,11 @@ public class UIController {
 				 */
 				final List<Plugin> plugins = ((PluginManager) evt.getNewValue()).getPlugins();
 				for (final Plugin p : plugins) {
+					// sanity check
+					if (p.getState() != Plugin.State.ALIVE) {
+						throw new IllegalArgumentException("Plugin is not alive!");
+					}
+
 					if (p instanceof Drawable) {
 						p.addDrawingObjectListener(drawingObjectListener);
 					}
@@ -143,6 +148,12 @@ public class UIController {
 
 		final List<Plugin> plugins = spyglass.getPluginManager().getPlugins();
 		for (final Plugin p : plugins) {
+
+			// sanity check
+			if (p.getState() != Plugin.State.ALIVE) {
+				throw new IllegalArgumentException("Plugin is not alive!");
+			}
+
 			if (p instanceof Drawable) {
 
 				/*
@@ -389,6 +400,11 @@ public class UIController {
 
 				switch (what) {
 					case NEW_PLUGIN:
+
+						if (p.getState() != Plugin.State.ALIVE) {
+							throw new IllegalArgumentException("Plugin is not alive!");
+						}
+
 						p.addDrawingObjectListener(drawingObjectListener);
 						p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
 
@@ -399,6 +415,10 @@ public class UIController {
 
 						break;
 					case PLUGIN_REMOVED:
+						if (p.getState() != Plugin.State.ZOMBIE) {
+							throw new IllegalArgumentException("Plugin is not dead yet!");
+						}
+
 						// hopefully the plugin has already shut down at this point
 						p.removeDrawingObjectListener(drawingObjectListener);
 						p.getXMLConfig().removePropertyChangeListener(pluginPropertyListener);

@@ -28,16 +28,16 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
  * This is a template plugin which can be used for coding new plugins.
- * 
+ *
  * By inheritance it is a BackgroundPainter.
- * 
+ *
  * Look also for the other classes in this java package. These classes (a Plugin, an XMLConfig and a
  * PreferencePage) represent the minimum any plugin writer must implement.
- * 
+ *
  * To activate this Plugin, you have to add it to PluginManager.availablePluginsTypes
- * 
+ *
  * @author Dariush Forouher
- * 
+ *
  */
 public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyChangeListener {
 
@@ -107,8 +107,8 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 	}
 
 	@Override
-	public void shutdown() {
-
+	public void shutdown() throws Exception {
+		super.shutdown();
 		xmlConfig.removePropertyChangeListener(this);
 	}
 

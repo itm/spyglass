@@ -12,6 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.SortedSet;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.RGB;
 import org.simpleframework.xml.Element;
 
@@ -26,9 +27,12 @@ import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 public class GridPainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener {
+
+	private static Logger log = SpyglassLoggerFactory.getLogger(GridPainterPlugin.class);
 
 	@Element(name = "parameters")
 	private final GridPainterXMLConfig xmlConfig;
@@ -59,7 +63,9 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 	}
 
 	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
-		return layer.getDrawingObjects(area);
+		synchronized (layer) {
+			return layer.getDrawingObjects(area);
+		}
 	}
 
 	public static String getHumanReadableName() {
@@ -105,7 +111,11 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent arg0) {
-		updateGrid();
+		try {
+			updateGrid();
+		} catch (final Exception e) {
+			log.error("Argh!",e);
+		}
 	}
 
 	private void updateGrid() {
