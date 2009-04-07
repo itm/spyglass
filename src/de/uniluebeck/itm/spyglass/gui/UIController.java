@@ -244,15 +244,12 @@ public class UIController {
 	 *
 	 */
 	private void handleDrawingObjectAdded(final Plugin p, final DrawingObject dob) {
-		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
 
-		// the drawingarea might have been disposed while we were waiting
-		if (da.isDisposed()) {
-			return;
+		if (dob.getState() != State.INFANT) {
+			throw new RuntimeException("Can only add fresh new DrawingObjects!");
 		}
 
-		// Initialize DrawingObject first.
-		dob.init(da);
+		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
 
 		drawingObjectMap.put(dob, p);
 
@@ -262,13 +259,8 @@ public class UIController {
 		// needed to synchronize the boundingbox of the drawingObject if the objects wishes so.
 		dob.addBoundingBoxIsDirtyListener(syncListener);
 
-		// now, after all this, redraw the screen where the object now sits.
-		if (p.isActive() && p.isVisible()) {
-			final AbsoluteRectangle absBBox = dob.getBoundingBox();
-			final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
-
-			redraw(pxBBox);
-		}
+		// Initialize DrawingObject first.
+		dob.init(da);
 	}
 
 	private void handleDrawingObjectChanged(final Plugin p, final AbsoluteRectangle boundingBox) {
@@ -289,11 +281,9 @@ public class UIController {
 	}
 
 	private void handleDrawingObjectRemoved(final Plugin p, final DrawingObject dob) {
-		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
 
-		// the drawingarea might have been disposed while we were waiting
-		if (da.isDisposed()) {
-			return;
+		if (dob.getState() != State.ALIVE) {
+			throw new RuntimeException("Can only remove alive DrawingObjects!");
 		}
 
 		dob.destroy();
@@ -304,13 +294,6 @@ public class UIController {
 		dob.removeBoundingBoxIsDirtyListener(syncListener);
 		drawingObjectMap.remove(dob);
 
-		if (p.isActive() && p.isVisible()) {
-
-			final AbsoluteRectangle absBBox = dob.getBoundingBox();
-			final PixelRectangle pxBBox = da.absRect2PixelRect(absBBox);
-
-			redraw(pxBBox);
-		}
 	}
 
 	private void updateBoundingBoxes() {
@@ -332,7 +315,7 @@ public class UIController {
 		appWindow.getGui().getDrawingArea().redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
 	}
 
-	private BoundingBoxIsDirtyListener syncListener = new BoundingBoxIsDirtyListener() {
+	private final BoundingBoxIsDirtyListener syncListener = new BoundingBoxIsDirtyListener() {
 
 		@Override
 		public void syncNeeded(final DrawingObject dob) {
@@ -341,10 +324,13 @@ public class UIController {
 
 	};
 
-	private ContentChangedListener contentChangeListener = new ContentChangedListener() {
+	private final ContentChangedListener contentChangeListener = new ContentChangedListener() {
 
 		@Override
 		public void onContentChanged(final DrawingObject updatedDrawingObject) {
+
+			// this may be called after the drawingObject has been destroyed to clean up the area
+			// on the canvas. Thus don't check for the state of the DrawingObject
 
 			// do the redraw synchronously if possible
 			if (Display.getCurrent() != null) {
@@ -368,7 +354,7 @@ public class UIController {
 
 	};
 
-	private BoundingBoxChangeListener bboxChangeListener = new BoundingBoxChangeListener() {
+	private final BoundingBoxChangeListener bboxChangeListener = new BoundingBoxChangeListener() {
 
 		@Override
 		public void onBoundingBoxChanged(final DrawingObject updatedDrawingObject, final AbsoluteRectangle oldBox) {
@@ -377,7 +363,7 @@ public class UIController {
 
 	};
 
-	private MouseListener mouseListener = new MouseAdapter() {
+	private final MouseListener mouseListener = new MouseAdapter() {
 
 		@Override
 		public void mouseDoubleClick(final MouseEvent e) {
@@ -395,7 +381,7 @@ public class UIController {
 
 	};
 
-	private PluginListChangeListener pluginListChangeListener = new PluginListChangeListener() {
+	private final PluginListChangeListener pluginListChangeListener = new PluginListChangeListener() {
 
 		@Override
 		public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
@@ -408,12 +394,12 @@ public class UIController {
 
 						// handle all drawingobjects that already exist
 						for (final DrawingObject dob : ((Drawable) p).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
-							// TODO: this will break if we are not in SWT thread!
 							handleDrawingObjectAdded(p, dob);
 						}
 
 						break;
 					case PLUGIN_REMOVED:
+						// hopefully the plugin has already shut down at this point
 						p.removeDrawingObjectListener(drawingObjectListener);
 						p.getXMLConfig().removePropertyChangeListener(pluginPropertyListener);
 						break;
@@ -422,43 +408,19 @@ public class UIController {
 		}
 	};
 
-	private DrawingObjectListener drawingObjectListener = new DrawingObjectListener() {
+	private final DrawingObjectListener drawingObjectListener = new DrawingObjectListener() {
 
 		@Override
 		public void drawingObjectAdded(final Plugin p, final DrawingObject dob) {
 
-			if (dob.getState() != State.INFANT) {
-				throw new RuntimeException("Can only add fresh new DrawingObjects!");
-			}
-
-			// Redrawing the canvas must happen from the SWT display thread
-			display.asyncExec(new Runnable() {
-
-				@Override
-				public void run() {
-
-					handleDrawingObjectAdded(p, dob);
-				}
-			});
+			handleDrawingObjectAdded(p, dob);
 
 		}
 
 		@Override
 		public void drawingObjectRemoved(final Plugin p, final DrawingObject dob) {
 
-			if (dob.getState() != State.ALIVE) {
-				throw new RuntimeException("Can only remove alive DrawingObjects!");
-			}
-
-			// Redrawing the canvas must happen from the SWT display thread
-			display.asyncExec(new Runnable() {
-
-				@Override
-				public void run() {
-
-					handleDrawingObjectRemoved(p, dob);
-				}
-			});
+			handleDrawingObjectRemoved(p, dob);
 
 		}
 
@@ -472,7 +434,7 @@ public class UIController {
 	 *            the graphic context used to actually draw the provided objects
 	 * @see DrawingObject
 	 */
-	private PaintListener paintListener = new PaintListener() {
+	private final PaintListener paintListener = new PaintListener() {
 
 		@Override
 		public void paintControl(final PaintEvent e) {
@@ -511,7 +473,7 @@ public class UIController {
 	/**
 	 * Listener for changes in the configuration of an plug-in.<br>
 	 */
-	private PropertyChangeListener pluginPropertyListener = new PropertyChangeListener() {
+	private final PropertyChangeListener pluginPropertyListener = new PropertyChangeListener() {
 
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
@@ -545,7 +507,7 @@ public class UIController {
 	 * Listener for change of visibility of ruler
 	 */
 
-	private PropertyChangeListener rulerPropertyListener = new PropertyChangeListener() {
+	private final PropertyChangeListener rulerPropertyListener = new PropertyChangeListener() {
 
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
@@ -555,7 +517,7 @@ public class UIController {
 		}
 	};
 
-	private PaintListener paintRulerListener = new PaintListener() {
+	private final PaintListener paintRulerListener = new PaintListener() {
 
 		@Override
 		public void paintControl(final PaintEvent e) {
@@ -580,7 +542,7 @@ public class UIController {
 	/**
 	 *
 	 */
-	private TransformChangedListener drawingAreaTransformListener = new TransformChangedListener() {
+	private final TransformChangedListener drawingAreaTransformListener = new TransformChangedListener() {
 
 		@Override
 		public void handleEvent(final TransformChangedEvent e) {

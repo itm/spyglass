@@ -101,7 +101,7 @@ public abstract class DrawingObject implements Cloneable {
 	 * Is the boundingBox dirty? It is dirty if and only if the shadowCopy is not completely
 	 * consistent with the main object.
 	 */
-	private boolean isBoundingBoxDirty = true;
+	private boolean isBoundingBoxDirty = false;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -111,6 +111,8 @@ public abstract class DrawingObject implements Cloneable {
 	 *
 	 * Subclasses may overwrite this method if they want to to additional things (e.g. add listener
 	 * to the drawing area).
+	 *
+	 * Please note that no assumption from which context this method is called must be made.
 	 *
 	 * @param drawingArea
 	 *            a reference to the drawing area
@@ -124,10 +126,12 @@ public abstract class DrawingObject implements Cloneable {
 
 		this.state = State.ALIVE;
 
-		this.isBoundingBoxDirty = true;
-		syncBoundingBox();
-
+		// there is a small window where draw() may be called with a bad bounding box.
+		// but since markBoundingBoxDirty() below will issue another redraw shortly after,
+		// this should not matter.
 		this.shadowCopy = clone();
+
+		markBoundingBoxDirty();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -138,14 +142,19 @@ public abstract class DrawingObject implements Cloneable {
 	 *
 	 * subclasses may overwrite this method if they want to to additional things (e.g. release
 	 * listener from drawing area).
+	 *
+	 * Please note that no assumption from which context this method is called must be made.
+	 *
 	 */
 	public synchronized void destroy() {
 		if (state != State.ALIVE) {
 			throw new RuntimeException("Object ether not yet initialized or already dead!");
 		}
 
-		this.drawingArea = null;
 		this.state = State.ZOMBIE;
+		this.drawingArea = null;
+
+		fireContentChangedEvent();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -278,6 +287,8 @@ public abstract class DrawingObject implements Cloneable {
 	 * @param gc
 	 */
 	public final synchronized void drawObject(final DrawingArea drawingArea, final GC gc) {
+		assert state == State.ALIVE;
+
 		shadowCopy.draw(drawingArea, gc);
 	}
 
