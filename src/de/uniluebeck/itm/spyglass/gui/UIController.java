@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -270,7 +271,6 @@ public class UIController {
 		// needed to synchronize the boundingbox of the drawingObject if the objects wishes so.
 		dob.addBoundingBoxIsDirtyListener(syncListener);
 
-		// Initialize DrawingObject first.
 		dob.init(da);
 	}
 
@@ -308,17 +308,24 @@ public class UIController {
 	}
 
 	private void updateBoundingBoxes() {
-		final ArrayList<DrawingObject> copy;
-		synchronized (drawingObjectsWithDirtyBoundingBox) {
-			copy = new ArrayList<DrawingObject>(drawingObjectsWithDirtyBoundingBox);
-			drawingObjectsWithDirtyBoundingBox.clear();
 
-		}
-		for(final DrawingObject dob: copy) {
-			final Plugin p = drawingObjectMap.get(dob);
-			if ((p != null) && p.isActive() && p.isVisible()) {
-				dob.syncBoundingBox();
+		// get a list of all drawingObjects from active and visible plugins which are in need of a
+		// new bounding box
+		final List<DrawingObject> list = new ArrayList<DrawingObject>();
+		synchronized (drawingObjectsWithDirtyBoundingBox) {
+			final Iterator<DrawingObject> it = drawingObjectsWithDirtyBoundingBox.iterator();
+			while (it.hasNext()) {
+				final DrawingObject next = it.next();
+				final Plugin p = this.drawingObjectMap.get(next);
+				if (p.isActive() && p.isVisible()) {
+					list.add(next);
+					it.remove();
+				}
 			}
+		}
+
+		for(final DrawingObject dob: list) {
+			dob.syncBoundingBox();
 		}
 	}
 
