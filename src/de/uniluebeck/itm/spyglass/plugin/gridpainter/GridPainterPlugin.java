@@ -111,11 +111,7 @@ public class GridPainterPlugin extends BackgroundPainterPlugin implements Proper
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent arg0) {
-		try {
-			updateGrid();
-		} catch (final Exception e) {
-			log.error("Argh!",e);
-		}
+		updateGrid();
 	}
 
 	private void updateGrid() {

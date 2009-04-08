@@ -15,6 +15,7 @@ import org.eclipse.core.databinding.observable.list.ListChangeEvent;
 import org.eclipse.core.databinding.observable.list.ListDiffEntry;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -41,7 +42,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
  * @author Daniel Bimschas, Dariush Forouher
- * 
+ *
  * @param <T>
  */
 public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig> extends PreferencePage {
@@ -118,7 +119,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * This flag indicates if the page contains unsaved changes (or, correcty, has been touched in
 	 * some way).
-	 * 
+	 *
 	 * This flag will automatically be set to true if a field connected to the <code>dbc</code> are
 	 * modified. Subclasses, which don't use Databinding must set this flag to true themselves when
 	 * appropriate.
@@ -133,7 +134,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Temporal config. it contains the current settings on the preference page, before the the user
 	 * pressed "Apply".
-	 * 
+	 *
 	 * This field is final, since databinding listens to events from this object specifically.
 	 */
 	protected final ConfigClass config;
@@ -183,7 +184,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	// --------------------------------------------------------------------------------
 	/**
 	 * Create a preference page for editing the defaultsconfiguration of an plugin type.
-	 * 
+	 *
 	 * @param cs
 	 */
 	@SuppressWarnings("unchecked")
@@ -211,7 +212,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	// --------------------------------------------------------------------------------
 	/**
 	 * Create a preference page for editing the configuration of an plugin instance.
-	 * 
+	 *
 	 * @param cs
 	 * @param plugin
 	 */
@@ -330,9 +331,9 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * Adds the handler to the ValidationStatus provider of the DataBindingCotext. Whenever the
 	 * validation status changes, the handler will update the errorString displayed to the user and
 	 * set a flag variable.
-	 * 
+	 *
 	 * the handler will also grey out the apply-Button, if there are errors present.
-	 * 
+	 *
 	 */
 	private void addErrorBinding() {
 		final AggregateValidationStatus aggregateStatus = new AggregateValidationStatus(getRealm(), dbc.getValidationStatusProviders(),
@@ -358,6 +359,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 					}
 				} else {
 					setErrorMessage(valStatus.getMessage());
+
 					if (buttons.applyButton != null) {
 						buttons.applyButton.setEnabled(false);
 					}
@@ -388,9 +390,9 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Does the form contain unsaved data? The return value of this method is only an indicator, IOW
 	 * it may return false-positives.
-	 * 
+	 *
 	 * Subclasses overriding this method should include the return value of super() in their answer.
-	 * 
+	 *
 	 * @return true if this page contains unsaved data.
 	 */
 	public boolean hasUnsavedChanges() {
@@ -431,30 +433,50 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 
 	/**
 	 * Store the form data into the model
-	 * 
+	 *
 	 * Subclasses overriding this method must call this method!
 	 */
 	protected void storeToModel() {
 		log.debug("Storing form to model");
-		this.dbc.updateModels();
-		this.dbc.updateTargets();
+		dbc.updateModels();
+		checkForErrors();
+		dbc.updateTargets();
+		checkForErrors();
 		resetDirtyFlag();
 	}
 
 	/**
+	 * Checks for errors in the dbc and displays an error message for each if there are so
+	 *
+	 * (these errors are likely bugs in the application, but we have to display them anyway.)
+	 */
+	private void checkForErrors() {
+		final IStatus status = AggregateValidationStatus.getStatusMerged(dbc.getValidationStatusProviders());
+		if (!status.isOK()) {
+			for (final IStatus s: status.getChildren()) {
+				if (!s.isOK()) {
+					log.error(s.getMessage(), s.getException());
+				}
+			}
+		}
+	}
+
+	/**
 	 * ReStore the form data from the model
-	 * 
+	 *
 	 * Subclasses overriding this method must call this method!
 	 */
 	protected void loadFromModel() {
 		log.debug("Restoring form from model");
 
-		this.dbc.updateTargets();
+		dbc.updateTargets();
+		checkForErrors();
 
 		// update the models (with the already existent values)
 		// this is necessary to (re)validate the values in case of erroneous values already existent
 		// in the configuration
-		this.dbc.updateModels();
+		dbc.updateModels();
+		checkForErrors();
 		resetDirtyFlag();
 	}
 
@@ -494,7 +516,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	protected final void performRestore() {
@@ -520,7 +542,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	// --------------------------------------------------------------------------------
 	/**
 	 * Checks if this is an instance page or a type page.
-	 * 
+	 *
 	 * @return <code>true</code> if this is a preference page for a plugin instance,
 	 *         <code>false</code> if this is a preference page for an instantiable plugin type.
 	 */
@@ -531,7 +553,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the <code>Plugin</code> instance associated with this page.
-	 * 
+	 *
 	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a type
 	 *         page (i.e. not an instance page, also see
 	 *         {@link PluginPreferencePage#isInstancePage()})
@@ -544,7 +566,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Returns the class-Object of the plugin this preference page is associated with. Needed for
 	 * runtime-reflection.
-	 * 
+	 *
 	 * @return the class-Object of the plugin this preference page is associated with
 	 */
 	public abstract Class<? extends Plugin> getPluginClass();
@@ -553,7 +575,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Returns the class-Object of the plugins' PluginXMLConfig this preference page is associated
 	 * with. Needed for runtime reflection.
-	 * 
+	 *
 	 * @return the class-Object of the plugins' PluginXMLConfig this preference page is associated
 	 *         with
 	 */
