@@ -91,7 +91,11 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 		@Override
 		protected boolean showPage(final IPreferenceNode node) {
-			return internalShowPage(node, true);
+			if (node.getPage() != super.getCurrentPage()) {
+				return internalShowPage(node, true);
+			} else {
+				return true;
+			}
 		}
 
 		private SelectionListener menuSelectionListener = new SelectionListener() {
