@@ -121,10 +121,7 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 		nrdo.setPosition(newPosition);
 		data.add(node, nrdo);
 
-		// don't cause a redraw if we're inactive
-		if (isActive()) {
-			fireDrawingObjectAdded(nrdo);
-		}
+		fireDrawingObjectAdded(nrdo);
 
 	}
 
@@ -134,7 +131,6 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 
 		if (drawingObject != null) {
 
-			final AbsoluteRectangle oldBoundingBox = drawingObject.getBoundingBox();
 			drawingObject.setPosition(newPosition);
 
 		} else {
@@ -150,9 +146,7 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	private void onNodeRemoved(final int node, final AbsolutePosition oldPosition) {
 
 		// don't cause a redraw if we're inactive
-		if (isActive()) {
-			fireDrawingObjectRemoved(data.remove(node));
-		}
+		fireDrawingObjectRemoved(data.remove(node));
 
 	}
 
