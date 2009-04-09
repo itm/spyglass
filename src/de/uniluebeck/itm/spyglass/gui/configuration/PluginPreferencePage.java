@@ -5,21 +5,10 @@ import java.beans.PropertyChangeListener;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.AggregateValidationStatus;
-import org.eclipse.core.databinding.Binding;
-import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.observable.ChangeEvent;
-import org.eclipse.core.databinding.observable.IChangeListener;
-import org.eclipse.core.databinding.observable.Realm;
-import org.eclipse.core.databinding.observable.list.IListChangeListener;
-import org.eclipse.core.databinding.observable.list.ListChangeEvent;
-import org.eclipse.core.databinding.observable.list.ListDiffEntry;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -45,7 +34,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  *
  * @param <T>
  */
-public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig> extends PreferencePage {
+public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig> extends AbstractDatabindingPreferencePage {
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(PluginPreferencePage.class);
 
@@ -104,29 +93,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	};
 
 	/**
-	 * This listener is called whenever someone modifies a field, which is observed by databinding
-	 */
-	private final IChangeListener formGotDirtyListener = new IChangeListener() {
-
-		@Override
-		public void handleChange(final ChangeEvent event) {
-
-			markFormDirty();
-
-		}
-	};
-
-	/**
-	 * This flag indicates if the page contains unsaved changes (or, correcty, has been touched in
-	 * some way).
-	 *
-	 * This flag will automatically be set to true if a field connected to the <code>dbc</code> are
-	 * modified. Subclasses, which don't use Databinding must set this flag to true themselves when
-	 * appropriate.
-	 */
-	private boolean formIsDirty = false;
-
-	/**
 	 * Reference to the plugin instance. may be null if PrefType==TYPE.
 	 */
 	protected final PluginClass plugin;
@@ -148,16 +114,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * reference to spyglass
 	 */
 	protected final Spyglass spyglass;
-
-	/**
-	 * databindingcontext. may be null before createContents() is called.
-	 */
-	protected DataBindingContext dbc = null;
-
-	/**
-	 * reference to the dialog
-	 */
-	private final PluginPreferenceDialog dialog;
 
 	/**
 	 * Image that is displayed in the top of the window.
@@ -192,7 +148,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.TYPE;
-		this.dialog = dialog;
+//		this.dialog = dialog;
 		this.spyglass = spyglass;
 		this.basicOptions = basicOptions;
 		this.plugin = null;
@@ -222,7 +178,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.INSTANCE;
-		this.dialog = dialog;
+//		this.dialog = dialog;
 		this.spyglass = spyglass;
 		this.plugin = plugin;
 		this.basicOptions = basicOptions;
@@ -276,10 +232,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 
 	}
 
-	protected final Realm getRealm() {
-		return SWTObservables.getRealm(getControl().getDisplay());
-	}
-
 	@Override
 	protected Composite createContents(final Composite parent) {
 		return createContentsInternal(parent);
@@ -291,115 +243,9 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		resetDirtyFlag();
 	}
 
-	protected Composite createContentsInternal(final Composite parent) {
-		final Composite composite = createComposite(parent);
 
-		if (this.config == null) {
-			// this means that the plugin type is abstract
-			return composite;
-		}
-
-		dbc = new DataBindingContext(getRealm());
-
-		// Add a Listener to each binding, so we get informed if the user modifies a field.
-		dbc.getBindings().addListChangeListener(new IListChangeListener() {
-
-			@Override
-			public void handleListChange(final ListChangeEvent event) {
-				for (final ListDiffEntry e : event.diff.getDifferences()) {
-					final Binding b = (Binding) e.getElement();
-					if (e.isAddition()) {
-						b.getTarget().addChangeListener(formGotDirtyListener);
-					} else {
-						b.getTarget().removeChangeListener(formGotDirtyListener);
-					}
-				}
-			}
-
-		});
-
-		addErrorBinding();
-
-		basicGroup = new BasicGroupComposite(composite, SWT.NONE);
-		basicGroup.disableUnwantedElements(basicOptions);
-		basicGroup.setDatabinding(dbc, config, this.plugin, this.spyglass.getPluginManager(), this.isInstancePage());
-
-		return composite;
-	}
-
-	/**
-	 * Adds the handler to the ValidationStatus provider of the DataBindingCotext. Whenever the
-	 * validation status changes, the handler will update the errorString displayed to the user and
-	 * set a flag variable.
-	 *
-	 * the handler will also grey out the apply-Button, if there are errors present.
-	 *
-	 */
-	private void addErrorBinding() {
-		final AggregateValidationStatus aggregateStatus = new AggregateValidationStatus(getRealm(), dbc.getValidationStatusProviders(),
-				AggregateValidationStatus.MAX_SEVERITY);
-
-		aggregateStatus.addValueChangeListener(new IValueChangeListener() {
-			public void handleValueChange(final ValueChangeEvent event) {
-				final Status valStatus = (Status) aggregateStatus.getValue();
-
-				setValid(valStatus.isOK());
-
-				if (valStatus.isOK()) {
-					setErrorMessage(null);
-
-					if (buttons.applyButton != null) {
-						buttons.applyButton.setEnabled(true);
-					}
-					if (buttons.createInstanceButton != null) {
-						buttons.createInstanceButton.setEnabled(true);
-					}
-					if (buttons.saveAsDefaultButton != null) {
-						buttons.saveAsDefaultButton.setEnabled(true);
-					}
-				} else {
-					setErrorMessage(valStatus.getMessage());
-
-					if (buttons.applyButton != null) {
-						buttons.applyButton.setEnabled(false);
-					}
-					if (buttons.createInstanceButton != null) {
-						buttons.createInstanceButton.setEnabled(false);
-					}
-					if (buttons.saveAsDefaultButton != null) {
-						buttons.saveAsDefaultButton.setEnabled(false);
-					}
-				}
-
-			}
-		});
-
-	}
-
-	private Button createButton(final Composite parent, final String label, final SelectionListener selectionListener) {
-		((GridLayout) parent.getLayout()).numColumns++;
-		final Button button = new Button(parent, SWT.PUSH);
-		button.setText(label);
-		button.setFont(JFaceResources.getDialogFont());
-		button.addSelectionListener(selectionListener);
-		setButtonLayoutData(button);
-		return button;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Does the form contain unsaved data? The return value of this method is only an indicator, IOW
-	 * it may return false-positives.
-	 *
-	 * Subclasses overriding this method should include the return value of super() in their answer.
-	 *
-	 * @return true if this page contains unsaved data.
-	 */
-	public boolean hasUnsavedChanges() {
-		return formIsDirty;
-	}
-
-	private void resetDirtyFlag() {
+	@Override
+	protected void resetDirtyFlag() {
 		formIsDirty = false;
 
 		if (this.config == null) {
@@ -416,69 +262,82 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		}
 	}
 
+	@Override
+	protected Composite createContentsInternal(final Composite parent) {
+
+		final Composite composite = super.createContentsInternal(parent);
+
+		if (this.config == null) {
+			// this means that the plugin type is abstract
+			return composite;
+		}
+
+		basicGroup = new BasicGroupComposite(composite, SWT.NONE);
+		basicGroup.disableUnwantedElements(basicOptions);
+		basicGroup.setDatabinding(dbc, config, this.plugin, this.spyglass.getPluginManager(), this.isInstancePage());
+
+		return composite;
+	}
+
 	/**
-	 * Transfers the form data into the model.
+	 * Adds the handler to the ValidationStatus provider of the DataBindingCotext. Whenever the
+	 * validation status changes, the handler will update the errorString displayed to the user and
+	 * set a flag variable.
+	 *
+	 * the handler will also grey out the apply-Button, if there are errors present.
+	 *
 	 */
 	@Override
-	public final void performApply() {
-		log.info("Pressed button Apply");
-		if (!this.isValid()) {
-			MessageDialog.openError(this.getShell(), "Can not store changes",
-					"Could not store your changes. There are still errors remaining in the form.");
-		} else {
-			this.storeToModel();
-		}
+	protected AggregateValidationStatus addErrorBinding() {
+		final AggregateValidationStatus aggregateStatus = super.addErrorBinding();
 
-	}
+		aggregateStatus.addValueChangeListener(new IValueChangeListener() {
 
-	/**
-	 * Store the form data into the model
-	 *
-	 * Subclasses overriding this method must call this method!
-	 */
-	protected void storeToModel() {
-		log.debug("Storing form to model");
-		dbc.updateModels();
-		checkForErrors();
-		dbc.updateTargets();
-		checkForErrors();
-		resetDirtyFlag();
-	}
+			public void handleValueChange(final ValueChangeEvent event) {
 
-	/**
-	 * Checks for errors in the dbc and displays an error message for each if there are so
-	 *
-	 * (these errors are likely bugs in the application, but we have to display them anyway.)
-	 */
-	private void checkForErrors() {
-		final IStatus status = AggregateValidationStatus.getStatusMerged(dbc.getValidationStatusProviders());
-		if (!status.isOK()) {
-			for (final IStatus s: status.getChildren()) {
-				if (!s.isOK()) {
-					log.error(s.getMessage(), s.getException());
+				final Status valStatus = (Status) event.diff.getNewValue();
+
+				if (valStatus.isOK()) {
+
+					if (buttons.applyButton != null) {
+						buttons.applyButton.setEnabled(true);
+					}
+					if (buttons.createInstanceButton != null) {
+						buttons.createInstanceButton.setEnabled(true);
+					}
+					if (buttons.saveAsDefaultButton != null) {
+						buttons.saveAsDefaultButton.setEnabled(true);
+					}
+				} else {
+
+					if (buttons.applyButton != null) {
+						buttons.applyButton.setEnabled(false);
+					}
+					if (buttons.createInstanceButton != null) {
+						buttons.createInstanceButton.setEnabled(false);
+					}
+					if (buttons.saveAsDefaultButton != null) {
+						buttons.saveAsDefaultButton.setEnabled(false);
+					}
 				}
+
 			}
-		}
+		});
+
+		return aggregateStatus;
+
 	}
 
-	/**
-	 * ReStore the form data from the model
-	 *
-	 * Subclasses overriding this method must call this method!
-	 */
-	protected void loadFromModel() {
-		log.debug("Restoring form from model");
-
-		dbc.updateTargets();
-		checkForErrors();
-
-		// update the models (with the already existent values)
-		// this is necessary to (re)validate the values in case of erroneous values already existent
-		// in the configuration
-		dbc.updateModels();
-		checkForErrors();
-		resetDirtyFlag();
+	private Button createButton(final Composite parent, final String label, final SelectionListener selectionListener) {
+		((GridLayout) parent.getLayout()).numColumns++;
+		final Button button = new Button(parent, SWT.PUSH);
+		button.setText(label);
+		button.setFont(JFaceResources.getDialogFont());
+		button.addSelectionListener(selectionListener);
+		setButtonLayoutData(button);
+		return button;
 	}
+
 
 	private final void performCreateInstance() {
 		log.info("Pressed button create");
@@ -516,16 +375,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 
 	// --------------------------------------------------------------------------------
 	/**
-	 *
-	 * @return
-	 */
-	protected final void performRestore() {
-		log.info("Pressed button restore");
-		loadFromModel();
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
 	 * @return
 	 */
 	protected final void performRestoreDefaults() {
@@ -537,6 +386,16 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 
 		this.loadFromModel();
 
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 *
+	 * @return
+	 */
+	protected final void performRestore() {
+		log.info("Pressed button restore");
+		loadFromModel();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -583,15 +442,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		return this.config.getClass();
 	}
 
-	protected Composite createComposite(final Composite parent) {
-		final Composite c = new Composite(parent, SWT.NONE);
-		c.setLayout(new GridLayout(1, true));
-		final GridData gridData = new GridData(SWT.LEFT, SWT.TOP, true, true);
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.verticalAlignment = GridData.FILL;
-		c.setLayoutData(gridData);
-		return c;
-	}
 
 	public void removePropertyChangeListeners() {
 		if (config != null) {
@@ -642,8 +492,9 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Calling this method marks the form dirty (and thus enables the "Apply" button)
 	 */
+	@Override
 	public void markFormDirty() {
-		formIsDirty = true;
+		super.markFormDirty();
 
 		if ((config == null) || !isValid()) {
 			// this means that the plugin type is abstractor contains errors
