@@ -14,13 +14,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
@@ -114,11 +110,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * reference to spyglass
 	 */
 	protected final Spyglass spyglass;
-
-	/**
-	 * Image that is displayed in the top of the window.
-	 */
-	private Image image;
 
 	final PropertyChangeListener propertyChangeListener;
 
@@ -246,7 +237,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 
 	@Override
 	protected void resetDirtyFlag() {
-		formIsDirty = false;
+		super.resetDirtyFlag();
 
 		if (this.config == null) {
 			// this means that the plugin type is abstract
@@ -445,48 +436,15 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 
 	public void removePropertyChangeListeners() {
 		if (config != null) {
-			config.removePropertyChangeListener("active", propertyChangeListener);
-			config.removePropertyChangeListener("visible", propertyChangeListener);
-			config.removePropertyChangeListener("name", propertyChangeListener);
+			config.removePropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, propertyChangeListener);
+			config.removePropertyChangeListener(PluginXMLConfig.PROPERTYNAME_VISIBLE, propertyChangeListener);
+			config.removePropertyChangeListener(PluginXMLConfig.PROPERTYNAME_NAME, propertyChangeListener);
 		}
 	}
 
 	@Override
 	public void dispose() {
 		removePropertyChangeListeners();
-	}
-
-	public void setImage(final Image image) {
-		this.image = image;
-	}
-
-	@Override
-	public Image getImage() {
-		return image;
-	}
-
-	public Composite createMS2Warning(final Composite parent) {
-
-		final Composite composite = createContentsInternal(parent);
-
-		final GridData groupData = new GridData(SWT.TOP, SWT.LEFT, true, true);
-		groupData.horizontalAlignment = GridData.FILL;
-		groupData.verticalAlignment = GridData.FILL;
-		final Group group = new Group(composite, SWT.NONE);
-		group.setLayoutData(groupData);
-		group.setLayout(new GridLayout());
-		group.setText("More information");
-
-		final GridData labelData = new GridData();
-		labelData.verticalAlignment = SWT.TOP;
-		labelData.horizontalAlignment = SWT.LEFT;
-		final Label label = new Label(group, SWT.NONE);
-		label.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_RED));
-		label.setText("This plugin is to be implemented for Milestone 2 and is not yet working.");
-		label.setLayoutData(labelData);
-
-		return parent;
-
 	}
 
 	/**

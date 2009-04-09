@@ -376,7 +376,6 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * This method is used to do the time consuming work on the plug in prior to any operations that
 	 * have any influence on the quad tree. This is useful since the quad tree stays in a valid
 	 * state and can be used by the main thread while the time consuming work goes on.<br>
-	 * This method must not have any write operations on the quad tree!
 	 *
 	 * @param packet
 	 *            the packet

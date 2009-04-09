@@ -41,9 +41,10 @@ public class GeneralPreferencePage extends AbstractDatabindingPreferencePage {
 
 		final GeneralPreferencesComposite comp = new GeneralPreferencesComposite(composite, SWT.NONE);
 
-		addErrorBinding();
-
 		comp.setDatabinding(dbc, config);
+
+		// the initialization of the fields has dirtied the page
+		resetDirtyFlag();
 
 		return comp;
 	}
@@ -57,9 +58,14 @@ public class GeneralPreferencePage extends AbstractDatabindingPreferencePage {
 
 	@Override
 	protected void resetDirtyFlag() {
-		formIsDirty = false;
-		getDefaultsButton().setEnabled(false);
-		getApplyButton().setEnabled(false);
+		super.resetDirtyFlag();
+
+		if (getDefaultsButton() != null) {
+			getDefaultsButton().setEnabled(false);
+		}
+		if (getApplyButton() != null) {
+			getApplyButton().setEnabled(false);
+		}
 	}
 
 
@@ -68,12 +74,14 @@ public class GeneralPreferencePage extends AbstractDatabindingPreferencePage {
 		super.markFormDirty();
 
 		if (isValid()) {
-			getDefaultsButton().setEnabled(true);
-			getApplyButton().setEnabled(true);
+			if (getDefaultsButton() != null) {
+				getDefaultsButton().setEnabled(true);
+			}
+			if (getApplyButton() != null) {
+				getApplyButton().setEnabled(true);
+			}
 		}
 
 	}
-
-
 
 }

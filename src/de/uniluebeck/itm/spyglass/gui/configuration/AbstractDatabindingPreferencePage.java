@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -50,10 +50,15 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 	 * This flag indicates if the page contains unsaved changes (or, correcty, has been touched in
 	 * some way).
 	 *
-	 * This flag will automatically be set to true if a field connected to the <code>dbc</code> are
+	 * This flag will automatically be set to true if a field connected to the <code>dbc</code> is
 	 * modified.
 	 */
-	protected boolean formIsDirty = false;
+	private boolean formIsDirty = false;
+
+	/**
+	 * Image that is displayed in the top of the window.
+	 */
+	private Image image;
 
 	/**
 	 * This listener is called whenever someone modifies a field, which is observed by databinding
@@ -70,46 +75,28 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 		return SWTObservables.getRealm(getControl().getDisplay());
 	}
 
-	// --------------------------------------------------------------------------------
-	/**
-	 */
-	public AbstractDatabindingPreferencePage() {
-		super();
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param title
-	 */
-	public AbstractDatabindingPreferencePage(final String title) {
-		super(title);
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param title
-	 * @param image
-	 */
-	public AbstractDatabindingPreferencePage(final String title, final ImageDescriptor image) {
-		super(title, image);
-	}
-
 	/**
 	 * Add error handling to the databindingcontext.
 	 *
 	 */
 	protected AggregateValidationStatus addErrorBinding() {
 
-		final AggregateValidationStatus aggregateStatus = new AggregateValidationStatus(getRealm(),
-				dbc.getValidationStatusProviders(), AggregateValidationStatus.MAX_SEVERITY);
+		final AggregateValidationStatus aggregateStatus = new AggregateValidationStatus(getRealm(), dbc.getValidationStatusProviders(),
+				AggregateValidationStatus.MAX_SEVERITY);
 
-		aggregateStatus.addValueChangeListener(new DatabindingErrorHandler(dbc,getShell()));
+		aggregateStatus.addValueChangeListener(new DatabindingErrorHandler(dbc, getShell()));
 
 		aggregateStatus.addValueChangeListener(new IValueChangeListener() {
 			public void handleValueChange(final ValueChangeEvent event) {
 				final Status valStatus = (Status) aggregateStatus.getValue();
 
 				setValid(valStatus.isOK());
+
+				// If the status contains an exception, show it.
+				// (ordinary validation errors don't contain exceptions, so this is to track bugs.)
+				if (valStatus.getException() != null) {
+					log.error(valStatus.getMessage(), valStatus.getException());
+				}
 
 				if (valStatus.isOK()) {
 					setErrorMessage(null);
@@ -123,8 +110,6 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 
 		return aggregateStatus;
 	}
-
-
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -184,7 +169,9 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 		}
 	}
 
-	protected abstract void resetDirtyFlag();
+	protected void resetDirtyFlag() {
+		formIsDirty = false;
+	}
 
 	/**
 	 * ReStore the form data from the model
@@ -239,7 +226,6 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 		return composite;
 	}
 
-
 	protected Composite createComposite(final Composite parent) {
 		final Composite c = new Composite(parent, SWT.NONE);
 		c.setLayout(new GridLayout(1, true));
@@ -248,6 +234,16 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 		gridData.verticalAlignment = GridData.FILL;
 		c.setLayoutData(gridData);
 		return c;
+	}
+
+
+	public void setImage(final Image image) {
+		this.image = image;
+	}
+
+	@Override
+	public Image getImage() {
+		return image;
 	}
 
 }

@@ -7,6 +7,7 @@ package de.uniluebeck.itm.spyglass.gui.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.ValidationStatusProvider;
 import org.eclipse.core.databinding.observable.IObservable;
@@ -23,6 +24,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolTip;
 import org.eclipse.swt.widgets.Widget;
 
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
+
 // --------------------------------------------------------------------------------
 /**
  * Displays validation errors as balloon tooltips at widgets.
@@ -31,6 +34,8 @@ import org.eclipse.swt.widgets.Widget;
  *
  */
 public class DatabindingErrorHandler implements IValueChangeListener, DisposeListener {
+
+	private static Logger log = SpyglassLoggerFactory.getLogger(DatabindingErrorHandler.class);
 
 	private final Map<Control, ToolTip> tipMap = new HashMap<Control, ToolTip>();
 
@@ -66,7 +71,7 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 			for (final Object o2 : prov.getTargets()) {
 				final IObservable observable = (IObservable) o2;
 
-				// TODO: I'm not sure what to do in the other cases...
+				//
 				if (observable instanceof ISWTObservable) {
 					final ISWTObservable observable2 = (ISWTObservable) observable;
 					final Widget w = observable2.getWidget();
@@ -76,6 +81,8 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 
 						updateToolTip(status, c);
 					}
+				} else {
+					log.warn(status.getMessage(), status.getException());
 				}
 			}
 
@@ -87,17 +94,20 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 	private void updateToolTip(final Status status, final Control c) {
 		ToolTip tip = tipMap.get(c);
 
-		if (tip == null) {
-			tip = new ToolTip(shell, SWT.BALLOON | SWT.ICON_ERROR);
-			tipMap.put(c, tip);
-			c.addDisposeListener(this);
-		}
-
-		if (status.isOK()) {
+		if (status.isOK() && (tip != null)) {
+			log.debug("Killing tooltip for widget "+c);
 			tip.setVisible(false);
 			tip.dispose();
 			tipMap.remove(c);
-		} else {
+
+		} else if (!status.isOK()) {
+//			log.debug("Widget "+c+" has bad content because of: "+status, status.getException());
+			if (tip == null) {
+				tip = new ToolTip(shell, SWT.BALLOON | SWT.ICON_ERROR);
+				tipMap.put(c, tip);
+				c.addDisposeListener(this);
+			}
+
 			tip.setMessage(status.getMessage());
 			tip.setText("Bad input");
 			tip.setVisible(true);
