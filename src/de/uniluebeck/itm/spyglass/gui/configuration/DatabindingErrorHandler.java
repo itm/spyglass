@@ -95,13 +95,13 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 		ToolTip tip = tipMap.get(c);
 
 		if (status.isOK() && (tip != null)) {
-			log.debug("Killing tooltip for widget "+c);
+			log.debug("Content of widget "+c+" became good: "+status, status.getException());
 			tip.setVisible(false);
 			tip.dispose();
 			tipMap.remove(c);
 
 		} else if (!status.isOK()) {
-//			log.debug("Widget "+c+" has bad content because of: "+status, status.getException());
+			log.debug("Content of widget "+c+" became bad: "+status, status.getException());
 			if (tip == null) {
 				tip = new ToolTip(shell, SWT.BALLOON | SWT.ICON_ERROR);
 				tipMap.put(c, tip);

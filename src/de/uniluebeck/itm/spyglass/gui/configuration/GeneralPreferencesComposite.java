@@ -407,8 +407,8 @@ public class GeneralPreferencesComposite extends org.eclipse.swt.widgets.Composi
 		dbc.bindValue(SWTObservables.observeText(this.scaleTime, SWT.Modify), BeansObservables.observeValue(dbc.getValidationRealm(), config,
 				"timeScale"), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), new UpdateValueStrategy());
 
-		dbc.bindValue(SWTObservables.observeText(this.unitLength, SWT.Modify), SWTObservables.observeText(this.label11length), null, null);
-		dbc.bindValue(SWTObservables.observeText(this.unitLength, SWT.Modify), SWTObservables.observeText(this.label9length), null, null);
+		dbc.bindValue(SWTObservables.observeText(this.label11length), SWTObservables.observeText(this.unitLength, SWT.Modify), null, null);
+		dbc.bindValue(SWTObservables.observeText(this.label9length), SWTObservables.observeText(this.unitLength, SWT.Modify), null, null);
 
 		updateScaleLink();
 
