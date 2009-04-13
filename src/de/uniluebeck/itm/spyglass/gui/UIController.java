@@ -282,7 +282,7 @@ public class UIController {
 			return;
 		}
 
-		if (p.isActive() && p.isVisible()) {
+		if ((p == null) || (p.isActive() && p.isVisible())) {
 
 			// the new area of the drawing object
 			final PixelRectangle pxBBox = da.absRect2PixelRect(boundingBox);
@@ -317,7 +317,7 @@ public class UIController {
 			while (it.hasNext()) {
 				final DrawingObject next = it.next();
 				final Plugin p = this.drawingObjectMap.get(next);
-				if (p.isActive() && p.isVisible()) {
+				if ((p != null) && p.isActive() && p.isVisible()) {
 					list.add(next);
 					it.remove();
 				}
