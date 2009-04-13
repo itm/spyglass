@@ -51,9 +51,11 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	 */
 	private Map map = null;
 
-	private volatile boolean dataChanged = true;
+	private boolean dataChanged = true;
 
 	private Timer timer = null;
+
+	private TimerTask task = null;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -94,42 +96,35 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	}
 
 	@Override
-	protected void resetPlugin() {
+	protected synchronized void resetPlugin() {
 		// clear the drawing object
-		synchronized (dataStore) {
-			dataStore.clear();
-			updateFramepoints();
-		}
+		dataStore.clear();
+		updateFramepoints();
 	}
 
 	@Override
-	public void init(final PluginManager manager) throws Exception {
+	public synchronized void init(final PluginManager manager) throws Exception {
 		super.init(manager);
 
-		timer = new Timer("MapPainter-Timer");
-
 		createMap();
+
+		timer = new Timer("Timer of "+this.toString());
 
 		xmlConfig.addPropertyChangeListener(this);
 		manager.addNodePositionListener(this);
 
-		timer.schedule(new TimerTask() {
+		createTask();
 
-			@Override
-			public void run() {
-
-				updateMatrix();
-			}
-
-		}, 0, 1000 / xmlConfig.getRefreshFrequency());
+		timer.schedule(task, 0, 1000 / xmlConfig.getRefreshFrequency());
 
 	}
 
 	@Override
-	public void shutdown() throws Exception {
+	public synchronized void shutdown() throws Exception {
 		super.shutdown();
 
 		timer.cancel();
+		timer = null;
 
 		if (map != null) {
 			fireDrawingObjectRemoved(map);
@@ -156,6 +151,28 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 		// log.debug(String.format("Parsing packet %s", packet));
 
+		final double value = extractValue(packet);
+
+		// log.debug(String.format("Parsed packet %s: Got value %f", packet, value));
+
+		// update the map
+		if (!Double.isNaN(value)) {
+			final DataPoint e = new DataPoint();
+			e.isFramepoint = false;
+			e.position = position;
+			e.nodeID = packet.getSenderId();
+			e.value = value;
+
+			synchronized (this) {
+				dataStore.add(e);
+				this.dataChanged = true;
+			}
+
+		}
+
+	}
+
+	private double extractValue(final SpyglassPacket packet) {
 		double value = Double.NaN;
 
 		switch (packet.getSyntaxType()) {
@@ -201,24 +218,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 			}
 
 		}
-
-		// log.debug(String.format("Parsed packet %s: Got value %f", packet, value));
-
-		// update the map
-		if (!Double.isNaN(value)) {
-			final DataPoint e = new DataPoint();
-			e.isFramepoint = false;
-			e.position = position;
-			e.nodeID = packet.getSenderId();
-			e.value = value;
-
-			synchronized (dataStore) {
-				dataStore.add(e);
-			}
-			this.dataChanged = true;
-
-		}
-
+		return value;
 	}
 
 	/**
@@ -227,20 +227,38 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	@Override
 	public synchronized void propertyChange(final PropertyChangeEvent evt) {
 
-		timer.cancel();
+		if (getState() != State.ALIVE) {
+			return;
+		}
+
+		if (task != null) {
+			task.cancel();
+			task = null;
+		}
+
 		createMap();
 
-		timer = new Timer("MapPainter-Timer");
-		timer.schedule(new TimerTask() {
+		createTask();
+
+		timer.schedule(task, 1000, 1000 / xmlConfig.getRefreshFrequency());
+
+	}
+
+	private void createTask() {
+		task = new TimerTask() {
 
 			@Override
 			public void run() {
 
-				updateMatrix();
+				try {
+					updateMatrix();
+				} catch (final Exception e) {
+					// TODO Auto-generated catch block
+					log.error("Exception while updating the matrix",e);
+				}
 			}
 
-		}, 0, 1000 / xmlConfig.getRefreshFrequency());
-
+		};
 	}
 
 	// --------------------------------------------------------------------------------
@@ -252,35 +270,31 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	 * .plugin.NodePositionEvent)
 	 */
 	@Override
-	public void handleEvent(final NodePositionEvent e) {
+	public synchronized void handleEvent(final NodePositionEvent e) {
 		switch (e.change) {
 			case ADDED:
 				// do nothing. will be handled by handlePacket anyway
 				break;
 			case REMOVED: {
 				// remove the node from the datastore
-				synchronized (dataStore) {
-					final Iterator<DataPoint> it = dataStore.iterator();
-					while (it.hasNext()) {
-						final DataPoint p = it.next();
-						if (!p.isFramepoint && (p.nodeID == e.node)) {
-							it.remove();
-						}
+				final Iterator<DataPoint> it = dataStore.iterator();
+				while (it.hasNext()) {
+					final DataPoint p = it.next();
+					if (!p.isFramepoint && (p.nodeID == e.node)) {
+						it.remove();
 					}
 				}
 				break;
 			}
 			case MOVED: {
-				synchronized (dataStore) {
-					final Iterator<DataPoint> it = dataStore.iterator();
-					while (it.hasNext()) {
-						final DataPoint p = it.next();
-						if (!p.isFramepoint && (p.nodeID == e.node)) {
-							p.position = e.newPosition;
-						}
+				final Iterator<DataPoint> it = dataStore.iterator();
+				while (it.hasNext()) {
+					final DataPoint p = it.next();
+					if (!p.isFramepoint && (p.nodeID == e.node)) {
+						p.position = e.newPosition;
 					}
-					break;
 				}
+				break;
 			}
 		}
 
@@ -306,7 +320,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 	private void updateFramepoints() {
 		// Update the framepoints
-		synchronized (dataStore) {
+		synchronized (this) {
 
 			// kill all old framepoints
 			final Iterator<DataPoint> it = dataStore.iterator();
@@ -392,22 +406,23 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	 * aquire the lock.
 	 */
 	private void updateMatrix() {
-		if (!dataChanged) {
-			return;
-		}
 
 		final DataStore store;
-		synchronized (dataStore) {
+		synchronized (this) {
+			if (!dataChanged) {
+				return;
+			}
 			store = dataStore.clone();
 			dataChanged = false;
 		}
-
 
 		final AbsoluteRectangle drawRect = new AbsoluteRectangle();
 		drawRect.setHeight(xmlConfig.getGridElementHeight());
 		drawRect.setWidth(xmlConfig.getGridElementWidth());
 
+		// create a new matrix
 		final double[][] matrix = new double[xmlConfig.getRows()][xmlConfig.getCols()];
+		// ... and fill it
 		for (int row = 0; row < xmlConfig.getRows(); row++) {
 			for (int col = 0; col < xmlConfig.getCols(); col++) {
 

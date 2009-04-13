@@ -24,7 +24,12 @@ public class DataStore extends AbstractDataStore<DataPoint> {
 	public DataStore clone() {
 		final DataStore store = new DataStore();
 
-		store.addAll(this);
+		// this destroys the last hope of any half-ass acceptable performance.
+		// but who wants that would have to reimplement the dataStore anyway with
+		// a datastructure more suited for k-NN (e.g. a kd-tree)
+		for (final DataPoint p: this) {
+			store.add(p.clone());
+		}
 
 		return store;
 	}

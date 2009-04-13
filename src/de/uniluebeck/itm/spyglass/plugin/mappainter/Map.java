@@ -1,6 +1,5 @@
 package de.uniluebeck.itm.spyglass.plugin.mappainter;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -10,7 +9,6 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * A map object for the MapPainterPlugin
@@ -19,8 +17,6 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  *
  */
 public class Map extends DrawingObject {
-
-	private static Logger log = SpyglassLoggerFactory.getLogger(Map.class);
 
 	private static final boolean DEBUG = false;
 
@@ -39,22 +35,13 @@ public class Map extends DrawingObject {
 		this.setPosition(config.getLowerLeft());
 	}
 
-	/**
-	 * This matrix contains the values which will be then converted to colors and drawn.
-	 *
-	 *  Note that access to this array should be synchronized to ensure a memory barrier
-	 */
-	public synchronized double[][] getMatrix() {
-		return this.dataMatrix;
-	}
-
 	public synchronized void setMatrix(final double[][] matrix) {
 		this.dataMatrix = matrix;
 		markContentDirty();
 	}
 
 	@Override
-	public void draw(final DrawingArea drawingArea, final GC gc) {
+	public synchronized void draw(final DrawingArea drawingArea, final GC gc) {
 
 		final PixelRectangle clippAreaPx = new PixelRectangle(gc.getClipping());
 

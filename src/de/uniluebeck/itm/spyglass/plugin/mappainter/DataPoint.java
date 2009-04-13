@@ -4,7 +4,6 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.mappainter;
 
-import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 
 // --------------------------------------------------------------------------------
 /**
@@ -21,19 +20,9 @@ public class DataPoint extends MetricPoint {
 	public boolean isFramepoint = false;
 
 	/**
-	 * The position of this pata point
-	 */
-	public AbsolutePosition position = null;
-
-	/**
 	 * sender ID of the node
 	 */
 	public int nodeID = -1;
-
-	/**
-	 * the value
-	 */
-	public double value = 0;
 
 	@Override
 	public boolean equals(final Object o) {
@@ -62,4 +51,13 @@ public class DataPoint extends MetricPoint {
 		return nodeID;
 	}
 
+	@Override
+	public DataPoint clone() {
+		final DataPoint newP = new DataPoint();
+		newP.isFramepoint = this.isFramepoint;
+		newP.nodeID = this.nodeID;
+		newP.position = this.position;
+		newP.value = this.value;
+		return newP;
+	}
 }
