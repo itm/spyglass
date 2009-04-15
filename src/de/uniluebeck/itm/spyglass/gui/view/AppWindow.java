@@ -20,7 +20,8 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
- *
+ * The application's window.<br>
+ * Instances of this class manage references to the graphical user interface's main components.
  */
 public class AppWindow implements DisposeListener {
 	private static Logger log = SpyglassLoggerFactory.getLogger(AppWindow.class);
@@ -31,7 +32,7 @@ public class AppWindow implements DisposeListener {
 
 	/**
 	 * Enables SWT Object tracking. This allows tracking memory leaks (e.g. missing dispose)
-	 *
+	 * 
 	 * IMPORTANT: This activates some really hacky butchering in internal SWT data structures. Only
 	 * the bravest of all should consider enabling this. You have been warned.
 	 */
@@ -39,14 +40,19 @@ public class AppWindow implements DisposeListener {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 *
+	 * Constructor
+	 * 
+	 * @param spyglass
+	 *            the active {@link Spyglass} object
+	 * @param parent
+	 *            the parent widget
 	 */
 	public AppWindow(final Spyglass spyglass, final Composite parent) {
 
 		if (ENABLE_SWT_DEBUGGING) {
 			if (!parent.getDisplay().getDeviceData().tracking) {
 				log.warn("Enabling SWT-Tracking hack. Expect problems.");
-//				SWTButcherClass.enableTracking(parent.getDisplay());
+				// SWTButcherClass.enableTracking(parent.getDisplay());
 			}
 			final Sleak sleak = new Sleak();
 			sleak.open();
@@ -60,7 +66,9 @@ public class AppWindow implements DisposeListener {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 *
+	 * Returns Spyglass's graphical user interface manager
+	 * 
+	 * @return Spyglass's graphical user interface manager
 	 */
 	public SpyglassGuiComponent getGui() {
 		return gui;
@@ -68,7 +76,9 @@ public class AppWindow implements DisposeListener {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 *
+	 * Returns the current display
+	 * 
+	 * @return the current display
 	 */
 	public Display getDisplay() {
 		return display;
@@ -76,16 +86,16 @@ public class AppWindow implements DisposeListener {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 *
+	 * Sets the display
+	 * 
+	 * @param display
+	 *            the display to be set
 	 */
 	public void setDisplay(final Display display) {
 		this.display = display;
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
-	 */
 	@Override
 	public void widgetDisposed(final DisposeEvent e) {
 		if (gui != null) {

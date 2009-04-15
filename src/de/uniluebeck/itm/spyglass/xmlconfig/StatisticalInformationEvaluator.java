@@ -341,7 +341,7 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 			return description + " " + value;
 		} catch (final RuntimeException e) {
 			value = "NaN";
-			throw new SpyglassPacketException("A packet coult not be evaluated in StatisticalInformationEvaluator");
+			throw new SpyglassPacketException("A packet coult not be evaluated in StatisticalInformationEvaluator", e);
 		}
 	}
 

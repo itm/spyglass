@@ -49,8 +49,6 @@ public class PacketProducerTask implements Runnable {
 	 * 
 	 * @param spyglass
 	 *            the Spyglass current instance
-	 * @param initialDelayMillis
-	 *            the time in milliseconds which has to elapse before producing a new packet
 	 */
 	public PacketProducerTask(final Spyglass spyglass) {
 		this.spyglass = spyglass;

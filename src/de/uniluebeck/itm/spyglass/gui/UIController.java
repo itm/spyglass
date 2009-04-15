@@ -53,7 +53,6 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // ------------------------------------------------------------------------------
-// --
 /**
  * The UI controller is the interface between the core Spyglass functionality and the graphical user
  * interface. It is bound to a specific GUI library. If the GUI must be completely replaced, the UI
@@ -77,16 +76,21 @@ public class UIController {
 	/** User events will be dispatched here */
 	private EventDispatcher eventDispatcher;
 
-	/** List of drawingObjects with outdated boundingboxes */
+	/** List of drawingObjects with outdated bounding boxes */
 	private Set<DrawingObject> drawingObjectsWithDirtyBoundingBox = Collections.synchronizedSet(new HashSet<DrawingObject>());
 
-	/** Maps each drawingObject to a plugin */
+	/** Maps each drawingObject to a plug-in */
 	private Map<DrawingObject, Plugin> drawingObjectMap = Collections.synchronizedMap(new HashMap<DrawingObject, Plugin>());
 
 	// --------------------------------------------------------------------------
-	// ------
 	/**
-	 *
+	 * Constructor
+	 * 
+	 * @param spyglass
+	 *            the active {@link Spyglass} object
+	 * @param appWindow
+	 *            the application's GUI manager
+	 * 
 	 */
 	public UIController(final Spyglass spyglass, final AppWindow appWindow) {
 		if ((spyglass == null) || (appWindow == null)) {
@@ -101,6 +105,7 @@ public class UIController {
 		init();
 
 		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener("pluginManager", new PropertyChangeListener() {
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
 
@@ -129,7 +134,7 @@ public class UIController {
 
 	// --------------------------------------------------------------------------
 	/**
-	 *
+	 * Initializes the object
 	 */
 	private void init() {
 
@@ -168,7 +173,7 @@ public class UIController {
 				 */
 				p.addDrawingObjectListener(drawingObjectListener);
 
-				// handle all drawingobjects that already exist
+				// handle all drawing objects that already exist
 				for (final DrawingObject dob : ((Drawable) p).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
 					handleDrawingObjectAdded(p, dob);
 				}
@@ -181,6 +186,7 @@ public class UIController {
 
 		display.timerExec(REDRAW_PERIOD, new Runnable() {
 
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void run() {
 				updateBoundingBoxes();
@@ -191,9 +197,10 @@ public class UIController {
 
 	}
 
+	// --------------------------------------------------------------------------
 	/**
 	 * Must be called during shutdown. Should be called before model and view are destroyed.
-	 *
+	 * 
 	 * Removes all existing listeners.
 	 */
 	public void shutdown() {
@@ -213,9 +220,10 @@ public class UIController {
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	/**
-	 *
+	 * Returns the application's window
+	 * 
+	 * @return the application's window
 	 */
 	private AppWindow getAppWindow() {
 		return appWindow;
@@ -223,15 +231,16 @@ public class UIController {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Draw all drawing objects inside the bounding box <code>area</code> from the plugin
-	 * <code>plugin</code> on <code>gc</code>.
-	 *
+	 * Draw all drawing objects inside the bounding box <code>area</code> from the plug-in
+	 * <code>plug-in</code> on <code>gc</code>.
+	 * 
 	 * @param gc
 	 *            a GC
 	 * @param plugin
-	 *            a Drawable Plugin
+	 *            a plug-in which is capable of drawing objects
 	 * @param area
 	 *            Only drawing objects inside this area will be redrawn.
+	 * @see Drawable
 	 */
 	private void renderPlugin(final GC gc, final Drawable plugin, final AbsoluteRectangle area) {
 
@@ -251,9 +260,9 @@ public class UIController {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Stuff to do when a new drawing object arrives on the scene.
-	 *
 	 */
 	private void handleDrawingObjectAdded(final Plugin p, final DrawingObject dob) {
 
@@ -268,16 +277,17 @@ public class UIController {
 		dob.addBoundingBoxChangedListener(bboxChangeListener);
 		dob.addContentChangedListener(contentChangeListener);
 
-		// needed to synchronize the boundingbox of the drawingObject if the objects wishes so.
+		// needed to synchronize the bounding box of the drawingObject if the objects wishes so.
 		dob.addBoundingBoxIsDirtyListener(syncListener);
 
 		dob.init(da);
 	}
 
+	// --------------------------------------------------------------------------------
 	private void handleDrawingObjectChanged(final Plugin p, final AbsoluteRectangle boundingBox) {
 		final DrawingArea da = getAppWindow().getGui().getDrawingArea();
 
-		// the drawingarea might have been disposed while we were waiting
+		// the drawing area might have been disposed while we were waiting
 		if (da.isDisposed()) {
 			return;
 		}
@@ -291,7 +301,16 @@ public class UIController {
 		}
 	}
 
-	private void handleDrawingObjectRemoved(final Plugin p, final DrawingObject dob) {
+	// --------------------------------------------------------------------------------
+	/**
+	 * Handles an event which will occur if a drawing object is removed.
+	 * 
+	 * @param dob
+	 *            the drawing object to be removed
+	 * @exception RuntimeException
+	 *                thrown if the drawing objects state is not {@link DrawingObject.State#ALIVE}
+	 */
+	private void handleDrawingObjectRemoved(final DrawingObject dob) {
 
 		if (dob.getState() != State.ALIVE) {
 			throw new RuntimeException("Can only remove alive DrawingObjects!");
@@ -307,9 +326,13 @@ public class UIController {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Updates the bounding boxes of all drawing objects which are currently marked as dirty
+	 */
 	private void updateBoundingBoxes() {
 
-		// get a list of all drawingObjects from active and visible plugins which are in need of a
+		// get a list of all drawingObjects from active and visible plug-ins which are in need of a
 		// new bounding box
 		final List<DrawingObject> list = new ArrayList<DrawingObject>();
 		synchronized (drawingObjectsWithDirtyBoundingBox) {
@@ -324,17 +347,29 @@ public class UIController {
 			}
 		}
 
-		for(final DrawingObject dob: list) {
+		for (final DrawingObject dob : list) {
 			dob.syncBoundingBox();
 		}
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Redraws a certain part of the drawing area
+	 * 
+	 * @param pxBBox
+	 *            the part of the drawing area to be redrawn
+	 */
 	private void redraw(final PixelRectangle pxBBox) {
 		appWindow.getGui().getDrawingArea().redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Listens for bounding boxes which need to be updated
+	 */
 	private final BoundingBoxIsDirtyListener syncListener = new BoundingBoxIsDirtyListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void syncNeeded(final DrawingObject dob) {
 			drawingObjectsWithDirtyBoundingBox.add(dob);
@@ -342,8 +377,13 @@ public class UIController {
 
 	};
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Listens for content changes of drawing objects
+	 */
 	private final ContentChangedListener contentChangeListener = new ContentChangedListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void onContentChanged(final DrawingObject updatedDrawingObject) {
 
@@ -372,8 +412,13 @@ public class UIController {
 
 	};
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Listens for bounding box changes
+	 */
 	private final BoundingBoxChangeListener bboxChangeListener = new BoundingBoxChangeListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void onBoundingBoxChanged(final DrawingObject updatedDrawingObject, final AbsoluteRectangle oldBox) {
 			handleDrawingObjectChanged(drawingObjectMap.get(updatedDrawingObject), oldBox);
@@ -381,8 +426,13 @@ public class UIController {
 
 	};
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Listens for mouse events
+	 */
 	private final MouseListener mouseListener = new MouseAdapter() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void mouseDoubleClick(final MouseEvent e) {
 			if (e.button == 1) {
@@ -390,6 +440,7 @@ public class UIController {
 			}
 		}
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void mouseDown(final MouseEvent e) {
 			if (e.button > 1) {
@@ -399,8 +450,13 @@ public class UIController {
 
 	};
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Listens for changes of the plug-in manager's list
+	 */
 	private final PluginListChangeListener pluginListChangeListener = new PluginListChangeListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
 			if (p instanceof Drawable) {
@@ -415,7 +471,7 @@ public class UIController {
 						p.addDrawingObjectListener(drawingObjectListener);
 						p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
 
-						// handle all drawingobjects that already exist
+						// handle all drawing objects that already exist
 						for (final DrawingObject dob : ((Drawable) p).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
 							handleDrawingObjectAdded(p, dob);
 						}
@@ -426,7 +482,7 @@ public class UIController {
 							throw new IllegalArgumentException("Plugin is not dead yet!");
 						}
 
-						// hopefully the plugin has already shut down at this point
+						// hopefully the plug-in has already shut down at this point
 						p.removeDrawingObjectListener(drawingObjectListener);
 						p.getXMLConfig().removePropertyChangeListener(pluginPropertyListener);
 						break;
@@ -435,8 +491,13 @@ public class UIController {
 		}
 	};
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Listens for added and removed drawing objects, respectively
+	 */
 	private final DrawingObjectListener drawingObjectListener = new DrawingObjectListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void drawingObjectAdded(final Plugin p, final DrawingObject dob) {
 
@@ -444,25 +505,24 @@ public class UIController {
 
 		}
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void drawingObjectRemoved(final Plugin p, final DrawingObject dob) {
-
-			handleDrawingObjectRemoved(p, dob);
-
+			handleDrawingObjectRemoved(dob);
 		}
 
 	};
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * Renders the visible plug-in's.<br>
+	 * Renders the visible plug-ins.<br>
 	 * The plug-ins provide objects which are drawn into the drawing area.
-	 *
-	 * @param gc
-	 *            the graphic context used to actually draw the provided objects
+	 * 
 	 * @see DrawingObject
 	 */
 	private final PaintListener paintListener = new PaintListener() {
 
+		@SuppressWarnings( { "synthetic-access" })
 		@Override
 		public void paintControl(final PaintEvent e) {
 
@@ -502,11 +562,12 @@ public class UIController {
 	 */
 	private final PropertyChangeListener pluginPropertyListener = new PropertyChangeListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
 
 			/**
-			 * Redraw the entire screen if visibilty or activity of a plugin changes.
+			 * Redraw the entire screen if visibility or activity of a plug-in changes.
 			 */
 			if (evt.getPropertyName().equalsIgnoreCase(PluginXMLConfig.PROPERTYNAME_ACTIVE)
 					|| evt.getPropertyName().equalsIgnoreCase(PluginXMLConfig.PROPERTYNAME_VISIBLE)) {
@@ -533,9 +594,9 @@ public class UIController {
 	/**
 	 * Listener for change of visibility of ruler
 	 */
-
 	private final PropertyChangeListener rulerPropertyListener = new PropertyChangeListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
 
@@ -544,8 +605,13 @@ public class UIController {
 		}
 	};
 
+	// ----------------------------------------------------------------
+	/**
+	 * Listens for ruler paint events
+	 */
 	private final PaintListener paintRulerListener = new PaintListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void paintControl(final PaintEvent e) {
 
@@ -566,11 +632,13 @@ public class UIController {
 		}
 	};
 
+	// ----------------------------------------------------------------
 	/**
-	 *
+	 * Listens for transformation of the drawing area
 	 */
 	private final TransformChangedListener drawingAreaTransformListener = new TransformChangedListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void handleEvent(final TransformChangedEvent e) {
 
@@ -578,10 +646,10 @@ public class UIController {
 			appWindow.getGui().getRulerH().redraw();
 			appWindow.getGui().getRulerV().redraw();
 
-			// On ZOOM we have to flush all outstanding boundingbox changes. Otherwise
+			// On ZOOM we have to flush all outstanding bounding box changes. Otherwise
 			// the repaint (which will follow soon after this listener finishes)
-			// would work with out-of-date boundingboxes.
-			if (e.type==Type.ZOOM_MOVE) {
+			// would work with out-of-date bounding boxes.
+			if (e.type == Type.ZOOM_MOVE) {
 				updateBoundingBoxes();
 			}
 

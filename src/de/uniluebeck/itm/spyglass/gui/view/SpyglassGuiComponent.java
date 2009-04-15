@@ -7,19 +7,13 @@
  */
 package de.uniluebeck.itm.spyglass.gui.view;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
@@ -29,9 +23,11 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class manager SpyGlass's graphical user Interface
+ * Instances of this class manage SpyGlass's graphical user interface
  * 
- * @author Sebastian Ebers and others
+ * @author Sebastian Ebers
+ * @author Oliver Kleine
+ * @author others
  */
 public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 
@@ -52,50 +48,6 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	private static int defaultRulerWidth = 30;
 
 	private GlobalInformationBar globalInformationBar;
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Displays this org.eclipse.swt.widgets.Composite inside a new Shell.
-	 * 
-	 * @param args
-	 *            the arguments
-	 * @throws IOException
-	 */
-	public static void main(final String[] args) throws Exception {
-		showGUI();
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Displays this org.eclipse.swt.widgets.Composite inside a new Shell.
-	 * 
-	 * @throws IOException
-	 */
-	public static void showGUI() throws Exception {
-		final Display display = Display.getDefault();
-		final Shell shell = new Shell(display);
-		final SpyglassGuiComponent inst = new SpyglassGuiComponent(shell, SWT.NULL, new Spyglass());
-		final Point size = inst.getSize();
-		shell.setLayout(new FillLayout());
-		shell.layout();
-
-		if ((size.x == 0) && (size.y == 0)) {
-			inst.pack();
-			shell.pack();
-		} else {
-			final Rectangle shellBounds = shell.computeTrim(0, 0, size.x, size.y);
-			shell.setSize(shellBounds.width, shellBounds.height);
-		}
-
-		shell.open();
-
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-
-	}
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -140,7 +92,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 				initGlobalInformationBar(wrapper, spyglass);
 			}
 
-			// 83% drawing area 17% global information bar
+			// 83% drawing area, 17% global information bar
 			form.setWeights(new int[] { 83, 17 });
 
 		} catch (final Exception e) {
@@ -263,6 +215,10 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 		return globalInformationBar;
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Changes the ruler's visibility
+	 */
 	public void changeRulerVis() {
 		log.debug("Ruler visibility changed!");
 		final GridData dataD = (GridData) unitArea.getLayoutData();
@@ -291,15 +247,79 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 		canvas.getParent().layout();
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the horizontal ruler area
+	 * 
+	 * @return the horizontal ruler area
+	 * 
+	 */
 	public RulerArea getRulerH() {
 		return rulerH;
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the vertical ruler area
+	 * 
+	 * @return the vertical ruler area
+	 */
 	public RulerArea getRulerV() {
 		return rulerV;
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the ruler's unit area
+	 * 
+	 * @return the ruler's unit area
+	 */
 	public RulerArea getUnitArea() {
 		return unitArea;
 	}
+
+	// // --------------------------------------------------------------------------------
+	// /**
+	// * Displays this org.eclipse.swt.widgets.Composite inside a new Shell.
+	// *
+	// * @param args
+	// * the arguments
+	// * @throws Exception
+	// */
+	// public static void main(final String[] args) throws Exception {
+	// showGUI();
+	// }
+	//
+	// // --------------------------------------------------------------------------------
+	// /**
+	// * Displays this org.eclipse.swt.widgets.Composite inside a new Shell.
+	// *
+	// * @throws Exception
+	// */
+	// public static void showGUI() throws Exception {
+	// final Display display = Display.getDefault();
+	// final Shell shell = new Shell(display);
+	// final SpyglassGuiComponent inst = new SpyglassGuiComponent(shell, SWT.NULL, new Spyglass());
+	// final Point size = inst.getSize();
+	// shell.setLayout(new FillLayout());
+	// shell.layout();
+	//
+	// if ((size.x == 0) && (size.y == 0)) {
+	// inst.pack();
+	// shell.pack();
+	// } else {
+	// final Rectangle shellBounds = shell.computeTrim(0, 0, size.x, size.y);
+	// shell.setSize(shellBounds.width, shellBounds.height);
+	// }
+	//
+	// shell.open();
+	//
+	// while (!shell.isDisposed()) {
+	// if (!display.readAndDispatch()) {
+	// display.sleep();
+	// }
+	// }
+	//
+	// }
+
 }

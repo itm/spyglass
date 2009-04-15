@@ -34,7 +34,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * To use this plug-in in iShell, you need to add two option to your iShell configuration file
  * (typically ishell.properties).
  * 
- * The first one determines the additional classpath parameters in where this plug-in and its
+ * The first one determines the additional class path parameters in where this plug-in and its
  * libraries are located. Please note that you must escape any backslash and colon with a backslash
  * character. An example of how this could look like is shown in the following line:
  * 
@@ -69,9 +69,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	private ToolbarHandler toolbarStuff = null;
 
 	// --------------------------------------------------------------------------
-	/**
-	 * 
-	 */
 	@Override
 	public int[] init() {
 		// iShell init (called on each plug-in start)
@@ -137,9 +134,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	}
 
 	// --------------------------------------------------------------------------
-	/**
-	 * 
-	 */
 	@Override
 	public void receivePacket(final MessagePacket packet) {
 
@@ -203,18 +197,12 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 	}
 
 	// --------------------------------------------------------------------------
-	/**
-	 * 
-	 */
 	@Override
 	public String getName() {
 		return "SpyGlass";
 	}
 
 	// --------------------------------------------------------------------------
-	/**
-	 * 
-	 */
 	@Override
 	public String getDescription() {
 		return getName() + " is a visualization framework for binary data packets arriving from the WSN";
