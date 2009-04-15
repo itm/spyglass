@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.window.ApplicationWindow;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -39,7 +40,6 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
-// --
 /**
  * Application class for wrapping the Spyglass core class and it's user interface/GUI. It
  * instantiate and injects the core classes that are needed to run the application.
@@ -57,6 +57,10 @@ public class SpyglassApp extends ApplicationWindow {
 
 	// -------------------------------------------------------------------------
 	/**
+	 * Constructor
+	 * 
+	 * @param shell
+	 *            the {@link Shell} to be used
 	 * @throws Exception
 	 */
 	public SpyglassApp(final Shell shell) throws Exception {
@@ -75,9 +79,22 @@ public class SpyglassApp extends ApplicationWindow {
 
 	// -------------------------------------------------------------------------
 	/**
+	 * The stand-alone application's entry point
 	 * 
+	 * @param args
+	 *            an array of arguments
 	 */
 	public static void main(final String[] args) {
+
+		// Set an exception handler which will handle uncaught exceptions
+		Window.setExceptionHandler(new IExceptionHandler() {
+			// --------------------------------------------------------------------------------
+			@SuppressWarnings("synthetic-access")
+			@Override
+			public void handleException(final Throwable t) {
+				log.error("The application crashed!", t);
+			}
+		});
 
 		// SWT stuff
 		final DeviceData data = new DeviceData();
@@ -101,6 +118,7 @@ public class SpyglassApp extends ApplicationWindow {
 
 	}
 
+	// -------------------------------------------------------------------------
 	@Override
 	protected MenuManager createMenuManager() {
 		final MenuManager man = super.createMenuManager();
@@ -119,6 +137,7 @@ public class SpyglassApp extends ApplicationWindow {
 
 	}
 
+	// -------------------------------------------------------------------------
 	@Override
 	protected Control createContents(final Composite parent) {
 
@@ -134,6 +153,7 @@ public class SpyglassApp extends ApplicationWindow {
 		return parent;
 	}
 
+	// -------------------------------------------------------------------------
 	@Override
 	protected void configureShell(final Shell shell) {
 		super.configureShell(shell);
@@ -143,6 +163,7 @@ public class SpyglassApp extends ApplicationWindow {
 
 		shell.addControlListener(new ControlAdapter() {
 
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void controlResized(final ControlEvent e) {
 				log.info("Shell resized.");
@@ -159,10 +180,20 @@ public class SpyglassApp extends ApplicationWindow {
 
 	}
 
+	// -------------------------------------------------------------------------
+	/**
+	 * Returns the area where plug-ins can place their objects to be displayed
+	 * 
+	 * @return the area where plug-ins can place their objects to be displayed
+	 */
 	public DrawingArea getDrawingArea() {
 		return appWindow.getGui().getDrawingArea();
 	}
 
+	// -------------------------------------------------------------------------
+	/**
+	 * Shuts the application down
+	 */
 	public void shutdown() {
 
 		if (uic != null) {
@@ -175,6 +206,12 @@ public class SpyglassApp extends ApplicationWindow {
 
 	}
 
+	// -------------------------------------------------------------------------
+	/**
+	 * Creates the part of the menu where the source can be selected
+	 * 
+	 * @return the part of the menu where the source can be selected
+	 */
 	private MenuManager createSourceMenu() {
 		final MenuManager sourceMenu = new MenuManager("&Source");
 
@@ -184,6 +221,12 @@ public class SpyglassApp extends ApplicationWindow {
 		return sourceMenu;
 	}
 
+	// -------------------------------------------------------------------------
+	/**
+	 * Creates the part of the menu where the recording options can be selected
+	 * 
+	 * @return the part of the menu where the recording options can be selected
+	 */
 	private MenuManager createRecordMenu() {
 		final MenuManager recordMenu = new MenuManager("&Record");
 
@@ -193,6 +236,14 @@ public class SpyglassApp extends ApplicationWindow {
 		return recordMenu;
 	}
 
+	// -------------------------------------------------------------------------
+	/**
+	 * Creates the part of the menu where the manipulations of the {@link DrawingArea} can be
+	 * performed
+	 * 
+	 * @return the part of the menu where the manipulations of the {@link DrawingArea} can be
+	 *         performed
+	 */
 	private MenuManager createMapMenu() {
 		final MenuManager mapMenu = new MenuManager("&Map");
 
@@ -203,6 +254,12 @@ public class SpyglassApp extends ApplicationWindow {
 		return mapMenu;
 	}
 
+	// -------------------------------------------------------------------------
+	/**
+	 * Creates the file part of the menu
+	 * 
+	 * @return the file part of the menu
+	 */
 	private MenuManager createFileMenu() {
 		final MenuManager fileMenu = new MenuManager("&File");
 

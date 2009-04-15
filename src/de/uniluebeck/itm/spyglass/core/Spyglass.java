@@ -61,6 +61,7 @@ public class Spyglass {
 	 * 
 	 */
 	public Spyglass() throws Exception {
+		Thread.setDefaultUncaughtExceptionHandler(new SpyglassExceptionHandler());
 		configStore = new ConfigStore();
 		init();
 	}
