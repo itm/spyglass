@@ -24,6 +24,8 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.globalinformation.GlobalInformationPlugin;
+import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin;
+import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
@@ -68,6 +70,7 @@ public class GlobalInformationBar {
 		expandBar.setSpacing(3);
 		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
 			// --------------------------------------------------------------------------------
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
 				if (evt.getPropertyName().equals("pluginManager")) {
@@ -79,7 +82,9 @@ public class GlobalInformationBar {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the expandBar
+	 * Returns the bar where the widgets of all {@link SimpleGlobalInformationPlugin}s are placed
+	 * 
+	 * @return the bar where the widgets of all {@link SimpleGlobalInformationPlugin}s are placed
 	 */
 	public ExpandBar getExpandBar() {
 		return expandBar;
@@ -96,10 +101,25 @@ public class GlobalInformationBar {
 	 */
 	private void setPluginManager(final PluginManager pluginManager) {
 
-		// set all GlobalInformationPlugins tinto the managed state
+		// set all GlobalInformationPlugins into the managed state
 		for (final Plugin p : pluginManager.getActivePlugins()) {
 			if (p instanceof GlobalInformationPlugin) {
 				manage((GlobalInformationPlugin) p);
+			}
+		}
+
+		// manage SGI plug-ins which are currently inactive as soon as they change that state
+		for (final Plugin p : pluginManager.getPlugins()) {
+			if (p instanceof GlobalInformationPlugin) {
+				p.getXMLConfig().addPropertyChangeListener(new PropertyChangeListener() {
+					// --------------------------------------------------------------------------------
+					@Override
+					public void propertyChange(final PropertyChangeEvent evt) {
+						if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ACTIVE) && ((Boolean) evt.getNewValue())) {
+							manage((SimpleGlobalInformationPlugin) p);
+						}
+					}
+				});
 			}
 		}
 
@@ -118,6 +138,7 @@ public class GlobalInformationBar {
 						case PLUGIN_REMOVED:
 							detach((GlobalInformationPlugin) p);
 							break;
+
 						default:
 							break;
 					}
@@ -191,8 +212,8 @@ public class GlobalInformationBar {
 		// create a widget a plug-in can use to place its information
 		final GlobalInformationWidget widget = new GlobalInformationWidget(this, SWT.NONE, p);
 		p.setWidget(widget);
-		// create an item which will be attached to the bar and which will contain the previously
-		// created widget
+		// create an item which will be attached to the bar and which will
+		// contain the previously created widget
 		attach(widget);
 		synchronized (widgets) {
 			widgets.add(widget);
@@ -229,14 +250,12 @@ public class GlobalInformationBar {
 				@SuppressWarnings("synthetic-access")
 				@Override
 				public void run() {
-					// synchronized (widgets) {
-					
+
 					// the widget might have been disposed while we were waiting
 					if (widget.isDisposed()) {
 						return;
 					}
 
-					// for (final GlobalInformationWidget widget : widgets) {
 					final ExpandItem item = widget.getExpandItem();
 
 					// if the widget is not to be shown or disposed
@@ -244,22 +263,20 @@ public class GlobalInformationBar {
 						detach(item);
 					}
 
-					// if a widget is to be shown but currently not visible on the bar, a
-					// new one has to be created
+					// if a widget is to be shown but currently not visible
+					// on the bar, a new one has to be created
 					else if (widget.isShow() && item.isDisposed()) {
 						attach(widget);
 					}
 
-					// if a widget is to be shown and also visible on the bar, refresh its
-					// contents
+					// if a widget is to be shown and also visible on the bar,
+					// refresh its contents
 					else if (widget.isShow() && !item.isDisposed()) {
 						item.setText(widget.getTitle());
 						widget.pack(true);
 						item.setHeight(widget.computeSize(SWT.DEFAULT, SWT.DEFAULT).y);
 						item.setControl(widget);
 					}
-					// }
-					// }
 				}
 			});
 		}

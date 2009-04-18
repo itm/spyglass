@@ -96,7 +96,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	private AtomicInteger numPackets;
 
-	private StatsTimerTask statsTimerTask;
+	private PacketCountTimerTask packetCountTimerTask;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -116,14 +116,23 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
 		pcl = new PropertyChangeListener() {
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void propertyChange(final PropertyChangeEvent evt) {
-				refreshConfigurationParameters();
+
+				if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ACTIVE)) {
+					setActive((Boolean) evt.getNewValue());
+				} else if (evt.getPropertyName().equals(SimpleGlobalInformationXMLConfig.PROPERTYNAME_SEMANTIC_TYPES4_NEIGHBORHOODS)) {
+					semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
+					avgNodeDegEvaluator.reset();
+				} else if (evt.getPropertyName().equals(SimpleGlobalInformationXMLConfig.PROPERTYNAME_STATISTICAL_INFORMATION_EVALUATORS)) {
+					refreshStatIEConf();
+				}
 			}
 		};
 		xmlConfig.addPropertyChangeListener(pcl);
 
-		new Timer("SGI-Statistics", true).schedule((statsTimerTask = new StatsTimerTask()), 1000, 1000);
+		new Timer("SGI-Statistics", true).schedule((packetCountTimerTask = new PacketCountTimerTask()), 1000, 1000);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -152,7 +161,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		};
 		refreshThread.setDaemon(true);
 		refreshThread.start();
-		refreshConfigurationParameters();
+		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
+		refreshStatIEConf();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -271,19 +281,17 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		avgNodeDegString = "avg. node degree: ";
 		numPackets.set(0);
 		totalPacketCount = 0;
-		statsTimerTask.reset();
+		packetCountTimerTask.reset();
 		refreshNodeCounts();
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Performs internal refreshments of the configuration parameters.<br>
-	 * This includes the widget and the active state of the plug-in.
+	 * Performs internal refreshments of the configuration parameters of the statistical information
+	 * evaluators.
 	 */
-	public void refreshConfigurationParameters() {
-		setActive(isActive());
-		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
-		refreshNodeCounts();
+	private void refreshStatIEConf() {
+
 		final Set<StatisticalInformationEvaluator> sfSettings = xmlConfig.getStatisticalInformationEvaluators();
 
 		if ((sfSettings != null) && (widget != null)) {
@@ -563,7 +571,14 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	}
 
-	private class StatsTimerTask extends TimerTask {
+	// --------------------------------------------------------------------------------
+	/**
+	 * Task to refresh the packet counts
+	 * 
+	 * @author Sebastian Ebers
+	 * 
+	 */
+	private class PacketCountTimerTask extends TimerTask {
 		private int times = 0;
 		private String perSec = "";
 		private String per30Sec = "     ";
@@ -575,7 +590,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		/**
 		 * Constructor
 		 */
-		public StatsTimerTask() {
+		public PacketCountTimerTask() {
 			super();
 		}
 
