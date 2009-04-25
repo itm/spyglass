@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS;
+import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS;
 
 // --------------------------------------------------------------------------------
 /**
@@ -192,7 +192,7 @@ public class StatisticalOperationTest {
 
 	/**
 	 * Test method for
-	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
+	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
 	 * .
 	 */
 	@Test
@@ -202,7 +202,7 @@ public class StatisticalOperationTest {
 
 	/**
 	 * Test method for
-	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
+	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
 	 * .
 	 */
 	@Test
@@ -212,7 +212,7 @@ public class StatisticalOperationTest {
 
 	/**
 	 * Test method for
-	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
+	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
 	 * .
 	 */
 	@Test
@@ -222,7 +222,7 @@ public class StatisticalOperationTest {
 
 	/**
 	 * Test method for
-	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
+	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
 	 * .
 	 */
 	@Test
@@ -232,7 +232,7 @@ public class StatisticalOperationTest {
 
 	/**
 	 * Test method for
-	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
+	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
 	 * .
 	 */
 	@Test

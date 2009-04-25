@@ -6,7 +6,7 @@
  * SpyGlass source tree for further details.
  * --------------------------------------------------------------------------------
  */
-package de.uniluebeck.itm.spyglass.xmlconfig;
+package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
 import java.text.DecimalFormat;
 
@@ -16,7 +16,6 @@ import org.simpleframework.xml.Element;
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
-import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 

@@ -11,7 +11,7 @@ package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS;
+import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS;
 
 // --------------------------------------------------------------------------------
 /**

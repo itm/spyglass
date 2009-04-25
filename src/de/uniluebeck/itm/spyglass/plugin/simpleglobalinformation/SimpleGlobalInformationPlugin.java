@@ -39,11 +39,10 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.packet.Uint16ListPacket;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.globalinformation.GlobalInformationPlugin;
+import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.Tools;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
-import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator;
-import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS;
 
 // --------------------------------------------------------------------------------
 /**

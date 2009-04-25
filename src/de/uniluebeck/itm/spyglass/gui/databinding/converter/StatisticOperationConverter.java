@@ -2,7 +2,7 @@ package de.uniluebeck.itm.spyglass.gui.databinding.converter;
 
 import org.eclipse.core.databinding.conversion.Converter;
 
-import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS;
+import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS;
 
 // --------------------------------------------------------------------------------
 /**

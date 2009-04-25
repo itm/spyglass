@@ -1,4 +1,4 @@
-package de.uniluebeck.itm.spyglass.drawing.primitive;
+package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.graphics.Color;

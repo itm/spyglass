@@ -16,7 +16,6 @@ import org.simpleframework.xml.ElementArray;
 import org.simpleframework.xml.ElementList;
 
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
-import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator;
 
 // --------------------------------------------------------------------------------
 /**

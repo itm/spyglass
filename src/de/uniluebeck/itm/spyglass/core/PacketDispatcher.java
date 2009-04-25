@@ -18,7 +18,6 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
-import de.uniluebeck.itm.spyglass.util.Tools;
 
 // ------------------------------------------------------------------------------
 /**
@@ -37,7 +36,7 @@ public class PacketDispatcher {
 	// --------------------------------------------------------------------------
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param spyglass
 	 *            the application's main class
 	 */
@@ -62,7 +61,7 @@ public class PacketDispatcher {
 	/**
 	 * This method distributes the given Packet object to all loaded plugins by invoking the
 	 * <code>handlePacket</code> method of a plugin.
-	 * 
+	 *
 	 * @param packet
 	 *            The packet object to be distributed.
 	 * @throws InterruptedException
@@ -96,7 +95,7 @@ public class PacketDispatcher {
 		}
 
 		if (log.isDebugEnabled()) {
-			log.debug("Dispatching packet[" + packet + "] to plugins: " + Tools.toString(plugins));
+			log.debug("Dispatching packet[" + packet + "] to plugins: " + plugins);
 		}
 
 		for (final Plugin plugin : plugins) {

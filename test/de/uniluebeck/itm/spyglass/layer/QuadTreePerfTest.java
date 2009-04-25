@@ -15,13 +15,13 @@ import org.junit.Test;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.drawing.primitive.Node;
 import de.uniluebeck.itm.spyglass.packet.PacketFactory;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample;
 import de.uniluebeck.itm.spyglass.packetgenerator.samples.Position;
 import de.uniluebeck.itm.spyglass.packetgenerator.samples.Sample;
+import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.Node;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 

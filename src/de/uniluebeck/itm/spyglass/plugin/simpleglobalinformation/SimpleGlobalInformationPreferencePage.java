@@ -18,7 +18,6 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
-import de.uniluebeck.itm.spyglass.xmlconfig.StatisticalInformationEvaluator;
 
 //--------------------------------------------------------------------------------
 /**

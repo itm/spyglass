@@ -1,11 +1,11 @@
-package de.uniluebeck.itm.spyglass.drawing;
+package de.uniluebeck.itm.spyglass.util;
 
 /*
  * (C) 2004 - Geotechnical Software Services
- * 
+ *
  * This code is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public 
- * License as published by the Free Software Foundation; either 
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  *
  * This code is distributed in the hope that it will be useful,
@@ -13,15 +13,14 @@ package de.uniluebeck.itm.spyglass.drawing;
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public 
- * License along with this program; if not, write to the Free 
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
  * MA  02111-1307, USA.
  */
-//package no.geosoft.cc.geometry;
 /**
  * Collection of geometry utility methods. All methods are static.
- * 
+ *
  * @author <a href="mailto:jacob.dreyer@geosoft.no">Jacob Dreyer</a>
  */
 public final class Geometry {
@@ -35,7 +34,7 @@ public final class Geometry {
 
 	/**
 	 * Check if two double precision numbers are "equal", i.e. close enough to a given limit.
-	 * 
+	 *
 	 * @param a
 	 *            First number to check
 	 * @param b
@@ -50,7 +49,7 @@ public final class Geometry {
 
 	/**
 	 * Check if two double precision numbers are "equal", i.e. close enough to a prespecified limit.
-	 * 
+	 *
 	 * @param a
 	 *            First number to check
 	 * @param b
@@ -63,7 +62,7 @@ public final class Geometry {
 
 	/**
 	 * Return smallest of four numbers.
-	 * 
+	 *
 	 * @param a
 	 *            First number to find smallest among.
 	 * @param b
@@ -80,7 +79,7 @@ public final class Geometry {
 
 	/**
 	 * Return largest of four numbers.
-	 * 
+	 *
 	 * @param a
 	 *            First number to find largest among.
 	 * @param b
@@ -97,7 +96,7 @@ public final class Geometry {
 
 	/**
 	 * Check if a specified point is inside a specified rectangle.
-	 * 
+	 *
 	 * @param x0
 	 *            , y0, x1, y1 Upper left and lower right corner of rectangle (inclusive)
 	 * @param x
@@ -110,7 +109,7 @@ public final class Geometry {
 
 	/**
 	 * Check if a given point is inside a given (complex) polygon.
-	 * 
+	 *
 	 * @param x
 	 *            , y Polygon.
 	 * @param pointX
@@ -140,7 +139,7 @@ public final class Geometry {
 
 	/**
 	 * Check if a given point is inside a given polygon. Integer domain.
-	 * 
+	 *
 	 * @param x
 	 *            , y Polygon.
 	 * @param pointX
@@ -172,7 +171,7 @@ public final class Geometry {
 	 * Find the point on the line p0,p1 [x,y,z] a given fraction from p0. Fraction of 0.0 whould
 	 * give back p0, 1.0 give back p1, 0.5 returns midpoint of line p0,p1 and so on. F raction can
 	 * be >1 and it can be negative to return any point on the line specified by p0,p1.
-	 * 
+	 *
 	 * @param p0
 	 *            First coordinale of line [x,y,z].
 	 * @param p0
@@ -195,7 +194,7 @@ public final class Geometry {
 	/**
 	 * Find the point on the line defined by x0,y0,x1,y1 a given fraction from x0,y0. 2D version of
 	 * method above..
-	 * 
+	 *
 	 * @param x0
 	 *            , y0 First point defining the line
 	 * @param x1
@@ -216,7 +215,7 @@ public final class Geometry {
 
 	/**
 	 * Extend a given line segment to a specified length.
-	 * 
+	 *
 	 * @param p0
 	 *            , p1 Line segment to extend [x,y,z].
 	 * @param toLength
@@ -239,7 +238,7 @@ public final class Geometry {
 	/**
 	 * Extend a given line segment to a given length and holding the first point of the line as
 	 * fixed.
-	 * 
+	 *
 	 * @param p0
 	 *            , p1 Line segment to extend. p0 is fixed during extension
 	 * @param length
@@ -256,7 +255,7 @@ public final class Geometry {
 
 	/**
 	 * Return the length of a vector.
-	 * 
+	 *
 	 * @param v
 	 *            Vector to compute length of [x,y,z].
 	 * @return Length of vector.
@@ -267,7 +266,7 @@ public final class Geometry {
 
 	/**
 	 * Compute distance between two points.
-	 * 
+	 *
 	 * @param p0
 	 *            , p1 Points to compute distance between [x,y,z].
 	 * @return Distance between points.
@@ -279,7 +278,7 @@ public final class Geometry {
 
 	/**
 	 * Compute the length of the line from (x0,y0) to (x1,y1)
-	 * 
+	 *
 	 * @param x0
 	 *            , y0 First line end point.
 	 * @param x1
@@ -292,7 +291,7 @@ public final class Geometry {
 
 	/**
 	 * Compute the length of the line from (x0,y0) to (x1,y1)
-	 * 
+	 *
 	 * @param x0
 	 *            , y0 First line end point.
 	 * @param x1
@@ -308,7 +307,7 @@ public final class Geometry {
 
 	/**
 	 * Compute the length of a polyline.
-	 * 
+	 *
 	 * @param x
 	 *            , y Arrays of x,y coordinates
 	 * @param nPoints
@@ -336,7 +335,7 @@ public final class Geometry {
 	/**
 	 * Return distance bwetween the line defined by (x0,y0) and (x1,y1) and the point (x,y). Ref:
 	 * http://astronomy.swin.edu.au/pbourke/geometry/pointline/ The 3D case should be similar.
-	 * 
+	 *
 	 * @param x0
 	 *            , y0 First point of line.
 	 * @param x1
@@ -365,7 +364,7 @@ public final class Geometry {
 
 	/**
 	 * Find the angle between twree points. P0 is center point
-	 * 
+	 *
 	 * @param p0
 	 *            , p1, p2 Three points finding angle between [x,y,z].
 	 * @return Angle (in radians) between given points.
@@ -390,7 +389,7 @@ public final class Geometry {
 
 	/**
 	 * Compute the dot product (a scalar) between two vectors.
-	 * 
+	 *
 	 * @param v0
 	 *            , v1 Vectors to compute dot product between [x,y,z].
 	 * @return Dot product of given vectors.
@@ -401,7 +400,7 @@ public final class Geometry {
 
 	/**
 	 * Compute the cross product (a vector) of two vectors.
-	 * 
+	 *
 	 * @param v0
 	 *            , v1 Vectors to compute cross product between [x,y,z].
 	 * @param crossProduct
@@ -419,7 +418,7 @@ public final class Geometry {
 
 	/**
 	 * Construct the vector specified by two points.
-	 * 
+	 *
 	 * @param p0
 	 *            , p1 Points the construct vector between [x,y,z].
 	 * @return v Vector from p0 to p1 [x,y,z].
@@ -431,7 +430,7 @@ public final class Geometry {
 
 	/**
 	 * Check if two points are on the same side of a given line. Algorithm from Sedgewick page 350.
-	 * 
+	 *
 	 * @param x0
 	 *            , y0, x1, y1 The line.
 	 * @param px0
@@ -469,7 +468,7 @@ public final class Geometry {
 
 	/**
 	 * Check if two points are on the same side of a given line. Integer domain.
-	 * 
+	 *
 	 * @param x0
 	 *            , y0, x1, y1 The line.
 	 * @param px0
@@ -485,7 +484,7 @@ public final class Geometry {
 
 	/**
 	 * Check if two line segments intersects. Integer domain.
-	 * 
+	 *
 	 * @param x0
 	 *            , y0, x1, y1 End points of first line to check.
 	 * @param x2
@@ -502,7 +501,7 @@ public final class Geometry {
 
 	/**
 	 * Check if a specified line intersects a specified rectangle. Integer domain.
-	 * 
+	 *
 	 * @param lx0
 	 *            , ly0 1st end point of line
 	 * @param ly1
@@ -540,7 +539,7 @@ public final class Geometry {
 
 	/**
 	 * Check if a specified polyline intersects a specified rectangle. Integer domain.
-	 * 
+	 *
 	 * @param x
 	 *            , y Polyline to check.
 	 * @param x0
@@ -571,7 +570,7 @@ public final class Geometry {
 
 	/**
 	 * Check if a specified polygon intersects a specified rectangle. Integer domain.
-	 * 
+	 *
 	 * @param x
 	 *            X coordinates of polyline.
 	 * @param y
@@ -624,7 +623,7 @@ public final class Geometry {
 
 	/**
 	 * Compute the area of the specfied polygon.
-	 * 
+	 *
 	 * @param x
 	 *            X coordinates of polygon.
 	 * @param y
@@ -647,7 +646,7 @@ public final class Geometry {
 
 	/**
 	 * Compute the area of the specfied polygon.
-	 * 
+	 *
 	 * @param xy
 	 *            Geometry of polygon [x,y,...]
 	 * @return Area of specified polygon.
@@ -668,7 +667,7 @@ public final class Geometry {
 
 	/**
 	 * Compute centorid (center of gravity) of specified polygon.
-	 * 
+	 *
 	 * @param x
 	 *            X coordinates of polygon.
 	 * @param y
@@ -699,7 +698,7 @@ public final class Geometry {
 
 	/**
 	 * Find the 3D extent of a polyline.
-	 * 
+	 *
 	 * @param x
 	 *            X coordinates of polyline.
 	 * @param y
@@ -763,7 +762,7 @@ public final class Geometry {
 
 	/**
 	 * Find the extent of a polygon.
-	 * 
+	 *
 	 * @param x
 	 *            X coordinates of polygon.
 	 * @param y
@@ -808,7 +807,7 @@ public final class Geometry {
 
 	/**
 	 * Compute the intersection between two line segments, or two lines of infinite length.
-	 * 
+	 *
 	 * @param x0
 	 *            X coordinate first end point first line segment.
 	 * @param y0
@@ -930,11 +929,11 @@ public final class Geometry {
 
 	/**
 	 * Find the intersections between a polygon and a straight line.
-	 * 
+	 *
 	 * NOTE: This method is only guaranteed to work if the polygon is first preprocessed so that
 	 * "unneccesary" vertices are removed (i.e vertices on the straight line between its
 	 * neighbours).
-	 * 
+	 *
 	 * @param x
 	 *            X coordinates of polygon.
 	 * @param y
@@ -1022,7 +1021,7 @@ public final class Geometry {
 	 * Return the geometry of an ellipse based on its four top points. Integer domain. The method
 	 * use the generic createEllipse() method for the main task, and then transforms this according
 	 * to any rotation or skew defined by the given top points.
-	 * 
+	 *
 	 * @param x
 	 *            X array of four top points of ellipse.
 	 * @param y
@@ -1088,7 +1087,7 @@ public final class Geometry {
 
 	/**
 	 * Create the geometry for an unrotated, unskewed ellipse. Integer domain.
-	 * 
+	 *
 	 * @param x0
 	 *            X center of ellipse.
 	 * @param y0
@@ -1173,7 +1172,7 @@ public final class Geometry {
 
 	/**
 	 * Create the geometry for an unrotated, unskewed ellipse. Floating point domain.
-	 * 
+	 *
 	 * @param x0
 	 *            X center of ellipse.
 	 * @param y0
@@ -1252,7 +1251,7 @@ public final class Geometry {
 
 	/**
 	 * Create geometry for a circle. Integer domain.
-	 * 
+	 *
 	 * @param x0
 	 *            X center of circle.
 	 * @param y0
@@ -1267,7 +1266,7 @@ public final class Geometry {
 
 	/**
 	 * Create geometry for a circle. Floating point domain.
-	 * 
+	 *
 	 * @param x0
 	 *            X center of circle.
 	 * @param y0
@@ -1282,7 +1281,7 @@ public final class Geometry {
 
 	/**
 	 * Create the geometry of a sector of an ellipse.
-	 * 
+	 *
 	 * @param x0
 	 *            X coordinate of center of ellipse.
 	 * @param y0
@@ -1329,7 +1328,7 @@ public final class Geometry {
 
 	/**
 	 * Create the geometry of a sector of a circle.
-	 * 
+	 *
 	 * @param x0
 	 *            X coordinate of center of ellipse.
 	 * @param y0
@@ -1351,10 +1350,10 @@ public final class Geometry {
 	/**
 	 * Create the geometry of an arrow. The arrow is positioned at the end (last point) of the
 	 * specified polyline, as follows:
-	 * 
+	 *
 	 * 0,4--, \ --, \ --, \ --, \ --, -------------------------3-----------1 / --' / --' / --' / --'
 	 * 2--'
-	 * 
+	 *
 	 * @param x
 	 *            X coordinates of polyline of where arrow is positioned in the end. Must contain at
 	 *            least two points.
@@ -1418,7 +1417,7 @@ public final class Geometry {
 	/**
 	 * Create geometry for an arrow along the specified line and with tip at x1,y1. See general
 	 * method above.
-	 * 
+	 *
 	 * @param x0
 	 *            X first end point of line.
 	 * @param y0
@@ -1447,7 +1446,7 @@ public final class Geometry {
 	/**
 	 * Create geometry for a rectangle. Returns a closed polygon; first and last points matches.
 	 * Integer domain.
-	 * 
+	 *
 	 * @param x0
 	 *            X corner of rectangle.
 	 * @param y0
@@ -1464,7 +1463,7 @@ public final class Geometry {
 	/**
 	 * Create geometry for a rectangle. Returns a closed polygon; first and last points matches.
 	 * Floating point domain.
-	 * 
+	 *
 	 * @param x0
 	 *            X corner of rectangle.
 	 * @param y0
@@ -1480,7 +1479,7 @@ public final class Geometry {
 
 	/**
 	 * Create geometry of a star. Integer domain.
-	 * 
+	 *
 	 * @param x0
 	 *            X center of star.
 	 * @param y0
@@ -1520,7 +1519,7 @@ public final class Geometry {
 
 	/**
 	 * Create geometry of a star. Floating point domain.
-	 * 
+	 *
 	 * @param x0
 	 *            X center of star.
 	 * @param y0
@@ -1557,7 +1556,7 @@ public final class Geometry {
 
 	/**
 	 * Return the x,y position at distance "length" into the given polyline.
-	 * 
+	 *
 	 * @param x
 	 *            X coordinates of polyline
 	 * @param y
