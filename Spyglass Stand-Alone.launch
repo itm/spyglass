@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<stringAttribute key="bad_container_name" value="\Spyglass\S"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/Spyglass/src/de/uniluebeck/itm/spyglass/SpyglassApp.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.uniluebeck.itm.spyglass.SpyglassApp"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Spyglass"/>
+</launchConfiguration>
