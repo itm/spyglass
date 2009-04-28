@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+</head>
+<body bgcolor="white">
+
+All plugins for the Spyglass visualization framework reside under this package.
+
+<h2>Contents</h2>
+<ul>
+	<li><a href="#AnchorTypesOfPluginsAndClassHierarchy">Types of plug-ins and class hierarchy</a></li>
+	<li><a href="#AnchorImplementingPlugins">Implementing plug-ins</a></li>
+	<li><a href="#AnchorDrawingObjects">Drawing Objects</a></li>
+	<li><a href="#AnchorGlobalInformationPlugins">Global Information Plug-Ins</a></li>
+</ul>
+
+
+
+<a name="AnchorTypesOfPluginsAndClassHierarchy"></a><h2>Types of plug-ins and class hierarchy</h2>
+
+From the functional point of view there are three types of plug-ins for the Spyglass framework:
+<ol>
+	<li>plug-ins that draw onto the canvas, called <b>drawing plug-ins</b> (example:
+	{@link de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin})</li>
+	<li>plug-ins that aggregate data, do statistics and so on and write them onto the so called
+	global information section (the bar on the right hand side of the window), called <b>global
+	information plug-ins</b> (example:
+	{@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin})</li>
+	<li>plug-ins that do both, called <b>drawing global information plug-ins</b></li>
+</ol>
+
+As plug-ins are furthermore distinguished by semantic properties there's a convention that specifies
+that plug-ins with similar semantics should be of the same parent type.<br/>
+The {@link de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin} for example is derived from
+the abstract base class {@link de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin},
+which itself is derived from {@link de.uniluebeck.itm.spyglass.plugin.Plugin}, the base class of all
+plug-ins.<br/>
+In this way plug-ins are grouped semantically, which also may, depending on the semantics, result in
+common behaviour implemented in the respective base class. Furthermore, the plug-ins are presented to
+the user in exactly the same hierarchy defined by the inheritance hierarchy (take a look in the properties
+dialog of the running application).
+
+
+
+<a name="AnchorImplementingPlugins"></a><h2>Implementing plug-ins</h2>
+
+Resulting from the introduction
+(<a href="#AnchorTypesOfPluginsAndClassHierarchy">Types of plug-ins and class hierarchy</a>) you have
+to follow some rules if you want to implement your own plug-ins:
+<ul>
+	<li>
+		<b>Every plugin must implement</b> the abstract base class {@link de.uniluebeck.itm.spyglass.plugin.Plugin},
+		either by extending another abstract class such as
+		{@link de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlugin} or directly.<br/>
+		In both cases, the implementor should carefully read the documentation of
+		{@link de.uniluebeck.itm.spyglass.plugin.Plugin}. Some properties, for example the human-readable
+		name of your plug-in, are determined at runtime by calling static methods of your class. Therefore
+		it's crucial that these methods are implemented in every plug-in. As there's no way to force you
+		overwriting static methods in the Java programming language, it's up to the programmer to read the
+		documentation, since your IDE won't tell you.</li>
+	<li>
+		To create a <b>drawing plug-in</b> you <b>must implement</b>
+		{@link de.uniluebeck.itm.spyglass.plugin.Drawable}. Objects are painted onto the canvas by using
+		so called drawing objects (see <a href="#AnchorDrawingObjects">Drawing Objects</a>).
+	</li>
+	<li>
+		To create a <b>global information plug-in</b> you <b>must implement</b>
+		{@link de.uniluebeck.itm.spyglass.plugin.GlobalInformation}.
+	</li>
+	<li>
+		In case the plug-in <b>needs metrics</b> for the node's position in order to work correctly,
+		<b>it must implement</b> {@link de.uniluebeck.itm.spyglass.plugin.NeedsMetric}. If your plug-in
+		implements this interface the framework automatically deactivates your plug-in if there's a
+		node positioner active which doesn't provide metrics.
+	</li>
+</ul>
+
+
+
+<a name="AnchorDrawingObjects"></a><h2>Drawing Objects</h2>
+
+<p>Plug-ins draw onto the canvas by adding drawing objects (see 
+{@link de.uniluebeck.itm.spyglass.drawing.DrawingObject}) onto their layer. Every
+plug-in has it's own layer "to draw on" (see {@link de.uniluebeck.itm.spyglass.layer.Layer}).</p>
+
+<p>The order in which is drawn results from the order in which the plug-in instances are sorted in the
+preferences dialog of the running Spyglass application. The topmost plug-in will be the last in queue
+to draw, therefore drawing over drawings of the lower plug-ins.</p>
+
+Writing your own plug-in you can either
+<ul>
+	<li>use primitive drawing objects, which are located in the package
+	{@link de.uniluebeck.itm.sypglass.drawing.primitive}</li>
+	<li>or use plug-in specific drawing objects which should then be located into your plug-in specific
+	package.</li>
+</ul>
+
+<p>If you need to write a new drawing object that might be used as a primitive since it's so marvellous that
+it can be reused by other plug-ins, it might be a good idea to place it into the primitive-package.</p>
+
+The drawing of Spyglass is event-driven. Because of that your plug-in instance needs to inform the framework
+about drawing objects added or removed. Please check the following methods for further information:
+<ul>
+	<li>{@link de.uniluebeck.itm.spyglass.plugin.Plugin#fireDrawingObjectAdded(de.uniluebeck.itm.spyglass.drawing.DrawingObject)}</li>
+	<li>{@link de.uniluebeck.itm.spyglass.plugin.Plugin#fireDrawingObjectRemoved(de.uniluebeck.itm.spyglass.drawing.DrawingObject)}</li>
+</ul>
+
+
+
+<a name="AnchorGlobalInformationPlugins"></a><h2>Global Information Plug-Ins</h2>
+<font color="red">TODO...</font>
+
+
+
+<a name="AnchorPluginInstanceProperties"></a><h2>Plug-in Instance Properties</h2>
+<font color="red">TODO...</font>
+
+
+
+<hr />
+This document was written by Daniel Bimschas
+(<a href="mailto:daniel@bimschas.com">daniel@bimschas.com</a>).
+Feel free to contact me regarding questions or errors in this document.
+
+</body>
+</html>
