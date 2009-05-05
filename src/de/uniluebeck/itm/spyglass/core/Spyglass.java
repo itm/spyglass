@@ -44,6 +44,8 @@ public class Spyglass {
 
 	private PacketProducerTask packetProducerTask = null;
 
+	private Boolean paused = false;
+
 	/**
 	 * Contains the packetProducerTask
 	 */
@@ -159,6 +161,34 @@ public class Spyglass {
 		this.packetDispatcher = packetDispatcher;
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Enables or disables the pause mode
+	 * 
+	 * @param paused
+	 *            indicates whether the pause mode is to be enabled
+	 */
+	public void setPaused(final boolean paused) {
+		synchronized (this.paused) {
+			this.paused.notifyAll();
+			this.paused = paused;
+			log.debug("Set Paused to " + this.paused);
+		}
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns whether the pause mode is enabled or disabled
+	 * 
+	 * @return whether the pause mode is enabled or disabled
+	 */
+	public Boolean isPaused() {
+		synchronized (paused) {
+			return paused;
+		}
+	}
+
 	// --------------------------------------------------------------------------
 	/**
 	 * Returns the facility which manages the currently loaded plug-ins
@@ -240,6 +270,10 @@ public class Spyglass {
 	 * Resets the application
 	 */
 	public void reset() {
+
+		final boolean wasPaused = isPaused();
+		setPaused(true);
+
 		try {
 			log.debug("The PacketReader will be resetted now");
 			packetReader.reset();
@@ -260,6 +294,7 @@ public class Spyglass {
 		log.debug("The node positioner '" + pluginManager.getNodePositioner().getInstanceName() + "' will be resetted now");
 		pluginManager.getNodePositioner().reset();
 		log.debug("The node positioner '" + pluginManager.getNodePositioner().getInstanceName() + "' was sucessfully resetted");
+		log.info("Spyglass was resetted successfully");
+		setPaused(wasPaused);
 	}
-
 }

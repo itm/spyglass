@@ -38,8 +38,6 @@ public class PacketProducerTask implements Runnable {
 
 	private final Spyglass spyglass;
 
-	private Boolean paused = false;
-
 	/** Object to securely access the configuration variables */
 	private Object mutex = new Object();
 
@@ -84,7 +82,8 @@ public class PacketProducerTask implements Runnable {
 		while (!Thread.currentThread().isInterrupted()) {
 
 			try {
-				synchronized (paused) {
+				Boolean paused = null;
+				synchronized (paused = spyglass.isPaused()) {
 					if (paused) {
 						paused.wait();
 					}
@@ -111,34 +110,6 @@ public class PacketProducerTask implements Runnable {
 		}
 
 		log.debug("PacketProducerTask ended. Done.");
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Enables or disables the pause mode
-	 * 
-	 * @param paused
-	 *            indicates whether the pause mode is to be enabled
-	 */
-	public void setPaused(final boolean paused) {
-		synchronized (this.paused) {
-			this.paused.notifyAll();
-			this.paused = paused;
-			log.debug("Set Paused to " + this.paused);
-		}
-
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Returns whether the pause mode is enabled or disabled
-	 * 
-	 * @return whether the pause mode is enabled or disabled
-	 */
-	public boolean getPaused() {
-		synchronized (paused) {
-			return paused;
-		}
 	}
 
 	// --------------------------------------------------------------------------------

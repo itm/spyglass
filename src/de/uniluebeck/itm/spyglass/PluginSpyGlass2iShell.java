@@ -151,7 +151,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		if (log.isDebugEnabled()) {
 			log.debug("Received Packet in Spyglass from iShell: " + spyglassPacket);
 		}
-		// spyglass.getPacketRecorder().handlePacket(spyglassPacket);
+
 		packetBroker.push(spyglassPacket);
 
 	}
