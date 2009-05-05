@@ -12,6 +12,7 @@ All plugins for the Spyglass visualization framework reside under this package.
 	<li><a href="#AnchorImplementingPlugins">Implementing plug-ins</a></li>
 	<li><a href="#AnchorDrawingObjects">Drawing Objects</a></li>
 	<li><a href="#AnchorGlobalInformationPlugins">Global Information Plug-Ins</a></li>
+	<li><a href="#AnchorPluginPreferencesInstanceProperties">Plug-In Preferences and Instance Properties</a></li>
 </ul>
 
 
@@ -108,13 +109,29 @@ about drawing objects added or removed. Please check the following methods for f
 
 
 <a name="AnchorGlobalInformationPlugins"></a><h2>Global Information Plug-Ins</h2>
-<font color="red">TODO...</font>
+<p>
+	In order to implement plug-ins that draw onto the global information area your plug-in class must
+	implement {@link de.uniluebeck.itm.spyglass.plugin.GlobalInformation}. It must furthermore provide
+	a GUI widget of class {@link de.uniluebeck.itm.spyglass.gui.view.GlobalInformationWidget} which is
+	later on displayed to the user inside a swt {@link org.eclipse.swt.widgets.ExpandBar} during
+	runtime. The content of the widget is of arbitrary type. You could, e.g. display an overview map of
+	the drawing area exactly as you could display any type of table displaying structured information.
+</p>
 
 
 
-<a name="AnchorPluginInstanceProperties"></a><h2>Plug-in Instance Properties</h2>
-<font color="red">TODO...</font>
 
+<a name="AnchorPluginPreferencesInstanceProperties"></a><h2>Plug-in Preferences and Instance Properties</h2>
+<p>
+	Spyglass implements a system for storing plugin preferences in a unified manner over all plug-ins.
+	Spyglass makes sure that plug-in preferences as well as plug-in instance preferences are loaded and
+	stored on program startup respectively program shutdown, as well when users edit the preferences.
+	In order to achieve this behavior plug-in implementors must implement
+	{@link de.uniluebeck.itm.spyglass.plugin.Plugin#createPreferencePage(PluginPreferenceDialog, Spyglass)}
+	as well as {@link de.uniluebeck.itm.spyglass.plugin.Plugin#getXMLConfig()} and the corresponding
+	classes {@link de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage} and
+	{@link de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig}.
+</p>
 
 
 <hr />
