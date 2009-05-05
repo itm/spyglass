@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -93,9 +94,9 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	private volatile long totalPacketCount;
 
-	private AtomicInteger numPackets;
+	private PNCountTimerTask pNCountTimerTask;
 
-	private PacketCountTimerTask packetCountTimerTask;
+	private ConcurrentLinkedQueue<StatisticalInformationEvaluator> dirtyEvaluators;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -104,9 +105,9 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	public SimpleGlobalInformationPlugin() {
 		xmlConfig = new SimpleGlobalInformationXMLConfig();
 		avgNodeDegEvaluator = new IDBasedStatisticalOperation(STATISTICAL_OPERATIONS.AVG);
+		dirtyEvaluators = new ConcurrentLinkedQueue<StatisticalInformationEvaluator>();
 		avgNodeDegString = "avg. node degree: ";
 		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
-		numPackets = new AtomicInteger(0);
 		totalPacketCount = 0;
 	}
 
@@ -131,7 +132,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		};
 		xmlConfig.addPropertyChangeListener(pcl);
 
-		new Timer("SGI-Statistics", true).schedule((packetCountTimerTask = new PacketCountTimerTask()), 1000, 1000);
+		new Timer("SGI-Statistics", true).schedule((pNCountTimerTask = new PNCountTimerTask()), 1000, 1000);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -142,26 +143,10 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		widget.setLayout(layout);
 
 		this.widget = new SimpleGlobalInformationWidget(widget, SWT.NONE);
-		final Thread refreshThread = new Thread() {
-			@SuppressWarnings("synthetic-access")
-			@Override
-			public void run() {
 
-				while (!isInterrupted()) {
-					refreshNodeCounts();
-					try {
-						sleep(1000);
-					} catch (final InterruptedException e) {
-						log.warn("GlobalInformationPlugin's sleep was interrupted");
-					}
-
-				}
-			}
-		};
-		refreshThread.setDaemon(true);
-		refreshThread.start();
 		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
 		refreshStatIEConf();
+		runUpdateTimerTask();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -198,13 +183,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
 
-		numPackets.incrementAndGet();
+		pNCountTimerTask.numPackets.incrementAndGet();
 		++totalPacketCount;
-
-		// if the widget was not initialized, yet, nothing is to do here
-		if ((widget == null) || (widget.isDisposed()) || (widget.getDisplay() == null)) {
-			return;
-		}
 
 		final int packetSemanticType = packet.getSemanticType();
 
@@ -215,31 +195,13 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		}
 
 		final StatisticalInformationEvaluator sfs = xmlConfig.getStatisticalInformationEvaluators4Type(packetSemanticType);
-
 		if (sfs != null) {
 			try {
 				sfs.parse(packet);
+				dirtyEvaluators.add(sfs);
 			} catch (final SpyglassPacketException e) {
 				log.error("Error parsing a packet in the " + getHumanReadableName()
 						+ ".\r\nPlease check the values in the StringFormatter for semantic type " + packetSemanticType + "!", e);
-			}
-
-			synchronized (widget) {
-				if (!widget.isDisposed()) {
-					widget.getDisplay().syncExec(new Runnable() {
-						@SuppressWarnings("synthetic-access")
-						@Override
-						public void run() {
-							// the widget might have been disposed while we were waiting
-							if (widget.isDisposed()) {
-								return;
-							}
-
-							widget.createOrUpdateLabel(sfs);
-						}
-					});
-				}
-
 			}
 
 		}
@@ -267,6 +229,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 			});
 		}
 		xmlConfig.removePropertyChangeListener(pcl);
+		dirtyEvaluators.clear();
 	}
 
 	@Override
@@ -278,10 +241,9 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		}
 		avgNodeDegEvaluator.reset();
 		avgNodeDegString = "avg. node degree: ";
-		numPackets.set(0);
 		totalPacketCount = 0;
-		packetCountTimerTask.reset();
-		refreshNodeCounts();
+		pNCountTimerTask.reset();
+		dirtyEvaluators.clear();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -316,43 +278,46 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	}
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * Refreshes the values of the average node degree and the total number of nodes which ware
-	 * currently active in the sensor net. The associated labels of the widget are updated, too.
-	 */
-	private void refreshNodeCounts() {
+	private void runUpdateTimerTask() {
 
-		final String numNodes = "# Nodes: " + getPluginManager().getNodePositioner().getNumNodes();
+		if ((widget != null) && (!widget.isDisposed())) {
+			synchronized (widget) {
+				widget.getDisplay().timerExec(1000, new Runnable() {
+					@SuppressWarnings("synthetic-access")
+					@Override
+					public void run() {
+						if ((widget != null) && !widget.isDisposed()) {
 
-		if ((widget != null) && !widget.isDisposed()) {
-			widget.getDisplay().asyncExec(new Runnable() {
+							if (isActive()) {
+								widget.createOrUpdateTotalPacketCount("# Packets: " + totalPacketCount);
+								widget.createOrUpdatePacketsPerSecond(pNCountTimerTask.getPacketsPerSecond());
 
-				@SuppressWarnings("synthetic-access")
-				@Override
-				public void run() {
+								if (xmlConfig.isShowNumNodes()) {
+									widget.createOrUpdateNumNodes(pNCountTimerTask.getNumNodes());
+								} else {
+									widget.removeNumNodes();
+								}
+								if (xmlConfig.isShowNodeDegree()) {
+									widget.createOrUpdateAVGNodeDeg(avgNodeDegString);
+								} else {
+									widget.removeAVGNodeDeg();
+								}
 
-					// the widget might have been disposed while we were waiting
-					if (widget.isDisposed()) {
-						return;
-					}
+								StatisticalInformationEvaluator sfs = null;
+								while ((sfs = dirtyEvaluators.poll()) != null) {
+									widget.createOrUpdateLabel(sfs);
+								}
 
-					if (isActive()) {
+								widget.pack(true);
+							}
 
-						if (xmlConfig.isShowNumNodes()) {
-							widget.createOrUpdateNumNodes(numNodes);
-						} else {
-							widget.removeNumNodes();
+							widget.getDisplay().timerExec(1000, this);
+
 						}
-						if (xmlConfig.isShowNodeDegree()) {
-							widget.createOrUpdateAVGNodeDeg(avgNodeDegString);
-						} else {
-							widget.removeAVGNodeDeg();
-						}
-						widget.pack(true);
 					}
-				}
-			});
+				});
+
+			}
 		}
 
 	}
@@ -572,12 +537,16 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Task to refresh the packet counts
+	 * Task to refresh the packet and node counts
 	 * 
 	 * @author Sebastian Ebers
 	 * 
 	 */
-	private class PacketCountTimerTask extends TimerTask {
+	private class PNCountTimerTask extends TimerTask {
+
+		AtomicInteger numPackets = new AtomicInteger(0);
+
+		private String numNodes;
 		private int times = 0;
 		private String perSec = "";
 		private String per30Sec = "     ";
@@ -585,11 +554,13 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		private StatisticalOperation statistics30sec = new StatisticalOperation(30, STATISTICAL_OPERATIONS.AVG);
 		private StatisticalOperation statistics60sec = new StatisticalOperation(60, STATISTICAL_OPERATIONS.AVG);
 
+		private volatile String packetsPerSecond = "# PPS: [ " + perSec + " | " + per30Sec + " | " + per60Sec + " ]";
+
 		// --------------------------------------------------------------------------------
 		/**
 		 * Constructor
 		 */
-		public PacketCountTimerTask() {
+		public PNCountTimerTask() {
 			super();
 		}
 
@@ -609,22 +580,25 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				per30Sec = new DecimalFormat("0.00").format(statistics30sec.getValue());
 			}
 
-			final String pps = "# PPS: [ " + perSec + " | " + per30Sec + " | " + per60Sec + " ]";
+			packetsPerSecond = "# PPS: [ " + perSec + " | " + per30Sec + " | " + per60Sec + " ]";
+			numNodes = "# Nodes: " + getPluginManager().getNodePositioner().getNumNodes();
 
-			if ((widget != null) && (!widget.isDisposed())) {
-				synchronized (widget) {
-					widget.getDisplay().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							if ((widget != null) && !widget.isDisposed()) {
-								widget.createOrUpdateTotalPacketCount("# Packets: " + totalPacketCount);
-								widget.createOrUpdatePacketsPerSecond(pps);
-							}
-						}
-					});
+		}
 
-				}
-			}
+		// --------------------------------------------------------------------------------
+		/**
+		 * @return the packetsPerSecond
+		 */
+		protected String getPacketsPerSecond() {
+			return packetsPerSecond;
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * @return the numNodes
+		 */
+		protected String getNumNodes() {
+			return numNodes;
 		}
 
 		// --------------------------------------------------------------------------------
@@ -638,6 +612,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 			perSec = "     ";
 			per30Sec = "     ";
 			per60Sec = "     ";
+			numPackets.set(0);
+			numNodes = "# Nodes: " + getPluginManager().getNodePositioner().getNumNodes();
 		}
 	}
 

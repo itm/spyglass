@@ -12,6 +12,7 @@ import java.text.DecimalFormat;
 
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Element;
+import org.simpleframework.xml.load.Commit;
 
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
@@ -357,4 +358,13 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	public void reset() {
 		operationExecutor.reset();
 	}
+
+	/**
+	 * Initializes the {@link StringFormatter} according to the provided Expression
+	 */
+	@Commit
+	public void init() {
+		setExpression(expression);
+	}
+
 }
