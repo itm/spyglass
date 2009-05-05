@@ -645,7 +645,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 
 		for (final DrawingObject drawingObject : drawingObjects) {
-			if (drawingObject.getState().equals(State.ALIVE)) {
+			if (drawingObject.getState().equals(DrawingObject.State.ALIVE)) {
 				fireDrawingObjectRemoved(drawingObject);
 			}
 		}
