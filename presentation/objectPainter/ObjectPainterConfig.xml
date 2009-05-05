@@ -1,0 +1,345 @@
+<spyglassConfiguration>
+   <packetReader class="de.uniluebeck.itm.spyglass.core.PacketRecorder">
+      <gateway class="de.uniluebeck.itm.spyglass.gateway.FileReaderGateway">
+         <file>/home/sebers/DATEN_D/usbstick/Daten/Batten/Uni/Master/FleGSenS/Workspace/SpyglassPure/record/Namenloser Ordner/objectPainterSample.rec</file>
+      </gateway>
+      <delayMillies>0</delayMillies>
+   </packetReader>
+   <instances>
+      <plugins class="java.util.ArrayList">
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin">
+            <parameters>
+               <active>true</active>
+               <visible>true</visible>
+               <name>default8hh</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>4</int>
+               </semanticTypes>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
+            <parameters>
+               <active>true</active>
+               <visible>true</visible>
+               <name>GlobalInformation</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <semanticTypes4Neighborhoods length="1">
+                  <int>11</int>
+               </semanticTypes4Neighborhoods>
+               <showNodeDegree>false</showNodeDegree>
+               <showNumNodes>true</showNumNodes>
+               <statisticalInformationEvaluators class="java.util.TreeSet"/>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
+            <parameters>
+               <active>true</active>
+               <visible>true</visible>
+               <name>NodePainter</name>
+               <timeout>-1</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <stringFormatters>
+                  <stringFormatter nodeID="2">SemType: 2</stringFormatter>
+               </stringFormatters>
+               <defaultStringFormatter></defaultStringFormatter>
+               <extendedInformation>
+                  <isActive nodeID="1">true</isActive>
+                  <isActive nodeID="2">true</isActive>
+                  <isActive nodeID="3">false</isActive>
+                  <isActive nodeID="4">true</isActive>
+                  <isActive nodeID="5">true</isActive>
+                  <isActive nodeID="6">true</isActive>
+                  <isActive nodeID="7">true</isActive>
+               </extendedInformation>
+               <isExtendedDefaultValue>false</isExtendedDefaultValue>
+               <lineColorRGB length="3">
+                  <int>255</int>
+                  <int>0</int>
+                  <int>0</int>
+               </lineColorRGB>
+               <lineWidth>1</lineWidth>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin">
+            <parameters>
+               <active>true</active>
+               <visible>true</visible>
+               <name>myFirstObjectPainter</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>42</int>
+               </semanticTypes>
+               <imageFileName>/home/sebers/DATEN_D/usbstick/Daten/Batten/Uni/Master/FleGSenS/Workspace/SpyglassPure/images/icons/brokenImageLink.png</imageFileName>
+               <imageSizeX>100</imageSizeX>
+               <imageSizeY>100</imageSizeY>
+               <keepProportions>true</keepProportions>
+               <drawLine>true</drawLine>
+               <packetType3D>true</packetType3D>
+               <lineColor length="3">
+                  <int>0</int>
+                  <int>0</int>
+                  <int>0</int>
+               </lineColor>
+               <updateInterval>500</updateInterval>
+            </parameters>
+         </plugin>
+      </plugins>
+   </instances>
+   <generalSettings>
+      <showRuler>true</showRuler>
+      <metrics>
+         <unit>mm</unit>
+         <abs2metricFactorX>1.0</abs2metricFactorX>
+         <abs2metricFactorY>1.0</abs2metricFactorY>
+         <abs2metricOffsetX>0.0</abs2metricOffsetX>
+         <abs2metricOffsetY>0.0</abs2metricOffsetY>
+         <lockAbs2metricFactor>false</lockAbs2metricFactor>
+      </metrics>
+      <timeUnit>s</timeUnit>
+      <timeScale>1.0</timeScale>
+   </generalSettings>
+   <defaults class="java.util.LinkedList">
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>default</name>
+            <timeout>0</timeout>
+            <semanticTypes length="1">
+               <int>-1</int>
+            </semanticTypes>
+            <gridElementHeight>320</gridElementHeight>
+            <gridElementWidth>320</gridElementWidth>
+            <gridLowerLeftPointX>-16000</gridLowerLeftPointX>
+            <gridLowerLeftPointY>-16000</gridLowerLeftPointY>
+            <lineColorRGB length="3">
+               <int>192</int>
+               <int>192</int>
+               <int>192</int>
+            </lineColorRGB>
+            <lineWidth>1.0</lineWidth>
+            <lockGridElementsSquare>true</lockGridElementsSquare>
+            <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
+            <numCols>100</numCols>
+            <numRows>100</numRows>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.imagepainter.ImagePainterPlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>default3</name>
+            <timeout>0</timeout>
+            <semanticTypes length="1">
+               <int>-1</int>
+            </semanticTypes>
+            <imageFileName>/home/dariush/Lageplan3D.jpg</imageFileName>
+            <lowerLeftX>-16000</lowerLeftX>
+            <lowerLeftY>16000</lowerLeftY>
+            <imageSizeX>32000</imageSizeX>
+            <imageSizeY>32000</imageSizeY>
+            <keepProportions>true</keepProportions>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>default4</name>
+            <timeout>0</timeout>
+            <semanticTypes length="1">
+               <int>-1</int>
+            </semanticTypes>
+            <defaultValue>3.0</defaultValue>
+            <gridElementHeight>10</gridElementHeight>
+            <gridElementWidth>10</gridElementWidth>
+            <lowerLeftX>-6000</lowerLeftX>
+            <lowerLeftY>-6000</lowerLeftY>
+            <lockGridElementSquare>true</lockGridElementSquare>
+            <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
+            <maxColorRGB length="3">
+               <int>0</int>
+               <int>14</int>
+               <int>255</int>
+            </maxColorRGB>
+            <maxValue>20.0</maxValue>
+            <minColorRGB length="3">
+               <int>29</int>
+               <int>255</int>
+               <int>0</int>
+            </minColorRGB>
+            <minValue>0.0</minValue>
+            <width>100</width>
+            <numFramePointsHorizontal>3</numFramePointsHorizontal>
+            <numFramePointsVertical>3</numFramePointsVertical>
+            <height>100</height>
+            <refreshFrequency>1</refreshFrequency>
+            <k>3</k>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>myFirstObjectPainter</name>
+            <timeout>0</timeout>
+            <semanticTypes length="1">
+               <int>88</int>
+            </semanticTypes>
+            <imageFileName>/home/sebers/DATEN_D/usbstick/Daten/Batten/Uni/Master/FleGSenS/Workspace/SpyglassPure/images/smily.gif</imageFileName>
+            <imageSizeX>100</imageSizeX>
+            <imageSizeY>100</imageSizeY>
+            <keepProportions>true</keepProportions>
+            <drawLine>true</drawLine>
+            <packetType3D>true</packetType3D>
+            <lineColor length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </lineColor>
+            <updateInterval>500</updateInterval>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>default6</name>
+            <timeout>0</timeout>
+            <semanticTypes length="1">
+               <int>-1</int>
+            </semanticTypes>
+            <semanticTypes4Neighborhoods length="1">
+               <int>-1</int>
+            </semanticTypes4Neighborhoods>
+            <showNodeDegree>false</showNodeDegree>
+            <showNumNodes>true</showNumNodes>
+            <statisticalInformationEvaluators class="java.util.TreeSet"/>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>default</name>
+            <timeout>-1</timeout>
+            <semanticTypes length="1">
+               <int>1</int>
+            </semanticTypes>
+            <stringFormatters>
+               <stringFormatter nodeID="3"/>
+               <stringFormatter nodeID="5">ffsfwer %d</stringFormatter>
+            </stringFormatters>
+            <defaultStringFormatter>fdsfsfsfs</defaultStringFormatter>
+            <extendedInformation/>
+            <isExtendedDefaultValue>false</isExtendedDefaultValue>
+            <lineColorRGB length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </lineColorRGB>
+            <lineWidth>1</lineWidth>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>default8</name>
+            <timeout>0</timeout>
+            <semanticTypes length="1">
+               <int>-1</int>
+            </semanticTypes>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.springembedderpositioner.SpringEmbedderPositionerPlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>default9</name>
+            <timeout>0</timeout>
+            <semanticTypes length="1">
+               <int>-1</int>
+            </semanticTypes>
+            <edgeSemanticTypes class="java.util.LinkedList"/>
+            <optimumSpringLength>200</optimumSpringLength>
+            <springStiffness>0.1</springStiffness>
+            <repulsionFactor>2000000</repulsionFactor>
+            <efficiencyFactor>0.1</efficiencyFactor>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>default10</name>
+            <timeout>-1</timeout>
+            <semanticTypes length="1">
+               <int>-1</int>
+            </semanticTypes>
+            <stringFormatters/>
+            <defaultStringFormatter></defaultStringFormatter>
+            <lineColorRGB length="3">
+               <int>0</int>
+               <int>0</int>
+               <int>0</int>
+            </lineColorRGB>
+            <lineWidth>1</lineWidth>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter.VectorSequencePainterPlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>default11</name>
+            <timeout>-1</timeout>
+            <semanticTypes length="1">
+               <int>-1</int>
+            </semanticTypes>
+            <dimension>2</dimension>
+            <lineColorRGB length="3">
+               <int>192</int>
+               <int>192</int>
+               <int>192</int>
+            </lineColorRGB>
+            <lineWidth>1</lineWidth>
+         </parameters>
+      </plugin>
+      <plugin class="de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangePlugin">
+         <parameters>
+            <active>true</active>
+            <visible>true</visible>
+            <name>default</name>
+            <timeout>-1</timeout>
+            <semanticTypes length="1">
+               <int>-1</int>
+            </semanticTypes>
+            <defaultConfig>
+               <lineWidth>1</lineWidth>
+               <backgroundAlpha>30</backgroundAlpha>
+               <backgroundRGB length="3">
+                  <int>0</int>
+                  <int>255</int>
+                  <int>0</int>
+               </backgroundRGB>
+               <colorRGB length="3">
+                  <int>0</int>
+                  <int>0</int>
+                  <int>0</int>
+               </colorRGB>
+               <range class="de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig$CircleRange">
+                  <circleRadius>100</circleRadius>
+               </range>
+               <rangeType>Circle</rangeType>
+            </defaultConfig>
+            <nodeRanges/>
+         </parameters>
+      </plugin>
+   </defaults>
+</spyglassConfiguration>

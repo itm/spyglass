@@ -11,13 +11,13 @@ import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
  * 
  */
 public class PacketFactory {
-	
+
 	private Spyglass spyglass;
-	
+
 	public PacketFactory(final Spyglass spyglass) {
 		this.spyglass = spyglass;
 	}
-	
+
 	/**
 	 * Create a new SpyglassPacket from the given raw packet.
 	 * 
@@ -29,7 +29,7 @@ public class PacketFactory {
 	public SpyglassPacket createInstance(final byte[] data) throws SpyglassPacketException {
 		try {
 			final SyntaxTypes syntaxType = SyntaxTypes.toEnum(data[3]);
-			
+
 			SpyglassPacket packet = null;
 			switch (syntaxType) {
 				case ISENSE_SPYGLASS_PACKET_INT64:
@@ -57,17 +57,19 @@ public class PacketFactory {
 					packet = new VariableListPacket();
 					break;
 			}
-			
+
 			packet.deserialize(data);
 
 			fixPosition(packet);
-			
+
 			return packet;
-			
+
 		} catch (final IllegalArgumentException e) {
 			throw new SpyglassPacketException(e);
+		} catch (final ArrayIndexOutOfBoundsException e) {
+			throw new SpyglassPacketException(e);
 		}
-		
+
 	}
 
 	/**
@@ -80,20 +82,20 @@ public class PacketFactory {
 		pos.y += conf.getAbs2metricOffsetY();
 		pos.x *= conf.getAbs2metricFactorX();
 		pos.y *= conf.getAbs2metricFactorY();
-		
+
 		if (pos.x >= Math.pow(2, 15)) {
-			pos.x = (int) Math.pow(2, 15)-1;
+			pos.x = (int) Math.pow(2, 15) - 1;
 		}
 		if (pos.y >= Math.pow(2, 15)) {
-			pos.y = (int) Math.pow(2, 15)-1;
+			pos.y = (int) Math.pow(2, 15) - 1;
 		}
 		if (pos.x <= -Math.pow(2, 15)) {
-			pos.x = (int) -Math.pow(2, 15)+1;
+			pos.x = (int) -Math.pow(2, 15) + 1;
 		}
 		if (pos.y <= -Math.pow(2, 15)) {
-			pos.y = (int) -Math.pow(2, 15)+1;
+			pos.y = (int) -Math.pow(2, 15) + 1;
 		}
-		
+
 		packet.setPosition(pos);
 	}
 }
