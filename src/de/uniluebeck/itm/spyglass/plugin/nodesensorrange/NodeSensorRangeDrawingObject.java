@@ -158,6 +158,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		final Color oldForeground = gc.getForeground();
 		final Color oldBackground = gc.getBackground();
 		final int oldLineWidth = gc.getLineWidth();
+		final boolean advancedSubsystem = gc.getAdvanced();
 
 		// set colors and so
 		gc.setForeground(foreground);
@@ -180,6 +181,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		gc.setTransform(oldTransform);
 		gc.setForeground(oldForeground);
 		gc.setBackground(oldBackground);
+		gc.setAdvanced(advancedSubsystem);
 
 		// dispose OS resources
 		oldTransform.dispose();
@@ -221,6 +223,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		final Color oldForeground = gc.getForeground();
 		final Color oldBackground = gc.getBackground();
 		final int oldLineWidth = gc.getLineWidth();
+		final boolean advancedSubsystem = gc.getAdvanced();
 
 		// set colors and so
 		gc.setForeground(foreground);
@@ -249,6 +252,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		gc.setTransform(oldTransform);
 		gc.setForeground(oldForeground);
 		gc.setBackground(oldBackground);
+		gc.setAdvanced(advancedSubsystem);
 
 		// dispose OS resources
 		oldTransform.dispose();
@@ -288,6 +292,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		final Color oldForeground = gc.getForeground();
 		final Color oldBackground = gc.getBackground();
 		final int oldLineWidth = gc.getLineWidth();
+		final boolean advancedSubsystem = gc.getAdvanced();
 
 		// translate to the center of the rectangle
 		transform.translate(x + (width / 2), y + (height / 2));
@@ -310,6 +315,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		gc.setTransform(oldTransform);
 		gc.setForeground(oldForeground);
 		gc.setBackground(oldBackground);
+		gc.setAdvanced(advancedSubsystem);
 
 		// dispose used resources
 		oldTransform.dispose();

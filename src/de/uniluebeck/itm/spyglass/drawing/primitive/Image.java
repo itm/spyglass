@@ -46,6 +46,10 @@ public class Image extends DrawingObject {
 	@Override
 	public void draw(final DrawingArea drawingArea, final GC gc) {
 
+		// disable the advanced subsystem for performance reasons and to avoid strange drawing bugs.
+		final boolean advancedSubsystem = gc.getAdvanced();
+		gc.setAdvanced(false);
+
 		// Transform from Image coordinate system to absolute coordinate system
 		final AffineTransform transform = AffineTransform.getScaleInstance(imageSizeX/((double)image.getBounds().width), imageSizeY/((double)image.getBounds().height));
 		transform.preConcatenate(AffineTransform.getTranslateInstance(this.getPosition().x, this.getPosition().y));
@@ -92,17 +96,7 @@ public class Image extends DrawingObject {
 				imageDestArea.getWidth(),
 				imageDestArea.getHeight());
 
-		// Old drawing code. Has performance problems
-//		gc.drawImage(image,
-//				0,
-//				0,
-//				image.getBounds().width,
-//				image.getBounds().height,
-//				drawingArea.absRect2PixelRect(getBoundingBox()).getUpperLeft().x,
-//				drawingArea.absRect2PixelRect(getBoundingBox()).getUpperLeft().y,
-//				drawingArea.absRect2PixelRect(getBoundingBox()).getWidth(),
-//				drawingArea.absRect2PixelRect(getBoundingBox()).getHeight());
-
+		gc.setAdvanced(advancedSubsystem);
 
 	}
 
