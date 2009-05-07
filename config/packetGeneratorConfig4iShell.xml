@@ -167,7 +167,7 @@
 			<!-- VectorSequencePainter test case -->
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>demo sample7</name>
-				<probability>0.05</probability>
+				<probability>0.15</probability>
 				<nodeIDs>7</nodeIDs>
 				<syntaxType>int16List</syntaxType>
 				<semanticTypes>12</semanticTypes>
@@ -175,7 +175,7 @@
 				<payload>0000000003E8000003E803E8000003E800000000</payload>
 			</sample>
 			
-			<!-- ObjectPainter Testcase -->
+			<!-- ObjectPainter Testcase
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySample">
 				<name>trajectory</name>
 				<probability>0.1</probability>
@@ -198,7 +198,7 @@
 						<duration>XX</duration>
 					</section>
 				</sections>
-			</sample>
+			</sample> -->
 			
 			<!-- this is a raw sample. the bytes contained in this sample will be
 			 ! sent out as a packet, without adding a header or doing anything else.

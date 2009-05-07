@@ -1,5 +1,5 @@
 <spyglassConfiguration>
-   <packetReader class="de.uniluebeck.itm.spyglass.core.PacketRecorder">
+   <packetReader class="de.uniluebeck.itm.spyglass.io.SpyglassPacketRecorder">
       <delayMillies>1000</delayMillies>
    </packetReader>
    <instances>

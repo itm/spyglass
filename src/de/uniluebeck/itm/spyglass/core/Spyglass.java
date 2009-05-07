@@ -16,7 +16,8 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
-import de.uniluebeck.itm.spyglass.packet.PacketReader;
+import de.uniluebeck.itm.spyglass.io.PacketReader;
+import de.uniluebeck.itm.spyglass.io.PacketRecorder;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;

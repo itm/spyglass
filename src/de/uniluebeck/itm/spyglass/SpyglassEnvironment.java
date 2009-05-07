@@ -34,6 +34,7 @@ public class SpyglassEnvironment {
 	 */
 	private static final String PROPERTY_CONFIG_FILE_WORKING_DIR = "configfile_dir";
 	private static final String PROPERTY_CONFIG_FILE_IMAGE_DIR = "image_dir";
+	private static final String PROPERTY_CONFIG_RECORD_DIR = "record_dir";
 	private static final String PROPERTY_CONFIG_ISHELL = "configfile_ishell";
 	private static final String PROPERTY_CONFIG_STANDALONE = "configfile_standalone";
 	private static final String PROPERTY_CONFIG_STANDALONE_SIZE_X = "screensize_x";
@@ -93,6 +94,7 @@ public class SpyglassEnvironment {
 		props.setProperty(PROPERTY_CONFIG_STANDALONE, "config/DefaultSpyglassConfigStandalone.xml");
 		props.setProperty(PROPERTY_CONFIG_FILE_WORKING_DIR, "config/");
 		props.setProperty(PROPERTY_CONFIG_FILE_IMAGE_DIR, "image/");
+		props.setProperty(PROPERTY_CONFIG_RECORD_DIR, "record/");
 		props.setProperty(PROPERTY_CONFIG_STANDALONE_SIZE_X, "800");
 		props.setProperty(PROPERTY_CONFIG_STANDALONE_SIZE_Y, "600");
 		storeProps(props);
@@ -202,6 +204,23 @@ public class SpyglassEnvironment {
 	 */
 	public static void setImageWorkingDirectory(final String path) throws IOException {
 		props.setProperty(PROPERTY_CONFIG_FILE_IMAGE_DIR, path);
+
+		storeProps(props);
+	}
+
+	/**
+	 * The current working directory, which is displayed on file open dialogs for record files.
+	 */
+	public static String getDefalutRecordDirectory() {
+
+		return props.getProperty(PROPERTY_CONFIG_RECORD_DIR);
+	}
+
+	/**
+	 * Set the current working directory, which is displayed on file open dialogs for record files.
+	 */
+	public static void setDefalutRecordDirectory(final String path) throws IOException {
+		props.setProperty(PROPERTY_CONFIG_RECORD_DIR, path);
 
 		storeProps(props);
 	}

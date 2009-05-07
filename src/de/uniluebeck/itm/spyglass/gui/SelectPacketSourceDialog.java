@@ -38,14 +38,17 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
-import de.uniluebeck.itm.spyglass.core.PacketRecorder;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gateway.FileReaderGateway;
 import de.uniluebeck.itm.spyglass.gateway.Gateway;
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.BooleanInversionConverter;
-import de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketBroker;
-import de.uniluebeck.itm.spyglass.packet.PacketReader;
+import de.uniluebeck.itm.spyglass.io.GatewayPacketReader;
+import de.uniluebeck.itm.spyglass.io.PacketReader;
+import de.uniluebeck.itm.spyglass.io.PacketRecorder;
+import de.uniluebeck.itm.spyglass.io.SpyGlassPacketQueue;
+import de.uniluebeck.itm.spyglass.io.SpyglassPacketRecorder;
+import de.uniluebeck.itm.spyglass.io.PacketReader.SOURCE_TYPE;
 
 // --------------------------------------------------------------------------------
 /**
@@ -63,6 +66,7 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 	private Text textPath2File;
 	private Spyglass spyglass;
 	private MyValues myvalues;
+	private String defaultDir = SpyglassEnvironment.getDefalutRecordDirectory();
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -141,7 +145,7 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 			public void handleEvent(final Event event) {
 				final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
 				fd.setFilterExtensions(new String[] { "*.rec" });
-				fd.setFilterPath(new File("./record/").getAbsoluteFile().toString());
+				fd.setFilterPath(new File(defaultDir).getAbsoluteFile().toString());
 				final String path = fd.open();
 				if (path != null) {
 					textPath2File.setText(path);
@@ -152,7 +156,7 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 		// set up data-binding
 		{
 
-			myvalues.setUseIShell(!(spyglass.getPacketReader().isReadFromFile()));
+			myvalues.setUseIShell(!(spyglass.getPacketReader().getSourceType().equals(SOURCE_TYPE.FILE)));
 			final DataBindingContext dbc = new DataBindingContext(SWTObservables.getRealm(getParentShell().getDisplay()));
 
 			// binding of select button to use a file and text file with its path
@@ -207,7 +211,7 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 	 * Initializes the values of the labels etc. using the currently defined ones of the application
 	 */
 	private void initializeValues() {
-		myvalues.setUseIShell(!(spyglass.getPacketReader().isReadFromFile()));
+		myvalues.setUseIShell(!(spyglass.getPacketReader().getSourceType().equals(SOURCE_TYPE.FILE)));
 		if (myvalues.useIShell) {
 			buttonOpenFileDialog.setEnabled(false);
 			textPath2File.setEnabled(false);
@@ -215,11 +219,16 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 
 		buttoniShell.setSelection(myvalues.useIShell);
 		buttonFile.setSelection(!myvalues.useIShell);
-		final Gateway gw = spyglass.getPacketReader().getGateway();
-		if ((gw != null) && (gw instanceof FileReaderGateway)) {
-			if (((FileReaderGateway) gw).getFile() != null) {
-				textPath2File.setText(((FileReaderGateway) gw).getFile().getPath());
+		if (spyglass.getPacketReader() instanceof GatewayPacketReader) {
+			final Gateway gw = ((GatewayPacketReader) spyglass.getPacketReader()).getGateway();
+			if ((gw != null) && (gw instanceof FileReaderGateway)) {
+				if (((FileReaderGateway) gw).getFile() != null) {
+					textPath2File.setText(((FileReaderGateway) gw).getFile().getPath());
+				}
 			}
+		} else if (spyglass.getPacketReader() instanceof PacketRecorder) {
+			final File f = spyglass.getPacketRecorder().getPlayBackFile();
+			textPath2File.setText(f != null ? f.getPath() : "");
 		}
 	}
 
@@ -230,8 +239,8 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 	private void setIShell() {
 		PacketReader packetReader = spyglass.getPacketReader();
 
-		if ((packetReader == null) || !(packetReader instanceof IShellToSpyGlassPacketBroker)) {
-			packetReader = new PacketRecorder();
+		if ((packetReader == null) || !(packetReader instanceof SpyGlassPacketQueue)) {
+			packetReader = new SpyglassPacketRecorder();
 			spyglass.setPacketReader(packetReader);
 		}
 		if (packetReader instanceof PacketRecorder) {
@@ -249,12 +258,12 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 	 */
 	private boolean setFile(final String path) {
 		PacketReader packetReader = spyglass.getPacketReader();
-		boolean success = true;
+		final boolean success = true;
 
 		// if no packet reader is defined, create a packet recorder and make it the current packet
 		// reader
 		if (packetReader == null) {
-			packetReader = new PacketRecorder();
+			packetReader = new SpyglassPacketRecorder();
 			spyglass.setPacketReader(packetReader);
 		}
 
@@ -263,27 +272,28 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 			// if the packet reader is actually a packet recorder, use its method to set the
 			// playback file since the file will be checked for conflicts etc.
 			if (packetReader instanceof PacketRecorder) {
-				success = success && ((PacketRecorder) packetReader).setPlayBackFile(path);
+				return success && ((PacketRecorder) packetReader).setPlayBackFile(path);
 			}
 
 			// otherwise check if the reader's gateway is capable of processing files
-			else {
-				final Gateway gw = packetReader.getGateway();
-				// if not, create a new FileReaderGateway and set its file
+			if (packetReader instanceof GatewayPacketReader) {
+
+				final GatewayPacketReader gwPacketReader = ((GatewayPacketReader) packetReader);
+
+				Gateway gw = gwPacketReader.getGateway();
 				if ((gw == null) || (!(gw instanceof FileReaderGateway))) {
-					final FileReaderGateway frgw = new FileReaderGateway();
-					frgw.setFile(new File(path));
-					success = success && (frgw.getInputStream() != null);
-				} else {
-					// or just set its file
-					((FileReaderGateway) gw).setFile(new File(path));
-					success = success && (gw.getInputStream() != null);
+					gw = new FileReaderGateway();
+					gwPacketReader.setGateway(gw);
 				}
+
+				((FileReaderGateway) gw).setFile(new File(path));
+				return success && (gw.getInputStream() != null);
+
 			}
+
 		}
-		// return whether the file was set successfully and the packet reaeder's input stream is
-		// available
-		return success && (packetReader.getGateway().getInputStream() != null);
+
+		return false;
 	}
 
 	// --------------------------------------------------------------------------------

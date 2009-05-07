@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.core.SpyglassExceptionHandler;
 import de.uniluebeck.itm.spyglass.gui.UIController;
 import de.uniluebeck.itm.spyglass.gui.actions.ExitSpyglassAction;
 import de.uniluebeck.itm.spyglass.gui.actions.LoadConfigurationAction;
@@ -87,14 +88,7 @@ public class SpyglassApp extends ApplicationWindow {
 	public static void main(final String[] args) {
 
 		// Set an exception handler which will handle uncaught exceptions
-		Window.setExceptionHandler(new IExceptionHandler() {
-			// --------------------------------------------------------------------------------
-			@SuppressWarnings("synthetic-access")
-			@Override
-			public void handleException(final Throwable t) {
-				log.error("The application crashed!", t);
-			}
-		});
+		Window.setExceptionHandler(new SpyglassExceptionHandler());
 
 		// SWT stuff
 		final DeviceData data = new DeviceData();

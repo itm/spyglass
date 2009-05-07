@@ -15,14 +15,16 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.core.SpyglassExceptionHandler;
 import de.uniluebeck.itm.spyglass.gui.UIController;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
-import de.uniluebeck.itm.spyglass.packet.IShellToSpyGlassPacketBroker;
+import de.uniluebeck.itm.spyglass.io.SpyGlassPacketQueue;
 import de.uniluebeck.itm.spyglass.packet.PacketFactory;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
@@ -62,7 +64,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 
 	private UIController controller = null;
 
-	private IShellToSpyGlassPacketBroker packetBroker;
+	private SpyGlassPacketQueue packetBroker;
 
 	private AppWindow appWindow = null;
 
@@ -100,6 +102,9 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 
 			factory = new PacketFactory(spyglass);
 
+			// Set an exception handler which will handle uncaught exceptions
+			Window.setExceptionHandler(new SpyglassExceptionHandler());
+
 		} catch (final Exception e) {
 			log.error("Could not initialize plugin \"Spyglass\" because of an very early error.", e);
 
@@ -115,22 +120,31 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 
 	}
 
-	private void connectPacketBroker() {
-		// save the packet broker for later
+	private void connectPacketBroker() throws ClassCastException {
 
-		// XXX: can we really assume this cast?
-		// according to the new structure and to the method's name - yes, we can!?!
-		packetBroker = (IShellToSpyGlassPacketBroker) spyglass.getPacketReader();
+		final String noBroker = "Even so Spyglass is used as iShell plug-in, packets provided by iShell"
+				+ " cannot be used since the currently active Packet reader is not capable of receiving packets from iShell.";
+		if (spyglass.getPacketReader() instanceof SpyGlassPacketQueue) {
 
-		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
-			@SuppressWarnings("synthetic-access")
-			@Override
-			public void propertyChange(final PropertyChangeEvent evt) {
-				if (evt.getPropertyName().equals("packetReader")) {
-					packetBroker = (IShellToSpyGlassPacketBroker) spyglass.getConfigStore().getSpyglassConfig().getPacketReader();
+			packetBroker = (SpyGlassPacketQueue) spyglass.getPacketReader();
+
+			spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(new PropertyChangeListener() {
+				@SuppressWarnings("synthetic-access")
+				@Override
+				public void propertyChange(final PropertyChangeEvent evt) {
+					if (evt.getPropertyName().equals("packetReader")) {
+						if ((spyglass.getPacketReader() instanceof SpyGlassPacketQueue)) {
+							packetBroker = (SpyGlassPacketQueue) spyglass.getConfigStore().getSpyglassConfig().getPacketReader();
+						} else {
+							log.warn(noBroker);
+						}
+					}
 				}
-			}
-		});
+			});
+		} else {
+			log.warn(noBroker);
+		}
+
 	}
 
 	// --------------------------------------------------------------------------
@@ -152,7 +166,11 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			log.debug("Received Packet in Spyglass from iShell: " + spyglassPacket);
 		}
 
-		packetBroker.push(spyglassPacket);
+		if (packetBroker != null) {
+			packetBroker.push(spyglassPacket);
+		} else {
+			log.error("The packet provided by iShell was droped since no packet broker is available!");
+		}
 
 	}
 
@@ -187,7 +205,9 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		}
 
 		try {
-			packetBroker.shutdown();
+			if (packetBroker != null) {
+				packetBroker.shutdown();
+			}
 		} catch (final IOException e) {
 			// since the application is about to exit, there is no need to display this exception
 			((SpyglassLogger) log).error("An error occured while trying to shut down the packet broker.", e, false);

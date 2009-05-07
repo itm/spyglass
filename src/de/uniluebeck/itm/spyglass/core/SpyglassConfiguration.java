@@ -16,7 +16,8 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
-import de.uniluebeck.itm.spyglass.packet.PacketReader;
+import de.uniluebeck.itm.spyglass.io.PacketReader;
+import de.uniluebeck.itm.spyglass.io.SpyglassPacketRecorder;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
@@ -40,7 +41,7 @@ public class SpyglassConfiguration extends XMLConfig {
 	 * Must be declared volatile since it can be replaced at runtime.
 	 */
 	@Element(name = "packetReader")
-	private volatile PacketReader packetReader = new PacketRecorder();
+	private volatile PacketReader packetReader = new SpyglassPacketRecorder();
 
 	/**
 	 * The one and only plug-in manager

@@ -5,8 +5,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
 
-import de.uniluebeck.itm.spyglass.core.PacketRecorder;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.io.PacketRecorder;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class RecordRecordAction extends Action {

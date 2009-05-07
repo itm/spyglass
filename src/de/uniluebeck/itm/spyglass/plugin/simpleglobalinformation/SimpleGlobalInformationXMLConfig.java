@@ -8,6 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
+import java.beans.PropertyChangeEvent;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -27,19 +28,39 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
+	/**
+	 * Name of a {@link PropertyChangeEvent} which is fired whenever any statistical information
+	 * evaluator is added, deleted or changed.<br>
+	 * The event is fired whenever the call of
+	 * {@link SimpleGlobalInformationXMLConfig#setStatisticalInformationEvaluators(Set)} yields a
+	 * change
+	 */
 	public static final String PROPERTYNAME_STATISTICAL_INFORMATION_EVALUATORS = "statisticalInformationEvaluators";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link SimpleGlobalInformationXMLConfig#setShowNumNodes(boolean)} yields a change
+	 */
 	public static final String PROPERTYNAME_SHOW_NUM_NODES = "showNumNodes";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link SimpleGlobalInformationXMLConfig#setShowNodeDegree(boolean)} yields a change
+	 */
 	public static final String PROPERTYNAME_SHOW_NODE_DEGREE = "showNodeDegree";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link SimpleGlobalInformationXMLConfig#setSemanticTypes4Neighborhoods(int[])} yields a
+	 * change
+	 */
 	public static final String PROPERTYNAME_SEMANTIC_TYPES4_NEIGHBORHOODS = "semanticTypes4Neighborhoods";
 
 	@ElementArray(required = false)
-	private int[] semanticTypes4Neighborhoods;
+	private int[] semanticTypes4Neighborhoods = { -1 };
 
 	@Element(required = false)
-	private boolean showNodeDegree = true;
+	private boolean showNodeDegree = false;
 
 	@Element(required = false)
 	private boolean showNumNodes = true;
@@ -49,6 +70,8 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
 	// --------------------------------------------------------------------------------
 	/**
+	 * Returns the semantic types of packages which provide information about neighborhood relations
+	 * 
 	 * @return the semanticTypes4Neighborhoods
 	 */
 	public synchronized int[] getSemanticTypes4Neighborhoods() {
@@ -60,7 +83,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 * Sets the semantic types of packages which provide information about neighborhood relations.
 	 * 
 	 * @param semanticTypes4Neighborhoods
-	 *            tSets the semantic types of packages which provide information about neighborhood
+	 *            the semantic types of packages which provide information about neighborhood
 	 *            relations.
 	 */
 	public synchronized void setSemanticTypes4Neighborhoods(final int[] semanticTypes4Neighborhoods) {
@@ -70,7 +93,10 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the showNodeDegree
+	 * Returns whether the average node degree is to be shown
+	 * 
+	 * @return <code>true</code>if the average node degree is to be shown, <code>false</code>
+	 *         otherwise
 	 */
 	public synchronized boolean isShowNodeDegree() {
 		return showNodeDegree;
@@ -78,17 +104,20 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
 	// --------------------------------------------------------------------------------
 	/**
+	 * Sets whether the average node degree is to be shown
+	 * 
 	 * @param showNodeDegree
-	 *            the showNodeDegree to set
+	 *            indicates whether the average node degree is to be shown
 	 */
 	public synchronized void setShowNodeDegree(final boolean showNodeDegree) {
-
 		firePropertyChange(PROPERTYNAME_SHOW_NODE_DEGREE, this.showNodeDegree, this.showNodeDegree = showNodeDegree);
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the showNumNodes
+	 * Returns whether the number of nodes is to be shown
+	 * 
+	 * @return <code>true</code>if the number of nodes is to be shown, <code>false</code> otherwise
 	 */
 	public synchronized boolean isShowNumNodes() {
 		return showNumNodes;
@@ -96,8 +125,11 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
 	// --------------------------------------------------------------------------------
 	/**
+	 * Sets whether the number of nodes is to be shown
+	 * 
 	 * @param showNumNodes
-	 *            the showNumNodes to set
+	 *            <code>true</code>if the number of nodes is to be shown, <code>false</code>
+	 *            otherwise
 	 */
 	public synchronized void setShowNumNodes(final boolean showNumNodes) {
 		firePropertyChange(PROPERTYNAME_SHOW_NUM_NODES, this.showNumNodes, this.showNumNodes = showNumNodes);
@@ -105,8 +137,11 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
 	// --------------------------------------------------------------------------------
 	/**
+	 * Returns an object which evaluates statistical information related to a certain semantic type
+	 * 
 	 * @param semanticType
-	 * @return the statisticalInformationEvaluators
+	 *            the semantic type related to the statistical information
+	 * @return the object which evaluates statistical information related to a certain semantic type
 	 */
 	public synchronized StatisticalInformationEvaluator getStatisticalInformationEvaluators4Type(final int semanticType) {
 		for (final StatisticalInformationEvaluator sfs : statisticalInformationEvaluators) {
@@ -119,7 +154,9 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return the statisticalInformationEvaluators
+	 * Returns a set of objects which are configured to evaluate statistical information
+	 * 
+	 * @return a set of objects which are configured to evaluate statistical information
 	 */
 	public synchronized Set<StatisticalInformationEvaluator> getStatisticalInformationEvaluators() {
 		return statisticalInformationEvaluators;
@@ -127,8 +164,10 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
 	// --------------------------------------------------------------------------------
 	/**
+	 * Sets a set of objects which are configured to evaluate statistical information
+	 * 
 	 * @param statisticalInformationEvaluators
-	 *            the statisticalInformationEvaluators to set
+	 *            a set of objects which are configured to evaluate statistical information
 	 */
 	public synchronized void setStatisticalInformationEvaluators(final Set<StatisticalInformationEvaluator> statisticalInformationEvaluators) {
 		// these extensive operations are necessary to prevent dependencies when creating new

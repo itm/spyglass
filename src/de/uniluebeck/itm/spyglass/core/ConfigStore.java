@@ -24,7 +24,8 @@ import org.simpleframework.xml.load.Persister;
 
 import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
-import de.uniluebeck.itm.spyglass.packet.PacketReader;
+import de.uniluebeck.itm.spyglass.io.PacketReader;
+import de.uniluebeck.itm.spyglass.io.PacketRecorder;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginFactory;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;

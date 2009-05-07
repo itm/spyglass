@@ -1,8 +1,5 @@
 <spyglassConfiguration>
-   <packetReader class="de.uniluebeck.itm.spyglass.core.PacketRecorder">
-      <gateway class="de.uniluebeck.itm.spyglass.gateway.FileReaderGateway">
-         <file>/home/sebers/DATEN_D/usbstick/Daten/Batten/Uni/Master/FleGSenS/Workspace/SpyglassPure/record/Namenloser Ordner/objectPainterSample.rec</file>
-      </gateway>
+   <packetReader class="de.uniluebeck.itm.spyglass.io.SpyglassPacketRecorder">
       <delayMillies>0</delayMillies>
    </packetReader>
    <instances>
