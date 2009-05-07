@@ -8,6 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -158,7 +159,12 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 
 	@Override
 	protected void resetPlugin() {
-		data.clear();
+		final Collection<NodeSensorRangeDrawingObject> drawingObjects = data.clear();
+		for (final DrawingObject drawingObject : drawingObjects) {
+			if (drawingObject.getState().equals(DrawingObject.State.ALIVE)) {
+				fireDrawingObjectRemoved(drawingObject);
+			}
+		}
 	}
 
 }

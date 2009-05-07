@@ -4,7 +4,9 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
+import java.util.Collection;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -44,9 +46,12 @@ public class Data {
 
 	}
 
-	public synchronized void clear() {
+	public synchronized Collection<NodeSensorRangeDrawingObject> clear() {
+		final Collection<NodeSensorRangeDrawingObject> drawingObjects = new LinkedList<NodeSensorRangeDrawingObject>();
+		drawingObjects.addAll(dos.values());
 		layer.clear();
 		dos.clear();
+		return drawingObjects;
 	}
 
 	// --------------------------------------------------------------------------------
