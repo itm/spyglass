@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.events.MouseAdapter;
@@ -28,6 +29,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import de.uniluebeck.itm.spyglass.core.EventDispatcher;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -36,6 +38,7 @@ import de.uniluebeck.itm.spyglass.drawing.BoundingBoxIsDirtyListener;
 import de.uniluebeck.itm.spyglass.drawing.ContentChangedListener;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject.State;
+import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.gui.view.RulerArea;
@@ -64,8 +67,14 @@ public class UIController {
 
 	private final static boolean ENABLE_DRAW_PROFILING = true;
 
-	/** Number of milliseconds to wait between checking for new boundingBox changes */
-	private final static int REDRAW_PERIOD = 100;
+	/** Counts the number of open preference dialogs */
+	private static final AtomicInteger openPrefDialogs = new AtomicInteger(0);
+
+	/** Default number of milliseconds to wait between checking for new boundingBox changes */
+	private static final int DEFAULT_REDRAW_PERIOD = 100;
+
+	/** Current number of milliseconds to wait between checking for new boundingBox changes */
+	private static int currentRedrawPeriod = DEFAULT_REDRAW_PERIOD;
 
 	private AppWindow appWindow = null;
 
@@ -184,13 +193,13 @@ public class UIController {
 
 		spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().addPropertyChangeListener(rulerPropertyListener);
 
-		display.timerExec(REDRAW_PERIOD, new Runnable() {
+		display.timerExec(currentRedrawPeriod, new Runnable() {
 
 			@SuppressWarnings("synthetic-access")
 			@Override
 			public void run() {
 				updateBoundingBoxes();
-				display.timerExec(REDRAW_PERIOD, this);
+				display.timerExec(currentRedrawPeriod, this);
 			}
 
 		});
@@ -655,5 +664,26 @@ public class UIController {
 
 		}
 	};
+
+	// ----------------------------------------------------------------
+	/**
+	 * Opens a non-modal dialog window to change the preferences.<br>
+	 * Note that the drawing area' frames per second will be decreased for convenient configuration
+	 * as long as at least one preference dialog is open.
+	 * 
+	 * @param parentShell
+	 *            the parent shell
+	 * @param spyglass
+	 *            the application's main class
+	 */
+	public static void openPreferencesDialog(final Shell parentShell, final Spyglass spyglass) {
+		if (openPrefDialogs.getAndIncrement() == 0) {
+			UIController.currentRedrawPeriod = 200;
+		}
+		new PluginPreferenceDialog(parentShell, spyglass).open();
+		if (openPrefDialogs.decrementAndGet() == 0) {
+			UIController.currentRedrawPeriod = UIController.DEFAULT_REDRAW_PERIOD;
+		}
+	}
 
 }
