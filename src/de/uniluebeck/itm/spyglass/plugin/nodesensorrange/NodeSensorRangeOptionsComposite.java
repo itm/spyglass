@@ -101,9 +101,9 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 				config.setRange(isCircle ? new CircleRange() : isCone ? new ConeRange() : new RectangleRange());
 
+			} else {
+				throw new RuntimeException("Unexpected case.");
 			}
-
-			throw new RuntimeException("Unexpected case.");
 
 		}
 

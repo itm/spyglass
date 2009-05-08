@@ -7,6 +7,7 @@ package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -18,20 +19,23 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.CircleRange;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.ConeRange;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.Config;
+import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.NodeSensorRange;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.RectangleRange;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
  * Flag class for DrawingObjects painted by NodeSensorRangePlugin
- *
+ * 
  * @author bimschas
  */
 public class NodeSensorRangeDrawingObject extends DrawingObject implements PropertyChangeListener {
 
+	private static final Logger log = SpyglassLoggerFactory.getLogger(NodeSensorRangeDrawingObject.class);
 	private NodeSensorRangePlugin plugin;
 
 	public NodeSensorRangeDrawingObject(final NodeSensorRangePlugin plugin, final Config config) {
@@ -41,9 +45,6 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		this.plugin = plugin;
 		this.config = config;
 		this.config.addPropertyChangeListener(this);
-
-		this.rangeType = config.getRange() instanceof RectangleRange ? RangeType.RECTANGLE
-				: config.getRange() instanceof CircleRange ? RangeType.CIRCLE : RangeType.CONE;
 
 		int[] color;
 		color = config.getBackgroundRGB();
@@ -59,12 +60,13 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 
 	private Config config;
 
-	private RangeType rangeType;
-
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 
 		final AbsoluteRectangle box = new AbsoluteRectangle();
+		final NodeSensorRange range = config.getRange();
+		final RangeType rangeType = range instanceof RectangleRange ? RangeType.RECTANGLE : range instanceof CircleRange ? RangeType.CIRCLE
+				: RangeType.CONE;
 
 		switch (rangeType) {
 
@@ -108,10 +110,14 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		final int width;
 		final int height;
 
+		final NodeSensorRange range = config.getRange();
+		final RangeType rangeType = range instanceof RectangleRange ? RangeType.RECTANGLE : range instanceof CircleRange ? RangeType.CIRCLE
+				: RangeType.CONE;
+
 		switch (rangeType) {
 
 			case CIRCLE:
-				radius = ((CircleRange) config.getRange()).getCircleRadius();
+				radius = ((CircleRange) range).getCircleRadius();
 				// calculate the real size of the bounding box
 				absRect = new AbsoluteRectangle(getPosition(), radius * 2, radius * 2);
 				pxRect = drawingArea.absRect2PixelRect(absRect);
@@ -120,7 +126,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 				break;
 
 			case CONE:
-				radius = ((ConeRange) config.getRange()).getConeRadius();
+				radius = ((ConeRange) range).getConeRadius();
 				absRect = new AbsoluteRectangle(getPosition(), radius * 2, radius * 2);
 				pxRect = drawingArea.absRect2PixelRect(absRect);
 				pxPos = pxRect.getUpperLeft();
@@ -128,8 +134,8 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 				break;
 
 			case RECTANGLE:
-				width = ((RectangleRange) config.getRange()).getRectangleWidth();
-				height = ((RectangleRange) config.getRange()).getRectangleHeight();
+				width = ((RectangleRange) range).getRectangleWidth();
+				height = ((RectangleRange) range).getRectangleHeight();
 				absRect = new AbsoluteRectangle(new AbsolutePosition(getPosition().x - (width / 2), getPosition().y - (height / 2)), width, height);
 				pxRect = drawingArea.absRect2PixelRect(absRect);
 				pxPos = pxRect.getUpperLeft();
@@ -193,8 +199,8 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 
 	// --------------------------------------------------------------------------------
 	/**
-	 *
-	 *
+	 * 
+	 * 
 	 * @param gc
 	 * @param x
 	 *            in pixel coordinates
@@ -341,8 +347,6 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		final boolean isForeground = NodeSensorRangeXMLConfig.PROPERTYNAME_COLOR_R_G_B.equals(e.getPropertyName());
 
 		if (isRange) {
-			rangeType = e.getNewValue() instanceof RectangleRange ? RangeType.RECTANGLE : e.getNewValue() instanceof CircleRange ? RangeType.CIRCLE
-					: RangeType.CONE;
 			markBoundingBoxDirty();
 		} else if (isBackground) {
 			final int[] color = (int[]) e.getNewValue();
