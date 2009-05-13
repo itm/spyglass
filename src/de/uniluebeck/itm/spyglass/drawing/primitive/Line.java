@@ -33,11 +33,17 @@ public class Line extends DrawingObject implements TransformChangedListener {
 
 	private int lineWidth = 1;
 
+	protected boolean currentClippingSaysDrawIt;
+
+	protected Point currentStartPoint;
+
+	protected Point currentEndPoint;
+
 	public Line() {
 		super();
 	}
 
-	private static class Point {
+	static class Point {
 
 		double x, y;
 
@@ -133,12 +139,17 @@ public class Line extends DrawingObject implements TransformChangedListener {
 		final PixelPosition start = drawingArea.absPoint2PixelPoint(this.getPosition());
 		final PixelPosition end = drawingArea.absPoint2PixelPoint(this.getEnd());
 
-		final Point startPoint = new Point(start.x, start.y);
-		final Point endPoint = new Point(end.x, end.y);
+		// set protected class variables so that extending classes don't have to calculate the
+		// points once again
+		currentStartPoint = new Point(start.x, start.y);
+		currentEndPoint = new Point(end.x, end.y);
 
-		if (cohenSutherlandClip(startPoint, endPoint, gc.getClipping())) {
+		// set protected class variable so that extending classes can read if to draw
+		currentClippingSaysDrawIt = cohenSutherlandClip(currentStartPoint, currentEndPoint, gc.getClipping());
 
-			gc.drawLine((int) startPoint.x, (int) startPoint.y, (int) endPoint.x, (int) endPoint.y);
+		if (currentClippingSaysDrawIt) {
+
+			gc.drawLine((int) currentStartPoint.x, (int) currentStartPoint.y, (int) currentEndPoint.x, (int) currentEndPoint.y);
 
 		}
 
@@ -207,6 +218,5 @@ public class Line extends DrawingObject implements TransformChangedListener {
 		super.init(drawingArea);
 		getDrawingArea().addDrawingAreaTransformListener(this);
 	}
-
 
 }

@@ -74,6 +74,10 @@ public class LinePainterOptionsComposite extends Composite {
 			group.setText("Display");
 
 			{
+				// ------------------------------------
+				// line width
+				// ------------------------------------
+
 				label = new Label(group, SWT.NONE);
 				label.setText("Line Width");
 
@@ -84,6 +88,10 @@ public class LinePainterOptionsComposite extends Composite {
 				lineWidth = new Text(group, SWT.BORDER);
 				lineWidth.setLayoutData(data);
 
+				// ------------------------------------
+				// line color
+				// ------------------------------------
+
 				label = new Label(group, SWT.NONE);
 				label.setText("Line Color");
 
@@ -93,6 +101,10 @@ public class LinePainterOptionsComposite extends Composite {
 
 				lineColor = new CLabel(group, SWT.BORDER);
 				lineColor.setLayoutData(data);
+
+				// ------------------------------------
+				// line color
+				// ------------------------------------
 
 				data = new GridData();
 
@@ -111,6 +123,10 @@ public class LinePainterOptionsComposite extends Composite {
 						}
 					}
 				});
+
+				// ------------------------------------
+				// time to live
+				// ------------------------------------
 
 				label = new Label(group, SWT.NONE);
 				label.setText("Time To Live");
