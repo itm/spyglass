@@ -98,15 +98,34 @@ public class PluginManager {
 		// availablePluginsTypes.add(TemplatePlugin.class);
 	}
 
+	/**
+	 * Constructor for SimpleXML
+	 * @throws Exception
+	 */
+	public PluginManager() {
+		initPlugins();
+
+		// Create default node positioner (we must have one at all times!)
+		try {
+			createNewPlugin(PositionPacketNodePositionerPlugin.class, null);
+		} catch (final Exception e) {
+			throw new RuntimeException("Could not create default node positioner plugin. Smells like a bug...");
+		}
+	}
+
 	// --------------------------------------------------------------------------
 	/**
 	 * This method is called after the deserialization of this instance has finished.
 	 *
-	 * it wraps the deserialized plugin list into a synchrozied collection.
+	 * First it wraps the deserialized plugin list into a synchrozied collection.
+	 * Then it initializes the pluginManager.
 	 */
 	@Commit
 	protected void commit() {
 		this.plugins = Collections.synchronizedList(pluginsInternal);
+
+		// initialize the new list of plugins
+		initPlugins();
 	}
 
 	// --------------------------------------------------------------------------
@@ -278,10 +297,8 @@ public class PluginManager {
 	 *
 	 * This method is called after the PluginManager got instantiated by the XML Deserializer
 	 */
-	public void init() {
+	private void initPlugins() {
 
-		// This is a workaround, since simple-xml does not call the setPlugins()
-		// method
 		synchronized (plugins) {
 			final Iterator<Plugin> it = plugins.iterator();
 			while(it.hasNext()) {
@@ -294,6 +311,7 @@ public class PluginManager {
 				}
 			}
 		}
+
 		log.debug("All plug-ins loaded and connected");
 	}
 
@@ -311,7 +329,6 @@ public class PluginManager {
 		if (plugin instanceof NodePositionerPlugin) {
 			plugin.getXMLConfig().addPropertyChangeListener("active", new PropertyChangeListener() {
 
-				@SuppressWarnings("synthetic-access")
 				@Override
 				public void propertyChange(final PropertyChangeEvent evt) {
 					final Boolean activeOld = (Boolean) evt.getOldValue();
@@ -366,7 +383,7 @@ public class PluginManager {
 	/**
 	 * Enable another NodePositioner, if the active one got disabled or deleted.
 	 */
-	private void findNewNodePositioner() {
+	protected void findNewNodePositioner() {
 		log.debug("Finding a new node positioner");
 
 		final ArrayList<Plugin> nodePositioner = new ArrayList<Plugin>();
@@ -396,7 +413,7 @@ public class PluginManager {
 	/**
 	 * Disable all NodePositioner plug-ins except the given one.
 	 */
-	private void newNodePositioner(final Plugin plugin) {
+	protected void newNodePositioner(final Plugin plugin) {
 		log.debug("Disabling old node positioner; new one is " + plugin);
 
 		synchronized (plugins) {
@@ -735,7 +752,7 @@ public class PluginManager {
 	 * @param what
 	 *            the reason
 	 */
-	private void firePluginListChangedEvent(final Plugin p, final ListChangeEvent what) {
+	protected void firePluginListChangedEvent(final Plugin p, final ListChangeEvent what) {
 
 		final PluginListChangeListener[] list = this.listeners.getListeners(PluginListChangeListener.class);
 

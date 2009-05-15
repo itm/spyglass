@@ -15,8 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Serializer;
@@ -30,7 +28,6 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginFactory;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
-import de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
@@ -39,21 +36,21 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * Instances of this class are used to load and store the spyglass configuration from and into the
  * local file system, respectively.<br>
  * Additionally, configuration parameters can be loaded and stored partially.
- * 
+ *
  * @author Sebastian Ebers
  * @author Dariush Forouher
- * 
+ *
  */
 public class ConfigStore extends PropertyBean {
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * Thread, which is responsible for storing into the default config file.
-	 * 
+	 *
 	 * @author Dariush Forouher
-	 * 
+	 *
 	 */
-	private final class AsyncStoreRunnable implements Runnable {
+	protected final class AsyncStoreRunnable implements Runnable {
 
 		@Override
 		public void run() {
@@ -92,15 +89,15 @@ public class ConfigStore extends PropertyBean {
 	}
 
 	/** An object which is used for logging errors and other events */
-	private static Logger log = SpyglassLoggerFactory.getLogger(ConfigStore.class);
+	protected static Logger log = SpyglassLoggerFactory.getLogger(ConfigStore.class);
 
 	/** Current instance of a SpyGlass configuration object */
 	private final SpyglassConfiguration spyglassConfig;
 
 	/** true, if the config should be written to file. */
-	private volatile boolean storePending = false;
+	protected volatile boolean storePending = false;
 
-	private final Object storePendingMutex = new Object();
+	protected final Object storePendingMutex = new Object();
 
 	/** Thread for async stores */
 	private final Thread storeThread = new Thread(new AsyncStoreRunnable(), "ConfigStore-Thread");
@@ -146,9 +143,9 @@ public class ConfigStore extends PropertyBean {
 	/**
 	 * Reads the configuration from an hard-coded standard-path (which is stored internally in this
 	 * class)
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public ConfigStore() throws Exception {
 		final File f = SpyglassEnvironment.getConfigFilePath();
@@ -190,7 +187,7 @@ public class ConfigStore extends PropertyBean {
 		// create a new config, if none exists
 		if (newConfig == null) {
 
-			newConfig = createDefaultSpyglassConfig();
+			newConfig = new SpyglassConfiguration();
 
 			store();
 		}
@@ -228,27 +225,6 @@ public class ConfigStore extends PropertyBean {
 		}
 	}
 
-	/**
-	 * Create a Spyglass Configuration with default values and one PostionPacketNodePositioner as
-	 * the only plugin.
-	 * 
-	 * @throws Exception
-	 */
-	private static SpyglassConfiguration createDefaultSpyglassConfig() throws Exception {
-		SpyglassConfiguration newConfig;
-		newConfig = new SpyglassConfiguration();
-		final Collection<Plugin> defaultPlugins = new HashSet<Plugin>();
-		newConfig.getPluginManager();
-		for (final Class<? extends Plugin> p : PluginManager.getAvailablePluginTypes()) {
-			defaultPlugins.add(PluginFactory.createDefaultInstance(p));
-		}
-		newConfig.setDefaultPlugins(defaultPlugins);
-
-		// Create node positioner
-		newConfig.getPluginManager().createNewPlugin(PositionPacketNodePositionerPlugin.class, null);
-		return newConfig;
-	}
-
 	// --------------------------------------------------------------------------
 	/**
 	 * @return the spyglassConfig
@@ -260,9 +236,9 @@ public class ConfigStore extends PropertyBean {
 	// --------------------------------------------------------------------------
 	/**
 	 * Overwrites the current config with the one inside the given file.
-	 * 
+	 *
 	 * @throws Exception
-	 * 
+	 *
 	 */
 	public void importConfig(final File file) throws Exception {
 		if (spyglassConfig == null) {
@@ -307,7 +283,7 @@ public class ConfigStore extends PropertyBean {
 
 	/**
 	 * Exports the config into the given file
-	 * 
+	 *
 	 * Note: Do this synchronized, since users generally don't mind waiting on this occasions (lots
 	 * of programs hang when saving their files after explicitly been commanded by the user).
 	 */
@@ -318,7 +294,7 @@ public class ConfigStore extends PropertyBean {
 	// --------------------------------------------------------------------------
 	/**
 	 * Loads and returns the configuration from a file
-	 * 
+	 *
 	 * @param configFile
 	 *            the file containing the configuration data
 	 * @returns a valid SpyglassConfiguration
@@ -335,7 +311,6 @@ public class ConfigStore extends PropertyBean {
 		final Serializer serializer = new Persister();
 		final SpyglassConfiguration config = serializer.read(SpyglassConfiguration.class, configFile);
 
-		config.getPluginManager();
 		// if there is a default config missing, add it
 		for (final Class<? extends Plugin> clazz : PluginManager.getAvailablePluginTypes()) {
 			if (config.getDefaultConfig(clazz) == null) {
@@ -350,7 +325,7 @@ public class ConfigStore extends PropertyBean {
 
 	/**
 	 * Store the config into the system-given file.
-	 * 
+	 *
 	 * Stores the configuration in an extra {@link Thread} to improve the performance.<br>
 	 * The storing operation will be delayed for one second. Every call received within this second
 	 * will be ignored.
@@ -366,13 +341,13 @@ public class ConfigStore extends PropertyBean {
 
 	/**
 	 * Stores the configuration persistently into the given file.
-	 * 
+	 *
 	 * This method is synchronized to avoid storing into the same file concurrently.
-	 * 
+	 *
 	 * @param configFile
 	 *            the file which will contain the configuration data afterwards
 	 */
-	private synchronized void storeSync(final File configFile) {
+	protected synchronized void storeSync(final File configFile) {
 
 		log.debug("Storing config to file: " + configFile);
 
@@ -402,9 +377,9 @@ public class ConfigStore extends PropertyBean {
 	/**
 	 * Notify the ConfigStore that Spyglass is shutting down and thus we should not accept any mre
 	 * store requests.
-	 * 
+	 *
 	 * This method blocks until async-store thread has died.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             if the excecuting thread is interrupted while this method is called.
 	 */
