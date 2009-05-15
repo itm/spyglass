@@ -87,7 +87,9 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 						updateToolTip(status, c);
 					}
 				} else {
-					log.warn(status.getMessage(), status.getException());
+					if (!status.isOK()) {
+						log.warn(status.getMessage(), status.getException());
+					}
 				}
 			}
 
