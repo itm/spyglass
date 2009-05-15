@@ -48,13 +48,6 @@ public class EventDispatcher {
 	}
 
 	// --------------------------------------------------------------------------------
-	@Override
-	public void finalize() {
-		pluginManager = null;
-		drawingArea = null;
-	}
-
-	// --------------------------------------------------------------------------------
 	/**
 	 * Forwards a event to the first plug-in which can handle it.
 	 * 

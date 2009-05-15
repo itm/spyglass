@@ -35,7 +35,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * dispatcher's thread to go on. The plug-in's packet handling thread is automatically notified
  * about the arrival and starts processing the packet. Since this occurs in a thread separated from
  * the main thread a slow plug in does not slow down the whole application.
- * 
+ *
  * @author Sebastian Ebers
  * @author Dariush Forouher
  */
@@ -99,7 +99,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * will be started when the plug-in is activated and stopped when the plug-in is deactivated.<br>
 	 * When a new plug-in is created, the Method {@link Plugin#init(PluginManager)} has to be called
 	 * which is usually done in the {@link PluginManager} when the plug-in is added to the list.
-	 * 
+	 *
 	 * @param needsPacketQueue
 	 *            indicates whether or not the plug-in has to administer a packet queue
 	 */
@@ -136,7 +136,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * This method handles a Packet object. Usually, a plug-in creates a new DrawingObject for each
 	 * packet it handles.<br>
 	 * <b>Note:</b> Nothing is done here if the plug-in is currently deactivated.
-	 * 
+	 *
 	 * @param packet
 	 *            The packet object to handle.
 	 * @throws InterruptedException
@@ -168,7 +168,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the name of the plug-in instance
-	 * 
+	 *
 	 * @return the name of the plug-in instance
 	 */
 	public final String getInstanceName() {
@@ -178,7 +178,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns if the plug-in is currently active
-	 * 
+	 *
 	 * @return <tt>true</tt> if the plug-in is currently active
 	 */
 	public final boolean isActive() {
@@ -209,7 +209,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the plug-in's activation state
-	 * 
+	 *
 	 * @param isActive
 	 *            indicates the plug-in's activation state
 	 */
@@ -221,13 +221,13 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	/**
 	 * Initializes the plug-in. It is called right after the plug-in has been instantiated and the
 	 * configuration of the plug-in is set.
-	 * 
+	 *
 	 * This methods starts the consumer thread, if necessary.
-	 * 
+	 *
 	 * @param manager
 	 *            reference to the parent PluginManager
 	 * @throws Exception
-	 * 
+	 *
 	 * @see PluginXMLConfig#getActive()
 	 */
 	public void init(final PluginManager manager) throws Exception {
@@ -302,13 +302,13 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Creates and returns a widget which can be used to configure the plug-in
-	 * 
+	 *
 	 * @param dialog
 	 *            the <code>PluginPreferenceDialog</code> instance the preference page is displayed
 	 *            in
 	 * @param spyglass
 	 *            the <code>Spyglass</code> instance
-	 * 
+	 *
 	 * @return a widget which can be used to configure the plug-in
 	 * @throws Exception
 	 *             an exception when the page could not be created. this will result in a
@@ -320,9 +320,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the plug-in's denotation in a human readable style
-	 * 
+	 *
 	 * @return the plug-in's denotation in a human readable style
-	 * 
+	 *
 	 * @throws UnsupportedOperationException
 	 *             if this operation is called on the plug-in superclass {@link Plugin}
 	 */
@@ -334,7 +334,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the plug-in's configuration parameters
-	 * 
+	 *
 	 * @return the plug-in's configuration parameters
 	 */
 	public abstract PluginXMLConfig getXMLConfig();
@@ -342,10 +342,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Handles a mouse event
-	 * 
+	 *
 	 * This method is called from the SWT Display thread. So this method should return as quickly as
 	 * possible, to avoid user-visible delays.
-	 * 
+	 *
 	 * @param e
 	 *            the mouse event
 	 * @param drawingArea
@@ -354,7 +354,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @throws Exception
 	 *             any kind of exception
 	 */
-	public boolean handleEvent(@SuppressWarnings("unused") final MouseEvent e, @SuppressWarnings("unused") final DrawingArea drawingArea)
+	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea)
 			throws Exception {
 		return false;
 	}
@@ -362,7 +362,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns <tt>true</tt> if the plug-in is visible
-	 * 
+	 *
 	 * @return <tt>true</tt> if the plug-in is visible
 	 */
 	public final boolean isVisible() {
@@ -375,7 +375,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * This method is used to do the time consuming work on the plug in prior to any operations that
 	 * have any influence on the layer. This is useful since the layer stays in a valid state and
 	 * can be used by the main thread while the time consuming work goes on.
-	 * 
+	 *
 	 * @param packet
 	 *            the packet to be processed
 	 * @throws Exception
@@ -386,7 +386,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the visibility state of a plug in
-	 * 
+	 *
 	 * @param setVisible
 	 *            isVisible
 	 */
@@ -412,7 +412,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * Note that this method does <em>not</em> take locale into account, and will result in an
 	 * unsatisfactory ordering for certain locales. The java.text package provides
 	 * <em>collators</em> to allow locale-sensitive ordering.
-	 * 
+	 *
 	 * @param p
 	 *            the other plug-in to be compared.
 	 * @return a negative integer, zero, or a positive integer as the specified String is greater
@@ -458,10 +458,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Register a new DrawingObjectListener.
-	 * 
+	 *
 	 * The listener will be called every time a new drawing object is added to the layer, removed
 	 * from it, or modified.
-	 * 
+	 *
 	 * @param listener
 	 *            a DrawingObjectListener
 	 */
@@ -472,7 +472,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Unregister an existing DrawingObjectListener.
-	 * 
+	 *
 	 * @param listener
 	 *            an existing DrawingObjectListener
 	 */
@@ -483,9 +483,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectAdded event for all drawing objects in <code>dobs</code>.<br />
-	 * 
+	 *
 	 * NOTE: Before this method is called, the dobs MUST have already been added to the Layer!
-	 * 
+	 *
 	 * @param dobs
 	 */
 	protected final void fireDrawingObjectAdded(final Collection<? extends DrawingObject> dobs) {
@@ -503,9 +503,9 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectAdded event.<br />
-	 * 
+	 *
 	 * NOTE: Before this method is called, the dob MUST have already been added to the Layer!
-	 * 
+	 *
 	 * @param dob
 	 *            The DrawingObject, which has been added
 	 */
@@ -522,7 +522,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectRemoved event for all drawing objects in <code>dobs</code>.<br />
-	 * 
+	 *
 	 * @param dobs
 	 *            The DrawingObjects, which have been removed
 	 */
@@ -541,7 +541,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Fire a DrawingObjectRemoved event.<br />
-	 * 
+	 *
 	 * @param dob
 	 *            The DrawingObject, which has been removed
 	 */
@@ -558,7 +558,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Return the responsible plug-in manager
-	 * 
+	 *
 	 * @return the responsible plug-in manager
 	 */
 	protected final PluginManager getPluginManager() {
@@ -568,11 +568,11 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Is called before the plug-in is removed or before spyglass shuts down.
-	 * 
+	 *
 	 * This method will be called exactly once, at the end of the lifetime of the plug-in. It's
 	 * purpose is to clean up behind, kill (eventually) remaining threads and unregister any
 	 * listeners (if necessary).
-	 * 
+	 *
 	 * @throws Exception
 	 *             any kind of exception
 	 */
@@ -593,7 +593,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the state of the plug-in.
-	 * 
+	 *
 	 * @return the state of the plug-in
 	 */
 	public final State getState() {

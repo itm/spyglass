@@ -3,7 +3,7 @@
  * This file is part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007
  * by the SwarmNet (www.swarmnet.de) project SpyGlass is free software; you can redistribute
  * it and/or modify it under the terms of the BSD License. Refer to spyglass-licence.txt
- * file in the root of the SpyGlass source tree for further details. 
+ * file in the root of the SpyGlass source tree for further details.
  * --------------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin;
@@ -68,14 +68,14 @@ public class PluginManager {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * Registered listerers (of different types) 
+	 * Registered listerers (of different types)
 	 */
 	private final EventListenerList listeners = new EventListenerList();
 
 	// --------------------------------------------------------------------------
 	/**
 	 * List of plug-ins that are currently being removed
-	 * 
+	 *
 	 * (this is currently only used to make sure, that such a plug-in wont be elected as new active
 	 * node positioner)
 	 */
@@ -101,7 +101,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * This method is called after the deserialization of this instance has finished.
-	 * 
+	 *
 	 * it wraps the deserialized plugin list into a synchrozied collection.
 	 */
 	@Commit
@@ -112,7 +112,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * This method is called after the deserialization of this instance has finished.
-	 * 
+	 *
 	 * - checks for duplicate plugin names - checks for the NodePositioner
 	 */
 	@Validate
@@ -140,7 +140,7 @@ public class PluginManager {
 	/**
 	 * Returns all plug-ins which are currently administered by this instance and which are marked
 	 * as 'active'
-	 * 
+	 *
 	 * @return all plug-ins which are currently administered by this instance and which are marked
 	 *         as 'active'
 	 */
@@ -160,7 +160,7 @@ public class PluginManager {
 	/**
 	 * Adds a <code>PluginListChangeListener</code> instance to the list of listeners. Every
 	 * listener will be informed of changes when plug-in instances are added or removed.
-	 * 
+	 *
 	 * @param listener
 	 *            the listener to add
 	 */
@@ -172,7 +172,7 @@ public class PluginManager {
 	/**
 	 * Adds a <code>PluginListChangeListener</code> instances to the list of listeners. Every
 	 * listener will be informed of changes when plug-in-instances are added or removed.
-	 * 
+	 *
 	 * @param listeners
 	 *            the listeners to add
 	 */
@@ -186,7 +186,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Removes a <code>PluginListChangeListener</code> instance from the list of listeners.
-	 * 
+	 *
 	 * @param listener
 	 *            the listener to add
 	 */
@@ -198,7 +198,7 @@ public class PluginManager {
 	/**
 	 * Returns a list-copy of all plug-ins which are currently administered by this instance<br>
 	 * Note that the priorities of the plug-ins are decreasing.
-	 * 
+	 *
 	 * @return a list-copy of all plug-ins which are currently administered by this instance
 	 */
 	public List<Plugin> getPlugins() {
@@ -212,7 +212,7 @@ public class PluginManager {
 	 * Returns a list-copy of all plug-ins which are currently administered by this instance, except
 	 * of the plug-ins that are of a class (or extending a class) contained in the excludes list.<br>
 	 * Note that the priorities of the plug-ins are decreasing.
-	 * 
+	 *
 	 * @param checkHierarchy
 	 *            <code>true</code> if the class hierarchy should be checked, such that even
 	 *            plug-ins derived from a class included in the <code>excludes</code> list will be
@@ -275,7 +275,7 @@ public class PluginManager {
 	/**
 	 * Initializes the instance by setting it as administration instance for all currently available
 	 * plug-ins
-	 * 
+	 *
 	 * This method is called after the PluginManager got instantiated by the XML Deserializer
 	 */
 	public void init() {
@@ -300,10 +300,10 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Connect the plug-in with the plug-in manager
-	 * 
+	 *
 	 * @param plugin
 	 *            the plug-in to be connected
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private void connectPlugin(final Plugin plugin) throws Exception {
 		// If the plug-in is a NodePositioner, we have to act when the plug-in is activated
@@ -342,7 +342,7 @@ public class PluginManager {
 	/**
 	 * Adds a plug-in if it is not contained yet. The plug-in is put at the end of the list which
 	 * means that the new plug-in has the lowest priority
-	 * 
+	 *
 	 * @param plugin
 	 *            The plug-in object to be added.
 	 * @throws Exception when the plugin could not be created.
@@ -354,7 +354,7 @@ public class PluginManager {
 		if (plugins.contains(plugin)) {
 			throw new RuntimeException("Plugin already there!");
 		}
-		
+
 		plugins.add(plugin);
 		log.debug("Added plug-in: " + plugin);
 
@@ -416,7 +416,7 @@ public class PluginManager {
 	 * Puts a plug-in at the top of the list which means that its priority is the highest one<br>
 	 * The others plug-ins' priorities are decreased by one which means that their order stays
 	 * intact.
-	 * 
+	 *
 	 * @param plugin
 	 *            The plug-in object whose priority is to be increased.
 	 * @throws RuntimeException
@@ -439,10 +439,10 @@ public class PluginManager {
 	 * If two plug-ins draw objects at the same spot on the drawing area, the one with the higher
 	 * priority will draw the object on top of the other. The same holds for events as the object
 	 * with the higher priority will receive the event previously to one with a lower priority.
-	 * 
+	 *
 	 * @param list
 	 *            the list of plug-ins which priorities are to be decreased
-	 * 
+	 *
 	 */
 	public void decreasePluginPriorities(final List<Plugin> list) {
 
@@ -480,10 +480,10 @@ public class PluginManager {
 	 * If two plug-ins draw objects at the same spot on the drawing area, the one with the higher
 	 * priority will draw the object on top of the other. The same holds for events as the object
 	 * with the higher priority will receive the event previously to one with a lower priority.
-	 * 
+	 *
 	 * @param list
 	 *            the list of plug-ins which priorities are to be increased
-	 * 
+	 *
 	 */
 	public void increasePluginPriorities(final List<Plugin> list) {
 
@@ -523,7 +523,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Toggles the priorities of the two plug-ins passed in as parameters.
-	 * 
+	 *
 	 * @param onePlugin
 	 * @param theOtherPlugin
 	 * @throws RuntimeException
@@ -564,7 +564,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Removes a plug-in instance
-	 * 
+	 *
 	 * @param plugin
 	 *            the plug-in instance to be removed
 	 * @return whether the plug-in was successfully removed
@@ -619,7 +619,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Returns the instances which holds information about the nodes' positions
-	 * 
+	 *
 	 * @return the instances which holds information about the nodes' positions
 	 */
 	public NodePositionerPlugin getNodePositioner() {
@@ -638,7 +638,7 @@ public class PluginManager {
 	 * Add a new Listener for changes in the position of nodes. Whenever a node moves around, an
 	 * event is fired. Note that the listener will be added no matter if it already exists in the
 	 * list.
-	 * 
+	 *
 	 * @param listener
 	 *            a listener to be added to the already existing ones
 	 */
@@ -649,7 +649,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Remove the given listener.
-	 * 
+	 *
 	 * @param listener
 	 *            the listener to be removed
 	 */
@@ -660,13 +660,13 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Fires a NodePositionEvent.
-	 * 
+	 *
 	 * Note: This method should only be used by NodePositioners. It is declared public so that it
 	 * can be used across packages, but ordinary plug-ins must never call it!
-	 * 
+	 *
 	 * @param event
 	 *            the NodePositionEvent to be fired
-	 * 
+	 *
 	 */
 	public void fireNodePositionEvent(final NodePositionEvent event) {
 		// Get listeners
@@ -681,7 +681,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Creates a new instance of a plug-in and entails it in the list
-	 * 
+	 *
 	 * @param clazz
 	 *            the plug-in's class
 	 * @param config
@@ -729,7 +729,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Fires an event which informs the listener about changes concerning a certain plug-in
-	 * 
+	 *
 	 * @param p
 	 *            the plug-in
 	 * @param what
@@ -738,7 +738,7 @@ public class PluginManager {
 	private void firePluginListChangedEvent(final Plugin p, final ListChangeEvent what) {
 
 		final PluginListChangeListener[] list = this.listeners.getListeners(PluginListChangeListener.class);
-		
+
 		for (final PluginListChangeListener listener : list) {
 			listener.pluginListChanged(p, what);
 		}
@@ -747,7 +747,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Returns a list of all types of plug-ins which are currently administered by this instance
-	 * 
+	 *
 	 * @return a list of all types of plug-ins which are currently administered by this instance
 	 */
 	public static List<Class<? extends Plugin>> getAvailablePluginTypes() {
@@ -758,7 +758,7 @@ public class PluginManager {
 	/**
 	 * Returns all instances of a certain kind of plug-ins which are currently administered by this
 	 * instance
-	 * 
+	 *
 	 * @param clazz
 	 *            the plug-in instances' class
 	 * @param checkHierarchy
@@ -807,7 +807,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Returns all active plug-ins in decreasing priority which are currently visible
-	 * 
+	 *
 	 * @return all active plug-ins in decreasing priority which are currently visible
 	 */
 	public List<Plugin> getVisibleActivePlugins() {
