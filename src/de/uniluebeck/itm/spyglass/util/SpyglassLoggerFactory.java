@@ -23,13 +23,13 @@ import org.apache.log4j.net.SocketAppender;
 /**
  * Instances of this class create and provide instances of classes which can to be used for logging
  * different kinds of events and message types.
- * 
+ *
  * @author Sebastian Ebers
  */
 public class SpyglassLoggerFactory {
 
 	private static long timestamp = new Date().getTime();
-	private static final String fileNameLog = "." + File.separator + "logs" + File.separator + timestamp + "_messages.log";
+	private static final String fileNameLog = "logs" + File.separator + timestamp + "_messages.log";
 	private static PatternLayout patternLayout = new PatternLayout("%-9d{HH:mm:ss} %-8p %-20c{1} - %m%n");
 	private static PatternLayout fileLoggerLayout = patternLayout;
 
@@ -44,7 +44,7 @@ public class SpyglassLoggerFactory {
 
 	/**
 	 * Returns an object to log messages which can be related to a certain class
-	 * 
+	 *
 	 * @param clazz
 	 *            - the class
 	 * @return an object to log messages
