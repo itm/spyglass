@@ -79,10 +79,24 @@
     </target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
+          target: arch-linux64                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="arch-linux64">
+    	<property name="arch" value="linux64" />
+    </target>
+    	
+	<!-- - - - - - - - - - - - - - - - - - 
           target: arch-win32                      
          - - - - - - - - - - - - - - - - - -->
     <target name="arch-win32">
     	<property name="arch" value="win32" />
+    </target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: arch-osx                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="arch-osx">
+    	<property name="arch" value="osx" />
     </target>
 
 	
@@ -195,9 +209,19 @@
     <target name="standalone-linux" depends="arch-linux,standalone" description="package spyglass as a standalone jar for linux"/>
 
 	<!-- ================================= 
+          target: standalone-linux64              
+         ================================= -->
+    <target name="standalone-linux64" depends="arch-linux64,standalone" description="package spyglass as a standalone jar for linux"/>
+
+	<!-- ================================= 
           target: standalone-win32              
          ================================= -->
     <target name="standalone-win32" depends="arch-win32,standalone" description="package spyglass as a standalone jar for win32"/>
+
+	<!-- ================================= 
+          target: standalone-osx              
+         ================================= -->
+    <target name="standalone-osx" depends="arch-osx,standalone" description="package spyglass as a standalone jar for Darwin"/>
 
 	<!-- ================================= 
           target: ishell-linux              
@@ -205,9 +229,19 @@
     <target name="ishell-linux" depends="arch-linux,ishell" description="package ishell with spyglass included for linux"/>
 
 	<!-- ================================= 
+          target: ishell-linux64            
+         ================================= -->
+    <target name="ishell-linux64" depends="arch-linux64,ishell" description="package ishell with spyglass included for linux64"/>
+
+	<!-- ================================= 
           target: ishell-win32              
          ================================= -->
     <target name="ishell-win32" depends="arch-win32,ishell" description="package ishell with spyglass included for win32"/>
+
+	<!-- ================================= 
+          target: ishell-osx              
+         ================================= -->
+    <target name="ishell-osx" depends="arch-osx,ishell" description="package ishell with spyglass included for Darwin"/>
 
 
 </project>
