@@ -472,7 +472,12 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 		}
 
-		map.setMatrix(matrix);
+		synchronized (this) {
+			// maybe the plugin was shutdown while we were busy
+			if (getState()==State.ALIVE) {
+				map.setMatrix(matrix);
+			}
+		}
 	}
 
 }
