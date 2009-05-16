@@ -13,7 +13,6 @@ import de.uniluebeck.itm.spyglass.drawing.primitive.Image;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.packet.Int16ListPacket.TrajectorySection;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
-import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 public class Trajectory extends TimerTask {
 
@@ -39,45 +38,47 @@ public class Trajectory extends TimerTask {
 		this.list = list;
 		startTime = System.currentTimeMillis();
 
-		// create drawing objects;
-		if (plugin.getXMLConfig().isDrawLine()) {
-			for (final TrajectorySection s : list) {
-				final Line l = new Line();
-				l.setPosition(s.start);
-				l.setEnd(s.end);
-				l.setColor(plugin.getXMLConfig().getLineColorRGB());
-				lines.add(l);
+		synchronized (plugin) {
+
+			// create drawing objects;
+			if (plugin.getXMLConfig().isDrawLine()) {
+				for (final TrajectorySection s : list) {
+					final Line l = new Line();
+					l.setPosition(s.start);
+					l.setEnd(s.end);
+					l.setColor(plugin.getXMLConfig().getLineColorRGB());
+					lines.add(l);
+				}
 			}
+
+			final AbsolutePosition pos = list.get(0).start.clone();
+
+			pos.x -= plugin.getXMLConfig().getImageSizeX() / 2;
+			pos.y -= plugin.getXMLConfig().getImageSizeY() / 2;
+			image.setPosition(pos);
+			image.setImageSizeX(plugin.getXMLConfig().getImageSizeX());
+			image.setImageSizeY(plugin.getXMLConfig().getImageSizeY());
+
+			this.init();
 		}
-
-		final AbsolutePosition pos = list.get(0).start.clone();
-
-		pos.x -= plugin.getXMLConfig().getImageSizeX() / 2;
-		pos.y -= plugin.getXMLConfig().getImageSizeY() / 2;
-		image.setPosition(pos);
-		image.setImageSizeX(plugin.getXMLConfig().getImageSizeX());
-		image.setImageSizeY(plugin.getXMLConfig().getImageSizeY());
-
-		this.init();
 	}
 
 	private void init() {
 
-		// Draw lines
-		for (final DrawingObject d : lines) {
-			synchronized (this.plugin.layer) {
-				this.plugin.layer.add(d);
+		synchronized (this.plugin) {
+
+			// Draw lines
+			for (final DrawingObject d : lines) {
+					this.plugin.layer.add(d);
+				this.plugin.fireDrawingObjectAddedInternal(d);
 			}
-			this.plugin.fireDrawingObjectAddedInternal(d);
-		}
 
-		synchronized (this.plugin.layer) {
 			this.plugin.layer.add(image);
+			this.plugin.fireDrawingObjectAddedInternal(image);
+
+			sectionTimestamp = startTime;
+
 		}
-		this.plugin.fireDrawingObjectAddedInternal(image);
-
-		sectionTimestamp = startTime;
-
 	}
 
 	@Override
@@ -116,8 +117,7 @@ public class Trajectory extends TimerTask {
 		location.x -= image.getImageSizeX() / 2;
 		location.y -= image.getImageSizeY() / 2;
 
-		final AbsoluteRectangle oldBBox = image.getBoundingBox();
-		synchronized (this.plugin.layer) {
+		synchronized (this.plugin) {
 			image.setPosition(location);
 			for (final Line l : lines) {
 				this.plugin.layer.pushBack(l);
@@ -130,26 +130,25 @@ public class Trajectory extends TimerTask {
 	 * Cancel this timer and remove the drawing objects while we're at it.
 	 */
 	@Override
-	public synchronized boolean cancel() {
+	public boolean cancel() {
 		final boolean ret = super.cancel();
 
-		// clean up, before we go
-		if (ret) {
+		synchronized (plugin) {
 
-			// XXX: we cannot remove ourself for concurrency-reasons
-			//plugin.trajectories.remove(this);
+			// remove ourself
+			plugin.trajectories.remove(this);
 
-			synchronized (this.plugin.layer) {
+			// clean up, before we go
+			if (ret) {
+
 				this.plugin.layer.remove(image);
-			}
-			this.plugin.fireDrawingObjectRemovedInternal(image);
+				this.plugin.fireDrawingObjectRemovedInternal(image);
 
-			// Remove lines
-			for (final DrawingObject d : lines) {
-				synchronized (this.plugin.layer) {
+				// Remove lines
+				for (final DrawingObject d : lines) {
 					this.plugin.layer.remove(d);
+					this.plugin.fireDrawingObjectRemovedInternal(d);
 				}
-				this.plugin.fireDrawingObjectRemovedInternal(d);
 			}
 		}
 

@@ -45,7 +45,7 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	static Logger log = SpyglassLoggerFactory.getLogger(ObjectPainterPlugin.class);
 
 	@Element(name = "parameters")
-	private final ObjectPainterXMLConfig config;
+	private final ObjectPainterXMLConfig config = new ObjectPainterXMLConfig();;
 
 	/**
 	 * Timer used for updating the trajectories
@@ -65,7 +65,6 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	 */
 	public ObjectPainterPlugin() {
 		super(true);
-		config = new ObjectPainterXMLConfig();
 	}
 
 	@Override
@@ -79,7 +78,7 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 		return new ObjectPainterPreferencePage(dialog, spyglass);
 	}
 
-	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
+	public synchronized SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		return layer.getDrawingObjects(area);
 	}
 
@@ -93,7 +92,7 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 	}
 
 	@Override
-	public void init(final PluginManager manager) throws Exception {
+	public synchronized void init(final PluginManager manager) throws Exception {
 		super.init(manager);
 
 		timer = new Timer("ObjectPainter-Timer");
@@ -124,40 +123,53 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 			return;
 		}
 
+		// DEADLOCK warning: The constructor of Trajectory creates an SWT image, which tries to aquire the
+		// SWT display lock. To avoid a AB-BA deadlock, we must avoid creating the constructor with the
+		// plugin-lock hold.
 		final Trajectory t = new Trajectory(this, list, config.getImageFileName());
 
-		this.trajectories.add(t);
-		timer.schedule(t, 0, config.getUpdateInterval());
-
-		// NOTE: the trajectories stay in the list until the plugin is shut down. but
-		// this doesn't really matter (except that it takes a small amount of mememory)
-		// since the list is only used on reset().
-	}
-
-	@Override
-	protected void resetPlugin() {
-
-		synchronized (trajectories) {
-			for (final Trajectory t : this.trajectories) {
-				t.cancel();
-			}
-		}
-		this.trajectories.clear();
-		synchronized (layer) {
-			this.layer.clear();
+		synchronized (this) {
+			this.trajectories.add(t);
+			timer.schedule(t, 0, config.getUpdateInterval());
 		}
 	}
 
 	@Override
-	public Set<DrawingObject> getAutoZoomDrawingObjects() {
+	protected synchronized void resetPlugin() {
+
+		// make a copy so trajectories can remove themselves
+		final List<Trajectory> list = new ArrayList<Trajectory>(trajectories);
+
+		// remove all trajectories
+		for (final Trajectory t : list) {
+			t.cancel();
+		}
+
+		assert trajectories.size()==0;
+
+		this.layer.clear();
+
+	}
+
+	@Override
+	public synchronized Set<DrawingObject> getAutoZoomDrawingObjects() {
 		return layer.getDrawingObjects();
 	}
 
 	@Override
-	public void shutdown() throws Exception {
+	public synchronized void shutdown() throws Exception {
 		super.shutdown();
 
-		// shutdown the timer (don't bother to clean up the DrawingObjects)
+		// make a copy so trajectories can remove themselves
+		final List<Trajectory> list = new ArrayList<Trajectory>(trajectories);
+
+		// remove all trajectories
+		for (final Trajectory t : list) {
+			t.cancel();
+		}
+
+		assert trajectories.size()==0;
+
 		timer.cancel();
 	}
 
