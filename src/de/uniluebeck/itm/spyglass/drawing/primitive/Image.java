@@ -52,7 +52,8 @@ public class Image extends DrawingObject {
 
 		// Transform from Image coordinate system to absolute coordinate system
 		final AffineTransform transform = AffineTransform.getScaleInstance(imageSizeX/((double)image.getBounds().width), imageSizeY/((double)image.getBounds().height));
-		transform.preConcatenate(AffineTransform.getTranslateInstance(this.getPosition().x, this.getPosition().y));
+		transform.preConcatenate(AffineTransform.getTranslateInstance(this.getPosition().x,
+										-this.getPosition().y - this.getBoundingBox().getHeight()));
 
 		// multiply transform from drawing area. now "transform" transforms from image coordinates to pixel coordinates
 		transform.preConcatenate(drawingArea.getTransform());

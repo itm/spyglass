@@ -30,7 +30,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * Flag class for DrawingObjects painted by NodeSensorRangePlugin
- * 
+ *
  * @author bimschas
  */
 public class NodeSensorRangeDrawingObject extends DrawingObject implements PropertyChangeListener {
@@ -76,7 +76,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 						.getRange()).getConeRadius();
 				final int lineWidth = config.getLineWidth();
 				// make it a little larger so that lineWidth fragments aren't so bad
-				box.setUpperLeft(new AbsolutePosition(getPosition().x - radius - lineWidth * 5, getPosition().y - radius - lineWidth * 5));
+				box.setLowerLeft(new AbsolutePosition(getPosition().x - radius - lineWidth * 5, getPosition().y - radius - lineWidth * 5));
 				box.setWidth(2 * radius + 10 * lineWidth);
 				box.setHeight(2 * radius + 10 * lineWidth);
 				return box;
@@ -88,7 +88,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 				final int hypLength = (int) Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) + 10;
 				final int x = getPosition().x - (hypLength / 2);
 				final int y = getPosition().y - (hypLength / 2);
-				box.setUpperLeft(new AbsolutePosition(x, y));
+				box.setLowerLeft(new AbsolutePosition(x, y));
 				box.setWidth(hypLength);
 				box.setHeight(hypLength);
 				return box;
@@ -120,6 +120,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 				radius = ((CircleRange) range).getCircleRadius();
 				// calculate the real size of the bounding box
 				absRect = new AbsoluteRectangle(getPosition(), radius * 2, radius * 2);
+				absRect.rectangle.y -= absRect.rectangle.height; // HACK
 				pxRect = drawingArea.absRect2PixelRect(absRect);
 				pxPos = pxRect.getUpperLeft();
 				drawCircle(gc, pxPos.x, pxPos.y, pxRect.getHeight() / 2);
@@ -128,6 +129,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 			case CONE:
 				radius = ((ConeRange) range).getConeRadius();
 				absRect = new AbsoluteRectangle(getPosition(), radius * 2, radius * 2);
+				absRect.rectangle.y -= absRect.rectangle.height; // HACK
 				pxRect = drawingArea.absRect2PixelRect(absRect);
 				pxPos = pxRect.getUpperLeft();
 				drawCone(gc, pxPos.x, pxPos.y, pxRect.getHeight() / 2);
@@ -199,8 +201,8 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param gc
 	 * @param x
 	 *            in pixel coordinates

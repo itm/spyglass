@@ -167,7 +167,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				dataStore.add(e);
 				this.dataChanged = true;
 			}
-
+			
 		}
 
 	}
@@ -334,7 +334,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 			final float numFramePointsHorizontal = xmlConfig.getNumFramePointsHorizontal();
 			final int width = xmlConfig.getBoundingBox().getWidth();
 			final int height = xmlConfig.getBoundingBox().getHeight();
-			final AbsolutePosition upperLeft = xmlConfig.getBoundingBox().getUpperLeft().clone();
+			final AbsolutePosition upperLeft = xmlConfig.getBoundingBox().getLowerLeft().clone();
 			final Double defaultValue = new Double(xmlConfig.getDefaultValue());
 
 			for (int i = 0; i < numFramePointsHorizontal; i++) {
@@ -429,7 +429,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				final AbsolutePosition newPos = new AbsolutePosition();
 				newPos.x = col * xmlConfig.getGridElementWidth() + xmlConfig.getLowerLeftX();
 				newPos.y = row * xmlConfig.getGridElementHeight() + xmlConfig.getLowerLeftY();
-				drawRect.setUpperLeft(newPos);
+				drawRect.setLowerLeft(newPos);
 				final double average = calculateValue(store, drawRect.getCenter());
 				matrix[row][col] = average;
 

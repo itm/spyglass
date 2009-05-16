@@ -39,6 +39,11 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * A drawingObject can have only one life, i.e. once it has been destroyed, it cannot be initialized
  * again.
  *
+ * TODO: write some lines about
+ * - locking
+ * - shadow copy
+ * - what implementors of subclasses have to take care of ("bean character"; stuff to do in setter methods)
+ *
  * @author Daniel Bimschas
  * @author Dariush Forouher
  * @author Sebastian Ebers
@@ -126,9 +131,6 @@ public abstract class DrawingObject implements Cloneable {
 
 		this.state = State.ALIVE;
 
-		// there is a small window where draw() may be called with a bad bounding box.
-		// but since markBoundingBoxDirty() below will issue another redraw shortly after,
-		// this should not matter.
 		this.shadowCopy = clone();
 
 		markBoundingBoxDirty();
@@ -184,9 +186,9 @@ public abstract class DrawingObject implements Cloneable {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the position of the upper left point of the <code>DrawingObject</code>.
+	 * Returns the position of the lower left point of the <code>DrawingObject</code>.
 	 *
-	 * @return the position of the upper left point of the <code>DrawingObject</code>
+	 * @return the position of the lower left point of the <code>DrawingObject</code>
 	 */
 	public synchronized AbsolutePosition getPosition() {
 		return position;
@@ -194,10 +196,10 @@ public abstract class DrawingObject implements Cloneable {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Sets the position of the object's upper left point
+	 * Sets the position of the object's lower left point
 	 *
 	 * @param position
-	 *            the position of the upper left point of the <code>DrawingObject</code>
+	 *            the position of the lower left point of the <code>DrawingObject</code>
 	 * @param fireBoundingBoxChangeEvent
 	 *            indicates whether a changeEvent has to be thrown
 	 */
@@ -270,7 +272,8 @@ public abstract class DrawingObject implements Cloneable {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Forces this DrawingObject to paint itself on the given GC.
+	 * In this method the drawingObject should draw itself in the drawingArea.
+	 * While doing so, it must not draw beyond the limits imposed by its bounding box.
 	 *
 	 * @param drawingArea
 	 *            the currently used drawing area
@@ -286,17 +289,19 @@ public abstract class DrawingObject implements Cloneable {
 	 * @param drawingArea
 	 * @param gc
 	 */
-	public final synchronized void drawObject(final DrawingArea drawingArea, final GC gc) {
+	public final synchronized void drawObject(final GC gc) {
 		assert state == State.ALIVE;
 
 		shadowCopy.draw(drawingArea, gc);
+		//shadowCopy.drawBoundingBox(gc);
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the bounding box of this drawing object.<br>
-	 * The bounding box is recalculated every time the drawing object itself is changed. Hence, it
-	 * is always up to date.
+	 *
+	 * The bounding box is kept in sync with the image that is drawn through draw().
+	 * It is not automatically updated whenever a property of a drawing object is modified.
 	 *
 	 * @return the bounding box of this drawing object
 	 */
@@ -313,7 +318,7 @@ public abstract class DrawingObject implements Cloneable {
 	 * @param gc
 	 *            the currently used graphics context
 	 */
-	protected void drawBoundingBox(final DrawingArea drawingArea, final GC gc) {
+	protected void drawBoundingBox(final GC gc) {
 		final PixelRectangle rect = drawingArea.absRect2PixelRect(getBoundingBox());
 		final int x = rect.getUpperLeft().x;
 		final int y = rect.getUpperLeft().y;
@@ -427,6 +432,9 @@ public abstract class DrawingObject implements Cloneable {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Adds a listener for changes concerning the object's bounding box
+	 *
+	 * Note that, unlike listeners in SWT or in other parts of Spyglass, a listener may only
+	 * registered once to this event (consecutive registrations will simply be ignored.)
 	 *
 	 * @param listener
 	 *            a listener for changes concerning the object's bounding box

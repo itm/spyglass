@@ -56,7 +56,7 @@ public class Map extends DrawingObject {
 				final AbsolutePosition newPos = new AbsolutePosition();
 				newPos.x = col*xmlConfig.getGridElementWidth() + xmlConfig.getLowerLeftX();
 				newPos.y = row*xmlConfig.getGridElementHeight() + xmlConfig.getLowerLeftY();
-				drawRect.setUpperLeft(newPos);
+				drawRect.setLowerLeft(newPos);
 
 				// Clipping
 				if (clippingArea.intersects(drawRect)) {
@@ -70,7 +70,7 @@ public class Map extends DrawingObject {
 		}
 
 		if (DEBUG) {
-			drawBoundingBox(drawingArea, gc);
+			drawBoundingBox(gc);
 		}
 	}
 

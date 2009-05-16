@@ -52,7 +52,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class UIController {
 
-	private static Logger log = SpyglassLoggerFactory.getLogger(UIController.class);
+	protected static Logger log = SpyglassLoggerFactory.getLogger(UIController.class);
 
 	private final static boolean ENABLE_DRAW_PROFILING = false;
 
@@ -173,14 +173,21 @@ public class UIController {
 	 *            Only drawing objects inside this area will be redrawn.
 	 * @see Drawable
 	 */
-	private void renderPlugin(final GC gc, final Drawable plugin, final AbsoluteRectangle area) {
+	protected void renderPlugin(final GC gc, final Drawable plugin, final AbsoluteRectangle area) {
+
+		if (ENABLE_DRAW_PROFILING) {
+			log.debug("Rendering plugin "+plugin+" on "+area);
+		}
 
 		final List<DrawingObject> dos = new LinkedList<DrawingObject>(plugin.getDrawingObjects(area));
 		for (final DrawingObject object : dos) {
 
 			switch (object.getState()) {
 				case ALIVE:
-					object.drawObject(appWindow.getGui().getDrawingArea(), gc);
+					if (ENABLE_DRAW_PROFILING) {
+						log.debug("Rendering DOB "+object);
+					}
+					object.drawObject(gc);
 					break;
 				case INFANT:
 					log.debug(String.format("Plugin %s contains an unitialized drawing object in its layer: %s (skipping it)", plugin, object));
@@ -324,7 +331,6 @@ public class UIController {
 	 */
 	private final PaintListener paintListener = new PaintListener() {
 
-		@SuppressWarnings( { "synthetic-access" })
 		@Override
 		public void paintControl(final PaintEvent e) {
 
@@ -334,6 +340,7 @@ public class UIController {
 					e.gc.getClipping().height);
 
 			final AbsoluteRectangle area = appWindow.getGui().getDrawingArea().pixelRect2AbsRect(pxArea);
+			//final AbsoluteRectangle area = DrawingArea.getGlobalBoundingBox();
 
 			final List<Plugin> plugins = spyglass.getPluginManager().getVisibleActivePlugins();
 

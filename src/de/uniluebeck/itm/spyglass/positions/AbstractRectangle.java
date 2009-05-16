@@ -9,9 +9,9 @@ import org.simpleframework.xml.Attribute;
 
 /**
  * This class represents an abstract rectangle
- * 
+ *
  * @author Dariush Forouher, Sebastian Ebers
- * 
+ *
  */
 public abstract class AbstractRectangle {
 
@@ -21,7 +21,6 @@ public abstract class AbstractRectangle {
 	/**
 	 * @return the height of the rectangle
 	 */
-	@Attribute(name = "height")
 	public int getHeight() {
 		return rectangle.height;
 	}
@@ -29,10 +28,9 @@ public abstract class AbstractRectangle {
 	// --------------------------------------------------------------------------------
 	/**
 	 * set the height
-	 * 
+	 *
 	 * @param height
 	 */
-	@Attribute(name = "height")
 	public void setHeight(final int height) {
 		this.rectangle.height = height;
 	}
@@ -41,7 +39,6 @@ public abstract class AbstractRectangle {
 	/**
 	 * @return the width
 	 */
-	@Attribute(name = "width")
 	public int getWidth() {
 		return rectangle.width;
 	}
@@ -49,10 +46,9 @@ public abstract class AbstractRectangle {
 	// --------------------------------------------------------------------------------
 	/**
 	 * set the width
-	 * 
+	 *
 	 * @param width
 	 */
-	@Attribute(name = "width")
 	public void setWidth(final int width) {
 		this.rectangle.width = width;
 	}
@@ -115,31 +111,29 @@ public abstract class AbstractRectangle {
 	public String toString() {
 		return this.rectangle.toString();
 	}
-	
-	public abstract AbstractPosition getUpperLeft();
-	
+
 	/**
 	 * Performs the given Transformation on this Rectangle.
-	 * 
+	 *
 	 * @param a transform
 	 */
 	public void transform(final AffineTransform at) {
 
 		final Rectangle newRect = new Rectangle(0,0,0,0);
-		
-		final Point2D upLeft = at.transform(this.getUpperLeft().toPoint2D(), null);
+
+		final Point2D upLeft = at.transform(new Point2D.Double(rectangle.x, rectangle.y), null);
 		newRect.x = (int) Math.floor(upLeft.getX());
 		newRect.y = (int) Math.floor(upLeft.getY());
-		
-		final Point2D lowerRightAbs = new Point2D.Double(this.getUpperLeft().x + this.getWidth(), this.getUpperLeft().y + this.getHeight());
+
+		final Point2D lowerRightAbs = new Point2D.Double(rectangle.x + this.getWidth(), rectangle.y + this.getHeight());
 		final Point2D lRight = at.transform(lowerRightAbs, null);
 
 		final int lowerRightX = (int) Math.floor(lRight.getX() + 1);
 		final int lowerRightY = (int) Math.floor(lRight.getY() + 1);
-		
+
 		newRect.width = Math.abs(lowerRightX - newRect.x);
 		newRect.height = Math.abs(newRect.y - lowerRightY);
-		
+
 		this.rectangle = newRect;
 
 	}

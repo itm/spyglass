@@ -26,7 +26,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -45,15 +44,14 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * information about the dimensions of the drawing area and offers methods to transform between
  * reference frames.
  *
- * Attention: Methods of this class MUST only be invoked from the SWT-GUI thread,
- * unless explicitly stated otherwise!
+ * Attention: Methods of this class MUST only be invoked from the SWT-GUI thread, unless explicitly
+ * stated otherwise!
  *
  * @author Dariush Forouher
  */
 public class DrawingArea extends Canvas {
 
-
-	private static Logger log = SpyglassLoggerFactory.getLogger(DrawingArea.class);
+	protected static Logger log = SpyglassLoggerFactory.getLogger(DrawingArea.class);
 
 	/**
 	 * Scale factor applied while zooming.
@@ -67,19 +65,21 @@ public class DrawingArea extends Canvas {
 	private final double ZOOM_MAX = 50;
 
 	/**
-	 * Limitation of the zoom. Any zoom level which completely shows this rectangle will be considered forbidden.
+	 * Limitation of the zoom. Any zoom level which completely shows this rectangle will be
+	 * considered forbidden.
 	 */
-	private static final AbsoluteRectangle MAX_ZOMM_OUT = new AbsoluteRectangle( -((int) Math.pow(2, 17)),  -((int) Math.pow(2, 17)), 2 * ((int) Math.pow(2, 17)), 2 * ((int) Math.pow(2, 17)));
+	private static final AbsoluteRectangle MAX_ZOMM_OUT = new AbsoluteRectangle(-((int) Math.pow(2, 17)), -((int) Math.pow(2, 17)), 2 * ((int) Math
+			.pow(2, 17)), 2 * ((int) Math.pow(2, 17)));
 
 	/**
 	 * x-coordinate of the upper-left point of the world.
 	 */
-	private static final int WORLD_UPPER_LEFT_X = -((int) Math.pow(2, 15));
+	private static final int WORLD_LOWER_LEFT_X = -((int) Math.pow(2, 15));
 
 	/**
 	 * y-coordinate of the upper-left point of the world.
 	 */
-	private static final int WORLD_UPPER_LEFT_Y = -((int) Math.pow(2, 15));
+	private static final int WORLD_LOWER_LEFT_Y = -((int) Math.pow(2, 15));
 
 	/**
 	 * width of the world.
@@ -99,15 +99,13 @@ public class DrawingArea extends Canvas {
 	/**
 	 * The transformation matrix. it transforms coordinates from the absolute reference frame to the
 	 * reference frame of the drawing area
-	 *
-	 * Note: Access to the transform is not protected since the class is not thread-safe.
 	 */
-	private AffineTransform at = new AffineTransform();
+	protected AffineTransform at = createInitialTransform();
 
 	/**
 	 * Mutex to synchronize access to "at"
 	 */
-	private Object transformMutex = new Object();
+	protected Object transformMutex = new Object();
 
 	/**
 	 * Listerńers for the DrawingAreaTransformEvent.
@@ -117,22 +115,22 @@ public class DrawingArea extends Canvas {
 	/**
 	 * This color is used for area outside of the the map
 	 */
-	private final Color canvasOutOfMapColor = new Color(getDisplay(), 50, 50, 50);
+	protected final Color canvasOutOfMapColor = new Color(getDisplay(), 50, 50, 50);
 
 	/**
 	 * This color is used as the background color
 	 */
-	private final Color canvasBgColor = new Color(getDisplay(), 255, 255, 255);
+	protected final Color canvasBgColor = new Color(getDisplay(), 255, 255, 255);
 
 	/**
 	 * True, while the user moves the map via mouse
 	 */
-	private volatile boolean mouseDragInProgress = false;
+	protected volatile boolean mouseDragInProgress = false;
 
 	/**
 	 * the starting point of the movement business.
 	 */
-	private volatile PixelPosition mouseDragStartPosition = null;
+	protected volatile PixelPosition mouseDragStartPosition = null;
 
 	/**
 	 * Dispose children
@@ -162,20 +160,22 @@ public class DrawingArea extends Canvas {
 			final PixelRectangle world = absRect2PixelRect(getGlobalBoundingBox());
 			final PixelRectangle canvas = getDrawingRectangle();
 
+			//log.debug("Pixel world is: "+world);
+
 			final int edgeN = world.getUpperLeft().y;
-			if (edgeN >0) {
+			if (edgeN > 0) {
 				arg0.gc.fillRectangle(0, 0, canvas.getWidth(), edgeN);
 			}
-			final int edgeE = canvas.getWidth()-world.getWidth()-world.getUpperLeft().x;
-			if (edgeE >0) {
-				arg0.gc.fillRectangle(world.getWidth()+world.getUpperLeft().x,0,  edgeE, canvas.getHeight());
+			final int edgeE = canvas.getWidth() - world.getWidth() - world.getUpperLeft().x;
+			if (edgeE > 0) {
+				arg0.gc.fillRectangle(world.getWidth() + world.getUpperLeft().x, 0, edgeE, canvas.getHeight());
 			}
-			final int edgeS = canvas.getHeight()-world.getHeight()-world.getUpperLeft().y;
-			if (edgeS >0) {
-				arg0.gc.fillRectangle(0,world.getHeight()+world.getUpperLeft().y, canvas.getWidth(),edgeS);
+			final int edgeS = canvas.getHeight() - world.getHeight() - world.getUpperLeft().y;
+			if (edgeS > 0) {
+				arg0.gc.fillRectangle(0, world.getHeight() + world.getUpperLeft().y, canvas.getWidth(), edgeS);
 			}
 			final int edgeW = world.getUpperLeft().x;
-			if (edgeW >0) {
+			if (edgeW > 0) {
 				arg0.gc.fillRectangle(0, 0, edgeW, canvas.getHeight());
 			}
 
@@ -183,8 +183,6 @@ public class DrawingArea extends Canvas {
 
 		}
 	};
-
-
 
 	/**
 	 *
@@ -238,7 +236,7 @@ public class DrawingArea extends Canvas {
 
 		@Override
 		public void keyPressed(final KeyEvent arg0) {
-			//log.debug("pressed" + arg0);
+			// log.debug("pressed" + arg0);
 			if (arg0.keyCode == 16777219) {
 				move(MOVE_OFFSET, 0);
 			}
@@ -319,8 +317,7 @@ public class DrawingArea extends Canvas {
 	 */
 	public DrawingArea(final Composite parent, final int style, final Spyglass spyglass) {
 		//
-		super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_BACKGROUND
-				| SWT.DOUBLE_BUFFERED);
+		super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
 		init();
 
@@ -382,42 +379,6 @@ public class DrawingArea extends Canvas {
 			}
 		});
 
-
-	}
-
-	/**
-	 * Draw the background.
-	 *
-	 * Space which lies inside the map (-2^15 to 2^15) will be colored in <code>canvasBgColor</code>
-	 * , whereas space outside this area is colored <code>canvasOutOfMapColor</code>.
-	 */
-	private void drawBackground(final GC gc) {
-		gc.setBackground(canvasOutOfMapColor);
-		gc.fillRectangle(getClientArea());
-
-		final AbsolutePosition absPoint = new AbsolutePosition();
-		absPoint.x = -32768;
-		absPoint.y = -32768;
-
-		final AbsoluteRectangle completeMap = new AbsoluteRectangle();
-		completeMap.setUpperLeft(absPoint);
-		completeMap.setHeight(2 * 32768);
-		completeMap.setWidth(2 * 32768);
-
-		PixelRectangle pxRect = null;
-
-		final AbsoluteRectangle visibleArea = getAbsoluteDrawingRectangle();
-
-		// This is a workaround, since GC has problems with huge negative numbers
-		if (completeMap.contains(visibleArea)) {
-			pxRect = getDrawingRectangle();
-		} else {
-			pxRect = absRect2PixelRect(completeMap);
-		}
-
-		gc.setBackground(canvasBgColor);
-		gc.fillRectangle(pxRect.getUpperLeft().x, pxRect.getUpperLeft().y, pxRect.getWidth(),
-				pxRect.getHeight());
 	}
 
 	/**
@@ -429,10 +390,13 @@ public class DrawingArea extends Canvas {
 	 *            a point in the absolute reference frame
 	 * @return the determined reference frame of the drawing area
 	 */
-	public PixelPosition absPoint2PixelPoint(final AbsolutePosition absPoint) {
+	public PixelPosition absPoint2PixelPoint(AbsolutePosition absPoint) {
 
 		synchronized (transformMutex) {
+			absPoint = inv(absPoint);
+
 			final Point2D pxPoint = at.transform(absPoint.toPoint2D(), null);
+
 			return new PixelPosition(pxPoint);
 		}
 
@@ -448,21 +412,22 @@ public class DrawingArea extends Canvas {
 	 *
 	 * @param absRect
 	 */
-	public PixelRectangle absRect2PixelRect(final AbsoluteRectangle absRect) {
+	public PixelRectangle absRect2PixelRect(AbsoluteRectangle absRect) {
 
 		final PixelRectangle rect = new PixelRectangle();
 
 		synchronized (transformMutex) {
-			Point2D a = at.transform(absRect.getUpperLeft().toPoint2D(), null);
+			absRect = inv(absRect);
+
+			Point2D a = at.transform(absRect.getLowerLeft().toPoint2D(), null);
 			final PixelPosition upperLeftPx = new PixelPosition(a);
 			rect.setUpperLeft(upperLeftPx);
 
 			final AbsolutePosition lowerRightAbs = new AbsolutePosition();
-			lowerRightAbs.x = absRect.getUpperLeft().x + absRect.getWidth();
-			lowerRightAbs.y = absRect.getUpperLeft().y + absRect.getHeight();
+			lowerRightAbs.x = absRect.getLowerLeft().x + absRect.getWidth();
+			lowerRightAbs.y = absRect.getLowerLeft().y + absRect.getHeight();
 			a = at.transform(lowerRightAbs.toPoint2D(), null);
-			final PixelPosition lowerRightPx = new PixelPosition((int) Math.floor(a.getX() + 1),
-					(int) Math.floor(a.getY() + 1));
+			final PixelPosition lowerRightPx = new PixelPosition((int) Math.floor(a.getX() + 1), (int) Math.floor(a.getY() + 1));
 
 			rect.setWidth(Math.abs(lowerRightPx.x - upperLeftPx.x));
 			rect.setHeight(Math.abs(upperLeftPx.y - lowerRightPx.y));
@@ -494,13 +459,13 @@ public class DrawingArea extends Canvas {
 
 		final AbsoluteRectangle absRect = new AbsoluteRectangle();
 
-		final AbsolutePosition upperLeft = this.getUpperLeft();
-		final AbsolutePosition lowerRight = this.getLowerRight();
+		final AbsolutePosition lowerLeft = this.getLowerLeft();
+		final AbsolutePosition upperRight = this.getUpperRight();
 
-		final int height = Math.abs(upperLeft.y - lowerRight.y);
-		final int width = Math.abs(lowerRight.x - upperLeft.x);
+		final int height = Math.abs(lowerLeft.y - upperRight.y);
+		final int width = Math.abs(upperRight.x - lowerLeft.x);
 
-		absRect.setUpperLeft(upperLeft);
+		absRect.setLowerLeft(lowerLeft);
 		absRect.setHeight(height);
 		absRect.setWidth(width);
 
@@ -511,17 +476,17 @@ public class DrawingArea extends Canvas {
 	}
 
 	/**
-	 * return the absolute point represented by the lower right point of the drawing area.
+	 * return the absolute point represented by the upper right point of the drawing area.
 	 */
-	public AbsolutePosition getLowerRight() {
+	public AbsolutePosition getUpperRight() {
 		this.checkWidget();
 
 		try {
+
 			synchronized (transformMutex) {
-				final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(),
-						this.getDrawingRectangle().getHeight());
-				final Point2D lowerRight2D = at.inverseTransform(lowerRight, null);
-				return new AbsolutePosition(lowerRight2D);
+				final Point2D upperRight = new Point2D.Double(this.getDrawingRectangle().getWidth(), 0);
+				final Point2D upperRight2D = at.inverseTransform(upperRight, null);
+				return inv(new AbsolutePosition(upperRight2D));
 			}
 
 		} catch (final NoninvertibleTransformException e) {
@@ -538,10 +503,9 @@ public class DrawingArea extends Canvas {
 		try {
 			synchronized (transformMutex) {
 
-				final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(),
-						this.getDrawingRectangle().getHeight());
+				final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(), this.getDrawingRectangle().getHeight());
 				final Point2D lowerRight2D = at.inverseTransform(lowerRight, null);
-				return lowerRight2D;
+				return new Point2D.Double(lowerRight2D.getX(), -lowerRight2D.getY());
 			}
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
@@ -549,18 +513,18 @@ public class DrawingArea extends Canvas {
 	}
 
 	/**
-	 * return the absolute point represented by the upper left point of the drawing area.
+	 * return the absolute point represented by the lower left point of the drawing area.
 	 *
 	 * This method is thread-safe.
 	 *
 	 */
-	public AbsolutePosition getUpperLeft() {
+	public AbsolutePosition getLowerLeft() {
 
 		try {
 			synchronized (transformMutex) {
 
-				final Point2D upperLeft2D = at.inverseTransform(new Point2D.Double(0, 0), null);
-				return new AbsolutePosition(upperLeft2D);
+				final Point2D lowerLeft2D = at.inverseTransform(new Point2D.Double(0, this.getDrawingRectangle().getHeight()), null);
+				return inv(new AbsolutePosition(lowerLeft2D));
 			}
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
@@ -579,11 +543,24 @@ public class DrawingArea extends Canvas {
 			synchronized (transformMutex) {
 
 				final Point2D upperLeft2D = at.inverseTransform(new Point2D.Double(0, 0), null);
-				return upperLeft2D;
+
+				return new Point2D.Double(upperLeft2D.getX(), -upperLeft2D.getY());
 			}
 		} catch (final NoninvertibleTransformException e) {
 			throw new RuntimeException("Transformation matrix in illegal state!", e);
 		}
+	}
+
+	private AbsoluteRectangle inv(final AbsoluteRectangle rect) {
+		final AbsoluteRectangle ret = new AbsoluteRectangle(rect);
+		ret.rectangle.y = -ret.rectangle.y - ret.rectangle.height;
+		return ret;
+	}
+
+	private AbsolutePosition inv(final AbsolutePosition rect) {
+		final AbsolutePosition ret = rect.clone();
+		ret.y *= -1;
+		return ret;
 	}
 
 	/**
@@ -594,6 +571,8 @@ public class DrawingArea extends Canvas {
 	 */
 	public void move(final int pixelX, final int pixelY) {
 		this.checkWidget();
+
+		//log.debug("Moving by "+pixelX+","+pixelY);
 
 		final AffineTransform atCopy;
 		synchronized (transformMutex) {
@@ -621,9 +600,10 @@ public class DrawingArea extends Canvas {
 		// This is an optimized alternative to above command.
 		// Unfortunatly it results in graphical errors, likely resulted
 		// by approximations in the transformation matrix
-//		final GC gc = new GC(this);
-//		gc.copyArea(0, 0, getDrawingRectangle().getWidth(), getDrawingRectangle().getHeight(), pixelX, pixelY, true);
-//		gc.dispose();
+		// final GC gc = new GC(this);
+		// gc.copyArea(0, 0, getDrawingRectangle().getWidth(), getDrawingRectangle().getHeight(),
+		// pixelX, pixelY, true);
+		// gc.dispose();
 
 		syncScrollBars();
 	}
@@ -633,7 +613,7 @@ public class DrawingArea extends Canvas {
 	 * result in a legal transformation matrix with respect to the global boundingBox (which must
 	 * never be left)
 	 */
-	private boolean isValidTransformation(final AffineTransform at2) {
+	protected boolean isValidTransformation(final AffineTransform at2) {
 		boolean ok = false;
 		// log.debug("Canvas: " + this.canvasRect);
 
@@ -641,17 +621,14 @@ public class DrawingArea extends Canvas {
 
 			final Point2D upperLeft2D = at2.inverseTransform(new Point2D.Double(0, 0), null);
 
-			final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(),
-					this.getDrawingRectangle().getHeight());
+			final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(), this.getDrawingRectangle().getHeight());
 			final Point2D lowerRight2D = at2.inverseTransform(lowerRight, null);
 
 			// log.debug(String.format("upperLeft2D=%s, lowerRight2D=%s", upperLeft2D,
 			// lowerRight2D));
 
-			ok = DrawingArea.MAX_ZOMM_OUT
-					.contains(upperLeft2D.getX(), upperLeft2D.getY())
-					&& DrawingArea.MAX_ZOMM_OUT.contains(lowerRight2D.getX(),
-							lowerRight2D.getY());
+			ok = DrawingArea.MAX_ZOMM_OUT.contains(upperLeft2D.getX(), upperLeft2D.getY())
+					&& DrawingArea.MAX_ZOMM_OUT.contains(lowerRight2D.getX(), lowerRight2D.getY());
 
 		} catch (final NoninvertibleTransformException e) {
 			log.error("Transformation matrix in illegal state!", e);
@@ -674,7 +651,7 @@ public class DrawingArea extends Canvas {
 		try {
 			synchronized (transformMutex) {
 				final Point2D a = at.inverseTransform(point.toPoint2D(), null);
-				return new AbsolutePosition(a);
+				return inv(new AbsolutePosition(a));
 			}
 
 		} catch (final NoninvertibleTransformException e) {
@@ -695,24 +672,24 @@ public class DrawingArea extends Canvas {
 	public AbsoluteRectangle pixelRect2AbsRect(final PixelRectangle rect) {
 
 		try {
+
 			synchronized (transformMutex) {
 				final AbsoluteRectangle absRect = new AbsoluteRectangle();
 
 				Point2D a = at.inverseTransform(rect.getUpperLeft().toPoint2D(), null);
 				final AbsolutePosition upperLeftAbs = new AbsolutePosition(a);
-				absRect.setUpperLeft(upperLeftAbs);
+				absRect.setLowerLeft(upperLeftAbs);
 
 				final PixelPosition lowerRight = new PixelPosition();
 				lowerRight.x = rect.getUpperLeft().x + rect.getWidth();
 				lowerRight.y = rect.getUpperLeft().y + rect.getHeight();
 				a = at.inverseTransform(lowerRight.toPoint2D(), null);
-				final AbsolutePosition lowerRightAbs = new AbsolutePosition((int) Math
-						.floor(a.getX() + 1), (int) Math.floor(a.getY() + 1), 0);
+				final AbsolutePosition lowerRightAbs = new AbsolutePosition((int) Math.floor(a.getX() + 1), (int) Math.floor(a.getY() + 1), 0);
 
 				absRect.setWidth(Math.abs(lowerRightAbs.x - upperLeftAbs.x));
 				absRect.setHeight(Math.abs(upperLeftAbs.y - lowerRightAbs.y));
 
-				return absRect;
+				return inv(absRect);
 			}
 
 		} catch (final NoninvertibleTransformException e) {
@@ -828,8 +805,7 @@ public class DrawingArea extends Canvas {
 	public void zoomIn(final double factor) {
 		this.checkWidget();
 
-		this.zoom(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle()
-				.getHeight() / 2, factor);
+		this.zoom(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle().getHeight() / 2, factor);
 
 	}
 
@@ -839,8 +815,7 @@ public class DrawingArea extends Canvas {
 	public void zoomOut(final double factor) {
 		this.checkWidget();
 
-		this.zoom(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle()
-				.getHeight() / 2, 1/factor);
+		this.zoom(this.getDrawingRectangle().getWidth() / 2, this.getDrawingRectangle().getHeight() / 2, 1 / factor);
 
 	}
 
@@ -870,11 +845,11 @@ public class DrawingArea extends Canvas {
 
 		// scale and move to upper left corner
 		newAt.scale(scale, scale);
-		newAt.translate(-rect.getUpperLeft().x, -rect.getUpperLeft().y);
+		newAt.translate(-rect.getLowerLeft().x, -rect.getLowerLeft().y);
 
 		// finally move the rect to the center of the drawing area
 
-		final AbsolutePosition lowerRight = rect.getUpperLeft();
+		final AbsolutePosition lowerRight = rect.getLowerLeft();
 		lowerRight.x += rect.getWidth();
 		lowerRight.y += rect.getHeight();
 		final Point2D lowerRightPx = newAt.transform(lowerRight.toPoint2D(), null);
@@ -906,8 +881,7 @@ public class DrawingArea extends Canvas {
 	 */
 	public static AbsoluteRectangle getGlobalBoundingBox() {
 
-		return new AbsoluteRectangle(WORLD_UPPER_LEFT_X, WORLD_UPPER_LEFT_Y, WORLD_WIDTH,
-				WORLD_HEIGHT);
+		return new AbsoluteRectangle(WORLD_LOWER_LEFT_X, WORLD_LOWER_LEFT_Y, WORLD_WIDTH, WORLD_HEIGHT);
 
 	}
 
@@ -919,7 +893,7 @@ public class DrawingArea extends Canvas {
 	 * TODO: adjust heuristic for the case when the drawing area is enlarged for more then 2x
 	 *
 	 */
-	private void adjustToValidMatrix() {
+	protected void adjustToValidMatrix() {
 
 		AffineTransform atCopy;
 
@@ -947,7 +921,7 @@ public class DrawingArea extends Canvas {
 
 				if ((atCopy.getScaleX() > ZOOM_MAX)) {
 					log.debug("Giving up, resetting to initial matrix.");
-					atCopy = new AffineTransform();
+					atCopy = new AffineTransform(); // TODO
 					break;
 				}
 
@@ -957,6 +931,7 @@ public class DrawingArea extends Canvas {
 			}
 
 		}
+
 		// TODO: what about the gap betweeen the two synchr. blocks?
 		synchronized (transformMutex) {
 			at = atCopy;
@@ -970,35 +945,39 @@ public class DrawingArea extends Canvas {
 		syncScrollBars();
 	}
 
+	private AffineTransform createInitialTransform() {
+		return AffineTransform.getScaleInstance(1, 1);
+	}
+
 	/**
 	 * Handle a scroll event
 	 */
-	private void scroll() {
+	protected void scroll() {
 
-		final int selectY = getVerticalBar().getSelection() + WORLD_UPPER_LEFT_Y;
-		final int selectX = getHorizontalBar().getSelection() + WORLD_UPPER_LEFT_X;
+		final int selectY = -getVerticalBar().getSelection() - WORLD_LOWER_LEFT_Y;
+		final int selectX = getHorizontalBar().getSelection() + WORLD_LOWER_LEFT_X;
 
-		final AbsolutePosition newPos = new AbsolutePosition(selectX,selectY);
+		final AbsolutePosition newPos = new AbsolutePosition(selectX, selectY);
 
-		int dx = getUpperLeft().x-newPos.x;
-		int dy = getUpperLeft().y-newPos.y;
+		int dx = getLowerLeft().x - newPos.x;
+		int dy = getLowerLeft().y + getAbsoluteDrawingRectangle().getHeight() - newPos.y;
 
 		// don't allow using scrollbars if we're at the border
-		if ((getHorizontalBar().getSelection()==getHorizontalBar().getMinimum()) && (dx < 0)) {
+		if ((getHorizontalBar().getSelection() == getHorizontalBar().getMinimum()) && (dx < 0)) {
 			dx = 0;
 		}
-		if ((getHorizontalBar().getSelection()==getHorizontalBar().getMaximum()) && (dx > 0)) {
+		if ((getHorizontalBar().getSelection() == getHorizontalBar().getMaximum()) && (dx > 0)) {
 			dx = 0;
 		}
-		if ((getVerticalBar().getSelection()==getVerticalBar().getMinimum()) && (dy < 0)) {
+		if ((getVerticalBar().getSelection() == getVerticalBar().getMinimum()) && (dy < 0)) {
 			dy = 0;
 		}
-		if ((getVerticalBar().getSelection()==getVerticalBar().getMaximum()) && (dy > 0)) {
+		if ((getVerticalBar().getSelection() == getVerticalBar().getMaximum()) && (dy > 0)) {
 			dy = 0;
 		}
 
 		synchronized (transformMutex) {
-			at.concatenate(AffineTransform.getTranslateInstance(dx, dy));
+			at.concatenate(AffineTransform.getTranslateInstance(dx, -dy));
 		}
 
 		fireTransformEvent(Type.MOVE);
@@ -1009,13 +988,12 @@ public class DrawingArea extends Canvas {
 		syncScrollBars();
 	}
 
-
 	/**
 	 * Readjust the scrollbars to the current position
 	 */
-	private void syncScrollBars() {
-		getHorizontalBar().setSelection(getUpperLeft().x - WORLD_UPPER_LEFT_X);
-		getVerticalBar().setSelection(getUpperLeft().y - WORLD_UPPER_LEFT_Y);
+	protected void syncScrollBars() {
+		getHorizontalBar().setSelection(getLowerLeft().x - WORLD_LOWER_LEFT_X);
+		getVerticalBar().setSelection(-getLowerLeft().y - getAbsoluteDrawingRectangle().getHeight()  - WORLD_LOWER_LEFT_Y);
 		getHorizontalBar().setThumb(getAbsoluteDrawingRectangle().getWidth());
 		getVerticalBar().setThumb(getAbsoluteDrawingRectangle().getHeight());
 	}
@@ -1054,17 +1032,20 @@ public class DrawingArea extends Canvas {
 	 */
 	private void fireTransformEvent(final TransformChangedEvent.Type type) {
 
-		final TransformChangedEvent event = new TransformChangedEvent(this,type);
+		final TransformChangedEvent event = new TransformChangedEvent(this, type);
 
 		// Fire the event (call-back method)
-		for (final TransformChangedListener l: listeners.getListeners(TransformChangedListener.class)) {
+		for (final TransformChangedListener l : listeners.getListeners(TransformChangedListener.class)) {
 			l.handleEvent(event);
 		}
 	}
 
 	/**
-	 * Returns a copy of the transformation matrix used to transform coordinates from the
-	 * absolute reference frame to the pixel reference frame.
+	 * Returns a copy of the transformation matrix used to transform coordinates from the absolute
+	 * reference frame to the pixel reference frame.
+	 *
+	 * Note that this transform does not incorporate the inverting of the y-axis between absolute and pixel
+	 * coordinates.
 	 *
 	 * This method is thread-safe.
 	 *
