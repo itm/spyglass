@@ -37,12 +37,19 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
+/**
+ * This plugin extracts scalar values from packets and draws a temperature-color map
+ * where different scalars represent different colors.
+ *
+ * @author Dariush Forouher
+ *
+ */
 public class MapPainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener, NodePositionListener {
 
-	private static Logger log = SpyglassLoggerFactory.getLogger(MapPainterPlugin.class);
+	protected static Logger log = SpyglassLoggerFactory.getLogger(MapPainterPlugin.class);
 
 	@Element(name = "parameters")
-	private final MapPainterXMLConfig xmlConfig = new MapPainterXMLConfig();;
+	private final MapPainterXMLConfig xmlConfig = new MapPainterXMLConfig();
 
 	DataStore dataStore = new DataStore();
 
@@ -167,7 +174,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				dataStore.add(e);
 				this.dataChanged = true;
 			}
-			
+
 		}
 
 	}
@@ -231,16 +238,21 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 			return;
 		}
 
-		if (task != null) {
-			task.cancel();
-			task = null;
+		if (evt.getPropertyName().equals(MapPainterXMLConfig.PROPERTYNAME_REFRESH_FREQUENCY)) {
+
+			if (task != null) {
+				task.cancel();
+				task = null;
+			}
+
+			createTask();
+
+			timer.schedule(task, 1000, 1000 / xmlConfig.getRefreshFrequency());
+
 		}
 
+		// drop the old map object and create a fresh one.
 		createMap();
-
-		createTask();
-
-		timer.schedule(task, 1000, 1000 / xmlConfig.getRefreshFrequency());
 
 	}
 
@@ -253,7 +265,6 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				try {
 					updateMatrix();
 				} catch (final Exception e) {
-					// TODO Auto-generated catch block
 					log.error("Exception while updating the matrix",e);
 				}
 			}
@@ -318,65 +329,71 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		fireDrawingObjectAdded(map);
 	}
 
-	private void updateFramepoints() {
-		// Update the framepoints
-		synchronized (this) {
+	/**
+	 * Remove all framepoints from the datastore and create new ones.
+	 *
+	 * Framepoints are fixed artifical nodes placed outside the map. They have a defined value
+	 * and give the map a default-coloring until real nodes arrive.
+	 */
+	private synchronized void updateFramepoints() {
 
-			// kill all old framepoints
-			final Iterator<DataPoint> it = dataStore.iterator();
-			while (it.hasNext()) {
-				if (it.next().isFramepoint) {
-					it.remove();
-				}
+		// kill all old framepoints
+		final Iterator<DataPoint> it = dataStore.iterator();
+		while (it.hasNext()) {
+			if (it.next().isFramepoint) {
+				it.remove();
 			}
-
-			// add framepoints horizontally
-			final float numFramePointsHorizontal = xmlConfig.getNumFramePointsHorizontal();
-			final int width = xmlConfig.getBoundingBox().getWidth();
-			final int height = xmlConfig.getBoundingBox().getHeight();
-			final AbsolutePosition upperLeft = xmlConfig.getBoundingBox().getLowerLeft().clone();
-			final Double defaultValue = new Double(xmlConfig.getDefaultValue());
-
-			for (int i = 0; i < numFramePointsHorizontal; i++) {
-				final AbsolutePosition pos = upperLeft.clone();
-				pos.x += i / (numFramePointsHorizontal - 1) * width;
-				newFramepoint(defaultValue, pos);
-			}
-			for (int i = 0; i < numFramePointsHorizontal; i++) {
-				final AbsolutePosition pos = upperLeft.clone();
-				pos.x += i / (numFramePointsHorizontal - 1) * width;
-				pos.y += height;
-				newFramepoint(defaultValue, pos);
-			}
-
-			// add framepoints vertically
-			final float numFramePointsVertical = xmlConfig.getNumFramePointsVertical();
-			for (int i = 0; i < numFramePointsVertical; i++) {
-				final AbsolutePosition pos = upperLeft.clone();
-				pos.y += i / (numFramePointsVertical - 1) * height;
-				newFramepoint(defaultValue, pos);
-			}
-			for (int i = 0; i < numFramePointsVertical; i++) {
-				final AbsolutePosition pos = upperLeft.clone();
-				pos.y += i / (numFramePointsVertical - 1) * height;
-				pos.x += width;
-				newFramepoint(defaultValue, pos);
-			}
-
 		}
+
+		// add framepoints horizontally
+		final float numFramePointsHorizontal = xmlConfig.getNumFramePointsHorizontal();
+		final int width = xmlConfig.getBoundingBox().getWidth();
+		final int height = xmlConfig.getBoundingBox().getHeight();
+		final AbsolutePosition upperLeft = xmlConfig.getBoundingBox().getLowerLeft().clone();
+		final Double defaultValue = new Double(xmlConfig.getDefaultValue());
+
+		// Node IDs in Spyglass are always non-negative. So using negative numbers should guaranty
+		// no collisions.
+		int framePointID = -1;
+
+		for (int i = 0; i < numFramePointsHorizontal; i++) {
+			final AbsolutePosition pos = upperLeft.clone();
+			pos.x += i / (numFramePointsHorizontal - 1) * width;
+			newFramepoint(defaultValue, pos, framePointID--);
+		}
+		for (int i = 0; i < numFramePointsHorizontal; i++) {
+			final AbsolutePosition pos = upperLeft.clone();
+			pos.x += i / (numFramePointsHorizontal - 1) * width;
+			pos.y += height;
+			newFramepoint(defaultValue, pos, framePointID--);
+		}
+
+		// add framepoints vertically
+		final float numFramePointsVertical = xmlConfig.getNumFramePointsVertical();
+		for (int i = 0; i < numFramePointsVertical; i++) {
+			final AbsolutePosition pos = upperLeft.clone();
+			pos.y += i / (numFramePointsVertical - 1) * height;
+			newFramepoint(defaultValue, pos, framePointID--);
+		}
+		for (int i = 0; i < numFramePointsVertical; i++) {
+			final AbsolutePosition pos = upperLeft.clone();
+			pos.y += i / (numFramePointsVertical - 1) * height;
+			pos.x += width;
+			newFramepoint(defaultValue, pos, framePointID--);
+		}
+
 	}
 
 	/**
 	 * Add a new framepoint to the data store
 	 */
-	private void newFramepoint(final Double defaultValue, final AbsolutePosition pos) {
+	private synchronized void newFramepoint(final Double defaultValue, final AbsolutePosition pos, final int id) {
 		final DataPoint p = new DataPoint();
 		p.isFramepoint = true;
+		p.nodeID = id;
 		p.value = defaultValue;
 		p.position = pos;
-		synchronized (dataStore) {
-			this.dataStore.add(p);
-		}
+		this.dataStore.add(p);
 	}
 
 	/**
@@ -384,7 +401,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	 */
 	private double calculateValue(final DataStore store, final AbsolutePosition point) {
 		final List<DataPoint> neighbors;
-		synchronized (store) {
+		synchronized (this) {
 			neighbors = store.kNN(point, xmlConfig.getK());
 		}
 
@@ -393,6 +410,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 			sum += dataPoint.value;
 		}
 		sum /= neighbors.size();
+
 
 		return sum;
 	}
@@ -405,30 +423,47 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	 * advantage of avoiding longtime blocking of the SWT-Thread when the draw() method tries to
 	 * aquire the lock.
 	 */
-	private void updateMatrix() {
+	protected void updateMatrix() {
+
+		// the datastore and the xmlConfig may change while this method computes.
+		// to avoid holding the plugin-wide lock for the whole time (which could slow down
+		// responsivness of the pref-dialog), we copy all relevant data.
 
 		final DataStore store;
+		final int rows;
+		final int cols;
+		final int elWidth;
+		final int elHeight;
+		final int lowerLeftX;
+		final int lowerLeftY;
+
 		synchronized (this) {
 			if (!dataChanged) {
 				return;
 			}
 			store = dataStore.clone();
 			dataChanged = false;
+			rows = xmlConfig.getRows();
+			cols = xmlConfig.getCols();
+			elWidth = xmlConfig.getGridElementWidth();
+			elHeight = xmlConfig.getGridElementHeight();
+			lowerLeftX = xmlConfig.getLowerLeftX();
+			lowerLeftY = xmlConfig.getLowerLeftY();
 		}
 
 		final AbsoluteRectangle drawRect = new AbsoluteRectangle();
-		drawRect.setHeight(xmlConfig.getGridElementHeight());
-		drawRect.setWidth(xmlConfig.getGridElementWidth());
+		drawRect.setHeight(elWidth);
+		drawRect.setWidth(elHeight);
 
 		// create a new matrix
-		final double[][] matrix = new double[xmlConfig.getRows()][xmlConfig.getCols()];
+		final double[][] matrix = new double[rows][cols];
 		// ... and fill it
-		for (int row = 0; row < xmlConfig.getRows(); row++) {
-			for (int col = 0; col < xmlConfig.getCols(); col++) {
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
 
 				final AbsolutePosition newPos = new AbsolutePosition();
-				newPos.x = col * xmlConfig.getGridElementWidth() + xmlConfig.getLowerLeftX();
-				newPos.y = row * xmlConfig.getGridElementHeight() + xmlConfig.getLowerLeftY();
+				newPos.x = col * elWidth + lowerLeftX;
+				newPos.y = row * elHeight + lowerLeftY;
 				drawRect.setLowerLeft(newPos);
 				final double average = calculateValue(store, drawRect.getCenter());
 				matrix[row][col] = average;
