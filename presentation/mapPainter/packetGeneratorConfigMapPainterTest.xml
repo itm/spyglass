@@ -1,0 +1,78 @@
+<!-- a sample configuration file for the packet generator
+ -->
+<packetGenerator>
+
+	<!-- number of nodes sent per second -->
+	<packetsPerSecond>50</packetsPerSecond>
+
+	<!-- Sinks which will handle each generated packet. -->
+	<sinks>
+		<!-- this sink opens a socket, from which iShell can fetch the packets. -->
+		<sink class="de.uniluebeck.itm.spyglass.packetgenerator.sinks.IShellSocketSink">
+			<ip>0.0.0.0</ip>
+			<port>8472</port>
+			<iShellSourceNode>1</iShellSourceNode>
+		</sink>
+
+	</sinks>
+
+	<sampleChooser>
+		<!-- list of samples from which the packets are generated. each sample
+		 ! has a given probability of being selected. -->
+		<samples>
+
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>sample</name>
+				<probability>1</probability>
+				<nodeIDs>1-20</nodeIDs>
+				<syntaxType>uint8List</syntaxType>
+				<semanticTypes>1</semanticTypes>
+				<position x="0-100" y="0" z="0"/>
+				<payload>FF</payload>
+			</sample>
+
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>sample</name>
+				<probability>1</probability>
+				<nodeIDs>21-40</nodeIDs>
+				<syntaxType>uint8List</syntaxType>
+				<semanticTypes>1</semanticTypes>
+				<position x="0-100" y="20" z="0"/>
+				<payload>00</payload>
+			</sample>
+
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>sample</name>
+				<probability>1</probability>
+				<nodeIDs>41-60</nodeIDs>
+				<syntaxType>uint8List</syntaxType>
+				<semanticTypes>1</semanticTypes>
+				<position x="0-100" y="40" z="0"/>
+				<payload>A0</payload>
+			</sample>
+
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>sample</name>
+				<probability>1</probability>
+				<nodeIDs>61-80</nodeIDs>
+				<syntaxType>uint8List</syntaxType>
+				<semanticTypes>1</semanticTypes>
+				<position x="0-100" y="60" z="0"/>
+				<payload>30</payload>
+			</sample>
+
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>sample</name>
+				<probability>1</probability>
+				<nodeIDs>81-100</nodeIDs>
+				<syntaxType>uint8List</syntaxType>
+				<semanticTypes>1</semanticTypes>
+				<position x="0-100" y="80" z="0"/>
+				<payload>10</payload>
+			</sample>
+
+
+		</samples>
+	</sampleChooser>
+	
+</packetGenerator>
