@@ -111,7 +111,7 @@ public class UIController {
 
 		eventDispatcher = new EventDispatcher(spyglass.getPluginManager(), appWindow.getGui().getDrawingArea());
 
-		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener(spyglassConfigPluginManagerChangeListener);
+		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener("pluginManager", spyglassConfigPluginManagerChangeListener);
 
 		// Add paint listener to the canvas
 		appWindow.getGui().getDrawingArea().addPaintListener(paintListener);
