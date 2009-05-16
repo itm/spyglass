@@ -105,7 +105,7 @@ public class QuadTreeTest {
 		assertTrue(set.contains(rectangle1));
 
 		// move rect1 to upper right quadrant
-		rectangle1.setPosition(upperRightQuadrant.getUpperLeft());
+		rectangle1.setPosition(upperRightQuadrant.getLowerLeft());
 		set = tree.getDrawingObjects(upperLeftQuadrant);
 		assertTrue(set.size() == 0);
 		assertTrue(!set.contains(rectangle1));
@@ -116,7 +116,7 @@ public class QuadTreeTest {
 		assertTrue(set.contains(rectangle2));
 
 		// move rect1 to lower right
-		rectangle1.setPosition(lowerRightQuadrant.getUpperLeft());
+		rectangle1.setPosition(lowerRightQuadrant.getLowerLeft());
 		set = tree.getDrawingObjects(upperRightQuadrant);
 		assertTrue(set.size() == 1);
 		assertTrue(set.contains(rectangle2));
@@ -126,7 +126,7 @@ public class QuadTreeTest {
 		assertTrue(set.contains(rectangle3));
 
 		// move rect1 to lower left
-		rectangle1.setPosition(lowerLeftQuadrant.getUpperLeft());
+		rectangle1.setPosition(lowerLeftQuadrant.getLowerLeft());
 		set = tree.getDrawingObjects(lowerRightQuadrant);
 		assertTrue(set.size() == 1);
 		assertTrue(set.contains(rectangle3));
@@ -486,7 +486,7 @@ public class QuadTreeTest {
 		for (int i = 1; i < max; i++) {
 
 			rect.setSize(2 * i, 2 * i);
-			rect.setUpperLeft(new AbsolutePosition(-1 * i, -1 * i, 0));
+			rect.setLowerLeft(new AbsolutePosition(-1 * i, -1 * i, 0));
 
 			if (!tree.getDrawingObjects(rect).contains(r)) {
 				failed = true;
