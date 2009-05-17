@@ -126,15 +126,7 @@ public class Spyglass {
 		}
 
 		// shutdown all plug-ins
-		for (final Plugin p : pluginManager.getPlugins()) {
-			try {
-				p.shutdown();
-			} catch (final Exception e) {
-				log.warn("The plugin could not be shut down properly. Continuing anyway.", e);
-			}
-		}
-
-		log.debug("All plugin-threads stopped");
+		pluginManager.shutdown();
 	}
 
 	// --------------------------------------------------------------------------
@@ -207,8 +199,12 @@ public class Spyglass {
 	 * @param pluginManager
 	 *            the facility which manages the currently loaded plug-ins
 	 */
-	public void setPluginManager(final PluginManager pluginManager) {
+	private void setPluginManager(final PluginManager pluginManager) {
+		if (this.pluginManager != null) {
+			this.pluginManager.shutdown();
+		}
 		this.pluginManager = pluginManager;
+		this.pluginManager.init();
 	}
 
 	// --------------------------------------------------------------------------

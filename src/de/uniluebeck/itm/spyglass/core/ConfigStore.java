@@ -260,15 +260,9 @@ public class ConfigStore extends PropertyBean {
 			((PacketRecorder) pr).setRecording(false);
 		}
 
-		log.debug("Stopping plugins.");
-		// destroy the currently active plug-ins since they will be no longer needed
-		for (final Plugin p : spyglassConfig.getPluginManager().getPlugins()) {
-			p.shutdown();
-		}
-
 		/* now activate the new configuration */
 
-		log.debug("Overwriting config.");
+		log.info("Overwriting the current configuration with the new one.");
 		spyglassConfig.overwriteWith(sgc);
 
 		log.debug("Registering new listener.");

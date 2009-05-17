@@ -54,6 +54,32 @@ public class PluginManager {
 	private static Logger log = SpyglassLoggerFactory.getLogger(PluginManager.class);
 
 	/**
+	 * The state of the plugin manager
+	 */
+	public enum State {
+
+		/**
+		 * The plugin manager has not been initialized yet.
+		 */
+		INFANT,
+
+		/**
+		 * The plugin manager has been initialized and is running.
+		 */
+		ALIVE,
+
+		/**
+		 * The plugin manager has been shut down.
+		 */
+		ZOMBIE
+	}
+
+	/**
+	 * State of the manager
+	 */
+	private State state = State.INFANT;
+
+	/**
 	 * This List is serialized by the XMLSerializer. It must not be used by any code, since access
 	 * to it is not synchronized! Use the variable <code>plugins</code> instead, which has a
 	 * Collections.synchronizedList() wrapper around it.
@@ -103,14 +129,15 @@ public class PluginManager {
 	 * @throws Exception
 	 */
 	public PluginManager() {
-		initPlugins();
 
 		// Create default node positioner (we must have one at all times!)
 		try {
+			// since the state is still INFANT, it won't get connected.
 			createNewPlugin(PositionPacketNodePositionerPlugin.class, null);
 		} catch (final Exception e) {
 			throw new RuntimeException("Could not create default node positioner plugin. Smells like a bug...");
 		}
+
 	}
 
 	// --------------------------------------------------------------------------
@@ -123,9 +150,6 @@ public class PluginManager {
 	@Commit
 	protected void commit() {
 		this.plugins = Collections.synchronizedList(pluginsInternal);
-
-		// initialize the new list of plugins
-		initPlugins();
 	}
 
 	// --------------------------------------------------------------------------
@@ -153,6 +177,56 @@ public class PluginManager {
 			}
 			pluginNames.add(name);
 		}
+	}
+
+	/**
+	 * Initializes the plugin manager.
+	 *
+	 * Connects and initializes all existing plugins ans sets the state to ALIVE.
+	 */
+	public void init() {
+		if (state != State.INFANT) {
+			throw new RuntimeException("Can only initialize a new PluginManager!");
+		}
+
+		state = State.ALIVE;
+
+		// connect the list of existing plugins
+		synchronized (plugins) {
+			final Iterator<Plugin> it = plugins.iterator();
+			while(it.hasNext()) {
+				final Plugin p = it.next();
+				try {
+					connectPlugin(p);
+				} catch (final Exception e) {
+					log.error("Could not connect plugin "+p+" with the plugin manager. Dropping the plugin.",e);
+					it.remove();
+				}
+			}
+		}
+
+		log.info("PluginManager initialized.");
+	}
+
+	/**
+	 * Shuts the plugin manager and all containing plugins down.
+	 */
+	public void shutdown() {
+		if (state != State.ALIVE) {
+			throw new RuntimeException("Can shutdown a running PluginManager only!");
+		}
+
+		state = State.ZOMBIE;
+
+		for (final Plugin p: plugins) {
+			try {
+				p.shutdown();
+			} catch (final Exception e) {
+				log.warn("The plugin "+p+" could not be shut down properly. Continuing anyway.", e);
+			}
+		}
+
+		log.info("PluginManager shut down.");
 	}
 
 	// --------------------------------------------------------------------------
@@ -292,31 +366,6 @@ public class PluginManager {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * Initializes the instance by setting it as administration instance for all currently available
-	 * plug-ins
-	 *
-	 * This method is called after the PluginManager got instantiated by the XML Deserializer
-	 */
-	private void initPlugins() {
-
-		synchronized (plugins) {
-			final Iterator<Plugin> it = plugins.iterator();
-			while(it.hasNext()) {
-				final Plugin p = it.next();
-				try {
-					connectPlugin(p);
-				} catch (final Exception e) {
-					log.error("Could not connect plugin "+p+" with the plugin manager. Dropping the plugin.",e);
-					it.remove();
-				}
-			}
-		}
-
-		log.debug("All plug-ins loaded and connected");
-	}
-
-	// --------------------------------------------------------------------------
-	/**
 	 * Connect the plug-in with the plug-in manager
 	 *
 	 * @param plugin
@@ -360,13 +409,18 @@ public class PluginManager {
 	 * Adds a plug-in if it is not contained yet. The plug-in is put at the end of the list which
 	 * means that the new plug-in has the lowest priority
 	 *
+	 * If we're not ALIVE yet, then just add the plugin to the list. It will be connected
+	 * later by {@link #init()}.
+	 *
 	 * @param plugin
 	 *            The plug-in object to be added.
-	 * @throws Exception when the plugin could not be created.
+	 * @throws Exception when the plugin could not be added.
 	 */
 	private void addPlugin(final Plugin plugin) throws Exception {
 
-		this.connectPlugin(plugin);
+		if (state == State.ALIVE) {
+			this.connectPlugin(plugin);
+		}
 
 		if (plugins.contains(plugin)) {
 			throw new RuntimeException("Plugin already there!");
@@ -375,10 +429,11 @@ public class PluginManager {
 		plugins.add(plugin);
 		log.debug("Added plug-in: " + plugin);
 
-		// Important: Only fire the event *after* it has been completely initialized
-		// (the UIController and probably other Listeners depend on this assumption)
-		firePluginListChangedEvent(plugin, ListChangeEvent.NEW_PLUGIN);
-
+		if (state == State.ALIVE) {
+			// Important: Only fire the event *after* it has been completely initialized
+			// (the UIController and probably other Listeners depend on this assumption)
+			firePluginListChangedEvent(plugin, ListChangeEvent.NEW_PLUGIN);
+		}
 	}
 
 	// --------------------------------------------------------------------------
