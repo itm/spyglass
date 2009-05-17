@@ -482,11 +482,12 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Fire a DrawingObjectAdded event for all drawing objects in <code>dobs</code>.<br />
+	 * Fire a DrawingObjectAdded event for all drawing objects in <code>dobs</code>.
 	 *
-	 * NOTE: Before this method is called, the dobs MUST have already been added to the Layer!
+	 * This is a convenience method for adding a number of drawing objects at once. See
+	 * method {@link #fireDrawingObjectAdded(DrawingObject)} for details.
 	 *
-	 * @param dobs
+	 * @param dobs A Collection of drawingObjects
 	 */
 	protected final void fireDrawingObjectAdded(final Collection<? extends DrawingObject> dobs) {
 		// Get listeners
@@ -502,9 +503,12 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Fire a DrawingObjectAdded event.<br />
+	 * Fire a DrawingObjectAdded event.
 	 *
-	 * NOTE: Before this method is called, the dob MUST have already been added to the Layer!
+	 * This will register the drawing object with the UIController and initialize it.
+	 * After this method returns, the drawing object will have the state ALIVE.
+	 * EXCEPT when it is called from {@link #init(PluginManager)}, in this case the drawing
+	 * object will only be enabled shortly after.
 	 *
 	 * @param dob
 	 *            The DrawingObject, which has been added
@@ -523,8 +527,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	/**
 	 * Fire a DrawingObjectRemoved event for all drawing objects in <code>dobs</code>.<br />
 	 *
-	 * @param dobs
-	 *            The DrawingObjects, which have been removed
+	 * This is a convenience method for removing a number of drawing objects at once. See
+	 * method {@link #fireDrawingObjectRemoved(DrawingObject)} for details.
+	 *
+	 * @param dobs A Collection of drawingObjects
 	 */
 	protected final void fireDrawingObjectRemoved(final Collection<? extends DrawingObject> dobs) {
 		// Get listeners
@@ -540,7 +546,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Fire a DrawingObjectRemoved event.<br />
+	 * Fire a DrawingObjectRemoved event.
+	 *
+	 * This will unbind the drawing object from the UIController. After this method returns,
+	 * the state of the drawing object will be ZOMBIE.
 	 *
 	 * @param dob
 	 *            The DrawingObject, which has been removed

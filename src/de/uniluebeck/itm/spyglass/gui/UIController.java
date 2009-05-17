@@ -211,7 +211,15 @@ public class UIController {
 		}
 	}
 
+	/**
+	 * Registers Listener to the PluginManager and creats PluginControllers for Plugins
+	 * inside the PluginManager.
+	 *
+	 * Note that at this point we assume that the PluginManager has already fully initialized
+	 * all his Plugins (i.e. it is in a "running" state).
+	 */
 	protected void registerPluginManager(final PluginManager manager) {
+
 		for (final Plugin p : manager.getPlugins()) {
 
 			// sanity check

@@ -73,7 +73,8 @@ public class PluginController {
 		 */
 		plugin.addDrawingObjectListener(drawingObjectListener);
 
-		// handle all drawing objects that already exist
+		// If a Plugin creates DrawingObjects during its init() method, we won't initialize those
+		// drawingobjects since we haven't connected with them yet. Thus we have to do this now.
 		for (final DrawingObject dob : ((Drawable)plugin).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
 			handleDrawingObjectAdded(dob);
 		}

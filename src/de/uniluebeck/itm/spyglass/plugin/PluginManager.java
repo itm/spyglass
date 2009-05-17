@@ -375,6 +375,8 @@ public class PluginManager {
 		plugins.add(plugin);
 		log.debug("Added plug-in: " + plugin);
 
+		// Important: Only fire the event *after* it has been completely initialized
+		// (the UIController and probably other Listeners depend on this assumption)
 		firePluginListChangedEvent(plugin, ListChangeEvent.NEW_PLUGIN);
 
 	}
