@@ -306,7 +306,7 @@ public abstract class DrawingObject implements Cloneable {
 	 * @return the bounding box of this drawing object
 	 */
 	public synchronized final AbsoluteRectangle getBoundingBox() {
-		return shadowCopy.boundingBox;
+		return boundingBox;
 	}
 
 	// --------------------------------------------------------------------------------
