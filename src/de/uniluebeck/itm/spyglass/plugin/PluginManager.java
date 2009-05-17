@@ -373,9 +373,15 @@ public class PluginManager {
 	 * @throws Exception
 	 */
 	private void connectPlugin(final Plugin plugin) throws Exception {
-		// If the plug-in is a NodePositioner, we have to act when the plug-in is activated
-		// (to disable all other plug-ins)
 		if (plugin instanceof NodePositionerPlugin) {
+
+			// if there is already an active nodepositioner, don't enable the new one.
+			if (plugin.isActive() && getNodePositioner().isActive() && (getNodePositioner() != plugin)) {
+				plugin.setActive(false);
+			}
+
+			// If the plug-in is a NodePositioner, we have to act when the plug-in is (de)activated
+			// (to en/disable any existing node positioner)
 			plugin.getXMLConfig().addPropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, new PropertyChangeListener() {
 
 				@Override
