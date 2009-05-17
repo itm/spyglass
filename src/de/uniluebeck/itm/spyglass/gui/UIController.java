@@ -261,6 +261,13 @@ public class UIController {
 	 *            the application's main class
 	 */
 	public static void openPreferencesDialog(final Shell parentShell, final Spyglass spyglass) {
+
+		// we don't want more than one dialog to be open to avoid unpredictable databinding behaviour
+		// (changes don't alway propagate between the windows.)
+		if (openPrefDialogs.get()>0) {
+			return;
+		}
+
 		if (openPrefDialogs.getAndIncrement() == 0) {
 			UIController.currentRedrawPeriod = 200;
 		}
