@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Serializer;
@@ -356,6 +357,12 @@ public class ConfigStore extends PropertyBean {
 			writer.write(buf.toString());
 			writer.close();
 
+		} catch (final ConcurrentModificationException e) {
+			// Note: In theory this may lead to StackOverflow. But since under normal circumstances
+			// the chances of hitting this Exception are already pretty small, we probably can risk it.
+			log.debug("Configuration was modified while the configstore tried to store the config. I'll just try again.", e);
+			storeSync(configFile);
+			return;
 		} catch (final IOException e) {
 			log.error("Unable to store configuration output: Error while writing the file!", e);
 		} catch (final InterruptedException e) {
