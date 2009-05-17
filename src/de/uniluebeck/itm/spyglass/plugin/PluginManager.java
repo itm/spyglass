@@ -376,7 +376,7 @@ public class PluginManager {
 		// If the plug-in is a NodePositioner, we have to act when the plug-in is activated
 		// (to disable all other plug-ins)
 		if (plugin instanceof NodePositionerPlugin) {
-			plugin.getXMLConfig().addPropertyChangeListener("active", new PropertyChangeListener() {
+			plugin.getXMLConfig().addPropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, new PropertyChangeListener() {
 
 				@Override
 				public void propertyChange(final PropertyChangeEvent evt) {
@@ -692,19 +692,32 @@ public class PluginManager {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * Returns the instances which holds information about the nodes' positions
+	 * Returns the instance which holds information about the nodes' positions
 	 *
-	 * @return the instances which holds information about the nodes' positions
+	 * @return the instance which holds information about the nodes' positions
 	 */
 	public NodePositionerPlugin getNodePositioner() {
+
 		synchronized (plugins) {
+
+			// first try to find the active nodepositioner
 			for (final Plugin p : plugins) {
 				if ((p instanceof NodePositionerPlugin) && p.isActive()) {
 					return (NodePositionerPlugin) p;
 				}
 			}
+
+			// if there none, then we're currenty in the process of switching from one
+			// to another. In this case just return an inactive one.
+			// (as soon as the new one arrives, we will be back in business again)
+			for (final Plugin p : plugins) {
+				if ((p instanceof NodePositionerPlugin)) {
+					return (NodePositionerPlugin) p;
+				}
+			}
 		}
-		throw new IllegalStateException("No active NodePositioner found!");
+
+		throw new IllegalStateException("No NodePositioner found!");
 	}
 
 	// --------------------------------------------------------------------------
