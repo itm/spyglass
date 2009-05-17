@@ -272,7 +272,7 @@ public class Node extends DrawingObject {
 	}
 
 	@Override
-	public void draw(final DrawingArea drawingArea, final GC gc) {
+	public void draw(final GC gc) {
 
 		try {
 			// set the colors and the width of the rectangle's line
@@ -294,7 +294,7 @@ public class Node extends DrawingObject {
 
 			// get the node's position in the drawing area
 			final AbsolutePosition pos = getPosition();
-			final PixelPosition upperLeft = drawingArea.absPoint2PixelPoint(pos != null ? pos : new AbsolutePosition(0, 0, 0));
+			final PixelPosition upperLeft = getDrawingArea().absPoint2PixelPoint(pos != null ? pos : new AbsolutePosition(0, 0, 0));
 
 			// the rectangles upper left pint will be in the middle of the surrounding line. Since
 			// the rectangle's upper left edge represents the object location, it has to be adapted

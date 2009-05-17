@@ -15,7 +15,6 @@ import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.CircleRange;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.ConeRange;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.Config;
@@ -101,7 +100,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 	}
 
 	@Override
-	public void draw(final DrawingArea drawingArea, final GC gc) {
+	public void draw(final GC gc) {
 
 		final AbsoluteRectangle absRect;
 		final PixelRectangle pxRect;
@@ -121,7 +120,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 				// calculate the real size of the bounding box
 				absRect = new AbsoluteRectangle(getPosition(), radius * 2, radius * 2);
 				absRect.rectangle.y -= absRect.rectangle.height; // HACK
-				pxRect = drawingArea.absRect2PixelRect(absRect);
+				pxRect = getDrawingArea().absRect2PixelRect(absRect);
 				pxPos = pxRect.getUpperLeft();
 				drawCircle(gc, pxPos.x, pxPos.y, pxRect.getHeight() / 2);
 				break;
@@ -130,7 +129,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 				radius = ((ConeRange) range).getConeRadius();
 				absRect = new AbsoluteRectangle(getPosition(), radius * 2, radius * 2);
 				absRect.rectangle.y -= absRect.rectangle.height; // HACK
-				pxRect = drawingArea.absRect2PixelRect(absRect);
+				pxRect = getDrawingArea().absRect2PixelRect(absRect);
 				pxPos = pxRect.getUpperLeft();
 				drawCone(gc, pxPos.x, pxPos.y, pxRect.getHeight() / 2);
 				break;
@@ -139,7 +138,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 				width = ((RectangleRange) range).getRectangleWidth();
 				height = ((RectangleRange) range).getRectangleHeight();
 				absRect = new AbsoluteRectangle(new AbsolutePosition(getPosition().x - (width / 2), getPosition().y - (height / 2)), width, height);
-				pxRect = drawingArea.absRect2PixelRect(absRect);
+				pxRect = getDrawingArea().absRect2PixelRect(absRect);
 				pxPos = pxRect.getUpperLeft();
 				drawRect(gc, pxPos.x, pxPos.y, pxRect.getWidth(), pxRect.getHeight());
 				break;

@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.GC;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 
@@ -44,7 +43,7 @@ public class Image extends DrawingObject {
 	}
 
 	@Override
-	public void draw(final DrawingArea drawingArea, final GC gc) {
+	public void draw(final GC gc) {
 
 		// disable the advanced subsystem for performance reasons and to avoid strange drawing bugs.
 		final boolean advancedSubsystem = gc.getAdvanced();
@@ -56,7 +55,7 @@ public class Image extends DrawingObject {
 										-this.getPosition().y - this.getBoundingBox().getHeight()));
 
 		// multiply transform from drawing area. now "transform" transforms from image coordinates to pixel coordinates
-		transform.preConcatenate(drawingArea.getTransform());
+		transform.preConcatenate(getDrawingArea().getTransform());
 
 		// the inverse matrix. it transforms from pixel coordinates to image coordinates
 		AffineTransform invTransform;
@@ -69,7 +68,7 @@ public class Image extends DrawingObject {
 		final PixelRectangle clippingArea = new PixelRectangle(gc.getClipping());
 
 		// the pixel area that actually has to be redrawn...
-		PixelRectangle imageSrcArea = drawingArea.absRect2PixelRect(getBoundingBox()).intersection(clippingArea);
+		PixelRectangle imageSrcArea = getDrawingArea().absRect2PixelRect(getBoundingBox()).intersection(clippingArea);
 		// ... transformed into the corresponding area in the image
 		imageSrcArea.transform(invTransform);
 

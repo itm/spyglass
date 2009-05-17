@@ -7,7 +7,6 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
 public class LinePainterLine extends Line {
@@ -28,9 +27,9 @@ public class LinePainterLine extends Line {
 	}
 
 	@Override
-	public void draw(final DrawingArea drawingArea, final GC gc) {
+	public void draw(final GC gc) {
 
-		super.draw(drawingArea, gc);
+		super.draw(gc);
 
 		// protected class variable currentClippingSaysDrawIt is set by super.draw() if clipping
 		// algorithm

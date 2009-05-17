@@ -41,11 +41,11 @@ public class Map extends DrawingObject {
 	}
 
 	@Override
-	public synchronized void draw(final DrawingArea drawingArea, final GC gc) {
+	public synchronized void draw(final GC gc) {
 
 		final PixelRectangle clippAreaPx = new PixelRectangle(gc.getClipping());
 
-		final AbsoluteRectangle clippingArea = drawingArea.pixelRect2AbsRect(clippAreaPx);
+		final AbsoluteRectangle clippingArea = getDrawingArea().pixelRect2AbsRect(clippAreaPx);
 
 		final AbsoluteRectangle drawRect = new AbsoluteRectangle();
 		drawRect.setHeight(xmlConfig.getGridElementHeight());
@@ -61,7 +61,7 @@ public class Map extends DrawingObject {
 				// Clipping
 				if (clippingArea.intersects(drawRect)) {
 
-					drawElement(drawingArea, gc, drawRect, row, col);
+					drawElement(getDrawingArea(), gc, drawRect, row, col);
 
 				}
 

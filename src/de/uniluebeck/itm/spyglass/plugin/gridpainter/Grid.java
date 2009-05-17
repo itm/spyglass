@@ -5,7 +5,6 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
@@ -19,7 +18,7 @@ public class Grid extends DrawingObject {
 	private int numRows;
 
 	@Override
-	public void draw(final DrawingArea drawingArea, final GC gc) {
+	public void draw(final GC gc) {
 
 		final Rectangle clipping = gc.getClipping();
 
@@ -45,8 +44,8 @@ public class Grid extends DrawingObject {
 			origin = new AbsolutePosition(originX, originY, 0);
 			dest = new AbsolutePosition(destX, destY, 0);
 
-			pxOrigin = drawingArea.absPoint2PixelPoint(origin);
-			pxDest = drawingArea.absPoint2PixelPoint(dest);
+			pxOrigin = getDrawingArea().absPoint2PixelPoint(origin);
+			pxDest = getDrawingArea().absPoint2PixelPoint(dest);
 
 			if ((pxOrigin.y >= clipping.y) && (pxOrigin.y <= (clipping.y + clipping.height))) {
 
@@ -71,8 +70,8 @@ public class Grid extends DrawingObject {
 			origin = new AbsolutePosition(originX, originY, 0);
 			dest = new AbsolutePosition(destX, destY, 0);
 
-			pxOrigin = drawingArea.absPoint2PixelPoint(origin);
-			pxDest = drawingArea.absPoint2PixelPoint(dest);
+			pxOrigin = getDrawingArea().absPoint2PixelPoint(origin);
+			pxDest = getDrawingArea().absPoint2PixelPoint(dest);
 
 			if ((pxOrigin.x >= clipping.x) && (pxOrigin.x <= (clipping.x + clipping.width))) {
 

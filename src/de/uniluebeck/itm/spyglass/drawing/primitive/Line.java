@@ -130,14 +130,14 @@ public class Line extends DrawingObject implements TransformChangedListener {
 	}
 
 	@Override
-	public void draw(final DrawingArea drawingArea, final GC gc) {
+	public void draw(final GC gc) {
 
 		final Color color = new Color(gc.getDevice(), this.getColor());
 		gc.setForeground(color);
 		gc.setLineWidth(this.getLineWidth());
 
-		final PixelPosition start = drawingArea.absPoint2PixelPoint(this.getPosition());
-		final PixelPosition end = drawingArea.absPoint2PixelPoint(this.getEnd());
+		final PixelPosition start = getDrawingArea().absPoint2PixelPoint(this.getPosition());
+		final PixelPosition end = getDrawingArea().absPoint2PixelPoint(this.getEnd());
 
 		// set protected class variables so that extending classes don't have to calculate the
 		// points once again
