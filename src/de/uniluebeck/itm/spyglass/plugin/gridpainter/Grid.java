@@ -1,5 +1,6 @@
 package de.uniluebeck.itm.spyglass.plugin.gridpainter;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
@@ -8,8 +9,11 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class Grid extends DrawingObject {
+
+	private static Logger log = SpyglassLoggerFactory.getLogger(Grid.class);
 
 	private int gridElementHeight;
 	private int numCols;
@@ -76,9 +80,9 @@ public class Grid extends DrawingObject {
 			if ((pxOrigin.x >= clipping.x) && (pxOrigin.x <= (clipping.x + clipping.width))) {
 
 				x1 = pxOrigin.x;
-				y1 = Math.max(clipping.y, pxOrigin.y);
+				y1 = Math.max(clipping.y, pxDest.y);
 				x2 = pxDest.x;
-				y2 = Math.min((clipping.y + clipping.height), pxDest.y);
+				y2 = Math.min((clipping.y + clipping.height),pxOrigin.y);
 
 				gc.drawLine(x1, y1, x2, y2);
 
