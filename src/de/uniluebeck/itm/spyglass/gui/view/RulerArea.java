@@ -74,6 +74,9 @@ public class RulerArea extends Canvas {
 
 		gc.fillRectangle(0, 0, this.getClientArea().width, this.getClientArea().height);
 
+		System.out.println("Upper left: " + upperLeft.getX() + ", " + upperLeft.getY());
+		System.out.println("Lower right: " + lowerRight.getX() + ", " + lowerRight.getY());
+
 		int pxMin;
 		int pxMax;
 		double absMin;
@@ -87,8 +90,8 @@ public class RulerArea extends Canvas {
 		} else if (direction == RulerArea.VERTICAL) {
 			pxMin = pxRect.getUpperLeft().y;
 			pxMax = pxMin + pxRect.getHeight();
-			absMin = upperLeft.getY();
-			absMax = lowerRight.getY();
+			absMin = lowerRight.getY();
+			absMax = upperLeft.getY();
 		} else {
 			// do nothing and quit
 			return;
@@ -123,17 +126,33 @@ public class RulerArea extends Canvas {
 			absScale = 10000;
 		}
 
-		// most left absolute value to be shown on ruler
-		final int shownMin;
-		if (absMin >= 0) {
-			shownMin = (int) Math.round((absMin + absScale - absMin % absScale) - absScale);
+		// most left (horizontal) or top (vertical) absolute value to be shown on ruler
+		final int shownFirst;
+		if (direction == RulerArea.HORIZONTAL) {
+			if (absMin >= 0) {
+				shownFirst = (int) Math.round((absMin + absScale - absMin % absScale) - absScale);
+			} else {
+				shownFirst = (int) Math.round((absMin + absScale + (-absScale - (absMin % absScale))) - absScale);
+			}
 		} else {
-			shownMin = (int) Math.round((absMin + absScale + (-absScale - (absMin % absScale))) - absScale);
+			if (absMax >= 0) {
+				shownFirst = (int) Math.round((absMax + absScale - absMax % absScale));
+			} else {
+				shownFirst = (int) Math.round((absMax + absScale + (-absScale - (absMax % absScale))));
+			}
 		}
 
 		// horizontal: x-Coordinate (in px) of the most left shown ruler value
 		// vertical: y-Coordinate (in px) of the most up shown ruler Value
-		final int firstLine = (int) Math.round((shownMin - absMin) * pxPerAbs);
+		// This value (firstLine) is always outside of the visible area. Thus ruler labels can be
+		// drawn even if the caption is located a threshold of the visible area.
+
+		int firstLine;
+		if (direction == RulerArea.HORIZONTAL) {
+			firstLine = (int) Math.round((shownFirst - absMin) * pxPerAbs);
+		} else {
+			firstLine = -(int) Math.round((shownFirst - absMax) * pxPerAbs);
+		}
 		final int numOfLines = (int) (absMax - absMin) / absScale + 1;
 
 		// fit the fontsize so that all values can be displayed completely
@@ -156,9 +175,9 @@ public class RulerArea extends Canvas {
 				gc.drawLine(curX + 1, 15, curX + 1, 27);
 
 				// draw the caption centered above the line
-				final String curTxt = "" + (shownMin + i * absScale);
+				final String curTxt = "" + (shownFirst + i * absScale);
 				final int txtWidth = gc.stringExtent(curTxt).x;
-				gc.drawText("" + (shownMin + i * absScale), curX - txtWidth / 2, 0);
+				gc.drawText("" + (shownFirst + i * absScale), curX - txtWidth / 2, 0);
 
 				// draw short lines before and behind (the 5th line is longer)
 				for (int j = 1; j < 10; j++) {
@@ -174,7 +193,7 @@ public class RulerArea extends Canvas {
 			for (int i = 0; i <= numOfLines; i++) {
 				final int curY = (int) Math.round((i * absScale * pxPerAbs + 1) + firstLine);
 
-				gc.drawText("" + (shownMin + (i * absScale)), 0, curY - gc.getFontMetrics().getHeight());
+				gc.drawText("" + (shownFirst - (i * absScale)), 0, curY - gc.getFontMetrics().getHeight());
 				gc.drawLine(15, curY, 27, curY);
 				gc.drawLine(15, curY + 1, 27, curY + 1);
 
