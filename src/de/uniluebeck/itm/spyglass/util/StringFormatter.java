@@ -14,6 +14,7 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
  * <ul>
  * <li>'u' (unsigned 8 Bit integer)</li>
  * <li>'U' (unsigned 32 Bit integer)</li>
+ * <li>'v' (unsigned 16 Bit integer)</li>
  * <li>'i' (signed 16 Bit integer)</li>
  * <li>'f' (signed 32 Bit float).</li>
  * </ul>
@@ -43,10 +44,10 @@ public class StringFormatter {
 	 * The parameter of the constructor must be a String containing an expression. If the expression
 	 * is invalid, an IllegalArgumentException will be thrown. An expression is unvalid, if it
 	 * <ul>
-	 * <li>contains a substring % followed by any character expect u,U,i,f or %,</li>
-	 * <li>contains a substring %u, %U, %i or %f followed by a non digit character,</li>
+	 * <li>contains a substring % followed by any character expect u,v,U,i,f or %,</li>
+	 * <li>contains a substring %u, %v, %U, %i or %f followed by a non digit character,</li>
 	 * <li>ends with % or</li>
-	 * <li>ends with %u, %U, %i or %f</li>
+	 * <li>ends with %u, ,%v, %U, %i or %f</li>
 	 * </ul>
 	 * Note, that %% masks a %. Thus an expression may contain e.g. a substring '%%fish', even
 	 * though this strictly spoken breaks rule 2 (it contains '%f').
@@ -67,8 +68,8 @@ public class StringFormatter {
 		// test if the given expression is valid and throw an exception
 		// otherwise
 
-		if (pFormatExpression.matches(".*%[^uUif%].*") || pFormatExpression.matches(".*%[uUif][^0-9].*") || pFormatExpression.matches(".*%")
-				|| pFormatExpression.matches(".*%[uUif]")) {
+		if (pFormatExpression.matches(".*%[^uvUif%].*") || pFormatExpression.matches(".*%[uvUif][^0-9].*") || pFormatExpression.matches(".*%")
+				|| pFormatExpression.matches(".*%[uvUif]")) {
 			final String msg = "StringFormatterExpression '" + pFormatExpression + "' is invalid";
 			throw new IllegalArgumentException(msg);
 		}
@@ -130,6 +131,27 @@ public class StringFormatter {
 						bb = ByteBuffer.allocate(2);
 						bb.put(b);
 						result += bb.getShort(0);
+					} catch (final ArrayIndexOutOfBoundsException e) {
+						result += "<packet to short>";
+					} catch (final NullPointerException e) {
+						result += "<packet without payload>";
+					}
+					break;
+
+				// uint16 (2 bytes):
+				case 'v':
+					b = new byte[4];
+					try {
+						for (int i = 0; i < 4; i++) {
+							if (i < 2) {
+								b[i] = 0;
+							} else {
+								b[i] = content[offset + i - 2];
+							}
+							bb = ByteBuffer.allocate(4);
+							bb.put(b);
+							result += bb.getInt(0);
+						}
 					} catch (final ArrayIndexOutOfBoundsException e) {
 						result += "<packet to short>";
 					} catch (final NullPointerException e) {
