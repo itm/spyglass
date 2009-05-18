@@ -68,6 +68,7 @@ public class RulerArea extends Canvas {
 		}
 
 		gc.drawText("" + unit, 7, 6, true);
+		font.dispose();
 	}
 
 	public void drawRuler(final PixelRectangle pxRect, final Point2D upperLeft, final Point2D lowerRight, final GC gc, final int direction) {
