@@ -19,10 +19,12 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 
 	@Override
 	protected Composite createContents(final Composite parent) {
-		final Composite composite = createContentsInternal(parent);
-		final NodeSensorRangeOptionsComposite optionsComposite = new NodeSensorRangeOptionsComposite(composite);
 
+		final Composite composite = createContentsInternal(parent);
+
+		final NodeSensorRangeOptionsComposite optionsComposite = new NodeSensorRangeOptionsComposite(composite);
 		optionsComposite.setDatabinding(dbc, config, this);
+		optionsComposite.getPerNodeConfigurationComposite().setDataBinding(dbc, config);
 
 		return composite;
 	}

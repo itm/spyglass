@@ -29,7 +29,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * Flag class for DrawingObjects painted by NodeSensorRangePlugin
- *
+ * 
  * @author bimschas
  */
 public class NodeSensorRangeDrawingObject extends DrawingObject implements PropertyChangeListener {
@@ -45,11 +45,8 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 		this.config = config;
 		this.config.addPropertyChangeListener(this);
 
-		int[] color;
-		color = config.getBackgroundRGB();
-		setBgColor(new RGB(color[0], color[1], color[2]));
-		color = config.getColorRGB();
-		setColor(new RGB(color[0], color[1], color[2]));
+		setBgColor(config.getBackgroundRGB());
+		setColor(config.getColorRGB());
 
 	}
 
@@ -200,8 +197,8 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 
 	// --------------------------------------------------------------------------------
 	/**
-	 *
-	 *
+	 * 
+	 * 
 	 * @param gc
 	 * @param x
 	 *            in pixel coordinates

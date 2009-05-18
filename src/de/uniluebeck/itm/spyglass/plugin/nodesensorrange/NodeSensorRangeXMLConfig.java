@@ -10,11 +10,13 @@ package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.eclipse.swt.graphics.RGB;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
-import org.simpleframework.xml.ElementMap;
+import org.simpleframework.xml.ElementList;
 
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -124,7 +126,15 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * @author bimschas
+	 * 
+	 */
 	public static class Config extends PropertyBean {
+
+		@Element(name = PROPERTYNAME_NODE_ID, required = false)
+		private int nodeId = -1;
 
 		@Element(name = PROPERTYNAME_LINE_WIDTH, required = false)
 		private int lineWidth = 1;
@@ -142,7 +152,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		private NodeSensorRange range = new CircleRange();
 
 		@Element(name = PROPERTYNAME_RANGE_TYPE, required = false)
-		private String rangeType = "Circle";
+		private String rangeType = PROPERTYVALUE_RANGE_TYPE_CIRCLE;
 
 		// --------------------------------------------------------------------------------
 		/**
@@ -186,12 +196,12 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			return backgroundAlpha;
 		}
 
-		public int[] getBackgroundRGB() {
-			return backgroundRGB;
+		public RGB getBackgroundRGB() {
+			return new RGB(backgroundRGB[0], backgroundRGB[1], backgroundRGB[2]);
 		}
 
-		public int[] getColorRGB() {
-			return colorRGB;
+		public RGB getColorRGB() {
+			return new RGB(colorRGB[0], colorRGB[1], colorRGB[2]);
 		}
 
 		public NodeSensorRange getRange() {
@@ -206,6 +216,14 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			return lineWidth;
 		}
 
+		public int getNodeId() {
+			return nodeId;
+		}
+
+		public void setNodeId(final int nodeId) {
+			firePropertyChange(PROPERTYNAME_NODE_ID, this.nodeId, this.nodeId = nodeId);
+		}
+
 		public void setLineWidth(final int lineWidth) {
 			firePropertyChange(PROPERTYNAME_LINE_WIDTH, this.lineWidth, this.lineWidth = lineWidth);
 		}
@@ -214,12 +232,13 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			firePropertyChange(PROPERTYNAME_BACKGROUND_ALPHA, this.backgroundAlpha, this.backgroundAlpha = backgroundAlpha);
 		}
 
-		public void setBackgroundRGB(final int[] backgroundRGB) {
-			firePropertyChange(PROPERTYNAME_BACKGROUND_R_G_B, this.backgroundRGB, this.backgroundRGB = backgroundRGB);
+		public void setBackgroundRGB(final RGB backgroundRGB) {
+			firePropertyChange(PROPERTYNAME_COLOR_R_G_B, getBackgroundRGB(), this.colorRGB = new int[] { backgroundRGB.red, backgroundRGB.green,
+					backgroundRGB.blue });
 		}
 
-		public void setColorRGB(final int[] colorRGB) {
-			firePropertyChange(PROPERTYNAME_COLOR_R_G_B, this.colorRGB, this.colorRGB = colorRGB);
+		public void setColorRGB(final RGB colorRGB) {
+			firePropertyChange(PROPERTYNAME_COLOR_R_G_B, getColorRGB(), this.colorRGB = new int[] { colorRGB.red, colorRGB.green, colorRGB.blue });
 		}
 
 		public void setRange(final NodeSensorRange range) {
@@ -313,6 +332,8 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 
 	}
 
+	public static final String PROPERTYNAME_NODE_ID = "nodeId";
+
 	public static final String PROPERTYNAME_LINE_WIDTH = "lineWidth";
 
 	public static final String PROPERTYNAME_BACKGROUND_ALPHA = "backgroundAlpha";
@@ -331,7 +352,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 
 	public static final String PROPERTYNAME_DEFAULT_CONFIG = "defaultConfig";
 
-	public static final String PROPERTYNAME_NODE_RANGES = "nodeRanges";
+	public static final String PROPERTYNAME_PER_NODE_CONFIGS = "perNodeConfigs";
 
 	public static final String PROPERTYNAME_RANGE = "range";
 
@@ -352,19 +373,14 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	@Element(name = PROPERTYNAME_DEFAULT_CONFIG, required = false)
 	private final Config defaultConfig = new Config();
 
-	@ElementMap(entry = PROPERTYNAME_NODE_RANGES, key = "nodeID", attribute = true, valueType = NodeSensorRange.class, required = false)
-	private HashMap<Integer, NodeSensorRange> nodeRanges = new HashMap<Integer, NodeSensorRange>();
-
-	public void addNodeRange(final int nodeId, final NodeSensorRange range) {
-		nodeRanges.put(nodeId, range);
-		range.addPropertyChangeListener(this);
-	}
+	@ElementList(entry = PROPERTYNAME_PER_NODE_CONFIGS, required = false)
+	private Set<Config> perNodeConfigs = new HashSet<Config>();
 
 	public boolean equals(final NodeSensorRangeXMLConfig o) {
 		if (!super.equals(o)) {
 			return false;
 		}
-		return nodeRanges.equals((o).nodeRanges);
+		return perNodeConfigs.equals((o).perNodeConfigs);
 	}
 
 	public Config getDefaultConfig() {
@@ -376,8 +392,12 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
 	}
 
-	public void removeNodeRange(final int nodeId) {
-		nodeRanges.remove(nodeId).removePropertyChangeListener(this);
+	public Set<Config> getPerNodeConfigs() {
+		return perNodeConfigs;
+	}
+
+	public void setPerNodeConfigs(final Set<Config> perNodeConfigs) {
+		firePropertyChange(PROPERTYNAME_PER_NODE_CONFIGS, this.perNodeConfigs, this.perNodeConfigs = perNodeConfigs);
 	}
 
 }

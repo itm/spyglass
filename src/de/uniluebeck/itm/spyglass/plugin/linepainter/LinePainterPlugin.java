@@ -54,7 +54,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	// --------------------------------------------------------------------------------
 	/**
 	 * Small helper class representing an edge in a graph, denoted by 2-tuple of 2 node IDs.
-	 *
+	 * 
 	 * @author Daniel Bimschas
 	 */
 	private class Edge {
@@ -81,7 +81,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	/**
 	 * A small helper class containing the graph defined by the edges which are read from incoming
 	 * packages.
-	 *
+	 * 
 	 * @author Daniel Bimschas
 	 */
 	private class Data {
@@ -351,6 +351,13 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 					synchronized (lock) {
 						data.updateEdgeTime(e);
+
+						// check if there's a string formatter especially for this
+						// semantic type and use it if so, otherwise use default
+						// string formatter
+						final boolean hasSemanticType = stringFormatters.get(p.getSemanticType()) != null;
+						e.line.setStringFormatterResult(hasSemanticType ? stringFormatters.get(p.getSemanticType()).parse(p) : defaultStringFormatter
+								.parse(p));
 					}
 
 				} else {

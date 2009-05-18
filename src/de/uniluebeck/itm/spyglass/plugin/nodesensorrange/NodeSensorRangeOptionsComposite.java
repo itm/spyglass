@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -43,8 +42,8 @@ import org.eclipse.swt.widgets.Text;
 import com.cloudgarden.resource.SWTResourceManager;
 
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
-import de.uniluebeck.itm.spyglass.gui.databinding.converter.ArrayToColorConverter;
-import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverter;
+import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToRGBConverter;
+import de.uniluebeck.itm.spyglass.gui.databinding.converter.RGBToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.CircleRange;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.ConeRange;
@@ -58,6 +57,12 @@ import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfi
  * 
  */
 public class NodeSensorRangeOptionsComposite extends Composite {
+
+	{
+		// Register as a resource user - SWTResourceManager will
+		// handle the obtaining and disposing of resources
+		SWTResourceManager.registerResourceUser(this);
+	}
 
 	public class ConfigWrapper extends PropertyBean implements PropertyChangeListener {
 
@@ -521,7 +526,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 					label.setText("Type");
 
 					data = new GridData();
-					data.widthHint = 60;
+					data.widthHint = 100;
 
 					defaultRangeType = new Combo(groupDefaultRange, SWT.DROP_DOWN | SWT.READ_ONLY);
 					defaultRangeType.setLayoutData(data);
@@ -574,18 +579,20 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 			groupPerNodeConfig = new Group(this, SWT.NONE);
 			groupPerNodeConfig.setLayoutData(data);
-			groupPerNodeConfig.setLayout(new GridLayout(3, false));
+			groupPerNodeConfig.setLayout(new GridLayout(2, false));
 			groupPerNodeConfig.setText("Per Node Configuration");
 
-			{
-				// elements of group "per node configuration"
-				label = new Label(groupPerNodeConfig, SWT.NONE);
-				label.setText("Not yet implemented. Rescheduled for MS 3.");
-			}
+			perNodeConfigurationComposite.addPerNodeConfigurationTable(groupPerNodeConfig);
 
 		}
 
 	}
+
+	public NodeSensorRangePerNodeConfigurationComposite getPerNodeConfigurationComposite() {
+		return perNodeConfigurationComposite;
+	}
+
+	private NodeSensorRangePerNodeConfigurationComposite perNodeConfigurationComposite = new NodeSensorRangePerNodeConfigurationComposite();
 
 	private Binding defaultRangeTypeBinding;
 
@@ -641,19 +648,20 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 			{
 				obsWidget = SWTObservables.observeBackground(defaultRangeForegroundColor);
 				obsModel = BeansObservables.observeValue(realm, config, NodeSensorRangeXMLConfig.PROPERTYNAME_COLOR_R_G_B);
+
 				usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-				usTargetToModel.setConverter(new ColorToArrayConverter());
+				usTargetToModel.setConverter(new ColorToRGBConverter());
 				usModelToTarget = new UpdateValueStrategy();
-				usModelToTarget.setConverter(new ArrayToColorConverter(Display.getDefault()));
+				usModelToTarget.setConverter(new RGBToColorConverter());
 				defaultRangeForegroundColorBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
 			}
 			{
 				obsWidget = SWTObservables.observeBackground(defaultRangeBackgroundColor);
 				obsModel = BeansObservables.observeValue(realm, config, NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_R_G_B);
 				usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-				usTargetToModel.setConverter(new ColorToArrayConverter());
+				usTargetToModel.setConverter(new ColorToRGBConverter());
 				usModelToTarget = new UpdateValueStrategy();
-				usModelToTarget.setConverter(new ArrayToColorConverter(Display.getDefault()));
+				usModelToTarget.setConverter(new RGBToColorConverter());
 				defaultRangeBackgroundColorBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
 			}
 			{
@@ -663,16 +671,6 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 				usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator("Background Alpha Transparency", 0, 255));
 				defaultBackgroundAlphaTransparencyBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 			}
-			// {
-			// final IObservableValue observeValue =
-			// BeansObservables.observeValue(dbc.getValidationRealm(),
-			// defaultConfigWrapper.getConfig(),
-			// NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE);
-			// obsModel = BeansObservables.observeValue(dbc.getValidationRealm(), evt.getNewValue(),
-			// NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE);
-			// usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
-			// dbc.bindValue(observeValue, obsModel, usTargetToModel, null);
-			// }
 
 		}
 	};
@@ -698,6 +696,8 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 			obsModel = BeansObservables.observeValue(realm, config, NodeSensorRangeXMLConfig.PROPERTYNAME_DEFAULT_CONFIG);
 			dbc.bindValue(obsValue, obsModel, null, null);
 		}
+
+		perNodeConfigurationComposite.setDataBinding(dbc, config);
 
 	}
 }
