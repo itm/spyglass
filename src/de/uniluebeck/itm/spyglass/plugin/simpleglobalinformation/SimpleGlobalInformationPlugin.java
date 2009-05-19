@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -96,8 +95,6 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	private PNCountTimerTask pNCountTimerTask;
 
-	private ConcurrentLinkedQueue<StatisticalInformationEvaluator> dirtyEvaluators;
-
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -105,7 +102,6 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	public SimpleGlobalInformationPlugin() {
 		xmlConfig = new SimpleGlobalInformationXMLConfig();
 		avgNodeDegEvaluator = new IDBasedStatisticalOperation(STATISTICAL_OPERATIONS.AVG);
-		dirtyEvaluators = new ConcurrentLinkedQueue<StatisticalInformationEvaluator>();
 		avgNodeDegString = "avg. node degree: ";
 		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
 		totalPacketCount = 0;
@@ -126,6 +122,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 					semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
 					avgNodeDegEvaluator.reset();
 				} else if (evt.getPropertyName().equals(SimpleGlobalInformationXMLConfig.PROPERTYNAME_STATISTICAL_INFORMATION_EVALUATORS)) {
+					refreshStatIEConf();
+				} else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_SEMANTIC_TYPES)) {
 					refreshStatIEConf();
 				}
 			}
@@ -195,10 +193,9 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		}
 
 		final StatisticalInformationEvaluator sfs = xmlConfig.getStatisticalInformationEvaluators4Type(packetSemanticType);
-		if (sfs != null) {
+		if ((sfs != null) && !((sfs.getExpression() == null) || sfs.getExpression().equals(""))) {
 			try {
 				sfs.parse(packet);
-				dirtyEvaluators.add(sfs);
 			} catch (final SpyglassPacketException e) {
 				log.error("Error parsing a packet in the " + getHumanReadableName()
 						+ ".\r\nPlease check the values in the StringFormatter for semantic type " + packetSemanticType + "!", e);
@@ -229,7 +226,6 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 			});
 		}
 		xmlConfig.removePropertyChangeListener(pcl);
-		dirtyEvaluators.clear();
 	}
 
 	@Override
@@ -243,7 +239,6 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		avgNodeDegString = "avg. node degree: ";
 		totalPacketCount = 0;
 		pNCountTimerTask.reset();
-		dirtyEvaluators.clear();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -303,9 +298,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 									widget.removeAVGNodeDeg();
 								}
 
-								StatisticalInformationEvaluator sfs = null;
-								while ((sfs = dirtyEvaluators.poll()) != null) {
-									widget.createOrUpdateLabel(sfs);
+								for (final StatisticalInformationEvaluator evaluator : xmlConfig.getStatisticalInformationEvaluators()) {
+									widget.createOrUpdateLabel(evaluator);
 								}
 
 								widget.pack(true);

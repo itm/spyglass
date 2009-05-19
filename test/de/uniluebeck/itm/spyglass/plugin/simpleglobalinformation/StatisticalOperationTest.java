@@ -98,7 +98,7 @@ public class StatisticalOperationTest {
 		statisticalOperation.addValue(8);
 		statisticalOperation.addValue(9);
 		statisticalOperation.addValue(10);
-		assertEquals(65, statisticalOperation.addValue(11));
+		assertEquals(66, statisticalOperation.addValue(11));
 	}
 
 	/**

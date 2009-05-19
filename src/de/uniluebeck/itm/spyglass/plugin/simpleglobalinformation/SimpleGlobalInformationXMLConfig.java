@@ -175,7 +175,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 		final Set<StatisticalInformationEvaluator> oldValue = new TreeSet<StatisticalInformationEvaluator>(this.statisticalInformationEvaluators);
 		this.statisticalInformationEvaluators.clear();
 		for (final StatisticalInformationEvaluator e : statisticalInformationEvaluators) {
-			this.statisticalInformationEvaluators.add(e.clone());
+			this.statisticalInformationEvaluators.add(e);
 		}
 		firePropertyChange(PROPERTYNAME_STATISTICAL_INFORMATION_EVALUATORS, oldValue, this.statisticalInformationEvaluators);
 	}

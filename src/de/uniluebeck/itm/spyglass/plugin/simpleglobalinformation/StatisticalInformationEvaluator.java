@@ -77,7 +77,7 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	/**
 	 * The latest computed value based on the selected statistical operation
 	 */
-	private volatile String value;
+	private volatile String value = "";
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -234,6 +234,7 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	 *            the expression to set
 	 */
 	public void setExpression(final String expression) {
+
 		StringFormatter newStringFormatter = null;
 		try {
 			newStringFormatter = new StringFormatter(expression);
@@ -241,9 +242,11 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 			log.error("The string " + expression + " is no valid format expression!", e);
 			return;
 		}
-		this.stringFormatter = newStringFormatter;
+
+		value = "";
 		final String oldValue = new String(this.expression);
 		this.expression = new String(expression);
+		this.stringFormatter = newStringFormatter;
 		firePropertyChange("expression", oldValue, expression);
 	}
 
@@ -339,7 +342,7 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 			final int val = Integer.valueOf(stringFormatter.parse(packet));
 			value = new DecimalFormat("0.0#").format(operationExecutor.addValue(val));
 			return description + " " + value;
-		} catch (final RuntimeException e) {
+		} catch (final Exception e) {
 			value = "NaN";
 			throw new SpyglassPacketException("A packet coult not be evaluated in StatisticalInformationEvaluator", e);
 		}

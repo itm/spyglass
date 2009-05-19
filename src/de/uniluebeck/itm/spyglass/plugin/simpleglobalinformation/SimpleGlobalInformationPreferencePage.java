@@ -8,9 +8,6 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -28,8 +25,6 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
  * 
  */
 public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> {
-
-	private Set<StatisticalInformationEvaluator> tempStringFormatterSettingsList = new TreeSet<StatisticalInformationEvaluator>();
 
 	private SimpleGlobalInformationOptionsComposite optionsComposite;
 
@@ -70,8 +65,7 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 
 		optionsComposite.setDatabinding(dbc, config);
 
-		tempStringFormatterSettingsList = config.getStatisticalInformationEvaluators();
-		optionsComposite.getStringFormatter().connectTableWithData(dbc, tempStringFormatterSettingsList);
+		optionsComposite.getStringFormatter().connectTableWithData(dbc, config);
 
 		return composite;
 	}

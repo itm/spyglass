@@ -14,7 +14,8 @@ import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInfo
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class perform statistical operations on an array of buffered values.
+ * Instances of this class perform statistical operations on an array of buffered {@link Float}
+ * values.
  * 
  * @author Sebastian Ebers
  * 
@@ -74,7 +75,11 @@ public class StatisticalOperation {
 	 * @return the result of the statistical operation which is applianced on the buffer.
 	 */
 	public synchronized float addValue(final float value) {
-		buffer[pointer++] = value;
+		if (defaultOperation.equals(STATISTICAL_OPERATIONS.SUM)) {
+			buffer[pointer++] += value;
+		} else {
+			buffer[pointer++] = value;
+		}
 		pointer = pointer % bufferSize;
 		if (maxValidFieldValue < buffer.length) {
 			++maxValidFieldValue;
@@ -174,7 +179,7 @@ public class StatisticalOperation {
 	 * @return the sum of the buffer's values
 	 */
 	private float getSum() {
-		int sum = 0;
+		float sum = 0;
 		for (int i = 0; i < maxValidFieldValue; i++) {
 			sum += buffer[i];
 		}
@@ -206,7 +211,7 @@ public class StatisticalOperation {
 	 * @return the minimum of the buffer's values
 	 */
 	private float getMinValue() {
-		float min = Integer.MAX_VALUE;
+		float min = Float.MAX_VALUE;
 		for (int i = 0; i < maxValidFieldValue; i++) {
 			if (buffer[i] < min) {
 				min = buffer[i];
@@ -222,7 +227,7 @@ public class StatisticalOperation {
 	 * @return the maximum of the buffer's values
 	 */
 	private float getMaxValue() {
-		float max = Integer.MIN_VALUE;
+		float max = Float.MIN_VALUE;
 		for (int i = 0; i < maxValidFieldValue; i++) {
 			if (buffer[i] > max) {
 				max = buffer[i];
@@ -255,7 +260,11 @@ public class StatisticalOperation {
 	public synchronized void reset() {
 		pointer = 0;
 		maxValidFieldValue = 0;
-		buffer[0] = 0;
+
+		for (int i = 0; i < buffer.length; i++) {
+			buffer[i] = 0;
+		}
+
 	}
 
 }
