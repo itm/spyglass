@@ -60,7 +60,7 @@ public class SpyglassApp extends ApplicationWindow {
 	/**
 	 * Enables SWT Object tracking. This allows tracking memory leaks (e.g. missing dispose)
 	 */
-	public static final boolean ENABLE_SLEAK = true;
+	public static final boolean ENABLE_SLEAK = false;
 
 	// -------------------------------------------------------------------------
 	/**
