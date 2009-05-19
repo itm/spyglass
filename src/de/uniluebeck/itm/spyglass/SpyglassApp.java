@@ -18,6 +18,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.DeviceData;
+import org.eclipse.swt.tools.internal.Sleak;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -56,16 +57,22 @@ public class SpyglassApp extends ApplicationWindow {
 
 	private AppWindow appWindow;
 
+	/**
+	 * Enables SWT Object tracking. This allows tracking memory leaks (e.g. missing dispose)
+	 */
+	public static final boolean ENABLE_SLEAK = true;
+
 	// -------------------------------------------------------------------------
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param shell
 	 *            the {@link Shell} to be used
 	 * @throws Exception
 	 */
-	public SpyglassApp(final Shell shell) throws Exception {
-		super(shell);
+	public SpyglassApp() throws Exception {
+		super(null);
+
 		// Model
 		SpyglassEnvironment.setIShellPlugin(false);
 		spyglass = new Spyglass();
@@ -81,7 +88,7 @@ public class SpyglassApp extends ApplicationWindow {
 	// -------------------------------------------------------------------------
 	/**
 	 * The stand-alone application's entry point
-	 * 
+	 *
 	 * @param args
 	 *            an array of arguments
 	 */
@@ -90,16 +97,25 @@ public class SpyglassApp extends ApplicationWindow {
 		// Set an exception handler which will handle uncaught exceptions
 		Window.setExceptionHandler(new SpyglassExceptionHandler());
 
-		// SWT stuff
-		final DeviceData data = new DeviceData();
-		data.tracking = true;
-		data.debug = true;
-		final Display display = new Display(data);
-		shell = new Shell(display);
+		if (ENABLE_SLEAK) {
+
+			// create a customized Device. Since a Device is a singleton object
+			// (at least with currently...) we don't have to save it. Newly created
+			// Shells will use it automatically.
+			final DeviceData data = new DeviceData();
+			data.tracking = true;
+			data.debug = true;
+			new Display(data);
+
+			// Open sleak
+			final Sleak sleak = new Sleak();
+			sleak.open();
+
+		}
 
 		SpyglassApp app = null;
 		try {
-			app = new SpyglassApp(shell);
+			app = new SpyglassApp();
 			app.open();
 
 		} catch (final Exception e) {
@@ -177,7 +193,7 @@ public class SpyglassApp extends ApplicationWindow {
 	// -------------------------------------------------------------------------
 	/**
 	 * Returns the area where plug-ins can place their objects to be displayed
-	 * 
+	 *
 	 * @return the area where plug-ins can place their objects to be displayed
 	 */
 	public DrawingArea getDrawingArea() {
@@ -203,7 +219,7 @@ public class SpyglassApp extends ApplicationWindow {
 	// -------------------------------------------------------------------------
 	/**
 	 * Creates the part of the menu where the source can be selected
-	 * 
+	 *
 	 * @return the part of the menu where the source can be selected
 	 */
 	private MenuManager createSourceMenu() {
@@ -218,7 +234,7 @@ public class SpyglassApp extends ApplicationWindow {
 	// -------------------------------------------------------------------------
 	/**
 	 * Creates the part of the menu where the recording options can be selected
-	 * 
+	 *
 	 * @return the part of the menu where the recording options can be selected
 	 */
 	private MenuManager createRecordMenu() {
@@ -234,7 +250,7 @@ public class SpyglassApp extends ApplicationWindow {
 	/**
 	 * Creates the part of the menu where the manipulations of the {@link DrawingArea} can be
 	 * performed
-	 * 
+	 *
 	 * @return the part of the menu where the manipulations of the {@link DrawingArea} can be
 	 *         performed
 	 */
@@ -251,7 +267,7 @@ public class SpyglassApp extends ApplicationWindow {
 	// -------------------------------------------------------------------------
 	/**
 	 * Creates the file part of the menu
-	 * 
+	 *
 	 * @return the file part of the menu
 	 */
 	private MenuManager createFileMenu() {

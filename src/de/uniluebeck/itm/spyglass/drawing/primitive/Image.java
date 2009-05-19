@@ -4,6 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
@@ -86,6 +87,17 @@ public class Image extends DrawingObject {
 		final PixelRectangle imageDestArea = new PixelRectangle(imageSrcArea);
 		imageDestArea.transform(transform);
 
+//		if (imageDestArea.rectangle.y < 0) {
+//			imageDestArea.rectangle.y = 0;
+//		}
+//		if (imageDestArea.rectangle.x > clippingArea.rectangle.x) {
+//			imageDestArea.rectangle.x = clippingArea.rectangle.x;
+//		}
+
+//		log.debug("Clipping: "+clippingArea);
+//		log.debug("Drawing image from "+imageSrcArea+" to: "+imageDestArea);
+		//log.debug("Drawing image to: "+imageDestArea);
+
 		gc.drawImage(image,
 				imageSrcArea.getUpperLeft().x,
 				imageSrcArea.getUpperLeft().y,
@@ -95,6 +107,12 @@ public class Image extends DrawingObject {
 				imageDestArea.getUpperLeft().y,
 				imageDestArea.getWidth(),
 				imageDestArea.getHeight());
+
+		gc.setLineWidth(3);
+		gc.setForeground(new Color(null, 255,0,0));
+		//gc.setBackground(new Color(null, 0,255,0));
+		gc.drawRectangle(imageDestArea.rectangle);
+		//gc.fillRectangle(imageDestArea.rectangle);
 
 		gc.setAdvanced(advancedSubsystem);
 

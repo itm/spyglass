@@ -7,16 +7,13 @@
  */
 package de.uniluebeck.itm.spyglass.gui.view;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.Sleak;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
@@ -24,39 +21,21 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * Instances of this class manage references to the graphical user interface's main components.
  */
 public class AppWindow implements DisposeListener {
-	private static Logger log = SpyglassLoggerFactory.getLogger(AppWindow.class);
 
 	private Display display = null;
 
 	private SpyglassGuiComponent gui = null;
 
-	/**
-	 * Enables SWT Object tracking. This allows tracking memory leaks (e.g. missing dispose)
-	 * 
-	 * IMPORTANT: This activates some really hacky butchering in internal SWT data structures. Only
-	 * the bravest of all should consider enabling this. You have been warned.
-	 */
-	public static final boolean ENABLE_SWT_DEBUGGING = false;
-
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param spyglass
 	 *            the active {@link Spyglass} object
 	 * @param parent
 	 *            the parent widget
 	 */
 	public AppWindow(final Spyglass spyglass, final Composite parent) {
-
-		if (ENABLE_SWT_DEBUGGING) {
-			if (!parent.getDisplay().getDeviceData().tracking) {
-				log.warn("Enabling SWT-Tracking hack. Expect problems.");
-				// SWTButcherClass.enableTracking(parent.getDisplay());
-			}
-			final Sleak sleak = new Sleak();
-			sleak.open();
-		}
 
 		this.display = parent.getDisplay();
 		gui = new SpyglassGuiComponent(parent, SWT.NULL, spyglass);
@@ -67,7 +46,7 @@ public class AppWindow implements DisposeListener {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns Spyglass's graphical user interface manager
-	 * 
+	 *
 	 * @return Spyglass's graphical user interface manager
 	 */
 	public SpyglassGuiComponent getGui() {
@@ -77,7 +56,7 @@ public class AppWindow implements DisposeListener {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the current display
-	 * 
+	 *
 	 * @return the current display
 	 */
 	public Display getDisplay() {
@@ -87,7 +66,7 @@ public class AppWindow implements DisposeListener {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the display
-	 * 
+	 *
 	 * @param display
 	 *            the display to be set
 	 */

@@ -272,7 +272,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		/**
 		 * Returns all active plug-ins in increasing priority
-		 * 
+		 *
 		 * @return all active plug-ins in increasing priority
 		 */
 		@SuppressWarnings("unchecked")
