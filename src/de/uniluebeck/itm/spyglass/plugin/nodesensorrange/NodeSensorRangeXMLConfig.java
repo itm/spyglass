@@ -24,9 +24,9 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 // --------------------------------------------------------------------------------
 /**
  * Instances of this class contain the configuration parameters of a {@link NodeSensorRangePlugin}
- * 
+ *
  * @author Sebastian Ebers, Daniel Bimschas
- * 
+ *
  */
 public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements PropertyChangeListener {
 
@@ -129,7 +129,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	// --------------------------------------------------------------------------------
 	/**
 	 * @author bimschas
-	 * 
+	 *
 	 */
 	public static class Config extends PropertyBean {
 
@@ -165,7 +165,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		// --------------------------------------------------------------------------------
 		/**
 		 * Constructor
-		 * 
+		 *
 		 * @param backgroundAlpha
 		 * @param backgroundRGB
 		 * @param colorRGB
@@ -184,7 +184,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		// --------------------------------------------------------------------------------
 		/**
 		 * Copy constructor. Makes a deep copy.
-		 * 
+		 *
 		 * @param other
 		 *            object to copy values from
 		 */
@@ -233,7 +233,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		}
 
 		public void setBackgroundRGB(final RGB backgroundRGB) {
-			firePropertyChange(PROPERTYNAME_COLOR_R_G_B, getBackgroundRGB(), this.colorRGB = new int[] { backgroundRGB.red, backgroundRGB.green,
+			firePropertyChange(PROPERTYNAME_BACKGROUND_R_G_B, getBackgroundRGB(), this.backgroundRGB = new int[] { backgroundRGB.red, backgroundRGB.green,
 					backgroundRGB.blue });
 		}
 
@@ -260,7 +260,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	/**
 	 * "Flag" base class grouping together {@link NodeSensorRangeXMLConfig.RectangleRange},
 	 * {@link NodeSensorRangeXMLConfig.CircleRange} &amp; {@link NodeSensorRangeXMLConfig.ConeRange}
-	 * 
+	 *
 	 * @author Daniel Bimschas
 	 */
 	public static abstract class NodeSensorRange extends PropertyBean {
