@@ -195,8 +195,10 @@ public class GlobalInformationBar {
 	 */
 	private void detach(final ExpandItem item) {
 		synchronized (widgets) {
-			item.setExpanded(false);
-			item.dispose();
+			if (!item.isDisposed()) {
+				item.setExpanded(false);
+				item.dispose();
+			}
 		}
 	}
 
