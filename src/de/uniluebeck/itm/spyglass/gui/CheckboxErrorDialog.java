@@ -21,6 +21,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
+
 // --------------------------------------------------------------------------------
 /**
  * Displays a customized {@link ErrorDialog}.<br>
@@ -141,8 +143,17 @@ public class CheckboxErrorDialog extends ErrorDialog {
 			return openError(parent, dialogTitle, message);
 		}
 
-		final Status[] childStatus = new Status[1];
-		childStatus[0] = new Status(IStatus.ERROR, "not_used", 0, "\r\n" + getStackTrace(t), null);
+		final String lineSeparator = java.security.AccessController.doPrivileged(new sun.security.action.GetPropertyAction("line.separator"));
+
+		// the tab character '\t' is not supported in this context by all operating systems (e.g.
+		// Microsoft Windows)
+		final String[] stacks = getStackTrace(t).replace("\t", "        ").split(lineSeparator);
+
+		final Status[] childStatus = new Status[stacks.length];
+
+		for (int i = 0; i < stacks.length; i++) {
+			childStatus[i] = new Status(IStatus.ERROR, "not_used", 0, stacks[i], null);
+		}
 		final MultiStatus m = new MultiStatus("not_used", 0, childStatus, t.getMessage(), t);
 
 		final CheckboxErrorDialog d = new CheckboxErrorDialog(parent, dialogTitle, message, m);
@@ -164,6 +175,10 @@ public class CheckboxErrorDialog extends ErrorDialog {
 		final PrintWriter printWriter = new PrintWriter(stringWriter);
 		t.printStackTrace(printWriter);
 		return stringWriter.toString();
+	}
+
+	public static void main(final String[] args) {
+		openError(null, "Test", "xyz", new SpyglassPacketException(new Exception("Testex")));
 	}
 
 }
