@@ -265,20 +265,14 @@ public class PluginController {
 	 *            the part of the drawing area to be redrawn
 	 */
 	protected void redraw(final PixelRectangle pxBBox) {
-		drawingArea.redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
+		//drawingArea.redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
+		drawingArea.backRedraw();
 	}
 
 	/**
 	 * Disconnects all listeners from the plugin.
 	 */
 	public void disconnect() {
-		// sanity check
-		for (final DrawingObject dob: ((Drawable)plugin).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
-			if (dob.getState() == State.ALIVE) {
-				log.warn("DrawingObject '"+dob+"' of plugin '"+plugin+"' is still alive!");
-			}
-		}
-
 		plugin.removeDrawingObjectListener(drawingObjectListener);
 		plugin.getXMLConfig().removePropertyChangeListener(pluginPropertyListener);
 	}
