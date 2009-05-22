@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------
 /**
- * 
+ *
  */
 package de.uniluebeck.itm.spyglass.gui.view;
 
@@ -22,7 +22,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * @author Oliver Kleine
- * 
+ *
  */
 public class RulerArea extends Canvas {
 
@@ -74,9 +74,6 @@ public class RulerArea extends Canvas {
 	public void drawRuler(final PixelRectangle pxRect, final Point2D upperLeft, final Point2D lowerRight, final GC gc, final int direction) {
 
 		gc.fillRectangle(0, 0, this.getClientArea().width, this.getClientArea().height);
-
-		System.out.println("Upper left: " + upperLeft.getX() + ", " + upperLeft.getY());
-		System.out.println("Lower right: " + lowerRight.getX() + ", " + lowerRight.getY());
 
 		int pxMin;
 		int pxMax;
