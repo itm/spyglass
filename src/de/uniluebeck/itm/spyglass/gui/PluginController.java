@@ -265,8 +265,7 @@ public class PluginController {
 	 *            the part of the drawing area to be redrawn
 	 */
 	protected void redraw(final PixelRectangle pxBBox) {
-		//drawingArea.redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
-		drawingArea.backRedraw();
+		drawingArea.redraw(pxBBox.getUpperLeft().x, pxBBox.getUpperLeft().y, pxBBox.getWidth(), pxBBox.getHeight(), false);
 	}
 
 	/**
