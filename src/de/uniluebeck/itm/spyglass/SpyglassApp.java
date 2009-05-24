@@ -47,7 +47,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * instantiate and injects the core classes that are needed to run the application.
  */
 public class SpyglassApp extends ApplicationWindow {
-	private static Logger log = SpyglassLoggerFactory.getLogger(SpyglassApp.class);
+	protected static Logger log = SpyglassLoggerFactory.getLogger(SpyglassApp.class);
 
 	private Spyglass spyglass;
 
@@ -173,15 +173,13 @@ public class SpyglassApp extends ApplicationWindow {
 
 		shell.addControlListener(new ControlAdapter() {
 
-			@SuppressWarnings("synthetic-access")
 			@Override
 			public void controlResized(final ControlEvent e) {
-				log.info("Shell resized.");
 				try {
 					SpyglassEnvironment.setWindowSizeX(shell.getSize().x);
 					SpyglassEnvironment.setWindowSizeY(shell.getSize().y);
 				} catch (final IOException e1) {
-					log.error(e1, e1);
+					log.error("Error while saving the size of the Spyglass window", e1);
 				}
 
 			}

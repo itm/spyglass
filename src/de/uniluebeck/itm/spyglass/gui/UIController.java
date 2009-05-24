@@ -141,6 +141,8 @@ public class UIController {
 
 		});
 
+		log.info("UI init done.");
+
 	}
 
 	// --------------------------------------------------------------------------
@@ -157,7 +159,7 @@ public class UIController {
 
 		spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().removePropertyChangeListener(rulerPropertyListener);
 
-		log.debug("UIController shut down.");
+		log.info("UI shut down.");
 	}
 
 	// --------------------------------------------------------------------------------

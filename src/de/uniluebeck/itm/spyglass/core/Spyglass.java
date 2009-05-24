@@ -95,7 +95,7 @@ public class Spyglass {
 			}
 		});
 
-		log.debug("Init done");
+		log.info("Spyglass init done.");
 	}
 
 	// --------------------------------------------------------------------------
@@ -103,7 +103,6 @@ public class Spyglass {
 	 * Starts the packet dispatching
 	 */
 	public void start() {
-		log.debug("Starting packetProducer Task");
 		executor.execute(packetProducerTask);
 	}
 
@@ -127,6 +126,8 @@ public class Spyglass {
 
 		// shutdown all plug-ins
 		pluginManager.shutdown();
+
+		log.info("Spyglass shut down.");
 	}
 
 	// --------------------------------------------------------------------------
@@ -199,7 +200,7 @@ public class Spyglass {
 	 * @param pluginManager
 	 *            the facility which manages the currently loaded plug-ins
 	 */
-	private void setPluginManager(final PluginManager pluginManager) {
+	protected void setPluginManager(final PluginManager pluginManager) {
 		if (this.pluginManager != null) {
 			this.pluginManager.shutdown();
 		}

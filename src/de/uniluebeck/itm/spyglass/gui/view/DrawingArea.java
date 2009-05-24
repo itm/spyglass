@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent.Type;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
@@ -68,7 +67,7 @@ public class DrawingArea extends Canvas {
 	 * Limitation of the zoom. Any zoom level which completely shows this rectangle will be
 	 * considered forbidden.
 	 */
-	private static final AbsoluteRectangle MAX_ZOMM_OUT = new AbsoluteRectangle(-((int) Math.pow(2, 17)), -((int) Math.pow(2, 17)), 2 * ((int) Math
+	private static final AbsoluteRectangle MAX_ZOOM_OUT = new AbsoluteRectangle(-((int) Math.pow(2, 17)), -((int) Math.pow(2, 17)), 2 * ((int) Math
 			.pow(2, 17)), 2 * ((int) Math.pow(2, 17)));
 
 	/**
@@ -108,7 +107,7 @@ public class DrawingArea extends Canvas {
 	protected Object transformMutex = new Object();
 
 	/**
-	 * Listerńers for the DrawingAreaTransformEvent.
+	 * Listeners for the DrawingAreaTransformEvent.
 	 */
 	private final EventListenerList listeners = new EventListenerList();
 
@@ -159,8 +158,6 @@ public class DrawingArea extends Canvas {
 
 			final PixelRectangle world = absRect2PixelRect(getGlobalBoundingBox());
 			final PixelRectangle canvas = getDrawingRectangle();
-
-			//log.debug("Pixel world is: "+world);
 
 			final int edgeN = world.getUpperLeft().y;
 			if (edgeN > 0) {
@@ -236,7 +233,7 @@ public class DrawingArea extends Canvas {
 
 		@Override
 		public void keyPressed(final KeyEvent arg0) {
-			// log.debug("pressed" + arg0);
+
 			if (arg0.keyCode == 16777219) {
 				move(MOVE_OFFSET, 0);
 			}
@@ -315,7 +312,7 @@ public class DrawingArea extends Canvas {
 	 * @param spyglass
 	 *            Reference to spyglass.
 	 */
-	public DrawingArea(final Composite parent, final int style, final Spyglass spyglass) {
+	public DrawingArea(final Composite parent, final int style) {
 		//
 		super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
@@ -390,12 +387,12 @@ public class DrawingArea extends Canvas {
 	 *            a point in the absolute reference frame
 	 * @return the determined reference frame of the drawing area
 	 */
-	public PixelPosition absPoint2PixelPoint(AbsolutePosition absPoint) {
+	public PixelPosition absPoint2PixelPoint(final AbsolutePosition absPoint) {
 
 		synchronized (transformMutex) {
-			absPoint = inv(absPoint);
+			final AbsolutePosition invertedAbsPoint = inv(absPoint);
 
-			final Point2D pxPoint = at.transform(absPoint.toPoint2D(), null);
+			final Point2D pxPoint = at.transform(invertedAbsPoint.toPoint2D(), null);
 
 			return new PixelPosition(pxPoint);
 		}
@@ -412,20 +409,21 @@ public class DrawingArea extends Canvas {
 	 *
 	 * @param absRect
 	 */
-	public PixelRectangle absRect2PixelRect(AbsoluteRectangle absRect) {
+	public PixelRectangle absRect2PixelRect(final AbsoluteRectangle absRect) {
 
 		final PixelRectangle rect = new PixelRectangle();
 
 		synchronized (transformMutex) {
-			absRect = inv(absRect);
+			final AbsoluteRectangle invertedabsRect = inv(absRect);
 
-			Point2D a = at.transform(absRect.getLowerLeft().toPoint2D(), null);
+
+			Point2D a = at.transform(invertedabsRect.getLowerLeft().toPoint2D(), null);
 			final PixelPosition upperLeftPx = new PixelPosition(a);
 			rect.setUpperLeft(upperLeftPx);
 
 			final AbsolutePosition lowerRightAbs = new AbsolutePosition();
-			lowerRightAbs.x = absRect.getLowerLeft().x + absRect.getWidth();
-			lowerRightAbs.y = absRect.getLowerLeft().y + absRect.getHeight();
+			lowerRightAbs.x = invertedabsRect.getLowerLeft().x + invertedabsRect.getWidth();
+			lowerRightAbs.y = invertedabsRect.getLowerLeft().y + invertedabsRect.getHeight();
 			a = at.transform(lowerRightAbs.toPoint2D(), null);
 			final PixelPosition lowerRightPx = new PixelPosition((int) Math.floor(a.getX() + 1), (int) Math.floor(a.getY() + 1));
 
@@ -468,9 +466,6 @@ public class DrawingArea extends Canvas {
 		absRect.setLowerLeft(lowerLeft);
 		absRect.setHeight(height);
 		absRect.setWidth(width);
-
-		// log.debug(String.format("Size of the drawing area in px: %dx%d; Pos=%s", width, height,
-		// upperLeft));
 
 		return absRect;
 	}
@@ -572,8 +567,6 @@ public class DrawingArea extends Canvas {
 	public void move(final int pixelX, final int pixelY) {
 		this.checkWidget();
 
-		//log.debug("Moving by "+pixelX+","+pixelY);
-
 		final AffineTransform atCopy;
 		synchronized (transformMutex) {
 
@@ -594,16 +587,7 @@ public class DrawingArea extends Canvas {
 
 		fireTransformEvent(Type.MOVE);
 
-		// redraw the canvas
 		redraw();
-
-		// This is an optimized alternative to above command.
-		// Unfortunatly it results in graphical errors, likely resulted
-		// by approximations in the transformation matrix
-		// final GC gc = new GC(this);
-		// gc.copyArea(0, 0, getDrawingRectangle().getWidth(), getDrawingRectangle().getHeight(),
-		// pixelX, pixelY, true);
-		// gc.dispose();
 
 		syncScrollBars();
 	}
@@ -615,7 +599,6 @@ public class DrawingArea extends Canvas {
 	 */
 	protected boolean isValidTransformation(final AffineTransform at2) {
 		boolean ok = false;
-		// log.debug("Canvas: " + this.canvasRect);
 
 		try {
 
@@ -624,17 +607,13 @@ public class DrawingArea extends Canvas {
 			final Point2D lowerRight = new Point2D.Double(this.getDrawingRectangle().getWidth(), this.getDrawingRectangle().getHeight());
 			final Point2D lowerRight2D = at2.inverseTransform(lowerRight, null);
 
-			// log.debug(String.format("upperLeft2D=%s, lowerRight2D=%s", upperLeft2D,
-			// lowerRight2D));
-
-			ok = DrawingArea.MAX_ZOMM_OUT.contains(upperLeft2D.getX(), upperLeft2D.getY())
-					&& DrawingArea.MAX_ZOMM_OUT.contains(lowerRight2D.getX(), lowerRight2D.getY());
+			ok = DrawingArea.MAX_ZOOM_OUT.contains(upperLeft2D.getX(), upperLeft2D.getY())
+					&& DrawingArea.MAX_ZOOM_OUT.contains(lowerRight2D.getX(), lowerRight2D.getY());
 
 		} catch (final NoninvertibleTransformException e) {
 			log.error("Transformation matrix in illegal state!", e);
 		}
 
-		// log.debug("val status: " + ok);
 		return ok;
 	}
 
@@ -722,8 +701,6 @@ public class DrawingArea extends Canvas {
 	public void zoomOut(final int px, final int py) {
 		this.checkWidget();
 
-		// log.debug("Zooming from " + px + "; " + py);
-
 		zoom(px, py, 1 / ZOOM_FACTOR);
 
 	}
@@ -737,8 +714,6 @@ public class DrawingArea extends Canvas {
 	 */
 	public void zoomIn(final int px, final int py) {
 		this.checkWidget();
-
-		// log.debug("Zooming into " + px + "; " + py);
 
 		zoom(px, py, ZOOM_FACTOR);
 	}
@@ -776,9 +751,7 @@ public class DrawingArea extends Canvas {
 				//
 				// TODO: This isn't the perfect solution, as it depends on the size
 				// of the Spyglass Window to be "regular size".
-				final AffineTransform at2 = (AffineTransform) at.clone();
-				at2.concatenate(sca);
-				if ((at2.getScaleX() > ZOOM_MAX)) {
+				if ((atTemp.getScaleX() > ZOOM_MAX)) {
 					return;
 				}
 
