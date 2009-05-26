@@ -9,6 +9,7 @@ package de.uniluebeck.itm.spyglass.gui.view;
 
 import java.util.EventListener;
 
+
 // --------------------------------------------------------------------------------
 /**
  * Listener for transform change events from the drawing area.

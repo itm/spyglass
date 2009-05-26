@@ -54,6 +54,17 @@ public class Spyglass {
 
 	private final ConfigStore configStore;
 
+	private boolean throttleBBoxUpdates = false;
+
+
+	public boolean isThrottleBBoxUpdates() {
+		return throttleBBoxUpdates;
+	}
+
+	public void setThrottleBBoxUpdates(final boolean throttleBBoxUpdates) {
+		this.throttleBBoxUpdates = throttleBBoxUpdates;
+	}
+
 	// --------------------------------------------------------------------------
 	/**
 	 * Constructor. Invokes the XML configuration reading from the default configuration files.

@@ -2,7 +2,7 @@
 /**
  *
  */
-package de.uniluebeck.itm.spyglass.gui;
+package de.uniluebeck.itm.spyglass.gui.control;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

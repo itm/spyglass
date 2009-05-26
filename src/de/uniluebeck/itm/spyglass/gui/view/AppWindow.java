@@ -18,7 +18,10 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 // --------------------------------------------------------------------------------
 /**
  * The application's window.<br>
+ *
  * Instances of this class manage references to the graphical user interface's main components.
+ *
+ * In M-V-C, this is the VIEW.
  */
 public class AppWindow implements DisposeListener {
 
@@ -38,6 +41,7 @@ public class AppWindow implements DisposeListener {
 	public AppWindow(final Spyglass spyglass, final Composite parent) {
 
 		this.display = parent.getDisplay();
+
 		gui = new SpyglassGuiComponent(parent, SWT.NULL, spyglass);
 
 		parent.addDisposeListener(this);
@@ -61,17 +65,6 @@ public class AppWindow implements DisposeListener {
 	 */
 	public Display getDisplay() {
 		return display;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Sets the display
-	 *
-	 * @param display
-	 *            the display to be set
-	 */
-	public void setDisplay(final Display display) {
-		this.display = display;
 	}
 
 	// --------------------------------------------------------------------------------

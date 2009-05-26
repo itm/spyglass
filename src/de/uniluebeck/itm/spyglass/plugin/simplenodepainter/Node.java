@@ -405,14 +405,14 @@ public class Node extends DrawingObject {
 		if (getDrawingArea() == null) {
 			throw new RuntimeException("DrawingObject already removed!!!");
 		}
-		getDrawingArea().removeDrawingAreaTransformListener(this.drawingAreaListener);
+		getDrawingArea().removeTransformChangedListener(this.drawingAreaListener);
 		super.destroy();
 	}
 
 	@Override
 	public void init(final DrawingArea drawingArea) {
 		super.init(drawingArea);
-		drawingArea.addDrawingAreaTransformListener(this.drawingAreaListener);
+		drawingArea.addTransformChangedListener(this.drawingAreaListener);
 	}
 
 

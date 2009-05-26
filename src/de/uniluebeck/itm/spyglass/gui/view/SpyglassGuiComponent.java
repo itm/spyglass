@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * Instances of this class manage SpyGlass's graphical user interface
- * 
+ *
  * @author Sebastian Ebers
  * @author Oliver Kleine
  * @author others
@@ -52,7 +52,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param parent
 	 *            the parent widget
 	 * @param style
@@ -63,12 +63,16 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	public SpyglassGuiComponent(final Composite parent, final int style, final Spyglass spyglass) {
 		super(parent, style);
 		initGUI(spyglass);
+
+		new RulerRenderer(this, spyglass);
+		new DrawingAreaRenderer(getDrawingArea(), spyglass);
+		new RulerRefresher(this);
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * Initializes the graphical user interface.
-	 * 
+	 *
 	 * @param spyglass
 	 *            the <code>SpyGlass</code> instance
 	 */
@@ -103,7 +107,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Initializes the area where all nodes etc. are painted on.
-	 * 
+	 *
 	 * @param parent
 	 *            the parent composite
 	 * @param spyglass
@@ -185,7 +189,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Initializes the widgets where {@link GlobalInformationPlugin}'s can attach information
-	 * 
+	 *
 	 * @param parent
 	 *            the parent widget
 	 */
@@ -196,7 +200,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the widget where all nodes etc. are painted on.
-	 * 
+	 *
 	 * @return the widget where all nodes etc. are painted on
 	 */
 	public DrawingArea getDrawingArea() {
@@ -207,7 +211,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	/**
 	 * Returns a bar where plug-ins of the type {@link GlobalInformationPlugin} can attach
 	 * information
-	 * 
+	 *
 	 * @return the globalInformationBar a bar where plug-ins of the type
 	 *         {@link GlobalInformationPlugin} can attach information
 	 */
@@ -250,9 +254,9 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the horizontal ruler area
-	 * 
+	 *
 	 * @return the horizontal ruler area
-	 * 
+	 *
 	 */
 	public RulerArea getRulerH() {
 		return rulerH;
@@ -261,7 +265,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the vertical ruler area
-	 * 
+	 *
 	 * @return the vertical ruler area
 	 */
 	public RulerArea getRulerV() {
@@ -271,55 +275,12 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the ruler's unit area
-	 * 
+	 *
 	 * @return the ruler's unit area
 	 */
 	public RulerArea getUnitArea() {
 		return unitArea;
 	}
 
-	// // --------------------------------------------------------------------------------
-	// /**
-	// * Displays this org.eclipse.swt.widgets.Composite inside a new Shell.
-	// *
-	// * @param args
-	// * the arguments
-	// * @throws Exception
-	// */
-	// public static void main(final String[] args) throws Exception {
-	// showGUI();
-	// }
-	//
-	// // --------------------------------------------------------------------------------
-	// /**
-	// * Displays this org.eclipse.swt.widgets.Composite inside a new Shell.
-	// *
-	// * @throws Exception
-	// */
-	// public static void showGUI() throws Exception {
-	// final Display display = Display.getDefault();
-	// final Shell shell = new Shell(display);
-	// final SpyglassGuiComponent inst = new SpyglassGuiComponent(shell, SWT.NULL, new Spyglass());
-	// final Point size = inst.getSize();
-	// shell.setLayout(new FillLayout());
-	// shell.layout();
-	//
-	// if ((size.x == 0) && (size.y == 0)) {
-	// inst.pack();
-	// shell.pack();
-	// } else {
-	// final Rectangle shellBounds = shell.computeTrim(0, 0, size.x, size.y);
-	// shell.setSize(shellBounds.width, shellBounds.height);
-	// }
-	//
-	// shell.open();
-	//
-	// while (!shell.isDisposed()) {
-	// if (!display.readAndDispatch()) {
-	// display.sleep();
-	// }
-	// }
-	//
-	// }
 
 }

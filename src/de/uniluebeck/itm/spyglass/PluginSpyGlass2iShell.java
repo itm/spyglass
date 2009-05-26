@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.core.SpyglassExceptionHandler;
-import de.uniluebeck.itm.spyglass.gui.UIController;
+import de.uniluebeck.itm.spyglass.gui.control.UIController;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.io.SpyGlassPacketQueue;
 import de.uniluebeck.itm.spyglass.packet.PacketFactory;
@@ -35,22 +35,22 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 /**
  * To use this plug-in in iShell, you need to add two option to your iShell configuration file
  * (typically ishell.properties).
- * 
+ *
  * The first one determines the additional class path parameters in where this plug-in and its
  * libraries are located. Please note that you must escape any backslash and colon with a backslash
  * character. An example of how this could look like is shown in the following line:
- * 
+ *
  * <pre>
  * plugin_classpath=C\:\\work\\java\\spyglass-lean\\bin\\eclipse;C\:\\work\\java\\spyglass-lean\\lib\\simple-xml-1.6.jar
  * </pre>
- * 
+ *
  * The second parameter denotes the fully classified class name of the plug-in. This should remain
  * unchanged and look like the following:
- * 
+ *
  * <pre>
  * plugin_classes = de.uniluebeck.itm.spyglass.PluginSpyGlass2iShell
  * </pre>
- * 
+ *
  * For further information, please refer to the iShell manual.
  */
 public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
@@ -92,7 +92,7 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 			appWindow = new AppWindow(spyglass, container);
 
 			// create Control
-			controller = new UIController(spyglass, appWindow);
+			UIController.connect(spyglass, appWindow);
 
 			// add tooltip icons
 			toolbarStuff = new ToolbarHandler(getCoolBar(), spyglass, appWindow);
@@ -190,7 +190,6 @@ public class PluginSpyGlass2iShell extends ishell.plugins.Plugin {
 		// Destroy the components in the reverse direction if which they were created.
 
 		if (controller != null) {
-			controller.shutdown();
 			controller = null;
 		}
 

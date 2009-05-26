@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Shell;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.core.SpyglassExceptionHandler;
-import de.uniluebeck.itm.spyglass.gui.UIController;
 import de.uniluebeck.itm.spyglass.gui.actions.ExitSpyglassAction;
 import de.uniluebeck.itm.spyglass.gui.actions.LoadConfigurationAction;
 import de.uniluebeck.itm.spyglass.gui.actions.OpenPreferencesAction;
@@ -37,6 +36,7 @@ import de.uniluebeck.itm.spyglass.gui.actions.RecordSelectOutputAction;
 import de.uniluebeck.itm.spyglass.gui.actions.StoreConfigurationAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomAction;
 import de.uniluebeck.itm.spyglass.gui.actions.ZoomCompleteMapAction;
+import de.uniluebeck.itm.spyglass.gui.control.UIController;
 import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
@@ -50,10 +50,6 @@ public class SpyglassApp extends ApplicationWindow {
 	protected static Logger log = SpyglassLoggerFactory.getLogger(SpyglassApp.class);
 
 	private Spyglass spyglass;
-
-	private UIController uic;
-
-	private static Shell shell;
 
 	private AppWindow appWindow;
 
@@ -77,11 +73,11 @@ public class SpyglassApp extends ApplicationWindow {
 		SpyglassEnvironment.setIShellPlugin(false);
 		spyglass = new Spyglass();
 
+		addMenuBar();
+
 		this.setBlockOnOpen(true);
 		addStatusLine();
-		addToolBar(SWT.None);
 
-		addMenuBar();
 
 	}
 
@@ -116,7 +112,11 @@ public class SpyglassApp extends ApplicationWindow {
 		SpyglassApp app = null;
 		try {
 			app = new SpyglassApp();
+			app.addToolBar(SWT.None);
+
 			app.open();
+
+			app.addMenuBar();
 
 		} catch (final Exception e) {
 			log.error(e, e);
@@ -154,7 +154,7 @@ public class SpyglassApp extends ApplicationWindow {
 		appWindow = new AppWindow(spyglass, getShell());
 
 		// Control
-		uic = new UIController(spyglass, appWindow);
+		UIController.connect(spyglass, appWindow);
 
 		new ToolbarHandler(getToolBarManager(), spyglass, appWindow);
 
@@ -204,10 +204,6 @@ public class SpyglassApp extends ApplicationWindow {
 	 */
 	public void shutdown() {
 
-		if (uic != null) {
-			uic.shutdown();
-		}
-
 		if (spyglass != null) {
 			spyglass.shutdown();
 		}
@@ -223,7 +219,7 @@ public class SpyglassApp extends ApplicationWindow {
 	private MenuManager createSourceMenu() {
 		final MenuManager sourceMenu = new MenuManager("&Source");
 
-		sourceMenu.add(new PlaySelectInputAction(shell, spyglass));
+		sourceMenu.add(new PlaySelectInputAction(getShell(), spyglass));
 		sourceMenu.add(new PlayPlayPauseAction(spyglass));
 
 		return sourceMenu;
@@ -274,7 +270,7 @@ public class SpyglassApp extends ApplicationWindow {
 		fileMenu.add(new LoadConfigurationAction(spyglass));
 		fileMenu.add(new StoreConfigurationAction(spyglass));
 		fileMenu.add(new Separator());
-		fileMenu.add(new OpenPreferencesAction(shell, spyglass));
+		fileMenu.add(new OpenPreferencesAction(spyglass, getShell()));
 		fileMenu.add(new Separator());
 		fileMenu.add(new ExitSpyglassAction(this));
 

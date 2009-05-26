@@ -8,28 +8,12 @@ import javax.swing.event.EventListenerList;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 
 import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent.Type;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
@@ -48,7 +32,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  *
  * @author Dariush Forouher
  */
-public class DrawingArea extends Canvas {
+public class DrawingArea extends Canvas implements ControlListener, DisposeListener {
 
 	protected static Logger log = SpyglassLoggerFactory.getLogger(DrawingArea.class);
 
@@ -73,33 +57,28 @@ public class DrawingArea extends Canvas {
 	/**
 	 * x-coordinate of the upper-left point of the world.
 	 */
-	private static final int WORLD_LOWER_LEFT_X = -((int) Math.pow(2, 15));
+	public static final int WORLD_LOWER_LEFT_X = -((int) Math.pow(2, 15));
 
 	/**
 	 * y-coordinate of the upper-left point of the world.
 	 */
-	private static final int WORLD_LOWER_LEFT_Y = -((int) Math.pow(2, 15));
+	public static final int WORLD_LOWER_LEFT_Y = -((int) Math.pow(2, 15));
 
 	/**
 	 * width of the world.
 	 */
-	private static final int WORLD_WIDTH = 2 * ((int) Math.pow(2, 15));
+	public static final int WORLD_WIDTH = 2 * ((int) Math.pow(2, 15));
 
 	/**
 	 * height of the world.
 	 */
-	private static final int WORLD_HEIGHT = 2 * ((int) Math.pow(2, 15));
-
-	/**
-	 * Number of pixels to be moved when Up/Down/Left/right is pressed.
-	 */
-	private final int MOVE_OFFSET = 20;
+	public static final int WORLD_HEIGHT = 2 * ((int) Math.pow(2, 15));
 
 	/**
 	 * The transformation matrix. it transforms coordinates from the absolute reference frame to the
 	 * reference frame of the drawing area
 	 */
-	protected AffineTransform at = createInitialTransform();
+	private AffineTransform at = createInitialTransform();
 
 	/**
 	 * Mutex to synchronize access to "at"
@@ -109,199 +88,7 @@ public class DrawingArea extends Canvas {
 	/**
 	 * Listeners for the DrawingAreaTransformEvent.
 	 */
-	private final EventListenerList listeners = new EventListenerList();
-
-	/**
-	 * This color is used for area outside of the the map
-	 */
-	protected final Color canvasOutOfMapColor = new Color(getDisplay(), 50, 50, 50);
-
-	/**
-	 * This color is used as the background color
-	 */
-	protected final Color canvasBgColor = new Color(getDisplay(), 255, 255, 255);
-
-	/**
-	 * True, while the user moves the map via mouse
-	 */
-	protected volatile boolean mouseDragInProgress = false;
-
-	/**
-	 * the starting point of the movement business.
-	 */
-	protected volatile PixelPosition mouseDragStartPosition = null;
-
-	/**
-	 * Dispose children
-	 */
-	private DisposeListener disposeListener = new DisposeListener() {
-
-		@Override
-		public void widgetDisposed(final DisposeEvent e) {
-			canvasBgColor.dispose();
-			canvasOutOfMapColor.dispose();
-		}
-
-	};
-
-	/**
-	 * PaintListener
-	 *
-	 * Draws areas outside of the world in a gray color.
-	 */
-	private PaintListener paintListener = new PaintListener() {
-
-		@Override
-		public void paintControl(final PaintEvent arg0) {
-
-			arg0.gc.setBackground(canvasOutOfMapColor);
-
-			final PixelRectangle world = absRect2PixelRect(getGlobalBoundingBox());
-			final PixelRectangle canvas = getDrawingRectangle();
-
-			final int edgeN = world.getUpperLeft().y;
-			if (edgeN > 0) {
-				arg0.gc.fillRectangle(0, 0, canvas.getWidth(), edgeN);
-			}
-			final int edgeE = canvas.getWidth() - world.getWidth() - world.getUpperLeft().x;
-			if (edgeE > 0) {
-				arg0.gc.fillRectangle(world.getWidth() + world.getUpperLeft().x, 0, edgeE, canvas.getHeight());
-			}
-			final int edgeS = canvas.getHeight() - world.getHeight() - world.getUpperLeft().y;
-			if (edgeS > 0) {
-				arg0.gc.fillRectangle(0, world.getHeight() + world.getUpperLeft().y, canvas.getWidth(), edgeS);
-			}
-			final int edgeW = world.getUpperLeft().x;
-			if (edgeW > 0) {
-				arg0.gc.fillRectangle(0, 0, edgeW, canvas.getHeight());
-			}
-
-			arg0.gc.setBackground(canvasBgColor);
-
-		}
-	};
-
-	/**
-	 *
-	 * mouse drag and drop: used for moving the drawing area.
-	 */
-	private MouseListener mouseListener = new org.eclipse.swt.events.MouseAdapter() {
-
-		@Override
-		public void mouseDown(final MouseEvent e) {
-			mouseDragInProgress = true;
-			mouseDragStartPosition = new PixelPosition(e.x, e.y);
-		}
-
-		@Override
-		public void mouseUp(final MouseEvent arg0) {
-			mouseDragInProgress = false;
-		}
-
-	};
-
-	/**
-	 * move listener: redraw the canvas while movement is in progress
-	 */
-	private MouseMoveListener mouseMoveListener = new MouseMoveListener() {
-
-		@Override
-		public void mouseMove(final MouseEvent arg0) {
-
-			// if a movement is in progress, update the drawing area by
-			// appling the current
-			// delta.
-			if (mouseDragInProgress) {
-
-				final PixelPosition mouseDragStopPosition = new PixelPosition(arg0.x, arg0.y);
-
-				final int deltaX = mouseDragStopPosition.x - mouseDragStartPosition.x;
-				final int deltaY = mouseDragStopPosition.y - mouseDragStartPosition.y;
-
-				move(deltaX, deltaY);
-
-				mouseDragStartPosition = mouseDragStopPosition;
-			}
-
-		}
-	};
-
-	/**
-	 * Key listener: for moving
-	 */
-	private KeyListener keyListener = new KeyAdapter() {
-
-		@Override
-		public void keyPressed(final KeyEvent arg0) {
-
-			if (arg0.keyCode == 16777219) {
-				move(MOVE_OFFSET, 0);
-			}
-			if (arg0.keyCode == 16777220) {
-				move(-MOVE_OFFSET, 0);
-			}
-			if (arg0.keyCode == 16777217) {
-				move(0, MOVE_OFFSET);
-			}
-			if (arg0.keyCode == 16777218) {
-				move(0, -MOVE_OFFSET);
-			}
-		}
-
-	};
-
-	/**
-	 * handle changes on the horizontal scrollbar
-	 */
-	private final SelectionListener scrollListener = new SelectionAdapter() {
-
-		@Override
-		public void widgetSelected(final SelectionEvent e) {
-			scroll();
-		}
-
-	};
-
-	/**
-	 * We have to react when the canvas is resized.
-	 */
-	private final ControlListener controlListener = new ControlAdapter() {
-
-		@Override
-		public void controlResized(final ControlEvent e) {
-			boolean isValid;
-			synchronized (transformMutex) {
-				isValid = isValidTransformation(at);
-			}
-
-			if (!isValid) {
-				log.error("Resizing resulted in illegal transform. Resetting matrix.");
-
-				// there is a redraw() in here
-				adjustToValidMatrix();
-			}
-
-			syncScrollBars();
-
-		}
-
-	};
-
-	/**
-	 * Mouse wheel: used for zooming
-	 */
-	private MouseWheelListener mouseWheelListener = new MouseWheelListener() {
-
-		@Override
-		public void mouseScrolled(final MouseEvent arg0) {
-			if (arg0.count > 0) {
-				zoomIn(arg0.x, arg0.y);
-			} else {
-				zoomOut(arg0.x, arg0.y);
-			}
-
-		}
-	};
+	private volatile EventListenerList listeners = new EventListenerList();
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -316,65 +103,8 @@ public class DrawingArea extends Canvas {
 		//
 		super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
-		init();
-
-	}
-
-	private void init() {
-		setBackground(canvasBgColor);
-
-		initKeyMouse();
-
-		initScrollBars();
-
-		addControlListener(this.controlListener);
-
-		addPaintListener(paintListener);
-
-		addDisposeListener(disposeListener);
-
-	}
-
-	/**
-	 * Add Mouse and Key listener
-	 */
-	private void initKeyMouse() {
-		// handle user events on the canvas (moving, zoom)
-		addMouseListener(mouseListener);
-		addMouseMoveListener(mouseMoveListener);
-		addMouseWheelListener(mouseWheelListener);
-		addKeyListener(keyListener);
-	}
-
-	/**
-	 * Configure scroll bars
-	 */
-	private void initScrollBars() {
-		// handle ScrollBar events
-		getHorizontalBar().addSelectionListener(scrollListener);
-		getVerticalBar().addSelectionListener(scrollListener);
-
-		getHorizontalBar().setMinimum(0);
-		getHorizontalBar().setMaximum(WORLD_WIDTH);
-		getHorizontalBar().setPageIncrement(1000);
-		getHorizontalBar().setIncrement(100);
-
-		getVerticalBar().setMinimum(0);
-		getVerticalBar().setMaximum(WORLD_HEIGHT);
-		getVerticalBar().setPageIncrement(1000);
-		getVerticalBar().setIncrement(100);
-
-		syncScrollBars();
-
-		// The canvas must not act on mouse wheel events (normally it would move the
-		// scroll bars) since the mouse wheel already controls the zoom.
-		addListener(SWT.MouseWheel, new Listener() {
-
-			@Override
-			public void handleEvent(final Event event) {
-				event.doit = false;
-			}
-		});
+		addControlListener(this);
+		addDisposeListener(this);
 
 	}
 
@@ -589,7 +319,27 @@ public class DrawingArea extends Canvas {
 
 		redraw();
 
-		syncScrollBars();
+	}
+
+	/**
+	 * Moves the drawing area by the given number of units in absolute coordinates
+	 *
+	 * @param pixelX
+	 * @param pixelY
+	 */
+	public void moveAbs(final int dx, final int dy) {
+		this.checkWidget();
+
+		synchronized (transformMutex) {
+
+			at.concatenate(AffineTransform.getTranslateInstance(dx, dy));
+
+		}
+
+		fireTransformEvent(Type.MOVE);
+
+		redraw();
+
 	}
 
 	/**
@@ -768,8 +518,6 @@ public class DrawingArea extends Canvas {
 		// redraw the canvas
 		redraw();
 
-		syncScrollBars();
-
 	}
 
 	/**
@@ -841,8 +589,6 @@ public class DrawingArea extends Canvas {
 
 		// redraw the canvas
 		redraw();
-
-		syncScrollBars();
 	}
 
 	/**
@@ -915,60 +661,10 @@ public class DrawingArea extends Canvas {
 		// redraw the canvas
 		redraw();
 
-		syncScrollBars();
 	}
 
 	private AffineTransform createInitialTransform() {
 		return AffineTransform.getScaleInstance(1, 1);
-	}
-
-	/**
-	 * Handle a scroll event
-	 */
-	protected void scroll() {
-
-		final int selectY = -getVerticalBar().getSelection() - WORLD_LOWER_LEFT_Y;
-		final int selectX = getHorizontalBar().getSelection() + WORLD_LOWER_LEFT_X;
-
-		final AbsolutePosition newPos = new AbsolutePosition(selectX, selectY);
-
-		int dx = getLowerLeft().x - newPos.x;
-		int dy = getLowerLeft().y + getAbsoluteDrawingRectangle().getHeight() - newPos.y;
-
-		// don't allow using scrollbars if we're at the border
-		if ((getHorizontalBar().getSelection() == getHorizontalBar().getMinimum()) && (dx < 0)) {
-			dx = 0;
-		}
-		if ((getHorizontalBar().getSelection() == getHorizontalBar().getMaximum()) && (dx > 0)) {
-			dx = 0;
-		}
-		if ((getVerticalBar().getSelection() == getVerticalBar().getMinimum()) && (dy < 0)) {
-			dy = 0;
-		}
-		if ((getVerticalBar().getSelection() == getVerticalBar().getMaximum()) && (dy > 0)) {
-			dy = 0;
-		}
-
-		synchronized (transformMutex) {
-			at.concatenate(AffineTransform.getTranslateInstance(dx, -dy));
-		}
-
-		fireTransformEvent(Type.MOVE);
-
-		// redraw the canvas
-		redraw();
-
-		syncScrollBars();
-	}
-
-	/**
-	 * Readjust the scrollbars to the current position
-	 */
-	protected void syncScrollBars() {
-		getHorizontalBar().setSelection(getLowerLeft().x - WORLD_LOWER_LEFT_X);
-		getVerticalBar().setSelection(-getLowerLeft().y - getAbsoluteDrawingRectangle().getHeight()  - WORLD_LOWER_LEFT_Y);
-		getHorizontalBar().setThumb(getAbsoluteDrawingRectangle().getWidth());
-		getVerticalBar().setThumb(getAbsoluteDrawingRectangle().getHeight());
 	}
 
 	/**
@@ -979,8 +675,9 @@ public class DrawingArea extends Canvas {
 	 * This method is thread-safe.
 	 *
 	 */
-	public void addDrawingAreaTransformListener(final TransformChangedListener listener) {
-		if (listener == null) {
+	public void addTransformChangedListener(final TransformChangedListener listener) {
+		// since this method must be thread-safe, just fail silently
+		if (isDisposed()) {
 			return;
 		}
 		listeners.add(TransformChangedListener.class, listener);
@@ -992,18 +689,18 @@ public class DrawingArea extends Canvas {
 	 * This method is thread-safe.
 	 *
 	 */
-	public void removeDrawingAreaTransformListener(final TransformChangedListener listener) {
-		if (listener == null) {
+	public void removeTransformChangedListener(final TransformChangedListener listener) {
+		// since this method must be thread-safe, just fail silently
+		if (isDisposed()) {
 			return;
 		}
-
 		listeners.remove(TransformChangedListener.class, listener);
 	}
 
 	/**
 	 * Fires a DrawingAreaTransformEvent.
 	 */
-	private void fireTransformEvent(final TransformChangedEvent.Type type) {
+	protected void fireTransformEvent(final TransformChangedEvent.Type type) {
 
 		final TransformChangedEvent event = new TransformChangedEvent(this, type);
 
@@ -1027,5 +724,44 @@ public class DrawingArea extends Canvas {
 		synchronized (transformMutex) {
 			return new AffineTransform(at);
 		}
+	}
+
+	// --------------------------------------------------------------------------------
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.events.ControlListener#controlMoved(org.eclipse.swt.events.ControlEvent)
+	 */
+	@Override
+	public void controlMoved(final ControlEvent e) {
+		//
+
+	}
+
+	@Override
+	public void controlResized(final ControlEvent e) {
+		boolean isValid;
+		synchronized (transformMutex) {
+			isValid = isValidTransformation(at);
+		}
+
+		if (!isValid) {
+			log.error("Resizing resulted in illegal transform. Resetting matrix.");
+
+			// there is a redraw() in here
+			adjustToValidMatrix();
+		}
+
+		fireTransformEvent(Type.MOVE);
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/* (non-Javadoc)
+	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+	 */
+	@Override
+	public void widgetDisposed(final DisposeEvent e) {
+
+		// SWT clears all its listeners on dispose. we have to do the same.
+		listeners = new EventListenerList();
 	}
 }

@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------
 /**
- * 
+ *
  */
 package de.uniluebeck.itm.spyglass;
 
@@ -12,7 +12,6 @@ import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -31,14 +30,14 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * This class creates and manages the toolbar
- * 
+ *
  * NOTE: The way the toolbar is created seems a bit fishy. Maybe this is really the
  * right thing to do, but likely there is a saner way to do this.
- * 
+ *
  * NOTE: this class contains some framework for handling mouse-events of the zoom
  * buttons. This is because the Action-Interface doesn't allow to listen to MouseEvents.
  * Again there is probable a smarter way to do this, but again I don't know it.
- * 
+ *
  * @author Dariush Forouher
  *
  */
@@ -51,51 +50,47 @@ public class ToolbarHandler {
 	 */
 	private CoolBar coolbar;
 
-	private ToolBar toolbar;
-
 	private Spyglass spyglass;
 	private AppWindow appWindow;
-	
+
 	/**
 	 * the manager used for the toolbar
 	 */
 	private ToolBarManager man;
 
-	private ZoomAction zoomInAction;
-	private ZoomAction zoomOutAction;
+	protected ZoomAction zoomInAction;
+	protected ZoomAction zoomOutAction;
 
-	private ToolItem zoomInItem = null;
-	private ToolItem zoomOutItem = null;
+	protected ToolItem zoomInItem = null;
+	protected ToolItem zoomOutItem = null;
 
 	public ToolbarHandler(final CoolBar coolbar, final Spyglass spyglass, final AppWindow appWindow) {
 		this.coolbar = coolbar;
 		this.spyglass = spyglass;
 		this.appWindow = appWindow;
-		
+
 		man = new ToolBarManager();
-		
+
 		man.createControl(coolbar);
-		
+
 		addIcons();
 	}
 
 	public ToolbarHandler(final ToolBarManager man, final Spyglass spyglass, final AppWindow appWindow) {
 		this.spyglass = spyglass;
 		this.appWindow = appWindow;
-		
-		this.man = man;
 
-		this.toolbar = man.getControl();
+		this.man = man;
 
 		addIcons();
 	}
-	
+
 
 	/**
 	 * Add icons to the given coolbar
 	 */
 	private void addIcons() {
-		
+
 		man.add(new PlaySelectInputAction(man.getControl().getShell(), spyglass));
 		man.add(new PlayPlayPauseAction(spyglass));
 		man.add(new PlayResetAction(spyglass));
@@ -106,8 +101,8 @@ public class ToolbarHandler {
 		zoomOutAction = new ZoomAction(appWindow.getGui().getDrawingArea(), Type.ZOOM_OUT);
 		man.add(zoomOutAction);
 		man.add(new ZoomCompleteMapAction(spyglass, appWindow.getGui().getDrawingArea()));
-		man.add(new OpenPreferencesAction(man.getControl().getShell(), spyglass));
-		
+		man.add(new OpenPreferencesAction(spyglass, appWindow.getGui().getShell()));
+
 		man.update(false);
 
 		// TODO: this can be done smarter
@@ -120,10 +115,10 @@ public class ToolbarHandler {
 		// save the items for ZoomIn/Out for later
 		zoomInItem = man.getControl().getItems()[5];
 		zoomOutItem = man.getControl().getItems()[6];
-	
+
 		man.getControl().addListener(SWT.MouseDown, listener);
 		man.getControl().addListener(SWT.MouseUp, listener);
-				
+
 		log.debug("Created toolbar");
 	}
 
@@ -132,14 +127,14 @@ public class ToolbarHandler {
 	 * to the zoomActions
 	 */
 	Listener listener = new Listener() {
-	
+
 		@Override
 		public void handleEvent(final Event event) {
-			
+
 			if (event.button!=1) {
 				return;
 			}
-	
+
 			if (event.type==SWT.MouseDown) {
 				if (zoomInItem.getBounds().contains(event.x, event.y)) {
 					zoomInAction.setChecked(true);
@@ -147,7 +142,7 @@ public class ToolbarHandler {
 				else if (zoomOutItem.getBounds().contains(event.x, event.y)) {
 					zoomOutAction.setChecked(true);
 				}
-				
+
 			} else if (event.type==SWT.MouseUp) {
 				if (zoomInAction.isChecked()) {
 					zoomInAction.setChecked(false);
@@ -157,7 +152,7 @@ public class ToolbarHandler {
 				}
 			}
 		}
-		
+
 	};
 
 	public void dispose() {

@@ -2,6 +2,7 @@ package de.uniluebeck.itm.spyglass.gui.view;
 
 import org.eclipse.swt.widgets.Event;
 
+
 /**
  * A TranformChangedEvent signals that the transform between absolute and pixel coordinates
  * has changed.

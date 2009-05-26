@@ -208,7 +208,7 @@ public class Line extends DrawingObject implements TransformChangedListener {
 
 	@Override
 	public void destroy() {
-		getDrawingArea().removeDrawingAreaTransformListener(this);
+		getDrawingArea().removeTransformChangedListener(this);
 		super.destroy();
 
 	}
@@ -216,7 +216,7 @@ public class Line extends DrawingObject implements TransformChangedListener {
 	@Override
 	public void init(final DrawingArea drawingArea) {
 		super.init(drawingArea);
-		getDrawingArea().addDrawingAreaTransformListener(this);
+		getDrawingArea().addTransformChangedListener(this);
 	}
 
 }
