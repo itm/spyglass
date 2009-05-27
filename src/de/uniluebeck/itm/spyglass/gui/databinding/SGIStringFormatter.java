@@ -12,7 +12,6 @@ package de.uniluebeck.itm.spyglass.gui.databinding;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -22,8 +21,6 @@ import org.eclipse.core.databinding.observable.map.IMapChangeListener;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.map.MapChangeEvent;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
-import org.eclipse.core.databinding.observable.set.ISetChangeListener;
-import org.eclipse.core.databinding.observable.set.SetChangeEvent;
 import org.eclipse.core.internal.databinding.beans.JavaBeanObservableMap;
 import org.eclipse.core.internal.databinding.observable.UnmodifiableObservableSet;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
@@ -43,7 +40,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationXMLConfig;
 import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -285,19 +281,8 @@ public class SGIStringFormatter {
 	/**
 	 * Creates a connection between the view's table and data from the model
 	 */
-	public void connectTableWithData(final DataBindingContext dbc, final SimpleGlobalInformationXMLConfig config) {
-
-		final Set<StatisticalInformationEvaluator> tempStringFormatterTable = new TreeSet<StatisticalInformationEvaluator>(config
-				.getStatisticalInformationEvaluators());
+	public void connectTableWithData(final DataBindingContext dbc, final Set<StatisticalInformationEvaluator> tempStringFormatterTable) {
 		tableData = new WrappedObservableSet(dbc.getValidationRealm(), tempStringFormatterTable, null);
 		table.setInput(tableData);
-		tableData.addSetChangeListener(new ISetChangeListener() {
-
-			// --------------------------------------------------------------------------------
-			@Override
-			public void handleSetChange(final SetChangeEvent event) {
-				config.setStatisticalInformationEvaluators(event.getObservableSet());
-			}
-		});
 	}
 }

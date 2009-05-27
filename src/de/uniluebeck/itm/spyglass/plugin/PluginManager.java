@@ -53,32 +53,35 @@ public class PluginManager {
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(PluginManager.class);
 
+	// --------------------------------------------------------------------------
 	/**
-	 * The state of the plugin manager
+	 * The state of the plug-in manager
 	 */
 	public enum State {
 
 		/**
-		 * The plugin manager has not been initialized yet.
+		 * The plug-in manager has not been initialized yet.
 		 */
 		INFANT,
 
 		/**
-		 * The plugin manager has been initialized and is running.
+		 * The plug-in manager has been initialized and is running.
 		 */
 		ALIVE,
 
 		/**
-		 * The plugin manager has been shut down.
+		 * The plug-in manager has been shut down.
 		 */
 		ZOMBIE
 	}
 
+	// --------------------------------------------------------------------------
 	/**
 	 * State of the manager
 	 */
 	private State state = State.INFANT;
 
+	// --------------------------------------------------------------------------
 	/**
 	 * This List is serialized by the XMLSerializer. It must not be used by any code, since access
 	 * to it is not synchronized! Use the variable <code>plugins</code> instead, which has a
@@ -88,7 +91,7 @@ public class PluginManager {
 	private final List<Plugin> pluginsInternal = new ArrayList<Plugin>();
 
 	/**
-	 * The list of plugins. Has always to be a wrapper arround pluginsInternal.
+	 * The list of plug-ins. Has always to be a wrapper around pluginsInternal.
 	 */
 	private List<Plugin> plugins = Collections.synchronizedList(pluginsInternal);
 
@@ -101,7 +104,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * List of plug-ins that are currently being removed
-	 *
+	 * 
 	 * (this is currently only used to make sure, that such a plug-in wont be elected as new active
 	 * node positioner)
 	 */
@@ -124,9 +127,9 @@ public class PluginManager {
 		// availablePluginsTypes.add(TemplatePlugin.class);
 	}
 
+	// --------------------------------------------------------------------------
 	/**
 	 * Constructor for SimpleXML
-	 * @throws Exception
 	 */
 	public PluginManager() {
 
@@ -135,7 +138,7 @@ public class PluginManager {
 			// since the state is still INFANT, it won't get connected.
 			createNewPlugin(PositionPacketNodePositionerPlugin.class, null);
 		} catch (final Exception e) {
-			throw new RuntimeException("Could not create default node positioner plugin. Smells like a bug...");
+			throw new RuntimeException("Could not create default node positioner plug-in. Smells like a bug...");
 		}
 
 	}
@@ -143,9 +146,9 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * This method is called after the deserialization of this instance has finished.
-	 *
-	 * First it wraps the deserialized plugin list into a synchrozied collection.
-	 * Then it initializes the pluginManager.
+	 * 
+	 * First it wraps the deserialized plug-in list into a synchrozied collection. Then it
+	 * initializes the pluginManager.
 	 */
 	@Commit
 	protected void commit() {
@@ -155,8 +158,8 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * This method is called after the deserialization of this instance has finished.
-	 *
-	 * - checks for duplicate plugin names - checks for the NodePositioner
+	 * 
+	 * - checks for duplicate plug-in names - checks for the NodePositioner
 	 */
 	@Validate
 	protected void validate() {
@@ -179,10 +182,11 @@ public class PluginManager {
 		}
 	}
 
+	// --------------------------------------------------------------------------
 	/**
-	 * Initializes the plugin manager.
-	 *
-	 * Connects and initializes all existing plugins ans sets the state to ALIVE.
+	 * Initializes the plug-in manager.
+	 * 
+	 * Connects and initializes all existing plug-ins and sets the state to ALIVE.
 	 */
 	public void init() {
 		if (state != State.INFANT) {
@@ -194,12 +198,12 @@ public class PluginManager {
 		// connect the list of existing plugins
 		synchronized (plugins) {
 			final Iterator<Plugin> it = plugins.iterator();
-			while(it.hasNext()) {
+			while (it.hasNext()) {
 				final Plugin p = it.next();
 				try {
 					connectPlugin(p);
 				} catch (final Exception e) {
-					log.error("Could not connect plugin "+p+" with the plugin manager. Dropping the plugin.",e);
+					log.error("Could not connect plug-in " + p + " with the plug-in manager. Dropping the plug-in.", e);
 					it.remove();
 				}
 			}
@@ -209,7 +213,7 @@ public class PluginManager {
 	}
 
 	/**
-	 * Shuts the plugin manager and all containing plugins down.
+	 * Shuts the plug-in manager and all containing plug-ins down.
 	 */
 	public void shutdown() {
 		if (state != State.ALIVE) {
@@ -218,11 +222,11 @@ public class PluginManager {
 
 		state = State.ZOMBIE;
 
-		for (final Plugin p: plugins) {
+		for (final Plugin p : plugins) {
 			try {
 				p.shutdown();
 			} catch (final Exception e) {
-				log.warn("The plugin "+p+" could not be shut down properly. Continuing anyway.", e);
+				log.warn("The plug-in " + p + " could not be shut down properly. Continuing anyway.", e);
 			}
 		}
 
@@ -233,7 +237,7 @@ public class PluginManager {
 	/**
 	 * Returns all plug-ins which are currently administered by this instance and which are marked
 	 * as 'active'
-	 *
+	 * 
 	 * @return all plug-ins which are currently administered by this instance and which are marked
 	 *         as 'active'
 	 */
@@ -253,7 +257,7 @@ public class PluginManager {
 	/**
 	 * Adds a <code>PluginListChangeListener</code> instance to the list of listeners. Every
 	 * listener will be informed of changes when plug-in instances are added or removed.
-	 *
+	 * 
 	 * @param listener
 	 *            the listener to add
 	 */
@@ -265,7 +269,7 @@ public class PluginManager {
 	/**
 	 * Adds a <code>PluginListChangeListener</code> instances to the list of listeners. Every
 	 * listener will be informed of changes when plug-in-instances are added or removed.
-	 *
+	 * 
 	 * @param listeners
 	 *            the listeners to add
 	 */
@@ -279,7 +283,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Removes a <code>PluginListChangeListener</code> instance from the list of listeners.
-	 *
+	 * 
 	 * @param listener
 	 *            the listener to add
 	 */
@@ -291,7 +295,7 @@ public class PluginManager {
 	/**
 	 * Returns a list-copy of all plug-ins which are currently administered by this instance<br>
 	 * Note that the priorities of the plug-ins are decreasing.
-	 *
+	 * 
 	 * @return a list-copy of all plug-ins which are currently administered by this instance
 	 */
 	public List<Plugin> getPlugins() {
@@ -305,7 +309,7 @@ public class PluginManager {
 	 * Returns a list-copy of all plug-ins which are currently administered by this instance, except
 	 * of the plug-ins that are of a class (or extending a class) contained in the excludes list.<br>
 	 * Note that the priorities of the plug-ins are decreasing.
-	 *
+	 * 
 	 * @param checkHierarchy
 	 *            <code>true</code> if the class hierarchy should be checked, such that even
 	 *            plug-ins derived from a class included in the <code>excludes</code> list will be
@@ -367,7 +371,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Connect the plug-in with the plug-in manager
-	 *
+	 * 
 	 * @param plugin
 	 *            the plug-in to be connected
 	 * @throws Exception
@@ -414,13 +418,14 @@ public class PluginManager {
 	/**
 	 * Adds a plug-in if it is not contained yet. The plug-in is put at the end of the list which
 	 * means that the new plug-in has the lowest priority
-	 *
-	 * If we're not ALIVE yet, then just add the plugin to the list. It will be connected
-	 * later by {@link #init()}.
-	 *
+	 * 
+	 * If we're not ALIVE yet, then just add the plug-in to the list. It will be connected later by
+	 * {@link #init()}.
+	 * 
 	 * @param plugin
 	 *            The plug-in object to be added.
-	 * @throws Exception when the plugin could not be added.
+	 * @throws Exception
+	 *             when the plug-in could not be added.
 	 */
 	private void addPlugin(final Plugin plugin) throws Exception {
 
@@ -429,7 +434,7 @@ public class PluginManager {
 		}
 
 		if (plugins.contains(plugin)) {
-			throw new RuntimeException("Plugin already there!");
+			throw new RuntimeException("Plug-in already there!");
 		}
 
 		plugins.add(plugin);
@@ -475,6 +480,9 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Disable all NodePositioner plug-ins except the given one.
+	 * 
+	 * @param plugin
+	 *            the new {@link NodePositionerPlugin}
 	 */
 	protected void newNodePositioner(final Plugin plugin) {
 		log.debug("Disabling old node positioner; new one is " + plugin);
@@ -496,7 +504,7 @@ public class PluginManager {
 	 * Puts a plug-in at the top of the list which means that its priority is the highest one<br>
 	 * The others plug-ins' priorities are decreased by one which means that their order stays
 	 * intact.
-	 *
+	 * 
 	 * @param plugin
 	 *            The plug-in object whose priority is to be increased.
 	 * @throws RuntimeException
@@ -506,7 +514,7 @@ public class PluginManager {
 	public void increasePluginPriorityToTop(final Plugin plugin) {
 
 		if (!plugins.remove(plugin)) {
-			throw new RuntimeException("The plugin was not yet managed.");
+			throw new RuntimeException("The plug-in was not yet managed.");
 		}
 		plugins.add(plugin);
 		log.debug("The plug-in: " + plugin + " is now the one with the highest priority");
@@ -519,10 +527,10 @@ public class PluginManager {
 	 * If two plug-ins draw objects at the same spot on the drawing area, the one with the higher
 	 * priority will draw the object on top of the other. The same holds for events as the object
 	 * with the higher priority will receive the event previously to one with a lower priority.
-	 *
+	 * 
 	 * @param list
 	 *            the list of plug-ins which priorities are to be decreased
-	 *
+	 * 
 	 */
 	public void decreasePluginPriorities(final List<Plugin> list) {
 
@@ -535,7 +543,7 @@ public class PluginManager {
 			for (final Plugin p : list) {
 				currentIndex = plugins.indexOf(p);
 				if (currentIndex == -1) {
-					throw new RuntimeException("The plugin was not yet managed.");
+					throw new RuntimeException("The plug-in was not yet managed.");
 				}
 				newPrios.put(p, currentIndex == 0 ? 0 : currentIndex - 1);
 			}
@@ -548,7 +556,7 @@ public class PluginManager {
 		}
 
 		for (final Plugin p : plugins) {
-			log.debug("Gave plugin " + p + " priority number " + plugins.indexOf(p));
+			log.debug("Gave plug-in " + p + " priority number " + plugins.indexOf(p));
 			firePluginListChangedEvent(p, ListChangeEvent.PRIORITY_CHANGED);
 		}
 
@@ -560,10 +568,10 @@ public class PluginManager {
 	 * If two plug-ins draw objects at the same spot on the drawing area, the one with the higher
 	 * priority will draw the object on top of the other. The same holds for events as the object
 	 * with the higher priority will receive the event previously to one with a lower priority.
-	 *
+	 * 
 	 * @param list
 	 *            the list of plug-ins which priorities are to be increased
-	 *
+	 * 
 	 */
 	public void increasePluginPriorities(final List<Plugin> list) {
 
@@ -594,7 +602,7 @@ public class PluginManager {
 		}
 
 		for (final Plugin p : plugins) {
-			log.debug("Gave plugin " + p + " priority number " + plugins.indexOf(p));
+			log.debug("Gave plug-in " + p + " priority number " + plugins.indexOf(p));
 			firePluginListChangedEvent(p, ListChangeEvent.PRIORITY_CHANGED);
 		}
 
@@ -603,7 +611,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Toggles the priorities of the two plug-ins passed in as parameters.
-	 *
+	 * 
 	 * @param onePlugin
 	 * @param theOtherPlugin
 	 * @throws RuntimeException
@@ -644,14 +652,14 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Removes a plug-in instance
-	 *
+	 * 
 	 * @param plugin
 	 *            the plug-in instance to be removed
 	 * @return whether the plug-in was successfully removed
 	 */
 	public boolean removePlugin(final Plugin plugin) {
 
-		log.debug("Removing plugin " + plugin);
+		log.debug("Removing plug-in " + plugin);
 
 		// We cannot remove the active NodePositioner, if there is no other to replace it.
 		if ((plugin instanceof NodePositionerPlugin) && plugin.getXMLConfig().getActive()) {
@@ -665,7 +673,7 @@ public class PluginManager {
 				}
 			}
 			if (!foundAnotherNP) {
-				log.debug("Cannot remove plugin, it is the only node positioner.");
+				log.debug("Cannot remove plug-in, it is the only node positioner.");
 				return false;
 			}
 		}
@@ -674,14 +682,14 @@ public class PluginManager {
 			removePending.add(plugin);
 		}
 
-		// first disable the plugin. if it is a NodePositioner, this would also activate another one
-		// as replacement.
+		// first disable the plug-in. if it is a NodePositioner, this would also
+		// activate another one as replacement.
 		plugin.setActive(false);
 
 		try {
 			plugin.shutdown();
 		} catch (final Exception e) {
-			log.warn("The plugin could not be shut down properly. Continuing anyway.",e);
+			log.warn("The plug-in could not be shut down properly. Continuing anyway.", e);
 		}
 
 		synchronized (plugins) {
@@ -699,7 +707,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Returns the instance which holds information about the nodes' positions
-	 *
+	 * 
 	 * @return the instance which holds information about the nodes' positions
 	 */
 	public NodePositionerPlugin getNodePositioner() {
@@ -713,7 +721,7 @@ public class PluginManager {
 				}
 			}
 
-			// if there none, then we're currenty in the process of switching from one
+			// if there none, then we're currently in the process of switching from one
 			// to another. In this case just return an inactive one.
 			// (as soon as the new one arrives, we will be back in business again)
 			for (final Plugin p : plugins) {
@@ -731,7 +739,7 @@ public class PluginManager {
 	 * Add a new Listener for changes in the position of nodes. Whenever a node moves around, an
 	 * event is fired. Note that the listener will be added no matter if it already exists in the
 	 * list.
-	 *
+	 * 
 	 * @param listener
 	 *            a listener to be added to the already existing ones
 	 */
@@ -742,7 +750,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Remove the given listener.
-	 *
+	 * 
 	 * @param listener
 	 *            the listener to be removed
 	 */
@@ -753,13 +761,13 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Fires a NodePositionEvent.
-	 *
+	 * 
 	 * Note: This method should only be used by NodePositioners. It is declared public so that it
 	 * can be used across packages, but ordinary plug-ins must never call it!
-	 *
+	 * 
 	 * @param event
 	 *            the NodePositionEvent to be fired
-	 *
+	 * 
 	 */
 	public void fireNodePositionEvent(final NodePositionEvent event) {
 		// Get listeners
@@ -774,13 +782,14 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Creates a new instance of a plug-in and entails it in the list
-	 *
+	 * 
 	 * @param clazz
 	 *            the plug-in's class
 	 * @param config
 	 *            the plug-in's configuration parameters
 	 * @return the new instance of a plug-in
-	 * @throws Exception when the plugin could not be created.
+	 * @throws Exception
+	 *             when the plug-in could not be created.
 	 */
 	public Plugin createNewPlugin(final Class<? extends Plugin> clazz, final PluginXMLConfig config) throws Exception {
 		final Plugin plugin;
@@ -822,7 +831,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Fires an event which informs the listener about changes concerning a certain plug-in
-	 *
+	 * 
 	 * @param p
 	 *            the plug-in
 	 * @param what
@@ -840,7 +849,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Returns a list of all types of plug-ins which are currently administered by this instance
-	 *
+	 * 
 	 * @return a list of all types of plug-ins which are currently administered by this instance
 	 */
 	public static List<Class<? extends Plugin>> getAvailablePluginTypes() {
@@ -851,7 +860,7 @@ public class PluginManager {
 	/**
 	 * Returns all instances of a certain kind of plug-ins which are currently administered by this
 	 * instance
-	 *
+	 * 
 	 * @param clazz
 	 *            the plug-in instances' class
 	 * @param checkHierarchy
@@ -900,7 +909,7 @@ public class PluginManager {
 	// --------------------------------------------------------------------------
 	/**
 	 * Returns all active plug-ins in decreasing priority which are currently visible
-	 *
+	 * 
 	 * @return all active plug-ins in decreasing priority which are currently visible
 	 */
 	public List<Plugin> getVisibleActivePlugins() {

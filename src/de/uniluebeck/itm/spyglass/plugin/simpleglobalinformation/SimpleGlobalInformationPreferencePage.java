@@ -8,6 +8,9 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -27,6 +30,7 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
 public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> {
 
 	private SimpleGlobalInformationOptionsComposite optionsComposite;
+	private Set<StatisticalInformationEvaluator> stringFormatterTable;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -64,9 +68,12 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 		optionsComposite = new SimpleGlobalInformationOptionsComposite(composite, SWT.NONE);
 
 		optionsComposite.setDatabinding(dbc, config);
-
-		optionsComposite.getStringFormatter().connectTableWithData(dbc, config);
-
+		stringFormatterTable = new TreeSet<StatisticalInformationEvaluator>();
+		final Set<StatisticalInformationEvaluator> tmp = config.getStatisticalInformationEvaluators();
+		for (final StatisticalInformationEvaluator statisticalInformationEvaluator : tmp) {
+			stringFormatterTable.add(statisticalInformationEvaluator.clone());
+		}
+		optionsComposite.getStringFormatter().connectTableWithData(dbc, stringFormatterTable);
 		return composite;
 	}
 
@@ -76,11 +83,26 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 		return SimpleGlobalInformationPlugin.class;
 	}
 
-	// public static void main(final String[] args) throws IOException {
-	// final Display display = Display.getDefault();
-	// final Shell shell = new Shell(display);
-	// final Spyglass sg = new Spyglass();
-	// final PluginPreferenceDialog inst = new PluginPreferenceDialog(shell, sg);
-	// inst.open();
-	// }
+	// --------------------------------------------------------------------------------
+	@Override
+	protected void loadFromModel() {
+		super.loadFromModel();
+		stringFormatterTable.clear();
+		final Set<StatisticalInformationEvaluator> tmp = config.getStatisticalInformationEvaluators();
+		for (final StatisticalInformationEvaluator statisticalInformationEvaluator : tmp) {
+			stringFormatterTable.add(statisticalInformationEvaluator.clone());
+		}
+		optionsComposite.getStringFormatter().connectTableWithData(dbc, stringFormatterTable);
+	}
+
+	// --------------------------------------------------------------------------------
+	@Override
+	protected void storeToModel() {
+		super.storeToModel();
+		final Set<StatisticalInformationEvaluator> tmp = new TreeSet<StatisticalInformationEvaluator>();
+		for (final StatisticalInformationEvaluator statisticalInformationEvaluator : stringFormatterTable) {
+			tmp.add(statisticalInformationEvaluator.clone());
+		}
+		config.setStatisticalInformationEvaluators(tmp);
+	}
 }

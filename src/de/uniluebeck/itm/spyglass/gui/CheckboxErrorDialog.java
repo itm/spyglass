@@ -1,6 +1,10 @@
-// --------------------------------------------------------------------------------
-/**
- * 
+/* 
+ * ----------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the
+ * SwarmNet (www.swarmnet.de) project SpyGlass is free software;
+ * you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further details.
+ * ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui;
 
@@ -20,8 +24,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-
-import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 
 // --------------------------------------------------------------------------------
 /**
@@ -175,10 +177,6 @@ public class CheckboxErrorDialog extends ErrorDialog {
 		final PrintWriter printWriter = new PrintWriter(stringWriter);
 		t.printStackTrace(printWriter);
 		return stringWriter.toString();
-	}
-
-	public static void main(final String[] args) {
-		openError(null, "Test", "xyz", new SpyglassPacketException(new Exception("Testex")));
 	}
 
 }

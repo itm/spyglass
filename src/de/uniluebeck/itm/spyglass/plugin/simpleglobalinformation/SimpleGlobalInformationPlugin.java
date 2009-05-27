@@ -1,10 +1,10 @@
-/*
- * -------------------------------------------------------------------------------- This file is
- * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
- * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
- * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
- * SpyGlass source tree for further details.
- * --------------------------------------------------------------------------------
+/* 
+ * ----------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the
+ * SwarmNet (www.swarmnet.de) project SpyGlass is free software;
+ * you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further details.
+ * ------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
@@ -123,8 +123,6 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 					avgNodeDegEvaluator.reset();
 				} else if (evt.getPropertyName().equals(SimpleGlobalInformationXMLConfig.PROPERTYNAME_STATISTICAL_INFORMATION_EVALUATORS)) {
 					refreshStatIEConf();
-				} else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_SEMANTIC_TYPES)) {
-					refreshStatIEConf();
 				}
 			}
 		};
@@ -140,11 +138,22 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		layout.verticalSpacing = 10;
 		widget.setLayout(layout);
 
+		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
 		this.widget = new SimpleGlobalInformationWidget(widget, SWT.NONE);
 
-		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
-		refreshStatIEConf();
-		runUpdateTimerTask();
+		synchronized (widget) {
+			widget.getDisplay().timerExec(1000, new Runnable() {
+				@SuppressWarnings("synthetic-access")
+				@Override
+				public void run() {
+					if (!widget.isDisposed()) {
+						updateWidget();
+						widget.getDisplay().timerExec(1000, this);
+					}
+				}
+			});
+
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -260,60 +269,44 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 						return;
 					}
 
-					final Collection<StatisticalInformationEvaluator> sfss = new LinkedList<StatisticalInformationEvaluator>();
-					for (final StatisticalInformationEvaluator sfs : sfSettings) {
-						sfss.add(sfs);
-						widget.createOrUpdateLabel(sfs);
-					}
-					widget.retaingLabels(sfss);
-
+					widget.retaingLabels(sfSettings);
+					updateWidget();
 				}
 			});
 		}
 
 	}
 
-	private void runUpdateTimerTask() {
+	// --------------------------------------------------------------------------------
+	/**
+	 * This helper updates all labels of the object's widget.<br>
+	 * Since this accesses an SWT Widget, it is necessary to catch its monitor before this method
+	 * can be run securely.
+	 */
+	private void updateWidget() {
+		if ((widget != null) && !widget.isDisposed()) {
+			if (isActive()) {
+				widget.createOrUpdateTotalPacketCount("# Packets: " + totalPacketCount);
+				widget.createOrUpdatePacketsPerSecond(pNCountTimerTask.getPacketsPerSecond());
 
-		if ((widget != null) && (!widget.isDisposed())) {
-			synchronized (widget) {
-				widget.getDisplay().timerExec(1000, new Runnable() {
-					@SuppressWarnings("synthetic-access")
-					@Override
-					public void run() {
-						if ((widget != null) && !widget.isDisposed()) {
+				if (xmlConfig.isShowNumNodes()) {
+					widget.createOrUpdateNumNodes(pNCountTimerTask.getNumNodes());
+				} else {
+					widget.removeNumNodes();
+				}
+				if (xmlConfig.isShowNodeDegree()) {
+					widget.createOrUpdateAVGNodeDeg(avgNodeDegString);
+				} else {
+					widget.removeAVGNodeDeg();
+				}
 
-							if (isActive()) {
-								widget.createOrUpdateTotalPacketCount("# Packets: " + totalPacketCount);
-								widget.createOrUpdatePacketsPerSecond(pNCountTimerTask.getPacketsPerSecond());
+				for (final StatisticalInformationEvaluator evaluator : xmlConfig.getStatisticalInformationEvaluators()) {
+					widget.createOrUpdateLabel(evaluator);
+				}
 
-								if (xmlConfig.isShowNumNodes()) {
-									widget.createOrUpdateNumNodes(pNCountTimerTask.getNumNodes());
-								} else {
-									widget.removeNumNodes();
-								}
-								if (xmlConfig.isShowNodeDegree()) {
-									widget.createOrUpdateAVGNodeDeg(avgNodeDegString);
-								} else {
-									widget.removeAVGNodeDeg();
-								}
-
-								for (final StatisticalInformationEvaluator evaluator : xmlConfig.getStatisticalInformationEvaluators()) {
-									widget.createOrUpdateLabel(evaluator);
-								}
-
-								widget.pack(true);
-							}
-
-							widget.getDisplay().timerExec(1000, this);
-
-						}
-					}
-				});
-
+				widget.pack(true);
 			}
 		}
-
 	}
 
 	// --------------------------------------------------------------------------------
@@ -331,7 +324,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		private Label labelAVGNodeDegree;
 		private Label labelTotalPacketCount;
 		private Label labelPacketsPerSecond;
-		private Map<StatisticalInformationEvaluator, Label> sfLabels = new TreeMap<StatisticalInformationEvaluator, Label>();
+		private Map<Integer, Label> sfLabels = new TreeMap<Integer, Label>();
 
 		// --------------------------------------------------------------------------------
 		/**
@@ -449,11 +442,12 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		public void createOrUpdateLabel(final StatisticalInformationEvaluator siEvaluator) {
 			synchronized (sfLabels) {
 				final String text = siEvaluator.getDescription() + " " + siEvaluator.getValue();
-				Label label = sfLabels.get(siEvaluator);
+				final int key = siEvaluator.hashCode();
+				Label label = sfLabels.get(key);
 
 				if (label == null) {
 					label = new Label(this, SWT.NONE);
-					sfLabels.put(siEvaluator, label);
+					sfLabels.put(key, label);
 					label.setText(text);
 					label.pack(true);
 					super.getParent().redraw();
@@ -472,9 +466,9 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		 * Removes the label which provides a certain statistical information.
 		 * 
 		 * @param siEvaluator
-		 *            an object which encapsulates the statistical information
+		 *            an object's identifier which encapsulates the statistical information
 		 */
-		public void removeLabel(final StatisticalInformationEvaluator siEvaluator) {
+		public void removeLabel(final Integer siEvaluator) {
 			Display.getDefault().syncExec(new Runnable() {
 				// ------------------------------------------------------------------------
 				@SuppressWarnings("synthetic-access")
@@ -501,12 +495,19 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		 *            information
 		 */
 		public void retaingLabels(final Collection<StatisticalInformationEvaluator> siEvaluators) {
-			final Collection<StatisticalInformationEvaluator> keySet = new LinkedList<StatisticalInformationEvaluator>();
+			final Collection<Integer> keySet = new LinkedList<Integer>();
 			synchronized (sfLabels) {
 				keySet.addAll(sfLabels.keySet());
 			}
-			for (final StatisticalInformationEvaluator key : keySet) {
-				if (!siEvaluators.contains(key)) {
+			for (final Integer key : keySet) {
+				boolean found = false;
+				for (final StatisticalInformationEvaluator eval : siEvaluators) {
+					if (eval.hashCode() == key) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
 					removeLabel(key);
 				}
 			}
@@ -518,11 +519,11 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		public void clear() {
 			removeAVGNodeDeg();
 			removeNumNodes();
-			final Collection<StatisticalInformationEvaluator> keySet = new LinkedList<StatisticalInformationEvaluator>();
+			final Collection<Integer> keySet = new LinkedList<Integer>();
 			synchronized (sfLabels) {
 				keySet.addAll(sfLabels.keySet());
 			}
-			for (final StatisticalInformationEvaluator key : keySet) {
+			for (final Integer key : keySet) {
 				removeLabel(key);
 			}
 		}
@@ -599,6 +600,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		/**
 		 * Resets the timer tasks statistical values
 		 */
+		@SuppressWarnings("synthetic-access")
 		public synchronized void reset() {
 			times = 0;
 			statistics30sec.reset();
