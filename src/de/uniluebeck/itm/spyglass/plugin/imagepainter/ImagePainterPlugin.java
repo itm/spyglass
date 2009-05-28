@@ -98,18 +98,19 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 		xmlConfig.addPropertyChangeListener(this);
 
 		// dito
-		loadImage();
+		reloadImage();
 
 	}
 
-	private void loadImage() {
+	private void reloadImage() {
 
-		if (image != null) {
-			synchronized (layer) {
-				layer.remove(image);
-			}
-		}
-		fireDrawingObjectRemoved(image);
+		removeImageFromLayer();
+		configureImage();
+		addImageToLayer();
+
+	}
+
+	private void configureImage() {
 
 		try {
 			image = new Image(xmlConfig.getImageFileName());
@@ -127,6 +128,21 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 		image.setImageSizeX(sizeX);
 		image.setImageSizeY(sizeY);
 
+	}
+
+	private void removeImageFromLayer() {
+
+		if (image != null) {
+			synchronized (layer) {
+				layer.remove(image);
+			}
+		}
+		fireDrawingObjectRemoved(image);
+
+	}
+
+	private void addImageToLayer() {
+
 		synchronized (layer) {
 			layer.add(image);
 		}
@@ -136,7 +152,7 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent e) {
-		loadImage();
+		reloadImage();
 	}
 
 }
