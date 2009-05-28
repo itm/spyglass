@@ -21,10 +21,9 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
  * Instances of this class contain the configuration parameters of a
  * {@link SimpleNodePainterXMLConfig}
  * 
- * NOTE: the data in this class is protected by synchronized, rather than volatile.
- * the reason behind this is that making complicated methods like 
- * putExtendedInformationActive(int, boolean) thread-safe by volatile would be too 
- * error-prone. -- Dariush
+ * NOTE: the data in this class is protected by synchronized, rather than volatile. the reason
+ * behind this is that making complicated methods like putExtendedInformationActive(int, boolean)
+ * thread-safe by volatile would be too error-prone. -- Dariush
  * 
  * @author Sebastian Ebers
  * 
@@ -37,6 +36,8 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 
 	public static final String PROPERTYNAME_LINE_COLOR_R_G_B = "lineColorRGB";
 
+	public static final String PROPERTYNAME_NODE_IDS_AS_HEX = "nodeIDsAsHex";
+
 	@ElementMap(entry = "isActive", key = "nodeID", attribute = true, name = "extendedInformation", required = false)
 	private HashMap<Integer, Boolean> isExtendenInformationActive = new HashMap<Integer, Boolean>();
 
@@ -48,6 +49,9 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 
 	@Element(required = false)
 	private int lineWidth = 1;
+
+	@Element(required = false)
+	private boolean nodeIDsAsHex = false;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -76,6 +80,31 @@ public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConf
 	 */
 	public synchronized void putExtendedInformationActive(final int nodeID, final boolean isExtendendActive) {
 		isExtendenInformationActive.put(nodeID, isExtendendActive);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns whether the nodes' identifiers are to be displayed in as hex value or decimal number
+	 * 
+	 * @return indicates whether the nodes' identifiers are to be displayed in as hex value or
+	 *         decimal number (<code>true</code> means hex value)
+	 */
+	public boolean getNodeIDsAsHex() {
+		return nodeIDsAsHex;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets whether the nodes' identifiers are to be displayed in as hex value or decimal number
+	 * 
+	 * @param nodeIDsAsHex
+	 *            indicates whether the nodes' identifiers are to be displayed in as hex value or
+	 *            decimal number (<code>true</code> means hex value)
+	 */
+	public void setNodeIDsAsHex(final boolean nodeIDsAsHex) {
+		final boolean oldValue = this.nodeIDsAsHex;
+		this.nodeIDsAsHex = nodeIDsAsHex;
+		firePropertyChange(PROPERTYNAME_NODE_IDS_AS_HEX, oldValue, this.nodeIDsAsHex);
 	}
 
 	// --------------------------------------------------------------------------------

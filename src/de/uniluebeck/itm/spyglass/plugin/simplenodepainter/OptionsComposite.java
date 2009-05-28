@@ -45,6 +45,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 	private Group group1;
 	private Label label1;
 	private Button showExtInf;
+	private Button nodeIDsAsHex;
 	private CLabel colorExample;
 	private Button lineColor;
 	private Label label2;
@@ -154,6 +155,15 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 
 				}
 
+				{
+					nodeIDsAsHex = new Button(group1, SWT.CHECK | SWT.LEFT);
+					final GridData nidashData = new GridData();
+					nidashData.horizontalSpan = 3;
+					nodeIDsAsHex.setLayoutData(nidashData);
+					nodeIDsAsHex.setText("Display node identifiers as hex values");
+
+				}
+
 				stringFormatter.addStringFormatterFields(group1, 2);
 
 			}
@@ -191,6 +201,13 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 				SimpleNodePainterXMLConfig.PROPERTYNAME_EXTENDED_DEFAULT_VALUE);
 		dbc.bindValue(SWTObservables.observeSelection(this.showExtInf), observableExtInf,
 				new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
+
+		// node indertifier representation
+
+		final IObservableValue observableNodeRepr = BeansObservables.observeValue(dbc.getValidationRealm(), config,
+				SimpleNodePainterXMLConfig.PROPERTYNAME_NODE_IDS_AS_HEX);
+		dbc.bindValue(SWTObservables.observeSelection(this.nodeIDsAsHex), observableNodeRepr, new UpdateValueStrategy(
+				UpdateValueStrategy.POLICY_CONVERT), null);
 
 		// line color
 

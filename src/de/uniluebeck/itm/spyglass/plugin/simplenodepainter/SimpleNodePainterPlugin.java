@@ -415,8 +415,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
 
-		final Node node = new Node(nodeID, "Node " + nodeID, "", isExtended, lineColorRGB, lineWidth, getPluginManager().getNodePositioner()
-				.getPosition(nodeID));
+		final String id = !xmlConfig.getNodeIDsAsHex() ? String.valueOf(nodeID) : Tools.convertDecToHex(nodeID);
+
+		final Node node = new Node(nodeID, "# " + id, "", isExtended, lineColorRGB, lineWidth, getPluginManager().getNodePositioner().getPosition(
+				nodeID));
 
 		synchronized (layer) {
 			layer.add(node);
@@ -571,9 +573,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				}
 
 				// otherwise it needs to be updated
+				final String denotation = "# " + (xmlConfig.getNodeIDsAsHex() ? Tools.convertDecToHex(nodeID) : nodeID);
 				final String stringFormatterResult = stringFormatterResultCache.get(nodeID);
-				node.update("Node " + nodeID, stringFormatterResult, xmlConfig.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(),
-						xmlConfig.getLineWidth());
+				node.update(denotation, stringFormatterResult, xmlConfig.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(), xmlConfig
+						.getLineWidth());
 
 			}
 		}
@@ -835,6 +838,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
 
+			// indicates whether the nodes should be updated afterwards
+			boolean updateNodes = true;
+
 			// if the plug-in is no longer active, reset it completely
 			if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ACTIVE)) {
 
@@ -842,6 +848,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					// this has to be done to stop the packet consumer thread
 					setActive(false);
 					reset();
+					updateNodes = false;
 				} else {
 					// this has to be done to start the packet consumer thread
 					setActive(true);
@@ -849,24 +856,35 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			}
 
 			// the default string formatter was removed
-			if (evt.getPropertyName().equals(PluginWithStringFormatterXMLConfig.PROPERTYNAME_DEFAULT_STRING_FORMATTER)) {
+			else if (evt.getPropertyName().equals(PluginWithStringFormatterXMLConfig.PROPERTYNAME_DEFAULT_STRING_FORMATTER)) {
 				if ((evt.getNewValue() == null) || evt.getNewValue().equals("")) {
 					purgeDefaultStringFormatterResults();
 				}
 			}
 
 			// the plug-in does not listen to all semantic types any more
-			if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ALL_SEMANTIC_TYPES) && !((Boolean) evt.getNewValue())) {
+			else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ALL_SEMANTIC_TYPES) && !((Boolean) evt.getNewValue())) {
 				purgeStringFormatterResults();
 				purgeNodeSemanticTypes();
 			}
 
-			// the list of semantic types the plug-in listens to has changed
-			if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_SEMANTIC_TYPES)) {
-				if (!xmlConfig.isAllSemanticTypes()) {
-					// remove all results cached for semantic types which are no longer listened
-					// to
+			// the nodes identifier representation has changed
+			else if (evt.getPropertyName().equals(SimpleNodePainterXMLConfig.PROPERTYNAME_NODE_IDS_AS_HEX)) {
+				synchronized (layer) {
+					final Collection<Node> nodeObjects = nodes.values();
+					for (final Node node : nodeObjects) {
+						node.setDenotation("# "
+								+ (((Boolean) evt.getNewValue()) == true ? Tools.convertDecToHex(node.getNodeID()) : node.getNodeID()));
+					}
+				}
+				updateNodes = false;
+			}
 
+			// the list of semantic types the plug-in listens to has changed
+			else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_SEMANTIC_TYPES)) {
+				if (!xmlConfig.isAllSemanticTypes()) {
+
+					// remove all results cached for semantic types which are no longer listened to
 					final List<Integer> purge = Tools.intArrayToIntegerList((int[]) evt.getOldValue());
 					purge.removeAll(Tools.intArrayToIntegerList((int[]) evt.getNewValue()));
 					for (final Integer p : purge) {
@@ -877,9 +895,21 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			}
 
 			// the set of string formatter configuration changed
-			if (evt.getPropertyName().equals(PluginWithStringFormatterXMLConfig.PROPERTYNAME_STRING_FORMATTERS)) {
+			else if (evt.getPropertyName().equals(PluginWithStringFormatterXMLConfig.PROPERTYNAME_STRING_FORMATTERS)) {
 				purgeStringFormatterResults();
 			}
+
+			if (updateNodes) {
+				updateNodes();
+			}
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Starts a {@link Thread} to update all node objects
+		 */
+		@SuppressWarnings("synthetic-access")
+		private void updateNodes() {
 
 			// to refresh the nodes only once ...
 			synchronized (refreshPending) {
@@ -912,8 +942,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			};
 			t.setDaemon(true);
 			t.start();
-
 		}
-
 	}
 }

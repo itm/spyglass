@@ -87,4 +87,74 @@ public class Tools {
 		return true;
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Converts a decimal value to hex
+	 * 
+	 * @param dec
+	 *            the decimal value to be converted
+	 * @return the converted decimal value
+	 */
+	public static String convertDecToHex(final double dec) {
+
+		final String[] cArr = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
+
+		int number = (int) dec;
+		double frac = dec - number;
+
+		String result = "";
+		if (number == 0) {
+			result = "0";
+		} else {
+			while (number > 0) {
+				result = cArr[(number % 16)] + result;
+				number /= 16;
+			}
+		}
+
+		if (frac != 0) {
+			result += ".";
+			int i = 10;
+			while ((frac > 0) && (i-- != 0)) {
+				final double tmp = frac * 16;
+				result += cArr[((int) tmp)];
+				frac = (tmp - (int) tmp);
+			}
+		}
+
+		return result;
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Converts a hex value to decimal
+	 * 
+	 * @param hex
+	 *            the hex value to be converted
+	 * @return the converted hex value
+	 */
+	public static double convertHexToDec(final String hex) {
+
+		final String characters = "0123456789ABCDEF";
+
+		final String[] val = hex.replace(".", ":").split(":");
+		final String pre = val[0];
+
+		long number = 0;
+		for (int i = 0; i < pre.length(); i++) {
+			number = (number * 16) + characters.indexOf(pre.charAt(i));
+		}
+
+		double frac = 0;
+		if (val.length == 2) {
+			final String post = val[1];
+			for (int i = post.length() - 1; i >= 0; i--) {
+				frac = (frac / 16) + characters.indexOf(post.charAt(i));
+			}
+			frac /= 16;
+		}
+
+		return number + frac;
+	}
 }
