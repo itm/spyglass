@@ -1,6 +1,8 @@
 // --------------------------------------------------------------------------------
 /**
+ * Spring Embedder Options Composite
  * 
+ * @author Oliver Kleine
  */
 package de.uniluebeck.itm.spyglass.plugin.springembedderpositioner;
 
@@ -182,9 +184,9 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 				data6.grabExcessHorizontalSpace = true;
 				data6.horizontalAlignment = SWT.RIGHT;
 
-				final Label label4 = new Label(group1, SWT.NONE);
-				label4.setText("Does currently work with semantictype 9 only");
-				label4.setLayoutData(data6);
+				// final Label label4 = new Label(group1, SWT.NONE);
+				// label4.setText("Does currently work with semantictype 9 only");
+				// label4.setLayoutData(data6);
 
 			}
 		}

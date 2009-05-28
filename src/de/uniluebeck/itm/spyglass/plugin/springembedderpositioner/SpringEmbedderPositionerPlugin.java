@@ -33,6 +33,13 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
+/**
+ * Spring Embedder Plugin
+ * 
+ * @author Oliver Kleine
+ * 
+ */
+
 public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(SpringEmbedderPositionerPlugin.class);
@@ -185,7 +192,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		}
 
 		// Check wether the current packet is a neighbourhood package
-		if (packet.getSemanticType() == 9) {
+		if (xmlConfig.containsEdgeSemanticType(packet.getSemanticType())) {
 			final byte[] payload = packet.getPayload();
 			final int countNb = payload.length / 2;
 
@@ -315,7 +322,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 					// do nothing;
 				} else if (nbs.contains(id2)) {
 
-					log.debug("Compute attraction between " + id + " and " + id2);
+					// log.debug("Compute attraction between " + id + " and " + id2);
 					final double factor1 = (cur.getEuclideanDistance(other) - springLength) * stiffness;
 					// log.debug("factor1: " + factor1);
 
@@ -323,17 +330,18 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 					// log.debug("dist (" + id + ", " + id2 + "): " + dist.x + ", " + dist.y + ", "
 					// + dist.z + ")");
 
-					log.debug("EucDist: " + cur.getEuclideanDistance(other));
+					// log.debug("EucDist: " + cur.getEuclideanDistance(other));
 
 					tmp = this.divide(dist, cur.getEuclideanDistance(other));
 					dist.x = (int) Math.round(tmp[0] * factor1);
 					dist.y = (int) Math.round(tmp[1] * factor1);
 					dist.z = (int) Math.round(tmp[2] * factor1);
 
-					log.debug("att: (" + dist.x + ", " + dist.y + ", " + dist.z + ")");
+					// log.debug("att: (" + dist.x + ", " + dist.y + ", " + dist.z + ")");
 
 					force.add(dist);
-					log.debug("force inkl. att: " + force.x + ", " + force.y + ", " + force.z + ")");
+					// log.debug("force inkl. att: " + force.x + ", " + force.y + ", " + force.z +
+					// ")");
 
 				}
 
@@ -352,7 +360,8 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 				// log.debug("rep: (" + dist.x + ", " + dist.y + ", " + dist.z + ")");
 
 				force.add(dist);
-				log.debug("result inkl. rep: " + force.x + ", " + force.y + ", " + force.z + ")");
+				// log.debug("result inkl. rep: " + force.x + ", " + force.y + ", " + force.z +
+				// ")");
 			}
 
 		}

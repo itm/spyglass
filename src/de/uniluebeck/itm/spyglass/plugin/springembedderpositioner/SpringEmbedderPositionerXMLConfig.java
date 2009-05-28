@@ -8,11 +8,10 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.springembedderpositioner;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Arrays;
 
 import org.simpleframework.xml.Element;
-import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.ElementArray;
 
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerXMLConfig;
 
@@ -36,8 +35,8 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 
 	public static final String PROPERTYNAME_EFFICIENCY_FACTOR = "efficiencyFactor";
 
-	@ElementList(required = false)
-	private volatile List<Integer> edgeSemanticTypes = new LinkedList<Integer>();
+	@ElementArray(required = false)
+	private volatile int[] edgeSemanticTypes = new int[] { -1 };
 
 	@Element(required = false)
 	private volatile int optimumSpringLength = 200;
@@ -51,9 +50,9 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 	@Element(required = false)
 	private volatile double efficiencyFactor = 0.1;
 
-	public SpringEmbedderPositionerXMLConfig() {
-		this.edgeSemanticTypes.add(9);
-	}
+	// public SpringEmbedderPositionerXMLConfig() {
+	// this.edgeSemanticTypes.add(9);
+	// }
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -127,17 +126,37 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 	/**
 	 * @return the edgeSemanticTypes
 	 */
-	public List<Integer> getEdgeSemanticTypes() {
+	public int[] getEdgeSemanticTypes() {
 		return this.edgeSemanticTypes;
 	}
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * @param edgeSemanticTypes
-	 *            the edgeSemanticTypes to set
-	 */
-	public void setEdgeSemanticTypes(final List<Integer> edgeSemanticTypes) {
-		firePropertyChange(PROPERTYNAME_EDGE_SEMANTIC_TYPES, this.edgeSemanticTypes, edgeSemanticTypes);
-		this.edgeSemanticTypes = edgeSemanticTypes;
+	public void setEdgeSemanticTypes(final int[] edgeSemanticTypes) {
+		final int[] oldvalue = this.edgeSemanticTypes;
+
+		// If "-1" is in the list, reduce it to that number
+		Arrays.sort(edgeSemanticTypes);
+		if (Arrays.binarySearch(edgeSemanticTypes, -1) >= 0) {
+			this.edgeSemanticTypes = new int[] { -1 };
+		} else {
+			this.edgeSemanticTypes = edgeSemanticTypes.clone();
+		}
+		firePropertyChange(PROPERTYNAME_EDGE_SEMANTIC_TYPES, oldvalue, this.edgeSemanticTypes);
+	}
+
+	public boolean containsEdgeSemanticType(final int type) {
+		if (this.isAllEdgeSemanticTypes()) {
+			return true;
+		}
+
+		for (int i = 0; i < edgeSemanticTypes.length; i++) {
+			if (edgeSemanticTypes[i] == type) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public synchronized boolean isAllEdgeSemanticTypes() {
+		return (this.edgeSemanticTypes.length == 1) && (this.edgeSemanticTypes[0] == -1);
 	}
 }

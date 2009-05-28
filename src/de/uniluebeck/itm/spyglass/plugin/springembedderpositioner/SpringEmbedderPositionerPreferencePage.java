@@ -7,6 +7,14 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
+//--------------------------------------------------------------------------------
+/**
+ * Spring Embedder Preferences
+ * 
+ * @author Oliver Kleine
+ * 
+ */
+
 public class SpringEmbedderPositionerPreferencePage extends PluginPreferencePage<SpringEmbedderPositionerPlugin, SpringEmbedderPositionerXMLConfig> {
 
 	public SpringEmbedderPositionerPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
