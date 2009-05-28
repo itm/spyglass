@@ -354,7 +354,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	boolean isAssociatedToSemanticType(final Node node) {
 		synchronized (nodeSemanticTypes) {
 			final Collection<Integer> semanticTypes = nodeSemanticTypes.get(node.getNodeID());
-			return ((semanticTypes == null) || (semanticTypes.size() == 0));
+			return ((semanticTypes != null) && (semanticTypes.size() > 0));
 		}
 	}
 
@@ -614,15 +614,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			}
 
 			if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_VISIBLE)) {
-
-				if ((Boolean) evt.getNewValue()) {
-
-					synchronized (layer) {
-						final Collection<Node> values = nodes.values();
-						for (final Node node : values) {
-							node.markContentDirty();
-						}
-					}
+				if (!(Boolean) evt.getNewValue()) {
+					updateNodes = false;
 				}
 			}
 
