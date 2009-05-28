@@ -68,33 +68,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	/** Logs messages */
 	private static final Logger log = SpyglassLoggerFactory.getLogger(SimpleNodePainterPlugin.class);
 
-	/**
-	 * The configuration parameters of this plug-in instance
-	 */
+	/** The configuration parameters of this plug-in instance */
 	@Element(name = "parameters")
 	private final SimpleNodePainterXMLConfig xmlConfig;
 
-	/**
-	 * The layer containing the drawing objects
-	 */
+	/** The layer containing the drawing objects */
 	private final Layer layer;
 
-	/**
-	 * Buffers StringFormatter result strings associated with nodes and semantic types.<br>
-	 * The first map's key is the node's identifier and the second ones the semantic type.<br>
-	 * The results have to be concatenated before they can be displayed.
-	 */
-	private Map<Integer, Map<Integer, String>> stringFormatterResults;
-
-	/**
-	 * Buffers StringFormatter result strings associated with nodes and semantic types.<br>
-	 * This map is the concatenation of all string formatter results associated to each node.
-	 */
-	private Map<Integer, String> stringFormatterResultCache;
-
-	/**
-	 * Tracks which node was added by sending packets of which semantic type
-	 */
+	/** Tracks which node was added by sending packets of which semantic type */
 	private Map<Integer, Collection<Integer>> nodeSemanticTypes;
 
 	/** Listens for changes of the nodes' positions */
@@ -103,9 +84,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	/** Listens for changes of configuration properties */
 	private PropertyChangeListener pcl;
 
+	/** Indicates whether or not a refresh operation is pending */
 	private volatile Boolean refreshPending = false;
 
+	/** Maps node identifiers to actual node objects */
 	private Map<Integer, Node> nodes = new HashMap<Integer, Node>();
+
+	/** Object used for StringFormatter handling */
+	private SimpleNodePainterPluginData data;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -115,9 +101,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		super();
 		xmlConfig = new SimpleNodePainterXMLConfig();
 		layer = Layer.Factory.createQuadTreeLayer();
-		stringFormatterResults = new TreeMap<Integer, Map<Integer, String>>();
-		stringFormatterResultCache = new ConcurrentHashMap<Integer, String>();
 		nodeSemanticTypes = new HashMap<Integer, Collection<Integer>>();
+		data = new SimpleNodePainterPluginData();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -157,10 +142,11 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			layer.clear();
 			nodes.clear();
 		}
-		stringFormatterResults.clear();
+		data.finalize();
 		xmlConfig.finalize();
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public PluginPreferencePage<SimpleNodePainterPlugin, SimpleNodePainterXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog,
 			final Spyglass spyglass) {
@@ -227,8 +213,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final Node node = getMatchingNodeObject(nodeID);
 
 		// if the description was changed, an update is needed
-		if (parsePayloadByStringFormatters(packet)) {
-			node.setDescription(stringFormatterResultCache.get(nodeID));
+		if (data.parsePayloadByStringFormatters(packet)) {
+			node.setDescription(data.getStringFormatterString(nodeID));
 		}
 	}
 
@@ -253,125 +239,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		// get the instance of the node's visualization
 		final Node node = getMatchingNodeObject(nodeID);
 		node.setPosition(position);
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Parses the packets payload using the defined {@link StringFormatter}s.<br>
-	 * If a string formatter exists which gains information from the payload, the {@link Node}
-	 * corresponding to the node which sent the packet will be updated.
-	 * 
-	 * @param packet
-	 *            the packet containing the payload
-	 * @return <code>true</code> if a StringFormatter gained information from the payload
-	 */
-	private boolean parsePayloadByStringFormatters(final SpyglassPacket packet) {
-
-		boolean needsUpdate = false;
-		final int nodeID = packet.getSenderId();
-		final int packetSemanticType = packet.getSemanticType();
-		StringFormatter stringFormatter = null;
-
-		// check if a default StringFormatter exists. If so, use to parse the packet and store
-		// the resulting string independently of the packet's identifier
-		final String stringFormatterString = xmlConfig.getDefaultStringFormatter();
-		if ((stringFormatterString != null) && !stringFormatterString.equals("")) {
-			stringFormatter = new StringFormatter(stringFormatterString);
-			needsUpdate = updateStringFormatterResults(-1, stringFormatter.parse(packet), nodeID);
-		}
-
-		// Additionally, check if a StringFormatter exists which was designed to process the
-		// semantic type of the packet. If so, use it to parse the packet
-		stringFormatter = xmlConfig.getStringFormatter(packetSemanticType);
-		if (stringFormatter != null) {
-			needsUpdate = updateStringFormatterResults(packetSemanticType, stringFormatter.parse(packet), nodeID);
-		}
-
-		return needsUpdate;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Updates a part of the string formatter results corresponding to a semantic type.<br>
-	 * If the provided information are already buffered, <code>false</code> will be returned to
-	 * indicate that an update was not necessary.
-	 * 
-	 * @param packetSemanticType
-	 *            the semantic type
-	 * @param str
-	 *            the semantic type's new string
-	 * @param nodeID
-	 *            the node which sent the packet
-	 * @return <code>true</code> if the results were actually updated because of the provided
-	 *         information
-	 */
-	private boolean updateStringFormatterResults(final int packetSemanticType, final String str, final int nodeID) {
-
-		// if the provided value is null, the result is obsolete and has to be removed
-		if (str == null) {
-			return removeStringFormatterResults(packetSemanticType, nodeID);
-		}
-
-		boolean needsUpdate = false;
-
-		// update the part of the string formatter results corresponding to the semantic type
-		synchronized (stringFormatterResults) {
-			Map<Integer, String> nodeResults = stringFormatterResults.get(nodeID);
-			if (nodeResults == null) {
-				nodeResults = new TreeMap<Integer, String>();
-				stringFormatterResults.put(nodeID, nodeResults);
-				needsUpdate = true;
-			}
-
-			// if the current node result changed, update the cached value
-			final String refStr = nodeResults.get(packetSemanticType);
-			if (((refStr == null) || !refStr.equals(str))) {
-				nodeResults.put(packetSemanticType, str);
-				updateStringFormatterResultCache(nodeID);
-				needsUpdate = true;
-			}
-		}
-
-		return needsUpdate;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Removes the part of a node's string formatter results which corresponds to a semantic type.<br>
-	 * 
-	 * @param packetSemanticType
-	 *            a semantic type
-	 * @param nodeID
-	 *            a node's identifier
-	 * @return <code>true</code> if the results were actually removed
-	 */
-	private boolean removeStringFormatterResults(final int packetSemanticType, final int nodeID) {
-		synchronized (stringFormatterResults) {
-			final Map<Integer, String> nodeResults = stringFormatterResults.get(nodeID);
-			if ((nodeResults != null) && (nodeResults.remove(packetSemanticType) != null)) {
-				updateStringFormatterResultCache(nodeID);
-				return true;
-			}
-		}
-		return false;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Removes the parts of the string formatter results which corresponds to a semantic type.<br>
-	 * 
-	 * @param packetSemanticType
-	 *            the semantic type
-	 * @return <code>true</code> if the results were actually removed
-	 */
-	private boolean removeStringFormatterResults(final int packetSemanticType) {
-		boolean returnValue = false;
-		synchronized (stringFormatterResults) {
-			for (final Integer nodeID : stringFormatterResults.keySet()) {
-				returnValue = returnValue || removeStringFormatterResults(packetSemanticType, nodeID);
-			}
-		}
-		return returnValue;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -415,10 +282,9 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		final int[] lineColorRGB = xmlConfig.getLineColorRGB();
 		final int lineWidth = xmlConfig.getLineWidth();
 
-		final String id = !xmlConfig.getNodeIDsAsHex() ? String.valueOf(nodeID) : Tools.convertDecToHex(nodeID);
+		final String id = !xmlConfig.getNodeIDsAsHex() ? String.valueOf(nodeID) : "0x" + Tools.convertDecToHex(nodeID);
 
-		final Node node = new Node(nodeID, "# " + id, "", isExtended, lineColorRGB, lineWidth, getPluginManager().getNodePositioner().getPosition(
-				nodeID));
+		final Node node = new Node(nodeID, id, "", isExtended, lineColorRGB, lineWidth, getPluginManager().getNodePositioner().getPosition(nodeID));
 
 		synchronized (layer) {
 			layer.add(node);
@@ -426,124 +292,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		}
 		fireDrawingObjectAdded(node);
 		return node;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Returns the semantic types which are currently listened to and which belong to an active
-	 * string formatter configuration
-	 * 
-	 * @return the semantic types which are currently listened to and which belong to an active
-	 *         string formatter configuration
-	 */
-	private List<Integer> getActiveSemanticTypes() {
-		// get all semantic types which are currently listened to
-		final List<Integer> valid = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes());
-
-		// if it is listening to all semantic types, which is indicated
-		// by a single "-1" element
-		if (xmlConfig.isAllSemanticTypes()) {
-			if ((xmlConfig.getDefaultStringFormatter() == null) || xmlConfig.getDefaultStringFormatter().equals("")) {
-				valid.clear();
-			}
-			// add the semantic types which belong to active string formatters to the list
-			valid.addAll(xmlConfig.getStringFormatters().keySet());
-
-		} else {
-			// otherwise remove all semantic types which are listened to but
-			// which don't belong to any active string formatter
-			valid.retainAll(xmlConfig.getStringFormatters().keySet());
-			if ((xmlConfig.getDefaultStringFormatter() != null) && !xmlConfig.getDefaultStringFormatter().equals("")) {
-				valid.add(0, -1);
-			}
-		}
-		return valid;
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Updates the result cache of all {@link StringFormatter}s which are associated to a certain
-	 * node
-	 * 
-	 * @param nodeID
-	 *            the node's identifier
-	 */
-	private void updateStringFormatterResultCache(final int nodeID) {
-
-		final StringBuffer stringFormatterResult = new StringBuffer("");
-		final Collection<String> sfResults = new Vector<String>();
-
-		synchronized (stringFormatterResults) {
-			final Map<Integer, String> nodeResults = stringFormatterResults.get(nodeID);
-			if (nodeResults != null) {
-				sfResults.addAll(nodeResults.values());
-			}
-		}
-
-		for (final String str : sfResults) {
-			stringFormatterResult.append("\r\n" + str);
-		}
-		String str = stringFormatterResult.toString();
-		if (str.length() > 4) {
-			str = str.substring(2);
-		}
-
-		stringFormatterResultCache.put(nodeID, str);
-
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Removes cached {@link StringFormatter} result strings which are no longer needed because the
-	 * corresponding semantic type is no longer listened to.
-	 */
-	private void purgeStringFormatterResults() {
-
-		final List<Integer> valid = getActiveSemanticTypes();
-
-		synchronized (stringFormatterResults) {
-
-			// purge the cache for every node
-			final Collection<Integer> nodeIDs = stringFormatterResults.keySet();
-			for (final Integer nodeID : nodeIDs) {
-
-				boolean needsUpdate = false;
-				final Map<Integer, String> nodeSemTypes = stringFormatterResults.get(nodeID);
-
-				// compute keys which are currently available but no longer valid
-				final Set<Integer> keys = nodeSemTypes.keySet();
-				keys.removeAll(valid);
-
-				for (final Integer key : keys) {
-					nodeSemTypes.remove(key);
-					needsUpdate = true;
-				}
-				if (needsUpdate) {
-					updateStringFormatterResultCache(nodeID);
-				}
-			}
-
-		}
-
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Removes the cached default {@link StringFormatter} result string
-	 */
-	private void purgeDefaultStringFormatterResults() {
-		synchronized (stringFormatterResults) {
-			final Collection<Map<Integer, String>> nodeResults = stringFormatterResults.values();
-
-			for (final Map<Integer, String> results : nodeResults) {
-				results.remove(-1);
-			}
-			for (final Integer nodeID : stringFormatterResultCache.keySet()) {
-				updateStringFormatterResultCache(nodeID);
-			}
-
-		}
-
 	}
 
 	// --------------------------------------------------------------------------------
@@ -573,8 +321,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				}
 
 				// otherwise it needs to be updated
-				final String denotation = "# " + (xmlConfig.getNodeIDsAsHex() ? Tools.convertDecToHex(nodeID) : nodeID);
-				final String stringFormatterResult = stringFormatterResultCache.get(nodeID);
+				final String denotation = (xmlConfig.getNodeIDsAsHex() ? "0x" + Tools.convertDecToHex(nodeID) : String.valueOf(nodeID));
+				final String stringFormatterResult = data.getStringFormatterString(nodeID);
 				node.update(denotation, stringFormatterResult, xmlConfig.isExtendedInformationActive(nodeID), xmlConfig.getLineColorRGB(), xmlConfig
 						.getLineWidth());
 
@@ -603,13 +351,14 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * @return <code>true</code> if the node is associated to a semantic type, <code>false</code>
 	 *         otherwise
 	 */
-	private boolean isAssociatedToSemanticType(final Node node) {
+	boolean isAssociatedToSemanticType(final Node node) {
 		synchronized (nodeSemanticTypes) {
 			final Collection<Integer> semanticTypes = nodeSemanticTypes.get(node.getNodeID());
 			return ((semanticTypes == null) || (semanticTypes.size() == 0));
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Updates the collection of semantic types associated to each node.<br>
 	 * Semantic types which are no longer listened to will be removed from the association to a
@@ -653,7 +402,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			}
 		}
 
-		stringFormatterResults.clear();
+		data.reset();
+
 	}
 
 	// --------------------------------------------------------------------------------
@@ -663,6 +413,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			return layer.getDrawingObjects();
 		}
 	}
+
+	// ############################################################################ //
+	// ############################# Event handling ############################### //
+	// ############################################################################ //
 
 	// --------------------------------------------------------------------------------
 	@Override
@@ -827,6 +581,10 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		return false;
 	}
 
+	// ############################################################################ //
+	// ################### Listening to property changes ########################## //
+	// ############################################################################ //
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Listens for changing properties of the {@link SimpleNodePainterPlugin}'s configuration
@@ -858,13 +616,13 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			// the default string formatter was removed
 			else if (evt.getPropertyName().equals(PluginWithStringFormatterXMLConfig.PROPERTYNAME_DEFAULT_STRING_FORMATTER)) {
 				if ((evt.getNewValue() == null) || evt.getNewValue().equals("")) {
-					purgeDefaultStringFormatterResults();
+					data.purgeDefaultStringFormatterResults();
 				}
 			}
 
 			// the plug-in does not listen to all semantic types any more
 			else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ALL_SEMANTIC_TYPES) && !((Boolean) evt.getNewValue())) {
-				purgeStringFormatterResults();
+				data.purgeStringFormatterResults();
 				purgeNodeSemanticTypes();
 			}
 
@@ -873,8 +631,8 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				synchronized (layer) {
 					final Collection<Node> nodeObjects = nodes.values();
 					for (final Node node : nodeObjects) {
-						node.setDenotation("# "
-								+ (((Boolean) evt.getNewValue()) == true ? Tools.convertDecToHex(node.getNodeID()) : node.getNodeID()));
+						node.setDenotation((((Boolean) evt.getNewValue()) == true ? "0x" + Tools.convertDecToHex(node.getNodeID()) : String
+								.valueOf(node.getNodeID())));
 					}
 				}
 				updateNodes = false;
@@ -888,7 +646,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 					final List<Integer> purge = Tools.intArrayToIntegerList((int[]) evt.getOldValue());
 					purge.removeAll(Tools.intArrayToIntegerList((int[]) evt.getNewValue()));
 					for (final Integer p : purge) {
-						removeStringFormatterResults(p);
+						data.removeStringFormatterResults(p);
 					}
 					purgeNodeSemanticTypes();
 				}
@@ -896,7 +654,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 
 			// the set of string formatter configuration changed
 			else if (evt.getPropertyName().equals(PluginWithStringFormatterXMLConfig.PROPERTYNAME_STRING_FORMATTERS)) {
-				purgeStringFormatterResults();
+				data.purgeStringFormatterResults();
 			}
 
 			if (updateNodes) {
@@ -944,4 +702,306 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			t.start();
 		}
 	}
+
+	// ############################################################################ //
+	// ####################### StringFormatter handling ########################### //
+	// ############################################################################ //
+
+	/**
+	 * Instances of this class handle create and cache formatter results
+	 */
+	private class SimpleNodePainterPluginData {
+
+		/**
+		 * Buffers StringFormatter result strings associated with nodes and semantic types.<br>
+		 * The first map's key is the node's identifier and the second ones the semantic type.<br>
+		 * The results have to be concatenated before they can be displayed.
+		 */
+		private Map<Integer, Map<Integer, String>> stringFormatterResults;
+
+		/**
+		 * Buffers StringFormatter result strings associated with nodes and semantic types.<br>
+		 * This map is the concatenation of all string formatter results associated to each node.
+		 */
+		private Map<Integer, String> stringFormatterResultCache;
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Constructor
+		 */
+		public SimpleNodePainterPluginData() {
+			stringFormatterResults = new TreeMap<Integer, Map<Integer, String>>();
+			stringFormatterResultCache = new ConcurrentHashMap<Integer, String>();
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Returns the {@link StringFormatter} result which is related to a certain node
+		 * 
+		 * @param nodeID
+		 *            a node identifier
+		 * @return the {@link StringFormatter} result which is related to a certain node
+		 */
+		public String getStringFormatterString(final int nodeID) {
+			return stringFormatterResultCache.get(nodeID);
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Parses the packets payload using the defined {@link StringFormatter}s.<br>
+		 * If a string formatter exists which gains information from the payload, the {@link Node}
+		 * corresponding to the node which sent the packet will be updated.
+		 * 
+		 * @param packet
+		 *            the packet containing the payload
+		 * @return <code>true</code> if a StringFormatter gained information from the payload
+		 */
+		@SuppressWarnings("synthetic-access")
+		boolean parsePayloadByStringFormatters(final SpyglassPacket packet) {
+
+			boolean needsUpdate = false;
+			final int nodeID = packet.getSenderId();
+			final int packetSemanticType = packet.getSemanticType();
+			StringFormatter stringFormatter = null;
+
+			// check if a default StringFormatter exists. If so, use to parse the packet and store
+			// the resulting string independently of the packet's identifier
+			final String stringFormatterString = xmlConfig.getDefaultStringFormatter();
+			if ((stringFormatterString != null) && !stringFormatterString.equals("")) {
+				stringFormatter = new StringFormatter(stringFormatterString);
+				needsUpdate = updateStringFormatterResults(-1, stringFormatter.parse(packet), nodeID);
+			}
+
+			// Additionally, check if a StringFormatter exists which was designed to process the
+			// semantic type of the packet. If so, use it to parse the packet
+			stringFormatter = xmlConfig.getStringFormatter(packetSemanticType);
+			if (stringFormatter != null) {
+				needsUpdate = updateStringFormatterResults(packetSemanticType, stringFormatter.parse(packet), nodeID);
+			}
+
+			return needsUpdate;
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Returns the semantic types which are currently listened to and which belong to an active
+		 * string formatter configuration
+		 * 
+		 * @return the semantic types which are currently listened to and which belong to an active
+		 *         string formatter configuration
+		 */
+		@SuppressWarnings("synthetic-access")
+		private List<Integer> getActiveSemanticTypes() {
+			// get all semantic types which are currently listened to
+			final List<Integer> valid = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes());
+
+			// if it is listening to all semantic types, which is indicated
+			// by a single "-1" element
+			if (xmlConfig.isAllSemanticTypes()) {
+				if ((xmlConfig.getDefaultStringFormatter() == null) || xmlConfig.getDefaultStringFormatter().equals("")) {
+					valid.clear();
+				}
+				// add the semantic types which belong to active string formatters to the list
+				valid.addAll(xmlConfig.getStringFormatters().keySet());
+
+			} else {
+				// otherwise remove all semantic types which are listened to but
+				// which don't belong to any active string formatter
+				valid.retainAll(xmlConfig.getStringFormatters().keySet());
+				if ((xmlConfig.getDefaultStringFormatter() != null) && !xmlConfig.getDefaultStringFormatter().equals("")) {
+					valid.add(0, -1);
+				}
+			}
+			return valid;
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Updates a part of the string formatter results corresponding to a semantic type.<br>
+		 * If the provided information are already buffered, <code>false</code> will be returned to
+		 * indicate that an update was not necessary.
+		 * 
+		 * @param packetSemanticType
+		 *            the semantic type
+		 * @param str
+		 *            the semantic type's new string
+		 * @param nodeID
+		 *            the node which sent the packet
+		 * @return <code>true</code> if the results were actually updated because of the provided
+		 *         information
+		 */
+		private boolean updateStringFormatterResults(final int packetSemanticType, final String str, final int nodeID) {
+
+			// if the provided value is null, the result is obsolete and has to be removed
+			if (str == null) {
+				return removeStringFormatterResults(packetSemanticType, nodeID);
+			}
+
+			boolean needsUpdate = false;
+
+			// update the part of the string formatter results corresponding to the semantic type
+			synchronized (stringFormatterResults) {
+				Map<Integer, String> nodeResults = stringFormatterResults.get(nodeID);
+				if (nodeResults == null) {
+					nodeResults = new TreeMap<Integer, String>();
+					stringFormatterResults.put(nodeID, nodeResults);
+					needsUpdate = true;
+				}
+
+				// if the current node result changed, update the cached value
+				final String refStr = nodeResults.get(packetSemanticType);
+				if (((refStr == null) || !refStr.equals(str))) {
+					nodeResults.put(packetSemanticType, str);
+					updateStringFormatterResultCache(nodeID);
+					needsUpdate = true;
+				}
+			}
+
+			return needsUpdate;
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Removes the part of a node's string formatter results which corresponds to a semantic
+		 * type.<br>
+		 * 
+		 * @param packetSemanticType
+		 *            a semantic type
+		 * @param nodeID
+		 *            a node's identifier
+		 * @return <code>true</code> if the results were actually removed
+		 */
+		private boolean removeStringFormatterResults(final int packetSemanticType, final int nodeID) {
+			synchronized (stringFormatterResults) {
+				final Map<Integer, String> nodeResults = stringFormatterResults.get(nodeID);
+				if ((nodeResults != null) && (nodeResults.remove(packetSemanticType) != null)) {
+					updateStringFormatterResultCache(nodeID);
+					return true;
+				}
+			}
+			return false;
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Removes the parts of the string formatter results which corresponds to a semantic type.<br>
+		 * 
+		 * @param packetSemanticType
+		 *            the semantic type
+		 * @return <code>true</code> if the results were actually removed
+		 */
+		private boolean removeStringFormatterResults(final int packetSemanticType) {
+			boolean returnValue = false;
+			synchronized (stringFormatterResults) {
+				for (final Integer nodeID : stringFormatterResults.keySet()) {
+					returnValue = returnValue || removeStringFormatterResults(packetSemanticType, nodeID);
+				}
+			}
+			return returnValue;
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Updates the result cache of all {@link StringFormatter}s which are associated to a
+		 * certain node
+		 * 
+		 * @param nodeID
+		 *            the node's identifier
+		 */
+		private void updateStringFormatterResultCache(final int nodeID) {
+
+			final StringBuffer stringFormatterResult = new StringBuffer("");
+			final Collection<String> sfResults = new Vector<String>();
+
+			synchronized (stringFormatterResults) {
+				final Map<Integer, String> nodeResults = stringFormatterResults.get(nodeID);
+				if (nodeResults != null) {
+					sfResults.addAll(nodeResults.values());
+				}
+			}
+
+			for (final String str : sfResults) {
+				stringFormatterResult.append("\r\n" + str);
+			}
+			String str = stringFormatterResult.toString();
+			if (str.length() > 4) {
+				str = str.substring(2);
+			}
+
+			stringFormatterResultCache.put(nodeID, str);
+
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Removes cached {@link StringFormatter} result strings which are no longer needed because
+		 * the corresponding semantic type is no longer listened to.
+		 */
+		private void purgeStringFormatterResults() {
+
+			final List<Integer> valid = getActiveSemanticTypes();
+
+			synchronized (stringFormatterResults) {
+
+				// purge the cache for every node
+				final Collection<Integer> nodeIDs = stringFormatterResults.keySet();
+				for (final Integer nodeID : nodeIDs) {
+
+					boolean needsUpdate = false;
+					final Map<Integer, String> nodeSemTypes = stringFormatterResults.get(nodeID);
+
+					// compute keys which are currently available but no longer valid
+					final Set<Integer> keys = nodeSemTypes.keySet();
+					keys.removeAll(valid);
+
+					for (final Integer key : keys) {
+						nodeSemTypes.remove(key);
+						needsUpdate = true;
+					}
+					if (needsUpdate) {
+						updateStringFormatterResultCache(nodeID);
+					}
+				}
+
+			}
+
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Removes the cached default {@link StringFormatter} result string
+		 */
+		private void purgeDefaultStringFormatterResults() {
+			synchronized (stringFormatterResults) {
+				final Collection<Map<Integer, String>> nodeResults = stringFormatterResults.values();
+
+				for (final Map<Integer, String> results : nodeResults) {
+					results.remove(-1);
+				}
+				for (final Integer nodeID : stringFormatterResultCache.keySet()) {
+					updateStringFormatterResultCache(nodeID);
+				}
+
+			}
+
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Resets the data
+		 */
+		public void reset() {
+			stringFormatterResults.clear();
+			stringFormatterResultCache.clear();
+		}
+
+		// --------------------------------------------------------------------------------
+		@Override
+		public void finalize() {
+			stringFormatterResults.clear();
+			stringFormatterResultCache.clear();
+		}
+
+	}
+
 }
