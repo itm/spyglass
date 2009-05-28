@@ -613,6 +613,19 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 				}
 			}
 
+			if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_VISIBLE)) {
+
+				if ((Boolean) evt.getNewValue()) {
+
+					synchronized (layer) {
+						final Collection<Node> values = nodes.values();
+						for (final Node node : values) {
+							node.markContentDirty();
+						}
+					}
+				}
+			}
+
 			// the default string formatter was removed
 			else if (evt.getPropertyName().equals(PluginWithStringFormatterXMLConfig.PROPERTYNAME_DEFAULT_STRING_FORMATTER)) {
 				if ((evt.getNewValue() == null) || evt.getNewValue().equals("")) {
