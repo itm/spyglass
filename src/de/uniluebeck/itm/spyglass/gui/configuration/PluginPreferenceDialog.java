@@ -87,16 +87,14 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 					// return to previous page if the user wishes so
 
-					if (preferenceDialog.getSelectedPage() instanceof PluginPreferencePage) {
-						final PluginPreferencePage prefpage = (PluginPreferencePage)preferenceDialog.getSelectedPage();
-						final Plugin p = prefpage.getPlugin();
-						selectPreferenceNode(p,false);
+					if (getSelectedPage() instanceof PluginPreferencePage<?, ?>) {
+						selectPreferenceNodeInternal(preferenceDialog.getSelectedNodePreference(), false);
 					} else if (preferenceDialog.getSelectedPage() instanceof GeneralPreferencePage) {
 						selectPreferenceNodeInternal(NODE_ID_GENERAL_SETTINGS, false);
 					} else if (preferenceDialog.getSelectedPage() instanceof PluginManagerPreferencePage) {
 						selectPreferenceNodeInternal(NODE_ID_PLUGINMANAGER, false);
 					} else {
-						log.error("Dont know "+preferenceDialog.getSelectedPage());
+						log.error("Dont know " + preferenceDialog.getSelectedPage());
 					}
 					return true;
 				}
@@ -114,12 +112,12 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 				internalShowPage(node, true);
 
-				// when we switch from the PluginManagerPage to a PluginPage, the PluginPage may have gotten dirtied
-				// because of change the user has done on the PluginManagerPage. Thus always reset the dirty flag
-				// on the page we just switched to.
+				// when we switch from the PluginManagerPage to a PluginPage, the PluginPage may
+				// have gotten dirtied because of change the user has done on the PluginManagerPage.
+				// Thus always reset the dirty flag on the page we just switched to.
 				if (oldPage != getCurrentPage()) {
 					if (getCurrentPage() instanceof AbstractDatabindingPreferencePage) {
-						final AbstractDatabindingPreferencePage dbPage = (AbstractDatabindingPreferencePage)getCurrentPage();
+						final AbstractDatabindingPreferencePage dbPage = (AbstractDatabindingPreferencePage) getCurrentPage();
 						log.debug("Resetting dirty flag");
 						dbPage.resetDirtyFlag();
 					}
@@ -770,7 +768,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 	/**
 	 * Returns if the currently visible preference dialog page has unsaved changes
-	 *
+	 * 
 	 * @return <code>true</code> if the currently visible preference dialog page has unsaved changes
 	 */
 	@SuppressWarnings("unchecked")
@@ -815,14 +813,14 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	 * Displays an information dialog which reminds the user that there are still unsaved changes at
 	 * a preference page. In respect to the type of the preference page, the user will be offered
 	 * the opportunity to store the changes before leaving the page.
-	 *
+	 * 
 	 * @returns true if the user aborted the page change (because she didn't save her changes)
 	 */
 	private boolean askToSaveChanges() {
 		if (hasUnsavedChanges()) {
 			final String message = "The currently opened preference page contains unsaved changes. Do you want to save now?";
 
-			final AbstractDatabindingPreferencePage selectedPrefPage = (AbstractDatabindingPreferencePage)preferenceDialog.getSelectedPage();
+			final AbstractDatabindingPreferencePage selectedPrefPage = (AbstractDatabindingPreferencePage) preferenceDialog.getSelectedPage();
 
 			if ((selectedPrefPage != null) && (selectedPrefPage instanceof AbstractDatabindingPreferencePage)
 					&& MessageDialog.openQuestion(preferenceDialog.getShell(), "Unsaved changes", message)) {
