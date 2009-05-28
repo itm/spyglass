@@ -22,7 +22,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * @author Oliver Kleine
- *
+ * 
  */
 public class RulerArea extends Canvas {
 
@@ -54,8 +54,10 @@ public class RulerArea extends Canvas {
 		final int[] pointArray = { 1, 20, 4, 23, 7, 20, 4, 23, 4, 4, 23, 4, 20, 1, 23, 4, 20, 7 };
 		gc.drawPolyline(pointArray);
 
-		Font font = gc.getFont();
-		final FontData fontData = font.getFontData()[0];
+		final Font oldFont = gc.getFont();
+		Font newFont = null;
+
+		final FontData fontData = oldFont.getFontData()[0];
 		int fontHeight = fontData.getHeight();
 
 		// as "mm" is the widest unit-string to be displayed properly, resize the font to do so
@@ -63,12 +65,20 @@ public class RulerArea extends Canvas {
 			gc.setFont(null);
 			fontHeight--;
 			fontData.setHeight(fontHeight);
-			font = new Font(this.getDisplay(), fontData);
-			gc.setFont(font);
+
+			final Font newFont2 = new Font(this.getDisplay(), fontData);
+			gc.setFont(newFont2);
+
+			if (newFont != null) {
+				newFont.dispose();
+			}
+			newFont = newFont2;
 		}
 
 		gc.drawText("" + unit, 7, 6, true);
-		// font.dispose();
+
+		gc.setFont(oldFont);
+		newFont.dispose();
 	}
 
 	public void drawRuler(final PixelRectangle pxRect, final Point2D upperLeft, final Point2D lowerRight, final GC gc, final int direction) {
@@ -154,15 +164,23 @@ public class RulerArea extends Canvas {
 		final int numOfLines = (int) (absMax - absMin) / absScale + 1;
 
 		// fit the fontsize so that all values can be displayed completely
-		Font font = gc.getFont();
+		final Font oldFont = gc.getFont();
+		Font newFont = null;
 		final FontData fontData = gc.getFont().getFontData()[0];
 		int fontHeight = fontData.getHeight();
 
 		while (!(gc.stringExtent("-00000").x <= 28)) {
 			fontHeight--;
 			fontData.setHeight(fontHeight);
-			font = new Font(this.getDisplay(), fontData);
-			gc.setFont(font);
+			// final Font oldFont = gc.getFont();
+			final Font newFont2 = new Font(this.getDisplay(), fontData);
+			gc.setFont(newFont2);
+
+			if (newFont != null) {
+				newFont.dispose();
+			}
+			newFont = newFont2;
+
 		}
 
 		// draw all lines and the caption of the ruler
@@ -207,8 +225,8 @@ public class RulerArea extends Canvas {
 			}
 		}
 
-		// gc.dispose();
-		font.dispose();
+		gc.setFont(oldFont);
+		newFont.dispose();
 	}
 
 	private void test() {
