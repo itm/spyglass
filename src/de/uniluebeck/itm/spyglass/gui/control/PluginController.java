@@ -30,14 +30,13 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
-
 // --------------------------------------------------------------------------------
 /**
  * This controller deals with handling a plugin and its drawingobjects.
- *
- * Among other things, it gets notified when a drawingobject's boundingbox gets dirty and
- * is responsible for issuing redraws if a drawingobject is changed.
- *
+ * 
+ * Among other things, it gets notified when a drawingobject's boundingbox gets dirty and is
+ * responsible for issuing redraws if a drawingobject is changed.
+ * 
  * @author Dariush Forouher
  */
 public class PluginController {
@@ -54,7 +53,7 @@ public class PluginController {
 	protected final Set<DrawingObject> drawingObjectsWithDirtyBoundingBox = Collections.synchronizedSet(new HashSet<DrawingObject>());
 
 	public PluginController(final Display display, final DrawingArea drawingArea, final Plugin plugin) {
-		if(!(plugin instanceof Drawable)) {
+		if (!(plugin instanceof Drawable)) {
 			throw new IllegalArgumentException("Plugin must implement Drawable!");
 		}
 
@@ -68,14 +67,14 @@ public class PluginController {
 		plugin.getXMLConfig().addPropertyChangeListener(this.pluginPropertyListener);
 
 		/*
-		 * Add DrawingObjectListeners to all current and future plug-ins (used for knowing
-		 * when to update the drawing area)
+		 * Add DrawingObjectListeners to all current and future plug-ins (used for knowing when to
+		 * update the drawing area)
 		 */
 		plugin.addDrawingObjectListener(drawingObjectListener);
 
 		// If a Plugin creates DrawingObjects during its init() method, we won't initialize those
 		// drawingobjects since we haven't connected with them yet. Thus we have to do this now.
-		for (final DrawingObject dob : ((Drawable)plugin).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
+		for (final DrawingObject dob : ((Drawable) plugin).getDrawingObjects(DrawingArea.getGlobalBoundingBox())) {
 			handleDrawingObjectAdded(dob);
 		}
 
@@ -164,18 +163,20 @@ public class PluginController {
 				handleDrawingObjectChanged(updatedDrawingObject.getBoundingBox());
 			} else {
 
-				// Redrawing the canvas must happen from the SWT display thread
-				display.asyncExec(new Runnable() {
+				if (!display.isDisposed()) {
+					// Redrawing the canvas must happen from the SWT display thread
+					display.asyncExec(new Runnable() {
 
-					@Override
-					public void run() {
-						if (display.isDisposed()) {
-							return;
+						@Override
+						public void run() {
+							if (display.isDisposed()) {
+								return;
+							}
+
+							handleDrawingObjectChanged(updatedDrawingObject.getBoundingBox());
 						}
-
-						handleDrawingObjectChanged(updatedDrawingObject.getBoundingBox());
-					}
-				});
+					});
+				}
 			}
 		}
 
@@ -235,7 +236,7 @@ public class PluginController {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Handles an event which will occur if a drawing object is removed.
-	 *
+	 * 
 	 * @param dob
 	 *            the drawing object to be removed
 	 * @exception RuntimeException
@@ -260,7 +261,7 @@ public class PluginController {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Redraws a certain part of the drawing area
-	 *
+	 * 
 	 * @param pxBBox
 	 *            the part of the drawing area to be redrawn
 	 */
