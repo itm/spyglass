@@ -290,7 +290,12 @@ public abstract class DrawingObject implements Cloneable {
 	 * @param gc
 	 */
 	public final synchronized void drawObject(final GC gc) {
-		assert state == State.ALIVE;
+
+		// since a drawing object may be destroyed from another thread than this method
+		// is called, we have to fail silently if this drawing object became a zombie.
+		if (state != State.ALIVE) {
+			return;
+		}
 
 		shadowCopy.draw(gc);
 		//shadowCopy.drawBoundingBox(gc);
@@ -376,6 +381,12 @@ public abstract class DrawingObject implements Cloneable {
 	 *
 	 */
 	public final synchronized void syncBoundingBox() {
+
+		// since a drawing object may be destroyed from another thread than this method
+		// is called, we have to fail silently if this drawing object became a zombie.
+		if (state != State.ALIVE) {
+			return;
+		}
 
 		if (Display.getCurrent()==null) {
 			throw new RuntimeException("This method must only be called from the SWT thread!");
