@@ -8,8 +8,6 @@ import java.awt.geom.Point2D;
 
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
@@ -39,7 +37,7 @@ public class RulerArea extends Canvas {
 
 		super(parent, SWT.NONE);
 		this.rulerDirection = direction;
-		this.addControlListener(controlListener);
+		// this.addControlListener(controlListener);
 
 	}
 
@@ -60,7 +58,7 @@ public class RulerArea extends Canvas {
 		final FontData fontData = oldFont.getFontData()[0];
 		int fontHeight = fontData.getHeight();
 
-		// as "mm" is the widest unit-string to be displayed properly, resize the font to do so
+		// resize the font to display the unit-string properly
 		while (!(gc.stringExtent("" + unit).x <= 22)) {
 			gc.setFont(null);
 			fontHeight--;
@@ -78,7 +76,6 @@ public class RulerArea extends Canvas {
 		gc.drawText("" + unit, 7, 6, true);
 
 		gc.setFont(oldFont);
-		newFont.dispose();
 	}
 
 	public void drawRuler(final PixelRectangle pxRect, final Point2D upperLeft, final Point2D lowerRight, final GC gc, final int direction) {
@@ -153,7 +150,7 @@ public class RulerArea extends Canvas {
 		// horizontal: x-Coordinate (in px) of the most left shown ruler value
 		// vertical: y-Coordinate (in px) of the most up shown ruler Value
 		// This value (firstLine) is always outside of the visible area. Thus ruler labels can be
-		// drawn even if the caption is located a threshold of the visible area.
+		// drawn even if the caption is located next to a threshold but within the visible area.
 
 		int firstLine;
 		if (direction == RulerArea.HORIZONTAL) {
@@ -226,32 +223,27 @@ public class RulerArea extends Canvas {
 		}
 
 		gc.setFont(oldFont);
-		newFont.dispose();
+		if (!newFont.isDisposed()) {
+			newFont.dispose();
+		}
 	}
 
-	private void test() {
-		/*
-		 * final GC gc = new GC(this); this.drawRuler(gc, this.rulerDirection); gc.dispose();
-		 * log.debug("Da is was passiert...");
-		 */
-	}
-
-	private ControlListener controlListener = new ControlListener() {
-
-		@Override
-		public void controlMoved(final ControlEvent e) {
-			// TODO Auto-generated method stub
-			log.debug("Ruler moved...");
-			test();
-
-		}
-
-		@Override
-		public void controlResized(final ControlEvent e) {
-			// TODO Auto-generated method stub
-			log.debug("Ruler resized...");
-			test();
-		}
-
-	};
+	// private ControlListener controlListener = new ControlListener() {
+	//
+	// @Override
+	// public void controlMoved(final ControlEvent e) {
+	// // TODO Auto-generated method stub
+	// log.debug("Ruler moved...");
+	// test();
+	//
+	// }
+	//
+	// @Override
+	// public void controlResized(final ControlEvent e) {
+	// // TODO Auto-generated method stub
+	// log.debug("Ruler resized...");
+	// test();
+	// }
+	//
+	// };
 }

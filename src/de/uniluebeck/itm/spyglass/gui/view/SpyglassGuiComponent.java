@@ -24,7 +24,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * Instances of this class manage SpyGlass's graphical user interface
- *
+ * 
  * @author Sebastian Ebers
  * @author Oliver Kleine
  * @author others
@@ -52,7 +52,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
-	 *
+	 * 
 	 * @param parent
 	 *            the parent widget
 	 * @param style
@@ -72,7 +72,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Initializes the graphical user interface.
-	 *
+	 * 
 	 * @param spyglass
 	 *            the <code>SpyGlass</code> instance
 	 */
@@ -107,7 +107,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Initializes the area where all nodes etc. are painted on.
-	 *
+	 * 
 	 * @param parent
 	 *            the parent composite
 	 * @param spyglass
@@ -167,6 +167,8 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 					rulerV.setLayoutData(rulerVData);
 				}
 				// end creation of ruler canvases
+
+				// now create the drawing area for the nodes, lines and all the other stuff
 				{
 					final GridData canvas1LData = new GridData();
 					canvas1LData.horizontalAlignment = GridData.FILL;
@@ -176,8 +178,8 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 					canvas = new DrawingArea(compositeDrawingArea, SWT.None);
 					canvas.setLayoutData(canvas1LData);
 
-					rulerH.setDrawingArea(canvas);
-					rulerV.setDrawingArea(canvas);
+					// rulerH.setDrawingArea(canvas);
+					// rulerV.setDrawingArea(canvas);
 				}
 			}
 			parent.layout();
@@ -189,7 +191,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Initializes the widgets where {@link GlobalInformationPlugin}'s can attach information
-	 *
+	 * 
 	 * @param parent
 	 *            the parent widget
 	 */
@@ -200,7 +202,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the widget where all nodes etc. are painted on.
-	 *
+	 * 
 	 * @return the widget where all nodes etc. are painted on
 	 */
 	public DrawingArea getDrawingArea() {
@@ -211,7 +213,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	/**
 	 * Returns a bar where plug-ins of the type {@link GlobalInformationPlugin} can attach
 	 * information
-	 *
+	 * 
 	 * @return the globalInformationBar a bar where plug-ins of the type
 	 *         {@link GlobalInformationPlugin} can attach information
 	 */
@@ -254,9 +256,9 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the horizontal ruler area
-	 *
+	 * 
 	 * @return the horizontal ruler area
-	 *
+	 * 
 	 */
 	public RulerArea getRulerH() {
 		return rulerH;
@@ -265,7 +267,7 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the vertical ruler area
-	 *
+	 * 
 	 * @return the vertical ruler area
 	 */
 	public RulerArea getRulerV() {
@@ -275,12 +277,11 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the ruler's unit area
-	 *
+	 * 
 	 * @return the ruler's unit area
 	 */
 	public RulerArea getUnitArea() {
 		return unitArea;
 	}
-
 
 }

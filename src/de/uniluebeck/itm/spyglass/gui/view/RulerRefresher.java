@@ -4,14 +4,12 @@
  */
 package de.uniluebeck.itm.spyglass.gui.view;
 
-
 // --------------------------------------------------------------------------------
 /**
- * Listens to changes of the transform of the drawingArea and updates the rulers
- * if it changed.
- *
+ * Listens to changes of the transform of the drawingArea and updates the rulers if it changed.
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class RulerRefresher implements TransformChangedListener {
 
@@ -23,8 +21,12 @@ public class RulerRefresher implements TransformChangedListener {
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see de.uniluebeck.itm.spyglass.gui.view.TransformChangedListener#handleEvent(de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniluebeck.itm.spyglass.gui.view.TransformChangedListener#handleEvent(de.uniluebeck.itm
+	 * .spyglass.gui.view.TransformChangedEvent)
 	 */
 	@Override
 	public void handleEvent(final TransformChangedEvent e) {

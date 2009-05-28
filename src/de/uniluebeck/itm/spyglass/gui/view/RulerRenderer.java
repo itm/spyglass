@@ -18,10 +18,10 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 
 // --------------------------------------------------------------------------------
 /**
- * This class is responsible for redrawing the rulers when they
- * send out a PaintEvent.
- *
+ * This class is responsible for redrawing the rulers when they send out a PaintEvent.
+ * 
  * @author Dariush Forouher
+ * @author Oliver Kleine
  */
 public class RulerRenderer implements PaintListener, PropertyChangeListener, DisposeListener {
 
@@ -38,6 +38,7 @@ public class RulerRenderer implements PaintListener, PropertyChangeListener, Dis
 		gui.addDisposeListener(this);
 
 		spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().addPropertyChangeListener(this);
+		spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getMetrics().addPropertyChangeListener(this);
 	}
 
 	@Override
@@ -61,16 +62,24 @@ public class RulerRenderer implements PaintListener, PropertyChangeListener, Dis
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
-
-		gui.changeRulerVis();
+		System.out.println("Geändert wurde: " + evt.getPropertyName());
+		if (evt.getPropertyName() == "showRuler") {
+			gui.changeRulerVis();
+		} else if (evt.getPropertyName() == "unit") {
+			gui.getUnitArea().redraw();
+		}
 
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
 	 */
 	@Override
 	public void widgetDisposed(final DisposeEvent e) {
-		spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().removePropertyChangeListener(this);	}
+		spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().removePropertyChangeListener(this);
+	}
 }

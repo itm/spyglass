@@ -175,7 +175,8 @@ public class SpringEmbedderPositionerOptionsComposite extends Composite {
 				semType.setLayoutData(data5);
 
 				// TODO: Make semtypes for neighbourhood editable
-				semType.setEnabled(false);
+				// semType.setText("9");
+				// semType.setEnabled(false);
 				final GridData data6 = new GridData();
 				data6.horizontalSpan = 3;
 				data6.grabExcessHorizontalSpace = true;
