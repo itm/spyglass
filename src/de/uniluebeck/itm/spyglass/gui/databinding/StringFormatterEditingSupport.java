@@ -1,6 +1,8 @@
 package de.uniluebeck.itm.spyglass.gui.databinding;
 
+import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
+import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
@@ -11,6 +13,8 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.StringFormatterValidator;
 
 public class StringFormatterEditingSupport extends ObservableValueEditingSupport {
 
@@ -28,6 +32,7 @@ public class StringFormatterEditingSupport extends ObservableValueEditingSupport
 		super(viewer, dbc);
 		this.dbc = dbc;
 		cellEditor = new TextCellEditor((Composite) viewer.getControl());
+
 		this.elementName = elementName;
 	}
 
@@ -44,6 +49,13 @@ public class StringFormatterEditingSupport extends ObservableValueEditingSupport
 	@Override
 	protected IObservableValue doCreateElementObservable(final Object element, final ViewerCell cell) {
 		return BeansObservables.observeValue(dbc.getValidationRealm(), element, elementName);
+	}
+
+	@Override
+	protected Binding createBinding(final IObservableValue target, final IObservableValue model) {
+		return dbc.bindValue(target, model, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT)
+				.setAfterGetValidator(new StringFormatterValidator()), null);
+
 	}
 
 }

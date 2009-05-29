@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import de.uniluebeck.itm.spyglass.gui.databinding.WrappedSet.ObservableEntry;
+import de.uniluebeck.itm.spyglass.gui.databinding.validator.StringFormatterValidator;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -149,8 +150,15 @@ public class StringFormatter {
 
 		final IObservableValue modelDefStrFmt = BeansObservables.observeValue(dbc.getValidationRealm(), config,
 				PluginWithStringFormatterXMLConfig.PROPERTYNAME_DEFAULT_STRING_FORMATTER);
-		dbc.bindValue(SWTObservables.observeText(this.defaultStringFmt, SWT.Modify), modelDefStrFmt, new UpdateValueStrategy(
-				UpdateValueStrategy.POLICY_CONVERT), null);
+
+		final UpdateValueStrategy strategy = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
+		strategy.setAfterGetValidator(new StringFormatterValidator());
+
+		dbc.bindValue(SWTObservables.observeText(this.defaultStringFmt, SWT.Modify), modelDefStrFmt, strategy, null);
+
+		// dbc.bindValue(SWTObservables.observeText(this.defaultStringFmt, SWT.Modify),
+		// modelDefStrFmt, new UpdateValueStrategy(
+		// UpdateValueStrategy.POLICY_CONVERT), null);
 
 		// table
 
