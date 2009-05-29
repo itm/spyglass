@@ -1,9 +1,5 @@
 // --------------------------------------------------------------------------------
-/**
- * Spring Embedder Options Composite
- * 
- * @author Oliver Kleine
- */
+
 package de.uniluebeck.itm.spyglass.plugin.springembedderpositioner;
 
 import org.eclipse.core.databinding.DataBindingContext;
