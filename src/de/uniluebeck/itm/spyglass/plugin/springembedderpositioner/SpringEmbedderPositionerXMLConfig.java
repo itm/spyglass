@@ -35,7 +35,8 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 
 	public static final String PROPERTYNAME_EFFICIENCY_FACTOR = "efficiencyFactor";
 
-	@ElementArray(required = false)
+	// Different name for xml field to archieve backward compatibility with old configs
+	@ElementArray(required = false, name="edgeSemanticTypes2")
 	private volatile int[] edgeSemanticTypes = new int[] { -1 };
 
 	@Element(required = false)
