@@ -469,6 +469,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			if ((node = nodes.get(nodeID)) != null) {
 				layer.remove(node);
 				nodes.remove(nodeID);
+				fireDrawingObjectRemoved(node);
 			}
 
 		}
