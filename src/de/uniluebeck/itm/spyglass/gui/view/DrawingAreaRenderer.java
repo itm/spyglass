@@ -153,10 +153,10 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 					object.drawObject(gc);
 					break;
 				case INFANT:
-					log.debug(String.format("Plugin %s contains an unitialized drawing object in its layer: %s (skipping it)", plugin, object));
-					break;
 				case ZOMBIE:
-					log.error(String.format("Plugin %s contains a zombie drawing object in its layer: %s", plugin, object));
+					// the drawingObject have been added/removed after we fetched the list from the layer
+					// so this is a valid race condition.
+					break;
 			}
 		}
 	}
