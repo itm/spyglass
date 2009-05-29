@@ -29,11 +29,12 @@ public class StatisticalOperationTest {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		so = new StatisticalOperation(10, STATISTICAL_OPERATIONS.SUM);
+		so = new StatisticalOperation(4, STATISTICAL_OPERATIONS.SUM);
 		so.addValue(1);
 		so.addValue(4);
 		so.addValue(7);
 		so.addValue(5);
+		so.addValue(9);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -197,7 +198,14 @@ public class StatisticalOperationTest {
 	 */
 	@Test
 	public final void testGetValueSUM() {
-		assertEquals(17, so.getValue(STATISTICAL_OPERATIONS.SUM));
+		final StatisticalOperation so = new StatisticalOperation(4, STATISTICAL_OPERATIONS.SUM);
+		so.addValue(1);
+		so.addValue(4);
+		so.addValue(7);
+		so.addValue(5);
+		so.addValue(9);
+		so.addValue(9);
+		assertEquals(35, so.getValue(STATISTICAL_OPERATIONS.SUM));
 	}
 
 	/**
@@ -207,7 +215,31 @@ public class StatisticalOperationTest {
 	 */
 	@Test
 	public final void testGetValueAVG() {
-		assertEquals(17 / 4, so.getValue(STATISTICAL_OPERATIONS.AVG));
+		final StatisticalOperation so = new StatisticalOperation(4, STATISTICAL_OPERATIONS.AVG);
+		so.addValue(1);
+		so.addValue(4);
+		so.addValue(7);
+		so.addValue(5);
+		so.addValue(9);
+		so.addValue(3);
+		assertEquals(24 / 4, so.getValue(STATISTICAL_OPERATIONS.AVG));
+	}
+
+	/**
+	 * Test method for
+	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
+	 * .
+	 */
+	@Test
+	public final void testGetValueAVG2() {
+		final StatisticalOperation so = new StatisticalOperation(4, STATISTICAL_OPERATIONS.SUM);
+		so.addValue(1);
+		so.addValue(4);
+		so.addValue(7);
+		so.addValue(5);
+		so.addValue(9);
+		so.addValue(3);
+		assertEquals(24 / 4, so.getValue(STATISTICAL_OPERATIONS.AVG));
 	}
 
 	/**
@@ -217,6 +249,30 @@ public class StatisticalOperationTest {
 	 */
 	@Test
 	public final void testGetValueMIN() {
+		final StatisticalOperation so = new StatisticalOperation(4, STATISTICAL_OPERATIONS.MIN);
+		so.addValue(1);
+		so.addValue(4);
+		so.addValue(7);
+		so.addValue(5);
+		so.addValue(9);
+		so.addValue(3);
+		assertEquals(1, so.getValue(STATISTICAL_OPERATIONS.MIN));
+	}
+
+	/**
+	 * Test method for
+	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
+	 * .
+	 */
+	@Test
+	public final void testGetValueMIN2() {
+		final StatisticalOperation so = new StatisticalOperation(4, STATISTICAL_OPERATIONS.AVG);
+		so.addValue(1);
+		so.addValue(4);
+		so.addValue(7);
+		so.addValue(5);
+		so.addValue(9);
+		so.addValue(3);
 		assertEquals(1, so.getValue(STATISTICAL_OPERATIONS.MIN));
 	}
 
@@ -227,7 +283,31 @@ public class StatisticalOperationTest {
 	 */
 	@Test
 	public final void testGetValueMAX() {
-		assertEquals(7, so.getValue(STATISTICAL_OPERATIONS.MAX));
+		final StatisticalOperation so = new StatisticalOperation(4, STATISTICAL_OPERATIONS.AVG);
+		so.addValue(10);
+		so.addValue(4);
+		so.addValue(7);
+		so.addValue(5);
+		so.addValue(9);
+		so.addValue(3);
+		assertEquals(10, so.getValue(STATISTICAL_OPERATIONS.MAX));
+	}
+
+	/**
+	 * Test method for
+	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
+	 * .
+	 */
+	@Test
+	public final void testGetValueMAX2() {
+		final StatisticalOperation so = new StatisticalOperation(4, STATISTICAL_OPERATIONS.AVG);
+		so.addValue(10);
+		so.addValue(4);
+		so.addValue(7);
+		so.addValue(5);
+		so.addValue(9);
+		so.addValue(3);
+		assertEquals(10, so.getValue(STATISTICAL_OPERATIONS.MAX));
 	}
 
 	/**
@@ -237,7 +317,48 @@ public class StatisticalOperationTest {
 	 */
 	@Test
 	public final void testGetValueMEDIAN() {
-		assertEquals(4, so.getValue(STATISTICAL_OPERATIONS.MEDIAN));
+		final StatisticalOperation so = new StatisticalOperation(4, STATISTICAL_OPERATIONS.AVG);
+		so.addValue(10);
+		so.addValue(4);
+		so.addValue(7);
+		so.addValue(3);
+		so.addValue(9);
+		so.addValue(5);
+		assertEquals(5, so.getValue(STATISTICAL_OPERATIONS.MEDIAN));
+	}
+
+	/**
+	 * Test method for
+	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
+	 * .
+	 */
+	@Test
+	public final void testGetValueMEDIAN2() {
+		final StatisticalOperation so = new StatisticalOperation(4, STATISTICAL_OPERATIONS.MEDIAN);
+		so.addValue(10);
+		so.addValue(4);
+		so.addValue(7);
+		so.addValue(5);
+		so.addValue(9);
+		so.addValue(3);
+		assertEquals(5, so.getValue(STATISTICAL_OPERATIONS.MEDIAN));
+	}
+
+	/**
+	 * Test method for
+	 * {@link de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalOperation#getValue(de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator.STATISTICAL_OPERATIONS)}
+	 * .
+	 */
+	@Test
+	public final void testGetValueMEDIAN3() {
+		final StatisticalOperation so = new StatisticalOperation(4, STATISTICAL_OPERATIONS.MAX);
+		so.addValue(10);
+		so.addValue(4);
+		so.addValue(7);
+		so.addValue(5);
+		so.addValue(9);
+		so.addValue(3);
+		assertEquals(5, so.getValue(STATISTICAL_OPERATIONS.MEDIAN));
 	}
 
 }

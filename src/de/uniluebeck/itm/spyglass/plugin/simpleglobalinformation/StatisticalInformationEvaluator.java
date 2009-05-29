@@ -118,11 +118,12 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	 * Protected constructor to be used by the XML framework
 	 */
 	protected StatisticalInformationEvaluator() {
-		description = "";
-		expression = "";
-		value = "";
+		super();
+		description = new String("");
+		expression = new String("");
+		value = new String("");
 		operation = STATISTICAL_OPERATIONS.SUM;
-		operationExecutor = new StatisticalOperation(10, operation);
+		init();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -155,16 +156,20 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	public StatisticalInformationEvaluator(final String description, final String expression, final STATISTICAL_OPERATIONS operation,
 			final int semanticType) {
 		super();
-		this.description = description;
+		this.description = new String(description);
 		this.expression = expression;
 		this.operation = operation;
 		this.semanticType = semanticType;
+		init();
 	}
 
 	// --------------------------------------------------------------------------------
 	@Override
 	public StatisticalInformationEvaluator clone() {
-		return new StatisticalInformationEvaluator(description, expression, operation, semanticType);
+		final StatisticalInformationEvaluator other = new StatisticalInformationEvaluator(description, expression, operation, semanticType);
+		other.operationExecutor = this.operationExecutor.clone();
+		other.value = this.value;
+		return other;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -238,12 +243,13 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 		StringFormatter newStringFormatter = null;
 		try {
 			newStringFormatter = new StringFormatter(expression);
+			value = "";
 		} catch (final IllegalArgumentException e) {
 			log.error("The string " + expression + " is no valid format expression!", e);
+			value = "NaN";
 			return;
 		}
 
-		value = "";
 		final String oldValue = new String(this.expression);
 		this.expression = new String(expression);
 		this.stringFormatter = newStringFormatter;
@@ -271,8 +277,11 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	 */
 	public void setOperation(final STATISTICAL_OPERATIONS operation) {
 		final STATISTICAL_OPERATIONS oldValue = this.operation;
-		this.operation = operation;
-		value = new DecimalFormat("0.0#").format(operationExecutor.getValue(operation));
+		operationExecutor.setDefaultOperation((this.operation = operation));
+		final Float val = operationExecutor.getValue(operation);
+
+		value = (val != null) ? new DecimalFormat("0.0#").format(val) : "";
+
 		firePropertyChange("operation", oldValue, operation);
 	}
 
@@ -288,9 +297,9 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Compares the semantic type and description of this object with the specified object for
-	 * order. Returns a negative integer, zero, or a positive integer as this object is less than,
-	 * equal to, or greater than the specified object.
+	 * Compares the semantic type description, expression and operation of this object with the
+	 * specified object for order. Returns a negative integer, zero, or a positive integer as this
+	 * object is less than, equal to, or greater than the specified object.
 	 * 
 	 * @param spe
 	 *            the StatisticalInformationEvaluator to be compared.
@@ -300,12 +309,21 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	@Override
 	public int compareTo(final StatisticalInformationEvaluator spe) {
 		if (spe != null) {
-			final int diff = this.semanticType - spe.semanticType;
+			int diff = this.semanticType - spe.semanticType;
 			if (diff > 0) {
 				return 1;
 			} else if (diff < 0) {
 				return -1;
 			}
+
+			if ((diff = this.operation.compareTo(spe.operation)) != 0) {
+				return diff;
+			}
+
+			if ((diff = this.expression.compareTo(spe.expression)) != 0) {
+				return diff;
+			}
+
 			return this.description.compareTo(spe.description);
 		}
 		return -1;
@@ -368,6 +386,8 @@ public class StatisticalInformationEvaluator extends PropertyBean implements Com
 	@Commit
 	public void init() {
 		setExpression(expression);
+		operationExecutor = new StatisticalOperation(10, operation);
+		setOperation(operation);
 	}
 
 }

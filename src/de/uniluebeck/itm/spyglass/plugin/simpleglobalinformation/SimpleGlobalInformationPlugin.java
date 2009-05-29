@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
@@ -95,6 +96,10 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 	private PNCountTimerTask pNCountTimerTask;
 
+	private Set<Integer> packetSemanticTypes;
+
+	private Set<StatisticalInformationEvaluator> evaluators;
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
@@ -105,6 +110,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		avgNodeDegString = "avg. node degree: ";
 		semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
 		totalPacketCount = 0;
+		packetSemanticTypes = new TreeSet<Integer>();
+		evaluators = new TreeSet<StatisticalInformationEvaluator>();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -122,7 +129,19 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 					semanticTypes4Neighborhoods = Tools.intArrayToIntegerList(xmlConfig.getSemanticTypes4Neighborhoods());
 					avgNodeDegEvaluator.reset();
 				} else if (evt.getPropertyName().equals(SimpleGlobalInformationXMLConfig.PROPERTYNAME_STATISTICAL_INFORMATION_EVALUATORS)) {
+					synchronized (evaluators) {
+						evaluators = xmlConfig.getStatisticalInformationEvaluators();
+					}
 					refreshStatIEConf();
+				} else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_SEMANTIC_TYPES)) {
+					final int[] stypes = (int[]) evt.getNewValue();
+					if ((stypes.length > 1) || (stypes[0] != -1)) {
+						synchronized (evaluators) {
+							packetSemanticTypes.retainAll(Tools.intArrayToIntegerList(stypes));
+							evaluators = xmlConfig.getStatisticalInformationEvaluators();
+						}
+						refreshStatIEConf();
+					}
 				}
 			}
 		};
@@ -195,21 +214,37 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 
 		final int packetSemanticType = packet.getSemanticType();
 
+		// check if the semantic type was found in a previously parsed packet, yet
+		final boolean newSemanticType = (packetSemanticTypes.add(packetSemanticType));
+
 		if (semanticTypes4Neighborhoods.contains(packetSemanticType) && (packet instanceof Uint16ListPacket)) {
 			avgNodeDegString = "avg. node degree: "
 					+ new DecimalFormat("0.0#").format(avgNodeDegEvaluator.addValue(packet.getSenderId(), ((Uint16ListPacket) packet)
 							.getNeighborhoodPacketNodeIDs().size()));
 		}
 
-		final StatisticalInformationEvaluator sfs = xmlConfig.getStatisticalInformationEvaluators4Type(packetSemanticType);
-		if ((sfs != null) && !((sfs.getExpression() == null) || sfs.getExpression().equals(""))) {
-			try {
-				sfs.parse(packet);
-			} catch (final SpyglassPacketException e) {
-				log.error("Error parsing a packet in the " + getHumanReadableName()
-						+ ".\r\nPlease check the values in the StringFormatter for semantic type " + packetSemanticType + "!", e);
-			}
+		final Collection<StatisticalInformationEvaluator> sfss = xmlConfig.getStatisticalInformationEvaluators4Type(packetSemanticType);
+		sfss.addAll(xmlConfig.getStatisticalInformationEvaluators4Type(-1));
+		for (final StatisticalInformationEvaluator sfs : sfss) {
+			if ((sfs != null) && !((sfs.getExpression() == null) || sfs.getExpression().equals(""))) {
+				try {
+					sfs.parse(packet);
+				} catch (final SpyglassPacketException e) {
+					log.error("Error parsing a packet in the " + getHumanReadableName()
+							+ ".\r\nPlease check the values in the StringFormatter for semantic type " + packetSemanticType + "!", e);
+				}
 
+			}
+		}
+
+		// if the semantic type is new, the evaluator might not have a label, yet
+		if (newSemanticType) {
+			synchronized (evaluators) {
+				for (final StatisticalInformationEvaluator sfs : sfss) {
+					evaluators.add(sfs);
+				}
+
+			}
 		}
 
 	}
@@ -248,6 +283,11 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		avgNodeDegString = "avg. node degree: ";
 		totalPacketCount = 0;
 		pNCountTimerTask.reset();
+		synchronized (evaluators) {
+			packetSemanticTypes.clear();
+			evaluators = new TreeSet<StatisticalInformationEvaluator>(sfSettings);
+		}
+		refreshStatIEConf();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -257,9 +297,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 	 */
 	private void refreshStatIEConf() {
 
-		final Set<StatisticalInformationEvaluator> sfSettings = xmlConfig.getStatisticalInformationEvaluators();
-
-		if ((sfSettings != null) && (widget != null)) {
+		if ((evaluators != null) && (widget != null)) {
 			widget.getDisplay().asyncExec(new Runnable() {
 				@SuppressWarnings("synthetic-access")
 				@Override
@@ -268,8 +306,18 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 					if ((widget == null) || widget.isDisposed()) {
 						return;
 					}
+					final Collection<StatisticalInformationEvaluator> retain = new TreeSet<StatisticalInformationEvaluator>();
+					synchronized (evaluators) {
+						for (final StatisticalInformationEvaluator eval : evaluators) {
+							final int semanticType = eval.getSemanticType();
+							if ((semanticType == -1) || packetSemanticTypes.contains(semanticType)) {
+								retain.add(eval);
+							}
+						}
+						evaluators.retainAll(retain);
 
-					widget.retaingLabels(sfSettings);
+					}
+					widget.retaingLabels(retain);
 					updateWidget();
 				}
 			});
@@ -300,7 +348,7 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 					widget.removeAVGNodeDeg();
 				}
 
-				for (final StatisticalInformationEvaluator evaluator : xmlConfig.getStatisticalInformationEvaluators()) {
+				for (final StatisticalInformationEvaluator evaluator : evaluators) {
 					widget.createOrUpdateLabel(evaluator);
 				}
 
@@ -475,10 +523,10 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 				@Override
 				public void run() {
 					synchronized (sfLabels) {
-						final Label label = sfLabels.get(siEvaluator);
+						final Label label = sfLabels.get(siEvaluator.hashCode());
 						if (label != null) {
 							label.dispose();
-							sfLabels.remove(siEvaluator);
+							sfLabels.remove(siEvaluator.hashCode());
 						}
 					}
 				}
@@ -495,22 +543,22 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		 *            information
 		 */
 		public void retaingLabels(final Collection<StatisticalInformationEvaluator> siEvaluators) {
-			final Collection<Integer> keySet = new LinkedList<Integer>();
+
+			final Collection<Integer> obsoleteKeys = new LinkedList<Integer>();
 			synchronized (sfLabels) {
-				keySet.addAll(sfLabels.keySet());
+				obsoleteKeys.addAll(sfLabels.keySet());
 			}
-			for (final Integer key : keySet) {
-				boolean found = false;
-				for (final StatisticalInformationEvaluator eval : siEvaluators) {
-					if (eval.hashCode() == key) {
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					removeLabel(key);
-				}
+
+			final Collection<Integer> evalKeys = new LinkedList<Integer>();
+			for (final StatisticalInformationEvaluator eval : siEvaluators) {
+				evalKeys.add(eval.hashCode());
 			}
+
+			obsoleteKeys.removeAll(evalKeys);
+			for (final Integer integer : obsoleteKeys) {
+				removeLabel(integer);
+			}
+
 		}
 
 		/**

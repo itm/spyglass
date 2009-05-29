@@ -9,8 +9,10 @@
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
@@ -137,19 +139,22 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns an object which evaluates statistical information related to a certain semantic type
+	 * Returns a collection of objects which evaluate statistical information related to a certain
+	 * semantic type
 	 * 
 	 * @param semanticType
 	 *            the semantic type related to the statistical information
-	 * @return the object which evaluates statistical information related to a certain semantic type
+	 * @return a collection of objects which evaluate statistical information related to a certain
+	 *         semantic type
 	 */
-	public synchronized StatisticalInformationEvaluator getStatisticalInformationEvaluators4Type(final int semanticType) {
+	public synchronized Collection<StatisticalInformationEvaluator> getStatisticalInformationEvaluators4Type(final int semanticType) {
+		final Collection<StatisticalInformationEvaluator> evaluators = new Vector<StatisticalInformationEvaluator>();
 		for (final StatisticalInformationEvaluator sfs : statisticalInformationEvaluators) {
 			if (sfs.getSemanticType() == semanticType) {
-				return sfs;
+				evaluators.add(sfs);
 			}
 		}
-		return null;
+		return evaluators;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -159,7 +164,7 @@ public class SimpleGlobalInformationXMLConfig extends PluginXMLConfig {
 	 * @return a set of objects which are configured to evaluate statistical information
 	 */
 	public synchronized Set<StatisticalInformationEvaluator> getStatisticalInformationEvaluators() {
-		return statisticalInformationEvaluators;
+		return new TreeSet<StatisticalInformationEvaluator>(statisticalInformationEvaluators);
 	}
 
 	// --------------------------------------------------------------------------------

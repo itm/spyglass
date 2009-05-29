@@ -15,7 +15,12 @@ import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInfo
 // --------------------------------------------------------------------------------
 /**
  * Instances of this class perform statistical operations on an array of buffered {@link Float}
- * values.
+ * values.<br>
+ * <br>
+ * The operations {@link STATISTICAL_OPERATIONS#AVG} and {@link STATISTICAL_OPERATIONS#MEDIAN} make
+ * use of the last <tt>n</tt> added values provided by {@link StatisticalOperation#addValue(float)}
+ * to compute the result.<br> {@link STATISTICAL_OPERATIONS#SUM}, {@link STATISTICAL_OPERATIONS#MAX} and
+ * {@link STATISTICAL_OPERATIONS#MIN} work independently of the buffer's size.
  * 
  * @author Sebastian Ebers
  * 
@@ -23,6 +28,9 @@ import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInfo
 public class StatisticalOperation {
 
 	private float[] buffer;
+	private float sumBuffer;
+	private Float minBuffer;
+	private Float maxBuffer;
 	private int pointer;
 	private int maxValidFieldValue;
 	private int bufferSize;
@@ -30,7 +38,12 @@ public class StatisticalOperation {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Constructor
+	 * Constructor setting the buffer's size and the statistical default operation.<br>
+	 * The operations {@link STATISTICAL_OPERATIONS#AVG} and {@link STATISTICAL_OPERATIONS#MEDIAN}
+	 * make use of the last <tt>n</tt> added values provided by
+	 * {@link StatisticalOperation#addValue(float)} to compute the result.<br>
+	 * {@link STATISTICAL_OPERATIONS#SUM}, {@link STATISTICAL_OPERATIONS#MAX} and
+	 * {@link STATISTICAL_OPERATIONS#MIN} work independently of the buffer's size.
 	 * 
 	 * @param bufferSize
 	 *            the size of the buffer
@@ -41,6 +54,9 @@ public class StatisticalOperation {
 		buffer = new float[bufferSize];
 		maxValidFieldValue = 0;
 		pointer = 0;
+		sumBuffer = 0;
+		minBuffer = null;
+		maxBuffer = null;
 		this.defaultOperation = defaultOperation;
 		this.bufferSize = bufferSize;
 	}
@@ -72,14 +88,20 @@ public class StatisticalOperation {
 	 * 
 	 * @param value
 	 *            the value to add
-	 * @return the result of the statistical operation which is applianced on the buffer.
+	 * @return the result of the statistical operation which uses the buffer.
 	 */
 	public synchronized float addValue(final float value) {
-		if (defaultOperation.equals(STATISTICAL_OPERATIONS.SUM)) {
-			buffer[pointer++] += value;
-		} else {
-			buffer[pointer++] = value;
+
+		sumBuffer += value;
+
+		if ((minBuffer == null) || (value < minBuffer)) {
+			minBuffer = value;
 		}
+		if ((maxBuffer == null) || (value > maxBuffer)) {
+			maxBuffer = value;
+		}
+		buffer[pointer++] = value;
+
 		pointer = pointer % bufferSize;
 		if (maxValidFieldValue < buffer.length) {
 			++maxValidFieldValue;
@@ -107,7 +129,7 @@ public class StatisticalOperation {
 	 *            the statistical operation to use
 	 * @return the value a statistical operation calculated using the buffered values
 	 */
-	public synchronized final float getValue(final STATISTICAL_OPERATIONS operation) {
+	public synchronized final Float getValue(final STATISTICAL_OPERATIONS operation) {
 		switch (operation) {
 			case AVG:
 				return getAverageValue();
@@ -158,7 +180,7 @@ public class StatisticalOperation {
 		System.arraycopy(buffer, 0, tmpBuffer, 0, buffer.length);
 		final int tmpValidFieldValue = maxValidFieldValue;
 
-		// switch the object's values wit the provided ones
+		// switch the object's values with the provided ones
 		maxValidFieldValue = values.length;
 		buffer = values;
 		final float result = getValue(operation);
@@ -174,16 +196,12 @@ public class StatisticalOperation {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the sum of the buffer's values
+	 * Returns the sum of all provided values
 	 * 
-	 * @return the sum of the buffer's values
+	 * @return the sum of all provided values
 	 */
 	private float getSum() {
-		float sum = 0;
-		for (int i = 0; i < maxValidFieldValue; i++) {
-			sum += buffer[i];
-		}
-		return sum;
+		return sumBuffer;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -206,34 +224,22 @@ public class StatisticalOperation {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the minimum of the buffer's values
+	 * Returns the minimum value or <code>null</code> if no values where provided, yet
 	 * 
-	 * @return the minimum of the buffer's values
+	 * @return the minimum value or <code>null</code> if no values where provided, yet
 	 */
-	private float getMinValue() {
-		float min = Float.MAX_VALUE;
-		for (int i = 0; i < maxValidFieldValue; i++) {
-			if (buffer[i] < min) {
-				min = buffer[i];
-			}
-		}
-		return min;
+	private Float getMinValue() {
+		return minBuffer;
 	}
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns the maximum of the buffer's values
+	 * Returns the maximum value or <code>null</code> if no values where provided, yet
 	 * 
-	 * @return the maximum of the buffer's values
+	 * @return the maximum value or <code>null</code> if no values where provided, yet
 	 */
-	private float getMaxValue() {
-		float max = Float.MIN_VALUE;
-		for (int i = 0; i < maxValidFieldValue; i++) {
-			if (buffer[i] > max) {
-				max = buffer[i];
-			}
-		}
-		return max;
+	private Float getMaxValue() {
+		return maxBuffer;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -260,11 +266,27 @@ public class StatisticalOperation {
 	public synchronized void reset() {
 		pointer = 0;
 		maxValidFieldValue = 0;
-
+		sumBuffer = 0;
+		minBuffer = null;
+		maxBuffer = null;
 		for (int i = 0; i < buffer.length; i++) {
 			buffer[i] = 0;
 		}
+	}
 
+	// --------------------------------------------------------------------------------
+	@Override
+	public synchronized StatisticalOperation clone() {
+		final StatisticalOperation other = new StatisticalOperation(this.bufferSize, this.defaultOperation);
+		other.maxValidFieldValue = this.maxValidFieldValue;
+		other.pointer = this.pointer;
+		other.defaultOperation = this.defaultOperation;
+		other.bufferSize = this.bufferSize;
+		System.arraycopy(this.buffer, 0, other.buffer, 0, maxValidFieldValue);
+		other.sumBuffer = this.sumBuffer;
+		other.minBuffer = this.minBuffer;
+		other.maxBuffer = this.maxBuffer;
+		return other;
 	}
 
 }
