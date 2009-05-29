@@ -15,6 +15,31 @@
                </semanticTypes>
             </parameters>
          </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
+            <parameters>
+               <active>true</active>
+               <visible>true</visible>
+               <name>Maingrid</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <gridElementHeight>1000</gridElementHeight>
+               <gridElementWidth>1000</gridElementWidth>
+               <gridLowerLeftPointX>-32000</gridLowerLeftPointX>
+               <gridLowerLeftPointY>-32000</gridLowerLeftPointY>
+               <lineColorRGB length="3">
+                  <int>191</int>
+                  <int>191</int>
+                  <int>191</int>
+               </lineColorRGB>
+               <lineWidth>1.0</lineWidth>
+               <lockGridElementsSquare>true</lockGridElementsSquare>
+               <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
+               <numCols>64</numCols>
+               <numRows>64</numRows>
+            </parameters>
+         </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangePlugin">
             <parameters>
                <active>true</active>
@@ -85,7 +110,7 @@
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin">
             <parameters>
-               <active>false</active>
+               <active>true</active>
                <visible>true</visible>
                <name>ObjectPainter Demo</name>
                <timeout>0</timeout>
@@ -99,36 +124,11 @@
                <drawLine>true</drawLine>
                <packetType3D>true</packetType3D>
                <lineColor length="3">
-                  <int>0</int>
                   <int>255</int>
+                  <int>0</int>
                   <int>0</int>
                </lineColor>
                <updateInterval>500</updateInterval>
-            </parameters>
-         </plugin>
-         <plugin class="de.uniluebeck.itm.spyglass.plugin.gridpainter.GridPainterPlugin">
-            <parameters>
-               <active>true</active>
-               <visible>true</visible>
-               <name>Maingrid</name>
-               <timeout>0</timeout>
-               <semanticTypes length="1">
-                  <int>-1</int>
-               </semanticTypes>
-               <gridElementHeight>1000</gridElementHeight>
-               <gridElementWidth>1000</gridElementWidth>
-               <gridLowerLeftPointX>-32000</gridLowerLeftPointX>
-               <gridLowerLeftPointY>-32000</gridLowerLeftPointY>
-               <lineColorRGB length="3">
-                  <int>191</int>
-                  <int>191</int>
-                  <int>191</int>
-               </lineColorRGB>
-               <lineWidth>1.0</lineWidth>
-               <lockGridElementsSquare>true</lockGridElementsSquare>
-               <lockNumberOfRowsNCols>true</lockNumberOfRowsNCols>
-               <numCols>64</numCols>
-               <numRows>64</numRows>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
@@ -210,21 +210,21 @@
                <statisticalInformationEvaluators class="java.util.TreeSet">
                   <statisticalInformationEvaluator>
                      <semanticType>20</semanticType>
-                     <description>Avg temp: </description>
+                     <description>Min temp: </description>
                      <expression>%u19</expression>
-                     <operations>AVG</operations>
+                     <operations>MIN</operations>
                   </statisticalInformationEvaluator>
                   <statisticalInformationEvaluator>
                      <semanticType>20</semanticType>
-                     <description>Max temp: </description>
+                     <description>Max temp:</description>
                      <expression>%u19</expression>
                      <operations>MAX</operations>
                   </statisticalInformationEvaluator>
                   <statisticalInformationEvaluator>
                      <semanticType>20</semanticType>
-                     <description>Min temp: </description>
+                     <description>Avg temp: </description>
                      <expression>%u19</expression>
-                     <operations>MIN</operations>
+                     <operations>AVG</operations>
                   </statisticalInformationEvaluator>
                </statisticalInformationEvaluators>
             </parameters>
@@ -257,7 +257,9 @@
                <semanticTypes length="1">
                   <int>10</int>
                </semanticTypes>
-               <stringFormatters/>
+               <stringFormatters>
+                  <stringFormatter nodeID="44">1234</stringFormatter>
+               </stringFormatters>
                <defaultStringFormatter></defaultStringFormatter>
                <extendedInformation>
                   <isActive nodeID="1">false</isActive>
@@ -312,6 +314,24 @@
                <imageSizeX>1000</imageSizeX>
                <imageSizeY>1000</imageSizeY>
                <keepProportions>false</keepProportions>
+            </parameters>
+         </plugin>
+         <plugin class="de.uniluebeck.itm.spyglass.plugin.springembedderpositioner.SpringEmbedderPositionerPlugin">
+            <parameters>
+               <active>false</active>
+               <visible>true</visible>
+               <name>Springembedder</name>
+               <timeout>0</timeout>
+               <semanticTypes length="1">
+                  <int>-1</int>
+               </semanticTypes>
+               <edgeSemanticTypes2 length="1">
+                  <int>10</int>
+               </edgeSemanticTypes2>
+               <optimumSpringLength>200</optimumSpringLength>
+               <springStiffness>0.1</springStiffness>
+               <repulsionFactor>2000000</repulsionFactor>
+               <efficiencyFactor>0.1</efficiencyFactor>
             </parameters>
          </plugin>
       </plugins>
@@ -448,9 +468,9 @@
             <semanticTypes length="1">
                <int>-1</int>
             </semanticTypes>
-            <edgeSemanticTypes class="java.util.LinkedList">
-               <integer>9</integer>
-            </edgeSemanticTypes>
+            <edgeSemanticTypes2 length="1">
+               <int>10</int>
+            </edgeSemanticTypes2>
             <optimumSpringLength>200</optimumSpringLength>
             <springStiffness>0.1</springStiffness>
             <repulsionFactor>2000000</repulsionFactor>
