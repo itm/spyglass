@@ -54,7 +54,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	private Map<Integer, Vector<Integer>> neighbours = new ConcurrentHashMap<Integer, Vector<Integer>>(16, 0.75f, 1);
 
 	private Timer timeoutTimer = null;
-	private Timer repositionTimer = null;
+	// private Timer repositionTimer = null;
 
 	/**
 	 * Hashmap containing the position information.
@@ -62,7 +62,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	 * Set concurrency level to "2", since only two threads (PacketHandler and the TimeoutTimer)
 	 * will modify the map.
 	 */
-	private final Map<Integer, PositionData> nodeMap = new ConcurrentHashMap<Integer, PositionData>(16, 0.75f, 2);
+	private volatile Map<Integer, PositionData> nodeMap = new ConcurrentHashMap<Integer, PositionData>(16, 0.75f, 2);
 
 	public SpringEmbedderPositionerPlugin() {
 		xmlConfig = new SpringEmbedderPositionerXMLConfig();
@@ -74,7 +74,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		super.init(manager);
 
 		timeoutTimer = new Timer("SpringEmbedderPositioner NodeTimeout-Timer");
-		repositionTimer = new Timer("SpringEmbedderPositioner Reposition-Timer");
+		// repositionTimer = new Timer("SpringEmbedderPositioner Reposition-Timer");
 
 		// Check every second for old nodes
 		timeoutTimer.schedule(new TimerTask() {
@@ -84,9 +84,9 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 				removeOldNodes();
 			}
 
-		}, 1000, 100);
+		}, 0, 1000);
 
-		// Redraw the existing node every second
+		// Recalculate the existing node positions ten times a second
 		timeoutTimer.schedule(new TimerTask() {
 
 			@Override
@@ -94,7 +94,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 				repositionNodes();
 			}
 
-		}, 1000, 100);
+		}, 500, 100);
 
 	}
 
@@ -103,7 +103,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		super.shutdown();
 
 		this.timeoutTimer.cancel();
-		this.repositionTimer.cancel();
+		// this.repositionTimer.cancel();
 	}
 
 	@Override
@@ -167,7 +167,6 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	 */
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
-
 		final int id = packet.getSenderId();
 
 		// check if we already know about this node
@@ -223,162 +222,178 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	 */
 	private void removeOldNodes() {
 
-		if (xmlConfig.getTimeout() == 0) {
-			return;
-		}
+		try {
+			if (xmlConfig.getTimeout() == 0) {
+				return;
+			}
 
-		final List<NodePositionEvent> list = new ArrayList<NodePositionEvent>();
+			final List<NodePositionEvent> list = new ArrayList<NodePositionEvent>();
 
-		final Iterator<Integer> it = nodeMap.keySet().iterator();
-		while (it.hasNext()) {
-			final int id = it.next();
-			final PositionData data = nodeMap.get(id);
-			if (data != null) {
-				final long time = data.lastSeen;
-				if (System.currentTimeMillis() - time > xmlConfig.getTimeout() * 1000) {
+			final Iterator<Integer> it = nodeMap.keySet().iterator();
+			while (it.hasNext()) {
+				final int id = it.next();
+				final PositionData data = nodeMap.get(id);
+				if (data != null) {
+					final long time = data.lastSeen;
+					if (System.currentTimeMillis() - time > xmlConfig.getTimeout() * 1000) {
 
-					final AbsolutePosition oldPos = data.position;
+						final AbsolutePosition oldPos = data.position;
 
-					// remove the element from our map
-					it.remove();
+						// remove the element from our map
+						it.remove();
 
-					log.debug("Removed node " + id + " after timeout.");
-					list.add(new NodePositionEvent(id, NodePositionEvent.Change.REMOVED, oldPos, null));
+						log.debug("Removed node " + id + " after timeout.");
+						list.add(new NodePositionEvent(id, NodePositionEvent.Change.REMOVED, oldPos, null));
 
+					}
 				}
 			}
-		}
 
-		for (final NodePositionEvent nodePositionEvent : list) {
-			pluginManager.fireNodePositionEvent(nodePositionEvent);
+			for (final NodePositionEvent nodePositionEvent : list) {
+				pluginManager.fireNodePositionEvent(nodePositionEvent);
+			}
+		} catch (final Exception e) {
+
+			// System.out.println("Remove-Exception: " + e.getMessage());
 		}
 
 	}
 
 	private void repositionNodes() {
 
-		final List<NodePositionEvent> list = new ArrayList<NodePositionEvent>();
-		final Map<Integer, PositionData> newMap = new ConcurrentHashMap<Integer, PositionData>(16, 0.75f, 2);
+		try {
+			final List<NodePositionEvent> list = new ArrayList<NodePositionEvent>();
+			final Map<Integer, PositionData> newMap = new ConcurrentHashMap<Integer, PositionData>(16, 0.75f, 2);
 
-		final Iterator<Integer> it = nodeMap.keySet().iterator();
+			final Iterator<Integer> it = nodeMap.keySet().iterator();
 
-		while (it.hasNext()) {
-			final int id = it.next();
-			final PositionData data = nodeMap.get(id).clone();
-			if (data != null) {
+			while (it.hasNext()) {
+				final int id = it.next();
 
-				final AbsolutePosition oldPos = data.position.clone();
+				final PositionData data = nodeMap.get(id).clone();
 
-				// change position
-				final AbsolutePosition newPos = this.springEmbedding(id);
+				if (data != null) {
 
-				data.position = newPos;
+					final AbsolutePosition oldPos = data.position.clone();
 
-				newMap.put(id, data);
+					// change position
+					final AbsolutePosition newPos = this.springEmbedding(id);
 
-				// log.debug("Position of node " + id + " changed from (" + oldPos.x + ", " +
-				// oldPos.y + " to (" + newPos.x + "," + newPos.y + ")");
+					data.position = newPos;
 
-				if (!newPos.equals(oldPos)) {
-					list.add(new NodePositionEvent(id, NodePositionEvent.Change.MOVED, oldPos, newPos));
+					newMap.put(id, data);
+
+					// log.debug("Position of node " + id + " changed from (" + oldPos.x + ", " +
+					// oldPos.y + " to (" + newPos.x + "," + newPos.y + ")");
+
+					if (newPos != null) {
+						if (!newPos.equals(oldPos)) {
+							list.add(new NodePositionEvent(id, NodePositionEvent.Change.MOVED, oldPos, newPos));
+						}
+					}
 				}
 			}
-		}
 
-		nodeMap.putAll(newMap);
+			nodeMap.putAll(newMap);
 
-		for (final NodePositionEvent nodePositionEvent : list) {
-			pluginManager.fireNodePositionEvent(nodePositionEvent);
+			for (final NodePositionEvent nodePositionEvent : list) {
+				pluginManager.fireNodePositionEvent(nodePositionEvent);
+			}
+		} catch (final Exception e) {
+			System.out.println("Reposition-Exception: ");
+			e.printStackTrace();
 		}
 	}
 
 	private AbsolutePosition springEmbedding(final int id) {
+		try {
+			final double springLength = xmlConfig.getOptimumSpringLength();
+			final double stiffness = xmlConfig.getSpringStiffness();
+			final double repFactor = xmlConfig.getRepulsionFactor();
+			final double epsilon = xmlConfig.getEfficiencyFactor();
 
-		final double springLength = xmlConfig.getOptimumSpringLength();
-		final double stiffness = xmlConfig.getSpringStiffness();
-		final double repFactor = xmlConfig.getRepulsionFactor();
-		final double epsilon = xmlConfig.getEfficiencyFactor();
+			final PositionData data = nodeMap.get(id);
 
-		final PositionData data = nodeMap.get(id);
+			final AbsolutePosition cur = data.position.clone();
+			final AbsolutePosition force = new AbsolutePosition(0, 0, 0);
 
-		final AbsolutePosition cur = data.position.clone();
-		final AbsolutePosition force = new AbsolutePosition(0, 0, 0);
+			final Iterator<Integer> it = nodeMap.keySet().iterator();
+			final Vector<Integer> nbs = this.neighbours.get(id);
 
-		final Iterator<Integer> it = nodeMap.keySet().iterator();
-		final Vector<Integer> nbs = this.neighbours.get(id);
+			// add all repulsive and attractive forces to the current value;
+			while (it.hasNext()) {
+				final int id2 = it.next();
+				if (id2 != id) {
+					final AbsolutePosition other = nodeMap.get(id2).position.clone();
+					AbsolutePosition dist;
+					double[] tmp;
 
-		// add all repulsive and attractive forces to the current value;
-		// TODO: neighbourhood
+					// compute attraction force only with neighbors
+					if (nbs == null) {
+						// do nothing;
+					} else if (nbs.contains(id2)) {
 
-		while (it.hasNext()) {
-			final int id2 = it.next();
-			if (id2 != id) {
-				final AbsolutePosition other = nodeMap.get(id2).position.clone();
-				AbsolutePosition dist;
-				double[] tmp;
+						// log.debug("Compute attraction between " + id + " and " + id2);
+						final double factor1 = (cur.getEuclideanDistance(other) - springLength) * stiffness;
+						// log.debug("factor1: " + factor1);
 
-				// compute attraction force only with neighbors
-				if (nbs == null) {
-					// do nothing;
-				} else if (nbs.contains(id2)) {
+						dist = cur.getDistanceVector(other);
+						// log.debug("dist (" + id + ", " + id2 + "): " + dist.x + ", " + dist.y +
+						// ", "
+						// + dist.z + ")");
 
-					// log.debug("Compute attraction between " + id + " and " + id2);
-					final double factor1 = (cur.getEuclideanDistance(other) - springLength) * stiffness;
-					// log.debug("factor1: " + factor1);
+						// log.debug("EucDist: " + cur.getEuclideanDistance(other));
 
-					dist = cur.getDistanceVector(other);
-					// log.debug("dist (" + id + ", " + id2 + "): " + dist.x + ", " + dist.y + ", "
-					// + dist.z + ")");
+						tmp = this.divide(dist, cur.getEuclideanDistance(other));
+						dist.x = (int) Math.round(tmp[0] * factor1);
+						dist.y = (int) Math.round(tmp[1] * factor1);
+						dist.z = (int) Math.round(tmp[2] * factor1);
 
-					// log.debug("EucDist: " + cur.getEuclideanDistance(other));
+						// log.debug("att: (" + dist.x + ", " + dist.y + ", " + dist.z + ")");
 
-					tmp = this.divide(dist, cur.getEuclideanDistance(other));
-					dist.x = (int) Math.round(tmp[0] * factor1);
-					dist.y = (int) Math.round(tmp[1] * factor1);
-					dist.z = (int) Math.round(tmp[2] * factor1);
+						force.add(dist);
+						// log.debug("force inkl. att: " + force.x + ", " + force.y + ", " + force.z
+						// +
+						// ")");
 
-					// log.debug("att: (" + dist.x + ", " + dist.y + ", " + dist.z + ")");
+					}
+
+					// compute repulsion force
+					final double factor2 = repFactor / Math.pow(cur.getEuclideanDistance(other), 2);
+
+					dist = other.getDistanceVector(cur);
+
+					tmp = this.divide(dist, other.getEuclideanDistance(cur));
+					dist.x = (int) Math.round(tmp[0] * factor2);
+					dist.y = (int) Math.round(tmp[1] * factor2);
+					dist.z = (int) Math.round(tmp[2] * factor2);
+
+					// log.debug("rep: (" + dist.x + ", " + dist.y + ", " + dist.z + ")");
 
 					force.add(dist);
-					// log.debug("force inkl. att: " + force.x + ", " + force.y + ", " + force.z +
+					// log.debug("result inkl. rep: " + force.x + ", " + force.y + ", " + force.z +
 					// ")");
-
 				}
 
-				final double factor2 = repFactor / Math.pow(cur.getEuclideanDistance(other), 2);
-				// log.debug("factor2: " + factor2);
-
-				dist = other.getDistanceVector(cur);
-				// log.debug("dist (" + id2 + ", " + id + "): " + dist.x + ", " + dist.y + ", " +
-				// dist.z + ")");
-
-				tmp = this.divide(dist, other.getEuclideanDistance(cur));
-				dist.x = (int) Math.round(tmp[0] * factor2);
-				dist.y = (int) Math.round(tmp[1] * factor2);
-				dist.z = (int) Math.round(tmp[2] * factor2);
-
-				// log.debug("rep: (" + dist.x + ", " + dist.y + ", " + dist.z + ")");
-
-				force.add(dist);
-				// log.debug("result inkl. rep: " + force.x + ", " + force.y + ", " + force.z +
-				// ")");
 			}
 
+			// reduce the force by the given factor (must only be between 0 an 1)
+			force.mult(epsilon);
+
+			final AbsolutePosition result = nodeMap.get(id).position.clone();
+			result.add(force);
+			return result;
+		} catch (final Exception e) {
+			// e.printStackTrace();
+			return null;
 		}
-
-		// TODO: add all attractive forces to the current value (only neighbours attract each other)
-
-		force.mult(epsilon);
-
-		final AbsolutePosition result = nodeMap.get(id).position.clone();
-		result.add(force);
-		return result;
 	}
 
 	private double[] divide(final AbsolutePosition vector, final double divisor) {
 
 		if (divisor == 0) {
 			final double[] result = { Math.pow(2, 15), Math.pow(2, 15), Math.pow(2, 15) };
+			log.debug("division result: (" + result[0] + ", " + result[1] + ", " + result[2] + ")");
 			return result;
 		}
 
@@ -387,7 +402,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		result[1] = (vector.y) / divisor;
 		result[2] = (vector.z) / divisor;
 
-		// log.debug("division result: (" + result[0] + ", " + result[1] + ", " + result[2] + ")");
+		log.debug("division result: (" + result[0] + ", " + result[1] + ", " + result[2] + ")");
 		return result;
 	}
 
