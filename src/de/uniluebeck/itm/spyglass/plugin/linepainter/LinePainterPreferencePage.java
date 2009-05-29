@@ -1,5 +1,7 @@
 package de.uniluebeck.itm.spyglass.plugin.linepainter;
 
+import java.util.HashMap;
+
 import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -10,6 +12,7 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
 public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> {
 
 	private LinePainterOptionsComposite optionsComposite;
+	private HashMap<Integer, String> tempStringFormatters;
 
 	public LinePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL);
@@ -22,7 +25,14 @@ public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterP
 	@Override
 	protected void loadFromModel() {
 		super.loadFromModel();
-		optionsComposite.stringFormatter.connectTableWithData(dbc, config.getStringFormatters());
+		tempStringFormatters = config.getStringFormatters();
+		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatters);
+	}
+
+	@Override
+	protected void storeToModel() {
+		super.storeToModel();
+		config.setStringFormatters(tempStringFormatters);
 	}
 
 	@Override
@@ -31,7 +41,8 @@ public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterP
 
 		optionsComposite = new LinePainterOptionsComposite(composite);
 		optionsComposite.setDatabinding(dbc, config, this);
-		optionsComposite.stringFormatter.connectTableWithData(dbc, config.getStringFormatters());
+		tempStringFormatters = config.getStringFormatters();
+		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatters);
 
 		return composite;
 	}
