@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Text;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
-import de.uniluebeck.itm.spyglass.gui.databinding.SGIStringFormatter;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.IntListToStringConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.StringToIntListConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;

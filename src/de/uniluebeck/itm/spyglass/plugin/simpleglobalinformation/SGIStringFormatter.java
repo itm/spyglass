@@ -1,4 +1,4 @@
-/* 
+/*
  * ----------------------------------------------------------------------
  * This file is part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the
  * SwarmNet (www.swarmnet.de) project SpyGlass is free software;
@@ -7,7 +7,7 @@
  * ------------------------------------------------------------------------
  */
 
-package de.uniluebeck.itm.spyglass.gui.databinding;
+package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -40,7 +40,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInformationEvaluator;
+import de.uniluebeck.itm.spyglass.gui.databinding.ComboBoxEditingSupport;
+import de.uniluebeck.itm.spyglass.gui.databinding.StringFormatterEditingSupport;
+import de.uniluebeck.itm.spyglass.gui.databinding.WrappedObservableSet;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -48,9 +50,9 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * Instances of this class create widgets providing data bound tables to creat, update and delete
  * {@link StatisticalInformationEvaluator}
- * 
+ *
  * @author Sebastian Ebers
- * 
+ *
  */
 public class SGIStringFormatter {
 
@@ -76,7 +78,7 @@ public class SGIStringFormatter {
 
 	/**
 	 * Adds fields to configure the {@link StatisticalInformationEvaluator}
-	 * 
+	 *
 	 * @param parent
 	 *            the parent widget
 	 * @param gridHorizontalSpan
@@ -166,7 +168,7 @@ public class SGIStringFormatter {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Activates data binding
-	 * 
+	 *
 	 * @param dbc
 	 *            the {@link DataBindingContext}
 	 * @param config
@@ -177,7 +179,7 @@ public class SGIStringFormatter {
 		// table
 
 		columnExpressionString.setEditingSupport(new StringFormatterEditingSupport(table, dbc, "expression"));
-		columnDescription.setEditingSupport(new StringFormatterEditingSupport(table, dbc, "description"));
+		//columnDescription.setEditingSupport(new StringEditingSupport(table, dbc, "description"));
 
 		columnStatisticType.setEditingSupport(new ComboBoxEditingSupport(table, dbc, "operation",
 				new String[] { "SUM", "MIN", "MAX", "AVG", "MEDIAN" }));
