@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
+import org.eclipse.swt.graphics.RGB;
+
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Image;
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
@@ -38,47 +40,45 @@ public class Trajectory extends TimerTask {
 		this.list = list;
 		startTime = System.currentTimeMillis();
 
-		synchronized (plugin) {
+		final boolean isDrawLine = plugin.getXMLConfig().isDrawLine();
+		final RGB lineColor = plugin.getXMLConfig().getLineColorRGB();
+		final int sizeX = plugin.getXMLConfig().getImageSizeX();
+		final int sizeY = plugin.getXMLConfig().getImageSizeY();
 
-			// create drawing objects;
-			if (plugin.getXMLConfig().isDrawLine()) {
-				for (final TrajectorySection s : list) {
-					final Line l = new Line();
-					l.setPosition(s.start);
-					l.setEnd(s.end);
-					l.setColor(plugin.getXMLConfig().getLineColorRGB());
-					lines.add(l);
-				}
+		// create drawing objects;
+		if (isDrawLine) {
+			for (final TrajectorySection s : list) {
+				final Line l = new Line();
+				l.setPosition(s.start);
+				l.setEnd(s.end);
+				l.setColor(lineColor);
+				lines.add(l);
 			}
-
-			final AbsolutePosition pos = list.get(0).start.clone();
-
-			pos.x -= plugin.getXMLConfig().getImageSizeX() / 2;
-			pos.y -= plugin.getXMLConfig().getImageSizeY() / 2;
-			image.setPosition(pos);
-			image.setImageSizeX(plugin.getXMLConfig().getImageSizeX());
-			image.setImageSizeY(plugin.getXMLConfig().getImageSizeY());
-
-			this.init();
 		}
+
+		final AbsolutePosition pos = list.get(0).start.clone();
+
+		pos.x -= sizeX / 2;
+		pos.y -= sizeY / 2;
+		image.setPosition(pos);
+		image.setImageSizeX(sizeX);
+		image.setImageSizeY(sizeY);
+
+		this.init();
 	}
 
 	private void init() {
 
-		synchronized (this.plugin) {
-
-			// Draw lines
-			for (final DrawingObject d : lines) {
-					this.plugin.layer.add(d);
-				this.plugin.fireDrawingObjectAddedInternal(d);
-			}
-
-			this.plugin.layer.add(image);
-			this.plugin.fireDrawingObjectAddedInternal(image);
-
-			sectionTimestamp = startTime;
-
+		// Draw lines
+		for (final DrawingObject d : lines) {
+				this.plugin.layer.add(d);
+			this.plugin.fireDrawingObjectAddedInternal(d);
 		}
+
+		this.plugin.layer.add(image);
+		this.plugin.fireDrawingObjectAddedInternal(image);
+
+		sectionTimestamp = startTime;
 	}
 
 	@Override
@@ -119,6 +119,8 @@ public class Trajectory extends TimerTask {
 
 		synchronized (this.plugin) {
 			image.setPosition(location);
+
+			// the lines should lie behind the moving image
 			for (final Line l : lines) {
 				this.plugin.layer.pushBack(l);
 			}
@@ -133,22 +135,19 @@ public class Trajectory extends TimerTask {
 	public boolean cancel() {
 		final boolean ret = super.cancel();
 
-		synchronized (plugin) {
+		// remove ourself
+		plugin.trajectories.remove(this);
 
-			// remove ourself
-			plugin.trajectories.remove(this);
+		// clean up, before we go
+		if (ret) {
 
-			// clean up, before we go
-			if (ret) {
+			this.plugin.layer.remove(image);
+			this.plugin.fireDrawingObjectRemovedInternal(image);
 
-				this.plugin.layer.remove(image);
-				this.plugin.fireDrawingObjectRemovedInternal(image);
-
-				// Remove lines
-				for (final DrawingObject d : lines) {
-					this.plugin.layer.remove(d);
-					this.plugin.fireDrawingObjectRemovedInternal(d);
-				}
+			// Remove lines
+			for (final DrawingObject d : lines) {
+				this.plugin.layer.remove(d);
+				this.plugin.fireDrawingObjectRemovedInternal(d);
 			}
 		}
 
