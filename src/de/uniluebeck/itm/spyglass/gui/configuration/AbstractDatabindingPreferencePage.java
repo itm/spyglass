@@ -84,7 +84,7 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 		final AggregateValidationStatus aggregateStatus = new AggregateValidationStatus(getRealm(), dbc.getValidationStatusProviders(),
 				AggregateValidationStatus.MAX_SEVERITY);
 
-		aggregateStatus.addValueChangeListener(new DatabindingErrorHandler(dbc, getShell()));
+		new DatabindingErrorHandler(dbc, aggregateStatus, getShell());
 
 		aggregateStatus.addValueChangeListener(new IValueChangeListener() {
 			public void handleValueChange(final ValueChangeEvent event) {

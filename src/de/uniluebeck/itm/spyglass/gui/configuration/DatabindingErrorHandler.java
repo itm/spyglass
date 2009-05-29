@@ -8,9 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.databinding.AggregateValidationStatus;
+import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.ValidationStatusProvider;
 import org.eclipse.core.databinding.observable.IObservable;
+import org.eclipse.core.databinding.observable.list.IListChangeListener;
+import org.eclipse.core.databinding.observable.list.ListChangeEvent;
+import org.eclipse.core.databinding.observable.list.ListDiffEntry;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.Status;
@@ -37,7 +42,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * @author Dariush Forouher
  *
  */
-public class DatabindingErrorHandler implements IValueChangeListener, DisposeListener, ControlListener {
+public class DatabindingErrorHandler implements IValueChangeListener, DisposeListener, ControlListener, IListChangeListener {
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(DatabindingErrorHandler.class);
 
@@ -54,9 +59,15 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 	 * @param dbc
 	 * @param shell
 	 */
-	public DatabindingErrorHandler(final DataBindingContext dbc, final Shell shell) {
+	public DatabindingErrorHandler(final DataBindingContext dbc,final AggregateValidationStatus aggregateStatus, final Shell shell) {
 		this.dbc = dbc;
 		this.shell = shell;
+
+		// theoretically we don' have to remove these listeners as they will be automatically purged
+		// when observables are disposed.
+		aggregateStatus.addValueChangeListener(this);
+		dbc.getBindings().addListChangeListener(this);
+
 	}
 
 	// --------------------------------------------------------------------------------
@@ -81,6 +92,7 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 					final ISWTObservable observable2 = (ISWTObservable) observable;
 					final Widget w = observable2.getWidget();
 
+					assert w instanceof Control;
 					if (w instanceof Control) {
 						final Control c = (Control) w;
 
@@ -190,5 +202,30 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 	@Override
 	public void controlResized(final ControlEvent e) {
 		// nothing to do
+	}
+
+	// --------------------------------------------------------------------------------
+	/* (non-Javadoc)
+	 * @see org.eclipse.core.databinding.observable.list.IListChangeListener#handleListChange(org.eclipse.core.databinding.observable.list.ListChangeEvent)
+	 */
+	@Override
+	public void handleListChange(final ListChangeEvent event) {
+
+		// if a binding gets disposed while it contains a validation error, we have to notice this
+		// to remove the information bubble
+		for(final ListDiffEntry e: event.diff.getDifferences()) {
+			if (!e.isAddition()) {
+				final Binding b = (Binding) e.getElement();
+				if (b.getTarget() instanceof ISWTObservable) {
+					final ISWTObservable obs = (ISWTObservable) b.getTarget();
+					assert obs.getWidget() instanceof Control;
+					final Control c = (Control) obs.getWidget();
+					if (tipMap.containsKey(c)) {
+						destroyToolTip(c, tipMap.get(c));
+					}
+				}
+			}
+		}
+
 	}
 }
