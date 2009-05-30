@@ -38,7 +38,7 @@ public class LinePainterLine extends Line {
 
 			final Point p = determineStringFormatterPosition(super.calculateBoundingBox());
 			final Color oldForeground = gc.getForeground();
-			gc.drawString(stringFormatterResult, p.x, p.y, true);
+			gc.drawText(stringFormatterResult, p.x, p.y, true);
 			gc.setForeground(oldForeground);
 
 		}
