@@ -1,5 +1,6 @@
 package de.uniluebeck.itm.spyglass.plugin.linepainter;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -38,7 +39,7 @@ public class LinePainterLine extends Line {
 
 			final Point p = determineStringFormatterPosition(super.calculateBoundingBox());
 			final Color oldForeground = gc.getForeground();
-			gc.drawText(stringFormatterResult, p.x, p.y, true);
+			gc.drawText(stringFormatterResult, p.x, p.y, SWT.DRAW_DELIMITER | SWT.DRAW_TAB | SWT.DRAW_TRANSPARENT);
 			gc.setForeground(oldForeground);
 
 		}
