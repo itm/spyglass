@@ -11,17 +11,15 @@ package de.uniluebeck.itm.spyglass.plugin.linepainter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.RGB;
 import org.simpleframework.xml.Element;
 
@@ -40,9 +38,7 @@ import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.relationpainter.RelationPainterPlugin;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
-import de.uniluebeck.itm.spyglass.util.StringFormatter;
-import de.uniluebeck.itm.spyglass.util.Tuple;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -51,88 +47,10 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class LinePainterPlugin extends RelationPainterPlugin implements PropertyChangeListener, NodePositionListener {
 
-	// --------------------------------------------------------------------------------
-	/**
-	 * Small helper class representing an edge in a graph, denoted by 2-tuple of 2 node IDs.
-	 * 
-	 * @author Daniel Bimschas
-	 */
-	private class Edge {
+	/** Logs messages */
+	private static final Logger log = SpyglassLoggerFactory.getLogger(LinePainterPlugin.class);
 
-		public int nodeId1;
-
-		public int nodeId2;
-
-		public LinePainterLine line;
-
-		public Edge(final int nodeId1, final int nodeId2) {
-			this.nodeId1 = nodeId1;
-			this.nodeId2 = nodeId2;
-		}
-
-		@Override
-		public String toString() {
-			return line.toString();
-		}
-
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * A small helper class containing the graph defined by the edges which are read from incoming
-	 * packages.
-	 * 
-	 * @author Daniel Bimschas
-	 */
-	private class Data {
-
-		/**
-		 * Map containing timestamps that tell when an edge was added or last referenced by a
-		 * package. By reading the keyset of the map you get all edges currently contained in the
-		 * node graph.
-		 */
-		private Map<Edge, Long> edgeTimes = new HashMap<Edge, Long>();
-
-		public void addEdge(final Edge edge) {
-			edgeTimes.put(edge, System.currentTimeMillis());
-		}
-
-		public Edge getExistingEdge(final int nodeId1, final int nodeId2) {
-			for (final Edge e : edgeTimes.keySet()) {
-				final boolean same = ((e.nodeId1 == nodeId1) && (e.nodeId2 == nodeId2)) || ((e.nodeId1 == nodeId2) && (e.nodeId2 == nodeId1));
-				if (same) {
-					return e;
-				}
-			}
-			return null;
-		}
-
-		public Set<Edge> getIncidentEdges(final int nodeId) {
-			final Set<Edge> incidentEdges = new HashSet<Edge>();
-			for (final Edge e : edgeTimes.keySet()) {
-				if ((e.nodeId1 == nodeId) || (e.nodeId2 == nodeId)) {
-					incidentEdges.add(e);
-				}
-			}
-			return incidentEdges;
-		}
-
-		public void removeEdge(final Edge edge) {
-			if (edgeTimes.remove(edge) != null) {
-				return;
-			}
-			throw new NullPointerException("Edge was not contained.");
-		}
-
-		public void clear() {
-			edgeTimes.clear();
-		}
-
-		public void updateEdgeTime(final Edge edge) {
-			data.edgeTimes.put(edge, System.currentTimeMillis());
-		}
-
-	}
+	private static final String TIMER_NAME = "LinePainterPlugin-Timeout-Timer";
 
 	public static PluginPreferencePage<LinePainterPlugin, LinePainterXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
 			final Spyglass spyglass) {
@@ -143,30 +61,27 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		return "LinePainter";
 	}
 
-	@Element(name = "parameters")
-	private final LinePainterXMLConfig xmlConfig;
+	private final GraphData graphData;
 
-	private Layer layer;
+	private final Layer layer;
 
-	private StringFormatter defaultStringFormatter;
+	private final Object lock = new Object();
 
-	private Hashtable<Integer, StringFormatter> stringFormatters = new Hashtable<Integer, StringFormatter>();
+	private final StringFormatterData stringFormatterData;
 
 	private Timer timer;
 
-	private final Data data;
-
-	private static final String TIMER_NAME = "LinePainterPlugin-Timeout-Timer";
-
-	private final Object lock = new Object();
+	@Element(name = "parameters")
+	final LinePainterXMLConfig config;
 
 	public LinePainterPlugin() {
 
 		super();
 
-		xmlConfig = new LinePainterXMLConfig();
+		config = new LinePainterXMLConfig();
 		layer = Layer.Factory.createQuadTreeLayer();
-		data = new Data();
+		graphData = new GraphData();
+		stringFormatterData = new StringFormatterData();
 
 	}
 
@@ -187,11 +102,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 	@Override
 	public PluginXMLConfig getXMLConfig() {
-		return xmlConfig;
-	}
-
-	private void handleDefaultStringFormatterChange(final String defaultStringFormatterExpr) {
-		this.defaultStringFormatter = new StringFormatter(defaultStringFormatterExpr);
+		return config;
 	}
 
 	public void handleEvent(final NodePositionEvent event) {
@@ -212,124 +123,54 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 	}
 
-	void onNodeRemoved(final int node) {
+	// --------------------------------------------------------------------------------
+	/**
+	 * Adds a new edge to the graph.
+	 * 
+	 * @param packet
+	 * @param senderId
+	 * @param neighboorId
+	 * @param pos1
+	 * @param pos2
+	 */
+	private void newEdge(final Uint16ListPacket packet, final int senderId, final int neighboorId, final AbsolutePosition pos1,
+			final AbsolutePosition pos2) {
 
-		final LinkedList<LinePainterLine> removedLines = new LinkedList<LinePainterLine>();
+		final Edge e = new Edge(senderId, neighboorId);
 
-		synchronized (lock) {
+		e.line = new LinePainterLine();
+		e.line.setPosition(pos1);
+		e.line.setEnd(pos2);
+		final int[] color = config.getLineColorRGB();
+		e.line.setColor(new RGB(color[0], color[1], color[2]));
+		e.line.setLineWidth(config.getLineWidth());
 
-			/*
-			 * we need to check if the node is existing in our data structures and remove it if
-			 * that's the case
-			 */
-
-			for (final Edge e : data.getIncidentEdges(node)) {
-				removedLines.add(e.line);
-				data.removeEdge(e);
-				layer.remove(e.line);
-			}
-
-		}
-
-		// fire event outside lock block to avoid deadlocks
-		fireDrawingObjectRemoved(removedLines);
-
-	}
-
-	void onNodeMoved(final int node, final AbsolutePosition newPosition) {
-
-		final LinkedList<Tuple<LinePainterLine, AbsoluteRectangle>> updatedLines = new LinkedList<Tuple<LinePainterLine, AbsoluteRectangle>>();
-		Tuple<LinePainterLine, AbsoluteRectangle> tuple;
+		final LinePainterLine addedLine;
 
 		synchronized (lock) {
 
-			for (final Edge e : data.getIncidentEdges(node)) {
-
-				tuple = new Tuple<LinePainterLine, AbsoluteRectangle>(e.line, e.line.getBoundingBox());
-				updatedLines.add(tuple);
-
-				if (e.nodeId1 == node) {
-					e.line.setPosition(newPosition);
-				} else {
-					e.line.setEnd(newPosition);
-				}
-
-			}
-		}
-	}
-
-	private void handleStringFormattersChange(final Map<Integer, String> newValue) {
-		setStringFormatters(newValue);
-	}
-
-	private void handleTimeout() {
-
-		final long now = System.currentTimeMillis();
-		final long timeout = 1000 * xmlConfig.getTimeout();
-		long diff;
-
-		final List<Edge> edgesToRemove = new ArrayList<Edge>();
-
-		synchronized (lock) {
-
-			for (final Edge e : data.edgeTimes.keySet()) {
-
-				diff = now - data.edgeTimes.get(e);
-				if (diff > timeout) {
-					edgesToRemove.add(e);
-				}
-
-			}
-
-			for (final Edge e : edgesToRemove) {
-				data.removeEdge(e);
-				layer.remove(e.line);
-			}
+			graphData.addEdge(e);
+			layer.add(e.line);
+			addedLine = e.line;
 
 		}
 
-		// fire events outside the lock to avoid deadlock
-		// possible deadlocks
-		for (final Edge e : edgesToRemove) {
-			fireDrawingObjectRemoved(e.line);
+		// fire the event outside of the synchronized block
+		// to avoid possible deadlocks
+		if (addedLine != null) {
+			fireDrawingObjectAdded(addedLine);
 		}
 
 	}
 
-	private void handleTimeoutChange(final long timeout) {
-		if (timer != null) {
-			timer.cancel();
-		}
-		if (timeout > 0) {
-			timer = new Timer(TIMER_NAME);
-			timer.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					handleTimeout();
-				}
-			}, 1000 * timeout, 1000 * timeout);
-		}
-	}
-
-	@Override
-	public void init(final PluginManager manager) throws Exception {
-
-		super.init(manager);
-
-		defaultStringFormatter = new StringFormatter(xmlConfig.getDefaultStringFormatter());
-		stringFormatters = new Hashtable<Integer, StringFormatter>();
-		setStringFormatters(xmlConfig.getStringFormatters());
-		xmlConfig.addPropertyChangeListener(this);
-		pluginManager.addNodePositionListener(this);
-
-		handleTimeoutChange(xmlConfig.getTimeout());
-
-	}
-
-	@Override
-	protected void processPacket(final SpyglassPacket p) {
-
-		final Uint16ListPacket packet = (Uint16ListPacket) p;
+	// --------------------------------------------------------------------------------
+	/**
+	 * Parses the packet and, according to its' content updates or adds edges and their respective
+	 * string formatter information.
+	 * 
+	 * @param packet
+	 */
+	void parsePacket(final Uint16ListPacket packet) {
 
 		final List<Integer> neighboorIds = packet.getNeighborhoodPacketNodeIDs();
 		final int senderId = packet.getSenderId();
@@ -344,56 +185,13 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 			if ((pos1 != null) && (pos2 != null)) {
 
 				synchronized (lock) {
-					e = data.getExistingEdge(senderId, neighboorId);
+					e = graphData.getExistingEdge(senderId, neighboorId);
 				}
 
 				if (e != null) {
-
-					synchronized (lock) {
-						data.updateEdgeTime(e);
-
-						// check if there's a string formatter especially for this
-						// semantic type and use it if so, otherwise use default
-						// string formatter
-						final boolean hasSemanticType = stringFormatters.get(p.getSemanticType()) != null;
-						e.line.setStringFormatterResult(hasSemanticType ? stringFormatters.get(p.getSemanticType()).parse(p) : defaultStringFormatter
-								.parse(p));
-					}
-
+					updateEdge(packet, e);
 				} else {
-
-					e = new Edge(senderId, neighboorId);
-
-					e.line = new LinePainterLine();
-					e.line.setPosition(pos1);
-					e.line.setEnd(pos2);
-					final int[] color = xmlConfig.getLineColorRGB();
-					e.line.setColor(new RGB(color[0], color[1], color[2]));
-					e.line.setLineWidth(xmlConfig.getLineWidth());
-
-					// check if there's a string formatter especially for this
-					// semantic type and use it if so, otherwise use default
-					// string formatter
-					final boolean hasSemanticType = stringFormatters.get(p.getSemanticType()) != null;
-					e.line.setStringFormatterResult(hasSemanticType ? stringFormatters.get(p.getSemanticType()).parse(p) : defaultStringFormatter
-							.parse(p));
-
-					LinePainterLine addedLine;
-
-					synchronized (lock) {
-
-						data.addEdge(e);
-						layer.add(e.line);
-						addedLine = e.line;
-
-					}
-
-					// fire the event outside of the synchronized block
-					// to avoid possible deadlocks
-					if (addedLine != null) {
-						fireDrawingObjectAdded(addedLine);
-					}
-
+					newEdge(packet, senderId, neighboorId, pos1, pos2);
 				}
 
 			}
@@ -402,19 +200,185 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Updates edge time and string formatter strings for an existing edge.
+	 * 
+	 * @param packet
+	 * @param e
+	 */
+	private void updateEdge(final Uint16ListPacket packet, final Edge e) {
+		synchronized (lock) {
+			graphData.updateEdgeTime(e);
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Called periodically by {@link #timer} if a timeout occurs and removes stale edges and their
+	 * respective drawing objects.
+	 */
+	private void handleTimeout() {
+
+		if (log.isDebugEnabled()) {
+			log.debug("handleTimeout()");
+		}
+
+		final long now = System.currentTimeMillis();
+		final long timeoutInMs = 1000 * config.getTimeout();
+
+		final List<LinePainterLine> dos = new ArrayList<LinePainterLine>();
+
+		synchronized (lock) {
+
+			final Iterator<Edge> iterator = graphData.edgeTimes.keySet().iterator();
+			Edge e;
+
+			while (iterator.hasNext()) {
+
+				e = iterator.next();
+
+				if ((now - graphData.edgeTimes.get(e)) > timeoutInMs) {
+
+					if (log.isDebugEnabled()) {
+						log.debug("removing edge from node " + e.nodeId1 + " to " + e.nodeId2 + " which is " + ((now - graphData.edgeTimes.get(e)))
+								+ " ms old (timeout is " + timeoutInMs + " ms)");
+					}
+
+					dos.add(e.line);
+					iterator.remove();
+					layer.remove(e.line);
+
+				}
+
+			}
+		}
+
+		// fire events outside the lock to avoid possible deadlocks
+		for (final LinePainterLine line : dos) {
+			fireDrawingObjectRemoved(line);
+		}
+
+	}
+
+	private void handleTimeoutChange(final long timeout) {
+
+		// cancel old timer which repeats timeouts periodically
+		if (timer != null) {
+			timer.cancel();
+		}
+
+		// remove stale edges / drawing objects
+		handleTimeout();
+
+		// reschedule the timer according to the new timeout (0 means no timeout)
+		if (timeout > 0) {
+			timer = new Timer(TIMER_NAME);
+			timer.schedule(new TimerTask() {
+				@Override
+				public void run() {
+					handleTimeout();
+				}
+			}, 1000 * timeout, 1000 * timeout);
+		}
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Called when a node changed its' position. If the update node is a node that is currently held
+	 * in this plug-ins' graph the drawing objects of every incident edge are updated to reflect the
+	 * new node position.
+	 * 
+	 * @param nodeId
+	 * @param newPosition
+	 */
+	void onNodeMoved(final int nodeId, final AbsolutePosition newPosition) {
+		synchronized (lock) {
+
+			if (log.isDebugEnabled()) {
+				log.debug("onNodeMoved(" + nodeId + "," + newPosition + ")");
+			}
+
+			for (final Edge e : graphData.getIncidentEdges(nodeId)) {
+				if (e.nodeId1 == nodeId) {
+					if (log.isDebugEnabled()) {
+						log.debug("moving node " + e.nodeId1);
+					}
+					e.line.setPosition(newPosition);
+				} else {
+					if (log.isDebugEnabled()) {
+						log.debug("moving node " + e.nodeId2);
+					}
+					e.line.setEnd(newPosition);
+				}
+			}
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Called when a NodePositionerPlugin sends an event indicating a nodes' removal. If the node's
+	 * in the graph, the node and it's corresponding drawing objects are removed.
+	 * 
+	 * @param nodeId
+	 */
+	void onNodeRemoved(final int nodeId) {
+
+		if (log.isDebugEnabled()) {
+			log.debug("onNodeRemoved(" + nodeId + ")");
+		}
+
+		final LinkedList<LinePainterLine> removedLines = new LinkedList<LinePainterLine>();
+
+		synchronized (lock) {
+
+			// we need to check if the node exists in the graph and remove it if that's the case
+
+			for (final Edge e : graphData.getIncidentEdges(nodeId)) {
+				removedLines.add(e.line);
+				graphData.removeEdge(e);
+				layer.remove(e.line);
+			}
+
+		}
+
+		// fire event outside lock block to avoid deadlocks
+		fireDrawingObjectRemoved(removedLines);
+
+	}
+
 	@Override
-	@SuppressWarnings("unchecked")
+	public void init(final PluginManager manager) throws Exception {
+
+		super.init(manager);
+
+		config.addPropertyChangeListener(LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B, this);
+		config.addPropertyChangeListener(LinePainterXMLConfig.PROPERTYNAME_LINE_WIDTH, this);
+		config.addPropertyChangeListener(PluginXMLConfig.PROPERTYNAME_TIMEOUT, this);
+
+		pluginManager.addNodePositionListener(this);
+		handleTimeoutChange(config.getTimeout());
+		stringFormatterData.init(config, graphData, lock);
+
+	}
+
+	@Override
+	protected void processPacket(final SpyglassPacket p) {
+		parsePacket((Uint16ListPacket) p);
+		stringFormatterData.parsePacket((Uint16ListPacket) p);
+	}
+
+	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
 		if (LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B.equals(event.getPropertyName())) {
-			updateLineColor((int[]) event.getNewValue());
+			handleLineColorChange((int[]) event.getNewValue());
 		} else if (LinePainterXMLConfig.PROPERTYNAME_LINE_WIDTH.equals(event.getPropertyName())) {
-			updateLineWidth((Integer) event.getNewValue());
+			handleLineWidthChange((Integer) event.getNewValue());
 		} else if (PluginXMLConfig.PROPERTYNAME_TIMEOUT.equals(event.getPropertyName())) {
 			handleTimeoutChange((Integer) event.getNewValue());
-		} else if (PluginWithStringFormatterXMLConfig.PROPERTYNAME_STRING_FORMATTERS.equals(event.getPropertyName())) {
-			handleStringFormattersChange((Map<Integer, String>) event.getNewValue());
-		} else if (PluginWithStringFormatterXMLConfig.PROPERTYNAME_DEFAULT_STRING_FORMATTER.equals(event.getPropertyName())) {
-			handleDefaultStringFormatterChange((String) event.getNewValue());
+		} else {
+			throw new RuntimeException("Unexpected case.");
 		}
 	}
 
@@ -424,79 +388,52 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		Set<DrawingObject> dos;
 
 		synchronized (lock) {
-
 			dos = layer.getDrawingObjects();
-			data.clear();
 			layer.clear();
-
+			graphData.clear();
+			stringFormatterData.clear();
 		}
 
 		fireDrawingObjectRemoved(dos);
 
-	}
-
-	private void setStringFormatters(final Map<Integer, String> newValue) {
-		this.stringFormatters.clear();
-		for (final int semanticType : newValue.keySet()) {
-			this.stringFormatters.put(semanticType, new StringFormatter(newValue.get(semanticType)));
-		}
 	}
 
 	@Override
 	public void shutdown() throws Exception {
+
 		super.shutdown();
 
-		xmlConfig.removePropertyChangeListener(this);
+		stringFormatterData.shutdown();
+
+		config.removePropertyChangeListener(LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B, this);
+		config.removePropertyChangeListener(LinePainterXMLConfig.PROPERTYNAME_LINE_WIDTH, this);
+		config.removePropertyChangeListener(PluginXMLConfig.PROPERTYNAME_TIMEOUT, this);
+
 		pluginManager.removeNodePositionListener(this);
+		timer.cancel();
 
-		Set<DrawingObject> dos;
-
-		synchronized (lock) {
-			dos = layer.getDrawingObjects();
-			layer.clear();
-			data.clear();
-		}
-
-		fireDrawingObjectRemoved(dos);
-
-		if (timer != null) {
-			timer.cancel();
-		}
+		resetPlugin();
 
 	}
 
-	private void updateLineColor(final int[] color) {
-
-		final LinkedList<LinePainterLine> updatedLines = new LinkedList<LinePainterLine>();
-
+	private void handleLineColorChange(final int[] color) {
 		synchronized (lock) {
-
 			LinePainterLine line;
 			for (final DrawingObject o : layer.getDrawingObjects()) {
 				line = (LinePainterLine) o;
-				updatedLines.add(line);
 				line.setColor(new RGB(color[0], color[1], color[2]));
 			}
-
 		}
-
 	}
 
-	private void updateLineWidth(final int width) {
-
-		final LinkedList<LinePainterLine> updatedLines = new LinkedList<LinePainterLine>();
-
+	private void handleLineWidthChange(final int width) {
 		synchronized (lock) {
-
 			LinePainterLine line;
 			for (final DrawingObject o : layer.getDrawingObjects()) {
 				line = (LinePainterLine) o;
-				updatedLines.add(line);
 				line.setLineWidth(width);
 			}
-
 		}
-
 	}
 
 }
