@@ -6,13 +6,13 @@ import java.beans.PropertyChangeSupport;
 // --------------------------------------------------------------------------------
 /**
  * This class provides an number of property change listeners.
- * 
+ *
  * All implementing subclasses should call
  * {@link PropertyBean#firePropertyChange(String, Object, Object)} if a property changes.
- * 
+ *
  * @author Dariush Forouher
  * @author Sebastian Ebers
- * 
+ *
  */
 public abstract class PropertyBean implements SpyglassPropertyChangeSupport {
 
@@ -71,11 +71,11 @@ public abstract class PropertyBean implements SpyglassPropertyChangeSupport {
 	/**
 	 * Report a bound property update to any registered listeners. No event is fired if old and new
 	 * are equal and non-null.
-	 * 
+	 *
 	 * <p>
 	 * This is merely a convenience wrapper around the more general firePropertyChange method that
 	 * takes {@code PropertyChangeEvent} value.
-	 * 
+	 *
 	 * @param propertyName
 	 *            The programmatic name of the property that was changed.
 	 * @param oldValue
@@ -96,6 +96,16 @@ public abstract class PropertyBean implements SpyglassPropertyChangeSupport {
 		for (int i = 0; i < listeners.length; i++) {
 			removePropertyChangeListener(listeners[i]);
 		}
+	}
+
+	@Override
+	protected PropertyBean clone() throws CloneNotSupportedException {
+		final PropertyBean b = (PropertyBean) super.clone();
+
+		// we DONT want to clone the list of observers, so clear it
+		b.propertyChangeSupport = new PropertyChangeSupport(b);
+
+		return b;
 	}
 
 }

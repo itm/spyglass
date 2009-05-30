@@ -6,7 +6,7 @@
  * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further details.
  * ------------------------------------------------------------------------
  */
-package de.uniluebeck.itm.spyglass.gui.databinding;
+package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.Binding;
@@ -25,7 +25,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.widgets.Combo;
 
-import de.uniluebeck.itm.spyglass.gui.databinding.converter.StatisticOperationConverter;
 import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
@@ -36,12 +35,12 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * @author Sebastian Ebers
  *
  */
-public class ComboBoxEditingSupport extends ObservableValueEditingSupport {
+public class ComboBoxRangeTypeEditingSupport extends ObservableValueEditingSupport {
 
 	private CellEditor cellEditor;
 	private DataBindingContext dbc;
 	private String elementName = "value";
-	private static final Logger log = SpyglassLoggerFactory.getLogger(ComboBoxEditingSupport.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(ComboBoxRangeTypeEditingSupport.class);
 	private String getterMethodName;
 
 	// --------------------------------------------------------------------------------
@@ -58,7 +57,7 @@ public class ComboBoxEditingSupport extends ObservableValueEditingSupport {
 	 *            the values to be shown in the {@link Combo} box
 	 *
 	 */
-	public ComboBoxEditingSupport(final ColumnViewer viewer, final DataBindingContext dbc, final String elementName, final String[] values) {
+	public ComboBoxRangeTypeEditingSupport(final ColumnViewer viewer, final DataBindingContext dbc, final String elementName, final String[] values) {
 		super(viewer, dbc);
 		this.dbc = dbc;
 		this.elementName = elementName;
@@ -117,9 +116,10 @@ public class ComboBoxEditingSupport extends ObservableValueEditingSupport {
 
 	@Override
 	protected Binding createBinding(final IObservableValue target, final IObservableValue model) {
-		return dbc.bindValue(target, model, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setConverter(new StatisticOperationConverter(
-				String.class, Enum.class)), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setConverter(new StatisticOperationConverter(
+		return dbc.bindValue(target, model, new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setConverter(new NodeSensorRangeTypeConverter(
+				String.class, Enum.class)), new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setConverter(new NodeSensorRangeTypeConverter(
 				Enum.class, String.class)));
 	}
+
 
 }

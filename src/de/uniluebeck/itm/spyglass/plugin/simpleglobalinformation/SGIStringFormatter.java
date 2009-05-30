@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.gui.databinding.ComboBoxEditingSupport;
+import de.uniluebeck.itm.spyglass.gui.databinding.DatabindingTextEditingSupport;
 import de.uniluebeck.itm.spyglass.gui.databinding.StringFormatterEditingSupport;
 import de.uniluebeck.itm.spyglass.gui.databinding.WrappedObservableSet;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
@@ -179,7 +180,7 @@ public class SGIStringFormatter {
 		// table
 
 		columnExpressionString.setEditingSupport(new StringFormatterEditingSupport(table, dbc, "expression"));
-		//columnDescription.setEditingSupport(new StringEditingSupport(table, dbc, "description"));
+		columnDescription.setEditingSupport(new DatabindingTextEditingSupport(table, dbc, "description", null,null,null));
 
 		columnStatisticType.setEditingSupport(new ComboBoxEditingSupport(table, dbc, "operation",
 				new String[] { "SUM", "MIN", "MAX", "AVG", "MEDIAN" }));

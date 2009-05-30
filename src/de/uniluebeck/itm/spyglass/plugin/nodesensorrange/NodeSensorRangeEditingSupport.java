@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------
 /**
- * 
+ *
  */
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 // --------------------------------------------------------------------------------
 /**
  * @author bimschas
- * 
+ *
  */
 public class NodeSensorRangeEditingSupport extends ObservableValueEditingSupport {
 
@@ -59,8 +59,7 @@ public class NodeSensorRangeEditingSupport extends ObservableValueEditingSupport
 		} else if (NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE.equals(elementName)) {
 
 			this.cellEditor = new ComboBoxCellEditor((Composite) viewer.getControl(), new String[] {
-					NodeSensorRangeXMLConfig.PROPERTYVALUE_RANGE_TYPE_CIRCLE, NodeSensorRangeXMLConfig.PROPERTYVALUE_RANGE_TYPE_CONE,
-					NodeSensorRangeXMLConfig.PROPERTYVALUE_RANGE_TYPE_RECTANGLE });
+					"Circle", "Cone", "Rectangle" });
 
 		}
 	}

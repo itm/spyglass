@@ -1,13 +1,29 @@
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
+import java.util.HashSet;
+
+import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.Config;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> {
+
+	private static final Logger log = SpyglassLoggerFactory.getLogger(NodeSensorRangePreferencePage.class);
+
+	/**
+	 * Reference to the map backing {@link tableData}. This map is a copy of the one from the
+	 * XMLConfig. Changes in the table reflect on this map. the entries of this map are propagated
+	 * tho the original map in the XMLConfig only when storeToModel() is called.
+	 */
+	private HashSet<Config> tempTable = new HashSet<Config>();
+	private NodeSensorRangeOptionsComposite optionsComposite;
+
 
 	public NodeSensorRangePreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
@@ -22,9 +38,12 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 
 		final Composite composite = createContentsInternal(parent);
 
-		final NodeSensorRangeOptionsComposite optionsComposite = new NodeSensorRangeOptionsComposite(composite);
-		optionsComposite.setDatabinding(dbc, config, this);
-		optionsComposite.getPerNodeConfigurationComposite().setDataBinding(dbc, config);
+		optionsComposite = new NodeSensorRangeOptionsComposite(composite);
+		optionsComposite.setDatabinding(dbc, config.getDefaultConfig(), this);
+
+		tempTable = config.getPerNodeConfigsClone();
+
+		optionsComposite.getPerNodeConfigurationComposite().connectTableWithData(dbc, tempTable);
 
 		return composite;
 	}
@@ -32,6 +51,39 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 	@Override
 	public Class<? extends Plugin> getPluginClass() {
 		return NodeSensorRangePlugin.class;
+	}
+
+	// --------------------------------------------------------------------------------
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#loadFromModel()
+	 */
+	@Override
+	protected void loadFromModel() {
+		super.loadFromModel();
+
+		log.info("load from model");
+
+		tempTable = config.getPerNodeConfigsClone();
+		optionsComposite.getPerNodeConfigurationComposite().connectTableWithData(dbc, tempTable);
+	}
+
+	// --------------------------------------------------------------------------------
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#storeToModel()
+	 */
+	@Override
+	public void storeToModel() {
+		super.storeToModel();
+
+		log.info("store to model");
+
+		config.setPerNodeConfigs(this.tempTable);
+		tempTable = config.getPerNodeConfigsClone();
+		optionsComposite.getPerNodeConfigurationComposite().connectTableWithData(dbc, tempTable);
 	}
 
 }

@@ -11,14 +11,15 @@ package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
-import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.RGB;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 import org.simpleframework.xml.ElementList;
 
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -30,22 +31,12 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements PropertyChangeListener {
 
+	private static final Logger log = SpyglassLoggerFactory.getLogger(NodeSensorRangeXMLConfig.class);
+
 	public static class CircleRange extends NodeSensorRange {
 
 		@Element(name = PROPERTYNAME_CIRCLE_RADIUS, required = false)
 		private int circleRadius = 100;
-
-		public CircleRange() {
-
-		}
-
-		public CircleRange(final int radius) {
-			this.circleRadius = radius;
-		}
-
-		public CircleRange(final CircleRange other) {
-			this(other.circleRadius);
-		}
 
 		public int getCircleRadius() {
 			return circleRadius;
@@ -57,10 +48,6 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			firePropertyChange(PROPERTYNAME_CIRCLE_RADIUS, old, this);
 		}
 
-		@Override
-		protected NodeSensorRange clone() {
-			return new CircleRange(this);
-		}
 
 	}
 
@@ -74,20 +61,6 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 
 		@Element(name = PROPERTYNAME_CONE_VIEWANGLE, required = false)
 		private int coneViewAngle = 45;
-
-		public ConeRange() {
-
-		}
-
-		public ConeRange(final int orientation, final int radius, final int viewAngle) {
-			this.coneOrientation = orientation;
-			this.coneRadius = radius;
-			this.coneViewAngle = viewAngle;
-		}
-
-		public ConeRange(final ConeRange other) {
-			this(other.coneOrientation, other.coneRadius, other.coneViewAngle);
-		}
 
 		public int getConeOrientation() {
 			return coneOrientation;
@@ -119,11 +92,6 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			firePropertyChange(PROPERTYNAME_CONE_VIEWANGLE, old, this);
 		}
 
-		@Override
-		protected NodeSensorRange clone() {
-			return new ConeRange(this);
-		}
-
 	}
 
 	// --------------------------------------------------------------------------------
@@ -131,7 +99,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	 * @author bimschas
 	 *
 	 */
-	public static class Config extends PropertyBean {
+	public static class Config extends PropertyBean implements Cloneable {
 
 		@Element(name = PROPERTYNAME_NODE_ID, required = false)
 		private int nodeId = -1;
@@ -152,45 +120,8 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		private NodeSensorRange range = new CircleRange();
 
 		@Element(name = PROPERTYNAME_RANGE_TYPE, required = false)
-		private String rangeType = PROPERTYVALUE_RANGE_TYPE_CIRCLE;
+		private RANGE_TYPE rangeType = RANGE_TYPE.Circle;
 
-		// --------------------------------------------------------------------------------
-		/**
-		 * Constructor
-		 */
-		public Config() {
-			// nothing to do
-		}
-
-		// --------------------------------------------------------------------------------
-		/**
-		 * Constructor
-		 *
-		 * @param backgroundAlpha
-		 * @param backgroundRGB
-		 * @param colorRGB
-		 * @param range
-		 * @param rangeType
-		 */
-		public Config(final int backgroundAlpha, final int[] backgroundRGB, final int[] colorRGB, final NodeSensorRange range, final String rangeType) {
-			super();
-			this.backgroundAlpha = backgroundAlpha;
-			this.backgroundRGB = backgroundRGB;
-			this.colorRGB = colorRGB;
-			this.range = range;
-			this.rangeType = rangeType;
-		}
-
-		// --------------------------------------------------------------------------------
-		/**
-		 * Copy constructor. Makes a deep copy.
-		 *
-		 * @param other
-		 *            object to copy values from
-		 */
-		public Config(final Config other) {
-			this(other.backgroundAlpha, other.backgroundRGB, other.colorRGB, other.range.clone(), other.rangeType);
-		}
 
 		public int getBackgroundAlpha() {
 			return backgroundAlpha;
@@ -208,11 +139,12 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			return range;
 		}
 
-		public String getRangeType() {
+		public RANGE_TYPE getRangeType() {
 			return rangeType;
 		}
 
 		public int getLineWidth() {
+			log.info("Got from "+super.hashCode()+" linewidth "+lineWidth);
 			return lineWidth;
 		}
 
@@ -225,6 +157,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		}
 
 		public void setLineWidth(final int lineWidth) {
+			log.info("set linewith on "+super.hashCode()+" from "+this.lineWidth+" to "+lineWidth);
 			firePropertyChange(PROPERTYNAME_LINE_WIDTH, this.lineWidth, this.lineWidth = lineWidth);
 		}
 
@@ -245,13 +178,42 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			firePropertyChange(PROPERTYNAME_RANGE, this.range, this.range = range);
 		}
 
-		public void setRangeType(final String rangeType) {
+		public void setRangeType(final RANGE_TYPE rangeType) {
 			firePropertyChange(PROPERTYNAME_RANGE_TYPE, this.rangeType, this.rangeType = rangeType);
 		}
 
 		@Override
-		protected Config clone() {
-			return new Config(this);
+		public Config clone() {
+			try {
+				final Config copy = (Config) super.clone();
+				copy.backgroundRGB = this.backgroundRGB.clone();
+				copy.colorRGB = this.colorRGB.clone();
+				copy.range = this.range.clone();
+
+				log.info("Cloned "+super.hashCode()+" to "+copy.hashCodeOrig());
+				return copy;
+			} catch (final CloneNotSupportedException e) {
+				throw new RuntimeException("Bug", e);
+			}
+		}
+
+		@Override
+		public boolean equals(final Object o) {
+			if (o instanceof Config) {
+				final Config c = (Config) o;
+				return c.nodeId==this.nodeId;
+			} else {
+				return false;
+			}
+		}
+
+		public int hashCodeOrig() {
+			return super.hashCode();
+		}
+
+		@Override
+		public int hashCode() {
+			return nodeId;
 		}
 
 	}
@@ -263,11 +225,16 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	 *
 	 * @author Daniel Bimschas
 	 */
-	public static abstract class NodeSensorRange extends PropertyBean {
+	public static abstract class NodeSensorRange extends PropertyBean implements Cloneable {
 
 		@Override
-		protected abstract NodeSensorRange clone();
-
+		public final NodeSensorRange clone() {
+			try {
+				return (NodeSensorRange) super.clone();
+			} catch (final CloneNotSupportedException e) {
+				throw new RuntimeException("Bug", e);
+			}
+		}
 	}
 
 	public static class RectangleRange extends NodeSensorRange {
@@ -325,10 +292,6 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			firePropertyChange(PROPERTYNAME_RECTANGLE_WIDTH, old, this);
 		}
 
-		@Override
-		protected NodeSensorRange clone() {
-			return new RectangleRange(this);
-		}
 
 	}
 
@@ -364,17 +327,22 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 
 	public static final String PROPERTYNAME_RECTANGLE_WIDTH = "rectangleWidth";
 
-	public static final String PROPERTYVALUE_RANGE_TYPE_CIRCLE = "Circle";
+	// --------------------------------------------------------------------------------
 
-	public static final String PROPERTYVALUE_RANGE_TYPE_CONE = "Cone";
+	public enum RANGE_TYPE {
 
-	public static final String PROPERTYVALUE_RANGE_TYPE_RECTANGLE = "Rectangle";
+		Circle,
+
+		Cone,
+
+		Rectangle,
+	}
 
 	@Element(name = PROPERTYNAME_DEFAULT_CONFIG, required = false)
 	private final Config defaultConfig = new Config();
 
 	@ElementList(entry = PROPERTYNAME_PER_NODE_CONFIGS, required = false)
-	private Set<Config> perNodeConfigs = new HashSet<Config>();
+	private HashSet<Config> perNodeConfigs = new HashSet<Config>();
 
 	public boolean equals(final NodeSensorRangeXMLConfig o) {
 		if (!super.equals(o)) {
@@ -392,11 +360,25 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
 	}
 
-	public Set<Config> getPerNodeConfigs() {
+	/**
+	 * Return a deep clone of the perNodeConfigs set.
+	 */
+	public HashSet<Config> getPerNodeConfigs() {
 		return perNodeConfigs;
 	}
 
-	public void setPerNodeConfigs(final Set<Config> perNodeConfigs) {
+	/**
+	 * Return a deep clone of the perNodeConfigs set.
+	 */
+	public HashSet<Config> getPerNodeConfigsClone() {
+		final HashSet<Config> set = new HashSet<Config>();
+		for (final Config c: perNodeConfigs) {
+			set.add(c.clone());
+		}
+		return set;
+	}
+
+	public void setPerNodeConfigs(final HashSet<Config> perNodeConfigs) {
 		firePropertyChange(PROPERTYNAME_PER_NODE_CONFIGS, this.perNodeConfigs, this.perNodeConfigs = perNodeConfigs);
 	}
 
