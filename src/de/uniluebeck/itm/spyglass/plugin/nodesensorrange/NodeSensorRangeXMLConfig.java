@@ -144,7 +144,6 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		}
 
 		public int getLineWidth() {
-			log.info("Got from "+super.hashCode()+" linewidth "+lineWidth);
 			return lineWidth;
 		}
 
@@ -157,7 +156,6 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		}
 
 		public void setLineWidth(final int lineWidth) {
-			log.info("set linewith on "+super.hashCode()+" from "+this.lineWidth+" to "+lineWidth);
 			firePropertyChange(PROPERTYNAME_LINE_WIDTH, this.lineWidth, this.lineWidth = lineWidth);
 		}
 
@@ -190,7 +188,6 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 				copy.colorRGB = this.colorRGB.clone();
 				copy.range = this.range.clone();
 
-				log.info("Cloned "+super.hashCode()+" to "+copy.hashCodeOrig());
 				return copy;
 			} catch (final CloneNotSupportedException e) {
 				throw new RuntimeException("Bug", e);
