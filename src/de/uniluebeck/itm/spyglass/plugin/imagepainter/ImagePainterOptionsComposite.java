@@ -272,28 +272,26 @@ public class ImagePainterOptionsComposite extends Composite {
 				final UpdateValueStrategy uvs = new UpdateValueStrategy() {
 					@Override
 					public Object convert(final Object value) {
-						try {
+						// Exception occurs when user has entered an empty string, in this
+						// case we'll return 0
+						if ((value != null) && !value.equals("")) {
 							final int intValue = Integer.parseInt(((String) value).replaceAll("\\.", ""));
 							return (int) Math.ceil(intValue / imgRatio);
-						} catch (final NumberFormatException e) {
-							// Exception occurs when user has entered an empty string, in this
-							// case we'll return 0
-							return 0;
 						}
-
+						return 0;
 					}
 				};
 				final UpdateValueStrategy uvs2 = new UpdateValueStrategy() {
 					@Override
 					public Object convert(final Object value) {
-						try {
+						// Exception occurs when user has entered an empty string, in this
+						// case we'll return 0
+						if ((value != null) && !value.equals("")) {
 							final int intValue = Integer.parseInt(((String) value).replaceAll("\\.", ""));
 							return (int) Math.ceil(intValue * imgRatio);
-						} catch (final NumberFormatException e) {
-							// Exception occurs when user has entered an empty string, in this
-							// case we'll return 0
-							return 0;
 						}
+						return 0;
+
 					}
 				};
 				lockBinding = dbc.bindValue(SWTObservables.observeText(imageSizeWidthText, SWT.Modify), SWTObservables.observeText(
