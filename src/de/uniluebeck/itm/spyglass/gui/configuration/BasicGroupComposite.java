@@ -164,11 +164,11 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 		}
 
 		// disable the visibility field if plug-in is inactive
-		// XXX: disabled since this produces strange errors.
 		{
-			// dbc.bindValue(SWTObservables.observeEnabled(this.isVisible), SWTObservables
-			// .observeSelection(this.isActive), new UpdateValueStrategy(
-			// UpdateValueStrategy.POLICY_NEVER), null);
+			dbc.bindValue(SWTObservables.observeEnabled(this.isVisible),
+						  SWTObservables.observeSelection(this.isActive),
+						  null,
+						  null);
 		}
 	}
 
