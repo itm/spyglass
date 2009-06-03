@@ -10,6 +10,7 @@ package de.uniluebeck.itm.spyglass.plugin.springembedderpositioner;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -61,8 +62,11 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	 * 
 	 * Set concurrency level to "2", since only two threads (PacketHandler and the TimeoutTimer)
 	 * will modify the map.
+	 * 
+	 * The first PositionData in the array is the real node position. The second PositionData is the
+	 * position calculated by the SpringEmbedder. Ther must always be 2 PositionData for each node.
 	 */
-	private volatile Map<Integer, PositionData> nodeMap = new ConcurrentHashMap<Integer, PositionData>(16, 0.75f, 2);
+	private volatile Map<Integer, PositionDataSE> nodeMap = new ConcurrentHashMap<Integer, PositionDataSE>(16, 0.75f, 2);
 
 	public SpringEmbedderPositionerPlugin() {
 		xmlConfig = new SpringEmbedderPositionerXMLConfig();
@@ -108,9 +112,9 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
-		final PositionData d = nodeMap.get(nodeId);
+		final PositionDataSE d = nodeMap.get(nodeId);
 
-		return d != null ? d.position : null;
+		return d != null ? d.sePosition : null;
 	}
 
 	@Override
@@ -170,24 +174,25 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		final int id = packet.getSenderId();
 
 		// check if we already know about this node
-		final PositionData oldData = nodeMap.get(id);
+		final PositionDataSE oldData = nodeMap.get(id);
 
-		// if node is already known, change the "last-seen" value
+		// if node is already known, change the "last-seen" value and the position
 		if (oldData != null) {
 			log.debug("Node " + id + " already exists");
 			oldData.lastSeen = System.currentTimeMillis();
+			oldData.position = packet.getPosition().clone();
 			this.nodeMap.put(id, oldData);
 		}
 		// otherwise create a new entry into the map and fire a NodePositionEvent
 		else {
 
 			// log.debug("Node " + id + " added at pos (" + nextX + ", " + nextY + ")");
-			final AbsolutePosition newPos = new AbsolutePosition(nextX, nextY);
-			this.nodeMap.put(id, new PositionData(newPos, System.currentTimeMillis()));
+			final AbsolutePosition sePos = new AbsolutePosition(nextX, nextY);
+			this.nodeMap.put(id, new PositionDataSE(packet.getPosition().clone(), sePos, System.currentTimeMillis()));
 			nextX += rand.nextInt(100) - 50;
 			nextY += rand.nextInt(100) - 50;
 
-			pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.ADDED, null, newPos));
+			pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.ADDED, null, sePos));
 		}
 
 		// Check wether the current packet is a neighbourhood package
@@ -232,12 +237,12 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 			final Iterator<Integer> it = nodeMap.keySet().iterator();
 			while (it.hasNext()) {
 				final int id = it.next();
-				final PositionData data = nodeMap.get(id);
+				final PositionDataSE data = nodeMap.get(id);
 				if (data != null) {
 					final long time = data.lastSeen;
 					if (System.currentTimeMillis() - time > xmlConfig.getTimeout() * 1000) {
 
-						final AbsolutePosition oldPos = data.position;
+						final AbsolutePosition oldPos = data.sePosition;
 
 						// remove the element from our map
 						it.remove();
@@ -263,23 +268,23 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 		try {
 			final List<NodePositionEvent> list = new ArrayList<NodePositionEvent>();
-			final Map<Integer, PositionData> newMap = new ConcurrentHashMap<Integer, PositionData>(16, 0.75f, 2);
+			final Map<Integer, PositionDataSE> newMap = new ConcurrentHashMap<Integer, PositionDataSE>(16, 0.75f, 2);
 
 			final Iterator<Integer> it = nodeMap.keySet().iterator();
 
 			while (it.hasNext()) {
 				final int id = it.next();
 
-				final PositionData data = nodeMap.get(id).clone();
+				final PositionDataSE data = nodeMap.get(id).clone();
 
 				if (data != null) {
 
-					final AbsolutePosition oldPos = data.position.clone();
+					final AbsolutePosition oldPos = data.sePosition.clone();
 
 					// change position
 					final AbsolutePosition newPos = this.springEmbedding(id);
 
-					data.position = newPos;
+					data.sePosition = newPos;
 
 					newMap.put(id, data);
 
@@ -312,9 +317,9 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 			final double repFactor = xmlConfig.getRepulsionFactor();
 			final double epsilon = xmlConfig.getEfficiencyFactor();
 
-			final PositionData data = nodeMap.get(id);
+			final PositionDataSE data = nodeMap.get(id);
 
-			final AbsolutePosition cur = data.position.clone();
+			final AbsolutePosition cur = data.sePosition.clone();
 			final AbsolutePosition force = new AbsolutePosition(0, 0, 0);
 
 			final Iterator<Integer> it = nodeMap.keySet().iterator();
@@ -324,7 +329,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 			while (it.hasNext()) {
 				final int id2 = it.next();
 				if (id2 != id) {
-					final AbsolutePosition other = nodeMap.get(id2).position.clone();
+					final AbsolutePosition other = nodeMap.get(id2).sePosition.clone();
 					AbsolutePosition dist;
 					double[] tmp;
 
@@ -380,7 +385,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 			// reduce the force by the given factor (must only be between 0 an 1)
 			force.mult(epsilon);
 
-			final AbsolutePosition result = nodeMap.get(id).position.clone();
+			final AbsolutePosition result = nodeMap.get(id).sePosition.clone();
 			result.add(force);
 			return result;
 		} catch (final Exception e) {
@@ -403,6 +408,41 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		result[2] = (vector.z) / divisor;
 
 		log.debug("division result: (" + result[0] + ", " + result[1] + ", " + result[2] + ")");
+		return result;
+	}
+
+	@Override
+	public void addNodes(final Map<Integer, PositionData> oldNodeMap) {
+		final Iterator<Integer> it = oldNodeMap.keySet().iterator();
+
+		while (it.hasNext()) {
+			final Integer key = it.next();
+			final PositionData posData = oldNodeMap.get(key);
+			final PositionDataSE tmp = new PositionDataSE(posData.position, posData.position, posData.lastSeen);
+			nodeMap.put(key, tmp);
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin#getNodeMap()
+	 */
+	@Override
+	public Map<Integer, PositionData> getNodeMap() {
+		final Map<Integer, PositionData> result = new HashMap<Integer, PositionData>();
+
+		final Iterator<Integer> it = nodeMap.keySet().iterator();
+
+		while (it.hasNext()) {
+			final Integer key = it.next();
+			final PositionDataSE tmp = nodeMap.get(key);
+			final PositionData posData = new PositionData(tmp.position, tmp.lastSeen);
+
+			result.put(key, posData);
+		}
+
 		return result;
 	}
 

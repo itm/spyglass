@@ -66,7 +66,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	@Override
 	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
-		
+
 		timer = new Timer("PositionPacketNodePositioner NodeTimeout-Timer");
 
 		// Check every second for old nodes
@@ -207,6 +207,22 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	public void shutdown() throws Exception {
 		super.shutdown();
 		this.timer.cancel();
+	}
+
+	@Override
+	public void addNodes(final Map<Integer, PositionData> oldNodeMap) {
+		nodeMap.putAll(oldNodeMap);
+	}
+
+	// --------------------------------------------------------------------------------
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin#getNodeMap()
+	 */
+	@Override
+	public Map<Integer, PositionData> getNodeMap() {
+		return this.nodeMap;
 	}
 
 }

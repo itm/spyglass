@@ -9,8 +9,10 @@
 package de.uniluebeck.itm.spyglass.plugin.nodepositioner;
 
 import java.util.List;
+import java.util.Map;
 
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionData;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 
 // --------------------------------------------------------------------------------
@@ -55,6 +57,21 @@ public abstract class NodePositionerPlugin extends Plugin {
 	 * @return a list of node-IDs
 	 */
 	public abstract List<Integer> getNodeList();
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns a list of all nodes and the appropriate PositionData objects that this
+	 * NodePositionPlugin currently has location information for
+	 * 
+	 * @return a Map containg node-IDs and PositionData objects
+	 */
+	public abstract Map<Integer, PositionData> getNodeMap();
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Add all nodes and its position information that the given Map contains into the nodeMap
+	 */
+	public abstract void addNodes(final Map<Integer, PositionData> oldNodeMap);
 
 	// --------------------------------------------------------------------------------
 	/**

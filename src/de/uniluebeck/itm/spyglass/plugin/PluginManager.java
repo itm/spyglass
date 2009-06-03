@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.event.EventListenerList;
 
@@ -35,6 +36,7 @@ import de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangePlugin;
 import de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin;
+import de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionData;
 import de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin;
 import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin;
@@ -490,6 +492,10 @@ public class PluginManager {
 		synchronized (plugins) {
 			for (final Plugin p : plugins) {
 				if ((p instanceof NodePositionerPlugin) && (p != plugin) && p.isActive()) {
+
+					final Map<Integer, PositionData> oldNodeMap = ((NodePositionerPlugin) p).getNodeMap();
+					((NodePositionerPlugin) plugin).addNodes(oldNodeMap);
+
 					p.getXMLConfig().setActive(false);
 					log.debug("Disabled " + p);
 
