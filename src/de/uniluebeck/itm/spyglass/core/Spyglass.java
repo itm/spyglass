@@ -56,7 +56,6 @@ public class Spyglass {
 
 	private boolean throttleBBoxUpdates = false;
 
-
 	public boolean isThrottleBBoxUpdates() {
 		return throttleBBoxUpdates;
 	}
@@ -126,9 +125,6 @@ public class Spyglass {
 		// Shutdown the packetProducerTask
 		executor.shutdownNow();
 
-		// TODO: not sure if this will even be executed, since were shutting down the configStore
-		// right after
-		configStore.store();
 		try {
 			configStore.shutdown();
 		} catch (final InterruptedException e) {
@@ -138,7 +134,7 @@ public class Spyglass {
 		// shutdown all plug-ins
 		pluginManager.shutdown();
 
-		log.info("Spyglass shut down.");
+		log.info("Spyglass was shut down.");
 	}
 
 	// --------------------------------------------------------------------------

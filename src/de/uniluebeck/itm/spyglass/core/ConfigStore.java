@@ -77,13 +77,13 @@ public class ConfigStore extends PropertyBean {
 					Thread.currentThread().interrupt();
 
 				} finally {
-					if (!Thread.currentThread().isInterrupted()) {
 
+					synchronized (storePendingMutex) {
 						// allow new store requests to be made
 						storePending = false;
-
 						storeSync(SpyglassEnvironment.getConfigFilePath());
 					}
+
 				}
 			}
 		}
@@ -199,7 +199,6 @@ public class ConfigStore extends PropertyBean {
 
 		storeThread.start();
 
-		// TODO: for Milestone2: register for events from the PacketReader
 	}
 
 	private void registerListener() {
@@ -237,7 +236,10 @@ public class ConfigStore extends PropertyBean {
 	// --------------------------------------------------------------------------
 	/**
 	 * Overwrites the current config with the one inside the given file.
-	 *
+	 * 
+	 * @param file
+	 *            the configuration file
+	 * 
 	 * @throws Exception
 	 *
 	 */
@@ -327,7 +329,6 @@ public class ConfigStore extends PropertyBean {
 	 */
 	public void store() {
 		synchronized (storePendingMutex) {
-
 			// log.debug("Waking up async-store thread.");
 			this.storePending = true;
 			this.storePendingMutex.notifyAll();
@@ -385,7 +386,6 @@ public class ConfigStore extends PropertyBean {
 	 *             if the excecuting thread is interrupted while this method is called.
 	 */
 	public void shutdown() throws InterruptedException {
-
 		storeThread.interrupt();
 		storeThread.join();
 	}
