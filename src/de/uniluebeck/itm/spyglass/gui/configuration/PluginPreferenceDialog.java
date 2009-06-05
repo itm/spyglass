@@ -319,8 +319,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			}
 		}
 
-		public void selectPluginManagerPreferenceNode() {
-			selectPreferenceNodeInternal(pluginManagerPreferenceNode.getId(), true);
+		public void selectPluginManagerPreferenceNode(final boolean testForUnsavedChanges) {
+			selectPreferenceNodeInternal(pluginManagerPreferenceNode.getId(), testForUnsavedChanges);
 		}
 
 		public void selectPreferenceNode(final Plugin p) {
@@ -862,7 +862,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 	private void onPluginRemoved(final Plugin p) {
 		removePreferenceNode(instancePreferenceNodes.get(p), preferenceManager.getRootSubNodes());
-		preferenceDialog.selectPluginManagerPreferenceNode();
+		preferenceDialog.selectPluginManagerPreferenceNode(false);
 	}
 
 	// --------------------------------------------------------------------------------
