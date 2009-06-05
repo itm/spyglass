@@ -1,6 +1,5 @@
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
-import java.io.File;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,7 +43,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -75,6 +73,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 	private class CustomPreferenceDialog extends PreferenceDialog implements IPageChangedListener, DisposeListener {
 
+		private IPreferenceNode lastSelectedPreferencePage;
+
 		public CustomPreferenceDialog(final Shell parentShell, final PreferenceManager preferenceManager) {
 			super(parentShell, preferenceManager);
 			setShellStyle(SWT.DIALOG_TRIM | SWT.RESIZE | getDefaultOrientation());
@@ -83,29 +83,27 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 		private boolean internalShowPage(final IPreferenceNode node, final boolean testForUnsavedChanges) {
 			if (testForUnsavedChanges) {
-				final boolean abort = askToSaveChanges();
-				if (abort) {
 
+				final int decision = askToSaveChanges();
+
+				if ((decision == 0) || (decision == 1)) {
+					// it's safe to go on for page change, since there were no unsaved changes or
+					// user saved or discarded them in the dialog
+				} else if (decision == 2) {
 					// return to previous page if the user wishes so
-					if (getSelectedPage() instanceof PluginPreferencePage<?, ?>) {
-						selectPreferenceNodeInternal(preferenceDialog.getSelectedNodePreference(), false);
-					} else if (preferenceDialog.getSelectedPage() instanceof GeneralPreferencePage) {
-						selectPreferenceNodeInternal(NODE_ID_GENERAL_SETTINGS, false);
-					} else if (preferenceDialog.getSelectedPage() instanceof PluginManagerPreferencePage) {
-						selectPreferenceNodeInternal(NODE_ID_PLUGINMANAGER, false);
-					} else {
-						log.error("Dont know " + preferenceDialog.getSelectedPage());
-					}
+					selectPreferenceNodeInternal(lastSelectedPreferencePage.getId(), false);
 					return true;
 				}
 			}
 			final GridData data = (GridData) getTreeViewer().getControl().getLayoutData();
 			data.widthHint = 230;
+			lastSelectedPreferencePage = node;
 			return super.showPage(node);
 		}
 
 		@Override
 		protected boolean showPage(final IPreferenceNode node) {
+
 			final IPreferencePage oldPage = super.getCurrentPage();
 
 			if (node.getPage() != oldPage) {
@@ -748,13 +746,6 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		return PluginPreferenceDialog.class.getResource(suffix);
 	}
 
-	private File getSaveLoadFileFromUser(final int swtStyle) {
-		final FileDialog fd = new FileDialog(preferenceDialog.getShell(), swtStyle);
-		fd.setFilterExtensions(new String[] { "*.xml" });
-		final String path = fd.open();
-		return path == null ? null : new File(path);
-	}
-
 	@SuppressWarnings("unchecked")
 	private PluginPreferencePage<? extends Plugin, ? extends PluginXMLConfig> getTypePreferencePage(final Class<? extends Plugin> clazz) {
 
@@ -819,24 +810,45 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	 * a preference page. In respect to the type of the preference page, the user will be offered
 	 * the opportunity to store the changes before leaving the page.
 	 * 
-	 * @returns true if the user aborted the page change (because she didn't save her changes)
+	 * @returns <ul>
+	 *          <li>0 if there were no unsaved changes or there were unsaved changes and the user
+	 *          decided to save them</li>
+	 *          <li>1 if there were unsaved changes and the user decided to discard them</li>
+	 *          <li>2 if there were unsaved changes and the user decided to cancel page change</li>
+	 *          </ul>
 	 */
-	private boolean askToSaveChanges() {
+	private int askToSaveChanges() {
+
 		if (hasUnsavedChanges()) {
-			final String message = "The currently opened preference page contains unsaved changes. Do you want to save now?";
 
 			final AbstractDatabindingPreferencePage selectedPrefPage = (AbstractDatabindingPreferencePage) preferenceDialog.getSelectedPage();
 
-			if ((selectedPrefPage != null) && (selectedPrefPage instanceof AbstractDatabindingPreferencePage)
-					&& MessageDialog.openQuestion(preferenceDialog.getShell(), "Unsaved changes", message)) {
-				selectedPrefPage.performApply();
-				return false;
+			if ((selectedPrefPage != null) && (selectedPrefPage instanceof AbstractDatabindingPreferencePage)) {
+
+				final String message = "The currently opened preference page contains unsaved changes. Do you want to save now?";
+				final MessageDialog dialog = new MessageDialog(preferenceDialog.getShell(), "Unsaved changes", null, message, SWT.ICON_QUESTION,
+						new String[] { "Save", "Discard", "Cancel" }, 0);
+				final int answer = dialog.open();
+
+				if (answer == 0) {
+					// save the changes
+					selectedPrefPage.performApply();
+				} else if (answer == 1) {
+					// discard the changes
+					selectedPrefPage.loadFromModel();
+				}
+
+				return answer;
+
 			} else {
-				return true;
+				// there are unsaved changes
+				return 2;
 			}
 
 		}
-		return false;
+
+		// there are no unsaved changes
+		return 0;
 	}
 
 	private boolean isAbstract(final Class<? extends Plugin> clazz) {
@@ -890,13 +902,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 	private boolean proceedIfUnsavedChanges() {
 
-		if (hasUnsavedChanges()) {
-			final String message = "The currently opened preference page contains unsaved changes. Are you sure you want to proceed?";
-			final boolean ok = MessageDialog.openQuestion(preferenceDialog.getShell(), "Unsaved changes", message);
-			return ok;
-		}
-
-		return true;
+		final int decision = askToSaveChanges();
+		return (decision == 0) || (decision == 1);
 
 	}
 
