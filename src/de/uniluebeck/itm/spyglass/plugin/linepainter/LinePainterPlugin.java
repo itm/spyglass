@@ -227,6 +227,11 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		final long now = System.currentTimeMillis();
 		final long timeoutInMs = 1000 * config.getTimeout();
 
+		// if timeout is 0 it means there's no timeout, so we don't have to remove any edges...
+		if (timeoutInMs == 0) {
+			return;
+		}
+
 		final List<LinePainterLine> dos = new ArrayList<LinePainterLine>();
 
 		synchronized (lock) {
