@@ -10,6 +10,7 @@ package de.uniluebeck.itm.spyglass.plugin;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.EventListener;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -17,6 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import javax.swing.event.EventListenerList;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.events.MouseEvent;
 import org.simpleframework.xml.Root;
 
@@ -112,7 +114,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Start/STop the consumer-thread when the plug-in is activated/deactivated.
+	 * Start/Stop the consumer-thread when the plug-in is activated/deactivated.
 	 */
 	private PropertyChangeListener propertyActiveListener = new PropertyChangeListener() {
 
@@ -130,6 +132,29 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 			}
 		}
 
+	};
+
+	/**
+	 * PropertyChangeListener that gets registered for the property 'active' of all plug-ins. Checks
+	 * if the plug-in needs metrics support and checks if the currently active node positioner
+	 * offers metrics. In case of incompatibility the plug-in is deactivated and the user gets
+	 * notified by a small MessageDialog.
+	 */
+	private PropertyChangeListener metricSupportPropertyChangeListener = new PropertyChangeListener() {
+		@Override
+		public void propertyChange(final PropertyChangeEvent evt) {
+			// if plug-in gets activated and it needs metric support from the node positioner
+			if ((Boolean) evt.getNewValue()) {
+				// if the node positioner doesn't offer metrics we'll disable the plug-in and inform
+				// the user
+				if (!pluginManager.getNodePositioner().offersMetric()) {
+					getXMLConfig().setActive(false);
+					MessageDialog.openWarning(null, "Plug-in cannot be activated", "The plug-in that you tried to activate (\"" + getInstanceName()
+							+ "\") cannot be activated because it needs metrics support and the currently "
+							+ "active NodePositioner doesn't offer metrics. Therefore it ");
+				}
+			}
+		}
 	};
 
 	// --------------------------------------------------------------------------------
@@ -248,6 +273,33 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		// add a property change listener to the config
 		getXMLConfig().addPropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, propertyActiveListener);
 
+		if (needsMetrics()) {
+
+			// check if there's an active node positioner supporting metrics, otherwise deactivate
+			// ourselves
+			if (!pluginManager.getNodePositioner().offersMetric()) {
+				getXMLConfig().setActive(false);
+			}
+
+			getXMLConfig().addPropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, metricSupportPropertyChangeListener);
+		}
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Checks if this plugin needs metrics by checking if it inherits from {@link NeedsMetric}.
+	 * 
+	 * @return <code>true</code> if this plugin inherits from {@link NeedsMetric},
+	 *         <code>false</code> otherwise
+	 */
+	public final boolean needsMetrics() {
+		for (final Type t : this.getClass().getGenericInterfaces()) {
+			if (t.equals(NeedsMetric.class)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -355,8 +407,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @throws Exception
 	 *             any kind of exception
 	 */
-	public boolean handleEvent(@SuppressWarnings("unused") final MouseEvent e, @SuppressWarnings("unused") final DrawingArea drawingArea)
-			throws Exception {
+	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) throws Exception {
 		return false;
 	}
 
@@ -597,6 +648,10 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 		state = State.ZOMBIE;
 
 		getXMLConfig().removePropertyChangeListener(propertyActiveListener);
+
+		if (needsMetrics()) {
+			getXMLConfig().removePropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, metricSupportPropertyChangeListener);
+		}
 
 		// stop the consumer thread
 		stopPacketConsumerThread();

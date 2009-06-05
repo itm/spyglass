@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.swing.event.EventListenerList;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.load.Commit;
@@ -141,6 +142,78 @@ public class PluginManager {
 			createNewPlugin(PositionPacketNodePositionerPlugin.class, null);
 		} catch (final Exception e) {
 			throw new RuntimeException("Could not create default node positioner plug-in. Smells like a bug...");
+		}
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * To be called BEFORE changing the NodePositioner plug-in. Checks if the newly selected
+	 * NodePositioner offers metrics, and, if not, disables all plug-ins that need metrics and
+	 * informs the user about that by displaying a DialogBox.
+	 * 
+	 * @param selectedPlugin
+	 * @return <code>true</code> if the NodePositionerPlugin <code>selectedPlugin</code> can safely
+	 *         be activated, <code>false</code> if not or the user chose to abort activation
+	 */
+	public boolean assureMetricsAllRight(final NodePositionerPlugin selectedPlugin) {
+
+		if (selectedPlugin.offersMetric()) {
+
+			// if the selected plug-in offers metrics the newly chosen NodePositioner can work with
+			// all plug-ins without problems
+			return true;
+
+		} else {
+
+			// check active plug-ins for plug-ins that don't work without metric support
+			final LinkedList<Plugin> pluginsToDeactivate = new LinkedList<Plugin>();
+			for (final Plugin p : getActivePlugins()) {
+				if (p.needsMetrics()) {
+					pluginsToDeactivate.add(p);
+				}
+			}
+
+			// if there are plug-ins to deactivate so that all plug-ins can work error-free with the
+			// new NodePositioner
+			if (pluginsToDeactivate.size() > 0) {
+
+				// fill a StringBuffer containing the names of all plug-ins that must be deactivated
+				// in order to allow for a NodePositioner that doesn't support metrics
+				final StringBuffer pluginNamesBuffer = new StringBuffer();
+				for (final Plugin p : pluginsToDeactivate) {
+					try {
+						pluginNamesBuffer.append("\"" + p.getInstanceName() + "\" ("
+								+ ((String) p.getClass().getMethod("getHumanReadableName").invoke(p)) + ")\r\n");
+					} catch (final Exception e1) {
+						log.fatal("This should not occur. Maybe somebody changed the plugin-interface?");
+					}
+				}
+
+				if (MessageDialog.openConfirm(null, "NodePositioner without metric support chosen",
+						"You chose a NodePositioner that doesn't support metrics. As some plug-ins require metrics, "
+								+ "the following have been disabled to avoid unpredictable behavior:\r\n\r\n" + pluginNamesBuffer.toString())) {
+
+					// deactivate all plug-ins
+					for (final Plugin p : pluginsToDeactivate) {
+						p.getXMLConfig().setActive(false);
+					}
+
+					// incompatible plug-ins have been disabled, so the new NodePositioner is
+					// allowed to be activated
+					return true;
+				}
+
+				// user chose not to disable plug-ins, so the new NodePositioner is not allowed to
+				// be activated
+				return false;
+
+			}
+
+			// there are no plug-ins that must be deactivated, so the new NodePositioner can be
+			// activated safely
+			return true;
+
 		}
 
 	}
@@ -395,11 +468,18 @@ public class PluginManager {
 					final Boolean activeOld = (Boolean) evt.getOldValue();
 					final Boolean activeNew = (Boolean) evt.getNewValue();
 					if (activeNew && !activeOld) {
-						// the plug-in got activated
 
-						newNodePositioner(plugin);
+						if (!assureMetricsAllRight((NodePositionerPlugin) plugin)) {
 
-						firePluginListChangedEvent(plugin, ListChangeEvent.NEW_NODE_POSITIONER);
+							((PluginXMLConfig) evt.getSource()).setActive(false);
+
+						} else {
+
+							// the plug-in got activated
+							newNodePositioner(plugin);
+							firePluginListChangedEvent(plugin, ListChangeEvent.NEW_NODE_POSITIONER);
+
+						}
 
 					} else if (activeOld && !activeNew) {
 						// the plug-in got deactivated

@@ -2,7 +2,6 @@ package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -39,7 +38,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
-import de.uniluebeck.itm.spyglass.plugin.NeedsMetric;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
@@ -91,31 +89,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		@Override
 		protected void setValue(final Object arg0, final Object arg1) {
-			boolean doIt = true;
+
 			final int selected = ((Integer) arg1);
 			final boolean selectedTrue = selected == 0;
-			final Plugin p = (Plugin) arg0;
-			final boolean npOffersMetric = spyglass.getPluginManager().getNodePositioner().offersMetric();
 
-			if (!npOffersMetric && selectedTrue) {
-				for (final Type t : p.getClass().getGenericInterfaces()) {
-					if (t.equals(NeedsMetric.class)) {
-						doIt = false;
-					}
-				}
-			}
-
-			if (doIt) {
-
-				((Plugin) arg0).setActive(selectedTrue);
-				pluginTableViewer.update(arg0, new String[] { COLUMN_ACTIVE });
-
-			} else {
-
-				MessageDialog.openWarning(getShell(), "Plug-in can't be activated", "The plug-in"
-						+ " can not be activated as it needs metrics support and the currently active NodePosition doesn't offer metrics.");
-
-			}
+			((Plugin) arg0).setActive(selectedTrue);
+			pluginTableViewer.update(arg0, new String[] { COLUMN_ACTIVE });
 		}
 	}
 
@@ -314,7 +293,11 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		@Override
 		public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
-			npComboViewer.refresh();
+			// if npComboViewer is still null it means that user hasn't yet visited this
+			// preference page and therefore createContents has not yet been called
+			if (npComboViewer != null) {
+				npComboViewer.refresh();
+			}
 		}
 
 		@Override
@@ -494,7 +477,11 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		@Override
 		public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
-			pluginTableViewer.refresh();
+			// if pluginTableViewer is still null it means that user hasn't yet visited this
+			// preference page and therefore createContents has not yet been called
+			if (pluginTableViewer != null) {
+				pluginTableViewer.refresh();
+			}
 		}
 
 		@Override
@@ -708,9 +695,6 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 				final IStructuredSelection selection = (IStructuredSelection) e.getSelection();
 				final NodePositionerPlugin selectedPlugin = (NodePositionerPlugin) selection.getFirstElement();
-
-				// warning if switching to NodePositioner without metric system
-				pluginPreferenceDialog.assureMetricsAllRight(selectedPlugin);
 
 				selectedPlugin.getXMLConfig().setActive(true);
 			}
