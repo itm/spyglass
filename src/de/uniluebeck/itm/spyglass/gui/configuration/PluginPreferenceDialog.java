@@ -2,11 +2,13 @@ package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,9 +53,11 @@ import org.eclipse.swt.widgets.Shell;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.actions.LoadConfigurationAction;
 import de.uniluebeck.itm.spyglass.gui.actions.StoreConfigurationAction;
+import de.uniluebeck.itm.spyglass.plugin.NeedsMetric;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -86,7 +90,6 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 				if (abort) {
 
 					// return to previous page if the user wishes so
-
 					if (getSelectedPage() instanceof PluginPreferencePage<?, ?>) {
 						selectPreferenceNodeInternal(preferenceDialog.getSelectedNodePreference(), false);
 					} else if (preferenceDialog.getSelectedPage() instanceof GeneralPreferencePage) {
@@ -189,6 +192,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 		private MenuItem menuItemDeleteInstance;
 
+		private Shell newShell;
+
 		@Override
 		protected TreeViewer createTreeViewer(final Composite parent) {
 
@@ -266,6 +271,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 		@Override
 		protected void configureShell(final Shell newShell) {
+			this.newShell = newShell;
 			super.configureShell(newShell);
 			newShell.setText("SpyGlass Preferences");
 			newShell.addDisposeListener(this);
@@ -306,6 +312,7 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		@SuppressWarnings("unchecked")
 		@Override
 		public void widgetDisposed(final DisposeEvent e) {
+			newShell.removeDisposeListener(this);
 			spyglass.getPluginManager().removePluginListChangeListener(PluginPreferenceDialog.this);
 			for (final PluginPreferenceNode ppn : instancePreferenceNodes.values()) {
 				((PluginPreferencePage) ppn.getPage()).removePropertyChangeListeners();
@@ -938,6 +945,74 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 		} catch (final Exception e) {
 			log.error("Error while spyglassing.", e);
 		}
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * To be called BEFORE changing the NodePositioner plug-in. Checks if the newly selected
+	 * NodePositioner offers metrics, and, if not, disables all plug-ins that need metrics and
+	 * informs the user about that by displaying a DialogBox.
+	 * 
+	 * @param selectedPlugin
+	 */
+	public void assureMetricsAllRight(final NodePositionerPlugin selectedPlugin) {
+
+		if (!(selectedPlugin.offersMetric())) {
+
+			// check active plug-ins for plug-ins that don't work without metric
+			// support, disable them and inform user about that step
+			final LinkedList<Plugin> pluginsToDeactivate = new LinkedList<Plugin>();
+			for (final Plugin p : spyglass.getPluginManager().getActivePlugins()) {
+				for (final Type t : p.getClass().getGenericInterfaces()) {
+					if (t.equals(NeedsMetric.class)) {
+						pluginsToDeactivate.add(p);
+					}
+				}
+			}
+
+			if (pluginsToDeactivate.size() > 0) {
+
+				final StringBuffer pluginNamesBuffer = new StringBuffer();
+				for (final Plugin p : pluginsToDeactivate) {
+					try {
+
+						pluginNamesBuffer.append("\"" + p.getInstanceName() + "\" ("
+								+ ((String) p.getClass().getMethod("getHumanReadableName").invoke(p)) + ")\r\n");
+
+						// deactivate plug-in
+						p.getXMLConfig().setActive(false);
+
+					} catch (final Exception e1) {
+						log.fatal("This should not occur. Maybe somebody changed the plugin-interface?");
+					}
+				}
+
+				final MessageDialog dialog = new MessageDialog(preferenceDialog.getShell(), "NodePositioner without metric support chosen", null,
+						"You chose a NodePositioner that doesn't support metrics. As some plug-ins require metrics, "
+								+ "the following have been disabled to avoid unpredictable behavior:\r\n\r\n" + pluginNamesBuffer.toString(),
+						SWT.ICON_WARNING, new String[] { "OK" }, 0);
+				dialog.open();
+
+			}
+
+		}
+
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param pluginManagerPreferencePage
+	 */
+	public void addDisposeListener(final DisposeListener listener) {
+		// preferenceDialog.addDisposeListener(listener);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param pluginListChangeListener
+	 */
+	public void removeDisposeListener(final DisposeListener listener) {
+		// preferenceDialog.getShell().removeDisposeListener(listener);
 	}
 
 }

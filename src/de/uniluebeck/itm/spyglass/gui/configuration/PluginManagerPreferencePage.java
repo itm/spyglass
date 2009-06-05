@@ -2,6 +2,7 @@ package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -38,13 +39,32 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.plugin.NeedsMetric;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
+// --------------------------------------------------------------------------------
+/**
+ * Preference page to display all currently active plug-ins. Allows to:
+ * 
+ * <ul>
+ * <li>manage the drawing order of the plug-ins</li>
+ * <li>one-click activating and deactivating of plug-ins</li>
+ * <li>changing the active NodePositioner plug-in instance</li>
+ * </ul>
+ * 
+ * @author Daniel Bimschas
+ */
 public class PluginManagerPreferencePage extends PreferencePage {
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Used for editing support of column 'active' of the plug-in table.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class ActiveEditing extends EditingSupport {
 
 		private final ComboBoxCellEditor cellEditor;
@@ -71,13 +91,40 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		@Override
 		protected void setValue(final Object arg0, final Object arg1) {
+			boolean doIt = true;
 			final int selected = ((Integer) arg1);
-			((Plugin) arg0).setActive(selected == 0 ? true : false);
-			pluginTableViewer.update(arg0, new String[] { COLUMN_ACTIVE });
-		}
+			final boolean selectedTrue = selected == 0;
+			final Plugin p = (Plugin) arg0;
+			final boolean npOffersMetric = spyglass.getPluginManager().getNodePositioner().offersMetric();
 
+			if (!npOffersMetric && selectedTrue) {
+				for (final Type t : p.getClass().getGenericInterfaces()) {
+					if (t.equals(NeedsMetric.class)) {
+						doIt = false;
+					}
+				}
+			}
+
+			if (doIt) {
+
+				((Plugin) arg0).setActive(selectedTrue);
+				pluginTableViewer.update(arg0, new String[] { COLUMN_ACTIVE });
+
+			} else {
+
+				MessageDialog.openWarning(getShell(), "Plug-in can't be activated", "The plug-in"
+						+ " can not be activated as it needs metrics support and the currently active NodePosition doesn't offer metrics.");
+
+			}
+		}
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Label provider for column 'active' of the plug-in table.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class ActiveLabelProvider extends ColumnLabelProvider {
 
 		@Override
@@ -87,6 +134,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Editing support class for column 'category' of the plug-in table.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class CategoryEditing extends EditingSupport {
 
 		public CategoryEditing(final TableViewer viewer) {
@@ -115,6 +168,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Label provider for the column 'category' of the plug-in table.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class CategoryLabelProvider extends ColumnLabelProvider {
 
 		@Override
@@ -124,6 +183,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Editing support for the column 'name' of the plug-in table.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class NameEditing extends EditingSupport {
 
 		// private final TextCellEditor cellEditor;
@@ -173,6 +238,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Label provider for the column 'name' of the plug-in table.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class NameLabelProvider extends ColumnLabelProvider {
 
 		@Override
@@ -182,10 +253,27 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Content provider for the ComboBox which allows for selecting the active NodePositioner
+	 * plug-in instance.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class NodePositionerComboContentProvider implements IStructuredContentProvider, PluginListChangeListener, PropertyChangeListener {
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Constructor that sets up listeners to the list of plug-ins and to all active
+		 * NodePositioner plug-in instances
+		 */
+		public NodePositionerComboContentProvider() {
+			spyglass.getPluginManager().addPluginListChangeListener(this);
+		}
 
 		@Override
 		public void dispose() {
+			// as the constructor added listeners, we now have to remove them
 			spyglass.getPluginManager().removePluginListChangeListener(this);
 		}
 
@@ -197,17 +285,30 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
-			if (newInput != null) {
-				for (final Plugin p : spyglass.getPluginManager().getPluginInstances(NodePositionerPlugin.class, true)) {
-					p.getXMLConfig().addPropertyChangeListener(this);
-				}
-				spyglass.getPluginManager().addPluginListChangeListener(this);
-			}
+			// remove as listener from old input, add the new input
 			if (oldInput != null) {
-				for (final Plugin p : spyglass.getPluginManager().getPluginInstances(NodePositionerPlugin.class, true)) {
+				addOrRemoveListeners(false);
+			}
+			if (newInput != null) {
+				addOrRemoveListeners(true);
+			}
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Adds or removes as PropertyChangeListener to all NodePositioner plug-in instances.
+		 * 
+		 * @param add
+		 *            if <code>true</code> this content provider is added, if <code>false</code> it
+		 *            is removed
+		 */
+		private void addOrRemoveListeners(final boolean add) {
+			for (final Plugin p : spyglass.getPluginManager().getPluginInstances(NodePositionerPlugin.class, true)) {
+				if (add) {
+					p.getXMLConfig().addPropertyChangeListener(this);
+				} else {
 					p.getXMLConfig().removePropertyChangeListener(this);
 				}
-				spyglass.getPluginManager().removePluginListChangeListener(this);
 			}
 		}
 
@@ -223,6 +324,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Label provider for the ComboBox displaying the NodePositioner plug-in instances.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class NodePositionerComboLabelProvider extends LabelProvider {
 
 		@Override
@@ -232,6 +339,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Viewer for the ComboBox displaying the NodePositioner plug-in instances.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class NodePositionerComboViewer extends ComboViewer {
 
 		public NodePositionerComboViewer(final Composite parent, final int style) {
@@ -241,10 +354,14 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		@Override
 		public void refresh() {
 			super.refresh();
-			selectNodePositioner();
+			selectActiveNodePositioner();
 		}
 
-		private void selectNodePositioner() {
+		// --------------------------------------------------------------------------------
+		/**
+		 * Assures that the currently activated NodePositioner is selected in the ComboBox.
+		 */
+		private void selectActiveNodePositioner() {
 			final NodePositionerPlugin np = spyglass.getPluginManager().getNodePositioner();
 			for (int i = 0; i < listGetItemCount(); i++) {
 				if (getElementAt(i) == np) {
@@ -255,12 +372,29 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Content provider for the table that displays all plug-in instances (except of
+	 * NodePositioners).
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class PluginTableContentProvider implements IStructuredContentProvider, PluginListChangeListener, PropertyChangeListener {
 
 		private List<Plugin> plugins;
 
+		// --------------------------------------------------------------------------------
+		/**
+		 * Constructor that registers this content provider as listener to the list of plug-in
+		 * instances and the properties of the displayed plug-ins.
+		 */
+		public PluginTableContentProvider() {
+			spyglass.getPluginManager().addPluginListChangeListener(this);
+		}
+
 		@Override
 		public void dispose() {
+			// as we have registered in the constructor, we now have to remove ourselves
 			spyglass.getPluginManager().removePluginListChangeListener(this);
 		}
 
@@ -272,7 +406,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		/**
 		 * Returns all active plug-ins in increasing priority
-		 *
+		 * 
 		 * @return all active plug-ins in increasing priority
 		 */
 		@SuppressWarnings("unchecked")
@@ -287,20 +421,41 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		@Override
 		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
-			if (newInput != null) {
-				for (final Plugin p : getPlugins()) {
-					p.getXMLConfig().addPropertyChangeListener(this);
-				}
-				spyglass.getPluginManager().addPluginListChangeListener(this);
-			}
 			if (oldInput != null) {
-				for (final Plugin p : plugins) {
-					p.getXMLConfig().removePropertyChangeListener(this);
-				}
-				spyglass.getPluginManager().removePluginListChangeListener(this);
+				addOrRemoveListeners(false);
+			}
+			if (newInput != null) {
+				addOrRemoveListeners(true);
 			}
 		}
 
+		// --------------------------------------------------------------------------------
+		/**
+		 * Adds or removes as PropertyChangeListener to all plug-in instances excluding
+		 * NodePositioner plug-in instances.
+		 * 
+		 * @param add
+		 *            if <code>true</code> this content provider is added, if <code>false</code> it
+		 *            is removed
+		 */
+		private void addOrRemoveListeners(final boolean add) {
+			for (final Plugin p : getPlugins()) {
+				if (add) {
+					p.getXMLConfig().addPropertyChangeListener(this);
+				} else {
+					p.getXMLConfig().removePropertyChangeListener(this);
+				}
+			}
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 * Checks if <code>selectedPlugin</code> is the first plug-in displayed in the table.
+		 * 
+		 * @param selectedPlugin
+		 * @return <code>true</code> if the plug-in is the first in list, <code>false</code>
+		 *         otherwise
+		 */
 		public boolean isFirstInList(final Plugin selectedPlugin) {
 
 			if (selectedPlugin == null) {
@@ -315,6 +470,14 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		}
 
+		// --------------------------------------------------------------------------------
+		/**
+		 * Checks if <code>selectedPlugin</code> is the last plug-in displayed in the table.
+		 * 
+		 * @param selectedPlugin
+		 * @return <code>true</code> if the plug-in is the last in list, <code>false</code>
+		 *         otherwise
+		 */
 		public boolean isLastInList(final Plugin selectedPlugin) {
 
 			if (selectedPlugin == null) {
@@ -344,6 +507,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Editing support for the column 'type' of the plug-in table.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class TypeEditing extends EditingSupport {
 
 		public TypeEditing(final TableViewer viewer) {
@@ -372,6 +541,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Label provider for the column 'type' of the plug-in table.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class TypeLabelProvider extends ColumnLabelProvider {
 
 		@Override
@@ -381,6 +556,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Editing support for the column 'visible' of the plug-in table.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class VisibleEditing extends EditingSupport {
 
 		private final ComboBoxCellEditor cellEditor;
@@ -414,6 +595,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Label provider for the column 'visible' of the plug-in table.
+	 * 
+	 * @author Daniel Bimschas
+	 */
 	private class VisibleLabelProvider extends ColumnLabelProvider {
 
 		@Override
@@ -460,13 +647,13 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	private Button buttonUp;
 
-	private final NodePositionerComboContentProvider npComboContentProvider = new NodePositionerComboContentProvider();
+	private final NodePositionerComboContentProvider npComboContentProvider;
 
-	private final NodePositionerComboLabelProvider npComboLabelProvider = new NodePositionerComboLabelProvider();
+	private final NodePositionerComboLabelProvider npComboLabelProvider;
 
 	private NodePositionerComboViewer npComboViewer;
 
-	private final PluginTableContentProvider pluginTableContentProvider = new PluginTableContentProvider();
+	private final PluginTableContentProvider pluginTableContentProvider;
 
 	private TableViewer pluginTableViewer;
 
@@ -474,27 +661,24 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	private PluginPreferenceDialog pluginPreferenceDialog;
 
+	private PluginListChangeListener pluginListChangeListener = new PluginListChangeListener() {
+		@Override
+		public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
+			pluginTableViewer.refresh();
+		}
+	};
+
 	public PluginManagerPreferencePage(final Spyglass spyglass, final PluginPreferenceDialog pluginPreferenceDialog) {
+
 		this.spyglass = spyglass;
 		this.pluginPreferenceDialog = pluginPreferenceDialog;
 
-		// add a listener to refresh the table whenever a plugin's property changes
-		spyglass.getPluginManager().addPluginListChangeListener(new PluginListChangeListener() {
-			// --------------------------------------------------------------------------------
-			@Override
-			public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
-				p.getXMLConfig().addPropertyChangeListener(new PropertyChangeListener() {
-					// --------------------------------------------------------------------------------
-					@Override
-					public void propertyChange(final PropertyChangeEvent evt) {
-						pluginTableViewer.refresh();
-					}
-				});
-
-			}
-		});
+		npComboContentProvider = new NodePositionerComboContentProvider();
+		npComboLabelProvider = new NodePositionerComboLabelProvider();
+		pluginTableContentProvider = new PluginTableContentProvider();
 
 		noDefaultAndApplyButton();
+
 	}
 
 	private void addNodePositionerSelectionGroup(final Composite composite) {
@@ -521,14 +705,18 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 			@Override
 			public void selectionChanged(final SelectionChangedEvent e) {
+
 				final IStructuredSelection selection = (IStructuredSelection) e.getSelection();
 				final NodePositionerPlugin selectedPlugin = (NodePositionerPlugin) selection.getFirstElement();
-				// TODO warning if switching to node positioner without metric system (!!!)
+
+				// warning if switching to NodePositioner without metric system
+				pluginPreferenceDialog.assureMetricsAllRight(selectedPlugin);
+
 				selectedPlugin.getXMLConfig().setActive(true);
 			}
 
 		});
-		npComboViewer.selectNodePositioner();
+		npComboViewer.selectActiveNodePositioner();
 
 	}
 
@@ -663,12 +851,6 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	}
 
 	private void clickedButtonDown() {
-		// final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer
-		// .getSelection()).getFirstElement();
-		// final Plugin nextPlugin;
-		// final List<Plugin> plugins = pluginTableContentProvider.plugins;
-		// nextPlugin = plugins.get(plugins.indexOf(selectedPlugin) + 1);
-		// spyglass.getPluginManager().togglePluginPriorities(selectedPlugin, nextPlugin);
 		final List<Plugin> list = getSelectedPlugins((IStructuredSelection) pluginTableViewer.getSelection());
 		spyglass.getPluginManager().decreasePluginPriorities(list);
 		pluginTableViewer.refresh();
@@ -676,12 +858,6 @@ public class PluginManagerPreferencePage extends PreferencePage {
 	}
 
 	private void clickedButtonUp() {
-		// final Plugin selectedPlugin = (Plugin) ((IStructuredSelection) pluginTableViewer
-		// .getSelection()).getFirstElement();
-		// final Plugin previousPlugin;
-		// final List<Plugin> plugins = pluginTableContentProvider.plugins;
-		// previousPlugin = plugins.get(plugins.indexOf(selectedPlugin) - 1);
-		// spyglass.getPluginManager().togglePluginPriorities(selectedPlugin, previousPlugin);
 		final List<Plugin> list = getSelectedPlugins((IStructuredSelection) pluginTableViewer.getSelection());
 		spyglass.getPluginManager().increasePluginPriorities(list);
 		pluginTableViewer.refresh();
@@ -770,6 +946,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	@Override
 	public void dispose() {
+
+		spyglass.getPluginManager().removePluginListChangeListener(pluginListChangeListener);
 
 		pluginTableViewer.getTable().dispose();
 		pluginTableViewer = null;
