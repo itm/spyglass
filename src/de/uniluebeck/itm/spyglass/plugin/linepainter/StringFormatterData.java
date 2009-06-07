@@ -159,7 +159,10 @@ class StringFormatterData implements PropertyChangeListener {
 
 		// brute force re-parse all packets from packet buffer with the new string formatter
 		// settings (sub-prime performance but easy to implement ;-)
-		clear();
+		for (final Edge edge : buffer.keySet()) {
+			edge.line.setStringFormatterResult("");
+		}
+		buffer.clear();
 
 		for (final HashMap<Integer, Uint16ListPacket> packetBufferEntry : packetBuffer.values()) {
 			for (final Uint16ListPacket packet : packetBufferEntry.values()) {
@@ -286,6 +289,15 @@ class StringFormatterData implements PropertyChangeListener {
 
 		return false;
 
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param e
+	 */
+	public void removeEdge(final Edge e) {
+		buffer.remove(e);
+		packetBuffer.remove(e);
 	}
 
 }

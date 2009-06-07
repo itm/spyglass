@@ -251,6 +251,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 					}
 
 					dos.add(e.line);
+					stringFormatterData.removeEdge(e);
 					iterator.remove();
 					layer.remove(e.line);
 
@@ -343,6 +344,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 			for (final Edge e : graphData.getIncidentEdges(nodeId)) {
 				removedLines.add(e.line);
 				graphData.removeEdge(e);
+				stringFormatterData.removeEdge(e);
 				layer.remove(e.line);
 			}
 
