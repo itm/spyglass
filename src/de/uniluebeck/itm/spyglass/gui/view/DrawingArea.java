@@ -12,6 +12,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
@@ -89,6 +90,8 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	 * Listeners for the DrawingAreaTransformEvent.
 	 */
 	private volatile EventListenerList listeners = new EventListenerList();
+
+	private Rectangle lastKnownWidgetSize = null;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -741,6 +744,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	@Override
 	public void controlResized(final ControlEvent e) {
+
 		boolean isValid;
 		synchronized (transformMutex) {
 			isValid = isValidTransformation(at);
@@ -753,7 +757,15 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 			adjustToValidMatrix();
 		}
 
-		fireTransformEvent(Type.MOVE);
+		// the origin of the absolute frame of reference should always be in the lower left corner
+		if (lastKnownWidgetSize == null) {
+			final int diffH = getClientArea().height;
+			move(0, diffH);
+		} else {
+			final int diffH = lastKnownWidgetSize.height - getClientArea().height;
+			move(0, -diffH);
+		}
+		lastKnownWidgetSize = getClientArea();
 
 	}
 
