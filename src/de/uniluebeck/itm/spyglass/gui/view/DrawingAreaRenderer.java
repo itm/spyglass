@@ -25,8 +25,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
- * This class is responsible for redrawing the drawingArea when it
- * sends out a PaintEvent.
+ * This class is responsible for redrawing the drawingArea when it sends out a PaintEvent.
  *
  * @author Dariush Forouher
  *
@@ -37,7 +36,6 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 
 	private Spyglass spyglass;
 	private DrawingArea drawingArea;
-
 
 	/**
 	 * This color is used for area outside of the the map
@@ -62,6 +60,7 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 		drawingArea.setBackground(canvasBgColor);
 
 	}
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Renders the visible plug-ins.<br>
@@ -71,27 +70,7 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 	 */
 	public void paintControl(final PaintEvent e) {
 
-		e.gc.setBackground(canvasOutOfMapColor);
-
-		final PixelRectangle world = drawingArea.absRect2PixelRect(DrawingArea.getGlobalBoundingBox());
-		final PixelRectangle canvas = drawingArea.getDrawingRectangle();
-
-		final int edgeN = world.getUpperLeft().y;
-		if (edgeN > 0) {
-			e.gc.fillRectangle(0, 0, canvas.getWidth(), edgeN);
-		}
-		final int edgeE = canvas.getWidth() - world.getWidth() - world.getUpperLeft().x;
-		if (edgeE > 0) {
-			e.gc.fillRectangle(world.getWidth() + world.getUpperLeft().x, 0, edgeE, canvas.getHeight());
-		}
-		final int edgeS = canvas.getHeight() - world.getHeight() - world.getUpperLeft().y;
-		if (edgeS > 0) {
-			e.gc.fillRectangle(0, world.getHeight() + world.getUpperLeft().y, canvas.getWidth(), edgeS);
-		}
-		final int edgeW = world.getUpperLeft().x;
-		if (edgeW > 0) {
-			e.gc.fillRectangle(0, 0, edgeW, canvas.getHeight());
-		}
+		drawOutOfMapBackground(e);
 
 		e.gc.setBackground(canvasBgColor);
 
@@ -118,9 +97,34 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 				log.debug(String.format("Partial redraw (%.0f px). Time: %.03f ms (%.0f ns per pixel).", pxCount, (time2 - time) / 1000000d,
 						((time2 - time) / pxCount)));
 			} else {
-				log.debug(String.format("Complete redraw. Time: %.03f ms (%.0f ns per pixel).", (time2 - time) / 1000000d,
-						((time2 - time) / pxCount)));
-			}			}
+				log.debug(String
+						.format("Complete redraw. Time: %.03f ms (%.0f ns per pixel).", (time2 - time) / 1000000d, ((time2 - time) / pxCount)));
+			}
+		}
+	}
+
+	private void drawOutOfMapBackground(final PaintEvent e) {
+		e.gc.setBackground(canvasOutOfMapColor);
+
+		final PixelRectangle world = drawingArea.absRect2PixelRect(DrawingArea.getGlobalBoundingBox());
+		final PixelRectangle canvas = drawingArea.getDrawingRectangle();
+
+		final int edgeN = world.getUpperLeft().y;
+		if (edgeN > 0) {
+			e.gc.fillRectangle(0, 0, canvas.getWidth(), edgeN);
+		}
+		final int edgeE = canvas.getWidth() - world.getWidth() - world.getUpperLeft().x;
+		if (edgeE > 0) {
+			e.gc.fillRectangle(world.getWidth() + world.getUpperLeft().x, 0, edgeE, canvas.getHeight());
+		}
+		final int edgeS = canvas.getHeight() - world.getHeight() - world.getUpperLeft().y;
+		if (edgeS > 0) {
+			e.gc.fillRectangle(0, world.getHeight() + world.getUpperLeft().y, canvas.getWidth(), edgeS);
+		}
+		final int edgeW = world.getUpperLeft().x;
+		if (edgeW > 0) {
+			e.gc.fillRectangle(0, 0, edgeW, canvas.getHeight());
+		}
 	}
 
 	// --------------------------------------------------------------------------------
@@ -139,7 +143,7 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 	protected void renderPlugin(final GC gc, final Drawable plugin, final AbsoluteRectangle area) {
 
 		if (ENABLE_DRAW_PROFILING) {
-			log.debug("Rendering plugin "+plugin+" on "+area);
+			log.debug("Rendering plugin " + plugin + " on " + area);
 		}
 
 		final List<DrawingObject> dos = new LinkedList<DrawingObject>(plugin.getDrawingObjects(area));
@@ -148,28 +152,30 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 			switch (object.getState()) {
 				case ALIVE:
 					if (ENABLE_DRAW_PROFILING) {
-						log.debug("Rendering DOB "+object);
+						log.debug("Rendering DOB " + object);
 					}
 					object.drawObject(gc);
 					break;
 				case INFANT:
 				case ZOMBIE:
-					// the drawingObject have been added/removed after we fetched the list from the layer
-					// so this is a valid race condition.
+					// the drawingObject have been added/removed after we fetched the list from the
+					// layer so this is a valid race condition.
 					break;
 			}
 		}
 	}
+
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
 	 */
 	@Override
 	public void widgetDisposed(final DisposeEvent e) {
 		canvasBgColor.dispose();
 		canvasOutOfMapColor.dispose();
 	}
-
-
 
 }

@@ -14,40 +14,40 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 public class ZoomAction extends Action implements IPropertyChangeListener {
-	
+
 	private static final Logger log = SpyglassLoggerFactory.getLogger(ZoomAction.class);
 
 	/**
 	 * Value added per zoom process
 	 */
 	private final static double ESCALATING_VALUE = 0.1;
-	
+
 	/**
 	 * initial zoom multiplier
 	 */
 	private final static double INITIAL_VALUE = 1.1;
-	
+
 	/**
-	 * time to wait between zooms (in ms) 
+	 * time to wait between zooms (in ms)
 	 */
 	private final static int ZOOM_PERIOD = 100;
-	
+
 
 	public enum Type {
 		ZOOM_IN,
 		ZOOM_OUT
 	}
-	
+
 	private final DrawingArea drawingArea;
-	
+
 	private final SpyglassApp app;
 
 	private final Type type;
 
 	private Timer timer = null;
-	
+
 	private double zoomFactor;
-	
+
 	private Runnable zoomRunnable = new Runnable() {
 
 		@Override
@@ -65,9 +65,9 @@ public class ZoomAction extends Action implements IPropertyChangeListener {
 				zoomFactor += ESCALATING_VALUE;
 			}
 		}
-		
+
 	};
-	
+
 	public ZoomAction(final DrawingArea da, final Type type) {
 		this.drawingArea = da;
 		app = null;
@@ -83,11 +83,11 @@ public class ZoomAction extends Action implements IPropertyChangeListener {
 
 		this.addPropertyChangeListener(this);
 	}
-	
+
 
 	@Override
 	public void run() {
-		
+
 		if (app != null) {
 			switch (type) {
 				case ZOOM_IN:
@@ -99,7 +99,7 @@ public class ZoomAction extends Action implements IPropertyChangeListener {
 			}
 		}
 	};
-	
+
 	@Override
 	public String getText() {
 		switch (type) {
@@ -110,7 +110,7 @@ public class ZoomAction extends Action implements IPropertyChangeListener {
 		}
 		return "";
 	}
-	
+
 	@Override
 	public ImageDescriptor getImageDescriptor() {
 		switch (type) {
@@ -150,9 +150,9 @@ public class ZoomAction extends Action implements IPropertyChangeListener {
 				if (!Display.getDefault().isDisposed()) {
 					Display.getDefault().syncExec(zoomRunnable);
 				}
-				
+
 			}
-			
+
 		}, 0, ZOOM_PERIOD);
 	}
 }

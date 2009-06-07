@@ -545,8 +545,11 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	 * area.
 	 *
 	 */
-	public void autoZoom(final AbsoluteRectangle rect) {
+	public void autoZoom(AbsoluteRectangle rect) {
 		this.checkWidget();
+
+		// modifiy y axis
+		rect = inv(rect);
 
 		log.debug("Auto zooming to " + rect);
 
@@ -569,14 +572,14 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		newAt.translate(-rect.getLowerLeft().x, -rect.getLowerLeft().y);
 
 		// finally move the rect to the center of the drawing area
+		final AbsolutePosition upperRight = rect.getLowerLeft();
+		upperRight.x += rect.getWidth();
+		upperRight.y += rect.getHeight();
 
-		final AbsolutePosition lowerRight = rect.getLowerLeft();
-		lowerRight.x += rect.getWidth();
-		lowerRight.y += rect.getHeight();
-		final Point2D lowerRightPx = newAt.transform(lowerRight.toPoint2D(), null);
+		final Point2D upperRightPx = newAt.transform(upperRight.toPoint2D(), null);
 
-		final double deltaX = DAwidth - lowerRightPx.getX();
-		final double deltaY = DAhright - lowerRightPx.getY();
+		final double deltaX = DAwidth - upperRightPx.getX();
+		final double deltaY = DAhright - upperRightPx.getY();
 
 		newAt.preConcatenate(AffineTransform.getTranslateInstance(deltaX / 2, deltaY / 2));
 
@@ -585,7 +588,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 			this.at = newAt;
 		}
 
-		fireTransformEvent(Type.MOVE);
+		fireTransformEvent(Type.ZOOM_MOVE);
 
 		// redraw the canvas
 		redraw();

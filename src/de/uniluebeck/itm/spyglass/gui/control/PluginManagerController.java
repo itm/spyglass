@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 
@@ -23,6 +24,7 @@ import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
@@ -35,6 +37,8 @@ import de.uniluebeck.itm.spyglass.plugin.PluginManager;
  *
  */
 public class PluginManagerController implements PluginListChangeListener, TransformChangedListener, PropertyChangeListener, DisposeListener {
+
+	protected static Logger log = SpyglassLoggerFactory.getLogger(PluginManagerController.class);
 
 	private Spyglass spyglass;
 	private AppWindow appWindow;
@@ -60,7 +64,6 @@ public class PluginManagerController implements PluginListChangeListener, Transf
 
 		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener("pluginManager", this);
 
-		appWindow.getGui().getDrawingArea().addTransformChangedListener(this);
 		appWindow.getGui().getDrawingArea().addTransformChangedListener(this);
 
 		appWindow.getDisplay().timerExec(DEFAULT_REDRAW_PERIOD, new Runnable() {
@@ -181,6 +184,7 @@ public class PluginManagerController implements PluginListChangeListener, Transf
 		for (final PluginController pc : list) {
 			pc.updateBoundingBoxes();
 		}
+		log.debug("Bounding boxes updated.");
 	}
 
 	// ----------------------------------------------------------------
