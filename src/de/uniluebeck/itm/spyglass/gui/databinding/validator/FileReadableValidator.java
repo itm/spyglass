@@ -16,9 +16,9 @@ import org.eclipse.core.runtime.IStatus;
 
 /**
  * Checks if a String points to file which exists and is readable.
- * 
+ *
  * @author Dariush Forouher
- * 
+ *
  */
 public class FileReadableValidator implements IValidator {
 
@@ -26,6 +26,9 @@ public class FileReadableValidator implements IValidator {
 	public IStatus validate(final Object value) {
 		if (value instanceof String) {
 			final String s = (String) value;
+			if (s.length()==0) {
+				return ValidationStatus.warning("Enter a filename");
+			}
 			final File f = new File(s);
 			if (f.canRead()) {
 				return ValidationStatus.ok();

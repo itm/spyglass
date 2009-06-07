@@ -15,9 +15,9 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 // --------------------------------------------------------------------------------
 /**
  * Instances of this class contain the configuration parameters of a {@link ImagePainterPlugin}
- * 
+ *
  * @author Sebastian Ebers, Dariush Forouher, Daniel Bimschas
- * 
+ *
  */
 public class ImagePainterXMLConfig extends PluginXMLConfig {
 
@@ -34,7 +34,7 @@ public class ImagePainterXMLConfig extends PluginXMLConfig {
 	public static final String PROPERTYNAME_LOWER_LEFT_X = "lowerLeftX";
 
 	@Element(required = false)
-	private volatile String imageFileName = "images/icons/brokenImageLink.png";
+	private volatile String imageFileName = "";
 
 	@Element(required = false)
 	private volatile  int lowerLeftX = 0;

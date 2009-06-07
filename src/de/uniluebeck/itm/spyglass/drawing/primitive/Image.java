@@ -4,6 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.GC;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
@@ -20,8 +21,19 @@ public class Image extends DrawingObject {
 
 	private int imageSizeY;
 
+	private final static String brokenImageFile = "brokenImageLink.png";
+
 	public Image(final String imageFileName) {
-		this.image = new org.eclipse.swt.graphics.Image(null, imageFileName);
+
+		// first try to load the given file. if that failes, use the brokenImageFile.
+		final ImageDescriptor desc = ImageDescriptor.createFromFile(null, imageFileName);
+		org.eclipse.swt.graphics.Image i = desc.createImage(false);
+		if (i == null) {
+			final ImageDescriptor descBad = ImageDescriptor.createFromURL(Image.class.getResource(brokenImageFile));
+			i = descBad.createImage();
+		}
+
+		this.image = i;
 	}
 
 	public synchronized int getImageSizeX() {

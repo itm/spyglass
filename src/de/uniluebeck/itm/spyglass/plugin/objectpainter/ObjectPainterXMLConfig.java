@@ -17,9 +17,9 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 // --------------------------------------------------------------------------------
 /**
  * Instances of this class contain the configuration parameters of a {@link ObjectPainterPlugin}
- * 
+ *
  * @author Sebastian Ebers, Dariush Forouher
- * 
+ *
  */
 public class ObjectPainterXMLConfig extends PluginXMLConfig {
 
@@ -40,7 +40,7 @@ public class ObjectPainterXMLConfig extends PluginXMLConfig {
 	public static final String PROPERTYNAME_UPDATE_INTERVAL = "updateInterval";
 
 	@Element(required=false)
-	private volatile String imageFileName = "images/icons/brokenImageLink.png";
+	private volatile String imageFileName = "";
 
 	@Element(required=false)
 	private volatile  int imageSizeX = 0;

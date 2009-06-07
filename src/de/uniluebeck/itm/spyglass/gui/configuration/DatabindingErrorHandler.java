@@ -18,6 +18,7 @@ import org.eclipse.core.databinding.observable.list.ListChangeEvent;
 import org.eclipse.core.databinding.observable.list.ListDiffEntry;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.ISWTObservable;
 import org.eclipse.swt.SWT;
@@ -48,6 +49,7 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 
 	private final Map<Control, ToolTip> tipMap = new HashMap<Control, ToolTip>();
 	private final Map<ToolTip, Point> tipPos = new HashMap<ToolTip, Point>();
+	private final Map<ToolTip, Integer> tipStatus = new HashMap<ToolTip, Integer>();
 
 	private final DataBindingContext dbc;
 
@@ -113,15 +115,19 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 	private void updateToolTip(final Status status, final Control c) {
 		ToolTip tip = tipMap.get(c);
 
-		if (status.isOK() && (tip != null)) {
-			log.debug("Content of widget "+c+" became good: "+status, status.getException());
+		// destroy the tip if the severity changed.
+		if ((tip != null) && (tipStatus.get(tip) != status.getSeverity())) {
+			log.debug("Content of widget "+c+" changed: "+status, status.getException());
 			destroyToolTip(c, tip);
+			tip = null;
+		}
 
-		} else if (!status.isOK()) {
+		// only display errors. others are too complicated at the moment
+		if (status.getSeverity() == IStatus.ERROR) {
 			log.debug("Content of widget "+c+" became bad: "+status, status.getException());
 
 			if (tip == null) {
-				tip = createNewToolTip(c);
+				tip = createNewToolTip(c,status.getSeverity());
 			}
 
 			tip.setMessage(status.getMessage());
@@ -132,15 +138,27 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 	private void destroyToolTip(final Control c, final ToolTip tip) {
 		tip.dispose();
 		tipMap.remove(c);
+		tipStatus.remove(tip);
 		if (!c.isDisposed()) {
 			c.removeDisposeListener(this);
 		}
 	}
 
-	private ToolTip createNewToolTip(final Control c) {
+	private ToolTip createNewToolTip(final Control c, final int severity) {
 		ToolTip tip;
-		tip = new ToolTip(shell, SWT.BALLOON | SWT.ICON_ERROR);
+		int flags = SWT.BALLOON;
+		if (IStatus.ERROR == severity) {
+			flags |= SWT.ICON_ERROR;
+		}
+		if (IStatus.WARNING == severity) {
+			flags |= SWT.ICON_WARNING;
+		}
+		if (IStatus.INFO == severity) {
+			flags |= SWT.ICON_INFORMATION;
+		}
+		tip = new ToolTip(shell, flags);
 		tipMap.put(c, tip);
+		tipStatus.put(tip, severity);
 		c.addDisposeListener(this);
 		c.addControlListener(this);
 
@@ -152,7 +170,16 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 			parent = parent.getParent();
 		}
 
-		tip.setText("Bad input");
+		if (IStatus.ERROR == severity) {
+			tip.setText("Error");
+		}
+		if (IStatus.WARNING == severity) {
+			tip.setText("Warning");
+		}
+		if (IStatus.INFO == severity) {
+			tip.setText("Info");
+		}
+
 		tip.setAutoHide(false);
 
 		return tip;

@@ -112,11 +112,7 @@ public class ImagePainterPlugin extends BackgroundPainterPlugin implements Prope
 
 	private void configureImage() {
 
-		try {
-			image = new Image(xmlConfig.getImageFileName());
-		} catch (final RuntimeException e) {
-			image = new Image("images/icons/brokenImageLink.png");
-		}
+		image = new Image(xmlConfig.getImageFileName());
 
 		final int sizeX = xmlConfig.getImageSizeX();
 		final int sizeY = xmlConfig.getImageSizeY();

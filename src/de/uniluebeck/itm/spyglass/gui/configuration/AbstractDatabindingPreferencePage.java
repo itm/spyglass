@@ -90,21 +90,22 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 			public void handleValueChange(final ValueChangeEvent event) {
 				final Status valStatus = (Status) aggregateStatus.getValue();
 
-				setValid(valStatus.isOK());
+				if (valStatus.getSeverity() == IStatus.ERROR) {
+					setErrorMessage(valStatus.getMessage());
+					setValid(false);
+				} else {
+					setValid(true);
+					setErrorMessage(null);
+				}
+
+				// only mark the page invalid if we have an error
+				setValid(valStatus.getSeverity() != IStatus.ERROR);
 
 				// If the status contains an exception, show it.
 				// (ordinary validation errors don't contain exceptions, so this is to track bugs.)
 				if (valStatus.getException() != null) {
 					log.error(valStatus.getMessage(), valStatus.getException());
 				}
-
-				if (valStatus.isOK()) {
-					setErrorMessage(null);
-
-				} else {
-					setErrorMessage("This page contains errors.");
-				}
-
 			}
 		});
 
@@ -162,8 +163,14 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 		final IStatus status = AggregateValidationStatus.getStatusMerged(dbc.getValidationStatusProviders());
 		if (!status.isOK()) {
 			for (final IStatus s : status.getChildren()) {
-				if (!s.isOK()) {
+				if (s.getSeverity() == IStatus.ERROR) {
 					log.error(s.getMessage(), s.getException());
+				}
+				else if (s.getSeverity() == IStatus.WARNING) {
+					log.warn(s.getMessage(), s.getException());
+				}
+				else if (s.getSeverity() == IStatus.INFO) {
+					log.info(s.getMessage(), s.getException());
 				}
 			}
 		}

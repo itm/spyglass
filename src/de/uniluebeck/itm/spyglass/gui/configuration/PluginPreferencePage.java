@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.AggregateValidationStatus;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.JFaceResources;
@@ -288,7 +289,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 
 				final Status valStatus = (Status) event.diff.getNewValue();
 
-				if (valStatus.isOK()) {
+				if (valStatus.getSeverity() != IStatus.ERROR) {
 
 					if (buttons.applyButton != null) {
 						buttons.applyButton.setEnabled(true);
