@@ -65,11 +65,16 @@ public class PluginManagerController implements PluginListChangeListener, Transf
 		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener("pluginManager", this);
 
 		appWindow.getGui().getDrawingArea().addTransformChangedListener(this);
+		appWindow.getGui().getDrawingArea().addDisposeListener(this);
 
 		appWindow.getDisplay().timerExec(DEFAULT_REDRAW_PERIOD, new Runnable() {
 
 			@Override
 			public void run() {
+				if (appWindow.getGui().getDrawingArea().isDisposed()) {
+					return;
+				}
+
 				updateBoundingBoxes();
 
 				// HACK: If there is a preference dialog open,
@@ -184,7 +189,6 @@ public class PluginManagerController implements PluginListChangeListener, Transf
 		for (final PluginController pc : list) {
 			pc.updateBoundingBoxes();
 		}
-		log.debug("Bounding boxes updated.");
 	}
 
 	// ----------------------------------------------------------------
