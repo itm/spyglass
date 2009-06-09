@@ -360,6 +360,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 		super.init(manager);
 
+		config.addPropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, this);
 		config.addPropertyChangeListener(LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B, this);
 		config.addPropertyChangeListener(LinePainterXMLConfig.PROPERTYNAME_LINE_WIDTH, this);
 		config.addPropertyChangeListener(PluginXMLConfig.PROPERTYNAME_TIMEOUT, this);
@@ -378,7 +379,11 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
-		if (LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B.equals(event.getPropertyName())) {
+		if (PluginXMLConfig.PROPERTYNAME_ACTIVE.equals(event.getPropertyName())) {
+			if (!(Boolean) event.getNewValue()) {
+				reset();
+			}
+		} else if (LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B.equals(event.getPropertyName())) {
 			handleLineColorChange((int[]) event.getNewValue());
 		} else if (LinePainterXMLConfig.PROPERTYNAME_LINE_WIDTH.equals(event.getPropertyName())) {
 			handleLineWidthChange((Integer) event.getNewValue());
@@ -410,6 +415,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 		stringFormatterData.shutdown();
 
+		config.removePropertyChangeListener(PluginXMLConfig.PROPERTYNAME_ACTIVE, this);
 		config.removePropertyChangeListener(LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B, this);
 		config.removePropertyChangeListener(LinePainterXMLConfig.PROPERTYNAME_LINE_WIDTH, this);
 		config.removePropertyChangeListener(PluginXMLConfig.PROPERTYNAME_TIMEOUT, this);
