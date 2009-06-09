@@ -24,8 +24,38 @@ public class Edge {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + destinationNodeId;
+		result = prime * result + sourceNodeId;
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Edge other = (Edge) obj;
+		if (destinationNodeId != other.destinationNodeId) {
+			return false;
+		}
+		if (sourceNodeId != other.sourceNodeId) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	public String toString() {
-		return line.toString();
+		return "Line from " + sourceNodeId + " to " + destinationNodeId;
 	}
 
 }

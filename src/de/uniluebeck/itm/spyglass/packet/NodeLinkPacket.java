@@ -9,6 +9,10 @@
  */
 package de.uniluebeck.itm.spyglass.packet;
 
+import org.apache.log4j.Logger;
+
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
+
 // --------------------------------------------------------------------------------
 /**
  * Represents a packet used to indicate a directed link between two nodes.<br>
@@ -19,6 +23,8 @@ package de.uniluebeck.itm.spyglass.packet;
  * @see SyntaxTypes#ISENSE_SPYGLASS_PACKET_UINT16
  */
 public class NodeLinkPacket extends IntListPacket {
+
+	private static final Logger log = SpyglassLoggerFactory.getLogger(NodeLinkPacket.class);
 
 	/**
 	 * Syntaxtype of this Packet
@@ -49,7 +55,7 @@ public class NodeLinkPacket extends IntListPacket {
 	 * 
 	 * @return the identifier of the link's destination node
 	 */
-	public Integer getDestinationNodeID() {
+	public Integer getDestinationNodeId() {
 		return values[0];
 	}
 
@@ -69,8 +75,23 @@ public class NodeLinkPacket extends IntListPacket {
 	 * 
 	 * @return the identifier of the link's source node
 	 */
-	public Integer getSourceNodeID() {
+	public Integer getSourceNodeId() {
 		return getSenderId();
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param packet
+	 * @return
+	 */
+	public static NodeLinkPacket interpret(final Uint16ListPacket packet) {
+		final NodeLinkPacket nodeLinkPacket = new NodeLinkPacket();
+		try {
+			nodeLinkPacket.deserialize(packet.getPacketData());
+		} catch (final SpyglassPacketException e) {
+			log.error("Goddamnit", e);
+		}
+		return nodeLinkPacket;
 	}
 
 }

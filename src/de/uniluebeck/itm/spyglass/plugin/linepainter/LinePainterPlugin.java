@@ -28,6 +28,7 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.layer.Layer;
+import de.uniluebeck.itm.spyglass.packet.NodeLinkPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.Uint16ListPacket;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionEvent;
@@ -130,17 +131,17 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	 * @param packet
 	 * @param senderId
 	 * @param neighboorId
-	 * @param pos1
-	 * @param pos2
+	 * @param sourcePos
+	 * @param destinationPos
 	 */
-	private void newEdge(final Uint16ListPacket packet, final int senderId, final int neighboorId, final AbsolutePosition pos1,
-			final AbsolutePosition pos2) {
+	private void newEdge(final NodeLinkPacket packet, final int senderId, final int neighboorId, final AbsolutePosition sourcePos,
+			final AbsolutePosition destinationPos) {
 
 		final Edge e = new Edge(senderId, neighboorId);
 
 		e.line = new LinePainterLine();
-		e.line.setPosition(pos1);
-		e.line.setEnd(pos2);
+		e.line.setPosition(sourcePos);
+		e.line.setEnd(destinationPos);
 		final int[] color = config.getLineColorRGB();
 		e.line.setColor(new RGB(color[0], color[1], color[2]));
 		e.line.setLineWidth(config.getLineWidth());
@@ -170,30 +171,27 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	 * 
 	 * @param packet
 	 */
-	void parsePacket(final Uint16ListPacket packet) {
+	void parsePacket(final NodeLinkPacket packet) {
 
-		final List<Integer> neighboorIds = packet.getNeighborhoodPacketNodeIDs();
-		final int senderId = packet.getSenderId();
 		Edge e;
 
-		for (final int neighboorId : neighboorIds) {
+		final int sourceNodeId = packet.getSourceNodeId();
+		final int destinationNodeId = packet.getDestinationNodeId();
 
-			final NodePositionerPlugin nodePositioner = getPluginManager().getNodePositioner();
-			final AbsolutePosition pos1 = nodePositioner.getPosition(senderId);
-			final AbsolutePosition pos2 = nodePositioner.getPosition(neighboorId);
+		final NodePositionerPlugin nodePositioner = getPluginManager().getNodePositioner();
+		final AbsolutePosition sourcePos = nodePositioner.getPosition(sourceNodeId);
+		final AbsolutePosition senderPos = nodePositioner.getPosition(destinationNodeId);
 
-			if ((pos1 != null) && (pos2 != null)) {
+		if ((sourcePos != null) && (senderPos != null)) {
 
-				synchronized (lock) {
-					e = graphData.getExistingEdge(senderId, neighboorId);
-				}
+			synchronized (lock) {
+				e = graphData.getExistingEdge(sourceNodeId, destinationNodeId);
+			}
 
-				if (e != null) {
-					updateEdge(packet, e);
-				} else {
-					newEdge(packet, senderId, neighboorId, pos1, pos2);
-				}
-
+			if (e != null) {
+				updateEdge(packet, e);
+			} else {
+				newEdge(packet, sourceNodeId, destinationNodeId, sourcePos, senderPos);
 			}
 
 		}
@@ -207,7 +205,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	 * @param packet
 	 * @param e
 	 */
-	private void updateEdge(final Uint16ListPacket packet, final Edge e) {
+	private void updateEdge(final NodeLinkPacket packet, final Edge e) {
 		synchronized (lock) {
 			graphData.updateEdgeTime(e);
 		}
@@ -372,9 +370,10 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	}
 
 	@Override
-	protected void processPacket(final SpyglassPacket p) {
-		parsePacket((Uint16ListPacket) p);
-		stringFormatterData.parsePacket((Uint16ListPacket) p);
+	protected void processPacket(final SpyglassPacket packet) {
+		assert packet instanceof Uint16ListPacket : "Received packet of wrong class type: " + packet.getClass().getSimpleName();
+		parsePacket(NodeLinkPacket.interpret((Uint16ListPacket) packet));
+		stringFormatterData.parsePacket(NodeLinkPacket.interpret((Uint16ListPacket) packet));
 	}
 
 	@Override

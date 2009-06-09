@@ -6,6 +6,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.drawing.primitive.Line;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
@@ -16,6 +17,8 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 public class LinePainterLine extends Line {
 
 	private String stringFormatterResult = "";
+
+	private boolean paintBox = false;
 
 	public LinePainterLine() {
 		super();
@@ -36,23 +39,24 @@ public class LinePainterLine extends Line {
 		super.draw(gc);
 
 		// protected class variable currentClippingSaysDrawIt is set by super.draw() if clipping
-		// algorithm
-		// says this line is currently visible -> then we'll have to draw the string
+		// algorithm says this line is currently visible -> then we'll have to draw the string
 		if (currentClippingSaysDrawIt) {
 
 			final Point textExtent = determineTextExtent();
 			final Point p = determineStringFormatterPosition(textExtent);
+
 			final Color oldForeground = gc.getForeground();
 			final Color oldBackground = gc.getBackground();
+			gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
+			gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 
-			// final Rectangle boxRect = new Rectangle(p.x - 2, p.y - 1, textExtent.x + 4,
-			// textExtent.y + 2);
-			// gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
-			// gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
-			// gc.fillRectangle(boxRect);
-			// gc.drawRectangle(boxRect);
+			if (paintBox) {
+				final Rectangle boxRect = new Rectangle(p.x - 2, p.y - 1, textExtent.x + 4, textExtent.y + 2);
+				gc.fillRectangle(boxRect);
+				gc.drawRectangle(boxRect);
+			}
 
-			gc.drawText(stringFormatterResult, p.x, p.y, SWT.DRAW_DELIMITER | SWT.DRAW_TAB | SWT.DRAW_TRANSPARENT);
+			gc.drawText(stringFormatterResult, p.x, p.y, SWT.DRAW_DELIMITER | SWT.DRAW_TAB);
 
 			gc.setForeground(oldForeground);
 			gc.setBackground(oldBackground);
@@ -104,34 +108,37 @@ public class LinePainterLine extends Line {
 
 		if ((stringFormatterResult != null) && (stringFormatterResult.length() > 0)) {
 
-			final AbsoluteRectangle absolutelineBoundingBox;
-			final PixelRectangle pixelLineBoundingBox;
-			final Point pixelExtent;
-			final Point pixelStringFormatterPosition;
-			final PixelRectangle pixelStringFormatterRectangle;
-			final PixelRectangle pixelUnionRectangle;
+			final AbsoluteRectangle absBBox;
+			final PixelRectangle pxLineBBox;
+			final Point pxExtent;
+			final Point pxSFPos;
+			final PixelRectangle pxSFRect;
+			final PixelRectangle pxUnionRect;
 
 			// make sure parent calculates the new bounding box in absolute coordinates for the line
-			absolutelineBoundingBox = super.calculateBoundingBox();
+			absBBox = super.calculateBoundingBox();
 
 			// calculate the bounding box of the line in pixel coordinates
-			pixelLineBoundingBox = getDrawingArea().absRect2PixelRect(absolutelineBoundingBox);
+			pxLineBBox = getDrawingArea().absRect2PixelRect(absBBox);
 
 			// calculate the text extent in pixel coordinates
-			pixelExtent = determineTextExtent();
+			pxExtent = determineTextExtent();
 
 			// calculate the position in pixel on which to draw the string formatter result
-			pixelStringFormatterPosition = determineStringFormatterPosition(pixelExtent);
+			pxSFPos = determineStringFormatterPosition(pxExtent);
 
 			// calculate the rectangle in pixel coordinates of the drawn string formatter result
-			pixelStringFormatterRectangle = new PixelRectangle(new Rectangle(pixelStringFormatterPosition.x, pixelStringFormatterPosition.y,
-					pixelExtent.x, pixelExtent.y));
+			if (paintBox) {
+				pxSFRect = new PixelRectangle(pxSFPos.x - 2, pxSFPos.y - 1, pxExtent.x + 4, pxExtent.y + 2);
+			} else {
+				pxSFRect = new PixelRectangle(pxSFPos.x, pxSFPos.y, pxExtent.x, pxExtent.y);
+			}
 
 			// calculate the union of the lines' bounding box in pixel coordinates
-			pixelUnionRectangle = pixelLineBoundingBox.union(pixelStringFormatterRectangle);
+			pxUnionRect = pxLineBBox.union(pxSFRect);
 
 			// return the transformed (from pixel to absolute coordinates) union rectangle
-			return getDrawingArea().pixelRect2AbsRect(pixelUnionRectangle);
+			return getDrawingArea().pixelRect2AbsRect(pxUnionRect);
 		}
 
 		return super.calculateBoundingBox();

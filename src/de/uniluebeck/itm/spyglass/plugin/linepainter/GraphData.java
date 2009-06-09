@@ -144,4 +144,19 @@ class GraphData {
 		edgeTimes.put(edge, System.currentTimeMillis());
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param sourceNodeId
+	 * @param destinationNodeId
+	 * @return
+	 */
+	public Edge getEdge(final Integer sourceNodeId, final Integer destinationNodeId) {
+		for (final Edge e : edgeTimes.keySet()) {
+			if ((e.sourceNodeId == sourceNodeId) && (e.destinationNodeId == destinationNodeId)) {
+				return e;
+			}
+		}
+		return null;
+	}
+
 }

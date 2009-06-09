@@ -11,9 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
-import de.uniluebeck.itm.spyglass.packet.Uint16ListPacket;
+import de.uniluebeck.itm.spyglass.packet.NodeLinkPacket;
 import de.uniluebeck.itm.spyglass.util.StringFormatter;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
 
@@ -69,7 +68,7 @@ class StringFormatterData implements PropertyChangeListener {
 	/**
 	 * Map holding the last relevant packet for each edge and semantic type.
 	 */
-	private HashMap<Edge, HashMap<Integer, Uint16ListPacket>> packetBuffer;
+	private HashMap<Edge, HashMap<Integer, NodeLinkPacket>> packetBuffer;
 
 	private Object lock;
 
@@ -83,7 +82,7 @@ class StringFormatterData implements PropertyChangeListener {
 	 */
 	StringFormatterData() {
 		this.buffer = new HashMap<Edge, HashMap<Integer, String>>();
-		this.packetBuffer = new HashMap<Edge, HashMap<Integer, Uint16ListPacket>>();
+		this.packetBuffer = new HashMap<Edge, HashMap<Integer, NodeLinkPacket>>();
 	}
 
 	// --------------------------------------------------------------------------------
@@ -117,7 +116,7 @@ class StringFormatterData implements PropertyChangeListener {
 
 		// put newline if we had default and there are more lines to add
 		if (foundDefaultStringFormatter && (sortedKeySet.size() > 1)) {
-			resultBuffer.append("\r\n");
+			resultBuffer.append("\n");
 		}
 
 		// put a line for every entry (except default string formatter)
@@ -130,7 +129,7 @@ class StringFormatterData implements PropertyChangeListener {
 			}
 
 			if (iterator.hasNext()) {
-				resultBuffer.append("\r\n");
+				resultBuffer.append("\n");
 			}
 
 		}
@@ -159,13 +158,15 @@ class StringFormatterData implements PropertyChangeListener {
 
 		// brute force re-parse all packets from packet buffer with the new string formatter
 		// settings (sub-prime performance but easy to implement ;-)
-		for (final Edge edge : buffer.keySet()) {
-			edge.line.setStringFormatterResult("");
+		synchronized (lock) {
+			for (final Edge edge : buffer.keySet()) {
+				edge.line.setStringFormatterResult("");
+			}
+			buffer.clear();
 		}
-		buffer.clear();
 
-		for (final HashMap<Integer, Uint16ListPacket> packetBufferEntry : packetBuffer.values()) {
-			for (final Uint16ListPacket packet : packetBufferEntry.values()) {
+		for (final HashMap<Integer, NodeLinkPacket> packetBufferEntry : packetBuffer.values()) {
+			for (final NodeLinkPacket packet : packetBufferEntry.values()) {
 				parsePacket(packet);
 			}
 		}
@@ -196,44 +197,42 @@ class StringFormatterData implements PropertyChangeListener {
 	 * Parses the packet and updates StringFormatter strings on the graphs' edges according the the
 	 * packages contents and StringFormatters' settings.
 	 * 
-	 * @param packet
+	 * @param nodeLinkPacket
 	 */
-	void parsePacket(final Uint16ListPacket packet) {
+	void parsePacket(final NodeLinkPacket nodeLinkPacket) {
 
-		final int nodeId = packet.getSenderId();
-		final Set<Edge> incidentEdges;
+		final Edge edge;
 		synchronized (lock) {
-			incidentEdges = graphData.getOutgoingEdges(nodeId);
+			edge = graphData.getEdge(nodeLinkPacket.getSourceNodeId(), nodeLinkPacket.getDestinationNodeId());
 		}
-		HashMap<Integer, Uint16ListPacket> packetBufferEntry;
-		HashMap<Integer, String> bufferEntry;
-		final String defaultStringFormatter = config.getDefaultStringFormatter();
-		final String stringFormatter = config.getStringFormatters().get(packet.getSemanticType());
-		boolean edgeNeedsUpdate;
 
-		for (final Edge e : incidentEdges) {
+		if (edge != null) {
 
-			edgeNeedsUpdate = false;
+			HashMap<Integer, NodeLinkPacket> packetBufferEntry;
+			HashMap<Integer, String> bufferEntry;
+			final String defaultStringFormatter = config.getDefaultStringFormatter();
+			final String stringFormatter = config.getStringFormatters().get(nodeLinkPacket.getSemanticType());
+			boolean edgeNeedsUpdate = false;
 
 			// put this packet as last received packet for the semantic type of this packet
-			packetBufferEntry = packetBuffer.containsKey(e) ? packetBuffer.get(e) : new HashMap<Integer, Uint16ListPacket>();
-			packetBufferEntry.put(packet.getSemanticType(), packet);
-			packetBuffer.put(e, packetBufferEntry);
+			packetBufferEntry = packetBuffer.containsKey(edge) ? packetBuffer.get(edge) : new HashMap<Integer, NodeLinkPacket>();
+			packetBufferEntry.put(nodeLinkPacket.getSemanticType(), nodeLinkPacket);
+			packetBuffer.put(edge, packetBufferEntry);
 
 			// get the buffer entry for this edge
-			bufferEntry = buffer.containsKey(e) ? buffer.get(e) : new HashMap<Integer, String>();
-			buffer.put(e, bufferEntry);
+			bufferEntry = buffer.containsKey(edge) ? buffer.get(edge) : new HashMap<Integer, String>();
+			buffer.put(edge, bufferEntry);
 
 			// check if there's a default string formatter and update the buffer according to the
 			// received package (semanticType of -1 means default string formatter)
-			edgeNeedsUpdate = edgeNeedsUpdate || updateBuffer(defaultStringFormatter, bufferEntry, packet, -1);
+			edgeNeedsUpdate = edgeNeedsUpdate || updateBuffer(defaultStringFormatter, bufferEntry, nodeLinkPacket, -1);
 
 			// put updated string formatter result for the received package if there's one for the
 			// semantic type of this packet
-			edgeNeedsUpdate = edgeNeedsUpdate || updateBuffer(stringFormatter, bufferEntry, packet, packet.getSemanticType());
+			edgeNeedsUpdate = edgeNeedsUpdate || updateBuffer(stringFormatter, bufferEntry, nodeLinkPacket, nodeLinkPacket.getSemanticType());
 
 			if (edgeNeedsUpdate) {
-				e.line.setStringFormatterResult(getStringFormatterResult(e));
+				edge.line.setStringFormatterResult(getStringFormatterResult(edge));
 			}
 
 		}
@@ -272,7 +271,7 @@ class StringFormatterData implements PropertyChangeListener {
 	 * @param semanticType
 	 * @return <code>true</code> if something was updated, <code>false</code> otherwise
 	 */
-	private boolean updateBuffer(final String stringFormatterString, final HashMap<Integer, String> bufferEntry, final Uint16ListPacket packet,
+	private boolean updateBuffer(final String stringFormatterString, final HashMap<Integer, String> bufferEntry, final NodeLinkPacket packet,
 			final int semanticType) {
 
 		if ((stringFormatterString != null) && !"".equals(stringFormatterString)) {
