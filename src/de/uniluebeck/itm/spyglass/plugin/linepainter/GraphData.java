@@ -61,7 +61,7 @@ class GraphData {
 	 */
 	public synchronized Edge getExistingEdge(final int nodeId1, final int nodeId2) {
 		for (final Edge e : edgeTimes.keySet()) {
-			final boolean same = ((e.nodeId1 == nodeId1) && (e.nodeId2 == nodeId2)) || ((e.nodeId1 == nodeId2) && (e.nodeId2 == nodeId1));
+			final boolean same = (e.sourceNodeId == nodeId1) && (e.destinationNodeId == nodeId2);
 			if (same) {
 				return e;
 			}
@@ -71,19 +71,54 @@ class GraphData {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Returns a set of all edges incident to the node with id <code>nodeId</code>.
+	 * Returns a set of all ingoing edges to the node with id <code>nodeId</code>.
 	 * 
 	 * @param nodeId
 	 * @return
 	 */
-	public synchronized Set<Edge> getIncidentEdges(final int nodeId) {
-		final Set<Edge> incidentEdges = new HashSet<Edge>();
+	public synchronized Set<Edge> getIngoingEdges(final int nodeId) {
+		final Set<Edge> ingoingEdges = new HashSet<Edge>();
 		for (final Edge e : edgeTimes.keySet()) {
-			if ((e.nodeId1 == nodeId) || (e.nodeId2 == nodeId)) {
-				incidentEdges.add(e);
+			if (e.destinationNodeId == nodeId) {
+				ingoingEdges.add(e);
 			}
 		}
-		return incidentEdges;
+		return ingoingEdges;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns a set of all ingoing and outgoing edges from or to the node with id
+	 * <code>nodeId</code>.
+	 * 
+	 * @param nodeId
+	 * @return
+	 */
+	public synchronized Set<Edge> getIngoingOutgoingEdges(final int nodeId) {
+		final Set<Edge> ingoingOutgoingEdges = new HashSet<Edge>();
+		for (final Edge e : edgeTimes.keySet()) {
+			if ((e.destinationNodeId == nodeId) || (e.sourceNodeId == nodeId)) {
+				ingoingOutgoingEdges.add(e);
+			}
+		}
+		return ingoingOutgoingEdges;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns a set of all edges outgoing from the node with id <code>nodeId</code>.s
+	 * 
+	 * @param nodeId
+	 * @return
+	 */
+	public synchronized Set<Edge> getOutgoingEdges(final int nodeId) {
+		final Set<Edge> outgoingEdges = new HashSet<Edge>();
+		for (final Edge e : edgeTimes.keySet()) {
+			if (e.sourceNodeId == nodeId) {
+				outgoingEdges.add(e);
+			}
+		}
+		return outgoingEdges;
 	}
 
 	// --------------------------------------------------------------------------------

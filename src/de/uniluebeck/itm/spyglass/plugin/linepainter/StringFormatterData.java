@@ -203,7 +203,7 @@ class StringFormatterData implements PropertyChangeListener {
 		final int nodeId = packet.getSenderId();
 		final Set<Edge> incidentEdges;
 		synchronized (lock) {
-			incidentEdges = graphData.getIncidentEdges(nodeId);
+			incidentEdges = graphData.getOutgoingEdges(nodeId);
 		}
 		HashMap<Integer, Uint16ListPacket> packetBufferEntry;
 		HashMap<Integer, String> bufferEntry;

@@ -246,8 +246,8 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 				if ((now - graphData.edgeTimes.get(e)) > timeoutInMs) {
 
 					if (log.isDebugEnabled()) {
-						log.debug("removing edge from node " + e.nodeId1 + " to " + e.nodeId2 + " which is " + ((now - graphData.edgeTimes.get(e)))
-								+ " ms old (timeout is " + timeoutInMs + " ms)");
+						log.debug("removing edge from node " + e.sourceNodeId + " to " + e.destinationNodeId + " which is "
+								+ ((now - graphData.edgeTimes.get(e))) + " ms old (timeout is " + timeoutInMs + " ms)");
 					}
 
 					dos.add(e.line);
@@ -306,15 +306,15 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 				log.debug("onNodeMoved(" + nodeId + "," + newPosition + ")");
 			}
 
-			for (final Edge e : graphData.getIncidentEdges(nodeId)) {
-				if (e.nodeId1 == nodeId) {
+			for (final Edge e : graphData.getIngoingOutgoingEdges(nodeId)) {
+				if (e.sourceNodeId == nodeId) {
 					if (log.isDebugEnabled()) {
-						log.debug("moving node " + e.nodeId1);
+						log.debug("moving node " + e.sourceNodeId);
 					}
 					e.line.setPosition(newPosition);
 				} else {
 					if (log.isDebugEnabled()) {
-						log.debug("moving node " + e.nodeId2);
+						log.debug("moving node " + e.destinationNodeId);
 					}
 					e.line.setEnd(newPosition);
 				}
@@ -341,7 +341,7 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 
 			// we need to check if the node exists in the graph and remove it if that's the case
 
-			for (final Edge e : graphData.getIncidentEdges(nodeId)) {
+			for (final Edge e : graphData.getIngoingOutgoingEdges(nodeId)) {
 				removedLines.add(e.line);
 				graphData.removeEdge(e);
 				stringFormatterData.removeEdge(e);

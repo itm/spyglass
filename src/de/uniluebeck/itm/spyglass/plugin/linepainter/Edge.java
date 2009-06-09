@@ -12,15 +12,15 @@ package de.uniluebeck.itm.spyglass.plugin.linepainter;
  */
 public class Edge {
 
-	public int nodeId1;
+	public int sourceNodeId;
 
-	public int nodeId2;
+	public int destinationNodeId;
 
 	public LinePainterLine line;
 
 	public Edge(final int nodeId1, final int nodeId2) {
-		this.nodeId1 = nodeId1;
-		this.nodeId2 = nodeId2;
+		this.sourceNodeId = nodeId1;
+		this.destinationNodeId = nodeId2;
 	}
 
 	@Override

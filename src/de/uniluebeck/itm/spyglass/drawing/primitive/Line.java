@@ -35,19 +35,19 @@ public class Line extends DrawingObject implements TransformChangedListener {
 
 	protected boolean currentClippingSaysDrawIt;
 
-	protected Point currentStartPoint;
+	protected DoublePoint currentStartPoint;
 
-	protected Point currentEndPoint;
+	protected DoublePoint currentEndPoint;
 
 	public Line() {
 		super();
 	}
 
-	static class Point {
+	protected static class DoublePoint {
 
-		double x, y;
+		public double x, y;
 
-		public Point(final double x, final double y) {
+		public DoublePoint(final double x, final double y) {
 			this.x = x;
 			this.y = y;
 		}
@@ -59,7 +59,7 @@ public class Line extends DrawingObject implements TransformChangedListener {
 
 	}
 
-	private static int outCodes(final Point point, final Rectangle rect) {
+	private static int outCodes(final DoublePoint point, final Rectangle rect) {
 
 		int code = 0;
 
@@ -79,7 +79,7 @@ public class Line extends DrawingObject implements TransformChangedListener {
 
 	}
 
-	private static boolean cohenSutherlandClip(final Point p1, final Point p2, final Rectangle rect) {
+	private static boolean cohenSutherlandClip(final DoublePoint p1, final DoublePoint p2, final Rectangle rect) {
 
 		int outCode1, outCode2;
 
@@ -141,8 +141,8 @@ public class Line extends DrawingObject implements TransformChangedListener {
 
 		// set protected class variables so that extending classes don't have to calculate the
 		// points once again
-		currentStartPoint = new Point(start.x, start.y);
-		currentEndPoint = new Point(end.x, end.y);
+		currentStartPoint = new DoublePoint(start.x, start.y);
+		currentEndPoint = new DoublePoint(end.x, end.y);
 
 		// set protected class variable so that extending classes can read if to draw
 		currentClippingSaysDrawIt = cohenSutherlandClip(currentStartPoint, currentEndPoint, gc.getClipping());
