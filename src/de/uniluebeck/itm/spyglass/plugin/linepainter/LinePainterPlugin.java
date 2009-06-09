@@ -408,8 +408,6 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 	@Override
 	public void shutdown() throws Exception {
 
-		super.shutdown();
-
 		stringFormatterData.shutdown();
 
 		config.removePropertyChangeListener(LinePainterXMLConfig.PROPERTYNAME_LINE_COLOR_R_G_B, this);
@@ -420,6 +418,8 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		timer.cancel();
 
 		resetPlugin();
+
+		super.shutdown();
 
 	}
 
