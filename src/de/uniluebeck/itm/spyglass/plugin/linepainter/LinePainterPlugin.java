@@ -415,7 +415,10 @@ public class LinePainterPlugin extends RelationPainterPlugin implements Property
 		config.removePropertyChangeListener(PluginXMLConfig.PROPERTYNAME_TIMEOUT, this);
 
 		pluginManager.removeNodePositionListener(this);
-		timer.cancel();
+
+		if (timer != null) {
+			timer.cancel();
+		}
 
 		resetPlugin();
 
