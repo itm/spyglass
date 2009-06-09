@@ -129,13 +129,15 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 			if (tip == null) {
 				tip = createNewToolTip(c,status.getSeverity());
 			}
-
+			tip.setVisible(false);
 			tip.setMessage(status.getMessage());
+			tip.setVisible(true);
 			updatePosition(c, tip);
 		}
 	}
 
 	private void destroyToolTip(final Control c, final ToolTip tip) {
+		tip.setVisible(false);
 		tip.dispose();
 		tipMap.remove(c);
 		tipStatus.remove(tip);
@@ -216,10 +218,12 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 		final Point oldPosition = tipPos.get(tip);
 		if (!newPosition.equals(oldPosition)) {
 			log.debug("Moved tooltop for control "+c);
+			tip.setVisible(false);
 			tip.setLocation(newPosition);
+			tip.setAutoHide(false);
+			tip.setVisible(true);
 			tipPos.put(tip, newPosition);
 		}
-		tip.setVisible(true);
 	}
 
 	// --------------------------------------------------------------------------------
