@@ -613,6 +613,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 	private Button buttonDeleteInstance;
 
+	private Button buttonResetInstance;
+
 	private final SelectionListener buttonSelectionListener = new SelectionAdapter() {
 
 		@Override
@@ -621,6 +623,8 @@ public class PluginManagerPreferencePage extends PreferencePage {
 				clickedButtonUp();
 			} else if (e.getSource() == buttonDown) {
 				clickedButtonDown();
+			} else if (e.getSource() == buttonResetInstance) {
+				clickedButtonReset();
 			} else if (e.getSource() == buttonDeleteInstance) {
 				clickedButtonRemoveInstance();
 			} else if (e.getSource() == buttonDeActivate) {
@@ -760,6 +764,9 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		final GridData buttonDownData = new GridData();
 		buttonDownData.widthHint = 130;
 
+		final GridData buttonResetInstanceData = new GridData();
+		buttonResetInstanceData.widthHint = 130;
+
 		final GridData buttonRemoveInstanceData = new GridData();
 		buttonRemoveInstanceData.widthHint = 130;
 
@@ -781,6 +788,12 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		buttonDown.setEnabled(false);
 		buttonDown.addSelectionListener(buttonSelectionListener);
 
+		buttonResetInstance = new Button(buttonComposite, SWT.PUSH);
+		buttonResetInstance.setText("Reset Instance");
+		buttonResetInstance.setLayoutData(buttonResetInstanceData);
+		buttonResetInstance.setEnabled(false);
+		buttonResetInstance.addSelectionListener(buttonSelectionListener);
+
 		buttonDeleteInstance = new Button(buttonComposite, SWT.PUSH);
 		buttonDeleteInstance.setText("Delete Instance");
 		buttonDeleteInstance.setLayoutData(buttonRemoveInstanceData);
@@ -799,6 +812,13 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		buttonInVisible.setEnabled(false);
 		buttonInVisible.addSelectionListener(buttonSelectionListener);
 
+	}
+
+	private void clickedButtonReset() {
+		final List<Plugin> list = getSelectedPlugins((IStructuredSelection) pluginTableViewer.getSelection());
+		for (final Plugin p : list) {
+			p.reset();
+		}
 	}
 
 	private void clickedButtonInVisible() {
@@ -942,6 +962,9 @@ public class PluginManagerPreferencePage extends PreferencePage {
 		buttonDown.dispose();
 		buttonDown = null;
 
+		buttonResetInstance.dispose();
+		buttonResetInstance = null;
+
 		buttonDeleteInstance.dispose();
 		buttonDeleteInstance = null;
 
@@ -975,6 +998,7 @@ public class PluginManagerPreferencePage extends PreferencePage {
 
 		buttonUp.setEnabled(enableUp);
 		buttonDown.setEnabled(enableDown);
+		buttonResetInstance.setEnabled(notEmpty);
 		buttonDeleteInstance.setEnabled(notEmpty);
 		buttonDeActivate.setEnabled(notEmpty);
 		buttonInVisible.setEnabled(notEmpty);
