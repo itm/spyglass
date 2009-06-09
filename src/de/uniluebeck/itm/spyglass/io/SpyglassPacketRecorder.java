@@ -447,6 +447,35 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 
 		// --------------------------------------------------------------------------------
 		/**
+		 * Checks if the selected recording file already exists. If so, a dialog window will show up
+		 * to ask the user whether the content is to be appended to the file or not. Alternatively,
+		 * the user can abort selecting the file at all.
+		 * 
+		 * @param file
+		 *            the file to be checked
+		 * @return <ul>
+		 *         <li><tt>0</tt> if the content is to be appended</li>
+		 *         <li><tt>1</tt> if the files content is to be replaced with the new one</li>
+		 *         <li><tt>2</tt> if the selection is to be aborted</li>
+		 *         </ul>
+		 */
+		private int checkAppend(final File file) {
+			int result = 0;
+
+			// Check if the file already exists and if it differs from the previous chosen one.
+			// If so, the user can decide to append the information, to overwrite the file or to
+			// abort the recording
+			if (file.exists() && (file.length() > 0)) {
+				result = new MessageDialog(Display.getCurrent().getActiveShell(), "Append or Replace", null,
+						"The file already exists. Shall the new information be appended or shall the file be replaced?", SWT.ICON_QUESTION,
+						new String[] { "Append", "Replace", "Abort" }, 0).open();
+				lastSelectedRecordFilePath = recordFileString;
+			}
+			return result;
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
 		 * Checks if the selected recording file already exists and if it is was already selected.
 		 * If it was not selected but it already exists, a dialog window will show up to ask the
 		 * user whether the content is to be appended to the file or not. Alternatively, the user
@@ -460,7 +489,7 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 		 *         <li><tt>2</tt> if the selection is to be aborted</li>
 		 *         </ul>
 		 */
-		private int checkAppend(final File file) {
+		private int checkAppendToPrevFile(final File file) {
 			int result = 0;
 
 			// Check if the file already exists and if it differs from the previous chosen one.

@@ -64,7 +64,13 @@ public class ComplexPacketReader extends AbstractGatewayPacketReader {
 		SpyglassPacket packet = null;
 		synchronized (gatewayMutex) {
 
-			packet = getNextPacketFromInputStream(getGateway().getInputStream());
+			final Gateway gw = getGateway();
+			InputStream is = null;
+			if ((gw != null) && ((is = gw.getInputStream()) != null)) {
+				packet = getNextPacketFromInputStream(getGateway().getInputStream());
+			} else {
+				log.warn("No packet could be fetched since the gateway is not completely initializey, yet");
+			}
 
 			if (packet != null) {
 				delayModule.delay(packet);
