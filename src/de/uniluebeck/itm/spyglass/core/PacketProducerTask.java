@@ -88,7 +88,7 @@ public class PacketProducerTask implements Runnable {
 				}
 
 				// wait for the next packet to arrive
-				packet = getPacketReader().getNextPacket();
+				packet = getPacketReader().getNextPacket(true);
 
 				if (packet == null) {
 					log

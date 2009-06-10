@@ -85,7 +85,7 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 	 * Constructor
 	 */
 	public SpyglassPacketRecorder() {
-		setSourceType(SOURCE_TYPE.ORTHER);
+		setSourceType(SOURCE_TYPE.ISHELL);
 		playbackModule = new PlaybackModule();
 	}
 
@@ -116,18 +116,25 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 
 	// --------------------------------------------------------------------------------
 	@Override
-	public SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException {
+	public SpyglassPacket getNextPacket(final boolean block) throws SpyglassPacketException, InterruptedException {
 
 		SpyglassPacket packet = null;
 
 		if (!recorderShutDown) {
 			// this do while is needed, to guarantee that valid packets are returned
 			do {
+
+				if (block && getSourceType().equals(SOURCE_TYPE.NONE)) {
+					synchronized (gatewayMutex) {
+						gatewayMutex.wait();
+					}
+				}
+
 				// if a file was chosen as input source ...
-				if (getSourceType().equals(SOURCE_TYPE.FILE)) {
-					recModule.handlePacket(packet = playbackModule.getNextPacket());
+				else if (getSourceType().equals(SOURCE_TYPE.FILE)) {
+					recModule.handlePacket(packet = playbackModule.getNextPacket(block));
 				} else {
-					packet = super.getNextPacket();
+					packet = super.getNextPacket(block);
 				}
 			} while ((packet == null) && !skipWaiting.getAndSet(false));
 		} else {
@@ -150,7 +157,8 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Enables or disables the readFromFile mode
+	 * Enables or disables the readFromFile mode.<br>
+	 * Note that the packets will fetched from the packet queue if they are not read from a file
 	 * 
 	 * @param enable
 	 *            <code>true</code> if the readFromFile mode is to be enabled, <code>false</code>
@@ -158,7 +166,7 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 	 * @return <code>true</code> if the readFromFile mode is enabled, <code>false</code> otherwise
 	 */
 	public boolean setReadFromFile(final boolean enable) {
-		this.setSourceType(enable ? SOURCE_TYPE.FILE : SOURCE_TYPE.ORTHER);
+		this.setSourceType(enable ? SOURCE_TYPE.FILE : SOURCE_TYPE.ISHELL);
 		return getSourceType().equals(SOURCE_TYPE.FILE);
 	}
 
@@ -336,9 +344,10 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 		 * 
 		 * @param path
 		 *            the path to the file which is used for recording the input
+		 * @return <code>true</code> if the file was set successfully
 		 */
 		@SuppressWarnings("synthetic-access")
-		public void setRecordFile(final String path) {
+		public boolean setRecordFile(final String path) {
 
 			if (path == null) {
 				recordFileString = null;
@@ -350,7 +359,7 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 
 					MessageDialog.openError(null, "The file is already in use",
 							"Sorry, the chosen file is already in use for playback. Please choose a different one ");
-
+					return false;
 				}
 
 				// if a file conflict was detected but the readFromFile mode is disabled, set
@@ -370,6 +379,7 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 					recordFileString = path;
 				}
 			}
+			return true;
 		}
 
 		// --------------------------------------------------------------------------------
@@ -572,19 +582,19 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 		 */
 		private String getRecordFilePath() {
 			if (recordFileString == null) {
-				setRecordFile(selectRecodingFileByUser());
+				setRecodingFileByUser();
 			}
 			return recordFileString;
 		}
 
 		// --------------------------------------------------------------------------------
 		/**
-		 * Opens a message dialog for the user to select the recording file
+		 * Opens a message dialog for the user to select and set the recording file
 		 * 
 		 * @return the path to the file selected by the user
 		 */
 		@SuppressWarnings("synthetic-access")
-		private String selectRecodingFileByUser() {
+		private String setRecodingFileByUser() {
 			final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
 			fd.setFilterExtensions(new String[] { "*.rec" });
 			fd.setFilterPath(recordDirectory);
@@ -598,21 +608,8 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 						path += ".rec";
 					}
 
-					conflictingFileSelected = playbackModule.equalsPlaybackFilePath(path);
-					if (isReadFromFile() && conflictingFileSelected) {
+					conflictingFileSelected = !setRecordFile(path);
 
-						MessageDialog.openError(null, "The file is already in use",
-								"Sorry, the chosen file is already in use for playback. Please choose a different one ");
-
-					}
-
-					// if a file conflict was detected but the readFromFile mode is disabled, set
-					// the
-					// playback file to null
-					else if (!isReadFromFile() && playbackModule.equalsPlaybackFilePath(path)) {
-						playbackModule.setPlayBackFile(null);
-						conflictingFileSelected = false;
-					}
 				}
 			} while (conflictingFileSelected);
 			return path;
@@ -660,7 +657,9 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 		 * Resets the recording module
 		 */
 		public void reset() {
-			recordFileString = null;
+			if (!isRecord()) {
+				recordFileString = null;
+			}
 			lastSelectedRecordFilePath = null;
 			getPacketQueue().clear();
 		}
@@ -731,7 +730,7 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 		 * @return the path to the file selected by the user
 		 */
 		@SuppressWarnings("synthetic-access")
-		String selectPlayBackFileByUser() {
+		public String selectPlayBackFileByUser() {
 			final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.OPEN);
 			fd.setFilterExtensions(new String[] { "*.rec" });
 			fd.setFilterPath(recordDirectory);
@@ -823,25 +822,40 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 				}
 			} else {
 				((FileReaderGateway) complexPacketReader.getGateway()).setFile(null);
-				setReadFromFile(false);
+				if (getSourceType().equals(SOURCE_TYPE.FILE)) {
+					setReadFromFile(false);
+				}
 			}
 			return isReadFromFile();
 		}
 
 		// --------------------------------------------------------------------------
 		/**
-		 * Returns a new packet, once it arrives. It will never return null, but block until it has
-		 * something to return.
+		 * Returns a new packet
 		 * 
+		 * @param block
+		 *            indicates whether the method has to block or return <code>null</code> if no
+		 *            packet is available
 		 * @exception SpyglassPacketException
 		 *                if the packet to return is invalid
 		 * @exception InterruptedException
 		 *                if the method was interrupted while waiting on a packet.
-		 * @return a new SpyGlass packet
+		 * @return a new SpyGlass packet or <code>null</code> if no more packets are available
 		 * 
 		 */
-		public SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException {
-			return complexPacketReader.getNextPacket();
+		@SuppressWarnings("synthetic-access")
+		public SpyglassPacket getNextPacket(final boolean block) throws SpyglassPacketException, InterruptedException {
+			synchronized (gatewayMutex) {
+
+				final SpyglassPacket packet = complexPacketReader.getNextPacket(false);
+				if (packet == null) {
+					setSourceType(SOURCE_TYPE.NONE);
+					if (block) {
+						gatewayMutex.wait();
+					}
+				}
+				return packet;
+			}
 		}
 
 		// --------------------------------------------------------------------------------
@@ -867,7 +881,7 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 		 * 
 		 * @throws IOException
 		 */
-		void reset() throws IOException {
+		public void reset() throws IOException {
 			complexPacketReader.reset();
 		}
 

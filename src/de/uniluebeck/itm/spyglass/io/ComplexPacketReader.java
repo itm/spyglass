@@ -51,15 +51,8 @@ public class ComplexPacketReader extends AbstractGatewayPacketReader {
 	}
 
 	// --------------------------------------------------------------------------------
-	/**
-	 * Returns the next packet from the currently selected playback file
-	 * 
-	 * @return a {@link SpyglassPacket}
-	 * @throws SpyglassPacketException
-	 * @throws InterruptedException
-	 */
 	@Override
-	public SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException {
+	public SpyglassPacket getNextPacket(final boolean block) throws SpyglassPacketException, InterruptedException {
 
 		SpyglassPacket packet = null;
 		synchronized (gatewayMutex) {
@@ -67,7 +60,10 @@ public class ComplexPacketReader extends AbstractGatewayPacketReader {
 			final Gateway gw = getGateway();
 			InputStream is = null;
 			if ((gw != null) && ((is = gw.getInputStream()) != null)) {
-				packet = getNextPacketFromInputStream(getGateway().getInputStream());
+				packet = getNextPacketFromInputStream(is);
+				if ((packet == null) && block) {
+					gatewayMutex.wait();
+				}
 			} else {
 				log.warn("No packet could be fetched since the gateway is not completely initializey, yet");
 			}
@@ -76,7 +72,6 @@ public class ComplexPacketReader extends AbstractGatewayPacketReader {
 				delayModule.delay(packet);
 			}
 		}
-		// this is done to enable the user to cut the packet stream read from a file
 		return packet;
 
 	}
@@ -93,18 +88,17 @@ public class ComplexPacketReader extends AbstractGatewayPacketReader {
 	 */
 	private SpyglassPacket getNextPacketFromInputStream(final InputStream playbackFileReader) throws SpyglassPacketException, InterruptedException {
 
-		SpyglassPacket packet = null;
 		synchronized (gatewayMutex) {
 
 			try {
 				final int next;
 				byte[] packetData;
 				if (playbackFileReader == null) {
-					gatewayMutex.wait();
+					return null;
 				} else if ((next = playbackFileReader.read()) != -1) {
 					packetData = new byte[next];
 					playbackFileReader.read(packetData);
-					packet = factory.createInstance(packetData);
+					return factory.createInstance(packetData);
 				} else {
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override
@@ -112,14 +106,14 @@ public class ComplexPacketReader extends AbstractGatewayPacketReader {
 							MessageDialog.openInformation(null, "No more data", "The end of the playback file was reached!");
 						}
 					});
-					gatewayMutex.wait();
+					return null;
 				}
 
 			} catch (final IOException e) {
 				log.error("Error while reading a new packet...", e);
+				return null;
 			}
 		}
-		return packet;
 	}
 
 	@Override

@@ -74,6 +74,9 @@ public class SpyGlassPacketQueue extends AbstractPacketReader {
 	 * arrives.<br>
 	 * As an exception of the rule, <code>null</code> might be returned in case of an reset.
 	 * 
+	 * @param block
+	 *            indicates whether the method has to block or return <code>null</code> if no packet
+	 *            is available
 	 * @return the tail of the packet queue, or <tt>null</tt> if the packet queue is empty
 	 * @exception SpyglassPacketException
 	 *                if the packet to return is invalid
@@ -81,7 +84,7 @@ public class SpyGlassPacketQueue extends AbstractPacketReader {
 	 *                if the method was interrupted while waiting on a packet.
 	 */
 	@Override
-	public SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException {
+	public SpyglassPacket getNextPacket(final boolean block) throws SpyglassPacketException, InterruptedException {
 
 		SpyglassPacket packet = null;
 

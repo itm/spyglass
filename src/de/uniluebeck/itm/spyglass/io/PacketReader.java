@@ -33,8 +33,12 @@ public interface PacketReader extends SpyglassPropertyChangeSupport {
 		FILE,
 		/** Indicates that packets are read from a network interface */
 		NETWORK,
-		/** Indicates that the source is neither a file nor a network */
-		ORTHER
+		/** Indicates that packets are provided by iShell */
+		ISHELL,
+		/** Indicates that the source is neither a file nor a network nor iShell */
+		OTHER,
+		/** Indicates that no source is selected at all */
+		NONE
 	}
 
 	// ------------------------------------------------------------------------------
@@ -65,17 +69,19 @@ public interface PacketReader extends SpyglassPropertyChangeSupport {
 
 	// --------------------------------------------------------------------------
 	/**
-	 * Returns a new packet, once it arrives. It will never return null, but block until it has
-	 * something to return.
+	 * Returns a new packet
 	 * 
+	 * @param block
+	 *            indicates whether the method has to block or return <code>null</code> if no packet
+	 *            is available
 	 * @exception SpyglassPacketException
 	 *                if the packet to return is invalid
 	 * @exception InterruptedException
 	 *                if the method was interrupted while waiting on a packet.
-	 * @return a new SpyGlass packet
+	 * @return a new SpyGlass packet or <code>null</code> if no more packets are available
 	 * 
 	 */
-	public SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException;
+	public SpyglassPacket getNextPacket(boolean block) throws SpyglassPacketException, InterruptedException;
 
 	// --------------------------------------------------------------------------------
 	/**

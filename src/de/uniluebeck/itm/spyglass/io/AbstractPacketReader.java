@@ -19,7 +19,6 @@ import de.uniluebeck.itm.spyglass.core.SpyglassConfiguration;
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.packet.PacketFactory;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
-import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 
 // ------------------------------------------------------------------------------
@@ -64,20 +63,6 @@ public abstract class AbstractPacketReader extends PropertyBean implements Packe
 	public void init(final Spyglass spyglass) {
 		this.factory = new PacketFactory(spyglass);
 	}
-
-	// --------------------------------------------------------------------------
-	/**
-	 * Returns a new packet, once it arrives. It will never return null, but block until it has
-	 * something to return.
-	 * 
-	 * @exception SpyglassPacketException
-	 *                if the packet to return is invalid
-	 * @exception InterruptedException
-	 *                if the method was interrupted while waiting on a packet.
-	 * @return a new SpyGlass packet
-	 * 
-	 */
-	public abstract SpyglassPacket getNextPacket() throws SpyglassPacketException, InterruptedException;
 
 	// --------------------------------------------------------------------------------
 	/**

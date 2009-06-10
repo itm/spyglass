@@ -211,14 +211,15 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 	 * Initializes the values of the labels etc. using the currently defined ones of the application
 	 */
 	private void initializeValues() {
-		myvalues.setUseIShell(!(spyglass.getPacketReader().getSourceType().equals(SOURCE_TYPE.FILE)));
-		if (myvalues.useIShell) {
+		final SOURCE_TYPE sourceType = spyglass.getPacketReader().getSourceType();
+		myvalues.setUseIShell(sourceType.equals(SOURCE_TYPE.ISHELL));
+		if (myvalues.useIShell || sourceType.equals(SOURCE_TYPE.NONE)) {
 			buttonOpenFileDialog.setEnabled(false);
 			textPath2File.setEnabled(false);
 		}
 
 		buttoniShell.setSelection(myvalues.useIShell);
-		buttonFile.setSelection(!myvalues.useIShell);
+		buttonFile.setSelection(sourceType.equals(SOURCE_TYPE.FILE));
 		if (spyglass.getPacketReader() instanceof GatewayPacketReader) {
 			final Gateway gw = ((GatewayPacketReader) spyglass.getPacketReader()).getGateway();
 			if ((gw != null) && (gw instanceof FileReaderGateway)) {
