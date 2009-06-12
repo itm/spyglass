@@ -51,7 +51,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * @author bimschas
- *
+ * 
  */
 public class NodeSensorRangePerNodeConfigurationComposite {
 
@@ -190,9 +190,9 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Snagged this code from https://bugs.eclipse.org/bugs/show_bug.cgi?id=36977
-	 * credit to Tom Schindl
-	 *
+	 * Snagged this code from https://bugs.eclipse.org/bugs/show_bug.cgi?id=36977 credit to Tom
+	 * Schindl
+	 * 
 	 * @author Dariush Forouher
 	 */
 	private final class ButtonCellLabelProvider extends CellLabelProvider {
@@ -201,20 +201,20 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 		public void update(final ViewerCell cell) {
 
 			final TableItem item = (TableItem) cell.getItem();
-			if( item.getData("EDITOR") != null ) {
+			if (item.getData("EDITOR") != null) {
 				final TableEditor editor = (TableEditor) item.getData("EDITOR");
 				editor.dispose();
 			}
 
 			final TableEditor editor = new TableEditor(item.getParent());
-			final Composite comp = new Composite(item.getParent(),SWT.NONE);
+			final Composite comp = new Composite(item.getParent(), SWT.NONE);
 			comp.setBackground(item.getParent().getBackground());
 			comp.setBackgroundMode(SWT.INHERIT_DEFAULT);
 			final RowLayout l = new RowLayout();
-			l.marginHeight=0;
-			l.marginWidth=0;
-			l.marginTop=0;
-			l.marginBottom=0;
+			l.marginHeight = 0;
+			l.marginWidth = 0;
+			l.marginTop = 0;
+			l.marginBottom = 0;
 
 			comp.setLayout(l);
 			final Button button = new Button(comp, SWT.PUSH);
@@ -223,7 +223,7 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					final TableItem item = editor.getItem();
-					final NodeSensorRangeXMLConfig.Config config =  (Config) item.getData();
+					final NodeSensorRangeXMLConfig.Config config = (Config) item.getData();
 
 					final RANGE_TYPE selectedRangeType = config.getRangeType();
 
@@ -246,8 +246,8 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 
 			});
 
-		    editor.grabHorizontal=true;
-		    editor.setEditor(comp, item, 6); // number of the column starting from zero!!!
+			editor.grabHorizontal = true;
+			editor.setEditor(comp, item, 6); // number of the column starting from zero!!!
 		}
 
 	}
@@ -270,9 +270,10 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 				color = new Color(Display.getDefault(), rgb);
 				return color;
 			} catch (final Exception e) {
-				throw new RuntimeException("Bug",e);
+				throw new RuntimeException("Bug", e);
 			}
 		}
+
 		@Override
 		public Color getBackground(final Object element) {
 			try {
@@ -282,7 +283,7 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 				color = new Color(Display.getDefault(), rgb);
 				return color;
 			} catch (final Exception e) {
-				throw new RuntimeException("Bug",e);
+				throw new RuntimeException("Bug", e);
 			}
 		}
 
@@ -296,7 +297,7 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Activates data binding
-	 *
+	 * 
 	 * @param dbc
 	 *            the {@link DataBindingContext}
 	 * @param config
@@ -306,12 +307,12 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 
 		this.page = page;
 
-		columnLineWidth.setEditingSupport(new DatabindingTextEditingSupport(table, dbc, NodeSensorRangeXMLConfig.PROPERTYNAME_LINE_WIDTH,
-				null, new IntegerRangeValidator(0,2000), null));
+		columnLineWidth.setEditingSupport(new DatabindingTextEditingSupport(table, dbc, NodeSensorRangeXMLConfig.PROPERTYNAME_LINE_WIDTH, null,
+				new IntegerRangeValidator(0, 2000), null));
 		columnLineColor.setEditingSupport(new ColorEditingSupport(table, dbc, NodeSensorRangeXMLConfig.PROPERTYNAME_COLOR_R_G_B));
 		columnBackgroundColor.setEditingSupport(new ColorEditingSupport(table, dbc, NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_R_G_B));
 		columnBackgroundAlpha.setEditingSupport(new DatabindingTextEditingSupport(table, dbc, NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_ALPHA,
-				null, new IntegerRangeValidator(0,255), null));
+				null, new IntegerRangeValidator(0, 255), null));
 
 		columnType.setEditingSupport(new ComboBoxRangeTypeEditingSupport(table, dbc, NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE, new String[] {
 				"Circle", "Cone", "Rectangle" }));
@@ -341,13 +342,13 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 		final IObservableMap buttonMap = BeansObservables.observeMap(contentProvider.getKnownElements(), NodeSensorRangeXMLConfig.Config.class,
 				NodeSensorRangeXMLConfig.PROPERTYNAME_NODE_ID);
 
-
 		final IObservableMap[] columnMaps = new IObservableMap[] { nodeIdMap, lineWidthMap, lineColorMap, backgroundColorMap, backgroundAlphaMap,
 				typeMap, buttonMap };
 
 		table.setLabelProvider(new ObservableMapLabelProvider(columnMaps));
 
-		// after we have defined a generic label provider for the entire table, we can now set individual label providers
+		// after we have defined a generic label provider for the entire table, we can now set
+		// individual label providers
 		// for specific columns.
 
 		columnBackgroundColor.setLabelProvider(new NodeSensorRangeColorLabelProvider(NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_R_G_B));
@@ -400,7 +401,7 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 			cfg.setNodeId(Integer.parseInt(dlg.getValue()));
 			tableData.add(cfg);
 			page.markFormDirty();
-	}
+		}
 
 		// this is a hack and will probably not work every time.
 		table.refresh();

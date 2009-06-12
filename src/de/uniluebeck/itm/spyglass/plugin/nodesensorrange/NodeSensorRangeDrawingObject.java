@@ -7,7 +7,6 @@ package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -24,37 +23,60 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
- * Flag class for DrawingObjects painted by NodeSensorRangePlugin
+ * Class for DrawingObjects painted by NodeSensorRangePlugin
  * 
- * @author bimschas
+ * @author Daniel Bimschas
  */
-public class NodeSensorRangeDrawingObject extends DrawingObject implements PropertyChangeListener {
-
-	private static final Logger log = SpyglassLoggerFactory.getLogger(NodeSensorRangeDrawingObject.class);
-	private NodeSensorRangePlugin plugin;
-
-	public NodeSensorRangeDrawingObject(final NodeSensorRangePlugin plugin, final Config config) {
-
-		super();
-
-		this.plugin = plugin;
-		this.config = config;
-		this.config.addPropertyChangeListener(this);
-
-		setBgColor(config.getBackgroundRGB());
-		setColor(config.getColorRGB());
-
-	}
+public class NodeSensorRangeDrawingObject extends DrawingObject {
 
 	private enum RangeType {
 		CIRCLE, CONE, RECTANGLE
 	}
 
 	private Config config;
+
+	private PropertyChangeListener configPropertyChangeListener = new PropertyChangeListener() {
+		@Override
+		public void propertyChange(final PropertyChangeEvent e) {
+
+			final boolean isRange = NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE.equals(e.getPropertyName());
+			final boolean isBackground = NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_R_G_B.equals(e.getPropertyName());
+			final boolean isForeground = NodeSensorRangeXMLConfig.PROPERTYNAME_COLOR_R_G_B.equals(e.getPropertyName());
+
+			if (isRange) {
+				markBoundingBoxDirty();
+			} else if (isBackground) {
+				final int[] color = (int[]) e.getNewValue();
+				setBgColor(new RGB(color[0], color[1], color[2]));
+			} else if (isForeground) {
+				final int[] color = (int[]) e.getNewValue();
+				setColor(new RGB(color[0], color[1], color[2]));
+			}
+
+			markContentDirty();
+
+		}
+	};
+
+	/**
+	 * To be called by the plug-in before (!) adding it to the layer
+	 */
+	public void init(final Config config) {
+		this.config = config;
+		this.config.addPropertyChangeListener(configPropertyChangeListener);
+		setColor(this.config.getColorRGB());
+		setBgColor(this.config.getBackgroundRGB());
+	}
+
+	/**
+	 * To be called by the plug-in before removing it from the layer
+	 */
+	public void shutdown() {
+		this.config.removePropertyChangeListener(configPropertyChangeListener);
+	}
 
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
@@ -329,32 +351,23 @@ public class NodeSensorRangeDrawingObject extends DrawingObject implements Prope
 
 	}
 
-	public synchronized Config getConfig() {
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public Config getConfig() {
 		return config;
 	}
 
-	public synchronized void setConfig(final Config config) {
-		this.config = config;
-	}
-
-	@Override
-	public void propertyChange(final PropertyChangeEvent e) {
-
-		final boolean isRange = NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE.equals(e.getPropertyName());
-		final boolean isBackground = NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_R_G_B.equals(e.getPropertyName());
-		final boolean isForeground = NodeSensorRangeXMLConfig.PROPERTYNAME_COLOR_R_G_B.equals(e.getPropertyName());
-
-		if (isRange) {
-			markBoundingBoxDirty();
-		} else if (isBackground) {
-			final int[] color = (int[]) e.getNewValue();
-			setBgColor(new RGB(color[0], color[1], color[2]));
-		} else if (isForeground) {
-			final int[] color = (int[]) e.getNewValue();
-			setColor(new RGB(color[0], color[1], color[2]));
+	public void setConfig(final Config c) {
+		if (this.config != null) {
+			this.config.removePropertyChangeListener(configPropertyChangeListener);
 		}
-
-		markContentDirty();
+		this.config = c;
+		this.config.addPropertyChangeListener(configPropertyChangeListener);
+		setColor(c.getColorRGB());
+		setBgColor(c.getBackgroundRGB());
+		markBoundingBoxDirty();
 	}
 
 }

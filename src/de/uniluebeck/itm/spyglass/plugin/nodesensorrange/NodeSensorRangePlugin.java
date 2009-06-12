@@ -61,14 +61,14 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	};
 
 	@Element(name = "parameters")
-	private final NodeSensorRangeXMLConfig xmlConfig;
+	private NodeSensorRangeXMLConfig xmlConfig;
 
 	private Data data;
 
 	public NodeSensorRangePlugin() {
 		super(false);
-		data = new Data();
 		xmlConfig = new NodeSensorRangeXMLConfig();
+		data = new Data();
 	}
 
 	@Override
@@ -99,8 +99,8 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 
 	@Override
 	public void init(final PluginManager pluginManager) throws Exception {
-
 		super.init(pluginManager);
+		data.init(xmlConfig);
 		pluginManager.addNodePositionListener(nodePositionListener);
 
 		// add NodeSensorRangeDrawingObjects for all existing nodes
@@ -113,16 +113,17 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	@Override
 	public void shutdown() throws Exception {
 		super.shutdown();
+		data.shutdown();
 		pluginManager.removeNodePositionListener(nodePositionListener);
 	}
 
 	private void onNodeAdded(final int node, final AbsolutePosition newPosition) {
 
-		final NodeSensorRangeDrawingObject nrdo = new NodeSensorRangeDrawingObject(this, xmlConfig.getDefaultConfig());
-		nrdo.setPosition(newPosition);
-		data.add(node, nrdo);
+		final NodeSensorRangeDrawingObject nsrdo = new NodeSensorRangeDrawingObject();
+		nsrdo.setPosition(newPosition);
+		data.add(node, nsrdo);
 
-		fireDrawingObjectAdded(nrdo);
+		fireDrawingObjectAdded(nsrdo);
 
 	}
 
@@ -147,14 +148,14 @@ public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
 	private void onNodeRemoved(final int node, final AbsolutePosition oldPosition) {
 
 		// don't cause a redraw if we're inactive
-		fireDrawingObjectRemoved(data.remove(node));
+		final NodeSensorRangeDrawingObject nsrdo = data.remove(node);
+		fireDrawingObjectRemoved(nsrdo);
 
 	}
 
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
-		// since the plug-in is not interested in packets, nothing has to be
-		// done here
+		// since the plug-in is not interested in packets, nothing has to be done here
 	}
 
 	@Override
