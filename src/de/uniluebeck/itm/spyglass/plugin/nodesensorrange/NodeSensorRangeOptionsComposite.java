@@ -51,7 +51,7 @@ import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfi
 // --------------------------------------------------------------------------------
 /**
  * @author bimschas
- *
+ * 
  */
 public class NodeSensorRangeOptionsComposite extends Composite {
 
@@ -96,10 +96,8 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 			// this will have another change event as result
 			if (NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE.equals(e.getPropertyName())) {
 
-				final String rangeType = (String) e.getNewValue();
-
-				final boolean isCircle = RANGE_TYPE.valueOf(rangeType) == RANGE_TYPE.Circle;
-				final boolean isCone = RANGE_TYPE.valueOf(rangeType) == RANGE_TYPE.Cone;
+				final boolean isCircle = e.getNewValue() == RANGE_TYPE.Circle;
+				final boolean isCone = e.getNewValue() == RANGE_TYPE.Cone;
 
 				config.setRange(isCircle ? new CircleRange() : isCone ? new ConeRange() : new RectangleRange());
 
@@ -107,6 +105,15 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 				throw new RuntimeException("Unexpected case.");
 			}
 
+		}
+
+		// --------------------------------------------------------------------------------
+		/**
+		 */
+		public void dispose() {
+			if (this.config != null) {
+				this.config.removePropertyChangeListener(NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE, this);
+			}
 		}
 
 	}
@@ -304,7 +311,8 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 							final String selectedRangeType = defaultRangeType.getText();
 
 							final NodeSensorRange defaultRange = defaultConfigWrapper.getConfig().getRange();
-							final NodeRangeDialog dialog = NodeRangeDialog.createDialog(getShell(), RANGE_TYPE.valueOf(selectedRangeType), defaultRange);
+							final NodeRangeDialog dialog = NodeRangeDialog.createDialog(getShell(), RANGE_TYPE.valueOf(selectedRangeType),
+									defaultRange);
 
 							if (Window.OK == dialog.open()) {
 								defaultConfigWrapper.getConfig().setRange(dialog.range);
@@ -349,11 +357,27 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 	private Binding defaultLineWidthBinding;
 
+	private Config defaultConfig;
 
-	public void setDatabinding(final DataBindingContext dbc, final NodeSensorRangeXMLConfig.Config defaultConfig, final NodeSensorRangePreferencePage page) {
+	private PropertyChangeListener dirtyListener = new PropertyChangeListener() {
+		@Override
+		public void propertyChange(final PropertyChangeEvent evt) {
+			page.markFormDirty();
+		}
+	};
+
+	private Config defaultConfigClone;
+
+	public void setDatabinding(final DataBindingContext dbc, final NodeSensorRangeXMLConfig.Config defaultConfig,
+			final NodeSensorRangePreferencePage page) {
 
 		this.page = page;
 		this.dbc = dbc;
+		this.defaultConfig = defaultConfig;
+		this.defaultConfigWrapper = new ConfigWrapper();
+		defaultConfigClone = defaultConfig.clone();
+		defaultConfigClone.addPropertyChangeListener(dirtyListener);
+		this.defaultConfigWrapper.setConfig(defaultConfigClone);
 
 		IObservableValue obsModel;
 		ISWTObservableValue obsWidget;
@@ -371,7 +395,8 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 		{
 			obsWidget = SWTObservables.observeSelection(defaultRangeType);
 			obsModel = BeansObservables.observeValue(realm, defaultConfig, NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE);
-			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setConverter(new NodeSensorRangeTypeConverter(String.class, Enum.class));
+			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setConverter(new NodeSensorRangeTypeConverter(String.class,
+					Enum.class));
 			defaultRangeTypeBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
@@ -403,5 +428,26 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 		perNodeConfigurationComposite.setDataBinding(dbc, page);
 
+	}
+
+	// --------------------------------------------------------------------------------
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.widgets.Widget#dispose()
+	 */
+	@Override
+	public void dispose() {
+		defaultConfigClone.removePropertyChangeListener(dirtyListener);
+		defaultConfigWrapper.dispose();
+		super.dispose();
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @return
+	 */
+	public Config getDefaultConfig() {
+		return defaultConfigWrapper.config;
 	}
 }

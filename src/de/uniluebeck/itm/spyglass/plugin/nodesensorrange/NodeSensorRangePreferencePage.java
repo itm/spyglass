@@ -22,8 +22,8 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 	 * tho the original map in the XMLConfig only when storeToModel() is called.
 	 */
 	private HashSet<Config> tempTable = new HashSet<Config>();
-	private NodeSensorRangeOptionsComposite optionsComposite;
 
+	private NodeSensorRangeOptionsComposite optionsComposite;
 
 	public NodeSensorRangePreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
@@ -56,7 +56,19 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
+	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#dispose()
+	 */
+	@Override
+	public void dispose() {
+		optionsComposite.dispose();
+		super.dispose();
+	}
+
+	// --------------------------------------------------------------------------------
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#loadFromModel()
 	 */
 	@Override
@@ -72,7 +84,7 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#storeToModel()
 	 */
 	@Override
@@ -81,6 +93,10 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 
 		log.info("store to model");
 
+		final Config updatedDefaultConfig = optionsComposite.getDefaultConfig();
+		if (!config.getDefaultConfig().equalsEachProperty(updatedDefaultConfig)) {
+			config.setDefaultConfig(updatedDefaultConfig);
+		}
 		config.setPerNodeConfigs(this.tempTable);
 		tempTable = config.getPerNodeConfigsClone();
 		optionsComposite.getPerNodeConfigurationComposite().connectTableWithData(dbc, tempTable);

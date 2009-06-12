@@ -202,6 +202,13 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 			}
 		}
 
+		public boolean equalsEachProperty(final Config o) {
+			return (backgroundAlpha == o.backgroundAlpha) && (backgroundRGB[0] == o.backgroundRGB[0]) && (backgroundRGB[1] == o.backgroundRGB[1])
+					&& (backgroundRGB[2] == o.backgroundRGB[2]) && (colorRGB[0] == o.colorRGB[0]) && (colorRGB[1] == o.colorRGB[1])
+					&& (colorRGB[2] == o.colorRGB[2]) && (lineWidth == o.lineWidth) && (nodeId == o.lineWidth) && range.equals(o.range)
+					&& (rangeType == o.rangeType);
+		}
+
 		public int hashCodeOrig() {
 			return super.hashCode();
 		}
@@ -333,7 +340,7 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	}
 
 	@Element(name = PROPERTYNAME_DEFAULT_CONFIG, required = false)
-	private final Config defaultConfig = new Config();
+	private Config defaultConfig = new Config();
 
 	@ElementList(entry = PROPERTYNAME_PER_NODE_CONFIGS, required = false)
 	private HashSet<Config> perNodeConfigs = new HashSet<Config>();
@@ -347,6 +354,15 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 
 	public Config getDefaultConfig() {
 		return defaultConfig;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param defaultConfig
+	 *            the defaultConfig to set
+	 */
+	public void setDefaultConfig(final Config defaultConfig) {
+		firePropertyChange(PROPERTYNAME_DEFAULT_CONFIG, this.defaultConfig, this.defaultConfig = defaultConfig);
 	}
 
 	@Override
