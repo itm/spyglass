@@ -308,11 +308,14 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * thread is clinically dead.
 	 */
 	private void stopPacketConsumerThread() {
+		log.debug("Stopping thread " + this.getInstanceName());
 		if (packetConsumerThread != null) {
 			try {
 				packetConsumerThread.interrupt();
 				packetConsumerThread.join();
+				log.debug("Stoppen von " + this.getInstanceName() + " funktioniert!");
 			} catch (final InterruptedException e) {
+				log.debug("Stoppen von " + this.getInstanceName() + " klappt nicht richtig!");
 				Thread.currentThread().interrupt();
 			}
 		}
@@ -332,6 +335,7 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 */
 	private void startPacketConsumerThread() {
 
+		log.debug("Starting thread " + this.getInstanceName());
 		if (packetQueue == null) {
 			return;
 		}

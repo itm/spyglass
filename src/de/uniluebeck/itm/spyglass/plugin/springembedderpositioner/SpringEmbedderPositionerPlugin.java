@@ -54,7 +54,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 	private Map<Integer, Vector<Integer>> neighbours = new ConcurrentHashMap<Integer, Vector<Integer>>(16, 0.75f, 1);
 
-	private Timer timeoutTimer = null;
+	private Timer timer = null;
 	// private Timer repositionTimer = null;
 
 	/**
@@ -77,25 +77,31 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
 
-		timeoutTimer = new Timer("SpringEmbedderPositioner NodeTimeout-Timer");
+		timer = new Timer("SpringEmbedderPositioner NodeTimeout-Timer");
 		// repositionTimer = new Timer("SpringEmbedderPositioner Reposition-Timer");
 
 		// Check every second for old nodes
-		timeoutTimer.schedule(new TimerTask() {
+		timer.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
-				removeOldNodes();
+				// Only do something while the plugin is active
+				if (xmlConfig.getActive()) {
+					removeOldNodes();
+				}
 			}
 
 		}, 0, 1000);
 
 		// Recalculate the existing node positions ten times a second
-		timeoutTimer.schedule(new TimerTask() {
+		timer.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
-				repositionNodes();
+				// Only do something while the plugin is active
+				if (xmlConfig.getActive()) {
+					repositionNodes();
+				}
 			}
 
 		}, 500, 100);
@@ -106,12 +112,13 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	public void shutdown() throws Exception {
 		super.shutdown();
 
-		this.timeoutTimer.cancel();
+		this.timer.cancel();
 		// this.repositionTimer.cancel();
 	}
 
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
+		log.debug("SEP " + this.getInstanceName() + " gibt Position für ID: " + nodeId);
 		final PositionDataSE d = nodeMap.get(nodeId);
 
 		return d != null ? d.sePosition : null;
@@ -171,6 +178,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	 */
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
+		log.debug("SEP " + this.getInstanceName() + " handles a packet...");
 		final int id = packet.getSenderId();
 
 		// check if we already know about this node
@@ -178,7 +186,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 		// if node is already known, change the "last-seen" value and the position
 		if (oldData != null) {
-			log.debug("Node " + id + " already exists");
+			// log.debug("Node " + id + " already exists");
 			oldData.lastSeen = System.currentTimeMillis();
 			oldData.position = packet.getPosition().clone();
 			this.nodeMap.put(id, oldData);
@@ -226,7 +234,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	 * Remove nodes which have timed out.
 	 */
 	private void removeOldNodes() {
-
+		// log.debug("SEP removes old nodes...");
 		try {
 			if (xmlConfig.getTimeout() == 0) {
 				return;
@@ -398,7 +406,8 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 		if (divisor == 0) {
 			final double[] result = { Math.pow(2, 15), Math.pow(2, 15), Math.pow(2, 15) };
-			log.debug("division result: (" + result[0] + ", " + result[1] + ", " + result[2] + ")");
+			// log.debug("division result: (" + result[0] + ", " + result[1] + ", " + result[2] +
+			// ")");
 			return result;
 		}
 
@@ -407,7 +416,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		result[1] = (vector.y) / divisor;
 		result[2] = (vector.z) / divisor;
 
-		log.debug("division result: (" + result[0] + ", " + result[1] + ", " + result[2] + ")");
+		// log.debug("division result: (" + result[0] + ", " + result[1] + ", " + result[2] + ")");
 		return result;
 	}
 

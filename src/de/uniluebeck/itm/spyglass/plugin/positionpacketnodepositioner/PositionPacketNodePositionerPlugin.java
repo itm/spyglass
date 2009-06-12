@@ -74,7 +74,10 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 			@Override
 			public void run() {
-				removeOldNodes();
+				// Only do something while the plugin is active
+				if (config.getActive()) {
+					removeOldNodes();
+				}
 			}
 
 		}, 1000, 100);
@@ -83,6 +86,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
+		log.debug("PPNP " + this.getInstanceName() + " gibt Position für ID: " + nodeId);
 		final PositionData d = nodeMap.get(nodeId);
 		return d != null ? d.position : null;
 	}
@@ -91,7 +95,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	 * Remove nodes which have timed out.
 	 */
 	private void removeOldNodes() {
-
+		// log.debug("PPNP " + this.getInstanceName() + " removes old nodes...");
 		if (config.getTimeout() == 0) {
 			return;
 		}
@@ -150,7 +154,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	 */
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
-
+		log.debug("PPNP " + this.getInstanceName() + " handles a packet...");
 		final int id = packet.getSenderId();
 
 		// check if we already know about this node
@@ -212,6 +216,14 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 	@Override
 	public void addNodes(final Map<Integer, PositionData> oldNodeMap) {
 		nodeMap.putAll(oldNodeMap);
+		final Iterator<Integer> it = nodeMap.keySet().iterator();
+		while (it.hasNext()) {
+			final int id = it.next();
+			final PositionData pos = nodeMap.get(id);
+			if (pos != null) {
+				pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.MOVED, pos.position, pos.position));
+			}
+		}
 	}
 
 	// --------------------------------------------------------------------------------
