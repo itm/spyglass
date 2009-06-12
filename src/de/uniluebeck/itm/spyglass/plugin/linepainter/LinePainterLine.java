@@ -46,20 +46,24 @@ public class LinePainterLine extends Line {
 			final Point p = determineStringFormatterPosition(textExtent);
 
 			final Color oldForeground = gc.getForeground();
-			final Color oldBackground = gc.getBackground();
-			gc.setForeground(Display.getDefault().getSystemColor(SWT.COLOR_BLACK));
-			gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+			final Color foreground = new Color(Display.getCurrent(), getColor());
+			gc.setForeground(foreground);
 
 			if (paintBox) {
+				final Color oldBackground = gc.getBackground();
+				gc.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+
 				final Rectangle boxRect = new Rectangle(p.x - 2, p.y - 1, textExtent.x + 4, textExtent.y + 2);
 				gc.fillRectangle(boxRect);
 				gc.drawRectangle(boxRect);
+
+				gc.setBackground(oldBackground);
 			}
 
 			gc.drawText(stringFormatterResult, p.x, p.y, SWT.DRAW_DELIMITER | SWT.DRAW_TAB);
 
 			gc.setForeground(oldForeground);
-			gc.setBackground(oldBackground);
+			foreground.dispose();
 
 		}
 
