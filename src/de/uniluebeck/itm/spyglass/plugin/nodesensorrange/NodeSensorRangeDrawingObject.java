@@ -81,10 +81,12 @@ public class NodeSensorRangeDrawingObject extends DrawingObject {
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
 
-		final AbsoluteRectangle box = new AbsoluteRectangle();
+		final AbsoluteRectangle absBox = new AbsoluteRectangle();
 		final NodeSensorRange range = config.getRange();
 		final RangeType rangeType = range instanceof RectangleRange ? RangeType.RECTANGLE : range instanceof CircleRange ? RangeType.CIRCLE
 				: RangeType.CONE;
+		final PixelRectangle pxBox;
+		final int lineWidth = config.getLineWidth();
 
 		switch (rangeType) {
 
@@ -92,12 +94,21 @@ public class NodeSensorRangeDrawingObject extends DrawingObject {
 			case CONE:
 				final int radius = rangeType == RangeType.CIRCLE ? ((CircleRange) config.getRange()).getCircleRadius() : ((ConeRange) config
 						.getRange()).getConeRadius();
-				final int lineWidth = config.getLineWidth();
-				// make it a little larger so that lineWidth fragments aren't so bad
-				box.setLowerLeft(new AbsolutePosition(getPosition().x - radius - lineWidth * 5, getPosition().y - radius - lineWidth * 5));
-				box.setWidth(2 * radius + 10 * lineWidth);
-				box.setHeight(2 * radius + 10 * lineWidth);
-				return box;
+
+				// calculate box in absolute coordinates resulting from radius
+				absBox.setLowerLeft(new AbsolutePosition(getPosition().x - radius, getPosition().y - radius));
+				absBox.setWidth(2 * radius);
+				absBox.setHeight(2 * radius);
+
+				// now transform to pixel coordinates and add the width of the line
+				pxBox = getDrawingArea().absRect2PixelRect(absBox);
+				pxBox.rectangle.x -= 2 * lineWidth;
+				pxBox.rectangle.y -= 2 * lineWidth;
+				pxBox.rectangle.width += 4 * lineWidth;
+				pxBox.rectangle.height += 4 * lineWidth;
+
+				// transform back to absolute coordinates and return
+				return getDrawingArea().pixelRect2AbsRect(pxBox);
 
 			case RECTANGLE:
 				final int width = ((RectangleRange) config.getRange()).getRectangleWidth();
@@ -106,10 +117,19 @@ public class NodeSensorRangeDrawingObject extends DrawingObject {
 				final int hypLength = (int) Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) + 10;
 				final int x = getPosition().x - (hypLength / 2);
 				final int y = getPosition().y - (hypLength / 2);
-				box.setLowerLeft(new AbsolutePosition(x, y));
-				box.setWidth(hypLength);
-				box.setHeight(hypLength);
-				return box;
+				absBox.setLowerLeft(new AbsolutePosition(x, y));
+				absBox.setWidth(hypLength);
+				absBox.setHeight(hypLength);
+
+				// now transform to pixel coordinates and add the width of the line
+				pxBox = getDrawingArea().absRect2PixelRect(absBox);
+				pxBox.rectangle.x -= lineWidth;
+				pxBox.rectangle.y -= lineWidth;
+				pxBox.rectangle.width += 2 * lineWidth;
+				pxBox.rectangle.height += 2 * lineWidth;
+
+				// transform back to absolute coordinates and return
+				return getDrawingArea().pixelRect2AbsRect(pxBox);
 
 			default:
 				throw new RuntimeException("We should never reach this code block!");
