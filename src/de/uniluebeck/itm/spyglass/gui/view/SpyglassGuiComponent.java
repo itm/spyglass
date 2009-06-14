@@ -7,9 +7,15 @@
  */
 package de.uniluebeck.itm.spyglass.gui.view;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -17,6 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
+import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.plugin.globalinformation.GlobalInformationPlugin;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
@@ -80,7 +87,6 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 		try {
 
 			this.setLayout(new FillLayout());
-
 			final SashForm form = new SashForm(this, SWT.HORIZONTAL);
 			form.setLayout(new FillLayout());
 
@@ -93,11 +99,54 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 			{
 				final Composite wrapper = new Composite(form, SWT.BORDER);
 				wrapper.setLayout(new FillLayout());
-				initGlobalInformationBar(wrapper, spyglass);
+				globalInformationBar = new GlobalInformationBar(wrapper, SWT.V_SCROLL, spyglass);
+				globalInformationBar.addPropertyChangeListener(new PropertyChangeListener() {
+					// --------------------------------------------------------------------------------
+					@Override
+					public void propertyChange(final PropertyChangeEvent evt) {
+						if (evt.getPropertyName().equals("hasVisibleWidgets")) {
+							if ((Boolean) evt.getNewValue()) {
+								final int size = SpyglassEnvironment.getDrawingAreaSize();
+								form.setWeights(new int[] { size, 100 - size });
+							} else {
+								form.setWeights(new int[] { 100, 0 });
+							}
+						}
+
+					}
+				});
+
+				wrapper.addControlListener(new ControlListener() {
+					// --------------------------------------------------------------------------------
+					@Override
+					public void controlMoved(final ControlEvent e) {
+						// nothing to do here
+					}
+
+					// --------------------------------------------------------------------------------
+					@SuppressWarnings("synthetic-access")
+					@Override
+					public void controlResized(final ControlEvent e) {
+						final int size = form.getWeights()[0] / 10;
+						// save the size information unless the global information bar is not
+						// visible at all
+						if (size != 100) {
+							try {
+								SpyglassEnvironment.setDrawingAreaSize(size);
+							} catch (final IOException e1) {
+								log.error("", e1);
+							}
+						}
+					}
+				});
 			}
 
-			// 83% drawing area, 17% global information bar
-			form.setWeights(new int[] { 83, 17 });
+			if (globalInformationBar.isHasVisibleWidgets()) {
+				final int size = SpyglassEnvironment.getDrawingAreaSize();
+				form.setWeights(new int[] { size, 100 - size });
+			} else {
+				form.setWeights(new int[] { 100, 0 });
+			}
 
 		} catch (final Exception e) {
 			log.error(e, e);
@@ -122,7 +171,6 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 			{
 				final Composite compositeDrawingArea = new Composite(parent, SWT.NONE);
 				final GridLayout composite1Layout = new GridLayout();
-				// composite1Layout.makeColumnsEqualWidth = true;
 				composite1Layout.marginHeight = 0;
 				composite1Layout.marginWidth = 0;
 				composite1Layout.numColumns = 2;
@@ -178,25 +226,12 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 					canvas = new DrawingArea(compositeDrawingArea, SWT.None);
 					canvas.setLayoutData(canvas1LData);
 
-					// rulerH.setDrawingArea(canvas);
-					// rulerV.setDrawingArea(canvas);
 				}
 			}
 			parent.layout();
 		} catch (final Exception e) {
 			log.error(e, e);
 		}
-	}
-
-	// --------------------------------------------------------------------------------
-	/**
-	 * Initializes the widgets where {@link GlobalInformationPlugin}'s can attach information
-	 * 
-	 * @param parent
-	 *            the parent widget
-	 */
-	private void initGlobalInformationBar(final Composite parent, final Spyglass spyglass) {
-		globalInformationBar = new GlobalInformationBar(parent, SWT.V_SCROLL, spyglass);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -247,8 +282,6 @@ public class SpyglassGuiComponent extends org.eclipse.swt.widgets.Composite {
 		unitArea.setLayoutData(dataD);
 		rulerV.setLayoutData(dataV);
 		rulerH.setLayoutData(dataH);
-		// final Point size2 = new Point(200, 200);
-		// canvas.setSize(size2);
 
 		canvas.getParent().layout();
 	}

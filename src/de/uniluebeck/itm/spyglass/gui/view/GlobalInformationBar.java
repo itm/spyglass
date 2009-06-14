@@ -1,9 +1,10 @@
 /*
- * -------------------------------------------------------------------------------- This file is
- * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
- * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
- * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
- * SpyGlass source tree for further details.
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui.view;
@@ -19,6 +20,7 @@ import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.plugin.GlobalInformation;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
@@ -40,7 +42,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  * @author Sebastian Ebers
  * 
  */
-public class GlobalInformationBar {
+public class GlobalInformationBar extends PropertyBean {
 
 	/**
 	 * Widgets containing the actual information and which are wrapped in {@link ExpandItem}s
@@ -51,6 +53,11 @@ public class GlobalInformationBar {
 	 * The {@link ExpandBar} where the information are to be attached and shown
 	 */
 	private ExpandBar expandBar;
+
+	/**
+	 * Indicates whether visible widgets are present at the global information bar
+	 */
+	private boolean hasVisibleWidgets;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -113,12 +120,18 @@ public class GlobalInformationBar {
 			if (p instanceof GlobalInformationPlugin) {
 				p.getXMLConfig().addPropertyChangeListener(new PropertyChangeListener() {
 					// --------------------------------------------------------------------------------
+					@SuppressWarnings("synthetic-access")
 					@Override
 					public void propertyChange(final PropertyChangeEvent evt) {
 						if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ACTIVE) && ((Boolean) evt.getNewValue())) {
 							manage((SimpleGlobalInformationPlugin) p);
 						}
+
+						if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_VISIBLE)) {
+							setHasVisibleWidgets(checkVisibleWidgets());
+						}
 					}
+
 				});
 			}
 		}
@@ -127,6 +140,7 @@ public class GlobalInformationBar {
 		// of existing ones appropriately
 		pluginManager.addPluginListChangeListener(new PluginListChangeListener() {
 
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void pluginListChanged(final Plugin p, final ListChangeEvent what) {
 				if (p instanceof GlobalInformationPlugin) {
@@ -142,9 +156,49 @@ public class GlobalInformationBar {
 						default:
 							break;
 					}
+					setHasVisibleWidgets(checkVisibleWidgets());
 				}
 			}
 		});
+		setHasVisibleWidgets(checkVisibleWidgets());
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Checks if any plug-in which might currently be attached might have a visible widget
+	 */
+	private boolean checkVisibleWidgets() {
+		for (final GlobalInformationWidget w : widgets) {
+			if (w.getPlugin().isActive() && w.getPlugin().isVisible()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets whether any plug-in which might currently be attached might have a visible widget
+	 * 
+	 * @param hasVisibleWidgets
+	 *            <code>true</code> if any plug-in which might currently be attached might have a
+	 *            visible widget
+	 */
+	private void setHasVisibleWidgets(final boolean hasVisibleWidgets) {
+		final boolean hadVisisbleWidgets = this.hasVisibleWidgets;
+		this.hasVisibleWidgets = hasVisibleWidgets;
+		firePropertyChange("hasVisibleWidgets", hadVisisbleWidgets, hasVisibleWidgets);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns whether any plug-in which might currently be attached might have a visible widget
+	 * 
+	 * @return <code>true</code> if any plug-in which might currently be attached might have a
+	 *         visible widget
+	 */
+	public boolean isHasVisibleWidgets() {
+		return hasVisibleWidgets;
 	}
 
 	// --------------------------------------------------------------------------------
