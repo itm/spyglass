@@ -9,6 +9,7 @@
  */
 package de.uniluebeck.itm.spyglass;
 
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
+
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 
 // --------------------------------------------------------------------------------
 /**
@@ -45,6 +48,7 @@ public class SpyglassEnvironment {
 	private static final String PROPERTY_CONFIG_STANDALONE_SIZE_X = "screensize_x";
 	private static final String PROPERTY_CONFIG_STANDALONE_SIZE_Y = "screensize_y";
 	private static final String PROPERTY_CONFIG_DRAWINGAREA_SIZE = "drawingarea_size";
+	private static final String PROPERTY_CONFIG_AFFINE_TRANSFORM_MATRIX = "affine_transform_matrix";
 
 	/**
 	 * our property store
@@ -107,6 +111,7 @@ public class SpyglassEnvironment {
 		props.setProperty(PROPERTY_CONFIG_STANDALONE_SIZE_X, "800");
 		props.setProperty(PROPERTY_CONFIG_STANDALONE_SIZE_Y, "600");
 		props.setProperty(PROPERTY_CONFIG_DRAWINGAREA_SIZE, "83");
+
 		storeProps(props);
 	}
 
@@ -311,6 +316,40 @@ public class SpyglassEnvironment {
 	public static void setDrawingAreaSize(final int size) throws IOException {
 		props.setProperty(PROPERTY_CONFIG_DRAWINGAREA_SIZE, size + "");
 		storeProps(props);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the object used for affine operation within the drawing area
+	 * 
+	 * @return the object used for affine operation within the drawing area
+	 * @see DrawingArea
+	 */
+	public static AffineTransform getAffineTransformation() {
+		final String[] matrix = String.valueOf(props.get(PROPERTY_CONFIG_AFFINE_TRANSFORM_MATRIX)).split(",");
+		final double[] flatmatrix = new double[6];
+		for (int i = 0; i < matrix.length; i++) {
+			flatmatrix[i] = Double.valueOf(matrix[i]);
+		}
+		return new AffineTransform(flatmatrix);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the object used for affine operation within the drawing area
+	 * 
+	 * @param at
+	 *            the object used for affine operation within the drawing area
+	 * @see DrawingArea
+	 */
+	public static void setAffineTransformation(final AffineTransform at) {
+		final double[] flatmatrix = new double[6];
+		at.getMatrix(flatmatrix);
+		final StringBuffer matrix = new StringBuffer();
+		for (final double d : flatmatrix) {
+			matrix.append("," + d);
+		}
+		props.setProperty(PROPERTY_CONFIG_AFFINE_TRANSFORM_MATRIX, matrix.substring(1));
 	}
 
 }

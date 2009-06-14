@@ -16,6 +16,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 import de.uniluebeck.itm.spyglass.gui.view.TransformChangedEvent.Type;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
@@ -27,10 +28,10 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * The drawing area is the place, where all nodes etc. are painted on. this class contains all
  * information about the dimensions of the drawing area and offers methods to transform between
  * reference frames.
- *
+ * 
  * Attention: Methods of this class MUST only be invoked from the SWT-GUI thread, unless explicitly
  * stated otherwise!
- *
+ * 
  * @author Dariush Forouher
  */
 public class DrawingArea extends Canvas implements ControlListener, DisposeListener {
@@ -96,11 +97,9 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	// --------------------------------------------------------------------------------
 	/**
 	 * Create a new DrawingArea.
-	 *
+	 * 
 	 * @param parent
 	 * @param style
-	 * @param spyglass
-	 *            Reference to spyglass.
 	 */
 	public DrawingArea(final Composite parent, final int style) {
 		//
@@ -113,9 +112,9 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	/**
 	 * Maps a point from the absolute reference frame to the reference frame of the drawing area.
-	 *
+	 * 
 	 * This method is thread-safe.
-	 *
+	 * 
 	 * @param absPoint
 	 *            a point in the absolute reference frame
 	 * @return the determined reference frame of the drawing area
@@ -134,12 +133,12 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	/**
 	 * Transforms a rectangle from absolute coordinates into a one with pixel coordinates.
-	 *
+	 * 
 	 * It is guaranteed that the resulting pixel rectangle will contain at least the area of the
 	 * original absolute rectangle (iow: the rounding is always done to the outside).
-	 *
+	 * 
 	 * This method is thread-safe.
-	 *
+	 * 
 	 * @param absRect
 	 */
 	public PixelRectangle absRect2PixelRect(final AbsoluteRectangle absRect) {
@@ -148,7 +147,6 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 		synchronized (transformMutex) {
 			final AbsoluteRectangle invertedabsRect = inv(absRect);
-
 
 			Point2D a = at.transform(invertedabsRect.getLowerLeft().toPoint2D(), null);
 			final PixelPosition upperLeftPx = new PixelPosition(a);
@@ -242,9 +240,9 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	/**
 	 * return the absolute point represented by the lower left point of the drawing area.
-	 *
+	 * 
 	 * This method is thread-safe.
-	 *
+	 * 
 	 */
 	public AbsolutePosition getLowerLeft() {
 
@@ -261,9 +259,9 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	/**
 	 * return the absolute point represented by the upper left point of the drawing area.
-	 *
+	 * 
 	 * This method is thread-safe.
-	 *
+	 * 
 	 */
 	public Point2D getUpperLeftPrecise() {
 
@@ -293,7 +291,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	/**
 	 * Moves the drawing area by the given number of pixels
-	 *
+	 * 
 	 * @param pixelX
 	 * @param pixelY
 	 */
@@ -326,7 +324,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	/**
 	 * Moves the drawing area by the given number of units in absolute coordinates
-	 *
+	 * 
 	 * @param pixelX
 	 * @param pixelY
 	 */
@@ -372,9 +370,9 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	/**
 	 * Maps a point from the reference frame of the drawing are to the absolute reference frame.
-	 *
+	 * 
 	 * This method is thread-safe.
-	 *
+	 * 
 	 * @param point
 	 *            a point in the reference frame of the drawing area
 	 */
@@ -393,12 +391,12 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	/**
 	 * Transforms a rectangle from pixel coordinates into a one with absolute coordinates.
-	 *
+	 * 
 	 * It is guaranteed that the resulting absolute rectangle will contain at least the area of the
 	 * original pixel rectangle (iow: the rounding is always done to the outside).
-	 *
+	 * 
 	 * This method is thread-safe.
-	 *
+	 * 
 	 * @param rect
 	 */
 	public AbsoluteRectangle pixelRect2AbsRect(final PixelRectangle rect) {
@@ -432,9 +430,9 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	/**
 	 * Returns the current zoom level. The zoom level can take any value in the range 0-ZOOM_MAX.
-	 *
+	 * 
 	 * This method is thread-safe.
-	 *
+	 * 
 	 */
 	public double getZoom() {
 
@@ -447,7 +445,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	// --------------------------------------------------------------------------------
 	/**
 	 * Zoom Out. Use the given pixel position as the zoom center
-	 *
+	 * 
 	 * @param px
 	 * @param py
 	 */
@@ -461,7 +459,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	// --------------------------------------------------------------------------------
 	/**
 	 * Zooms in.
-	 *
+	 * 
 	 * @param px
 	 * @param py
 	 */
@@ -474,7 +472,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	// --------------------------------------------------------------------------------
 	/**
 	 * Zoom in or out by the given factor
-	 *
+	 * 
 	 * @param px
 	 * @param py
 	 * @param factor
@@ -546,7 +544,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	/**
 	 * Adjusts the transformation matrix to make the given rectangle fit exactly in the drawing
 	 * area.
-	 *
+	 * 
 	 */
 	public void autoZoom(AbsoluteRectangle rect) {
 		this.checkWidget();
@@ -600,9 +598,9 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	/**
 	 * Returns the global bounding box describing the whole world. (absolute coordinates outside
 	 * this bounding box can be considered an error.)
-	 *
+	 * 
 	 * This method is thread-safe.
-	 *
+	 * 
 	 */
 	public static AbsoluteRectangle getGlobalBoundingBox() {
 
@@ -612,11 +610,11 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	/**
 	 * Adjust the Transform ,until it is valid again.
-	 *
+	 * 
 	 * Note: this method is not thread-safe!
-	 *
+	 * 
 	 * TODO: adjust heuristic for the case when the drawing area is enlarged for more then 2x
-	 *
+	 * 
 	 */
 	protected void adjustToValidMatrix() {
 
@@ -670,16 +668,16 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	}
 
 	private AffineTransform createInitialTransform() {
-		return AffineTransform.getScaleInstance(1, 1);
+		return SpyglassEnvironment.getAffineTransformation();
 	}
 
 	/**
 	 * Add a new Listener for changes in the transform of this drawing area.
-	 *
+	 * 
 	 * This listener can be used to listen for changes in zoom or movement of the drawing area.
-	 *
+	 * 
 	 * This method is thread-safe.
-	 *
+	 * 
 	 */
 	public void addTransformChangedListener(final TransformChangedListener listener) {
 		// since this method must be thread-safe, just fail silently
@@ -691,9 +689,9 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	/**
 	 * Remove the given listener.
-	 *
+	 * 
 	 * This method is thread-safe.
-	 *
+	 * 
 	 */
 	public void removeTransformChangedListener(final TransformChangedListener listener) {
 		// since this method must be thread-safe, just fail silently
@@ -714,17 +712,18 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		for (final TransformChangedListener l : listeners.getListeners(TransformChangedListener.class)) {
 			l.handleEvent(event);
 		}
+		SpyglassEnvironment.setAffineTransformation(at);
 	}
 
 	/**
 	 * Returns a copy of the transformation matrix used to transform coordinates from the absolute
 	 * reference frame to the pixel reference frame.
-	 *
-	 * Note that this transform does not incorporate the inverting of the y-axis between absolute and pixel
-	 * coordinates.
-	 *
+	 * 
+	 * Note that this transform does not incorporate the inverting of the y-axis between absolute
+	 * and pixel coordinates.
+	 * 
 	 * This method is thread-safe.
-	 *
+	 * 
 	 */
 	public AffineTransform getTransform() {
 		synchronized (transformMutex) {
@@ -733,7 +732,9 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.swt.events.ControlListener#controlMoved(org.eclipse.swt.events.ControlEvent)
 	 */
 	@Override
@@ -770,13 +771,17 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
 	 */
 	@Override
 	public void widgetDisposed(final DisposeEvent e) {
 
 		// SWT clears all its listeners on dispose. we have to do the same.
 		listeners = new EventListenerList();
+		SpyglassEnvironment.setAffineTransformation(at);
 	}
 }
