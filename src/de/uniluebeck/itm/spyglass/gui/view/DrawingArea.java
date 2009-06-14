@@ -1,8 +1,18 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.view;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 
 import javax.swing.event.EventListenerList;
 
@@ -24,6 +34,7 @@ import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
+// --------------------------------------------------------------------------------
 /**
  * The drawing area is the place, where all nodes etc. are painted on. this class contains all
  * information about the dimensions of the drawing area and offers methods to transform between
@@ -36,7 +47,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class DrawingArea extends Canvas implements ControlListener, DisposeListener {
 
-	protected static Logger log = SpyglassLoggerFactory.getLogger(DrawingArea.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(DrawingArea.class);
 
 	/**
 	 * Scale factor applied while zooming.
@@ -110,6 +121,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Maps a point from the absolute reference frame to the reference frame of the drawing area.
 	 * 
@@ -131,6 +143,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Transforms a rectangle from absolute coordinates into a one with pixel coordinates.
 	 * 
@@ -140,6 +153,8 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	 * This method is thread-safe.
 	 * 
 	 * @param absRect
+	 *            a rectangle using absolute coordinates
+	 * @return a rectangle using pixel coordinates
 	 */
 	public PixelRectangle absRect2PixelRect(final AbsoluteRectangle absRect) {
 
@@ -166,8 +181,11 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * return a rectangle descrbing the dimensions of the drawing area.
+	 * Returns a rectangle describing the dimensions of the drawing area.
+	 * 
+	 * @return a rectangle describing the dimensions of the drawing area
 	 */
 	public PixelRectangle getDrawingRectangle() {
 		this.checkWidget();
@@ -179,9 +197,13 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		return ret;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * return a rectangle descrbing the dimensions and position of the currently visible part of the
-	 * absolute frame of reference.
+	 * Returns a rectangle describing the dimensions and position of the currently visible part of
+	 * the absolute frame of reference.
+	 * 
+	 * @return a rectangle describing the dimensions and position of the currently visible part of
+	 *         the absolute frame of reference
 	 */
 	public AbsoluteRectangle getAbsoluteDrawingRectangle() {
 		this.checkWidget();
@@ -201,8 +223,11 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		return absRect;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * return the absolute point represented by the upper right point of the drawing area.
+	 * Returns the absolute point represented by the upper right point of the drawing area.
+	 * 
+	 * @return the absolute point represented by the upper right point of the drawing area
 	 */
 	public AbsolutePosition getUpperRight() {
 		this.checkWidget();
@@ -220,8 +245,11 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * return the absolute point represented by the lower right point of the drawing area.
+	 * Returns the absolute point represented by the lower right point of the drawing area.
+	 * 
+	 * @return the absolute point represented by the lower right point of the drawing area
 	 */
 	public Point2D getLowerRightPrecise() {
 		this.checkWidget();
@@ -238,10 +266,13 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * return the absolute point represented by the lower left point of the drawing area.
+	 * Returns the absolute point represented by the lower left point of the drawing area.
 	 * 
 	 * This method is thread-safe.
+	 * 
+	 * @return the absolute point represented by the lower left point of the drawing area
 	 * 
 	 */
 	public AbsolutePosition getLowerLeft() {
@@ -257,11 +288,13 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * return the absolute point represented by the upper left point of the drawing area.
+	 * Returns the absolute point represented by the upper left point of the drawing area.
 	 * 
 	 * This method is thread-safe.
 	 * 
+	 * @return the absolute point represented by the upper left point of the drawing area
 	 */
 	public Point2D getUpperLeftPrecise() {
 
@@ -289,11 +322,14 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		return ret;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Moves the drawing area by the given number of pixels
 	 * 
 	 * @param pixelX
+	 *            the horizontal number of pixels
 	 * @param pixelY
+	 *            the vertical number of pixels
 	 */
 	public void move(final int pixelX, final int pixelY) {
 		this.checkWidget();
@@ -322,11 +358,14 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Moves the drawing area by the given number of units in absolute coordinates
 	 * 
-	 * @param pixelX
-	 * @param pixelY
+	 * @param dx
+	 *            the horizontal number of units
+	 * @param dy
+	 *            the vertical number of units
 	 */
 	public void moveAbs(final int dx, final int dy) {
 		this.checkWidget();
@@ -343,10 +382,15 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * Checks, if the given Transformation, concatinated to the current <code>at</code>, would
+	 * Checks, if the given Transformation, concatenated to the current <code>at</code>, would
 	 * result in a legal transformation matrix with respect to the global boundingBox (which must
 	 * never be left)
+	 * 
+	 * @param at2
+	 *            the affine transformation to be checked
+	 * @return <code>true</code> if the transformation is valid, <code>false</code> otherwise
 	 */
 	protected boolean isValidTransformation(final AffineTransform at2) {
 		boolean ok = false;
@@ -368,6 +412,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		return ok;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Maps a point from the reference frame of the drawing are to the absolute reference frame.
 	 * 
@@ -375,6 +420,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	 * 
 	 * @param point
 	 *            a point in the reference frame of the drawing area
+	 * @return the point in the absolute reference frame
 	 */
 	public AbsolutePosition pixelPoint2AbsPoint(final PixelPosition point) {
 
@@ -389,6 +435,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Transforms a rectangle from pixel coordinates into a one with absolute coordinates.
 	 * 
@@ -398,6 +445,8 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	 * This method is thread-safe.
 	 * 
 	 * @param rect
+	 *            a rectangle in pixel coordinates
+	 * @return a rectangle in absolute coordinates
 	 */
 	public AbsoluteRectangle pixelRect2AbsRect(final PixelRectangle rect) {
 
@@ -428,11 +477,13 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the current zoom level. The zoom level can take any value in the range 0-ZOOM_MAX.
 	 * 
 	 * This method is thread-safe.
 	 * 
+	 * @return the current zoom level
 	 */
 	public double getZoom() {
 
@@ -447,7 +498,9 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	 * Zoom Out. Use the given pixel position as the zoom center
 	 * 
 	 * @param px
+	 *            the zoom center's horizontal position
 	 * @param py
+	 *            the zoom center's vertical position
 	 */
 	public void zoomOut(final int px, final int py) {
 		this.checkWidget();
@@ -521,8 +574,12 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * Zoom in and implicitly asume that the center of the drawing area is the scale center.
+	 * Zoom in and implicitly assume that the center of the drawing area is the scale center.
+	 * 
+	 * @param factor
+	 *            the zoom factor
 	 */
 	public void zoomIn(final double factor) {
 		this.checkWidget();
@@ -531,8 +588,12 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * Zoom out and implicitly asume that the center of the drawing area is the scale center.
+	 * Zoom out and implicitly assume that the center of the drawing area is the scale center.
+	 * 
+	 * @param factor
+	 *            the zoom factor
 	 */
 	public void zoomOut(final double factor) {
 		this.checkWidget();
@@ -541,15 +602,18 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Adjusts the transformation matrix to make the given rectangle fit exactly in the drawing
 	 * area.
 	 * 
+	 * @param rect
+	 *            the rectangle defining the drawing areas size
 	 */
 	public void autoZoom(AbsoluteRectangle rect) {
 		this.checkWidget();
 
-		// modifiy y axis
+		// modify y axis
 		rect = inv(rect);
 
 		log.debug("Auto zooming to " + rect);
@@ -572,7 +636,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		newAt.scale(scale, scale);
 		newAt.translate(-rect.getLowerLeft().x, -rect.getLowerLeft().y);
 
-		// finally move the rect to the center of the drawing area
+		// finally move the rectangle to the center of the drawing area
 		final AbsolutePosition upperRight = rect.getLowerLeft();
 		upperRight.x += rect.getWidth();
 		upperRight.y += rect.getHeight();
@@ -595,11 +659,14 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		redraw();
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the global bounding box describing the whole world. (absolute coordinates outside
 	 * this bounding box can be considered an error.)
 	 * 
 	 * This method is thread-safe.
+	 * 
+	 * @return the global bounding box describing the whole world
 	 * 
 	 */
 	public static AbsoluteRectangle getGlobalBoundingBox() {
@@ -608,6 +675,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Adjust the Transform ,until it is valid again.
 	 * 
@@ -655,7 +723,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 		}
 
-		// TODO: what about the gap betweeen the two synchr. blocks?
+		// TODO: what about the gap between the two synchr. blocks?
 		synchronized (transformMutex) {
 			at = atCopy;
 		}
@@ -671,12 +739,16 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		return SpyglassEnvironment.getAffineTransformation();
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Add a new Listener for changes in the transform of this drawing area.
 	 * 
 	 * This listener can be used to listen for changes in zoom or movement of the drawing area.
 	 * 
 	 * This method is thread-safe.
+	 * 
+	 * @param listener
+	 *            a new Listener for changes in the transform of this drawing area
 	 * 
 	 */
 	public void addTransformChangedListener(final TransformChangedListener listener) {
@@ -687,10 +759,14 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		listeners.add(TransformChangedListener.class, listener);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Remove the given listener.
 	 * 
 	 * This method is thread-safe.
+	 * 
+	 * @param listener
+	 *            the linstener to be removed
 	 * 
 	 */
 	public void removeTransformChangedListener(final TransformChangedListener listener) {
@@ -701,8 +777,12 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		listeners.remove(TransformChangedListener.class, listener);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Fires a DrawingAreaTransformEvent.
+	 * 
+	 * @param type
+	 *            the event's type
 	 */
 	protected void fireTransformEvent(final TransformChangedEvent.Type type) {
 
@@ -712,9 +792,14 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 		for (final TransformChangedListener l : listeners.getListeners(TransformChangedListener.class)) {
 			l.handleEvent(event);
 		}
-		SpyglassEnvironment.setAffineTransformation(at);
+		try {
+			SpyglassEnvironment.setAffineTransformation(at);
+		} catch (final IOException e) {
+			log.error("An error occured while trying to store the affine transformation parameters", e);
+		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Returns a copy of the transformation matrix used to transform coordinates from the absolute
 	 * reference frame to the pixel reference frame.
@@ -724,6 +809,8 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	 * 
 	 * This method is thread-safe.
 	 * 
+	 * @return a copy of the transformation matrix used to transform coordinates from the absolute
+	 *         reference frame to the pixel reference frame
 	 */
 	public AffineTransform getTransform() {
 		synchronized (transformMutex) {
@@ -739,10 +826,10 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	 */
 	@Override
 	public void controlMoved(final ControlEvent e) {
-		//
-
+		// 
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void controlResized(final ControlEvent e) {
 
@@ -760,12 +847,11 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 		// the origin of the absolute frame of reference should always be in the lower left corner
 		if (lastKnownWidgetSize == null) {
-			final int diffH = getClientArea().height;
-			move(0, diffH);
-		} else {
-			final int diffH = lastKnownWidgetSize.height - getClientArea().height;
-			move(0, -diffH);
+			lastKnownWidgetSize = SpyglassEnvironment.getDrawingAreaPosition();
 		}
+		final int diffH = lastKnownWidgetSize.height - getClientArea().height;
+		move(0, -diffH);
+
 		lastKnownWidgetSize = getClientArea();
 
 	}
@@ -782,6 +868,11 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 
 		// SWT clears all its listeners on dispose. we have to do the same.
 		listeners = new EventListenerList();
-		SpyglassEnvironment.setAffineTransformation(at);
+		try {
+			SpyglassEnvironment.setAffineTransformation(at);
+			SpyglassEnvironment.setDrawingAreaPosition(lastKnownWidgetSize);
+		} catch (final IOException e1) {
+			log.error("An error occured while trying to store the affine transformation parameters", e1);
+		}
 	}
 }

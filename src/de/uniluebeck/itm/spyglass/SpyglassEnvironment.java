@@ -18,6 +18,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import org.eclipse.swt.graphics.Rectangle;
+
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 
 // --------------------------------------------------------------------------------
@@ -49,6 +51,7 @@ public class SpyglassEnvironment {
 	private static final String PROPERTY_CONFIG_STANDALONE_SIZE_Y = "screensize_y";
 	private static final String PROPERTY_CONFIG_DRAWINGAREA_SIZE = "drawingarea_size";
 	private static final String PROPERTY_CONFIG_AFFINE_TRANSFORM_MATRIX = "affine_transform_matrix";
+	private static final String PROPERTY_CONFIG_DRAWINGAREA_POSITION = "drawingarea_position";
 
 	/**
 	 * our property store
@@ -111,6 +114,8 @@ public class SpyglassEnvironment {
 		props.setProperty(PROPERTY_CONFIG_STANDALONE_SIZE_X, "800");
 		props.setProperty(PROPERTY_CONFIG_STANDALONE_SIZE_Y, "600");
 		props.setProperty(PROPERTY_CONFIG_DRAWINGAREA_SIZE, "83");
+		props.setProperty(PROPERTY_CONFIG_AFFINE_TRANSFORM_MATRIX, "1.0,0.0,0.0,1.0,0.0,1.0");
+		props.setProperty(PROPERTY_CONFIG_DRAWINGAREA_POSITION, "0,0,1000,500");
 
 		storeProps(props);
 	}
@@ -340,9 +345,10 @@ public class SpyglassEnvironment {
 	 * 
 	 * @param at
 	 *            the object used for affine operation within the drawing area
+	 * @throws IOException
 	 * @see DrawingArea
 	 */
-	public static void setAffineTransformation(final AffineTransform at) {
+	public static void setAffineTransformation(final AffineTransform at) throws IOException {
 		final double[] flatmatrix = new double[6];
 		at.getMatrix(flatmatrix);
 		final StringBuffer matrix = new StringBuffer();
@@ -350,6 +356,32 @@ public class SpyglassEnvironment {
 			matrix.append("," + d);
 		}
 		props.setProperty(PROPERTY_CONFIG_AFFINE_TRANSFORM_MATRIX, matrix.substring(1));
+		storeProps(props);
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the position of the drawing area
+	 * 
+	 * @return the position of the drawing area
+	 */
+	public static Rectangle getDrawingAreaPosition() {
+		final String[] v = String.valueOf(props.get(PROPERTY_CONFIG_DRAWINGAREA_POSITION)).split(",");
+		return new Rectangle(Integer.parseInt(v[0]), Integer.parseInt(v[1]), Integer.parseInt(v[2]), Integer.parseInt(v[3]));
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the position of the drawing area
+	 * 
+	 * @param rect
+	 *            the position of the drawing area
+	 * @throws IOException
+	 */
+	public static void setDrawingAreaPosition(final Rectangle rect) throws IOException {
+		final String s = rect.x + "," + rect.y + "," + rect.width + "," + rect.height;
+		props.setProperty(PROPERTY_CONFIG_DRAWINGAREA_POSITION, s);
+		storeProps(props);
 	}
 
 }
