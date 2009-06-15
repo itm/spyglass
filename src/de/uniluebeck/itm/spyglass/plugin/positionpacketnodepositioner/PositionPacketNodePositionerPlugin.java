@@ -33,7 +33,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * Default node positioner. it reads the position information from the incoming packets.
  * 
- * @author Dariush Forouher
+ * @author Dariush Forouher, Oliver Kleine
  * 
  */
 public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
@@ -86,7 +86,7 @@ public class PositionPacketNodePositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
-		log.debug("PPNP " + this.getInstanceName() + " gibt Position für ID: " + nodeId);
+		log.debug("PPNP " + this.getInstanceName() + " was asked for position of node ID: " + nodeId);
 		final PositionData d = nodeMap.get(nodeId);
 		return d != null ? d.position : null;
 	}

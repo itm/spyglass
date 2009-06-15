@@ -27,7 +27,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * PacketReader object to get new Packets and put them into a Packet-Cache (
  * <code>packetCache</code> member of the Spyglass class). This thread stop when the
  * <code>visualizationRunning</code> member of the Spyglass class is set to false.
- *
+ * 
  * @author Dariush Forouher
  * @author Sebastian Ebers
  */
@@ -44,7 +44,7 @@ public class PacketProducerTask implements Runnable {
 	// -------------------------------------------------------------------------
 	/**
 	 * Constructor.
-	 *
+	 * 
 	 * @param spyglass
 	 *            the Spyglass current instance
 	 */
@@ -96,7 +96,9 @@ public class PacketProducerTask implements Runnable {
 					continue;
 				}
 
+				log.debug("PacketProducerTask gives packet with hash " + packet.hashCode() + " to PacketDispatcher");
 				spyglass.getPacketDispatcher().dispatchPacket(packet);
+				log.debug("PacketProducerTask finishes packet with hash " + packet.hashCode());
 
 			} catch (final InterruptedException e) {
 				log.debug("PacketReader has been interrupted, shutting down.");
@@ -113,7 +115,7 @@ public class PacketProducerTask implements Runnable {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the currently active packet reader instance
-	 *
+	 * 
 	 * @return the currently active packet reader instance
 	 */
 	private PacketReader getPacketReader() {
@@ -125,7 +127,7 @@ public class PacketProducerTask implements Runnable {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Activates a new packet reader instance
-	 *
+	 * 
 	 * @param packetReader
 	 *            a new packet reader instance
 	 */

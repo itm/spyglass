@@ -147,13 +147,12 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	protected void resetPlugin() {
-		// TODO Auto-generated method stub
-
+		this.nodeMap.clear();
+		this.neighbours.clear();
 	}
 
 	@Override
@@ -163,7 +162,6 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public boolean offersMetric() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -178,7 +176,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	 */
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
-		log.debug("SEP " + this.getInstanceName() + " handles a packet...");
+		log.debug("SEP " + this.getInstanceName() + " handles packet with hashcode " + packet.hashCode());
 		final int id = packet.getSenderId();
 
 		// check if we already know about this node
@@ -199,8 +197,9 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 			this.nodeMap.put(id, new PositionDataSE(packet.getPosition().clone(), sePos, System.currentTimeMillis()));
 			nextX += rand.nextInt(100) - 50;
 			nextY += rand.nextInt(100) - 50;
-
+			log.debug("SEP " + this.getInstanceName() + " fires NodePositionEvent (ADD) because of packet with hashcode " + packet.hashCode());
 			pluginManager.fireNodePositionEvent(new NodePositionEvent(id, NodePositionEvent.Change.ADDED, null, sePos));
+			log.debug("SEP " + this.getInstanceName() + " finishes NodePositionEvent (ADD) because of packet with hashcode " + packet.hashCode());
 		}
 
 		// Check wether the current packet is a neighbourhood package
@@ -224,6 +223,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 			this.neighbours.put(id, nbs);
 		}
+		log.debug("SEP " + this.getInstanceName() + " finished handling of packet with hashcode " + packet.hashCode());
 	}
 
 	private int byteToInt(final byte b) {

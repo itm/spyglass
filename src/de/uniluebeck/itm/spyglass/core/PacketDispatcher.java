@@ -36,7 +36,7 @@ public class PacketDispatcher {
 	// --------------------------------------------------------------------------
 	/**
 	 * Constructor.
-	 *
+	 * 
 	 * @param spyglass
 	 *            the application's main class
 	 */
@@ -61,7 +61,7 @@ public class PacketDispatcher {
 	/**
 	 * This method distributes the given Packet object to all loaded plugins by invoking the
 	 * <code>handlePacket</code> method of a plugin.
-	 *
+	 * 
 	 * @param packet
 	 *            The packet object to be distributed.
 	 * @throws InterruptedException
@@ -84,7 +84,9 @@ public class PacketDispatcher {
 		}
 
 		try {
+			log.debug("Packet dispatcher gives packet with hashcode " + packet.hashCode() + "  to NodePositioner " + np.getInstanceName());
 			np.handlePacket(packet);
+			log.debug("Packet dispatcher finishes packet with hascode " + packet.hashCode());
 		} catch (final Exception e1) {
 			log.error("Plugin " + np + " threw an exception while handling the packet " + packet, e1);
 		}
@@ -104,12 +106,16 @@ public class PacketDispatcher {
 				continue;
 			}
 			try {
+				log.debug("PacketDispatcher gives packet with hash " + packet.hashCode() + " to Plugin: " + plugin.getInstanceName());
 				plugin.handlePacket(packet);
+				log.debug("PacketDispatcher says that Plugin " + plugin.getInstanceName() + " has finished handling of packet with hash "
+						+ packet.hashCode());
 			} catch (final InterruptedException e) {
 				throw e; // we don't handle this
 			} catch (final Exception e) {
 				log.error("Plugin " + plugin + " threw an exception while handling the packet " + packet, e);
 			}
 		}
+		log.debug("PacketDispatcher reached the end for packet with hash: " + packet.hashCode());
 	}
 }
