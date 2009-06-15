@@ -118,7 +118,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
-		log.debug("SEP " + this.getInstanceName() + " gibt Position für ID: " + nodeId);
+		log.debug("SEP " + this.getInstanceName() + " was asked for position of node ID: " + nodeId);
 		final PositionDataSE d = nodeMap.get(nodeId);
 
 		return d != null ? d.sePosition : null;
