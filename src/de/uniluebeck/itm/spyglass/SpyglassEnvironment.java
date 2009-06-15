@@ -18,9 +18,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Rectangle;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
@@ -33,6 +36,8 @@ import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
  * 
  */
 public class SpyglassEnvironment {
+
+	private static final Logger log = SpyglassLoggerFactory.getLogger(SpyglassEnvironment.class);
 
 	/**
 	 * Name of the property file
@@ -333,8 +338,20 @@ public class SpyglassEnvironment {
 	public static AffineTransform getAffineTransformation() {
 		final String[] matrix = String.valueOf(props.get(PROPERTY_CONFIG_AFFINE_TRANSFORM_MATRIX)).split(",");
 		final double[] flatmatrix = new double[6];
-		for (int i = 0; i < matrix.length; i++) {
-			flatmatrix[i] = Double.valueOf(matrix[i]);
+		try {
+			for (int i = 0; i < matrix.length; i++) {
+				flatmatrix[i] = Double.valueOf(matrix[i]);
+			}
+		} catch (final NumberFormatException e) {
+			String mstring = "";
+			for (final String m : matrix) {
+				mstring += "," + m;
+			}
+			mstring = mstring.substring(1);
+			((SpyglassLogger) log).error(
+					"No initialization values for affine transformation present in the configuration file. The values will be set to default.", e,
+					false);
+			return new AffineTransform(new double[] { 1.0, 0.0, 0.0, 1.0, 0.0, 1.0 });
 		}
 		return new AffineTransform(flatmatrix);
 	}
