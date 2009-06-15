@@ -61,7 +61,11 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 	 */
 	@Override
 	public void dispose() {
-		optionsComposite.dispose();
+		// the object will be null if the preference page was just added to the tree and not
+		// selected by the user
+		if (optionsComposite != null) {
+			optionsComposite.dispose();
+		}
 		super.dispose();
 	}
 
