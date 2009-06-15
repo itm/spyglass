@@ -348,9 +348,9 @@ public class SpyglassEnvironment {
 				mstring += "," + m;
 			}
 			mstring = mstring.substring(1);
-			((SpyglassLogger) log).error(
-					"No initialization values for affine transformation present in the configuration file. The values will be set to default.", e,
-					false);
+
+			((SpyglassLogger) log).error("No initialization values for affine transformation present in the configuration file file:"
+					+ new File(PROPERTY_FILE).getAbsolutePath() + ") values: (" + mstring + "). The values will be set to default.", e, false);
 			return new AffineTransform(new double[] { 1.0, 0.0, 0.0, 1.0, 0.0, 1.0 });
 		}
 		return new AffineTransform(flatmatrix);
