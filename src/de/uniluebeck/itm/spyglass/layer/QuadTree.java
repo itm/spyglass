@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.eclipse.swt.graphics.Rectangle;
+
 import de.danbim.swtquadtree.ISWTQuadTree;
 import de.uniluebeck.itm.spyglass.drawing.BoundingBoxChangeListener;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
@@ -167,8 +169,12 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 	@Override
 	public void onBoundingBoxChanged(final DrawingObject updatedDrawingObject, final AbsoluteRectangle oldBox) {
 		if (threadSafe) {
+			Rectangle rect = null;
+			synchronized (updatedDrawingObject) {
+				rect = updatedDrawingObject.getBoundingBox().rectangle;
+			}
 			synchronized (lock) {
-				tree.moveItem(updatedDrawingObject, oldBox.rectangle, updatedDrawingObject.getBoundingBox().rectangle);
+				tree.moveItem(updatedDrawingObject, oldBox.rectangle, rect);
 			}
 		} else {
 			tree.moveItem(updatedDrawingObject, oldBox.rectangle, updatedDrawingObject.getBoundingBox().rectangle);
@@ -190,11 +196,16 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 	@Override
 	public void remove(final DrawingObject d) {
 		if (threadSafe) {
+			Rectangle rect = null;
+			synchronized (d) {
+				rect = d.getBoundingBox().rectangle;
+			}
 			synchronized (lock) {
-				tree.removeItem(d, d.getBoundingBox().rectangle);
+				tree.removeItem(d, rect);
 				d.removeBoundingBoxChangeListener(this);
 				insertionOrder.remove(d);
 			}
+
 		} else {
 			tree.removeItem(d, d.getBoundingBox().rectangle);
 			d.removeBoundingBoxChangeListener(this);

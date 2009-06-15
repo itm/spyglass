@@ -266,8 +266,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 				pluginManager.fireNodePositionEvent(nodePositionEvent);
 			}
 		} catch (final Exception e) {
-
-			// System.out.println("Remove-Exception: " + e.getMessage());
+			log.error("Error while removing a node", e);
 		}
 
 	}
@@ -313,8 +312,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 				pluginManager.fireNodePositionEvent(nodePositionEvent);
 			}
 		} catch (final Exception e) {
-			System.out.println("Reposition-Exception: ");
-			e.printStackTrace();
+			log.error("Reposition-Exception", e);
 		}
 	}
 
@@ -397,7 +395,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 			result.add(force);
 			return result;
 		} catch (final Exception e) {
-			// e.printStackTrace();
+			log.error("An error occured while computing a node's position", e);
 			return null;
 		}
 	}
