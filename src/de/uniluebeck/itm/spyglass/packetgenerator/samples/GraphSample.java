@@ -173,12 +173,15 @@ public class GraphSample extends PayloadSample {
 		// Now fill the array with data
 		synchronized (graph) {
 			final List<NodePoint> list = graph.kNN(p.position, getNeighborCount()+1);
-			for(final NodePoint other: list) {
-				if (p==other) {
-					continue;
-				}
-				buf.putShort(other.nodeID);
+			NodePoint p2 = list.get(r.nextInt(list.size()));
+			while(p==p2) {
+				p2 = list.get(r.nextInt(list.size()));
 			}
+			// first entry is the node id
+			buf.putShort(p2.nodeID);
+			// second is the distance between the two nodes (as a float)
+			final float distance = (float)p2.position.getEuclideanDistance(p.position);
+			buf.putFloat(distance);
 		}
 
 		buf.compact();
