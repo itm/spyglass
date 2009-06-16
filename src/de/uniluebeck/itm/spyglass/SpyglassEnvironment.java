@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Rectangle;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.util.SpyglassLogger;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
@@ -312,7 +311,8 @@ public class SpyglassEnvironment {
 	 * @return the current drawing area's size
 	 */
 	public static Integer getDrawingAreaSize() {
-		return Integer.parseInt(props.getProperty(PROPERTY_CONFIG_DRAWINGAREA_SIZE));
+		final String s = props.getProperty(PROPERTY_CONFIG_DRAWINGAREA_SIZE);
+		return s != null ? Integer.parseInt(s) : 83;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -336,23 +336,14 @@ public class SpyglassEnvironment {
 	 * @see DrawingArea
 	 */
 	public static AffineTransform getAffineTransformation() {
-		final String[] matrix = String.valueOf(props.get(PROPERTY_CONFIG_AFFINE_TRANSFORM_MATRIX)).split(",");
+		final String s = String.valueOf(props.get(PROPERTY_CONFIG_AFFINE_TRANSFORM_MATRIX));
+		final String[] matrix = s != null ? s.split(",") : "1.0,0.0,0.0,1.0,0.0,1.0".split(",");
 		final double[] flatmatrix = new double[6];
-		try {
-			for (int i = 0; i < matrix.length; i++) {
-				flatmatrix[i] = Double.valueOf(matrix[i]);
-			}
-		} catch (final NumberFormatException e) {
-			String mstring = "";
-			for (final String m : matrix) {
-				mstring += "," + m;
-			}
-			mstring = mstring.substring(1);
 
-			((SpyglassLogger) log).error("No initialization values for affine transformation present in the configuration file file:\r\n("
-					+ new File(PROPERTY_FILE).getAbsolutePath() + ") values: (" + mstring + "). The values will be set to default.", e, false);
-			return new AffineTransform(new double[] { 1.0, 0.0, 0.0, 1.0, 0.0, 1.0 });
+		for (int i = 0; i < matrix.length; i++) {
+			flatmatrix[i] = Double.valueOf(matrix[i]);
 		}
+
 		return new AffineTransform(flatmatrix);
 	}
 
@@ -383,7 +374,9 @@ public class SpyglassEnvironment {
 	 * @return the position of the drawing area
 	 */
 	public static Rectangle getDrawingAreaPosition() {
-		final String[] v = String.valueOf(props.get(PROPERTY_CONFIG_DRAWINGAREA_POSITION)).split(",");
+		final String s = String.valueOf(props.get(PROPERTY_CONFIG_DRAWINGAREA_POSITION));
+
+		final String[] v = s != null ? s.split(",") : "0,0,1000,500".split(",");
 		return new Rectangle(Integer.parseInt(v[0]), Integer.parseInt(v[1]), Integer.parseInt(v[2]), Integer.parseInt(v[3]));
 	}
 
