@@ -12,14 +12,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.RGB;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementArray;
 import org.simpleframework.xml.ElementList;
 
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -31,9 +29,33 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements PropertyChangeListener {
 
-	private static final Logger log = SpyglassLoggerFactory.getLogger(NodeSensorRangeXMLConfig.class);
-
 	public static class CircleRange extends NodeSensorRange {
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + circleRadius;
+			return result;
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			final CircleRange other = (CircleRange) obj;
+			if (circleRadius != other.circleRadius) {
+				return false;
+			}
+			return true;
+		}
 
 		@Element(name = PROPERTYNAME_CIRCLE_RADIUS, required = false)
 		private int circleRadius = 100;
@@ -51,6 +73,40 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 	}
 
 	public static class ConeRange extends NodeSensorRange {
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + coneOrientation;
+			result = prime * result + coneRadius;
+			result = prime * result + coneViewAngle;
+			return result;
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			final ConeRange other = (ConeRange) obj;
+			if (coneOrientation != other.coneOrientation) {
+				return false;
+			}
+			if (coneRadius != other.coneRadius) {
+				return false;
+			}
+			if (coneViewAngle != other.coneViewAngle) {
+				return false;
+			}
+			return true;
+		}
 
 		@Element(name = PROPERTYNAME_CONE_ORIENTATION, required = false)
 		private int coneOrientation = 0;
@@ -237,12 +293,47 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 				throw new RuntimeException("Bug", e);
 			}
 		}
+
 	}
 
 	public static class RectangleRange extends NodeSensorRange {
 
 		@Element(name = PROPERTYNAME_RECTANGLE_HEIGHT, required = false)
 		private int rectangleHeight = 100;
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + rectangleHeight;
+			result = prime * result + rectangleOrientation;
+			result = prime * result + rectangleWidth;
+			return result;
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			final RectangleRange other = (RectangleRange) obj;
+			if (rectangleHeight != other.rectangleHeight) {
+				return false;
+			}
+			if (rectangleOrientation != other.rectangleOrientation) {
+				return false;
+			}
+			if (rectangleWidth != other.rectangleWidth) {
+				return false;
+			}
+			return true;
+		}
 
 		@Element(name = PROPERTYNAME_RECTANGLE_ORIENTATION, required = false)
 		private int rectangleOrientation = 45;

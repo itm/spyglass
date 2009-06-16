@@ -61,6 +61,8 @@ public class Data {
 
 		synchronized (this) {
 
+			System.out.println(layer.getDrawingObjects().size() + " " + dos.size());
+
 			for (final Integer key : dos.keySet()) {
 
 				foundPerNodeConfig = false;
@@ -69,7 +71,8 @@ public class Data {
 				// check if perNodeConfigs contains a config for this drawing object
 				for (final Config c : perNodeConfigs) {
 					if (c.getNodeId() == key) {
-						if (nsrdo.getConfig() != c) {
+						System.out.println("updating one per node");
+						if (!nsrdo.getConfig().equals(c)) {
 							nsrdo.setConfig(c);
 							foundPerNodeConfig = true;
 						}
@@ -78,8 +81,9 @@ public class Data {
 
 				// as we didn't find any per node config for this node we set it to the default
 				// config if it's not already set to
-				if (!foundPerNodeConfig && (nsrdo.getConfig() != defaultConfig)) {
+				if (!foundPerNodeConfig && !nsrdo.getConfig().equalsEachProperty(defaultConfig)) {
 					nsrdo.setConfig(defaultConfig);
+					System.out.println("updating one default");
 				}
 
 			}

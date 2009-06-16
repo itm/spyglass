@@ -7,7 +7,6 @@ package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -37,16 +36,12 @@ import org.eclipse.swt.widgets.Text;
 
 import com.cloudgarden.resource.SWTResourceManager;
 
-import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToRGBConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.converter.RGBToColorConverter;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
-import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.CircleRange;
-import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.ConeRange;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.Config;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.NodeSensorRange;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.RANGE_TYPE;
-import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.RectangleRange;
 
 // --------------------------------------------------------------------------------
 /**
@@ -59,63 +54,6 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 		// Register as a resource user - SWTResourceManager will
 		// handle the obtaining and disposing of resources
 		SWTResourceManager.registerResourceUser(this);
-	}
-
-	public class ConfigWrapper extends PropertyBean implements PropertyChangeListener {
-
-		public static final String PROPERTYNAME_CONFIG = "config";
-
-		private Config config;
-
-		public ConfigWrapper() {
-			// nothing to do
-		}
-
-		public Config getConfig() {
-			return config;
-		}
-
-		public void setConfig(final Config config) {
-
-			// remove listener from old config instance
-			if (this.config != null) {
-				this.config.removePropertyChangeListener(NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE, this);
-			}
-
-			firePropertyChange(PROPERTYNAME_CONFIG, this.config, this.config = config);
-
-			// add listener to new config instance
-			this.config.addPropertyChangeListener(NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE, this);
-
-		}
-
-		@Override
-		public void propertyChange(final PropertyChangeEvent e) {
-
-			// if the property range type changes also change the range programmatically
-			// this will have another change event as result
-			if (NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE.equals(e.getPropertyName())) {
-
-				final boolean isCircle = e.getNewValue() == RANGE_TYPE.Circle;
-				final boolean isCone = e.getNewValue() == RANGE_TYPE.Cone;
-
-				config.setRange(isCircle ? new CircleRange() : isCone ? new ConeRange() : new RectangleRange());
-
-			} else {
-				throw new RuntimeException("Unexpected case.");
-			}
-
-		}
-
-		// --------------------------------------------------------------------------------
-		/**
-		 */
-		public void dispose() {
-			if (this.config != null) {
-				this.config.removePropertyChangeListener(NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE, this);
-			}
-		}
-
 	}
 
 	private NodeSensorRangePreferencePage page;
@@ -138,17 +76,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 	private Text defaultBackgroundAlphaTransparency;
 
-	private ConfigWrapper defaultConfigWrapper;
-
-	private DataBindingContext dbc;
-
 	private Text defaultLineWidth;
-
-	{
-		// Register as a resource user - SWTResourceManager will
-		// handle the obtaining and disposing of resources
-		SWTResourceManager.registerResourceUser(this);
-	}
 
 	public NodeSensorRangeOptionsComposite(final Composite parent) {
 		super(parent, SWT.NONE);
@@ -310,12 +238,14 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 							final String selectedRangeType = defaultRangeType.getText();
 
-							final NodeSensorRange defaultRange = defaultConfigWrapper.getConfig().getRange();
+							final NodeSensorRange defaultRange = defaultConfigClone.getRange();
+							// defaultConfigWrapper.getConfig().getRange();
 							final NodeRangeDialog dialog = NodeRangeDialog.createDialog(getShell(), RANGE_TYPE.valueOf(selectedRangeType),
 									defaultRange);
 
 							if (Window.OK == dialog.open()) {
-								defaultConfigWrapper.getConfig().setRange(dialog.range);
+								// defaultConfigWrapper.getConfig().setRange(dialog.range);
+								defaultConfigClone.setRange(dialog.range);
 							}
 
 						}
@@ -345,20 +275,6 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 	private NodeSensorRangePerNodeConfigurationComposite perNodeConfigurationComposite = new NodeSensorRangePerNodeConfigurationComposite();
 
-	private Binding defaultRangeTypeBinding;
-
-	private Binding defaultRangeForegroundColorBinding;
-
-	private Binding defaultRangeBackgroundColorBinding;
-
-	private Binding defaultBackgroundAlphaTransparencyBinding;
-
-	private Binding defaultRangeBinding;
-
-	private Binding defaultLineWidthBinding;
-
-	private Config defaultConfig;
-
 	private PropertyChangeListener dirtyListener = new PropertyChangeListener() {
 		@Override
 		public void propertyChange(final PropertyChangeEvent evt) {
@@ -368,16 +284,11 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 	private Config defaultConfigClone;
 
-	public void setDatabinding(final DataBindingContext dbc, final NodeSensorRangeXMLConfig.Config defaultConfig,
-			final NodeSensorRangePreferencePage page) {
+	public void setDatabinding(final DataBindingContext dbc, final NodeSensorRangeXMLConfig.Config config, final NodeSensorRangePreferencePage page) {
 
 		this.page = page;
-		this.dbc = dbc;
-		this.defaultConfig = defaultConfig;
-		this.defaultConfigWrapper = new ConfigWrapper();
-		defaultConfigClone = defaultConfig.clone();
+		defaultConfigClone = config.clone();
 		defaultConfigClone.addPropertyChangeListener(dirtyListener);
-		this.defaultConfigWrapper.setConfig(defaultConfigClone);
 
 		IObservableValue obsModel;
 		ISWTObservableValue obsWidget;
@@ -387,59 +298,52 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 		{
 			obsWidget = SWTObservables.observeText(defaultLineWidth, SWT.Modify);
-			obsModel = BeansObservables.observeValue(realm, defaultConfig, NodeSensorRangeXMLConfig.PROPERTYNAME_LINE_WIDTH);
+			obsModel = BeansObservables.observeValue(realm, defaultConfigClone, NodeSensorRangeXMLConfig.PROPERTYNAME_LINE_WIDTH);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator("Line Width", 1, Integer.MAX_VALUE));
-			defaultLineWidthBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeSelection(defaultRangeType);
-			obsModel = BeansObservables.observeValue(realm, defaultConfig, NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE);
+			obsModel = BeansObservables.observeValue(realm, defaultConfigClone, NodeSensorRangeXMLConfig.PROPERTYNAME_RANGE_TYPE);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT).setConverter(new NodeSensorRangeTypeConverter(String.class,
 					Enum.class));
-			defaultRangeTypeBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 		{
 			obsWidget = SWTObservables.observeBackground(defaultRangeForegroundColor);
-			obsModel = BeansObservables.observeValue(realm, defaultConfig, NodeSensorRangeXMLConfig.PROPERTYNAME_COLOR_R_G_B);
+			obsModel = BeansObservables.observeValue(realm, defaultConfigClone, NodeSensorRangeXMLConfig.PROPERTYNAME_COLOR_R_G_B);
 
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			usTargetToModel.setConverter(new ColorToRGBConverter());
 			usModelToTarget = new UpdateValueStrategy();
 			usModelToTarget.setConverter(new RGBToColorConverter());
-			defaultRangeForegroundColorBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
 		}
 		{
 			obsWidget = SWTObservables.observeBackground(defaultRangeBackgroundColor);
-			obsModel = BeansObservables.observeValue(realm, defaultConfig, NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_R_G_B);
+			obsModel = BeansObservables.observeValue(realm, defaultConfigClone, NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_R_G_B);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			usTargetToModel.setConverter(new ColorToRGBConverter());
 			usModelToTarget = new UpdateValueStrategy();
 			usModelToTarget.setConverter(new RGBToColorConverter());
-			defaultRangeBackgroundColorBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, usModelToTarget);
 		}
 		{
 			obsWidget = SWTObservables.observeText(defaultBackgroundAlphaTransparency, SWT.Modify);
-			obsModel = BeansObservables.observeValue(realm, defaultConfig, NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_ALPHA);
+			obsModel = BeansObservables.observeValue(realm, defaultConfigClone, NodeSensorRangeXMLConfig.PROPERTYNAME_BACKGROUND_ALPHA);
 			usTargetToModel = new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT);
 			usTargetToModel.setAfterConvertValidator(new IntegerRangeValidator("Background Alpha Transparency", 0, 255));
-			defaultBackgroundAlphaTransparencyBinding = dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
+			dbc.bindValue(obsWidget, obsModel, usTargetToModel, null);
 		}
 
 		perNodeConfigurationComposite.setDataBinding(dbc, page);
 
 	}
 
-	// --------------------------------------------------------------------------------
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.swt.widgets.Widget#dispose()
-	 */
 	@Override
 	public void dispose() {
 		defaultConfigClone.removePropertyChangeListener(dirtyListener);
-		defaultConfigWrapper.dispose();
 		super.dispose();
 	}
 
@@ -448,6 +352,6 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 	 * @return
 	 */
 	public Config getDefaultConfig() {
-		return defaultConfigWrapper.config;
+		return defaultConfigClone;
 	}
 }

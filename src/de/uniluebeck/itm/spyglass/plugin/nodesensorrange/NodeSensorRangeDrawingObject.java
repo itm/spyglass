@@ -26,7 +26,12 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 
 // --------------------------------------------------------------------------------
 /**
- * Class for DrawingObjects painted by NodeSensorRangePlugin
+ * Class for DrawingObjects painted by NodeSensorRangePlugin. Can paint
+ * <ul>
+ * <li>a rectangle of arbitrary size, rotatable by any degree</li>
+ * <li>a circle of arbitrary size</li>
+ * <li>a cone with an arbitrary angle, rotatable by any degree</li>
+ * </ul>
  * 
  * @author Daniel Bimschas
  */
