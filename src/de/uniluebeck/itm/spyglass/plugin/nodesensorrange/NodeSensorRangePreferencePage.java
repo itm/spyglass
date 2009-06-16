@@ -98,7 +98,7 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 		log.info("store to model");
 
 		final Config updatedDefaultConfig = optionsComposite.getDefaultConfig();
-		if (!config.getDefaultConfig().equalsEachProperty(updatedDefaultConfig)) {
+		if (!config.getDefaultConfig().equals(updatedDefaultConfig)) {
 			config.setDefaultConfig(updatedDefaultConfig);
 		}
 		config.setPerNodeConfigs(this.tempTable);

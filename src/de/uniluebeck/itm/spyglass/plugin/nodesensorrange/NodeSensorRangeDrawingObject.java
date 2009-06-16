@@ -66,14 +66,14 @@ public class NodeSensorRangeDrawingObject extends DrawingObject {
 		}
 	};
 
+	private boolean initCalled = false;
+
 	/**
 	 * To be called by the plug-in before (!) adding it to the layer
 	 */
 	public void init(final Config config) {
-		this.config = config;
-		this.config.addPropertyChangeListener(configPropertyChangeListener);
-		setColor(this.config.getColorRGB());
-		setBgColor(this.config.getBackgroundRGB());
+		initCalled = true;
+		setConfig(config);
 	}
 
 	/**
@@ -85,6 +85,10 @@ public class NodeSensorRangeDrawingObject extends DrawingObject {
 
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {
+
+		if (!initCalled) {
+			System.out.println("Fuck it");
+		}
 
 		final AbsoluteRectangle absBox = new AbsoluteRectangle();
 		final NodeSensorRange range = config.getRange();
@@ -145,6 +149,10 @@ public class NodeSensorRangeDrawingObject extends DrawingObject {
 
 	@Override
 	public void draw(final GC gc) {
+
+		if (!initCalled) {
+			System.out.println("Fuck it");
+		}
 
 		final AbsoluteRectangle absRect;
 		final PixelRectangle pxRect;
@@ -385,6 +393,11 @@ public class NodeSensorRangeDrawingObject extends DrawingObject {
 	}
 
 	public void setConfig(final Config c) {
+
+		if (!initCalled) {
+			System.out.println("Fuck it");
+		}
+
 		if (this.config != null) {
 			this.config.removePropertyChangeListener(configPropertyChangeListener);
 		}

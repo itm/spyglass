@@ -81,7 +81,7 @@ public class Data {
 
 				// as we didn't find any per node config for this node we set it to the default
 				// config if it's not already set to
-				if (!foundPerNodeConfig && !nsrdo.getConfig().equalsEachProperty(defaultConfig)) {
+				if (!foundPerNodeConfig && !nsrdo.getConfig().equals(defaultConfig)) {
 					nsrdo.setConfig(defaultConfig);
 					System.out.println("updating one default");
 				}

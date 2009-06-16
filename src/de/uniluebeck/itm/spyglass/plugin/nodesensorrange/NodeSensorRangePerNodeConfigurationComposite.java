@@ -5,6 +5,7 @@
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
 import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -397,8 +398,16 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 		dlg.setBlockOnOpen(true);
 		final int ret = dlg.open();
 		if (ret == Window.OK) {
+			final int nodeId = Integer.parseInt(dlg.getValue());
+			// check if there's already a config for this nodeId and simply ignore if there is
+			for (final Iterator<Config> iterator = tableData.iterator(); iterator.hasNext();) {
+				final Config type = iterator.next();
+				if (type.getNodeId() == nodeId) {
+					return;
+				}
+			}
 			final Config cfg = new Config();
-			cfg.setNodeId(Integer.parseInt(dlg.getValue()));
+			cfg.setNodeId(nodeId);
 			tableData.add(cfg);
 			page.markFormDirty();
 		}

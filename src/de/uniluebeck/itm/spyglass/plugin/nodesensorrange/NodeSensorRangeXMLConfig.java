@@ -10,6 +10,7 @@ package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 import java.util.HashSet;
 
 import org.eclipse.swt.graphics.RGB;
@@ -241,7 +242,6 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 				copy.backgroundRGB = this.backgroundRGB.clone();
 				copy.colorRGB = this.colorRGB.clone();
 				copy.range = this.range.clone();
-
 				return copy;
 			} catch (final CloneNotSupportedException e) {
 				throw new RuntimeException("Bug", e);
@@ -249,29 +249,61 @@ public class NodeSensorRangeXMLConfig extends PluginXMLConfig implements Propert
 		}
 
 		@Override
-		public boolean equals(final Object o) {
-			if (o instanceof Config) {
-				final Config c = (Config) o;
-				return c.nodeId == this.nodeId;
-			} else {
-				return false;
-			}
-		}
-
-		public boolean equalsEachProperty(final Config o) {
-			return (backgroundAlpha == o.backgroundAlpha) && (backgroundRGB[0] == o.backgroundRGB[0]) && (backgroundRGB[1] == o.backgroundRGB[1])
-					&& (backgroundRGB[2] == o.backgroundRGB[2]) && (colorRGB[0] == o.colorRGB[0]) && (colorRGB[1] == o.colorRGB[1])
-					&& (colorRGB[2] == o.colorRGB[2]) && (lineWidth == o.lineWidth) && (nodeId == o.lineWidth) && range.equals(o.range)
-					&& (rangeType == o.rangeType);
-		}
-
-		public int hashCodeOrig() {
-			return super.hashCode();
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + backgroundAlpha;
+			result = prime * result + Arrays.hashCode(backgroundRGB);
+			result = prime * result + Arrays.hashCode(colorRGB);
+			result = prime * result + lineWidth;
+			result = prime * result + nodeId;
+			result = prime * result + ((range == null) ? 0 : range.hashCode());
+			result = prime * result + ((rangeType == null) ? 0 : rangeType.hashCode());
+			return result;
 		}
 
 		@Override
-		public int hashCode() {
-			return nodeId;
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			final Config other = (Config) obj;
+			if (backgroundAlpha != other.backgroundAlpha) {
+				return false;
+			}
+			if (!Arrays.equals(backgroundRGB, other.backgroundRGB)) {
+				return false;
+			}
+			if (!Arrays.equals(colorRGB, other.colorRGB)) {
+				return false;
+			}
+			if (lineWidth != other.lineWidth) {
+				return false;
+			}
+			if (nodeId != other.nodeId) {
+				return false;
+			}
+			if (range == null) {
+				if (other.range != null) {
+					return false;
+				}
+			} else if (!range.equals(other.range)) {
+				return false;
+			}
+			if (rangeType == null) {
+				if (other.rangeType != null) {
+					return false;
+				}
+			} else if (!rangeType.equals(other.rangeType)) {
+				return false;
+			}
+			return true;
 		}
 
 	}
