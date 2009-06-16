@@ -26,9 +26,9 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * This class is responsible for redrawing the drawingArea when it sends out a PaintEvent.
- *
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 
@@ -65,7 +65,7 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 	/**
 	 * Renders the visible plug-ins.<br>
 	 * The plug-ins provide objects which are drawn into the drawing area.
-	 *
+	 * 
 	 * @see DrawingObject
 	 */
 	public void paintControl(final PaintEvent e) {
@@ -76,16 +76,16 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 
 		final long time = System.nanoTime();
 
-		final PixelRectangle pxArea = new PixelRectangle(e.gc.getClipping().x, e.gc.getClipping().y, e.gc.getClipping().width,
-				e.gc.getClipping().height);
+		final PixelRectangle pxArea = new PixelRectangle(e.gc.getClipping());
 
 		final AbsoluteRectangle area = drawingArea.pixelRect2AbsRect(pxArea);
+		final AbsoluteRectangle intersection = new AbsoluteRectangle(area.rectangle.intersection(DrawingArea.getGlobalBoundingBox().rectangle));
 
 		final List<Plugin> plugins = spyglass.getPluginManager().getVisibleActivePlugins();
 
 		for (final Plugin plugin : plugins) {
 			if (plugin instanceof Drawable) {
-				renderPlugin(e.gc, (Drawable) plugin, area);
+				renderPlugin(e.gc, (Drawable) plugin, intersection);
 			}
 		}
 
@@ -131,7 +131,7 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 	/**
 	 * Draw all drawing objects inside the bounding box <code>area</code> from the plug-in
 	 * <code>plug-in</code> on <code>gc</code>.
-	 *
+	 * 
 	 * @param gc
 	 *            a GC
 	 * @param plugin
@@ -168,7 +168,7 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
 	 */
