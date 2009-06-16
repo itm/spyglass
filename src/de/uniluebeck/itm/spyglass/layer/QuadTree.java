@@ -169,12 +169,15 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 	@Override
 	public void onBoundingBoxChanged(final DrawingObject updatedDrawingObject, final AbsoluteRectangle oldBox) {
 		if (threadSafe) {
-			Rectangle rect = null;
-			synchronized (updatedDrawingObject) {
-				rect = updatedDrawingObject.getBoundingBox().rectangle;
-			}
+			final Rectangle rect = updatedDrawingObject.getBoundingBox().rectangle;
 			synchronized (lock) {
-				tree.moveItem(updatedDrawingObject, oldBox.rectangle, rect);
+				// the drawingObject might have been removed from the QuadTree in between.
+				// so check silenty if it is already there
+				// TODO: it would be more performant if moveItem() could be advised to return
+				// silently instead of throwing an exception
+				if (tree.containsItem(updatedDrawingObject, oldBox.rectangle)) {
+					tree.moveItem(updatedDrawingObject, oldBox.rectangle, rect);
+				}
 			}
 		} else {
 			tree.moveItem(updatedDrawingObject, oldBox.rectangle, updatedDrawingObject.getBoundingBox().rectangle);
@@ -196,10 +199,7 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 	@Override
 	public void remove(final DrawingObject d) {
 		if (threadSafe) {
-			Rectangle rect = null;
-			synchronized (d) {
-				rect = d.getBoundingBox().rectangle;
-			}
+			final Rectangle rect = d.getBoundingBox().rectangle;
 			synchronized (lock) {
 				tree.removeItem(d, rect);
 				d.removeBoundingBoxChangeListener(this);
@@ -217,7 +217,7 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see de.uniluebeck.itm.spyglass.layer.Layer#removeAll(java.util.Set)
 	 */
 	@Override
