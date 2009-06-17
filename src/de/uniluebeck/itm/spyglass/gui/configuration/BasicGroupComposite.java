@@ -48,6 +48,8 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 	private Group group1;
 	private Text pluginName;
 
+	private BasicOptions basicOptions;
+
 	/**
 	 * Auto-generated main method to display this org.eclipse.swt.widgets.Composite inside a new
 	 * Shell.
@@ -82,6 +84,7 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 	}
 
 	public void disableUnwantedElements(final BasicOptions basicOptions) {
+		this.basicOptions = basicOptions;
 		switch (basicOptions) {
 			case ALL:
 				semanticTypes.setEnabled(true);
@@ -165,10 +168,11 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 
 		// disable the visibility field if plug-in is inactive
 		{
-			dbc.bindValue(SWTObservables.observeEnabled(this.isVisible),
-						  SWTObservables.observeSelection(this.isActive),
-						  null,
-						  null);
+			// ... but only if it's visibility button is not to be disabled all the time
+			if (!basicOptions.equals(BasicOptions.ALL_BUT_VISIBLE) && !basicOptions.equals(BasicOptions.ALL_BUT_VISIBLE_AND_SEMANTIC_TYPES)) {
+				dbc.bindValue(SWTObservables.observeEnabled(this.isVisible), SWTObservables.observeSelection(this.isActive), null, null);
+			}
+
 		}
 	}
 
