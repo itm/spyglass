@@ -48,21 +48,28 @@ public class PositionPacketNodePositionerPreferencePage extends
 	private void createOptionsGroup(final Composite composite) {
 		final Group optionsGroup = new Group(composite, SWT.SHADOW_ETCHED_IN);
 		optionsGroup.setText("Options");
-		optionsGroup.setLayout(new GridLayout(2, false));
+		optionsGroup.setLayout(new GridLayout(3, false));
 		optionsGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
 		final Label label2 = new Label(optionsGroup, SWT.NONE);
 		label2.setText("Timeout: ");
 
 		final GridData textData = new GridData();
-		textData.grabExcessHorizontalSpace = true;
-		textData.horizontalAlignment = GridData.FILL;
+		// textData.grabExcessHorizontalSpace = true;
+		// textData.horizontalAlignment = GridData.FILL;
+		textData.widthHint = 80;
 		textData.heightHint = 17;
 		fieldName = new Text(optionsGroup, SWT.BORDER);
 		fieldName.setLayoutData(textData);
 
+		final Label label2a = new Label(optionsGroup, SWT.NONE);
+		label2a.setText("seconds");
+
+		final GridData data = new GridData();
+		data.horizontalSpan = 3;
 		final Label label3 = new Label(optionsGroup, SWT.NONE);
 		label3.setText("(0 means no timeout.)");
+		label3.setLayoutData(data);
 
 	}
 

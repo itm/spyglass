@@ -78,7 +78,6 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		super.init(manager);
 
 		timer = new Timer("SpringEmbedderPositioner NodeTimeout-Timer");
-		// repositionTimer = new Timer("SpringEmbedderPositioner Reposition-Timer");
 
 		// Check every second for old nodes
 		timer.schedule(new TimerTask() {

@@ -86,7 +86,7 @@ public class ImagePainterOptionsComposite extends Composite {
 				imageFileData.widthHint = 100;
 				final Label imageFileLabel = new Label(group, SWT.NONE);
 				imageFileLabel.setLayoutData(imageFileData);
-				imageFileLabel.setText("Image File");
+				imageFileLabel.setText("Image file");
 
 				final GridLayout imageFileCompositeLayout = new GridLayout();
 				imageFileCompositeLayout.numColumns = 2;
@@ -133,23 +133,32 @@ public class ImagePainterOptionsComposite extends Composite {
 				lowerLeftLabelData.widthHint = 100;
 				final Label lowerLeftLabel = new Label(group, SWT.NONE);
 				lowerLeftLabel.setLayoutData(lowerLeftLabelData);
-				lowerLeftLabel.setText("Lower Left");
+				lowerLeftLabel.setText("Lower left point: ");
+
+				final GridData data = new GridData();
+				data.horizontalAlignment = SWT.RIGHT;
 
 				Label label = new Label(group, SWT.NONE);
 				label.setText("x:");
+				label.setLayoutData(data);
 
 				final GridData lowerLeftXTextData = new GridData();
-				lowerLeftXTextData.widthHint = 40;
+				lowerLeftXTextData.widthHint = 50;
 				lowerLeftXText = new Text(group, SWT.BORDER);
 				lowerLeftXText.setLayoutData(lowerLeftXTextData);
 
+				final GridData xUnitData = new GridData();
+				xUnitData.widthHint = 40;
+
 				xUnitLabel = new Label(group, SWT.NONE);
+				xUnitLabel.setLayoutData(xUnitData);
 
 				label = new Label(group, SWT.NONE);
 				label.setText("y:");
+				label.setLayoutData(data);
 
 				final GridData lowerLeftYTextData = new GridData();
-				lowerLeftYTextData.widthHint = 40;
+				lowerLeftYTextData.widthHint = 50;
 				lowerLeftYText = new Text(group, SWT.BORDER);
 				lowerLeftYText.setLayoutData(lowerLeftYTextData);
 
@@ -160,13 +169,14 @@ public class ImagePainterOptionsComposite extends Composite {
 				imageSizeLabelData.widthHint = 100;
 				final Label imageSizeLabel = new Label(group, SWT.NONE);
 				imageSizeLabel.setLayoutData(imageSizeLabelData);
-				imageSizeLabel.setText("Image Size");
+				imageSizeLabel.setText("Image size: ");
 
 				label = new Label(group, SWT.NONE);
 				label.setText("Width:");
+				// label.setLayoutData(data);
 
 				final GridData imageSizeWidthTextData = new GridData();
-				imageSizeWidthTextData.widthHint = 40;
+				imageSizeWidthTextData.widthHint = 50;
 				imageSizeWidthText = new Text(group, SWT.BORDER);
 				imageSizeWidthText.setLayoutData(imageSizeWidthTextData);
 
@@ -174,9 +184,10 @@ public class ImagePainterOptionsComposite extends Composite {
 
 				label = new Label(group, SWT.NONE);
 				label.setText("Height:");
+				// label.setLayoutData(data);
 
 				final GridData imageSizeHeightTextData = new GridData();
-				imageSizeHeightTextData.widthHint = 40;
+				imageSizeHeightTextData.widthHint = 50;
 				imageSizeHeightText = new Text(group, SWT.BORDER);
 				imageSizeHeightText.setLayoutData(imageSizeHeightTextData);
 

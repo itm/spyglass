@@ -122,19 +122,19 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 			groupDefaultRange = new Group(this, SWT.NONE);
 			groupDefaultRange.setLayoutData(data);
-			groupDefaultRange.setLayout(new GridLayout(3, false));
-			groupDefaultRange.setText("Default Range");
+			groupDefaultRange.setLayout(new GridLayout(4, false));
+			groupDefaultRange.setText("Default range");
 
 			{
 				// elements of group "default range"
 				{
 					// first line
 					label = new Label(groupDefaultRange, SWT.NONE);
-					label.setText("Line Width");
+					label.setText("Line width");
 
 					data = new GridData();
 					data.widthHint = 40;
-					data.horizontalSpan = 2;
+					data.horizontalSpan = 3;
 
 					defaultLineWidth = new Text(groupDefaultRange, SWT.BORDER);
 					defaultLineWidth.setLayoutData(data);
@@ -143,7 +143,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 				{
 					// second line
 					label = new Label(groupDefaultRange, SWT.NONE);
-					label.setText("Line Color");
+					label.setText("Line color");
 
 					data = new GridData();
 					data.widthHint = 40;
@@ -152,6 +152,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 					defaultRangeForegroundColor.setLayoutData(data);
 
 					data = new GridData();
+					data.horizontalSpan = 2;
 
 					buttonForegroundColor = new Button(groupDefaultRange, SWT.PUSH | SWT.CENTER);
 					buttonForegroundColor.setText("Change...");
@@ -172,7 +173,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 				{
 					// third line
 					label = new Label(groupDefaultRange, SWT.NONE);
-					label.setText("Background Color");
+					label.setText("Background color");
 
 					data = new GridData();
 					data.widthHint = 40;
@@ -181,6 +182,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 					defaultRangeBackgroundColor.setLayoutData(data);
 
 					data = new GridData();
+					data.horizontalSpan = 2;
 
 					buttonBackgroundColor = new Button(groupDefaultRange, SWT.PUSH | SWT.CENTER);
 					buttonBackgroundColor.setText("Change...");
@@ -201,7 +203,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 				{
 					// fourth line
 					label = new Label(groupDefaultRange, SWT.NONE);
-					label.setText("Background Alpha Transparency");
+					label.setText("Background alpha transparency");
 
 					data = new GridData();
 					data.widthHint = 40;
@@ -209,8 +211,11 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 					defaultBackgroundAlphaTransparency = new Text(groupDefaultRange, SWT.BORDER);
 					defaultBackgroundAlphaTransparency.setLayoutData(data);
 
+					data = new GridData();
+					data.horizontalSpan = 2;
 					label = new Label(groupDefaultRange, SWT.NONE);
 					label.setText("[0 (transparent) - 255 (opaque)]");
+					label.setLayoutData(data);
 
 				}
 				{
@@ -220,6 +225,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 
 					data = new GridData();
 					data.widthHint = 100;
+					data.horizontalSpan = 2;
 
 					defaultRangeType = new Combo(groupDefaultRange, SWT.DROP_DOWN | SWT.READ_ONLY);
 					defaultRangeType.setLayoutData(data);
@@ -228,7 +234,7 @@ public class NodeSensorRangeOptionsComposite extends Composite {
 					defaultRangeType.add(RANGE_TYPE.Cone.toString());
 
 					data = new GridData();
-
+					// data.horizontalSpan = 2;
 					buttonOptions = new Button(groupDefaultRange, SWT.PUSH | SWT.CENTER);
 					buttonOptions.setText("Options...");
 					buttonOptions.setLayoutData(data);

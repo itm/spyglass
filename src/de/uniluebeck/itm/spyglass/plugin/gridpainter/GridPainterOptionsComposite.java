@@ -94,7 +94,7 @@ public class GridPainterOptionsComposite extends Composite {
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.FILL;
 		data.grabExcessHorizontalSpace = true;
-		data.grabExcessVerticalSpace = true;
+		// data.grabExcessVerticalSpace = true;
 		setLayoutData(data);
 
 		{
@@ -114,16 +114,17 @@ public class GridPainterOptionsComposite extends Composite {
 						// 1st column
 						// lower left point
 						data = new GridData();
-						data.widthHint = 120;
+						// data.widthHint = 120;
 
 						label = new Label(group, SWT.NONE);
-						label.setText("Lower Left Point:");
+						label.setText("Lower left point:");
 						label.setLayoutData(data);
 					}
 					{
 						// 2nd column
 						data = new GridData();
-						data.widthHint = 20;
+						// data.widthHint = 100;
+						data.horizontalAlignment = SWT.RIGHT;
 
 						label = new Label(group, SWT.NONE);
 						label.setText("x:");
@@ -132,29 +133,26 @@ public class GridPainterOptionsComposite extends Composite {
 					{
 						// 3rd column
 						data = new GridData();
-						data.widthHint = 40;
+						data.widthHint = 50;
 
 						lowerLeftPointXText = new Text(group, SWT.BORDER);
 						lowerLeftPointXText.setLayoutData(data);
 					}
 					{
 						// 4th column
-						lowerLeftPointXUnitLabel = new Label(group, SWT.NONE);
-						lowerLeftPointXUnitLabel.setText("");
-					}
-					{
-						// 5th column
 						data = new GridData();
 						data.widthHint = 30;
 
-						label = new Label(group, SWT.NONE);
-						label.setText("");
-						label.setLayoutData(data);
+						lowerLeftPointXUnitLabel = new Label(group, SWT.NONE);
+						lowerLeftPointXUnitLabel.setText("");
+						lowerLeftPointXUnitLabel.setLayoutData(data);
 					}
 					{
-						// 6th column
+						// 5th, 6th column
 						data = new GridData();
-						data.widthHint = 20;
+						// data.widthHint = 20;
+						data.horizontalAlignment = SWT.RIGHT;
+						data.horizontalSpan = 2;
 
 						label = new Label(group, SWT.NONE);
 						label.setText("y:");
@@ -163,16 +161,19 @@ public class GridPainterOptionsComposite extends Composite {
 					{
 						// 7th column
 						data = new GridData();
-						data.widthHint = 40;
+						data.widthHint = 50;
 
 						lowerLeftPointYText = new Text(group, SWT.BORDER);
 						lowerLeftPointYText.setLayoutData(data);
 					}
 					{
 						// 8th column
+						data = new GridData();
+						// data.horizontalSpan = 2;
+
 						lowerLeftPointYUnitLabel = new Label(group, SWT.NONE);
 						lowerLeftPointYUnitLabel.setText("");
-						lowerLeftPointYUnitLabel.setLayoutData(new GridData());
+						lowerLeftPointYUnitLabel.setLayoutData(data);
 					}
 				}
 				{
@@ -181,16 +182,24 @@ public class GridPainterOptionsComposite extends Composite {
 						// 1st column
 						// rows and columns
 						data = new GridData();
-						data.horizontalSpan = 2;
 
 						label = new Label(group, SWT.NONE);
-						label.setText("# Rows / Columns:");
+						label.setText("Number of ");
+						label.setLayoutData(data);
+					}
+					{
+						// 2nd column
+						data = new GridData();
+						data.horizontalAlignment = SWT.RIGHT;
+
+						label = new Label(group, SWT.NONE);
+						label.setText("rows:");
 						label.setLayoutData(data);
 					}
 					{
 						// 3rd column
 						data = new GridData();
-						data.widthHint = 40;
+						data.widthHint = 50;
 						data.horizontalSpan = 2;
 
 						numRowsText = new Text(group, SWT.BORDER);
@@ -201,7 +210,8 @@ public class GridPainterOptionsComposite extends Composite {
 						data = new GridData();
 						data.widthHint = 50;
 						data.heightHint = 20;
-						data.horizontalSpan = 2;
+						// data.horizontalSpan = 2;
+						data.horizontalAlignment = SWT.CENTER;
 
 						buttonLockNumberOfRowsNCols = new Button(group, SWT.PUSH | SWT.CENTER);
 						buttonLockNumberOfRowsNCols.setLayoutData(data);
@@ -225,9 +235,17 @@ public class GridPainterOptionsComposite extends Composite {
 						});
 					}
 					{
+						data = new GridData();
+						data.horizontalAlignment = SWT.RIGHT;
+
+						final Label columnsLabel = new Label(group, SWT.NONE);
+						columnsLabel.setText("columns:");
+						columnsLabel.setLayoutData(data);
+					}
+					{
 						// 7th to 8th column
 						data = new GridData();
-						data.widthHint = 40;
+						data.widthHint = 50;
 						data.horizontalSpan = 2;
 
 						numColsText = new Text(group, SWT.BORDER);
@@ -238,33 +256,39 @@ public class GridPainterOptionsComposite extends Composite {
 					// 3rd row
 					{
 						// 1st column
-						// row width and column height
-						data = new GridData();
-						data.horizontalSpan = 2;
-
-						label = new Label(group, SWT.NONE);
-						label.setText("Row Width / Column Height:");
-						label.setLayoutData(data);
+						final Label gridElementLabel = new Label(group, SWT.NONE);
+						gridElementLabel.setText("Grid elements");
 					}
 					{
 						// 2nd column
+						// row width and column height
 						data = new GridData();
-						data.widthHint = 40;
+						// data.horizontalSpan = 2;
+						data.horizontalAlignment = SWT.RIGHT;
+
+						label = new Label(group, SWT.NONE);
+						label.setText("width:");
+						label.setLayoutData(data);
+					}
+					{
+						// 3rd column
+						data = new GridData();
+						data.widthHint = 50;
 
 						gridElementWidthText = new Text(group, SWT.BORDER);
 						gridElementWidthText.setLayoutData(data);
 					}
 					{
-						// 3rd column
+						// 4th column
 						gridElementWidthUnitLabel = new Label(group, SWT.NONE);
 						gridElementWidthUnitLabel.setLayoutData(new GridData());
 					}
 					{
-						// 4th to 6th column
+						// 5th column
 						data = new GridData();
 						data.widthHint = 50;
 						data.heightHint = 20;
-						data.horizontalSpan = 2;
+						// data.horizontalSpan = 2;
 
 						buttonLockGridElementsSquare = new Button(group, SWT.PUSH | SWT.CENTER);
 						buttonLockGridElementsSquare.setLayoutData(data);
@@ -288,9 +312,18 @@ public class GridPainterOptionsComposite extends Composite {
 						});
 					}
 					{
+						// 6th column
+						data = new GridData();
+						data.horizontalAlignment = SWT.RIGHT;
+
+						final Label rowWidthLabel = new Label(group, SWT.NONE);
+						rowWidthLabel.setText("height:");
+						rowWidthLabel.setLayoutData(data);
+					}
+					{
 						// 7th column
 						data = new GridData();
-						data.widthHint = 40;
+						data.widthHint = 50;
 
 						gridElementHeightText = new Text(group, SWT.BORDER);
 						gridElementHeightText.setLayoutData(data);
@@ -309,13 +342,13 @@ public class GridPainterOptionsComposite extends Composite {
 						data.horizontalSpan = 2;
 
 						label = new Label(group, SWT.NONE);
-						label.setText("Line Width");
+						label.setText("Line width");
 						label.setLayoutData(data);
 					}
 					{
 						// 2nd to 8th column
 						data = new GridData();
-						data.widthHint = 40;
+						data.widthHint = 50;
 						data.horizontalSpan = 6;
 
 						lineWidth = new Text(group, SWT.BORDER);
@@ -330,7 +363,7 @@ public class GridPainterOptionsComposite extends Composite {
 						data.horizontalSpan = 2;
 
 						label = new Label(group, SWT.NONE);
-						label.setText("Line Color");
+						label.setText("Line color");
 						label.setLayoutData(data);
 					}
 					{

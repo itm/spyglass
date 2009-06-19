@@ -254,7 +254,7 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 					allTypes = new Button(group1, SWT.LEFT | SWT.CHECK);
 					allTypes.setText("All Types");
 					final GridData allTypesLData = new GridData();
-					allTypesLData.widthHint = 73;
+					// allTypesLData.widthHint = 80;
 					allTypesLData.heightHint = 28;
 					allTypes.setLayoutData(allTypesLData);
 					allTypes.addSelectionListener(new SelectionAdapter() {

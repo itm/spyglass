@@ -74,7 +74,7 @@ public class VectorSequencePainterOptionsComposite extends Composite {
 
 			{
 				label = new Label(group, SWT.NONE);
-				label.setText("Line Width");
+				label.setText("Line width");
 
 				data = new GridData();
 				data.widthHint = 40;
@@ -84,7 +84,7 @@ public class VectorSequencePainterOptionsComposite extends Composite {
 				lineWidth.setLayoutData(data);
 
 				label = new Label(group, SWT.NONE);
-				label.setText("Line Color");
+				label.setText("Line color");
 
 				data = new GridData();
 				data.widthHint = 50;
@@ -112,7 +112,7 @@ public class VectorSequencePainterOptionsComposite extends Composite {
 				});
 
 				label = new Label(group, SWT.NONE);
-				label.setText("Time To Live");
+				label.setText("Time to live");
 
 				data = new GridData();
 				data.widthHint = 40;

@@ -78,6 +78,7 @@ public class ObjectPainterOptionsComposite extends Composite {
 	private Label label4;
 	private Button keepProportionsButton;
 	private Label label3;
+	private Label label3a;
 
 	ObjectPainterPreferencePage page;
 
@@ -123,7 +124,7 @@ public class ObjectPainterOptionsComposite extends Composite {
 				imageFileData.heightHint = 17;
 				final Label imageFileLabel = new Label(group, SWT.NONE);
 				imageFileLabel.setLayoutData(imageFileData);
-				imageFileLabel.setText("File path: ");
+				imageFileLabel.setText("Image file: ");
 
 				final GridLayout imageFileCompositeLayout = new GridLayout();
 				imageFileCompositeLayout.numColumns = 2;
@@ -184,7 +185,7 @@ public class ObjectPainterOptionsComposite extends Composite {
 				lowerLeftLabelData.horizontalSpan = 2;
 				final Label lowerLeftLabel = new Label(group, SWT.NONE);
 				lowerLeftLabel.setLayoutData(lowerLeftLabelData);
-				lowerLeftLabel.setText("Dimensions (W/H): ");
+				lowerLeftLabel.setText("Dimensions (width/height): ");
 			}
 			{
 				final GridData lowerLeftXTextData = new GridData();
@@ -205,25 +206,31 @@ public class ObjectPainterOptionsComposite extends Composite {
 			group.setLayoutData(groupData);
 			final GridLayout groupLayout = new GridLayout();
 			group.setLayout(groupLayout);
-			groupLayout.numColumns = 5;
+			groupLayout.numColumns = 6;
 			group.setText("Drawing options");
 
+			// 1st row
 			{
 				// image size
 				final GridData imageSizeLabelData = new GridData();
-				imageSizeLabelData.horizontalSpan = 5;
+				imageSizeLabelData.horizontalSpan = 6;
 				final Label imageSizeLabel = new Label(group, SWT.NONE);
 				imageSizeLabel.setLayoutData(imageSizeLabelData);
-				imageSizeLabel.setText("Scale Image to");
+				imageSizeLabel.setText("Scale image to");
 				imageSizeLabel.setFont(SWTResourceManager.getFont("Sans", 10, 1, false, false));
 			}
+			// 2nd row
 			{
+				final GridData data = new GridData();
+				data.horizontalAlignment = SWT.RIGHT;
+
 				label4 = new Label(group, SWT.NONE);
 				final GridData label4LData = new GridData();
-				label4LData.widthHint = 113;
+				// label4LData.widthHint = 113;
 				label4LData.heightHint = 17;
 				label4.setLayoutData(label4LData);
-				label4.setText("Width / Height");
+				label4.setText("Width:");
+				label4.setLayoutData(data);
 			}
 			{
 				final GridData imageSizeWidthTextData = new GridData();
@@ -238,14 +245,19 @@ public class ObjectPainterOptionsComposite extends Composite {
 				});
 			}
 			{
+				// The text will be automatically generated (metric unit from xml config)
+				label3a = new Label(group, SWT.NONE);
+				label3a.setText("");
+			}
+			{
 				label2 = new Label(group, SWT.NONE);
 				final GridData label2LData = new GridData();
-				label2LData.widthHint = 7;
+				label2LData.horizontalAlignment = SWT.RIGHT;
+				// label2LData.widthHint = 7;
 				label2LData.heightHint = 17;
 				label2.setLayoutData(label2LData);
-				label2.setText("/");
+				label2.setText("Height:");
 			}
-
 			{
 
 				final GridData imageSizeHeightTextData = new GridData();
@@ -269,23 +281,28 @@ public class ObjectPainterOptionsComposite extends Composite {
 				label3.setText("m");
 
 			}
-			{
-				label1 = new Label(group, SWT.NONE);
-				final GridData label1LData = new GridData();
-				label1LData.widthHint = 41;
-				label1LData.heightHint = 17;
-				label1.setLayoutData(label1LData);
-				label1.setText("");
-			}
+
+			// {
+			// label1 = new Label(group, SWT.NONE);
+			// final GridData label1LData = new GridData();
+			// label1LData.widthHint = 41;
+			// label1LData.heightHint = 17;
+			// label1.setLayoutData(label1LData);
+			// label1.setText("");
+			// }
+
+			// 3rd row
 			{
 				keepProportionsButton = new Button(group, SWT.CHECK | SWT.LEFT);
 				final GridData keepProportionsButtonLData = new GridData();
-				keepProportionsButtonLData.horizontalSpan = 4;
+				keepProportionsButtonLData.horizontalSpan = 6;
 				keepProportionsButtonLData.horizontalAlignment = GridData.FILL;
 				keepProportionsButtonLData.grabExcessHorizontalSpace = true;
 				keepProportionsButton.setLayoutData(keepProportionsButtonLData);
 				keepProportionsButton.setText("Keep proportions");
 			}
+
+			// 4th row
 			{
 				label5 = new Label(group, SWT.NONE);
 				final GridData label5LData = new GridData();
@@ -296,16 +313,20 @@ public class ObjectPainterOptionsComposite extends Composite {
 				label5.setText("Trajectory");
 				label5.setFont(SWTResourceManager.getFont("Sans", 10, 1, false, false));
 			}
+
+			// 5th row
 			{
 				drawLineCheckbox = new Button(group, SWT.CHECK | SWT.LEFT);
 				final GridData button1LData = new GridData();
 				button1LData.heightHint = 22;
 				button1LData.horizontalAlignment = GridData.FILL;
 				button1LData.grabExcessHorizontalSpace = true;
-				button1LData.horizontalSpan = 5;
+				button1LData.horizontalSpan = 6;
 				drawLineCheckbox.setLayoutData(button1LData);
 				drawLineCheckbox.setText("Draw trajectory as line");
 			}
+
+			// 6th row
 			{
 				label6 = new Label(group, SWT.NONE);
 				label6.setText("Line color: ");
@@ -320,7 +341,7 @@ public class ObjectPainterOptionsComposite extends Composite {
 			{
 				button1 = new Button(group, SWT.PUSH | SWT.CENTER);
 				final GridData button1LData1 = new GridData();
-				button1LData1.horizontalSpan = 3;
+				button1LData1.horizontalSpan = 4;
 				button1LData1.grabExcessHorizontalSpace = true;
 				button1LData1.widthHint = 78;
 				button1LData1.heightHint = 29;
@@ -333,19 +354,27 @@ public class ObjectPainterOptionsComposite extends Composite {
 					}
 				});
 			}
+
+			// 7th row
 			{
 				label8 = new Label(group, SWT.NONE);
 				label8.setText("Trajectory");
 				final GridData label8LData = new GridData();
 				label8LData.widthHint = 101;
 				label8LData.heightHint = 17;
-				label8LData.horizontalSpan = 5;
+				label8LData.horizontalSpan = 6;
 				label8.setLayoutData(label8LData);
 				label8.setFont(SWTResourceManager.getFont("Sans", 10, 1, false, false));
 			}
+
+			// 8th row
 			{
+				final GridData data = new GridData();
+				data.horizontalSpan = 2;
+
 				label7 = new Label(group, SWT.NONE);
 				label7.setText("Packet type: ");
+				label7.setLayoutData(data);
 			}
 			{
 				final GridData combo1LData = new GridData();
@@ -355,9 +384,15 @@ public class ObjectPainterOptionsComposite extends Composite {
 				combo1.add("TrajectoryPacket2D");
 				combo1.add("TrajectoryPacket3D");
 			}
+
+			// 9th row
 			{
+				final GridData data = new GridData();
+				data.horizontalSpan = 2;
+
 				label9 = new Label(group, SWT.NONE);
 				label9.setText("Display update interval: ");
+				label9.setLayoutData(data);
 			}
 			{
 				final GridData text1LData = new GridData();
@@ -367,8 +402,12 @@ public class ObjectPainterOptionsComposite extends Composite {
 				inteval.setLayoutData(text1LData);
 			}
 			{
+				final GridData data = new GridData();
+				data.horizontalSpan = 3;
+
 				label10 = new Label(group, SWT.NONE);
 				label10.setText("milliseconds");
+				label10.setLayoutData(data);
 			}
 		}
 
@@ -422,6 +461,12 @@ public class ObjectPainterOptionsComposite extends Composite {
 					.bindValue(SWTObservables.observeText(this.label3), BeansObservables.observeValue(dbc.getValidationRealm(), mConf, "unit"), null,
 							null);
 		}
+		{
+			final MetricsXMLConfig mConf = spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings().getMetrics();
+			dbc.bindValue(SWTObservables.observeText(this.label3a), BeansObservables.observeValue(dbc.getValidationRealm(), mConf, "unit"), null,
+					null);
+		}
+		// TODO:
 		{
 			final IObservableValue observableColor = BeansObservables.observeValue(dbc.getValidationRealm(), config,
 					ObjectPainterXMLConfig.PROPERTYNAME_LINE_COLOR);

@@ -107,7 +107,6 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 			table.getControl().setLayoutData(tableLData);
 			table.getTable().setLinesVisible(true);
 			table.getTable().setHeaderVisible(true);
-
 		}
 		{
 			columnNodeId = new TableViewerColumn(table, SWT.LEFT);
@@ -120,26 +119,26 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 		}
 		{
 			columnLineWidth = new TableViewerColumn(table, SWT.LEFT);
-			columnLineWidth.getColumn().setWidth(60);
-			columnLineWidth.getColumn().setText("Line Width");
+			columnLineWidth.getColumn().setWidth(80);
+			columnLineWidth.getColumn().setText("Line width");
 			// editing support is set later on data binding
 		}
 		{
 			columnLineColor = new TableViewerColumn(table, SWT.LEFT);
-			columnLineColor.getColumn().setWidth(170);
-			columnLineColor.getColumn().setText("Line Color");
+			columnLineColor.getColumn().setWidth(150);
+			columnLineColor.getColumn().setText("Line color");
 			// editing support is set later on data binding
 		}
 		{
 			columnBackgroundColor = new TableViewerColumn(table, SWT.LEFT);
-			columnBackgroundColor.getColumn().setWidth(170);
-			columnBackgroundColor.getColumn().setText("Background Color");
+			columnBackgroundColor.getColumn().setWidth(150);
+			columnBackgroundColor.getColumn().setText("Background color");
 			// editing support is set later on data binding
 		}
 		{
 			columnBackgroundAlpha = new TableViewerColumn(table, SWT.LEFT);
-			columnBackgroundAlpha.getColumn().setWidth(105);
-			columnBackgroundAlpha.getColumn().setText("Background Alpha");
+			columnBackgroundAlpha.getColumn().setWidth(120);
+			columnBackgroundAlpha.getColumn().setText("Background alpha");
 			// editing support is set later on data binding
 		}
 		{

@@ -80,6 +80,7 @@ public class SimpleGlobalInformationOptionsComposite extends Composite {
 		data = new GridData();
 		data.horizontalAlignment = GridData.FILL;
 		data.verticalAlignment = GridData.FILL;
+		// data.heightHint = 400;
 		data.grabExcessHorizontalSpace = true;
 		data.grabExcessVerticalSpace = true;
 		setLayoutData(data);
@@ -88,6 +89,7 @@ public class SimpleGlobalInformationOptionsComposite extends Composite {
 			data = new GridData(SWT.TOP, SWT.LEFT, true, true);
 			data.horizontalAlignment = GridData.FILL;
 			data.verticalAlignment = GridData.FILL;
+			data.grabExcessVerticalSpace = true;
 
 			final Group groupSF = new Group(this, SWT.NONE);
 			groupSF.setLayoutData(data);
@@ -98,6 +100,11 @@ public class SimpleGlobalInformationOptionsComposite extends Composite {
 
 		}
 		{
+			data = new GridData(SWT.TOP, SWT.LEFT, true, true);
+			data.horizontalAlignment = GridData.FILL;
+			// data.verticalAlignment = GridData.FILL;
+			// data.grabExcessHorizontalSpace = true;
+
 			final Group groupPredef = new Group(this, SWT.NONE);
 			groupPredef.setLayoutData(data);
 			groupPredef.setLayout(new GridLayout(3, false));

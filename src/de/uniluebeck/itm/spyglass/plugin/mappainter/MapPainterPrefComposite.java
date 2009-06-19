@@ -157,6 +157,9 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 				group1.setLayoutData(group1LData);
 
 				group1.setText("Layout");
+
+				GridData data;
+
 				{
 					label7 = new Label(group1, SWT.NONE);
 					final GridData label7LData = new GridData();
@@ -169,11 +172,15 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 				}
 				{
 					label1 = new Label(group1, SWT.NONE);
-					label1.setText("Lower Left Point: ");
+					label1.setText("Lower left point: ");
 				}
 				{
+					data = new GridData();
+					data.horizontalAlignment = SWT.RIGHT;
+
 					label2 = new Label(group1, SWT.NONE);
-					label2.setText("x: ");
+					label2.setText("x:");
+					label2.setLayoutData(data);
 				}
 				{
 					lowerLeftX = new Text(group1, SWT.BORDER);
@@ -183,26 +190,31 @@ public class MapPainterPrefComposite extends org.eclipse.swt.widgets.Composite {
 					lowerLeftX.setLayoutData(text1LData);
 				}
 				{
+					data = new GridData();
+					data.widthHint = 40;
+
 					label3space = new Label(group1, SWT.NONE);
-					label3space.setText("m");
+					label3space.setText("");
+					label3space.setLayoutData(data);
 				}
 				{
+
 					label4 = new Label(group1, SWT.NONE);
 					final GridData label4LData = new GridData();
-					label4LData.horizontalAlignment = GridData.END;
+					label4LData.horizontalAlignment = SWT.RIGHT;
 					label4.setLayoutData(label4LData);
-					label4.setText("y: ");
+					label4.setText("y:");
 				}
 				{
 					lowerLeftY = new Text(group1, SWT.BORDER);
 					final GridData lowerLeftYLData = new GridData();
 					lowerLeftYLData.heightHint = 17;
-					lowerLeftYLData.widthHint = 76;
+					lowerLeftYLData.widthHint = 50;
 					lowerLeftY.setLayoutData(lowerLeftYLData);
 				}
 				{
 					labelspace = new Label(group1, SWT.NONE);
-					labelspace.setText("m");
+					labelspace.setText("");
 				}
 				{
 					label6 = new Label(group1, SWT.NONE);
