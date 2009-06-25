@@ -489,7 +489,8 @@ public class SimpleGlobalInformationPlugin extends GlobalInformationPlugin {
 		 */
 		public void createOrUpdateLabel(final StatisticalInformationEvaluator siEvaluator) {
 			synchronized (sfLabels) {
-				final String text = siEvaluator.getDescription() + " " + siEvaluator.getValue();
+				final String text = ((siEvaluator.getExpression() == null) || siEvaluator.getExpression().equals("")) ? siEvaluator.getDescription()
+						: siEvaluator.getDescription() + " " + siEvaluator.getValue();
 				final int key = siEvaluator.hashCode();
 				Label label = sfLabels.get(key);
 

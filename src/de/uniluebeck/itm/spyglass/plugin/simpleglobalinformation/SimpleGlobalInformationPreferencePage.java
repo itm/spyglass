@@ -10,7 +10,10 @@ package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -18,6 +21,7 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 //--------------------------------------------------------------------------------
 /**
@@ -29,6 +33,7 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
  */
 public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<SimpleGlobalInformationPlugin, SimpleGlobalInformationXMLConfig> {
 
+	private static final Logger log = SpyglassLoggerFactory.getLogger(SimpleGlobalInformationPreferencePage.class);
 	private SimpleGlobalInformationOptionsComposite optionsComposite;
 	private Set<StatisticalInformationEvaluator> stringFormatterTable;
 
@@ -99,10 +104,39 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 	@Override
 	protected void storeToModel() {
 		super.storeToModel();
+
+		// prevent two objects from sharing the same semantic type and description
+		final Vector<StatisticalInformationEvaluator> evaluators = new Vector<StatisticalInformationEvaluator>(stringFormatterTable);
+		for (int i = 0; i < evaluators.size() - 1; i++) {
+			final StatisticalInformationEvaluator e1 = evaluators.get(i);
+			for (int j = i + 1; j < evaluators.size(); j++) {
+				final StatisticalInformationEvaluator e2 = evaluators.get(j);
+				if ((e1.getSemanticType() == e2.getSemanticType()) && e1.getDescription().equals(e2.getDescription())) {
+					final String message = "Two configurations with the same semantic type and description have been found. One description was"
+							+ " slightly changed to prevent errors.";
+					log.warn(message);
+					MessageDialog.openWarning(null, "Duplicate Elements", message);
+					e2.setDescription(e2.getDescription() + ".");
+				}
+			}
+		}
+
 		final Set<StatisticalInformationEvaluator> tmp = new TreeSet<StatisticalInformationEvaluator>();
-		for (final StatisticalInformationEvaluator statisticalInformationEvaluator : stringFormatterTable) {
+		for (final StatisticalInformationEvaluator statisticalInformationEvaluator : evaluators) {
 			tmp.add(statisticalInformationEvaluator.clone());
 		}
 		config.setStatisticalInformationEvaluators(tmp);
+	}
+
+	// --------------------------------------------------------------------------------
+	@Override
+	public void dispose() {
+		// the object will be null if the preference page was just added to the tree and not
+		// selected by the user
+		if (optionsComposite != null) {
+			optionsComposite.dispose();
+		}
+
+		super.dispose();
 	}
 }

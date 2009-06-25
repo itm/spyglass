@@ -9,25 +9,19 @@
 
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Set;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.observable.map.IMapChangeListener;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
-import org.eclipse.core.databinding.observable.map.MapChangeEvent;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
-import org.eclipse.core.internal.databinding.beans.JavaBeanObservableMap;
-import org.eclipse.core.internal.databinding.observable.UnmodifiableObservableSet;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableSetContentProvider;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -41,7 +35,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.gui.databinding.ComboBoxEditingSupport;
-import de.uniluebeck.itm.spyglass.gui.databinding.DatabindingTextEditingSupport;
 import de.uniluebeck.itm.spyglass.gui.databinding.StringFormatterEditingSupport;
 import de.uniluebeck.itm.spyglass.gui.databinding.WrappedObservableSet;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
@@ -51,9 +44,9 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * Instances of this class create widgets providing data bound tables to creat, update and delete
  * {@link StatisticalInformationEvaluator}
- *
+ * 
  * @author Sebastian Ebers
- *
+ * 
  */
 public class SGIStringFormatter {
 
@@ -79,7 +72,7 @@ public class SGIStringFormatter {
 
 	/**
 	 * Adds fields to configure the {@link StatisticalInformationEvaluator}
-	 *
+	 * 
 	 * @param parent
 	 *            the parent widget
 	 * @param gridHorizontalSpan
@@ -169,7 +162,7 @@ public class SGIStringFormatter {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Activates data binding
-	 *
+	 * 
 	 * @param dbc
 	 *            the {@link DataBindingContext}
 	 * @param config
@@ -180,7 +173,7 @@ public class SGIStringFormatter {
 		// table
 
 		columnExpressionString.setEditingSupport(new StringFormatterEditingSupport(table, dbc, "expression"));
-		columnDescription.setEditingSupport(new DatabindingTextEditingSupport(table, dbc, "description", null,null,null));
+		columnDescription.setEditingSupport(new StringFormatterEditingSupport(table, dbc, "description"));
 
 		columnStatisticType.setEditingSupport(new ComboBoxEditingSupport(table, dbc, "operation",
 				new String[] { "SUM", "MIN", "MAX", "AVG", "MEDIAN" }));
@@ -202,31 +195,6 @@ public class SGIStringFormatter {
 		final IObservableMap[] columnMaps = new IObservableMap[] { typeMap, descriptionMap, fmtStringMap, operationMap };
 		table.setLabelProvider(new ObservableMapLabelProvider(columnMaps));
 
-		descriptionMap.addMapChangeListener(new IMapChangeListener() {
-
-			@Override
-			public void handleMapChange(final MapChangeEvent event) {
-				final Collection<StatisticalInformationEvaluator> settings = new LinkedList<StatisticalInformationEvaluator>();
-				if (event.getSource() == null) {
-					return;
-				}
-				final UnmodifiableObservableSet o = (UnmodifiableObservableSet) ((JavaBeanObservableMap) event.getSource()).getObserved();
-				final Vector<StatisticalInformationEvaluator> s = new Vector<StatisticalInformationEvaluator>(o);
-				for (int i = 0; i < s.size() - 1; i++) {
-					for (int j = i + 1; j < s.size(); j++) {
-						if (s.get(i).compareTo(s.get(j)) == 0) {
-							final String message = "Two configurations with the same semantic type and description have been found. One description was"
-									+ " slightly changed to prevent errors.";
-							log.warn(message);
-							MessageDialog.openWarning(null, "Duplicate Elements", message);
-							s.get(j).setDescription(s.get(j).getDescription() + ".");
-						}
-					}
-				}
-				table.refresh();
-			}
-
-		});
 	}
 
 	private void addEntryWidgetSelected(final SelectionEvent evt) {
@@ -285,7 +253,35 @@ public class SGIStringFormatter {
 	 * Creates a connection between the view's table and data from the model
 	 */
 	public void connectTableWithData(final DataBindingContext dbc, final Set<StatisticalInformationEvaluator> tempStringFormatterTable) {
-		tableData = new WrappedObservableSet(dbc.getValidationRealm(), tempStringFormatterTable, null);
+		final IElementComparer comp = new IElementComparer() {
+			// --------------------------------------------------------------------------------
+			@Override
+			public boolean equals(final Object a, final Object b) {
+				StatisticalInformationEvaluator e1 = null;
+				StatisticalInformationEvaluator e2 = null;
+				if (a instanceof StatisticalInformationEvaluator) {
+					e1 = (StatisticalInformationEvaluator) a;
+				}
+				if (b instanceof StatisticalInformationEvaluator) {
+					e2 = (StatisticalInformationEvaluator) b;
+				}
+				if ((e1 != null) && (e2 != null)) {
+					return ((e1.getSemanticType() == e2.getSemanticType()) && e1.getDescription().equals(e2.getDescription()));
+				}
+				if ((e1 != null) && (e2 != null)) {
+					// return ((e1.getSemanticType() == e2.getSemanticType()) &&
+					// e1.getDescription().equals(e2.getDescription()));
+					return ((e1.getSemanticType() == e2.getSemanticType()));
+				}
+				return e1 == e2;
+			}
+
+			@Override
+			public int hashCode(final Object element) {
+				return element.hashCode();
+			}
+		};
+		tableData = new WrappedObservableSet(dbc.getValidationRealm(), tempStringFormatterTable, comp);
 		table.setInput(tableData);
 	}
 }
