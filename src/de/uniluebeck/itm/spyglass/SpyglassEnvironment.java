@@ -23,6 +23,7 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
+import de.uniluebeck.itm.spyglass.util.Tools;
 
 // --------------------------------------------------------------------------------
 /**
@@ -217,9 +218,9 @@ public class SpyglassEnvironment {
 	public static void setConfigFilePath(final File file) throws IOException {
 
 		if (isIShellPlugin) {
-			props.setProperty(PROPERTY_CONFIG_ISHELL, file.getAbsolutePath());
+			props.setProperty(PROPERTY_CONFIG_ISHELL, Tools.getRelativePath(file));
 		} else {
-			props.setProperty(PROPERTY_CONFIG_STANDALONE, file.getAbsolutePath());
+			props.setProperty(PROPERTY_CONFIG_STANDALONE, Tools.getRelativePath(file));
 		}
 
 		storeProps(props);
@@ -274,7 +275,7 @@ public class SpyglassEnvironment {
 	 * @throws IOException
 	 */
 	public static void setImageWorkingDirectory(final String path) throws IOException {
-		props.setProperty(PROPERTY_CONFIG_FILE_IMAGE_DIR, path);
+		props.setProperty(PROPERTY_CONFIG_FILE_IMAGE_DIR, Tools.getRelativePath(path));
 		storeProps(props);
 	}
 
@@ -300,7 +301,7 @@ public class SpyglassEnvironment {
 	 * @throws IOException
 	 */
 	public static void setDefalutRecordDirectory(final String path) throws IOException {
-		props.setProperty(PROPERTY_CONFIG_RECORD_DIR, path);
+		props.setProperty(PROPERTY_CONFIG_RECORD_DIR, Tools.getRelativePath(path));
 		storeProps(props);
 	}
 
@@ -337,7 +338,7 @@ public class SpyglassEnvironment {
 	 */
 	public static AffineTransform getAffineTransformation() {
 		final String s = String.valueOf(props.get(PROPERTY_CONFIG_AFFINE_TRANSFORM_MATRIX));
-		final String[] matrix = s != null ? s.split(",") : "1.0,0.0,0.0,1.0,0.0,1.0".split(",");
+		final String[] matrix = ((s != null) && !s.equals("null")) ? s.split(",") : "1.0,0.0,0.0,1.0,0.0,1.0".split(",");
 		final double[] flatmatrix = new double[6];
 
 		for (int i = 0; i < matrix.length; i++) {
@@ -376,7 +377,7 @@ public class SpyglassEnvironment {
 	public static Rectangle getDrawingAreaPosition() {
 		final String s = String.valueOf(props.get(PROPERTY_CONFIG_DRAWINGAREA_POSITION));
 
-		final String[] v = s != null ? s.split(",") : "0,0,1000,500".split(",");
+		final String[] v = ((s != null) && !s.equals("null")) ? s.split(",") : "0,0,1000,500".split(",");
 		return new Rectangle(Integer.parseInt(v[0]), Integer.parseInt(v[1]), Integer.parseInt(v[2]), Integer.parseInt(v[3]));
 	}
 

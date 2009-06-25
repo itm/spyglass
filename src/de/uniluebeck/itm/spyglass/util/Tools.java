@@ -157,4 +157,41 @@ public class Tools {
 
 		return number + frac;
 	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns a file's relative path based on the current working directory
+	 * 
+	 * @param file
+	 *            the file which relative path will be returned
+	 * @return a file's relative path based on the current working directory
+	 * @throws IOException
+	 * 
+	 */
+	public static String getRelativePath(final File file) throws IOException {
+		return getRelativePath(file.getCanonicalPath());
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns a path as a relative one based on the current working directory
+	 * 
+	 * @param path
+	 *            the path to be converted
+	 * @return a file's relative path based on the current working directory
+	 * @throws IOException
+	 * 
+	 */
+	public static String getRelativePath(final String path) throws IOException {
+
+		final File file2 = new File("relpath.tmp");
+		file2.exists();
+		String full = file2.getCanonicalPath().replace("relpath.tmp", "");
+		if (!full.endsWith(File.separator)) {
+			full += File.separator;
+		}
+		return path.replace(full, "");
+
+	}
+
 }
