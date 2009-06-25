@@ -19,6 +19,7 @@ import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.plugin.NeedsMetric;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionEvent;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
@@ -31,7 +32,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * @author Daniel Bimschas
  */
-public class NodeSensorRangePlugin extends BackgroundPainterPlugin {
+public class NodeSensorRangePlugin extends BackgroundPainterPlugin implements NeedsMetric {
 
 	public static PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
 			final Spyglass spyglass) {
