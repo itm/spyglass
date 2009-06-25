@@ -334,9 +334,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	private final void performCreateInstance() {
 		log.info("Pressed button create");
 
-		// First save data.
-		this.performApply();
-
 		if (!this.isValid()) {
 			MessageDialog.openError(this.getShell(), "Can not store changes",
 					"Could not store your changes. There are still errors remaining in the form.");
