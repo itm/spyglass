@@ -29,6 +29,7 @@ import de.uniluebeck.itm.spyglass.packet.IntListPacket;
 import de.uniluebeck.itm.spyglass.packet.LongListPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.VariableListPacket;
+import de.uniluebeck.itm.spyglass.plugin.NeedsMetric;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionEvent;
 import de.uniluebeck.itm.spyglass.plugin.NodePositionListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
@@ -38,13 +39,13 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
- * This plugin extracts scalar values from packets and draws a temperature-color map
- * where different scalars represent different colors.
- *
+ * This plugin extracts scalar values from packets and draws a temperature-color map where different
+ * scalars represent different colors.
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
-public class MapPainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener, NodePositionListener {
+public class MapPainterPlugin extends BackgroundPainterPlugin implements PropertyChangeListener, NodePositionListener, NeedsMetric {
 
 	protected static Logger log = SpyglassLoggerFactory.getLogger(MapPainterPlugin.class);
 
@@ -115,7 +116,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 		createMap();
 
-		timer = new Timer("Timer of "+this.toString());
+		timer = new Timer("Timer of " + this.toString());
 
 		xmlConfig.addPropertyChangeListener(this);
 		manager.addNodePositionListener(this);
@@ -265,7 +266,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 				try {
 					updateMatrix();
 				} catch (final Exception e) {
-					log.error("Exception while updating the matrix",e);
+					log.error("Exception while updating the matrix", e);
 				}
 			}
 
@@ -275,7 +276,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see
 	 * de.uniluebeck.itm.spyglass.plugin.NodePositionListener#handleEvent(de.uniluebeck.itm.spyglass
 	 * .plugin.NodePositionEvent)
@@ -331,9 +332,9 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 	/**
 	 * Remove all framepoints from the datastore and create new ones.
-	 *
-	 * Framepoints are fixed artifical nodes placed outside the map. They have a defined value
-	 * and give the map a default-coloring until real nodes arrive.
+	 * 
+	 * Framepoints are fixed artifical nodes placed outside the map. They have a defined value and
+	 * give the map a default-coloring until real nodes arrive.
 	 */
 	private synchronized void updateFramepoints() {
 
@@ -411,13 +412,12 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 		}
 		sum /= neighbors.size();
 
-
 		return sum;
 	}
 
 	/**
 	 * Update the matrix. After we're done, cause a redraw.
-	 *
+	 * 
 	 * Note, that we only lock shortly over the map. although this may result in short-time
 	 * graphical errors (when a redraw occurs while this method is still running) it has the
 	 * advantage of avoiding longtime blocking of the SWT-Thread when the draw() method tries to
@@ -474,7 +474,7 @@ public class MapPainterPlugin extends BackgroundPainterPlugin implements Propert
 
 		synchronized (this) {
 			// maybe the plugin was shutdown while we were busy
-			if (getState()==State.ALIVE) {
+			if (getState() == State.ALIVE) {
 				map.setMatrix(matrix);
 			}
 		}
