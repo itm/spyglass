@@ -28,7 +28,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 /**
  * @author Daniel Bimschas, Dariush Forouher
- *
+ * 
  * @param <T>
  */
 public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigClass extends PluginXMLConfig> extends AbstractDatabindingPreferencePage {
@@ -97,7 +97,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Temporal config. it contains the current settings on the preference page, before the the user
 	 * pressed "Apply".
-	 *
+	 * 
 	 * This field is final, since databinding listens to events from this object specifically.
 	 */
 	protected final ConfigClass config;
@@ -132,7 +132,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	// --------------------------------------------------------------------------------
 	/**
 	 * Create a preference page for editing the defaultsconfiguration of an plugin type.
-	 *
+	 * 
 	 * @param cs
 	 */
 	@SuppressWarnings("unchecked")
@@ -140,7 +140,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.TYPE;
-//		this.dialog = dialog;
+		// this.dialog = dialog;
 		this.spyglass = spyglass;
 		this.basicOptions = basicOptions;
 		this.plugin = null;
@@ -160,7 +160,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	// --------------------------------------------------------------------------------
 	/**
 	 * Create a preference page for editing the configuration of an plugin instance.
-	 *
+	 * 
 	 * @param cs
 	 * @param plugin
 	 */
@@ -170,7 +170,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		super();
 		noDefaultAndApplyButton();
 		this.type = PrefType.INSTANCE;
-//		this.dialog = dialog;
+		// this.dialog = dialog;
 		this.spyglass = spyglass;
 		this.plugin = plugin;
 		this.basicOptions = basicOptions;
@@ -235,7 +235,6 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		resetDirtyFlag();
 	}
 
-
 	@Override
 	protected void resetDirtyFlag() {
 		super.resetDirtyFlag();
@@ -275,9 +274,9 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * Adds the handler to the ValidationStatus provider of the DataBindingCotext. Whenever the
 	 * validation status changes, the handler will update the errorString displayed to the user and
 	 * set a flag variable.
-	 *
+	 * 
 	 * the handler will also grey out the apply-Button, if there are errors present.
-	 *
+	 * 
 	 */
 	@Override
 	protected AggregateValidationStatus addErrorBinding() {
@@ -330,9 +329,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		return button;
 	}
 
-
 	private final void performCreateInstance() {
 		log.info("Pressed button create");
+
+		// First save data.
+		this.performApply();
 
 		if (!this.isValid()) {
 			MessageDialog.openError(this.getShell(), "Can not store changes",
@@ -379,7 +380,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 
 	// --------------------------------------------------------------------------------
 	/**
-	 *
+	 * 
 	 * @return
 	 */
 	protected final void performRestore() {
@@ -390,7 +391,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	// --------------------------------------------------------------------------------
 	/**
 	 * Checks if this is an instance page or a type page.
-	 *
+	 * 
 	 * @return <code>true</code> if this is a preference page for a plugin instance,
 	 *         <code>false</code> if this is a preference page for an instantiable plugin type.
 	 */
@@ -401,7 +402,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the <code>Plugin</code> instance associated with this page.
-	 *
+	 * 
 	 * @return the associated <code>Plugin</code> instance or <code>null</code> if this is a type
 	 *         page (i.e. not an instance page, also see
 	 *         {@link PluginPreferencePage#isInstancePage()})
@@ -414,7 +415,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Returns the class-Object of the plugin this preference page is associated with. Needed for
 	 * runtime-reflection.
-	 *
+	 * 
 	 * @return the class-Object of the plugin this preference page is associated with
 	 */
 	public abstract Class<? extends Plugin> getPluginClass();
@@ -423,14 +424,13 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	/**
 	 * Returns the class-Object of the plugins' PluginXMLConfig this preference page is associated
 	 * with. Needed for runtime reflection.
-	 *
+	 * 
 	 * @return the class-Object of the plugins' PluginXMLConfig this preference page is associated
 	 *         with
 	 */
 	public final Class<? extends PluginXMLConfig> getConfigClass() {
 		return this.config.getClass();
 	}
-
 
 	public void removePropertyChangeListeners() {
 		if (config != null) {
