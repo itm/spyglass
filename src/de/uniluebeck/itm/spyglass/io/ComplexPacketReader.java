@@ -32,9 +32,28 @@ public class ComplexPacketReader extends AbstractGatewayPacketReader {
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(ComplexPacketReader.class);
 
-	private Object gatewayMutex = new Object();
+	private final Object gatewayMutex;
 
 	private DelayModule delayModule;
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 */
+	public ComplexPacketReader() {
+		gatewayMutex = new Object();
+	}
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param mutex
+	 *            the mutex object to use
+	 */
+	public ComplexPacketReader(final Object mutex) {
+		gatewayMutex = mutex;
+	}
 
 	// --------------------------------------------------------------------------------
 	@Override

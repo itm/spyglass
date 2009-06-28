@@ -688,8 +688,9 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 	 */
 	private class PlaybackModule {
 
+		@SuppressWarnings("synthetic-access")
 		@Element(name = "packetReader", required = false)
-		private ComplexPacketReader complexPacketReader = new ComplexPacketReader();
+		private ComplexPacketReader complexPacketReader = new ComplexPacketReader(gatewayMutex);
 
 		// --------------------------------------------------------------------------------
 		/**
