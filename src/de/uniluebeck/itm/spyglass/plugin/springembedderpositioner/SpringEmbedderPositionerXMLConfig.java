@@ -19,9 +19,9 @@ import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerXMLConfig;
 /**
  * Instances of this class contain the configuration parameters of a
  * {@link SpringEmbedderPositionerPlugin}
- * 
+ *
  * @author Sebastian Ebers, Oliver Kleine
- * 
+ *
  */
 public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 
@@ -128,7 +128,7 @@ public class SpringEmbedderPositionerXMLConfig extends NodePositionerXMLConfig {
 	 * @return the edgeSemanticTypes
 	 */
 	public int[] getEdgeSemanticTypes() {
-		return this.edgeSemanticTypes;
+		return this.edgeSemanticTypes.clone();
 	}
 
 	public void setEdgeSemanticTypes(final int[] edgeSemanticTypes) {
