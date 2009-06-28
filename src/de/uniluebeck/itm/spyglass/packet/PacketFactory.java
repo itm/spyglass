@@ -1,9 +1,19 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.packet;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.xmlconfig.MetricsXMLConfig;
 
+//--------------------------------------------------------------------------------
 /**
  * Factory to create SpyglassPacket objects from raw packets.
  * 
@@ -14,15 +24,24 @@ public class PacketFactory {
 
 	private Spyglass spyglass;
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param a
+	 *            Spyglass instance
+	 */
 	public PacketFactory(final Spyglass spyglass) {
 		this.spyglass = spyglass;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create a new SpyglassPacket from the given raw packet.
 	 * 
 	 * @param data
 	 *            a raw packet
+	 * @return a new SpyglassPacket from the given raw packet
 	 * @throws SpyglassPacketException
 	 *             if this is no valid Spyglass packet.
 	 */
@@ -58,7 +77,15 @@ public class PacketFactory {
 					break;
 			}
 
+			if (packet == null) {
+				throw new SpyglassPacketException("The received packet's syntax type is not supported");
+			}
 			packet.deserialize(data);
+			final int validVersion = 2;
+			if (packet.getVersion() != validVersion) {
+				throw new SpyglassPacketException("The received packet's version  number is '" + packet.getVersion()
+						+ "', which is not supported.\r\nOnly packets of version '" + validVersion + "' can be processed by the application!");
+			}
 
 			fixPosition(packet);
 
@@ -72,6 +99,7 @@ public class PacketFactory {
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Apply the scale and offset values from general settings
 	 */
