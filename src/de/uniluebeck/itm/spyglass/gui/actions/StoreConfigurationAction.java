@@ -18,13 +18,13 @@ public class StoreConfigurationAction extends Action {
 	private static Logger log = SpyglassLoggerFactory.getLogger(StoreConfigurationAction.class);
 
 	private final ImageDescriptor imageDescriptor = getImageDescriptor("page_save.png");
-	
+
 	private final Spyglass spyglass;
-	
+
 	public StoreConfigurationAction(final Spyglass spyglass) {
 		this.spyglass = spyglass;
 	}
-	
+
 	@Override
 	public void run() {
 		final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
@@ -36,7 +36,7 @@ public class StoreConfigurationAction extends Action {
 				path += ".xml";
 			}
 			final File file = new File(path);
-			
+
 			if (!file.exists()) {
 				boolean ret = false;
 				try {
@@ -50,18 +50,17 @@ public class StoreConfigurationAction extends Action {
 					}
 				}
 			}
-			
+
 			if (!file.canWrite()) {
 				log.error("Could not open file for writing.");
 				return;
 			}
-			
+
 			// store
 			spyglass.getConfigStore().exportConfig(file);
 
 			// this is our new config file
 			try {
-				SpyglassEnvironment.setConfigFilePath(file);
 				SpyglassEnvironment.setConfigFileWorkingDirectory(file.getParent());
 			} catch (final IOException e) {
 				log.error("Could not store the new config path in my property file.",e);
@@ -69,20 +68,20 @@ public class StoreConfigurationAction extends Action {
 
 		}
 	};
-	
+
 	@Override
 	public String getText() {
 		return "&Save file";
 	}
-	
+
 	@Override
 	public String getToolTipText() {
 		return "Store Configuration";
 	}
-	
+
 	@Override
 	public ImageDescriptor getImageDescriptor() {
 		return imageDescriptor;
 	}
-	
+
 }

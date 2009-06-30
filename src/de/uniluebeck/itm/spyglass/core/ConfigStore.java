@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.load.Persister;
 
-import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.io.PacketReader;
 import de.uniluebeck.itm.spyglass.io.PacketRecorder;
@@ -43,6 +42,9 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  *
  */
 public class ConfigStore extends PropertyBean {
+
+	/** Config file. It is always expected to be in the current working directory */
+	final private File CONFIG_FILE_NAME = new File(new File("."), "SpyGlassConfig.xml");
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -81,7 +83,7 @@ public class ConfigStore extends PropertyBean {
 					synchronized (storePendingMutex) {
 						// allow new store requests to be made
 						storePending = false;
-						storeSync(SpyglassEnvironment.getConfigFilePath());
+						storeSync(CONFIG_FILE_NAME);
 					}
 
 				}
@@ -149,7 +151,7 @@ public class ConfigStore extends PropertyBean {
 	 *
 	 */
 	public ConfigStore() throws Exception {
-		final File f = SpyglassEnvironment.getConfigFilePath();
+		final File f = CONFIG_FILE_NAME;
 
 		boolean newFile = false;
 		// create the file if necessary
@@ -236,10 +238,10 @@ public class ConfigStore extends PropertyBean {
 	// --------------------------------------------------------------------------
 	/**
 	 * Overwrites the current config with the one inside the given file.
-	 * 
+	 *
 	 * @param file
 	 *            the configuration file
-	 * 
+	 *
 	 * @throws Exception
 	 *
 	 */

@@ -16,10 +16,10 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 //--------------------------------------------------------------------------------
 /**
  * Implementation of an {@link Action} needed for loading a Spyglass configuration.
- * 
+ *
  * @author Dariush Forouher
  * @author Sebastian Ebers
- * 
+ *
  */
 public class LoadConfigurationAction extends Action {
 
@@ -32,7 +32,7 @@ public class LoadConfigurationAction extends Action {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param spyglass
 	 *            the spyglass instance
 	 */
@@ -53,7 +53,7 @@ public class LoadConfigurationAction extends Action {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Loads the configuration from a file which is selected using a {@link FileDialog}
-	 * 
+	 *
 	 * @return <code>true</code> if the configuration was loaded successfully
 	 * @throws Exception
 	 *             thrown if the configuration is not loaded successfully due to an exception
@@ -81,7 +81,6 @@ public class LoadConfigurationAction extends Action {
 			}
 
 			try {
-				SpyglassEnvironment.setConfigFilePath(f);
 				SpyglassEnvironment.setConfigFileWorkingDirectory(f.getParent());
 			} catch (final IOException e) {
 				throw new IOException("Could not store the new config path in my property file.", e);
