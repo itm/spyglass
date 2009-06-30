@@ -35,11 +35,6 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 	}
 
 	// --------------------------------------------------------------------------------
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#loadFromModel()
-	 */
 	@Override
 	protected void loadFromModel() {
 		super.loadFromModel();
@@ -51,20 +46,13 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 	}
 
 	// --------------------------------------------------------------------------------
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage#storeToModel()
-	 */
 	@Override
 	public void storeToModel() {
 		super.storeToModel();
-
-		// TODO: find a sane way to apply an UpdateSetStrategy to the Table, so we don't have
-		// to do this by hand
 		config.setStringFormatters(this.tempStringFormatterTable);
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	protected Composite createContents(final Composite parent) {
 
@@ -77,8 +65,20 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 		tempStringFormatterTable = config.getStringFormatters();
 		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatterTable);
 
-		// necessary to prevent the change listerner to react on the initialization
+		// necessary to prevent the change listener to react on the initialization
 		return composite;
+	}
+
+	// --------------------------------------------------------------------------------
+	@Override
+	public void dispose() {
+		// the object will be null if the preference page was just added to the tree and not
+		// selected by the user
+		if (optionsComposite != null) {
+			optionsComposite.dispose();
+		}
+
+		super.dispose();
 	}
 
 }

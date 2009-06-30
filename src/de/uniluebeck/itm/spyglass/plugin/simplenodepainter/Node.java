@@ -51,6 +51,7 @@ public class Node extends DrawingObject {
 	 */
 	private TransformChangedListener drawingAreaListener = new TransformChangedListener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void handleEvent(final TransformChangedEvent e) {
 
@@ -87,8 +88,6 @@ public class Node extends DrawingObject {
 	 *            in extended mode)
 	 * @param isExtended
 	 *            indicates if the extended mode is active
-	 * @param drawingArea
-	 *            the currently active drawing area
 	 */
 	public Node(final int nodeID, final String denotation, final String stringFormatterResult, final boolean isExtended) {
 		this(nodeID, denotation, stringFormatterResult, isExtended, new int[] { 255, 0, 0 }, 1);
@@ -111,8 +110,6 @@ public class Node extends DrawingObject {
 	 *            the line colo's RGB values
 	 * @param lineWidth
 	 *            the line's width
-	 * @param drawingArea
-	 *            the currently active drawing area
 	 */
 	public Node(final int nodeID, final String denotation, final String stringFormatterResult, final boolean isExtended, final int[] lineColorRGB,
 			final int lineWidth) {
@@ -136,8 +133,6 @@ public class Node extends DrawingObject {
 	 *            the line colo's RGB values
 	 * @param lineWidth
 	 *            the line's width
-	 * @param drawingArea
-	 *            the currently active drawing area
 	 * @param position
 	 *            the node's absolute position
 	 */
@@ -317,8 +312,6 @@ public class Node extends DrawingObject {
 			// dispose the no longer used colors
 			color.dispose();
 			bg.dispose();
-
-			//drawBoundingBox(drawingArea, gc);
 
 		} catch (final SWTException e) {
 			if (e.getMessage().contains("Widget is disposed")) {
