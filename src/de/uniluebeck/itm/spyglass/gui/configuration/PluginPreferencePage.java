@@ -27,7 +27,7 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 // --------------------------------------------------------------------------------
 
 /**
- * @author Daniel Bimschas, Dariush Forouher
+ * @author Daniel Bimschas, Dariush Forouher, Sebastian Ebers
  * 
  * @param <T>
  */
@@ -71,6 +71,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	BasicOptions basicOptions = BasicOptions.ALL;
 
 	private final SelectionListener buttonSelectionListener = new SelectionAdapter() {
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void widgetSelected(final SelectionEvent e) {
 			if (e.getSource() == buttons.deleteButton) {
@@ -78,11 +79,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 			} else if (e.getSource() == buttons.restoreButton) {
 				performRestore();
 			} else if (e.getSource() == buttons.applyButton) {
-				performApply();
+				PluginPreferencePage.super.performApply();
 			} else if (e.getSource() == buttons.restoreDefaultsButton) {
 				performRestoreDefaults();
 			} else if (e.getSource() == buttons.saveAsDefaultButton) {
-				performApply(); // the same method as Apply
+				PluginPreferencePage.this.performApply();
 			} else if (e.getSource() == buttons.createInstanceButton) {
 				performCreateInstance();
 			}
@@ -101,6 +102,11 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 * This field is final, since databinding listens to events from this object specifically.
 	 */
 	protected final ConfigClass config;
+
+	/**
+	 * Default configuration of the {@link PluginPreferencePage#plugin}
+	 */
+	private final ConfigClass defaultConfig;
 
 	/**
 	 * is this page representing an plugin type or instance?
@@ -150,9 +156,12 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.propertyChangeListener = null;
 
 		// This is fine
-		config = (ConfigClass) spyglass.getConfigStore().getSpyglassConfig().getDefaultConfig(this.getPluginClass());
-		if (config == null) {
+		defaultConfig = (ConfigClass) spyglass.getConfigStore().getSpyglassConfig().getDefaultConfig(this.getPluginClass());
+		if (defaultConfig == null) {
 			// this page represents an abstract plugin type. so no config here
+			config = null;
+		} else {
+			config = (ConfigClass) defaultConfig.clone();
 		}
 
 	}
@@ -176,6 +185,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 		this.basicOptions = basicOptions;
 
 		this.config = (ConfigClass) plugin.getXMLConfig();
+		defaultConfig = null;
 
 		this.propertyChangeListener = new PropertyChangeListener() {
 			@Override
@@ -332,20 +342,43 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	private final void performCreateInstance() {
 		log.info("Pressed button create");
 
-		// First save data.
-		this.performApply();
+		final boolean isDirty = hasUnsavedChanges();
 
+		// First save data.
+		super.performApply();
 		if (!this.isValid()) {
 			MessageDialog.openError(this.getShell(), "Can not store changes",
 					"Could not store your changes. There are still errors remaining in the form.");
 		} else {
 
 			try {
-				spyglass.getPluginManager().createNewPlugin(getPluginClass(), config);
+				spyglass.getPluginManager().createNewPlugin(getPluginClass(), config.clone());
 			} catch (final Exception e) {
 				log.error("Could not create the requested plugin.", e);
 			}
 		}
+
+		if (isDirty && (defaultConfig != null)) {
+			markFormDirty();
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+	@Override
+	public void performApply() {
+		super.performApply();
+		if (defaultConfig != null) {
+			defaultConfig.overwriteWith(config);
+		}
+	}
+
+	// --------------------------------------------------------------------------------
+	@Override
+	protected void loadFromModel() {
+		if (defaultConfig != null) {
+			config.overwriteWith(defaultConfig);
+		}
+		super.loadFromModel();
 	}
 
 	/**
@@ -385,7 +418,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 */
 	protected final void performRestore() {
 		log.info("Pressed button restore");
-		loadFromModel();
+		super.loadFromModel();
 	}
 
 	// --------------------------------------------------------------------------------

@@ -129,7 +129,7 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 	 * Transfers the form data into the model.
 	 */
 	@Override
-	public final void performApply() {
+	public void performApply() {
 		log.info("Pressed button Apply");
 		if (!this.isValid()) {
 			MessageDialog.openError(this.getShell(), "Can not store changes",
