@@ -1,0 +1,77 @@
+\documentclass[11pt,a4paper,twoside,titlepage]{scrartcl}%{scrbook}
+\usepackage{a4}
+
+%\usepackage[ngerman]{babel}
+%\usepackage{ngerman}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{enumerate}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage[pdfborderstyle={/S/U/W 0},pdfpagelabels,plainpages=false]{hyperref}
+
+% kein einrücken bei paragraphen, stattdessen abstandzeile
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.95}
+\renewcommand{\floatpagefraction}{0.35}
+\setcounter{totalnumber}{5}
+
+% die Code-Umgebung einbinden
+\usepackage{listings}
+
+% Standard-Layout für die Code-Umgebung (alle Sprachen)
+\lstset{%
+ 	basicstyle=\footnotesize\ttfamily,
+	moredelim=[is][\bfseries]{|}{|},
+	showspaces=false,
+	showtabs=false,
+	columns=fixed,
+	numbers=left,
+	frame=none,
+	numberstyle=\tiny,
+	breaklines=true,
+	showstringspaces=false,
+	xleftmargin=1cm,
+	tabsize=4
+}%
+
+
+
+\usepackage{color}
+\def\red{\textcolor{red}}
+\def\blue{\textcolor{blue}}
+\def\green{\textcolor{green}}
+\def\se{\textcolor{red}}
+
+% hohe penalty für footnote breaks.
+\interfootnotelinepenalty=10000
+
+%opening
+\title{SpyGlass Manual}
+\author{Daniel Bimschas \and Sebastian Ebers \and Dariush Forouher \and Oliver Kleine}
+\date{Version 0.1 (\today)}
+
+\pagestyle{headings}
+\pagenumbering{roman}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\clearpage
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\include{manual_introduction}
+\include{manual_packets}
+\include{manual_plugins}
+
+\end{document}

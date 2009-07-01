@@ -1,0 +1,246 @@
+\section{SpyGlass packets}
+
+As SpyGlass itself is just an application to display something, it obviously needs a source of data where it gets the information
+from what can or must be displayed. This information comes from the so called SpyGlass packets, which are syntactically
+well-defined data packets. That means, that they must be formatted according to one of the five packet types described
+in chapter \ref{packet_types} ff.
+
+All SpyGlass packets consist of a header and a payload, where the header format is equal for all packet types. A header
+must always have a length of exactly 19 bytes and contain the information shown in table \ref{packet_header}. Note, that
+the numbering of the bytes of a packet starts with 0.
+
+\begin{table}[htdp]
+  \begin{center}
+    \begin{tabular}{l|l|l|p{3cm}}
+      \textbf{Byte no.} & \textbf{type} & \textbf{content} & \textbf{comment} \\
+      \hline
+      \hline
+      0,1 & uint16 & packet length (header + payload) & \\
+      \hline
+      2 & uint8 & version & currently fixed to ``2'' \\
+      \hline
+      3 & uint8 & syntaxtype &  0 = std \newline
+				1 = uint8List \newline
+				2 = uInt16List \newline
+				3 = Int16List \newline
+				4 = uInt32List \newline
+				5 = Int64List \newline
+				6 = FloatList \newline
+				7 = variable \\
+      \hline
+      4 & uint8 & semantic type & \\
+      \hline
+      5, 6 & uint16 & sender ID & \\
+      \hline
+      7, 8, 9, 10 & uint32 & current time in seconds &  \\
+      \hline
+      11, 12 & uint16 & milliseconds of current time & \\
+      \hline
+      13, 14 & int16 & x-coordinate of senders position & \\
+      \hline
+      15, 16 & int16 & y-coordinate of senders position & \\
+      \hline
+      17, 18 & int16 & z-coordinate of senders position & \\
+    \end{tabular}
+    \caption{SpyGlass packetheader}
+    \label{packet_header}
+  \end{center}
+\end{table}
+
+
+
+\subsection{Packet types}
+\label{packet_types}
+
+\subsection{Neighborhood-Packet}
+\label{subsection:neighbourhood_packet}
+
+The payload of a Neighborhood-Packet contains a list of uint16 values which represents a list of node IDs.
+Its syntaxtype is consequently ``uint16List''. The list must neither contain a node ID twice, nor the node
+ID of the sender itself. See an overview on the payload in table \ref{neighbourhood_packet_payload}.
+
+\begin{table}[htdp]
+  \begin{center}
+    \begin{tabular}{l|l|l}
+      \textbf{Byte no.} & \textbf{content} & \textbf{type} \\
+      \hline
+      \hline
+      19, 20 & node ID & uint16 \\
+      \hline
+      20, 21 & node ID & uint16 \\
+      \hline
+      22, 23 & node ID & uint 16 \\
+      \hline
+      ... & ... & ... \\
+    \end{tabular}
+    \caption{Payload of a Neighbourhood-Packet}
+    \label{neighbourhood_packet_payload}
+  \end{center}
+\end{table}
+
+\subsection{Coordinates-List-Packet-2}
+\label{subsection:coordiantes-list-packet-2}
+
+A Coordinates-List-Packet-2 contains a payload, which consists of a list of 2-dimensional coordiantes. Each coordinate is
+represented by an int16 value. Thus a 2-dimensional position needs two values and consequently the payload must have a lenght
+of a multiple of four bytes. Obviuosly its syntaxtype is ``int16List''. A tabular overview is given in table
+\ref{coordinates_list_packet_2_payload}.
+
+\begin{table}[htdp]
+  \begin{center}
+    \begin{tabular}{l|l|l}
+      \textbf{Byte no.} & \textbf{content} & \textbf{type} \\
+      \hline
+      \hline
+      19, 20 & x-coordinate of position 1 & int16 \\
+      \hline
+      21, 22 & y-coordinate of position 1 & int16 \\
+      \hline
+      23, 24 & x-coordinate of position 2 & int16 \\
+      \hline
+      25, 26 & y-coordinate of position 2 & int16 \\
+      \hline
+      27, 28 & x-coordinate of position 3 & int16 \\
+      \hline
+      29, 30 & y-coordinate of position 3 & int16 \\
+      \hline
+      ... & ... & ... \\
+    \end{tabular}
+    \caption{Payload of a Coordinates-List-Packet-2-Packet}
+    \label{coordinates_list_packet_2_payload}
+  \end{center}
+\end{table}
+
+
+\subsection{Coordinates-List-Packet-3}
+\label{subsection:coordiantes-list-packet-3}
+
+A Coordinates-List-Packet-3 is very similar to a Coordinates-List-2-Packet. The only difference is the dimensionality, because
+this packet contains positions with three dimensions instead of 2. As each coordinate is represented by an int16 value and
+a 3-dimensional position needs three values, the payload must have a lenght of a multiple of six bytes. The syntaxtype is
+``int16List''. See table \ref{coordinates_list_packet_3_payload} for further details.
+
+\begin{table}[htdp]
+  \begin{center}
+    \begin{tabular}{l|l|l}
+      \textbf{Byte no.} & \textbf{content} & \textbf{type} \\
+      \hline
+      \hline
+      19, 20 & x-coordinate of position 1 & int16 \\
+      \hline
+      21, 22 & y-coordinate of position 1 & int16 \\
+      \hline
+      23, 24 & z-coordinate of position 1 & int16 \\
+      \hline
+      25, 26 & x-coordinate of position 2 & int16 \\
+      \hline
+      27, 28 & y-coordinate of position 2 & int16 \\
+      \hline
+      29, 30 & z-coordinate of position 2 & int16 \\
+      \hline
+      ... & ... & ... \\
+    \end{tabular}
+  \end{center}
+  \caption{Payload of a Coordinates-List-Packet-3-Packet}
+  \label{coordinates_list_packet_3_payload}
+\end{table}
+
+\subsection{Trajectory-Packet-2}
+\label{subsection:trajectory2d}
+
+The payload of Trajectory-Packet-2 represents the way of an object via several 2-dimensional positions and the time it needs
+to come from one position to the next. So the payload contains a list of tuples, where the first two elements of each tuple
+represents a position. The third element represents the time in seconds, that the object spends between the position given 
+before and the next position. Although the syntaxtype is ``int16List'' and all elements are of type int16, the time
+element must not contain negative values.
+
+Since the last position specifies the ending point, the last tuple is incomplete. It contains only the two elements
+representing the position. Table \ref{trajectory_packet_2_payload} shows the content of the payload.
+
+\begin{table}[htdp]
+ \begin{center}
+    \begin{tabular}{l|l|l}
+      \textbf{Byte no.} & \textbf{content} & \textbf{type} \\
+      \hline
+      \hline
+      19, 20 & x-coordinate of position 1 & int16 \\
+      \hline
+      21, 22 & y-coordinate of position 1 & int16 \\
+      \hline
+      23, 24 & duration of moving between & int16\\
+      & position 1 and 2 & \\
+      \hline
+      25, 26 & x-coordinate of position 2 & int16 \\
+      \hline
+      27, 28 & y-coordinate of position 2 & int16 \\
+      \hline
+      29, 30 & duration of moving between & int16 \\
+      &  position 2 and 3 & \\
+      \hline
+      ... & ... & ... \\
+      \hline
+      19 + 6(n-1), 20 + 6(n-1) & x-coordinate of position n & int16 \\
+      \hline
+      21 + 6(n-1), 22 + 6(n-1) & y-coordinate of position n & int16 \\
+      \hline
+    \end{tabular}
+    \caption{Payload of a Trajectory-Packet-2-Packet}
+    \label{trajectory_packet_2_payload}
+  \end{center}
+\end{table}
+
+\subsection{Trajectory-Packet-3}
+\label{subsection:trajectory3d}
+
+The payload of a Trajectory-Packet-3 is very similar to a Trajectory-Packet-2. The only difference is, that the positions
+are not given in 2D but in 3D. Thus each position consists of three coordinates. Between two positions the payload contains
+the duration, the objects needs to pass the way from one position to the next.  
+
+The syntaxtype is ``int16List''. The duration value must be given in seconds und mus not contain a negative number
+even though it is an int16 field. See table \ref{trajectory_packet_3_payload} for more details.
+
+\begin{table}[htdp]
+ \begin{center}
+    \begin{tabular}{l|l|l}
+      \textbf{Byte no.} & \textbf{content} & \textbf{type} \\
+      \hline
+      \hline
+      19, 20 & x-coordinate of position 1 & int16 \\
+      \hline
+      21, 22 & y-coordinate of position 1 & int16 \\
+      \hline
+      23, 24 & z-coordinate of position 1 & int16 \\
+      \hline
+      25, 26 & duration of moving between & int16\\
+      & position 1 and 2 & \\
+      \hline
+      27, 28 & x-coordinate of position 2 & int16 \\
+      \hline
+      29, 30 & y-coordinate of position 2 & int16 \\
+      \hline
+      31, 32 & z-coordinate of position 2 & int16 \\
+      \hline
+      33, 34 & duration of moving between & int16 \\
+      &  position 2 and 3 & \\
+      \hline
+      ... & ... & ... \\
+      \hline
+      19 + 8(n-1), 20 + 8(n-1) & x-coordinate of position n & int16 \\
+      \hline
+      21 + 8(n-1), 22 + 8(n-1) & y-coordinate of position n & int16 \\
+      \hline
+      23 + 8(n-1), 24 + 8(n-1) & z-coordinate of position n & int16 \\
+      \hline
+    \end{tabular}
+    \caption{Payload of a Trajectory-Packet-3-Packet}
+    \label{trajectory_packet_3_payload}
+  \end{center}
+\end{table}
+
+\subsection{Data-Packet}
+\label{subsection:datapacket}
+
+A Data-Packets payload contains arbitrary data. Its syntaxtype is flexible but must be defined in the header of the packet.
+The possible syntaxtypes are ``uint8List'', ``uint16List'', int16List``, ''uint32List``, ''int64List`` and ''floatList``.
+The length of the payload depends on the syntaxtype.
+	
