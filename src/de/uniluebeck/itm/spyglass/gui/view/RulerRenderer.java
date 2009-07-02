@@ -62,7 +62,6 @@ public class RulerRenderer implements PaintListener, PropertyChangeListener, Dis
 
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
-		System.out.println("Geändert wurde: " + evt.getPropertyName());
 		if (evt.getPropertyName() == "showRuler") {
 			gui.changeRulerVis();
 		} else if (evt.getPropertyName() == "unit") {

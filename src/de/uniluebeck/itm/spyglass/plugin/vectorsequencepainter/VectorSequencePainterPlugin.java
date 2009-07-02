@@ -301,7 +301,7 @@ public class VectorSequencePainterPlugin extends RelationPainterPlugin implement
 						try {
 							layer.remove(l);
 						} catch (final RuntimeException e) {
-							System.out.println("bla");
+							log.debug("", e); // TODO: why is this try-catch even needed?
 						}
 						fireDrawingObjectRemoved(l);
 					}

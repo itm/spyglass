@@ -7,6 +7,7 @@ package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
@@ -23,6 +24,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
@@ -36,6 +38,8 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
  * @author Daniel Bimschas
  */
 public class NodeSensorRangeDrawingObject extends DrawingObject {
+
+	private static Logger log = SpyglassLoggerFactory.getLogger(NodeSensorRangeDrawingObject.class);
 
 	private enum RangeType {
 		CIRCLE, CONE, RECTANGLE
@@ -87,7 +91,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject {
 	protected AbsoluteRectangle calculateBoundingBox() {
 
 		if (!initCalled) {
-			System.out.println("Fuck it");
+			log.debug("Fuck it");
 		}
 
 		final AbsoluteRectangle absBox = new AbsoluteRectangle();
@@ -395,7 +399,7 @@ public class NodeSensorRangeDrawingObject extends DrawingObject {
 	public void setConfig(final Config c) {
 
 		if (!initCalled) {
-			System.out.println("Fuck it");
+			log.debug("Fuck it");
 		}
 
 		if (this.config != null) {

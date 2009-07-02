@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------
 /**
- * 
+ *
  */
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
@@ -13,10 +13,13 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.apache.log4j.Logger;
+
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.layer.Layer;
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.Config;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
@@ -25,6 +28,8 @@ import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
  * @author bimschas
  */
 public class Data {
+
+	private static Logger log = SpyglassLoggerFactory.getLogger(Data.class);
 
 	/**
 	 * A {@link Hashtable} for referencing all drawing objects that were added to the layer easily
@@ -61,7 +66,7 @@ public class Data {
 
 		synchronized (this) {
 
-			System.out.println(layer.getDrawingObjects().size() + " " + dos.size());
+			log.debug(layer.getDrawingObjects().size() + " " + dos.size());
 
 			for (final Integer key : dos.keySet()) {
 
@@ -71,7 +76,7 @@ public class Data {
 				// check if perNodeConfigs contains a config for this drawing object
 				for (final Config c : perNodeConfigs) {
 					if (c.getNodeId() == key) {
-						System.out.println("updating one per node");
+						log.debug("updating one per node");
 						if (!nsrdo.getConfig().equals(c)) {
 							nsrdo.setConfig(c);
 							foundPerNodeConfig = true;
@@ -83,7 +88,7 @@ public class Data {
 				// config if it's not already set to
 				if (!foundPerNodeConfig && !nsrdo.getConfig().equals(defaultConfig)) {
 					nsrdo.setConfig(defaultConfig);
-					System.out.println("updating one default");
+					log.debug("updating one default");
 				}
 
 			}
