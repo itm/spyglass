@@ -58,13 +58,13 @@ would result into the following String:
 
 \subsection{General information about plugins}
 
-Each plugin defines a specific functionality. To use this functionality one must create instances of the plugin. 
+Each plugin defines a specific functionality. To use this functionality one must create instances of the plugin.
 Some plugins do some background computing (e.g. PositionPacketNodePositioner), while others display someting
 on the screen (e.g. SimpleNodePainter).
 
 Usually there will be more than one visible instance to be displayed on the screen. Thus, one needs to define a ranking,
 which instance should be diplayed on top of another. So some content of an instance in the background might be hidden
-by content of another instance. This is done in the 
+by content of another instance. This is done in the
 Plugin overview of the SpyGlass preference dialog (see \ref{subsection:pluginoverview}).
 
 But there is also another advantage for the existence of this ranking. Some plugins may provide actions, if the user
@@ -182,7 +182,7 @@ draw its content over all instances contents that should be displayed on the sam
   \end{center}
 \end{figure}
 
-If e.g. an instance SNP of the SimpleNodePainter paints a node as a rectangle and a VectorSequencePainter instance VSP 
+If e.g. an instance SNP of the SimpleNodePainter paints a node as a rectangle and a VectorSequencePainter instance VSP
 draws a line that crosses this rectangle, the line is drawn ``behind'' the node (i.e. is invisible) if SNP
 is above VSP in the list. Otherwise the line would be drawn above the rectangle. Thus especially BackgroundPainters
 should be on the bottom of this list in most cases. To change an
@@ -244,7 +244,7 @@ packet will be forwarded to the active NodePositioner instance. This instance gr
 the time, when the node sent the packet out of the packets header.
 
 This information is available either until it is overwritten
-because the node sent a new packet or until the information times out. The time-out-intervall must be set in the preference page
+because the node sent a new packet or until the information times out. The time-out-interval must be set in the preference page
 of the instance. On the preference page one can decide, whether the instance is active or not. Since there can only be one
 active instance of the NodePositioner plugin, the current instance will be deactivated, when another instance is activated.
 The option ``visible'' cannot be set or changed since the plugin instance does not display anything anyway.
@@ -256,10 +256,10 @@ There are two types of the NodePositioner plugin which are discribed in the foll
 \label{subsection:ppnp}
 
 An instance of the PositionPacketNodePositioner plugin provides the exact absolute positions for all nodes, who sent
-a packet in the past and whose information did not time out yet. 
+a packet in the past and whose information did not time out yet.
 
-Additionally to the activation status one must define the timeout intervall. The intervall is set in seconds where 0 means,
-that the timeout intervall is infinite. Figure \ref{pic:ppnp_preferences} shows the preference dialog 
+Additionally to the activation status one must define the timeout interval. The interval is set in seconds where 0 means,
+that the timeout interval is infinite. Figure \ref{pic:ppnp_preferences} shows the preference dialog
 for the PositionPacketNodePositioner
 
 \begin{figure}[htb]
@@ -273,12 +273,12 @@ for the PositionPacketNodePositioner
 \subsection{SpringEmbedderPositioner}
 \label{subsection:sep}
 
-The SpringEmbedderPositioner does not provide absolute positions of the nodes. Instead of absolute positions 
+The SpringEmbedderPositioner does not provide absolute positions of the nodes. Instead of absolute positions
 a SpringEmbedderPositioner orders the nodes in such a way, that
-nodes beeing in a neighbourhood relationship attract each other while the others repulse. For this reason
+nodes being in a neighbourhood relationship attract each other while the others repulse. For this reason
 the positions change dynamically.
 
-All attraction and repulsion forces are beeing computed for all nodes in the network one after another
+All attraction and repulsion forces are being computed for all nodes in the network one after another
 once a second. Thus, the positions of all nodes might change permanently, since the distance between the nodes
 and thus the forces of attraction and repulsion change in every round.
 
@@ -286,7 +286,7 @@ Additionally to these positions, the SpringEmbedderPositioner stores the current
 PositionPacketNodePositioner plugin becomes active after a SpringEmbedder instance, the new instance will be
 initiated with the absolute positions of all known nodes.
 
-If a SpringEmbedderPositioner instance is beeing activated while another NodePositioner is running, the new
+If a SpringEmbedderPositioner instance is being activated while another NodePositioner is running, the new
 instance will be provided with all nodes and its absolute positions by the old instance. Each of these nodes
 gets a random position as a start position for the dynamic computing. The same is valid for new nodes during
 the running time of the instance.
@@ -294,7 +294,7 @@ the running time of the instance.
 There are several values to configure for a SpringEmbedderPositioner instance which is shown in figure
 \ref{pic:sep_preferences}. Like a PositionPacketNodePositioner
 the SpringEmbedderPositioner has time-to-live for all nodes. If a node does not send a packet for a duration
-which is longer than this time-to-live-intervall, it will be removed.
+which is longer than this time-to-live-interval, it will be removed.
 
 \begin{figure}[htb]
   \begin{center}
@@ -307,10 +307,10 @@ which is longer than this time-to-live-intervall, it will be removed.
 The most important value is/are the semantic type(s) of the packets, that provide the neighbourhood information.
 If a node sends such a neighbourhood packet (see chapter \ref{subsection:neighbourhood_packet}), it will be
 attracted by all its neighbours contained in the packets payload. This does not include the reverse, so a sender of the
-packet does not attract all its neighbours. A node A is only beeing attracted by another node B, if node A is contained
+packet does not attract all its neighbours. A node A is only being attracted by another node B, if node A is contained
 in a neighbourhood packet sent by node B.
 
-The other cofiguration values are algorithm specific. The optimum spring length represents the distance, where the
+The other configuration values are algorithm specific. The optimum spring length represents the distance, where the
 attraction force between to nodes comes into a resting state. The spring stiffness defines, how fast the positions
 of the nodes converge to this resting state. The value must be greater than 0 and not greater than 1.
 
@@ -364,7 +364,7 @@ configuration.
   \end{center}
 \end{figure}
 
-As one can see, the strings generated by the StringFormatter expressions are beeing displayed next to the
+As one can see, the strings generated by the StringFormatter expressions are being displayed next to the
 sender and above the line between the sender and its neighbour.
 
 \begin{figure}[htb]
@@ -426,7 +426,7 @@ on the button with the chain. If they are associated, then both will have the sa
 It is the same with the width and the height of a grid element. The preference page for an instance of the GridPainter
 plugin is shown in figure \ref{pic:gp_preferences}. Since a GridPainter instance does not compute any packets, no semantic type
 can be set. To make the grid visible, both active and visible must be set. If one of those is not set, the
-is not beeing displayed.
+is not being displayed.
 
 \begin{figure}[htb]
   \begin{center}
@@ -449,14 +449,14 @@ The grid corresponding to the configuration above can be seen in figure \ref{pic
 A GridPainter instance does not support metric. It simply draws a grid at the specified position and the with
 the specified size on the drawing area. Thus an instance can be active independently from the type of the
 active NodePositioner. If a SpringEmbedderPositioner instance is active, one must ignore the metric units
-on the preference page. 
+on the preference page.
 
 \subsection{ImagePainter}
 
 The ImagePainter is to draw an image on the background. This might be an arbitrary image from the local filesystem.
 Supported images types are ``jpg'', ``gif'' and ``png''. See the preference page in figure \ref{pic:ip_preferences}.
 
-The position is set by setting the lower left point in absolute coordinates. The image can be resized either 
+The position is set by setting the lower left point in absolute coordinates. The image can be resized either
 independently per dimensionor with keeping the proportions automatically when changing the value for one dimension.
 
 \begin{figure}[htb]
@@ -467,7 +467,7 @@ independently per dimensionor with keeping the proportions automatically when ch
   \end{center}
 \end{figure}
 
-The ImagePainter does not support metric. It just drwas the specified image at the specified position with the specified
+The ImagePainter does not support metric. It just draws the specified image at the specified position with the specified
 size. If a SpringEmbedderPositioner instance is active, one must ignore the metric units
 on the preference page.
 
@@ -476,7 +476,7 @@ on the preference page.
 A MapPainter instance draws a map on the specified sector of the drawing area. This sector must be defined by
 setting its lower left point, and its horizontal and vertical comprehensiveness on the preference page (see
 \ref{pic:mp_preferences}). The granularity defines the resolution of the map, i.e. the number of independently
-computed values (rectangles on the map). The two paramters per dimension for comprehensiveness and resolution can be associated to
+computed values (rectangles on the map). The two parameters per dimension for comprehensiveness and resolution can be associated to
 each other, i.e. set to the same value automatically, by using the appropriate button with the chain.
 
 \begin{figure}[htb]
@@ -505,10 +505,10 @@ but higher than the minimum value will be associated with a bright grey.
 For each rectangle of the map, the appropriate value is computed by identifying the k nearest neighbours,
 i.e. the k nearest positions, where a measured value is known and calculate the mean of these k values.
 
-Each map has framepoints. Framepoints are unvisible points on the maps border, that behave like nodes with
+Each map has framepoints. Framepoints are invisible points on the maps border, that behave like nodes with
 a fixed position and measured data. The positions of the framepoints are uniformly distributed on the frame, thus
 per dimension the distance between neighboured framepoints is equal. Each framepoint provides the
-default value. The update frequency defines how often the map is beeing recomputed per second. As the algorithm
+default value. The update frequency defines how often the map is being recomputed per second. As the algorithm
 to recalculate all the values is computational expensive, the actual update frequency could be slower than the
 configured.
 
@@ -552,7 +552,7 @@ next to the selection field for the type.
 The only options for a circle range is the radius. It is given with respect to the generally defined metric unit.
 A rectangle needs three parameters. The width and the height that must be defined with respect to the generally
 defined metric unit as well. The orientation value defines the angle in degrees how far the rectangle is
-turned to the right. A cone has three specific paramters, too. The first paramter is the length, e.g. the
+turned to the right. A cone has three specific parameters, too. The first parameter is the length, e.g. the
 radius of the imaginary circle around the node, where the cone is a part of. Like for rectangles, the orientation
 defines the angel in degrees how far the cone is turned to the right. If the orientation angle is 0, the right
 edge of the cone is parallel to the x-axis. The view angle defines how wide the range is
@@ -568,7 +568,7 @@ See the illustration of an example instance of the NodeSensorRange plugin in fig
   \end{center}
 \end{figure}
 
-The NodeSensorRange plugin does not support metric. Thus it can be active together with an actic SpringEmbedderPositioner
+The NodeSensorRange plugin does not support metric. Thus it can be active together with an active SpringEmbedderPositioner
 instance. In case of an active SpringEmbedder, the range information is more informal and not absolute.
 
 \subsection{ObjectPainter}
@@ -594,7 +594,7 @@ the way of the object. The packets are explained in the chapters \ref{subsection
 To mix both trajectory types in one network, one must define at least two ObjectPainter instances. Anyway in case of
 3D, the third dimension is ignored for illustration.
 
-The last parameter is the update intervall. As smaller this intervall is, the more
+The last parameter is the update interval. As smaller this interval is, the more
 often the plugins illustration is updated, e.g. the more smooth is the movement of the object.
 
 \begin{figure}[htb]
@@ -605,7 +605,7 @@ often the plugins illustration is updated, e.g. the more smooth is the movement 
   \end{center}
 \end{figure}
 
-The example in figure \ref{pic:op} shows one trajectory but many little man moving on the line. Each of this 
+The example in figure \ref{pic:op} shows one trajectory but many little man moving on the line. Each of this
 little men exists because of one packet, e.g. each packet generates a moving object on the screen. In this
 example, all objects take the same way but this is not necessary. An object takes the way, that is defined
 by its appropriate tracetory packet.
@@ -644,12 +644,12 @@ type(s) defined, that contain the neighbourhood information (see \ref{subsection
 The table in the middle of the preference page is for the configuration of some specific statistical information.
 Each row in this table belongs to one statistial value. In the example configuration on figure \ref{pic:sgi_preferences}
 the packets of semantic type 20 contain a temperature value of type uint8 at the beginning of the packets payload (offset 19).
-This data is used to compute some statistics on it. Possible operations are ``sum'', ``minimum'', ``maximum'', 
+This data is used to compute some statistics on it. Possible operations are ``sum'', ``minimum'', ``maximum'',
 ``average'' and ``median''.
 
 Figure \ref{pic:sgi} shows an active instance of the SimpleGlobalInformation plugin together with an active MapPainter.
 As the MapPainter draws a map from the temperatures, the SimpleGlobalInformation instance computes some statistics
-on the same data. 
+on the same data.
 
 \begin{figure}[htb]
   \begin{center}
