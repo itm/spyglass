@@ -160,7 +160,7 @@ public class SimpleGlobalInformationOptionsComposite extends Composite {
 	 */
 	public void setDatabinding(final DataBindingContext dbc, final SimpleGlobalInformationXMLConfig config) {
 
-		stringFormatter.setDataBinding(dbc, config);
+		stringFormatter.setDataBinding(dbc);
 
 		// show the total number of available nodes
 

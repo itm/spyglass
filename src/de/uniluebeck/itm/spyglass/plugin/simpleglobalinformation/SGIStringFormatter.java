@@ -16,6 +16,7 @@ import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
+import org.eclipse.core.databinding.observable.set.ISetChangeListener;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableSetContentProvider;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -38,11 +39,10 @@ import de.uniluebeck.itm.spyglass.gui.databinding.ComboBoxEditingSupport;
 import de.uniluebeck.itm.spyglass.gui.databinding.StringFormatterEditingSupport;
 import de.uniluebeck.itm.spyglass.gui.databinding.WrappedObservableSet;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
-import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class create widgets providing data bound tables to creat, update and delete
+ * Instances of this class create widgets providing data bound tables to create, update and delete
  * {@link StatisticalInformationEvaluator}
  * 
  * @author Sebastian Ebers
@@ -70,6 +70,7 @@ public class SGIStringFormatter {
 
 	private Composite buttonComposite;
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Adds fields to configure the {@link StatisticalInformationEvaluator}
 	 * 
@@ -138,6 +139,7 @@ public class SGIStringFormatter {
 			addEntry.setLayoutData(addEntryLData);
 			addEntry.setText("Add");
 			addEntry.addSelectionListener(new SelectionAdapter() {
+				@SuppressWarnings("synthetic-access")
 				@Override
 				public void widgetSelected(final SelectionEvent evt) {
 					addEntryWidgetSelected(evt);
@@ -151,6 +153,7 @@ public class SGIStringFormatter {
 			delEntry.setLayoutData(data);
 			delEntry.setText("Delete");
 			delEntry.addSelectionListener(new SelectionAdapter() {
+				@SuppressWarnings("synthetic-access")
 				@Override
 				public void widgetSelected(final SelectionEvent evt) {
 					delEntryWidgetSelected(evt);
@@ -165,10 +168,8 @@ public class SGIStringFormatter {
 	 * 
 	 * @param dbc
 	 *            the {@link DataBindingContext}
-	 * @param config
-	 *            the configuration which represents the model
 	 */
-	public void setDataBinding(final DataBindingContext dbc, final PluginXMLConfig config) {
+	public void setDataBinding(final DataBindingContext dbc) {
 
 		// table
 
@@ -197,7 +198,14 @@ public class SGIStringFormatter {
 
 	}
 
-	private void addEntryWidgetSelected(final SelectionEvent evt) {
+	// --------------------------------------------------------------------------------
+	/**
+	 * Adds a statistical information evaluator to the table
+	 * 
+	 * @param evt
+	 *            a selection event
+	 */
+	private void addEntryWidgetSelected(@SuppressWarnings("unused") final SelectionEvent evt) {
 		final InputDialog dlg = new InputDialog(parent.getShell(), "Enter a semantic type", "Please enter a semantic type (-1 - 255)", "",
 				new IInputValidator() {
 
@@ -240,7 +248,15 @@ public class SGIStringFormatter {
 
 	}
 
-	private void delEntryWidgetSelected(final SelectionEvent evt) {
+	// --------------------------------------------------------------------------------
+	/**
+	 * Deletes the statistical information evaluator which was selected in the table
+	 * 
+	 * @param evt
+	 *            a selection event (which is not used at all, since the table provides all
+	 *            information itself)
+	 */
+	private void delEntryWidgetSelected(@SuppressWarnings("unused") final SelectionEvent evt) {
 		final IStructuredSelection selection = (IStructuredSelection) table.getSelection();
 		for (final Object o : selection.toList()) {
 			tableData.remove(o);
@@ -251,8 +267,14 @@ public class SGIStringFormatter {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Creates a connection between the view's table and data from the model
+	 * 
+	 * @param dbc
+	 *            the data binding context
+	 * @param statisticalInformationEvaluators
+	 *            a set containing the statistical information evaluators
 	 */
-	public void connectTableWithData(final DataBindingContext dbc, final Set<StatisticalInformationEvaluator> tempStringFormatterTable) {
+	public void connectTableWithData(final DataBindingContext dbc, final Set<StatisticalInformationEvaluator> statisticalInformationEvaluators,
+			final ISetChangeListener setChangeListener) {
 		final IElementComparer comp = new IElementComparer() {
 			// --------------------------------------------------------------------------------
 			@Override
@@ -281,7 +303,8 @@ public class SGIStringFormatter {
 				return element.hashCode();
 			}
 		};
-		tableData = new WrappedObservableSet(dbc.getValidationRealm(), tempStringFormatterTable, comp);
+		tableData = new WrappedObservableSet(dbc.getValidationRealm(), statisticalInformationEvaluators, comp);
 		table.setInput(tableData);
+		tableData.addSetChangeListener(setChangeListener);
 	}
 }

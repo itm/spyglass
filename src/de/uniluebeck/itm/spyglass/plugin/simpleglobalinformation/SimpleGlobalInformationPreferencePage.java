@@ -13,6 +13,8 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.databinding.observable.set.ISetChangeListener;
+import org.eclipse.core.databinding.observable.set.SetChangeEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -36,6 +38,7 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 	private static final Logger log = SpyglassLoggerFactory.getLogger(SimpleGlobalInformationPreferencePage.class);
 	private SimpleGlobalInformationOptionsComposite optionsComposite;
 	private Set<StatisticalInformationEvaluator> stringFormatterTable;
+	private final ISetChangeListener setChangeListener;
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -48,6 +51,13 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 	 */
 	public SimpleGlobalInformationPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
+		setChangeListener = new ISetChangeListener() {
+			// --------------------------------------------------------------------------------
+			@Override
+			public void handleSetChange(final SetChangeEvent event) {
+				markFormDirty();
+			}
+		};
 	}
 
 	// --------------------------------------------------------------------------------
@@ -64,6 +74,13 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 	public SimpleGlobalInformationPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass,
 			final SimpleGlobalInformationPlugin plugin) {
 		super(dialog, spyglass, plugin, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
+		setChangeListener = new ISetChangeListener() {
+			// --------------------------------------------------------------------------------
+			@Override
+			public void handleSetChange(final SetChangeEvent event) {
+				markFormDirty();
+			}
+		};
 	}
 
 	// --------------------------------------------------------------------------------
@@ -78,7 +95,7 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 		for (final StatisticalInformationEvaluator statisticalInformationEvaluator : tmp) {
 			stringFormatterTable.add(statisticalInformationEvaluator.clone());
 		}
-		optionsComposite.getStringFormatter().connectTableWithData(dbc, stringFormatterTable);
+		optionsComposite.getStringFormatter().connectTableWithData(dbc, stringFormatterTable, setChangeListener);
 		return composite;
 	}
 
@@ -97,7 +114,7 @@ public class SimpleGlobalInformationPreferencePage extends PluginPreferencePage<
 		for (final StatisticalInformationEvaluator statisticalInformationEvaluator : tmp) {
 			stringFormatterTable.add(statisticalInformationEvaluator.clone());
 		}
-		optionsComposite.getStringFormatter().connectTableWithData(dbc, stringFormatterTable);
+		optionsComposite.getStringFormatter().connectTableWithData(dbc, stringFormatterTable, setChangeListener);
 	}
 
 	// --------------------------------------------------------------------------------
