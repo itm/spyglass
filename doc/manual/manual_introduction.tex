@@ -33,7 +33,7 @@
 			for the iShell \footnote{see http://www.coalesenses.com/index.php?page=ishell}
 			software, the other is a standalone version. For both versions, a 
 			Java Runtime Environment (version 6.0 or newer) is necessary. For the iShell 
-			version you need a plattform that is supported by iShell, which is currently 
+			version one needs a platform that is supported by iShell, which is currently 
 			Windows and Linux.
 
 			Tested plattforms are:
@@ -47,7 +47,7 @@
 
 		\subsubsection{Build instructions}
 		
-			The Spyglass pro ject is hosted on SourceForge.net
+			The Spyglass project is hosted on SourceForge.net
 			(\url{http://sourceforge.net/projects/itm-spyglass}).
 			
 			You can check out it’s sources with a Subversion client from
@@ -178,65 +178,58 @@
 
 		In the following all buttons’ functionalities will be explained:
 		
-		\begin{itemize}
+		\paragraph{Packet Source}
+		  The button opens a dialog to define the current packet source. The source 
+		  can either be iShell (through a TCP/IP socket connection) or a file. If 
+		  the packet source is iShell, then the packets come from network. The real 
+		  packet source (i.e. the packet source where iShell receives packets from)
+		  must then be configured by setting the TCP/IP preferences of iShell.
+		  
+		  \emph{Please note:} In the standalone version of SpyGlass it is only possible to 
+		  choose a file as packet source. For more information about how to generate 
+		  such a file check the reference for the output file and record buttons.
 			
-			\item Packet Source\\
-				The button opens a dialog to define the current packet source. The source 
-				can either be iShell (through a TCP/IP socket connection) or a file. If 
-				the packet source is iShell, then the packets come from network. The real 
-				packet source (i.e. the packet source where iShell receives packets from)
-				must then be configured by setting the TCP/IP preferences of iShell.
+		\paragraph{Pause / Play}
+		  Clicking the pause button will stop the SpyGlass application delivering 
+		  the sensor nodes’ packets to the various plugins currently active. By this, 
+		  the visualization will freeze for the most parts as the plugins don’t receive 
+		  new packets. However, some ob jects on the drawing area could disappear 
+		  because they time out or they could move to another position for any 
+		  reason (e.g. when using a SpringEmbedderNodePositioner, see subsection 
+		  \ref{subsection:sep}). Also, plugins doing statistical calculations including
+		  timing information, such as packets per second, will therefore display falsified
+		  information during the time SpyGlass is paused.
+		  
+		  All new packets coming in during the time SpyGlass is paused, are queued. 
+		  They are delivered sequentially after the play button has been clicked. The 
+		  pause button toggles to a play button when it was clicked and vice versa.
 				
-				\emph{Please note:} In the standalone version of SpyGlass it is only possible to 
-				choose a file as packet source. For more information about how to generate 
-				such a file check the reference for the output file and record buttons.
-			
-			\item Pause / Play\\
-				Clicking the pause button will stop the SpyGlass application delivering 
-				the sensor nodes’ packets to the various plugins currently active. By this, 
-				the visualization will freeze for the most parts as the plugins don’t receive 
-				new packets. However, some ob jects on the drawing area could disappear 
-				because they time out or they could move to another position for any 
-				reason (e.g. when using a SpringEmbedderNodePositioner, see subsection 
-				\ref{subsection:sep}). Also, plugins doing statistical calculations including
-				timing information, such as packets per second, will therefore display falsified
-				information during the time SpyGlass is paused.
+		\paragraph{Reset}
+		  Clicking the reset button will cause all active SpyGlass plugins to reset.
+		  Resetting a plugin means that it forgets all aggregated data and removes
+		  all drawings from the drawing area. You could say that, after all plugins
+		  are reset, the application displays the same information as it displays
+		  directly after startup. However, the configuration of plugin instances are kept.
 				
-				All new packets coming in during the time SpyGlass is paused, are queued. 
-				They are delivered sequentially after the play button has been clicked. The 
-				pause button toggles to a play button when it was clicked and vice versa.
+		\paragraph{Output File / Record}
+		  The record button is to start the recording of incoming packets. One must
+		  specify a file, where the incoming packets will be written into. The file gets
+		  the ending “.rec” and can be used later in both the standalone application
+		  and the SpyGlass iShell plugin as a packet source. The record stops if one
+		  clicks on the record button again. During the recording time, the button
+		  is white. Otherwise it is red.
 				
-			\item Reset\\
-				Clicking the reset button will cause all active SpyGlass plugins to reset.
-				Resetting a plugin means that it forgets all aggregated data and removes
-				all drawings from the drawing area. You could say that, after all plugins
-				are reset, the application displays the same information as it displays
-				directly after startup. However, the configuration of plugin instances as
-				well as their preferences are kept.
+		\paragraph{Zoom In / Out / All}
+		  The “+” and “-” buttons with the magnifier are pretty self-explanatory.
+		  One zooms in (+) while the other zooms out (-). The third magnifier button
+		  zooms exactly to the zoom level that all current network components
+		  (nodes) are displayed on the drawing area.
+		  
+		  Additionally to the buttons, zooming can also be done with the scrollwheel
+		  on the mouse, if the pointer is located on the drawing area.
 				
-			\item Output File / Record\\
-				
-				The record button is to start the recording of incoming packets. One must
-				specify a file, where the incoming packets will be written into. The file gets
-				the ending “.rec” and can be used later in both the standalone application
-				and the SpyGlass iShell plugin as a packet source. The record stops if one
-				clicks on the record button again. During the recording time, the button
-				is white. Otherwise it is red.
-				
-			\item Zoom In / Out / All\\
-				
-				The “+” and “-” buttons with the magnifier are pretty self-explanatory.
-				One zooms in (+) while the other zooms out (-). The third magnifier button
-				zooms exactly to the zoom level that all current network components
-				(nodes) are displayed on the drawing area.
-				
-				Additionally to the buttons, zooming can also be done with the scrollwheel
-				on the mouse, if the pointer is located on the drawing area.
-				
-			\item Preferences\\
-				
-				The button opens the preferences dialog, where you can configure the
-				SpyGlass application, as well as the spyglass plugin instances. All that is
-				described in detail from chapter 5 on.
-				
-		\end{itemize}
+		\paragraph{Preferences}
+		  The button opens the preferences dialog, where you can configure the
+		  SpyGlass application, as well as the spyglass plugin instances. All that is
+		  described in detail from chapter 5 on.
+

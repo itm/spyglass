@@ -2,12 +2,13 @@
 \section{StringFormatter}
 \label{section:stringformatter}
 
+The StringFormatter is a utility which is used by several plugins to write specific information on the screen.
 A StringFormatter expression combines arbitrary text with information from SpyGlass-packets. The placeholders
 in these expressions define the type and the position of the value in the packet. Such a placeholder always
 starts with a \% followed by specific letter, that represents the type of the value. All possible value types
 and the corresponding letter are shown in table \ref{table:stringformatter_types}. Afterwards the
 offset of the value in the packet must be given to complete the placeholder. If the string should contain
-a \%, it must be masked as \%\%. A line break must be masked as \\n.
+a \%, it must be masked as \%\%. A line break must be masked as \textbackslash n.
 
 \begin{table}[htdp]
   \begin{center}
