@@ -45,6 +45,13 @@ public class SimpleLayer implements Layer, BoundingBoxChangeListener {
 		this.addInternal(d);
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Adds a drawing object internally
+	 * 
+	 * @param d
+	 *            a drawing object
+	 */
 	protected void addInternal(final DrawingObject d) {
 		list.add(d);
 		d.addBoundingBoxChangedListener(this);
@@ -93,6 +100,7 @@ public class SimpleLayer implements Layer, BoundingBoxChangeListener {
 	 * 
 	 * @see de.uniluebeck.itm.spyglass.layer.Layer#getDrawingObjects()
 	 */
+	@SuppressWarnings("synthetic-access")
 	@Override
 	public synchronized SortedSet<DrawingObject> getDrawingObjects() {
 		final TreeSet<DrawingObject> set = new TreeSet<DrawingObject>(new DummyComparator());
@@ -110,6 +118,7 @@ public class SimpleLayer implements Layer, BoundingBoxChangeListener {
 	 * de.uniluebeck.itm.spyglass.layer.Layer#getDrawingObjects(de.uniluebeck.itm.spyglass.positions
 	 * .AbsoluteRectangle)
 	 */
+	@SuppressWarnings("synthetic-access")
 	@Override
 	public synchronized SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle rect) {
 		final TreeSet<DrawingObject> ret = new TreeSet<DrawingObject>(new DummyComparator());

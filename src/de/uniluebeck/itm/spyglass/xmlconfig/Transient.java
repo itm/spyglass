@@ -9,5 +9,5 @@ package de.uniluebeck.itm.spyglass.xmlconfig;
  */
 @java.lang.annotation.Retention(value = java.lang.annotation.RetentionPolicy.RUNTIME)
 public @interface Transient {
-	
+	// nothing to do here
 }

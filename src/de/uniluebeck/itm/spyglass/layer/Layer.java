@@ -83,7 +83,7 @@ public interface Layer {
 	 * Sets the point order parameter of a drawing object to make it the last one in the set to be
 	 * painted. This way, the drawing object will be in front of all other ones.
 	 * 
-	 * @param object
+	 * @param dob
 	 *            the drawing object to be brought to the front
 	 */
 	public void bringToFront(final DrawingObject dob);
@@ -107,6 +107,14 @@ public interface Layer {
 	/**
 	 * Same as calling {@link Layer#getDrawingObjects(AbsoluteRectangle, boolean)} with
 	 * <code>sorted</code> set to <code>true</code>.
+	 * 
+	 * @param rect
+	 *            the bounding box inside which the objects should b
+	 * @return a sorted set of all drawing objects that are in this layer and whose bounding boxes
+	 *         intersect with <code>rect</code> as a <code>Set&lt;DrawingObject&gt;</code> when
+	 *         setting <code>sorted</code> to <code>false</code>, or as a
+	 *         <code>SortedSet&lt;DrawingObject&gt;</code> when setting <code>sorted</code> to
+	 *         <code>true</code>.
 	 * 
 	 * @see Layer#getDrawingObjects(AbsoluteRectangle, boolean)
 	 */
@@ -142,6 +150,11 @@ public interface Layer {
 	 * Since the only use-case at the current time is the auto zoom method there's no need to sort
 	 * the elements which costs additional time (n*log(n) in the QuadTree implementation where n
 	 * denotes the number of items in the tree).
+	 * 
+	 * @return an unsorted set of all drawing objects that are in this layer as a
+	 *         <code>Set&lt;DrawingObject&gt;</code> when setting <code>sorted</code> to
+	 *         <code>false</code> or as a <code>SortedSet&lt;DrawingObject&gt;</code> when setting
+	 *         <code>sorted</code> to <code>true</code>.
 	 * 
 	 * @see Layer#getDrawingObjects(boolean)
 	 */

@@ -18,33 +18,33 @@ import org.simpleframework.xml.Element;
  * 
  */
 public class GeneralSettingsXMLConfig extends XMLConfig {
-	
+
 	/**
 	 * if <code>true</code> a ruler is shown in the graphical user interface
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private volatile boolean showRuler = true;
-	
+
 	/**
 	 * defines the metric settings
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	final private MetricsXMLConfig metrics = new MetricsXMLConfig();
-	
+
 	/**
 	 * the time's unit (important when showing the results of received packets on the graphical user
 	 * interface). The unit is just for information purposes. It is not processed in any way.
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private volatile String timeUnit = "s";
-	
+
 	/**
 	 * the time's scale(important when showing the results of received packets on the graphical user
 	 * interface)
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private volatile float timeScale = 1;
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the showRuler
@@ -52,7 +52,7 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 	public boolean getShowRuler() {
 		return showRuler;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param showRuler
@@ -63,7 +63,7 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 		this.showRuler = showRuler;
 		firePropertyChange("showRuler", oldValue, showRuler);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the metrics
@@ -71,7 +71,7 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 	public MetricsXMLConfig getMetrics() {
 		return metrics;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the timeUnit
@@ -79,7 +79,7 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 	public String getTimeUnit() {
 		return timeUnit;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param timeUnit
@@ -90,7 +90,7 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 		this.timeUnit = timeUnit;
 		firePropertyChange("timeUnit", oldValue, timeUnit);
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the timeScale
@@ -98,7 +98,7 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 	public float getTimeScale() {
 		return timeScale;
 	}
-	
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param timeScale
@@ -109,10 +109,17 @@ public class GeneralSettingsXMLConfig extends XMLConfig {
 		this.timeScale = timeScale;
 		firePropertyChange("timeScale", oldValue, timeScale);
 	}
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Overwrites the object with the provided other one
+	 * 
+	 * @param o
+	 *            the object which contains the objects new parameter values
+	 */
 	public void overwriteWith(final GeneralSettingsXMLConfig o) {
 		super.overwriteWith(o);
 		this.metrics.overwriteWith(o.getMetrics());
 	}
-	
+
 }

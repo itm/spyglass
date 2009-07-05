@@ -1,13 +1,15 @@
 /*
- * -------------------------------------------------------------------------------- This file is
- * part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet
- * (www.swarmnet.de) project SpyGlass is free software; you can redistribute it and/or modify it
- * under the terms of the BSD License. Refer to spyglass-licence.txt file in the root of the
- * SpyGlass source tree for further details.
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
  * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
+import java.beans.PropertyChangeEvent;
 import java.util.HashMap;
 
 import org.simpleframework.xml.Element;
@@ -30,12 +32,28 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
  */
 public class SimpleNodePainterXMLConfig extends PluginWithStringFormatterXMLConfig {
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link SimpleNodePainterXMLConfig#setExtendedDefaultValue(boolean)} yields a change
+	 */
 	public static final String PROPERTYNAME_EXTENDED_DEFAULT_VALUE = "extendedDefaultValue";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link SimpleNodePainterXMLConfig#setLineWidth(int)} yields a change
+	 */
 	public static final String PROPERTYNAME_LINE_WIDTH = "lineWidth";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link SimpleNodePainterXMLConfig#setLineColorRGB(int[])} yields a change
+	 */
 	public static final String PROPERTYNAME_LINE_COLOR_R_G_B = "lineColorRGB";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link SimpleNodePainterXMLConfig#setNodeIDsAsHex(boolean)} yields a change
+	 */
 	public static final String PROPERTYNAME_NODE_IDS_AS_HEX = "nodeIDsAsHex";
 
 	@ElementMap(entry = "isActive", key = "nodeID", attribute = true, name = "extendedInformation", required = false)

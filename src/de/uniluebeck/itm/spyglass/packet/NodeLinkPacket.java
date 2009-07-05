@@ -81,8 +81,11 @@ public class NodeLinkPacket extends IntListPacket {
 
 	// --------------------------------------------------------------------------------
 	/**
+	 * Converts a raw packet {@link Uint16ListPacket} into a {@link NodeLinkPacket}
+	 * 
 	 * @param packet
-	 * @return
+	 *            a raw packet
+	 * @return a packet used to indicate a directed link between two nodes
 	 */
 	public static NodeLinkPacket interpret(final Uint16ListPacket packet) {
 		final NodeLinkPacket nodeLinkPacket = new NodeLinkPacket();

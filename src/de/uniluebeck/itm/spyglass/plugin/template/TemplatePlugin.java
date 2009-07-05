@@ -26,18 +26,19 @@ import de.uniluebeck.itm.spyglass.plugin.backgroundpainter.BackgroundPainterPlug
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
+//--------------------------------------------------------------------------------
 /**
  * This is a template plugin which can be used for coding new plugins.
- *
+ * 
  * By inheritance it is a BackgroundPainter.
- *
+ * 
  * Look also for the other classes in this java package. These classes (a Plugin, an XMLConfig and a
  * PreferencePage) represent the minimum any plugin writer must implement.
- *
+ * 
  * To activate this Plugin, you have to add it to PluginManager.availablePluginsTypes
- *
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyChangeListener {
 
@@ -54,6 +55,10 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 	 */
 	private final Layer layer = Layer.Factory.createQuadTreeLayer();
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 */
 	public TemplatePlugin() {
 
 		// Tell the super class we wish to receive packets
@@ -61,29 +66,44 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public PluginPreferencePage<TemplatePlugin, TemplateXMLConfig> createPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		return new TemplatePreferencePage(dialog, spyglass, this);
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns a widget used for the configuration of an instance of this class
+	 * 
+	 * @param dialog
+	 *            the dialog where the widget is attached
+	 * @param spyglass
+	 *            a {@link Spyglass} instance
+	 * @return a widget used for the configuration of an instance of this class
+	 */
 	public static PluginPreferencePage<TemplatePlugin, TemplateXMLConfig> createTypePreferencePage(final PluginPreferenceDialog dialog,
 			final Spyglass spyglass) {
 		return new TemplatePreferencePage(dialog, spyglass);
 	}
 
+	// --------------------------------------------------------------------------------
 	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle area) {
 		return layer.getDrawingObjects(area);
 	}
 
+	// --------------------------------------------------------------------------------
 	public static String getHumanReadableName() {
 		return "TemplatePainter";
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public PluginXMLConfig getXMLConfig() {
 		return xmlConfig;
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	protected void processPacket(final SpyglassPacket p) {
 
@@ -91,6 +111,7 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	protected void resetPlugin() {
 		synchronized (layer) {
@@ -98,6 +119,7 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void init(final PluginManager manager) throws Exception {
 
@@ -106,17 +128,20 @@ public class TemplatePlugin extends BackgroundPainterPlugin implements PropertyC
 
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void shutdown() throws Exception {
 		super.shutdown();
 		xmlConfig.removePropertyChangeListener(this);
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public Set<DrawingObject> getAutoZoomDrawingObjects() {
 		return layer.getDrawingObjects();
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {
 		// Some parameter in the config file has been modified.

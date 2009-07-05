@@ -33,8 +33,8 @@ import de.uniluebeck.itm.spyglass.gui.databinding.validator.StringToIntListValid
 
 // --------------------------------------------------------------------------------
 /**
- * Instances of this class are widgets to create, delete and edit configurations for
- * {@link SimpleGlobalInformationPlugin}s
+ * Instances of this class are widgets edit configurations for {@link SimpleGlobalInformationPlugin}
+ * s
  * 
  * @author Sebastian Ebers
  * 
@@ -51,6 +51,7 @@ public class SimpleGlobalInformationOptionsComposite extends Composite {
 
 	private SGIStringFormatter stringFormatter = new SGIStringFormatter();
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
 	 * 
@@ -150,6 +151,7 @@ public class SimpleGlobalInformationOptionsComposite extends Composite {
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the parameters necessary for data binding
 	 * 

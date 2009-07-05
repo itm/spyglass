@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.databinding;
 
 import java.util.HashMap;
@@ -34,6 +43,12 @@ import de.uniluebeck.itm.spyglass.gui.databinding.validator.StringFormatterValid
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
+// --------------------------------------------------------------------------------
+/**
+ * Instances of this class are widgets which are used to add, delete and edit
+ * {@link de.uniluebeck.itm.spyglass.util.StringFormatter}s
+ * 
+ */
 public class StringFormatter {
 
 	private Button delEntry;

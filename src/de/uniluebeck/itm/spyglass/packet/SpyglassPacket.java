@@ -1,7 +1,17 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.packet;
 
 import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 
+//--------------------------------------------------------------------------------
 /**
  * Generic Spyglass packet.
  * 
@@ -11,16 +21,16 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 public class SpyglassPacket {
 
 	/**
-	 * 
+	 * The packet's expected size
 	 */
 	public static final int EXPECTED_PACKET_SIZE = 19;
 
 	/** The packets raw data */
 	private byte[] rawData;
-	
+
 	/**
-	 * The PacketFactory may set a new position, which incorporates the given
-	 * scale and offset values.
+	 * The PacketFactory may set a new position, which incorporates the given scale and offset
+	 * values.
 	 */
 	private AbsolutePosition overwritePosition = null;
 
@@ -34,11 +44,12 @@ public class SpyglassPacket {
 		deserialize(rawData);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Deserializes a Spyglass Packet
 	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @param rawData
+	 * @param buf
 	 *            Byte Array of the Packet
 	 * @throws SpyglassPacketException
 	 */
@@ -51,6 +62,7 @@ public class SpyglassPacket {
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Deserializes a serialized uint8.
 	 * 
@@ -64,6 +76,7 @@ public class SpyglassPacket {
 		return b & 0xff;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Deserializes a serialized uint16.
 	 * 
@@ -78,6 +91,7 @@ public class SpyglassPacket {
 		return (((b1 & 0xFF) & 0xFFFF) | (((b0 & 0xFF) << 8) & 0xFFFF));
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Deserializes a serialized int16.
 	 * 
@@ -95,6 +109,7 @@ public class SpyglassPacket {
 		return (i1 | (i0 << 8));
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Deserializes a serialized uint32.
 	 * 
@@ -121,10 +136,28 @@ public class SpyglassPacket {
 		return ret;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Deserializes a serialized Int64.
 	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
+	 * @param b0
+	 *            byte 0
+	 * @param b1
+	 *            byte 1
+	 * @param b2
+	 *            byte 2
+	 * @param b3
+	 *            byte 3
+	 * @param b4
+	 *            byte 4
+	 * @param b5
+	 *            byte 5
+	 * @param b6
+	 *            byte 6
+	 * @param b7
+	 *            byte 7
+	 * @return the deserialized Int64
 	 */
 	protected long deserializeInt64(final byte b0, final byte b1, final byte b2, final byte b3, final byte b4, final byte b5, final byte b6,
 			final byte b7) {
@@ -141,10 +174,20 @@ public class SpyglassPacket {
 		return ret;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Deserializes a serialized Float.
 	 * 
 	 * @author Nils Glombitza, ITM Uni Luebeck
+	 * @param b0
+	 *            byte 0
+	 * @param b1
+	 *            byte 1
+	 * @param b2
+	 *            byte 2
+	 * @param b3
+	 *            byte 3
+	 * @return a deserialized serialized Float
 	 */
 	protected float deserializeFloat(final byte b0, final byte b1, final byte b2, final byte b3) {
 		final int i0 = b0;
@@ -156,9 +199,9 @@ public class SpyglassPacket {
 
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * @author Nils Glombitza, ITM Uni Luebeck
-	 * @see de.uniluebeck.itm.spyglass.packet.Packet#toString()
 	 */
 	@Override
 	public String toString() {
@@ -181,6 +224,7 @@ public class SpyglassPacket {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Property getter
 	 * 
@@ -191,6 +235,7 @@ public class SpyglassPacket {
 		return deserializeUint16(rawData[0], rawData[1]);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Property getter
 	 * 
@@ -201,6 +246,7 @@ public class SpyglassPacket {
 		return SyntaxTypes.toEnum(deserializeUint8(rawData[3]));
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Property getter
 	 * 
@@ -211,6 +257,7 @@ public class SpyglassPacket {
 		return deserializeUint8(rawData[4]);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Property getter
 	 * 
@@ -221,6 +268,7 @@ public class SpyglassPacket {
 		return deserializeUint16(rawData[5], rawData[6]);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Property getter
 	 * 
@@ -243,10 +291,13 @@ public class SpyglassPacket {
 	public int getVersion() {
 		return deserializeUint8(rawData[2]);
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
-	 * Overwrites the position with the given one. The underlying rawData
-	 * stays unaffected.
+	 * Overwrites the position with the given one. The underlying rawData stays unaffected.
+	 * 
+	 * @param newPos
+	 *            the new position
 	 */
 	void setPosition(final AbsolutePosition newPos) {
 		this.overwritePosition = newPos;
@@ -259,18 +310,18 @@ public class SpyglassPacket {
 	public AbsolutePosition getPosition() {
 		if (overwritePosition != null) {
 			return overwritePosition.clone();
-		} else {
-			final int x = deserializeInt16(rawData[13], rawData[14]);
-			final int y = deserializeInt16(rawData[15], rawData[16]);
-			final int z = deserializeInt16(rawData[17], rawData[18]);
-			return new AbsolutePosition(x, y, z);
 		}
+		final int x = deserializeInt16(rawData[13], rawData[14]);
+		final int y = deserializeInt16(rawData[15], rawData[16]);
+		final int z = deserializeInt16(rawData[17], rawData[18]);
+		return new AbsolutePosition(x, y, z);
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * Return the payload of the packet
+	 * 
+	 * @return the payload of the packet
 	 */
 	public byte[] getPayload() {
 		final int length = getLength();
@@ -295,6 +346,7 @@ public class SpyglassPacket {
 		return null;
 	}
 
+	// --------------------------------------------------------------------------
 	/**
 	 * @return the whole packet data (header + payload) as a byte array
 	 */
@@ -302,16 +354,13 @@ public class SpyglassPacket {
 		return this.rawData;
 	}
 
+	// --------------------------------------------------------------------------
 	/**
 	 * Returns the serialized the packet
 	 * 
 	 * @return the serialized packet
 	 */
 	public byte[] serialize() {
-		// final byte[] buffer = new byte[header.length + payload.length + 1];
-		// System.arraycopy(header, 0, buffer, 0, header.length);
-		// System.arraycopy(payload, 0, buffer, header.length + 1, payload.length);
-		// return buffer;
 		return rawData;
 	}
 

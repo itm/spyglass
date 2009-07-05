@@ -56,10 +56,25 @@ public class Spyglass {
 
 	private boolean throttleBBoxUpdates = false;
 
+	// ------------------------------------------------------------------------------
+	/**
+	 * Returns if the redraw frequency which is determined by the frequency of the drawing objects'
+	 * bounding box updates is throttled
+	 * 
+	 * @return <code>true</code> if throttled, <code>false</code> otherwise
+	 */
 	public boolean isThrottleBBoxUpdates() {
 		return throttleBBoxUpdates;
 	}
 
+	// ------------------------------------------------------------------------------
+	/**
+	 * Sets if the redraw frequency which is determined by the frequency of the drawing objects'
+	 * bounding box updates is to be throttled
+	 * 
+	 * @param throttleBBoxUpdates
+	 *            <code>true</code> if throttled, <code>false</code> otherwise
+	 */
 	public void setThrottleBBoxUpdates(final boolean throttleBBoxUpdates) {
 		this.throttleBBoxUpdates = throttleBBoxUpdates;
 	}
@@ -69,9 +84,9 @@ public class Spyglass {
 	 * Constructor. Invokes the XML configuration reading from the default configuration files.
 	 * Which file is used depends on the context (if Spyglass is used as stand alone application or
 	 * iShell plug-in).
-	 *
+	 * 
 	 * @throws Exception
-	 *
+	 * 
 	 */
 	public Spyglass() throws Exception {
 		Thread.setDefaultUncaughtExceptionHandler(new SpyglassExceptionHandler());
@@ -141,7 +156,7 @@ public class Spyglass {
 	/**
 	 * Returns the facility which is responsible for dispatching incoming packets to all active
 	 * plug-ins.
-	 *
+	 * 
 	 * @return the facility which is responsible for dispatching incoming packets to all active
 	 *         plug-ins.
 	 */
@@ -153,7 +168,7 @@ public class Spyglass {
 	/**
 	 * Sets the facility which is responsible for dispatching incoming packets to all active
 	 * plug-ins.
-	 *
+	 * 
 	 * @param packetDispatcher
 	 *            the facility which is responsible for dispatching incoming packets to all active
 	 *            plug-ins.
@@ -165,7 +180,7 @@ public class Spyglass {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Enables or disables the pause mode
-	 *
+	 * 
 	 * @param paused
 	 *            indicates whether the pause mode is to be enabled
 	 */
@@ -181,7 +196,7 @@ public class Spyglass {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns whether the pause mode is enabled or disabled
-	 *
+	 * 
 	 * @return whether the pause mode is enabled or disabled
 	 */
 	public Boolean isPaused() {
@@ -193,7 +208,7 @@ public class Spyglass {
 	// --------------------------------------------------------------------------
 	/**
 	 * Returns the facility which manages the currently loaded plug-ins
-	 *
+	 * 
 	 * @return the facility which manages the currently loaded plug-ins
 	 */
 	public PluginManager getPluginManager() {
@@ -203,7 +218,7 @@ public class Spyglass {
 	// --------------------------------------------------------------------------
 	/**
 	 * Sets the facility which manages the currently loaded plug-ins
-	 *
+	 * 
 	 * @param pluginManager
 	 *            the facility which manages the currently loaded plug-ins
 	 */
@@ -219,7 +234,7 @@ public class Spyglass {
 	/**
 	 * Returns the facility which reads packets to be evaluated from a configurable source (e.g. a
 	 * file)
-	 *
+	 * 
 	 * @return the facility which reads packets to be evaluated from a configurable source (e.g. a
 	 *         file)
 	 */
@@ -230,7 +245,7 @@ public class Spyglass {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the currently active packet recorder or <code>null</code> if no recorder is active
-	 *
+	 * 
 	 * @return the packetRecorder
 	 */
 	public PacketRecorder getPacketRecorder() {
@@ -241,7 +256,7 @@ public class Spyglass {
 	/**
 	 * Sets the facility which reads packets to be evaluated from a configurable source (e.g. a
 	 * file)
-	 *
+	 * 
 	 * @param packetReader
 	 *            the facility which reads packets to be evaluated from a configurable source (e.g.
 	 *            a file)
@@ -254,7 +269,7 @@ public class Spyglass {
 	// --------------------------------------------------------------------------
 	/**
 	 * Returns the facility responsible for loading and storing the application's configuration
-	 *
+	 * 
 	 * @return the facility responsible for loading and storing the application's configuration
 	 */
 	public ConfigStore getConfigStore() {

@@ -28,7 +28,7 @@ public class PacketFactory {
 	/**
 	 * Constructor
 	 * 
-	 * @param a
+	 * @param spyglass
 	 *            Spyglass instance
 	 */
 	public PacketFactory(final Spyglass spyglass) {

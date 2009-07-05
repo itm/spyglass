@@ -378,6 +378,7 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 		page.markFormDirty();
 	}
 
+	@SuppressWarnings("unchecked")
 	private void clickedButtonAddEntry(final SelectionEvent evt) {
 		final InputDialog dlg = new InputDialog(parent.getShell(), "Enter a node ID", "Please enter a node ID", "", new IInputValidator() {
 

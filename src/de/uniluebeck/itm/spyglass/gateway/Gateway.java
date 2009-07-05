@@ -20,7 +20,9 @@ public interface Gateway {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * @return
+	 * The gateway's input as stream
+	 * 
+	 * @return the gateway's input as stream
 	 */
 	public InputStream getInputStream();
 

@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import org.apache.log4j.Logger;
@@ -35,6 +44,11 @@ import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
+// --------------------------------------------------------------------------------
+/**
+ * Instances of this class are widgets used to manage plug-in parameters which are common to all
+ * plug-ins.
+ */
 public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 
 	private static final Logger log = SpyglassLoggerFactory.getLogger(BasicGroupComposite.class);
@@ -50,16 +64,9 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 
 	private BasicOptions basicOptions;
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * Auto-generated main method to display this org.eclipse.swt.widgets.Composite inside a new
-	 * Shell.
-	 */
-	public static void main(final String[] args) {
-		showGUI();
-	}
-
-	/**
-	 * Auto-generated method to display this org.eclipse.swt.widgets.Composite inside a new Shell.
+	 * Displays the Composite inside a new Shell.
 	 */
 	public static void showGUI() {
 		final Display display = Display.getDefault();
@@ -83,7 +90,14 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 		}
 	}
 
-	public void disableUnwantedElements(final BasicOptions basicOptions) {
+	// --------------------------------------------------------------------------------
+	/**
+	 * Disables buttons, boxes etc. which are not to be used by the user
+	 * 
+	 * @param basicOptions
+	 *            indicates which elements are to be disabled
+	 */
+	void disableUnwantedElements(final BasicOptions basicOptions) {
 		this.basicOptions = basicOptions;
 		switch (basicOptions) {
 			case ALL:
@@ -109,6 +123,23 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the parameters necessary for data binding
+	 * 
+	 * @param dbc
+	 *            the data binding context
+	 * @param config
+	 *            the configuration
+	 * @param owner
+	 * @param manager
+	 *            the plug-in managing instance
+	 * @param isInstancePage
+	 *            <code>true</code> indicates that this widget is used to set parameters for a
+	 *            plug-in instance, <code>false</code> indicates that this widget is used to set
+	 *            parameters for a plug-in type.
+	 * 
+	 */
 	public void setDatabinding(final DataBindingContext dbc, final PluginXMLConfig config, final Plugin owner, final PluginManager manager,
 			final boolean isInstancePage) {
 
@@ -176,6 +207,15 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param parent
+	 *            the parent widget
+	 * @param style
+	 *            the style of the widget to construct
+	 */
 	public BasicGroupComposite(final org.eclipse.swt.widgets.Composite parent, final int style) {
 		super(parent, style);
 		initGUI();
@@ -236,6 +276,7 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 					semanticTypes.setLayoutData(semanticTypesLData);
 					semanticTypes.addModifyListener(new ModifyListener() {
 
+						@SuppressWarnings("synthetic-access")
 						@Override
 						public void modifyText(final ModifyEvent e) {
 							if (semanticTypes.getText().equals("-1")) {
@@ -258,6 +299,7 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 					allTypesLData.heightHint = 28;
 					allTypes.setLayoutData(allTypesLData);
 					allTypes.addSelectionListener(new SelectionAdapter() {
+						@SuppressWarnings("synthetic-access")
 						@Override
 						public void widgetSelected(final SelectionEvent evt) {
 							if (allTypes.getSelection()) {
@@ -286,5 +328,13 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 			log.error("Problem while building the basicGroup composite.", e);
 		}
 	}
+
+	// /**
+	// * Auto-generated main method to display this org.eclipse.swt.widgets.Composite inside a new
+	// * Shell.
+	// */
+	// public static void main(final String[] args) {
+	// showGUI();
+	// }
 
 }

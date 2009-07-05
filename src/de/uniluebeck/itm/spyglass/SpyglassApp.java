@@ -47,7 +47,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * instantiate and injects the core classes that are needed to run the application.
  */
 public class SpyglassApp extends ApplicationWindow {
-	protected static Logger log = SpyglassLoggerFactory.getLogger(SpyglassApp.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(SpyglassApp.class);
 
 	private Spyglass spyglass;
 
@@ -61,9 +61,7 @@ public class SpyglassApp extends ApplicationWindow {
 	// -------------------------------------------------------------------------
 	/**
 	 * Constructor
-	 *
-	 * @param shell
-	 *            the {@link Shell} to be used
+	 * 
 	 * @throws Exception
 	 */
 	public SpyglassApp() throws Exception {
@@ -78,13 +76,12 @@ public class SpyglassApp extends ApplicationWindow {
 		this.setBlockOnOpen(true);
 		addStatusLine();
 
-
 	}
 
 	// -------------------------------------------------------------------------
 	/**
 	 * The stand-alone application's entry point
-	 *
+	 * 
 	 * @param args
 	 *            an array of arguments
 	 */
@@ -173,6 +170,7 @@ public class SpyglassApp extends ApplicationWindow {
 
 		shell.addControlListener(new ControlAdapter() {
 
+			@SuppressWarnings("synthetic-access")
 			@Override
 			public void controlResized(final ControlEvent e) {
 				try {
@@ -191,7 +189,7 @@ public class SpyglassApp extends ApplicationWindow {
 	// -------------------------------------------------------------------------
 	/**
 	 * Returns the area where plug-ins can place their objects to be displayed
-	 *
+	 * 
 	 * @return the area where plug-ins can place their objects to be displayed
 	 */
 	public DrawingArea getDrawingArea() {
@@ -213,7 +211,7 @@ public class SpyglassApp extends ApplicationWindow {
 	// -------------------------------------------------------------------------
 	/**
 	 * Creates the part of the menu where the source can be selected
-	 *
+	 * 
 	 * @return the part of the menu where the source can be selected
 	 */
 	private MenuManager createSourceMenu() {
@@ -228,7 +226,7 @@ public class SpyglassApp extends ApplicationWindow {
 	// -------------------------------------------------------------------------
 	/**
 	 * Creates the part of the menu where the recording options can be selected
-	 *
+	 * 
 	 * @return the part of the menu where the recording options can be selected
 	 */
 	private MenuManager createRecordMenu() {
@@ -244,7 +242,7 @@ public class SpyglassApp extends ApplicationWindow {
 	/**
 	 * Creates the part of the menu where the manipulations of the {@link DrawingArea} can be
 	 * performed
-	 *
+	 * 
 	 * @return the part of the menu where the manipulations of the {@link DrawingArea} can be
 	 *         performed
 	 */
@@ -261,7 +259,7 @@ public class SpyglassApp extends ApplicationWindow {
 	// -------------------------------------------------------------------------
 	/**
 	 * Creates the file part of the menu
-	 *
+	 * 
 	 * @return the file part of the menu
 	 */
 	private MenuManager createFileMenu() {

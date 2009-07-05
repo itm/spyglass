@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.packet;
 
 import java.text.ParseException;
@@ -13,18 +22,26 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
  * @author Dariush Forouher
  */
 public class Int16ListPacket extends IntListPacket {
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Instances of this class are sections in a trajectory
+	 * 
+	 */
 	public class TrajectorySection {
+		/** The trajectory's starting point */
 		public AbsolutePosition start;
+		/** The trajectory's ending point */
 		public AbsolutePosition end;
+		/** The trajectory's duration between starting and ending point */
 		public int duration;
 	}
-	
+
 	/**
 	 * Syntaxtype of this Packet
 	 */
 	public static final SyntaxTypes SYNTAXTYPE = SyntaxTypes.ISENSE_SPYGLASS_PACKET_INT16;
-	
+
 	/**
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @see SpyglassPacket#deserialize(byte[])
@@ -41,7 +58,7 @@ public class Int16ListPacket extends IntListPacket {
 			values[i] = deserializeInt16(buf[pos], buf[pos + 1]);
 		}
 	}
-	
+
 	/**
 	 * Interprets the payload as a list of 3D coordinates and returns them as a list.
 	 * 
@@ -51,16 +68,15 @@ public class Int16ListPacket extends IntListPacket {
 	 * 
 	 * @throws ParseException
 	 *             when the payload has a wrong length to be such a packet.
-	 * @returns a list of coordinates.
+	 * @return a list of coordinates.
 	 */
 	public List<AbsolutePosition> getCoordinates3D() throws ParseException {
 		final List<AbsolutePosition> ret = new ArrayList<AbsolutePosition>();
-		
+
 		if (values.length % 3 != 0) {
-			throw new ParseException(
-					"The payload has a wrong length (is it really a 3D coordinates list?)", -1);
+			throw new ParseException("The payload has a wrong length (is it really a 3D coordinates list?)", -1);
 		}
-		
+
 		for (int i = 0; i < values.length; i = i + 3) {
 			final AbsolutePosition p = new AbsolutePosition();
 			p.x = values[i];
@@ -68,10 +84,10 @@ public class Int16ListPacket extends IntListPacket {
 			p.z = values[i + 2];
 			ret.add(p);
 		}
-		
+
 		return ret;
 	}
-	
+
 	/**
 	 * Interprets the payload as a list of 2D coordinates and returns them as a list.
 	 * 
@@ -81,26 +97,25 @@ public class Int16ListPacket extends IntListPacket {
 	 * 
 	 * @throws ParseException
 	 *             when the payload has a wrong length to be such a packet.
-	 * @returns a list of coordinates.
+	 * @return a list of coordinates.
 	 */
 	public List<AbsolutePosition> getCoordinates2D() throws ParseException {
 		final List<AbsolutePosition> ret = new ArrayList<AbsolutePosition>();
-		
+
 		if (values.length % 2 != 0) {
-			throw new ParseException(
-					"The payload has a wrong length (is it really a 2D coordinates list?)", -1);
+			throw new ParseException("The payload has a wrong length (is it really a 2D coordinates list?)", -1);
 		}
-		
+
 		for (int i = 0; i < values.length; i = i + 2) {
 			final AbsolutePosition p = new AbsolutePosition();
 			p.x = values[i];
 			p.y = values[i + 1];
 			ret.add(p);
 		}
-		
+
 		return ret;
 	}
-	
+
 	/**
 	 * Interprets the payload as a list of 3D trajectory packet and returns them as a list.
 	 * 
@@ -109,16 +124,15 @@ public class Int16ListPacket extends IntListPacket {
 	 * 
 	 * @throws ParseException
 	 *             when the payload has a wrong length to be such a packet.
-	 * @returns a list of trajectory sections.
+	 * @return a list of trajectory sections.
 	 */
 	public List<TrajectorySection> getTrajectory3D() throws ParseException {
 		final List<TrajectorySection> ret = new ArrayList<TrajectorySection>();
-		
+
 		if ((values.length < 7) || ((values.length - 3) % 4 != 0)) {
-			throw new ParseException(
-					"The payload has a wrong length (is it really a 3D trajectory packet?)", -1);
+			throw new ParseException("The payload has a wrong length (is it really a 3D trajectory packet?)", -1);
 		}
-		
+
 		for (int i = 0; i < values.length - 3; i = i + 4) {
 			final TrajectorySection s = new TrajectorySection();
 			final AbsolutePosition start = new AbsolutePosition();
@@ -126,21 +140,21 @@ public class Int16ListPacket extends IntListPacket {
 			start.y = values[i + 1];
 			start.z = values[i + 2];
 			s.start = start;
-			
+
 			s.duration = values[i + 3];
-			
+
 			final AbsolutePosition end = new AbsolutePosition();
 			end.x = values[i + 4];
 			end.y = values[i + 5];
 			end.z = values[i + 6];
 			s.end = end;
-			
+
 			ret.add(s);
 		}
-		
+
 		return ret;
 	}
-	
+
 	/**
 	 * Interprets the payload as a list of 2D trajectory packet and returns them as a list.
 	 * 
@@ -149,33 +163,32 @@ public class Int16ListPacket extends IntListPacket {
 	 * 
 	 * @throws ParseException
 	 *             when the payload has a wrong length to be such a packet.
-	 * @returns a list of trajectory sections.
+	 * @return a list of trajectory sections.
 	 */
 	public List<TrajectorySection> getTrajectory2D() throws ParseException {
 		final List<TrajectorySection> ret = new ArrayList<TrajectorySection>();
-		
+
 		if ((values.length < 5) || ((values.length - 2) % 3 != 0)) {
-			throw new ParseException(
-					"The payload has a wrong length (is it really a 2D trajectory packet?)", -1);
+			throw new ParseException("The payload has a wrong length (is it really a 2D trajectory packet?)", -1);
 		}
-		
+
 		for (int i = 0; i < values.length - 2; i = i + 3) {
 			final TrajectorySection s = new TrajectorySection();
 			final AbsolutePosition start = new AbsolutePosition();
 			start.x = values[i];
 			start.y = values[i + 1];
 			s.start = start;
-			
+
 			s.duration = values[i + 2];
-			
+
 			final AbsolutePosition end = new AbsolutePosition();
 			end.x = values[i + 3];
 			end.y = values[i + 4];
 			s.end = end;
-			
+
 			ret.add(s);
 		}
-		
+
 		return ret;
 	}
 }

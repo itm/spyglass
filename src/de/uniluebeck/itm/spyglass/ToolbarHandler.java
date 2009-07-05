@@ -1,6 +1,11 @@
-// --------------------------------------------------------------------------------
-/**
- *
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
+ * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass;
 
@@ -30,16 +35,16 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * This class creates and manages the toolbar
- *
- * NOTE: The way the toolbar is created seems a bit fishy. Maybe this is really the
- * right thing to do, but likely there is a saner way to do this.
- *
- * NOTE: this class contains some framework for handling mouse-events of the zoom
- * buttons. This is because the Action-Interface doesn't allow to listen to MouseEvents.
- * Again there is probable a smarter way to do this, but again I don't know it.
- *
+ * 
+ * NOTE: The way the toolbar is created seems a bit fishy. Maybe this is really the right thing to
+ * do, but likely there is a saner way to do this.
+ * 
+ * NOTE: this class contains some framework for handling mouse-events of the zoom buttons. This is
+ * because the Action-Interface doesn't allow to listen to MouseEvents. Again there is probable a
+ * smarter way to do this, but again I don't know it.
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class ToolbarHandler {
 
@@ -58,12 +63,24 @@ public class ToolbarHandler {
 	 */
 	private ToolBarManager man;
 
-	protected ZoomAction zoomInAction;
-	protected ZoomAction zoomOutAction;
+	private ZoomAction zoomInAction;
+	private ZoomAction zoomOutAction;
 
-	protected ToolItem zoomInItem = null;
-	protected ToolItem zoomOutItem = null;
+	private ToolItem zoomInItem = null;
+	private ToolItem zoomOutItem = null;
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param coolbar
+	 *            a cool bar
+	 * @param spyglass
+	 *            the current spyglass instance
+	 * @param appWindow
+	 *            the application's window
+	 * 
+	 */
 	public ToolbarHandler(final CoolBar coolbar, final Spyglass spyglass, final AppWindow appWindow) {
 		this.coolbar = coolbar;
 		this.spyglass = spyglass;
@@ -76,6 +93,17 @@ public class ToolbarHandler {
 		addIcons();
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param man
+	 *            a toolbar's managing facility
+	 * @param spyglass
+	 *            the current spyglass instance
+	 * @param appWindow
+	 *            the application's window
+	 */
 	public ToolbarHandler(final ToolBarManager man, final Spyglass spyglass, final AppWindow appWindow) {
 		this.spyglass = spyglass;
 		this.appWindow = appWindow;
@@ -85,7 +113,7 @@ public class ToolbarHandler {
 		addIcons();
 	}
 
-
+	// --------------------------------------------------------------------------------
 	/**
 	 * Add icons to the given coolbar
 	 */
@@ -105,11 +133,10 @@ public class ToolbarHandler {
 
 		man.update(false);
 
-		// TODO: this can be done smarter
 		if (coolbar != null) {
 			final Point p = man.getControl().computeSize(SWT.DEFAULT, SWT.DEFAULT);
-			final CoolItem item = new CoolItem (coolbar, SWT.NONE);
-			item.setPreferredSize (p);
+			final CoolItem item = new CoolItem(coolbar, SWT.NONE);
+			item.setPreferredSize(p);
 		}
 
 		// save the items for ZoomIn/Out for later
@@ -122,32 +149,31 @@ public class ToolbarHandler {
 		log.debug("Created toolbar");
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * This listener handles Mouse Down/Up events and passes them on
-	 * to the zoomActions
+	 * This listener handles Mouse Down/Up events and passes them on to the zoomActions
 	 */
 	Listener listener = new Listener() {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void handleEvent(final Event event) {
 
-			if (event.button!=1) {
+			if (event.button != 1) {
 				return;
 			}
 
-			if (event.type==SWT.MouseDown) {
+			if (event.type == SWT.MouseDown) {
 				if (zoomInItem.getBounds().contains(event.x, event.y)) {
 					zoomInAction.setChecked(true);
-				}
-				else if (zoomOutItem.getBounds().contains(event.x, event.y)) {
+				} else if (zoomOutItem.getBounds().contains(event.x, event.y)) {
 					zoomOutAction.setChecked(true);
 				}
 
-			} else if (event.type==SWT.MouseUp) {
+			} else if (event.type == SWT.MouseUp) {
 				if (zoomInAction.isChecked()) {
 					zoomInAction.setChecked(false);
-				}
-				else if (zoomOutAction.isChecked()) {
+				} else if (zoomOutAction.isChecked()) {
 					zoomOutAction.setChecked(false);
 				}
 			}
@@ -155,6 +181,10 @@ public class ToolbarHandler {
 
 	};
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Disposes the object
+	 */
 	public void dispose() {
 		if (man != null) {
 			man.removeAll();

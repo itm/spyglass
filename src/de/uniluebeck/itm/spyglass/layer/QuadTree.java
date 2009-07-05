@@ -16,10 +16,18 @@ import de.uniluebeck.itm.spyglass.drawing.BoundingBoxChangeListener;
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 
+// --------------------------------------------------------------------------------
+/**
+ * A quadtree implementation of the {@link Layer} superclass
+ * 
+ * @author Daniel Bimschas
+ * 
+ */
 class QuadTree implements Layer, BoundingBoxChangeListener {
 
 	private class DrawingObjectComparator implements Comparator<DrawingObject> {
 
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public int compare(final DrawingObject o1, final DrawingObject o2) {
 			final long long1 = insertionOrder.get(o1);
@@ -42,6 +50,24 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 
 	private final ISWTQuadTree<DrawingObject> tree;
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param originX
+	 *            the quadtree's origin x coordinate
+	 * @param originY
+	 *            the quadtree's origin y coordinate
+	 * @param totalSideLength
+	 *            the quadtree's total side length
+	 * @param minSideLength
+	 *            the quadtree's minimal side length
+	 * @param capacity
+	 *            the quadtree's capacity
+	 * @param threadSafe
+	 *            indicates whether the quadtree's operations are to be thread-save or not
+	 */
+	@SuppressWarnings("synthetic-access")
 	public QuadTree(final int originX, final int originY, final int totalSideLength, final int minSideLength, final int capacity,
 			final boolean threadSafe) {
 
@@ -55,6 +81,7 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void add(final DrawingObject d) {
 		if (threadSafe) {
@@ -76,6 +103,7 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void bringToFront(final DrawingObject dob) {
 		if (threadSafe) {
@@ -87,6 +115,7 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void clear() {
 		if (threadSafe) {
@@ -112,16 +141,19 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public Set<DrawingObject> getDrawingObjects() {
 		return getDrawingObjects(false);
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public SortedSet<DrawingObject> getDrawingObjects(final AbsoluteRectangle rect) {
 		return (SortedSet<DrawingObject>) getDrawingObjects(rect, true);
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public Set<DrawingObject> getDrawingObjects(final AbsoluteRectangle rect, final boolean sorted) {
 		if (threadSafe) {
@@ -144,6 +176,7 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public Set<DrawingObject> getDrawingObjects(final boolean sorted) {
 		if (threadSafe) {
@@ -166,6 +199,7 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void onBoundingBoxChanged(final DrawingObject updatedDrawingObject, final AbsoluteRectangle oldBox) {
 		if (threadSafe) {
@@ -185,6 +219,7 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void pushBack(final DrawingObject object) {
 		if (threadSafe) {
@@ -196,6 +231,7 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void remove(final DrawingObject d) {
 		if (threadSafe) {
@@ -217,7 +253,7 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 	// --------------------------------------------------------------------------------
 	/*
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see de.uniluebeck.itm.spyglass.layer.Layer#removeAll(java.util.Set)
 	 */
 	@Override

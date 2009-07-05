@@ -164,57 +164,54 @@ public class PluginManager {
 			// all plug-ins without problems
 			return true;
 
-		} else {
+		}
+		// check active plug-ins for plug-ins that don't work without metric support
+		final LinkedList<Plugin> pluginsToDeactivate = new LinkedList<Plugin>();
+		for (final Plugin p : getActivePlugins()) {
+			if (p.needsMetrics()) {
+				pluginsToDeactivate.add(p);
+			}
+		}
 
-			// check active plug-ins for plug-ins that don't work without metric support
-			final LinkedList<Plugin> pluginsToDeactivate = new LinkedList<Plugin>();
-			for (final Plugin p : getActivePlugins()) {
-				if (p.needsMetrics()) {
-					pluginsToDeactivate.add(p);
+		// if there are plug-ins to deactivate so that all plug-ins can work error-free with the
+		// new NodePositioner
+		if (pluginsToDeactivate.size() > 0) {
+
+			// fill a StringBuffer containing the names of all plug-ins that must be deactivated
+			// in order to allow for a NodePositioner that doesn't support metrics
+			final StringBuffer pluginNamesBuffer = new StringBuffer();
+			for (final Plugin p : pluginsToDeactivate) {
+				try {
+					pluginNamesBuffer.append("\"" + p.getInstanceName() + "\" ("
+							+ ((String) p.getClass().getMethod("getHumanReadableName").invoke(p)) + ")\r\n");
+				} catch (final Exception e1) {
+					log.fatal("This should not occur. Maybe somebody changed the plugin-interface?");
 				}
 			}
 
-			// if there are plug-ins to deactivate so that all plug-ins can work error-free with the
-			// new NodePositioner
-			if (pluginsToDeactivate.size() > 0) {
+			if (MessageDialog.openConfirm(null, "NodePositioner without metric support chosen",
+					"You chose a NodePositioner that doesn't support metrics. As some plug-ins require metrics, "
+							+ "the following have been disabled to avoid unpredictable behavior:\r\n\r\n" + pluginNamesBuffer.toString())) {
 
-				// fill a StringBuffer containing the names of all plug-ins that must be deactivated
-				// in order to allow for a NodePositioner that doesn't support metrics
-				final StringBuffer pluginNamesBuffer = new StringBuffer();
+				// deactivate all plug-ins
 				for (final Plugin p : pluginsToDeactivate) {
-					try {
-						pluginNamesBuffer.append("\"" + p.getInstanceName() + "\" ("
-								+ ((String) p.getClass().getMethod("getHumanReadableName").invoke(p)) + ")\r\n");
-					} catch (final Exception e1) {
-						log.fatal("This should not occur. Maybe somebody changed the plugin-interface?");
-					}
+					p.getXMLConfig().setActive(false);
 				}
 
-				if (MessageDialog.openConfirm(null, "NodePositioner without metric support chosen",
-						"You chose a NodePositioner that doesn't support metrics. As some plug-ins require metrics, "
-								+ "the following have been disabled to avoid unpredictable behavior:\r\n\r\n" + pluginNamesBuffer.toString())) {
-
-					// deactivate all plug-ins
-					for (final Plugin p : pluginsToDeactivate) {
-						p.getXMLConfig().setActive(false);
-					}
-
-					// incompatible plug-ins have been disabled, so the new NodePositioner is
-					// allowed to be activated
-					return true;
-				}
-
-				// user chose not to disable plug-ins, so the new NodePositioner is not allowed to
-				// be activated
-				return false;
-
+				// incompatible plug-ins have been disabled, so the new NodePositioner is
+				// allowed to be activated
+				return true;
 			}
 
-			// there are no plug-ins that must be deactivated, so the new NodePositioner can be
-			// activated safely
-			return true;
+			// user chose not to disable plug-ins, so the new NodePositioner is not allowed to
+			// be activated
+			return false;
 
 		}
+
+		// there are no plug-ins that must be deactivated, so the new NodePositioner can be
+		// activated safely
+		return true;
 
 	}
 

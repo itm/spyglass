@@ -1,6 +1,11 @@
-// --------------------------------------------------------------------------------
-/**
- *
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
+ * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui.control;
 
@@ -11,7 +16,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 
@@ -24,21 +28,18 @@ import de.uniluebeck.itm.spyglass.plugin.Drawable;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginListChangeListener;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // --------------------------------------------------------------------------------
 /**
- * Handles events from the model, specifically all stuff surrounding plugins
- * and their drawing objects.
- *
+ * Handles events from the model, specifically all stuff surrounding plugins and their drawing
+ * objects.
+ * 
  * For each plugin it holds a PluginController to do the main work.
- *
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class PluginManagerController implements PluginListChangeListener, TransformChangedListener, PropertyChangeListener, DisposeListener {
-
-	protected static Logger log = SpyglassLoggerFactory.getLogger(PluginManagerController.class);
 
 	private Spyglass spyglass;
 	private AppWindow appWindow;
@@ -46,17 +47,27 @@ public class PluginManagerController implements PluginListChangeListener, Transf
 	/** Default number of milliseconds to wait between checking for new boundingBox changes */
 	private static final int DEFAULT_REDRAW_PERIOD = 100;
 
-	/** Number of milliseconds to wait between checking for new boundingBox changes
-	 * when there is currently a preference dialog open */
+	/**
+	 * Number of milliseconds to wait between checking for new boundingBox changes when there is
+	 * currently a preference dialog open
+	 */
 	private static final int REDUCED_REDRAW_PERIOD = 200;
 
 	/**
-	 * List of pluginControllers. Each controller is responsible for handling the drawingobjects
-	 * of one plugin.
+	 * List of pluginControllers. Each controller is responsible for handling the drawingobjects of
+	 * one plugin.
 	 */
-	protected final Map<Plugin,PluginController> pluginControllers = Collections.synchronizedMap(new HashMap<Plugin,PluginController>());
+	protected final Map<Plugin, PluginController> pluginControllers = Collections.synchronizedMap(new HashMap<Plugin, PluginController>());
 
-
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param appWindow
+	 *            the application's window
+	 * @param spyglass
+	 *            the spyglass instance
+	 */
 	public PluginManagerController(final AppWindow appWindow, final Spyglass spyglass) {
 		this.spyglass = spyglass;
 		this.appWindow = appWindow;
@@ -80,23 +91,25 @@ public class PluginManagerController implements PluginListChangeListener, Transf
 				// HACK: If there is a preference dialog open,
 				// use a reduced frequency to increase smoothness
 				// of the view
-				final int period = spyglass.isThrottleBBoxUpdates() ?
-						REDUCED_REDRAW_PERIOD : DEFAULT_REDRAW_PERIOD;
+				final int period = spyglass.isThrottleBBoxUpdates() ? REDUCED_REDRAW_PERIOD : DEFAULT_REDRAW_PERIOD;
 
 				appWindow.getDisplay().timerExec(period, this);
 			}
 
 		});
 
-
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * Registers Listener to the PluginManager and creats PluginControllers for Plugins
-	 * inside the PluginManager.
-	 *
-	 * Note that at this point we assume that the PluginManager has already fully initialized
-	 * all his Plugins (i.e. it is in a "running" state).
+	 * Registers Listener to the PluginManager and creates PluginControllers for Plugins inside the
+	 * PluginManager.
+	 * 
+	 * Note that at this point we assume that the PluginManager has already fully initialized all
+	 * his Plugins (i.e. it is in a "running" state).
+	 * 
+	 * @param manager
+	 *            the plugin management facility
 	 */
 	protected void registerPluginManager(final PluginManager manager) {
 
@@ -109,8 +122,8 @@ public class PluginManagerController implements PluginListChangeListener, Transf
 
 			if (p instanceof Drawable) {
 
-				final PluginController c = new PluginController(appWindow.getDisplay(), appWindow.getGui().getDrawingArea(),p);
-				pluginControllers.put(p,c);
+				final PluginController c = new PluginController(appWindow.getDisplay(), appWindow.getGui().getDrawingArea(), p);
+				pluginControllers.put(p, c);
 
 			}
 		}
@@ -118,9 +131,17 @@ public class PluginManagerController implements PluginListChangeListener, Transf
 		spyglass.getPluginManager().addPluginListChangeListener(this);
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Unregisters Listener to the PluginManager
+	 * 
+	 * @param manager
+	 *            the plugin management facility
+	 * 
+	 */
 	protected void unregisterPluginManager(final PluginManager manager) {
 		synchronized (pluginControllers) {
-			for (final PluginController pc: pluginControllers.values()) {
+			for (final PluginController pc : pluginControllers.values()) {
 				pc.disconnect();
 			}
 			pluginControllers.clear();
@@ -145,7 +166,7 @@ public class PluginManagerController implements PluginListChangeListener, Transf
 					}
 
 					final PluginController c = new PluginController(appWindow.getDisplay(), appWindow.getGui().getDrawingArea(), p);
-					pluginControllers.put(p,c);
+					pluginControllers.put(p, c);
 
 					break;
 				case PLUGIN_REMOVED:
@@ -208,8 +229,11 @@ public class PluginManagerController implements PluginListChangeListener, Transf
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
 	 */
 	@Override
 	public void widgetDisposed(final DisposeEvent e) {

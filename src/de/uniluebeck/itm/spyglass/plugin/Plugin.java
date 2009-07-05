@@ -411,7 +411,8 @@ public abstract class Plugin implements Runnable, Comparable<Plugin> {
 	 * @throws Exception
 	 *             any kind of exception
 	 */
-	public boolean handleEvent(final MouseEvent e, final DrawingArea drawingArea) throws Exception {
+	public boolean handleEvent(@SuppressWarnings("unused") final MouseEvent e, @SuppressWarnings("unused") final DrawingArea drawingArea)
+			throws Exception {
 		return false;
 	}
 

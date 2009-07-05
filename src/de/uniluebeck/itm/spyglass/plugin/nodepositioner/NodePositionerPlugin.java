@@ -69,7 +69,10 @@ public abstract class NodePositionerPlugin extends Plugin {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * Add all nodes and its position information that the given Map contains into the nodeMap
+	 * Add all nodes and their position information that the given Map contains into the nodeMap
+	 * 
+	 * @param oldNodeMap
+	 *            the old node map
 	 */
 	public abstract void addNodes(final Map<Integer, PositionData> oldNodeMap);
 

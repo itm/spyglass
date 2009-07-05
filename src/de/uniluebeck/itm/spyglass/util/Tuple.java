@@ -9,6 +9,8 @@ package de.uniluebeck.itm.spyglass.util;
  * A simple type-safe helper class for methods returning or receiving tuples of data.
  * 
  * @author Daniel Bimschas
+ * @param <V>
+ * @param <W>
  */
 public class Tuple<V, W> {
 

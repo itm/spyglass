@@ -8,6 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.xmlconfig;
 
+import java.beans.PropertyChangeEvent;
+
 import org.simpleframework.xml.Element;
 
 // --------------------------------------------------------------------------------
@@ -20,56 +22,80 @@ import org.simpleframework.xml.Element;
  */
 public class MetricsXMLConfig extends XMLConfig {
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link MetricsXMLConfig#setLockAbs2metricFactor(boolean)} yields a change
+	 */
 	public static final String PROPERTYNAME_LOCK_ABS2METRIC_FACTOR = "lockAbs2metricFactor";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link MetricsXMLConfig#setAbs2metricOffsetY(float)} yields a change
+	 */
 	public static final String PROPERTYNAME_ABS2METRIC_OFFSET_Y = "abs2metricOffsetY";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link MetricsXMLConfig#setAbs2metricOffsetX(float)} yields a change
+	 */
 	public static final String PROPERTYNAME_ABS2METRIC_OFFSET_X = "abs2metricOffsetX";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link MetricsXMLConfig#setAbs2metricFactorY(float)} yields a change
+	 */
 	public static final String PROPERTYNAME_ABS2METRIC_FACTOR_Y = "abs2metricFactorY";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link MetricsXMLConfig#setAbs2metricFactorX(float)} yields a change
+	 */
 	public static final String PROPERTYNAME_ABS2METRIC_FACTOR_X = "abs2metricFactorX";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link MetricsXMLConfig#setUnit(String)} yields a change
+	 */
 	public static final String PROPERTYNAME_UNIT = "unit";
 
 	/**
 	 * a string for the unit
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private volatile String unit = "m";
 
 	/**
 	 * multiplying an absolute coordinate's x value with this factor will result in the
 	 * corresponding metric value
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private volatile float abs2metricFactorX = 1;
 
 	/**
 	 * multiplying an absolute coordinate's y value with this factor will result in the
 	 * corresponding metric value
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private volatile float abs2metricFactorY = 1;
 
 	/**
 	 * this is an offset value which allows the user to let the metric coordinates starting position
 	 * be anywhere in the absolute coordinate system
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private volatile float abs2metricOffsetX = 0;
 
 	/**
 	 * this is an offset value which allows the user to let the metric coordinates starting position
 	 * be anywhere in the absolute coordinate system
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private volatile float abs2metricOffsetY = 0;
 
 	/**
 	 * locks abs2metricFactorX and abs2metricFactorY to the same value in the view
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private volatile boolean lockAbs2metricFactor = false;
 
 	// --------------------------------------------------------------------------------

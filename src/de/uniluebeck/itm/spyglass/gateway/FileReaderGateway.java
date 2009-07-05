@@ -32,9 +32,8 @@ public class FileReaderGateway implements Gateway {
 	private File file = null;
 
 	private InputStream inputStream = null;
-	
+
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * 
 	 */
@@ -44,16 +43,16 @@ public class FileReaderGateway implements Gateway {
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	/**
+	 * Returns the file which is used as input
 	 * 
+	 * @return the file which is used as input
 	 */
 	public File getFile() {
 		return file;
 	}
 
 	// --------------------------------------------------------------------------
-	// ------
 	/**
 	 * Sets the input file
 	 * 
@@ -78,6 +77,7 @@ public class FileReaderGateway implements Gateway {
 		}
 	}
 
+	// --------------------------------------------------------------------------
 	/**
 	 * Resets the file.
 	 */

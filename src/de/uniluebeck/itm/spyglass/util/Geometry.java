@@ -20,11 +20,12 @@ package de.uniluebeck.itm.spyglass.util;
  */
 /**
  * Collection of geometry utility methods. All methods are static.
- *
+ * 
  * @author <a href="mailto:jacob.dreyer@geosoft.no">Jacob Dreyer</a>
  */
 public final class Geometry {
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Return true if c is between a and b.
 	 */
@@ -32,9 +33,10 @@ public final class Geometry {
 		return b > a ? (c >= a) && (c <= b) : (c >= b) && (c <= a);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Check if two double precision numbers are "equal", i.e. close enough to a given limit.
-	 *
+	 * 
 	 * @param a
 	 *            First number to check
 	 * @param b
@@ -47,9 +49,10 @@ public final class Geometry {
 		return Math.abs(a - b) < limit;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Check if two double precision numbers are "equal", i.e. close enough to a prespecified limit.
-	 *
+	 * 
 	 * @param a
 	 *            First number to check
 	 * @param b
@@ -60,9 +63,10 @@ public final class Geometry {
 		return equals(a, b, 1.0e-5);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Return smallest of four numbers.
-	 *
+	 * 
 	 * @param a
 	 *            First number to find smallest among.
 	 * @param b
@@ -77,9 +81,10 @@ public final class Geometry {
 		return Math.min(Math.min(a, b), Math.min(c, d));
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Return largest of four numbers.
-	 *
+	 * 
 	 * @param a
 	 *            First number to find largest among.
 	 * @param b
@@ -94,26 +99,41 @@ public final class Geometry {
 		return Math.max(Math.max(a, b), Math.max(c, d));
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Check if a specified point is inside a specified rectangle.
-	 *
+	 * 
 	 * @param x0
-	 *            , y0, x1, y1 Upper left and lower right corner of rectangle (inclusive)
+	 *            x-coordinate of the upper left corner of rectangle (inclusive)
+	 * @param y0
+	 *            y-coordinate of the upper left corner of rectangle (inclusive)
+	 * @param x1
+	 *            x-coordinate of the lower right corner of rectangle (inclusive)
+	 * @param y1
+	 *            y-coordinate of the lower right corner of rectangle (inclusive)
 	 * @param x
-	 *            ,y Point to check.
+	 *            x-coordinate of the point to check
+	 * 
+	 * @param y
+	 *            y-coordinate of the point to check
 	 * @return True if the point is inside the rectangle, false otherwise.
 	 */
 	public static boolean isPointInsideRectangle(final int x0, final int y0, final int x1, final int y1, final int x, final int y) {
 		return (x >= x0) && (x < x1) && (y >= y0) && (y < y1);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Check if a given point is inside a given (complex) polygon.
-	 *
+	 * 
 	 * @param x
-	 *            , y Polygon.
+	 *            the polygon's x-coordinates
+	 * @param y
+	 *            the polygon's y-coordinates
 	 * @param pointX
-	 *            , pointY Point to check.
+	 *            the point's x-coordinates
+	 * @param pointY
+	 *            the point's y-coordinates
 	 * @return True if the given point is inside the polygon, false otherwise.
 	 */
 	public static boolean isPointInsidePolygon(final double[] x, final double[] y, final double pointX, final double pointY) {
@@ -137,13 +157,18 @@ public final class Geometry {
 		return isInside;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Check if a given point is inside a given polygon. Integer domain.
-	 *
+	 * 
 	 * @param x
-	 *            , y Polygon.
+	 *            the polygon's x-coordinates
+	 * @param y
+	 *            the polygon's y-coordinates
 	 * @param pointX
-	 *            , pointY Point to check.
+	 *            the point's x-coordinates
+	 * @param pointY
+	 *            the point's y-coordinates
 	 * @return True if the given point is inside the polygon, false otherwise.
 	 */
 	public static boolean isPointInsidePolygon(final int[] x, final int[] y, final int pointX, final int pointY) {
@@ -167,19 +192,19 @@ public final class Geometry {
 		return isInside;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Find the point on the line p0,p1 [x,y,z] a given fraction from p0. Fraction of 0.0 whould
 	 * give back p0, 1.0 give back p1, 0.5 returns midpoint of line p0,p1 and so on. F raction can
 	 * be >1 and it can be negative to return any point on the line specified by p0,p1.
-	 *
+	 * 
 	 * @param p0
-	 *            First coordinale of line [x,y,z].
-	 * @param p0
-	 *            Second coordinale of line [x,y,z].
+	 *            First coordinate of line [x,y,z].
+	 * @param p1
+	 *            Second coordinate of line [x,y,z].
 	 * @param fractionFromP0
 	 *            Point we are looking for coordinates of
-	 * @param p
-	 *            Coordinate of point we are looking for
+	 * @return Coordinate of point we are looking for
 	 */
 	public static double[] computePointOnLine(final double[] p0, final double[] p1, final double fractionFromP0) {
 		final double[] p = new double[3];
@@ -191,14 +216,19 @@ public final class Geometry {
 		return p;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Find the point on the line defined by x0,y0,x1,y1 a given fraction from x0,y0. 2D version of
 	 * method above..
-	 *
+	 * 
 	 * @param x0
-	 *            , y0 First point defining the line
+	 *            First point defining the line
+	 * @param y0
+	 *            First point defining the line
 	 * @param x1
-	 *            , y1 Second point defining the line
+	 *            Second point defining the line
+	 * @param y1
+	 *            Second point defining the line
 	 * @param fractionFrom0
 	 *            Distance from (x0,y0)
 	 * @return x, y Coordinate of point we are looking for
@@ -213,11 +243,14 @@ public final class Geometry {
 		return r;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Extend a given line segment to a specified length.
-	 *
+	 * 
 	 * @param p0
-	 *            , p1 Line segment to extend [x,y,z].
+	 *            Line segment to extend [x,y,z].
+	 * @param p1
+	 *            Line segment to extend [x,y,z].
 	 * @param toLength
 	 *            Length of new line segment.
 	 * @param anchor
@@ -235,13 +268,16 @@ public final class Geometry {
 		Geometry.extendLine(p, p1, length1);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Extend a given line segment to a given length and holding the first point of the line as
 	 * fixed.
-	 *
+	 * 
 	 * @param p0
-	 *            , p1 Line segment to extend. p0 is fixed during extension
-	 * @param length
+	 *            Line segment to extend. p0 is fixed during extension
+	 * @param p1
+	 *            Line segment to extend.
+	 * @param toLength
 	 *            Length of new line segment.
 	 */
 	public static void extendLine(final double[] p0, final double[] p1, final double toLength) {
@@ -253,9 +289,10 @@ public final class Geometry {
 		p1[2] = p0[2] + (p1[2] - p0[2]) * lengthFraction;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Return the length of a vector.
-	 *
+	 * 
 	 * @param v
 	 *            Vector to compute length of [x,y,z].
 	 * @return Length of vector.
@@ -264,11 +301,14 @@ public final class Geometry {
 		return Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Compute distance between two points.
-	 *
+	 * 
 	 * @param p0
-	 *            , p1 Points to compute distance between [x,y,z].
+	 *            Point [x,y,z].
+	 * @param p1
+	 *            Point [x,y,z].
 	 * @return Distance between points.
 	 */
 	public static double length(final double[] p0, final double[] p1) {
@@ -276,26 +316,36 @@ public final class Geometry {
 		return length(v);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Compute the length of the line from (x0,y0) to (x1,y1)
-	 *
+	 * 
 	 * @param x0
-	 *            , y0 First line end point.
+	 *            First line end point.
+	 * @param y0
+	 *            First line end point.
 	 * @param x1
-	 *            , y1 Second line end point.
+	 *            Second line end point.
+	 * @param y1
+	 *            Second line end point.
 	 * @return Length of line from (x0,y0) to (x1,y1).
 	 */
 	public static double length(final int x0, final int y0, final int x1, final int y1) {
 		return Geometry.length((double) x0, (double) y0, (double) x1, (double) y1);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Compute the length of the line from (x0,y0) to (x1,y1)
-	 *
+	 * 
 	 * @param x0
-	 *            , y0 First line end point.
+	 *            First line end point.
+	 * @param y0
+	 *            First line end point.
 	 * @param x1
-	 *            , y1 Second line end point.
+	 *            Second line end point.
+	 * @param y1
+	 *            Second line end point.
 	 * @return Length of line from (x0,y0) to (x1,y1).
 	 */
 	public static double length(final double x0, final double y0, final double x1, final double y1) {
@@ -305,13 +355,14 @@ public final class Geometry {
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Compute the length of a polyline.
-	 *
+	 * 
 	 * @param x
-	 *            , y Arrays of x,y coordinates
-	 * @param nPoints
-	 *            Number of elements in the above.
+	 *            Arrays of x coordinates
+	 * @param y
+	 *            Arrays of y coordinates
 	 * @param isClosed
 	 *            True if this is a closed polygon, false otherwise
 	 * @return Length of polyline defined by x, y and nPoints.
@@ -332,16 +383,23 @@ public final class Geometry {
 		return length;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * Return distance bwetween the line defined by (x0,y0) and (x1,y1) and the point (x,y). Ref:
+	 * Return distance between the line defined by (x0,y0) and (x1,y1) and the point (x,y). Ref:
 	 * http://astronomy.swin.edu.au/pbourke/geometry/pointline/ The 3D case should be similar.
-	 *
+	 * 
 	 * @param x0
-	 *            , y0 First point of line.
+	 *            First point of line.
+	 * @param y0
+	 *            First point of line.
 	 * @param x1
-	 *            , y1 Second point of line.
+	 *            Second point of line.
+	 * @param y1
+	 *            Second point of line.
 	 * @param x
-	 *            , y, Point to consider.
+	 *            Point to consider.
+	 * @param y
+	 *            , Point to consider.
 	 * @return Distance from x,y down to the (extended) line defined by x0, y0, x1, y1.
 	 */
 	public static double distance(final int x0, final int y0, final int x1, final int y1, final int x, final int y) {
@@ -362,11 +420,16 @@ public final class Geometry {
 		return length;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * Find the angle between twree points. P0 is center point
-	 *
+	 * Find the angle between three points. P0 is center point
+	 * 
 	 * @param p0
-	 *            , p1, p2 Three points finding angle between [x,y,z].
+	 *            Point 1 [x,y,z].
+	 * @param p1
+	 *            Point 2 [x,y,z].
+	 * @param p2
+	 *            Point 3 [x,y,z].
 	 * @return Angle (in radians) between given points.
 	 */
 	public static double computeAngle(final double[] p0, final double[] p1, final double[] p2) {
@@ -387,24 +450,29 @@ public final class Geometry {
 		return angle;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Compute the dot product (a scalar) between two vectors.
-	 *
+	 * 
 	 * @param v0
-	 *            , v1 Vectors to compute dot product between [x,y,z].
+	 *            Vector 1 [x,y,z].
+	 * @param v1
+	 *            Vector 2 [x,y,z].
 	 * @return Dot product of given vectors.
 	 */
 	public static double computeDotProduct(final double[] v0, final double[] v1) {
 		return v0[0] * v1[0] + v0[1] * v1[1] + v0[2] * v1[2];
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Compute the cross product (a vector) of two vectors.
-	 *
+	 * 
 	 * @param v0
-	 *            , v1 Vectors to compute cross product between [x,y,z].
-	 * @param crossProduct
-	 *            Cross product of specified vectors [x,y,z].
+	 *            Vector 1 [x,y,z].
+	 * @param v1
+	 *            Vector 2 [x,y,z].
+	 * @return the cross product (a vector) of two vectors.
 	 */
 	public static double[] computeCrossProduct(final double[] v0, final double[] v1) {
 		final double crossProduct[] = new double[3];
@@ -416,11 +484,14 @@ public final class Geometry {
 		return crossProduct;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Construct the vector specified by two points.
-	 *
+	 * 
 	 * @param p0
-	 *            , p1 Points the construct vector between [x,y,z].
+	 *            Point 1 [x,y,z].
+	 * @param p1
+	 *            Point 2 [x,y,z].
 	 * @return v Vector from p0 to p1 [x,y,z].
 	 */
 	public static double[] createVector(final double[] p0, final double[] p1) {
@@ -428,9 +499,10 @@ public final class Geometry {
 		return v;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Check if two points are on the same side of a given line. Algorithm from Sedgewick page 350.
-	 *
+	 * 
 	 * @param x0
 	 *            , y0, x1, y1 The line.
 	 * @param px0
@@ -466,9 +538,10 @@ public final class Geometry {
 		return sameSide;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Check if two points are on the same side of a given line. Integer domain.
-	 *
+	 * 
 	 * @param x0
 	 *            , y0, x1, y1 The line.
 	 * @param px0
@@ -482,13 +555,27 @@ public final class Geometry {
 		return sameSide((double) x0, (double) y0, (double) x1, (double) y1, (double) px0, (double) py0, (double) px1, (double) py1);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Check if two line segments intersects. Integer domain.
-	 *
+	 * 
 	 * @param x0
-	 *            , y0, x1, y1 End points of first line to check.
+	 *            End points of first line to check
+	 * @param y0
+	 *            End points of first line to check
+	 * @param x1
+	 *            End points of first line to check.
+	 * @param y1
+	 *            End points of first line to check.
+	 * 
 	 * @param x2
-	 *            , yy, x3, y3 End points of second line to check.
+	 *            End points of second line to check.
+	 * @param y2
+	 *            End points of second line to check.
+	 * @param x3
+	 *            End points of second line to check.
+	 * @param y3
+	 *            End points of second line to check.
 	 * @return True if the two lines intersects.
 	 */
 	public static boolean isLineIntersectingLine(final int x0, final int y0, final int x1, final int y1, final int x2, final int y2, final int x3,
@@ -499,15 +586,26 @@ public final class Geometry {
 		return (s1 <= 0) && (s2 <= 0);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Check if a specified line intersects a specified rectangle. Integer domain.
-	 *
+	 * 
 	 * @param lx0
-	 *            , ly0 1st end point of line
+	 *            1st end point of line
+	 * @param ly0
+	 *            1st end point of line
+	 * @param lx1
+	 *            2nd end point of line
 	 * @param ly1
-	 *            , ly1 2nd end point of line
+	 *            2nd end point of line
 	 * @param x0
-	 *            , y0, x1, y1 Upper left and lower right corner of rectangle (inclusive).
+	 *            Upper left corner of rectangle (inclusive).
+	 * @param y0
+	 *            Upper left corner of rectangle (inclusive).
+	 * @param x1
+	 *            Lower right corner of rectangle (inclusive).
+	 * @param y1
+	 *            Lower right corner of rectangle (inclusive).
 	 * @return True if the line intersects the rectangle, false otherwise.
 	 */
 	public static boolean isLineIntersectingRectangle(final int lx0, final int ly0, final int lx1, final int ly1, final int x0, final int y0,
@@ -537,13 +635,22 @@ public final class Geometry {
 		return false;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Check if a specified polyline intersects a specified rectangle. Integer domain.
-	 *
+	 * 
 	 * @param x
-	 *            , y Polyline to check.
+	 *            Polyline to check.
+	 * @param y
+	 *            Polyline to check.
 	 * @param x0
-	 *            , y0, x1, y1 Upper left and lower left corner of rectangle (inclusive).
+	 *            Upper left corner of rectangle (inclusive).
+	 * @param y0
+	 *            Upper left corner of rectangle (inclusive).
+	 * @param x1
+	 *            Lower left corner of rectangle (inclusive).
+	 * @param y1
+	 *            Lower left corner of rectangle (inclusive).
 	 * @return True if the polyline intersects the rectangle, false otherwise.
 	 */
 	public static boolean isPolylineIntersectingRectangle(final int[] x, final int[] y, final int x0, final int y0, final int x1, final int y1) {
@@ -568,9 +675,10 @@ public final class Geometry {
 		return false;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Check if a specified polygon intersects a specified rectangle. Integer domain.
-	 *
+	 * 
 	 * @param x
 	 *            X coordinates of polyline.
 	 * @param y
@@ -621,9 +729,10 @@ public final class Geometry {
 		return false;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Compute the area of the specfied polygon.
-	 *
+	 * 
 	 * @param x
 	 *            X coordinates of polygon.
 	 * @param y
@@ -644,9 +753,10 @@ public final class Geometry {
 		return area;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Compute the area of the specfied polygon.
-	 *
+	 * 
 	 * @param xy
 	 *            Geometry of polygon [x,y,...]
 	 * @return Area of specified polygon.
@@ -665,9 +775,10 @@ public final class Geometry {
 		return area;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Compute centorid (center of gravity) of specified polygon.
-	 *
+	 * 
 	 * @param x
 	 *            X coordinates of polygon.
 	 * @param y
@@ -696,9 +807,10 @@ public final class Geometry {
 		return new double[] { cx, cy };
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Find the 3D extent of a polyline.
-	 *
+	 * 
 	 * @param x
 	 *            X coordinates of polyline.
 	 * @param y
@@ -760,9 +872,10 @@ public final class Geometry {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Find the extent of a polygon.
-	 *
+	 * 
 	 * @param x
 	 *            X coordinates of polygon.
 	 * @param y
@@ -805,9 +918,10 @@ public final class Geometry {
 		yExtent[1] = yMax;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Compute the intersection between two line segments, or two lines of infinite length.
-	 *
+	 * 
 	 * @param x0
 	 *            X coordinate first end point first line segment.
 	 * @param y0
@@ -853,29 +967,28 @@ public final class Geometry {
 		if (Geometry.equals(a0, a1)) {
 			if (!Geometry.equals(b0, b1)) {
 				return -1; // Parallell non-overlapping
-			} else {
-				if (Geometry.equals(x0, x1)) {
-					if ((Math.min(y0, y1) < Math.max(y2, y3)) || (Math.max(y0, y1) > Math.min(y2, y3))) {
-						final double twoMiddle = y0 + y1 + y2 + y3 - Geometry.min(y0, y1, y2, y3) - Geometry.max(y0, y1, y2, y3);
-						y = (twoMiddle) / 2.0;
-						x = (y - b0) / a0;
-					} else {
-						return -1; // Parallell non-overlapping
-					}
-				} else {
-					if ((Math.min(x0, x1) < Math.max(x2, x3)) || (Math.max(x0, x1) > Math.min(x2, x3))) {
-						final double twoMiddle = x0 + x1 + x2 + x3 - Geometry.min(x0, x1, x2, x3) - Geometry.max(x0, x1, x2, x3);
-						x = (twoMiddle) / 2.0;
-						y = a0 * x + b0;
-					} else {
-						return -1;
-					}
-				}
-
-				intersection[0] = x;
-				intersection[1] = y;
-				return -2;
 			}
+			if (Geometry.equals(x0, x1)) {
+				if ((Math.min(y0, y1) < Math.max(y2, y3)) || (Math.max(y0, y1) > Math.min(y2, y3))) {
+					final double twoMiddle = y0 + y1 + y2 + y3 - Geometry.min(y0, y1, y2, y3) - Geometry.max(y0, y1, y2, y3);
+					y = (twoMiddle) / 2.0;
+					x = (y - b0) / a0;
+				} else {
+					return -1; // Parallell non-overlapping
+				}
+			} else {
+				if ((Math.min(x0, x1) < Math.max(x2, x3)) || (Math.max(x0, x1) > Math.min(x2, x3))) {
+					final double twoMiddle = x0 + x1 + x2 + x3 - Geometry.min(x0, x1, x2, x3) - Geometry.max(x0, x1, x2, x3);
+					x = (twoMiddle) / 2.0;
+					y = a0 * x + b0;
+				} else {
+					return -1;
+				}
+			}
+
+			intersection[0] = x;
+			intersection[1] = y;
+			return -2;
 		}
 
 		// Find correct intersection point
@@ -927,24 +1040,25 @@ public final class Geometry {
 		return Geometry.equals(distanceFrom1, 0.0) && Geometry.equals(distanceFrom2, 0.0) ? 1 : 0;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Find the intersections between a polygon and a straight line.
-	 *
+	 * 
 	 * NOTE: This method is only guaranteed to work if the polygon is first preprocessed so that
 	 * "unneccesary" vertices are removed (i.e vertices on the straight line between its
 	 * neighbours).
-	 *
+	 * 
 	 * @param x
 	 *            X coordinates of polygon.
 	 * @param y
 	 *            Y coordinates of polygon.
 	 * @param x0
 	 *            X first end point of line.
-	 * @param x0
+	 * @param y0
 	 *            Y first end point of line.
-	 * @param x0
+	 * @param x1
 	 *            X second end point of line.
-	 * @param x0
+	 * @param y1
 	 *            Y second end point of line.
 	 * @return Intersections [x,y,x,y...].
 	 */
@@ -1017,11 +1131,12 @@ public final class Geometry {
 		return finalArray;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Return the geometry of an ellipse based on its four top points. Integer domain. The method
 	 * use the generic createEllipse() method for the main task, and then transforms this according
 	 * to any rotation or skew defined by the given top points.
-	 *
+	 * 
 	 * @param x
 	 *            X array of four top points of ellipse.
 	 * @param y
@@ -1085,9 +1200,10 @@ public final class Geometry {
 		return ellipse;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create the geometry for an unrotated, unskewed ellipse. Integer domain.
-	 *
+	 * 
 	 * @param x0
 	 *            X center of ellipse.
 	 * @param y0
@@ -1170,9 +1286,10 @@ public final class Geometry {
 		return ellipse;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create the geometry for an unrotated, unskewed ellipse. Floating point domain.
-	 *
+	 * 
 	 * @param x0
 	 *            X center of ellipse.
 	 * @param y0
@@ -1249,9 +1366,10 @@ public final class Geometry {
 		return ellipse;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create geometry for a circle. Integer domain.
-	 *
+	 * 
 	 * @param x0
 	 *            X center of circle.
 	 * @param y0
@@ -1264,9 +1382,10 @@ public final class Geometry {
 		return createEllipse(x0, y0, radius, radius);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create geometry for a circle. Floating point domain.
-	 *
+	 * 
 	 * @param x0
 	 *            X center of circle.
 	 * @param y0
@@ -1279,9 +1398,10 @@ public final class Geometry {
 		return createEllipse(x0, y0, radius, radius);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create the geometry of a sector of an ellipse.
-	 *
+	 * 
 	 * @param x0
 	 *            X coordinate of center of ellipse.
 	 * @param y0
@@ -1326,34 +1446,34 @@ public final class Geometry {
 		return xy;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create the geometry of a sector of a circle.
-	 *
+	 * 
 	 * @param x0
 	 *            X coordinate of center of ellipse.
 	 * @param y0
 	 *            Y coordinate of center of ellipse.
-	 * @param dx
-	 *            X radius of ellipse.
-	 * @param dy
-	 *            Y radius of ellipse.
+	 * @param radius
+	 *            radius of ellipse.
 	 * @param angle0
 	 *            First angle of sector (in radians).
 	 * @param angle1
 	 *            Second angle of sector (in radians).
-	 * @return Geometry of secor [x,y,...]
+	 * @return Geometry of sector [x,y,...]
 	 */
 	public static int[] createSector(final int x0, final int y0, final int radius, final double angle0, final double angle1) {
 		return createSector(x0, y0, radius, radius, angle0, angle1);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create the geometry of an arrow. The arrow is positioned at the end (last point) of the
 	 * specified polyline, as follows:
-	 *
+	 * 
 	 * 0,4--, \ --, \ --, \ --, \ --, -------------------------3-----------1 / --' / --' / --' / --'
 	 * 2--'
-	 *
+	 * 
 	 * @param x
 	 *            X coordinates of polyline of where arrow is positioned in the end. Must contain at
 	 *            least two points.
@@ -1414,10 +1534,11 @@ public final class Geometry {
 		return arrow;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create geometry for an arrow along the specified line and with tip at x1,y1. See general
 	 * method above.
-	 *
+	 * 
 	 * @param x0
 	 *            X first end point of line.
 	 * @param y0
@@ -1443,10 +1564,11 @@ public final class Geometry {
 		return createArrow(x, y, length, angle, inset);
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create geometry for a rectangle. Returns a closed polygon; first and last points matches.
 	 * Integer domain.
-	 *
+	 * 
 	 * @param x0
 	 *            X corner of rectangle.
 	 * @param y0
@@ -1454,16 +1576,18 @@ public final class Geometry {
 	 * @param width
 	 *            Width (may be negative to indicate leftwards direction)
 	 * @param height
-	 *            Height (may be negative to indicaten upwards direction)
+	 *            Height (may be negative to indicate upwards direction)
+	 * @return a closed polygon
 	 */
 	public static int[] createRectangle(final int x0, final int y0, final int width, final int height) {
 		return new int[] { x0, y0, x0 + (width - 1), y0, x0 + (width - 1), y0 + (height - 1), x0, y0 + (height - 1), x0, y0 };
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create geometry for a rectangle. Returns a closed polygon; first and last points matches.
 	 * Floating point domain.
-	 *
+	 * 
 	 * @param x0
 	 *            X corner of rectangle.
 	 * @param y0
@@ -1471,21 +1595,23 @@ public final class Geometry {
 	 * @param width
 	 *            Width (may be negative to indicate leftwards direction)
 	 * @param height
-	 *            Height (may be negative to indicaten upwards direction)
+	 *            Height (may be negative to indicate upwards direction)
+	 * @return a closed polygon
 	 */
 	public static double[] createRectangle(final double x0, final double y0, final double width, final double height) {
 		return new double[] { x0, y0, x0 + width, y0, x0 + width, y0 + height, x0, y0 + height, x0, y0 };
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create geometry of a star. Integer domain.
-	 *
+	 * 
 	 * @param x0
 	 *            X center of star.
 	 * @param y0
 	 *            Y center of star.
 	 * @param innerRadius
-	 *            Inner radis of arms.
+	 *            Inner radius of arms.
 	 * @param outerRadius
 	 *            Outer radius of arms.
 	 * @param nArms
@@ -1517,15 +1643,16 @@ public final class Geometry {
 		return xy;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Create geometry of a star. Floating point domain.
-	 *
+	 * 
 	 * @param x0
 	 *            X center of star.
 	 * @param y0
 	 *            Y center of star.
 	 * @param innerRadius
-	 *            Inner radis of arms.
+	 *            Inner radius of arms.
 	 * @param outerRadius
 	 *            Outer radius of arms.
 	 * @param nArms
@@ -1554,9 +1681,10 @@ public final class Geometry {
 		return xy;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Return the x,y position at distance "length" into the given polyline.
-	 *
+	 * 
 	 * @param x
 	 *            X coordinates of polyline
 	 * @param y

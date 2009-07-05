@@ -1,3 +1,11 @@
+/* 
+ * ----------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the
+ * SwarmNet (www.swarmnet.de) project SpyGlass is free software;
+ * you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further details.
+ * ------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
 import org.apache.log4j.Logger;
@@ -33,6 +41,13 @@ import de.uniluebeck.itm.spyglass.gui.databinding.converter.ColorToArrayConverte
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
+//--------------------------------------------------------------------------------
+/**
+ * Instances of this class are widgets edit configurations for {@link SimpleNodePainterPlugin}s
+ * 
+ * @author Sebastian Ebers
+ * 
+ */
 public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 
 	{
@@ -51,17 +66,10 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 	private Label label2;
 	private Text lineWidth;
 
+	private SimpleNodePainterPreferencePage page;
+
+	/** The string formatter configuration widget */
 	StringFormatter stringFormatter = new StringFormatter();
-
-	SimpleNodePainterPreferencePage page;
-
-	/**
-	 * Auto-generated main method to display this org.eclipse.swt.widgets.Composite inside a new
-	 * Shell.
-	 */
-	public static void main(final String[] args) {
-		showGUI();
-	}
 
 	/**
 	 * Auto-generated method to display this org.eclipse.swt.widgets.Composite inside a new Shell.
@@ -88,6 +96,15 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param parent
+	 *            the parent widget
+	 * @param style
+	 *            the style of the widget to construct
+	 */
 	public OptionsComposite(final org.eclipse.swt.widgets.Composite parent, final int style) {
 		super(parent, style);
 		initGUI();
@@ -140,6 +157,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 					lineColor = new Button(group1, SWT.PUSH | SWT.CENTER);
 					lineColor.setText("Change color");
 					lineColor.addSelectionListener(new SelectionAdapter() {
+						@SuppressWarnings("synthetic-access")
 						@Override
 						public void widgetSelected(final SelectionEvent evt) {
 							lineColorWidgetSelected(evt);
@@ -184,6 +202,17 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Sets the parameters necessary for data binding
+	 * 
+	 * @param dbc
+	 *            the data binding context
+	 * @param config
+	 *            the configuration
+	 * @param page
+	 *            the plug-in's preference page
+	 */
 	public void setDatabinding(final DataBindingContext dbc, final PluginXMLConfig config, final SimpleNodePainterPreferencePage page) {
 
 		this.page = page;

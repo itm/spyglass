@@ -1,9 +1,15 @@
-// --------------------------------------------------------------------------------
-/**
- * 
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
+ * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.packet;
 
+//--------------------------------------------------------------------------------
 /**
  * 
  * Enumeration representing all legal syntax types of an spyglass packet
@@ -14,7 +20,7 @@ package de.uniluebeck.itm.spyglass.packet;
  * 
  */
 public enum SyntaxTypes {
-	
+
 	/**
 	 * 
 	 */
@@ -54,19 +60,39 @@ public enum SyntaxTypes {
 	 * 
 	 */
 	ISENSE_SPYGLASS_PACKET_VARIABLE(7);
-	
+
 	private int value;
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param value
+	 *            a syntax type's numerical value
+	 * 
+	 */
 	private SyntaxTypes(final int value) {
 		this.value = value;
 	}
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Returns the syntax types numerical value
+	 * 
+	 * @return the syntax types numerical value
+	 */
 	public int toID() {
 		return value;
 	}
-	
+
+	// --------------------------------------------------------------------------------
 	/**
-	 * Return the corresponding syntax type
+	 * Returns the corresponding syntax type
+	 * 
+	 * @param value
+	 *            the syntax types numerical value
+	 * 
+	 * @return the corresponding syntax type
 	 */
 	public static SyntaxTypes toEnum(final int value) {
 		switch (value) {
@@ -89,7 +115,7 @@ public enum SyntaxTypes {
 			default:
 				throw new IllegalArgumentException("Unknown syntax type.");
 		}
-		
+
 	}
-	
+
 }

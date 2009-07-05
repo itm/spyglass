@@ -8,6 +8,8 @@
  */
 package de.uniluebeck.itm.spyglass.plugin.template;
 
+import java.beans.PropertyChangeEvent;
+
 import org.simpleframework.xml.Element;
 
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
@@ -16,25 +18,26 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * This is the configuration class of plugin TemplatePlugin.
  * 
- * It has (additionally to the ones defined in PluginXMLConfig) one parameter,
- * "someParameter".
+ * It has (additionally to the ones defined in PluginXMLConfig) one parameter, "someParameter".
  * 
- * A note to thread-safety: objects of this class may be used by different threads,
- * so have to put some memory barriers in place to make sure that changes
- * propagate correctly to other threads. In simple cases like this declaring a variable
- * volatile may be sufficient. but as it can be seen in more complex plugins 
- * synchronized blocks may become necessary.
+ * A note to thread-safety: objects of this class may be used by different threads, so have to put
+ * some memory barriers in place to make sure that changes propagate correctly to other threads. In
+ * simple cases like this declaring a variable volatile may be sufficient. but as it can be seen in
+ * more complex plugins synchronized blocks may become necessary.
  * 
  * @author Dariush Forouher
  */
 public class TemplateXMLConfig extends PluginXMLConfig {
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link TemplateXMLConfig#setSomeParameter(int)} yields a change
+	 */
 	public static final String PROPERTYNAME_SOME_PARAMETER = "someParameter";
 
-	@Element(required=false)
+	@Element(required = false)
 	private volatile int someParameter = 42;
 
-	
 	// --------------------------------------------------------------------------------
 	/**
 	 * @return the someParameter
@@ -42,7 +45,6 @@ public class TemplateXMLConfig extends PluginXMLConfig {
 	public int getSomeParameter() {
 		return someParameter;
 	}
-
 
 	// --------------------------------------------------------------------------------
 	/**

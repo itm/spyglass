@@ -18,26 +18,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.graphics.Rectangle;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.util.Tools;
 
 // --------------------------------------------------------------------------------
 /**
  * This Class gives some information about the environment of Spyglass which are static to the
  * process.
- *
+ * 
  * It also servers as an abstract property store, providing some basic file paths.
- *
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class SpyglassEnvironment {
-
-	private static final Logger log = SpyglassLoggerFactory.getLogger(SpyglassEnvironment.class);
 
 	/**
 	 * Name of the property file
@@ -64,7 +60,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Read the properties from file.
-	 *
+	 * 
 	 * Fail early if the file is not readable
 	 */
 	static {
@@ -125,7 +121,7 @@ public class SpyglassEnvironment {
 	/**
 	 * Sets whether Spyglass is running as an iShell plugin<br>
 	 * This should be set before Spyglass is started!
-	 *
+	 * 
 	 * @param isIShellPlugin
 	 *            indicates whether Spyglass is running as an iShell plugin
 	 */
@@ -136,7 +132,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns <code>true</code>, if Spyglass is running as an iShell Plugin
-	 *
+	 * 
 	 * @return <code>true</code>, if Spyglass is running as an iShell Plugin
 	 */
 	public static boolean isIshellPlugin() {
@@ -146,7 +142,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the horizontal size of the main window
-	 *
+	 * 
 	 * @return the horizontal size of the main window
 	 */
 	public static int getWindowSizeX() {
@@ -156,7 +152,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the vertical size of the main window
-	 *
+	 * 
 	 * @return the vertical size of the main window
 	 */
 	public static int getWindowSizeY() {
@@ -166,7 +162,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the horizontal size of the main window
-	 *
+	 * 
 	 * @param size
 	 *            the horizontal size of the main window
 	 * @throws IOException
@@ -179,7 +175,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the vertical size of the main window
-	 *
+	 * 
 	 * @param size
 	 *            the vertical size of the main window
 	 * @throws IOException
@@ -193,7 +189,7 @@ public class SpyglassEnvironment {
 	/**
 	 * Returns the current working directory, which is displayed on file open dialogs for
 	 * configuration files.
-	 *
+	 * 
 	 * @return the current working directory, which is displayed on file open dialogs for
 	 *         configuration files
 	 */
@@ -205,7 +201,7 @@ public class SpyglassEnvironment {
 	/**
 	 * Sets the current working directory, which is displayed on file open dialogs for configuration
 	 * files.
-	 *
+	 * 
 	 * @param path
 	 *            the current working directory, which is displayed on file open dialogs for
 	 *            configuration files
@@ -220,7 +216,7 @@ public class SpyglassEnvironment {
 	/**
 	 * Returns the current working directory, which is displayed on file open dialogs for image
 	 * files.
-	 *
+	 * 
 	 * @return the current working directory, which is displayed on file open dialogs for image
 	 *         files
 	 */
@@ -231,7 +227,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the current working directory, which is displayed on file open dialogs for image files.
-	 *
+	 * 
 	 * @param path
 	 *            the current working directory, which is displayed on file open dialogs for image
 	 *            files
@@ -246,7 +242,7 @@ public class SpyglassEnvironment {
 	/**
 	 * Returns the current working directory, which is displayed on file open dialogs for record
 	 * files.
-	 *
+	 * 
 	 * @return the current working directory, which is displayed on file open dialogs for record
 	 *         files
 	 */
@@ -257,7 +253,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the current working directory, which is displayed on file open dialogs for record files.
-	 *
+	 * 
 	 * @param path
 	 *            the current working directory, which is displayed on file open dialogs for record
 	 *            files
@@ -271,7 +267,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the current drawing area's size
-	 *
+	 * 
 	 * @return the current drawing area's size
 	 */
 	public static Integer getDrawingAreaSize() {
@@ -282,7 +278,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the current drawing area's size
-	 *
+	 * 
 	 * @param size
 	 *            current drawing area's size
 	 * @throws IOException
@@ -295,7 +291,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the object used for affine operation within the drawing area
-	 *
+	 * 
 	 * @return the object used for affine operation within the drawing area
 	 * @see DrawingArea
 	 */
@@ -314,7 +310,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the object used for affine operation within the drawing area
-	 *
+	 * 
 	 * @param at
 	 *            the object used for affine operation within the drawing area
 	 * @throws IOException
@@ -334,7 +330,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the position of the drawing area
-	 *
+	 * 
 	 * @return the position of the drawing area
 	 */
 	public static Rectangle getDrawingAreaPosition() {
@@ -347,7 +343,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Sets the position of the drawing area
-	 *
+	 * 
 	 * @param rect
 	 *            the position of the drawing area
 	 * @throws IOException

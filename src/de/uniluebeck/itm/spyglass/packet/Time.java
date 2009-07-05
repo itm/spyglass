@@ -1,5 +1,15 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.packet;
 
+//--------------------------------------------------------------------------------
 /**
  * Represents the Time of a Spyglass Packet
  * 
@@ -8,13 +18,15 @@ package de.uniluebeck.itm.spyglass.packet;
  */
 public class Time {
 
+	// --------------------------------------------------------------------------------
 	/**
-	 * Constrcutor
+	 * Constructor
 	 */
 	public Time() {
 		// nothing to do
-	};
+	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Constructor
 	 * 
@@ -29,16 +41,19 @@ public class Time {
 		ms_ = ms;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Seconds
 	 */
 	long sec_;
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Milliseconds
 	 */
 	int ms_;
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * @author Nils Glombitza, ITM Uni Luebeck
 	 * @see java.lang.Object#toString()
@@ -48,6 +63,7 @@ public class Time {
 		return "" + sec_ + "." + ms_;
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * Returns the time in milliseconds
 	 * 

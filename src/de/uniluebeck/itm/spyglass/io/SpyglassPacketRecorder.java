@@ -499,7 +499,7 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 		 *         <li><tt>2</tt> if the selection is to be aborted</li>
 		 *         </ul>
 		 */
-		private int checkAppendToPrevFile(final File file) {
+		protected int checkAppendToPrevFile(final File file) {
 			int result = 0;
 
 			// Check if the file already exists and if it differs from the previous chosen one.

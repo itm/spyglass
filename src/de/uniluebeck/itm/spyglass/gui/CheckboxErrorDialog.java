@@ -145,7 +145,7 @@ public class CheckboxErrorDialog extends ErrorDialog {
 			return openError(parent, dialogTitle, message);
 		}
 
-		final String lineSeparator = java.security.AccessController.doPrivileged(new sun.security.action.GetPropertyAction("line.separator"));
+		final String lineSeparator = System.getProperty("line.separator");
 
 		// the tab character '\t' is not supported in this context by all operating systems (e.g.
 		// Microsoft Windows)

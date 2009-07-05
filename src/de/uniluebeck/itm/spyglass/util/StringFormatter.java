@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass.
+ * Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD License.
+ * Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for further
+ * details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.util;
 
 import java.nio.ByteBuffer;
@@ -238,9 +247,8 @@ public class StringFormatter {
 		final Matcher m = notNumeric.matcher(lookIn);
 		if (m.find()) {
 			return m.start();
-		} else {
-			return -1;
 		}
+		return -1;
 	}
 
 	// --------------------------------------------------------------------------------
@@ -274,30 +282,30 @@ public class StringFormatter {
 		return resultString;
 	}
 
-	/**
-	 * Main method for testing
-	 * 
-	 * @param args
-	 *            an array of arguments
-	 */
-	public static void main(final String[] args) {
-		// final StringFormatter test = new StringFormatter("Temp: %u5\nBattery %U1%");
-		// final StringFormatter test = new StringFormatter("Temp: %u5 Battery %u1");
-		final StringFormatter test = new StringFormatter(
-				"Wert 1 (uint8): %u0, Wert 2 (uint32): %U4, Wert 3 (int16): %i8, Wert 4 (float): %f10 und noch Text");
-		// final StringFormatter test = new StringFormatter("");
-		final SpyglassPacket packet = new SpyglassPacket();
-
-		final byte[] content = { -128, 0, 0, 0, -1, -1, -1, -1, -128, 0, 65, -109, 51, 51 };
-		// final byte[] content = { -128, 0, 0, 0, -1, -1, -1, -1, -128, 0, 65 };
-		// final byte[] content = { 0, -2, -1, -1, -1, -1, 49, 0, 0, 10 };
-		// packet.setPayload(content);
-		final String result = test.parse(packet);
-		if (result.equalsIgnoreCase("")) {
-			System.out.println("<leer>");
-		} else {
-			System.out.println(result);
-		}
-	}
+	// /**
+	// * Main method for testing
+	// *
+	// * @param args
+	// * an array of arguments
+	// */
+	// public static void main(final String[] args) {
+	// // final StringFormatter test = new StringFormatter("Temp: %u5\nBattery %U1%");
+	// // final StringFormatter test = new StringFormatter("Temp: %u5 Battery %u1");
+	// final StringFormatter test = new StringFormatter(
+	// "Wert 1 (uint8): %u0, Wert 2 (uint32): %U4, Wert 3 (int16): %i8, Wert 4 (float): %f10 und noch Text");
+	// // final StringFormatter test = new StringFormatter("");
+	// final SpyglassPacket packet = new SpyglassPacket();
+	//
+	// final byte[] content = { -128, 0, 0, 0, -1, -1, -1, -1, -128, 0, 65, -109, 51, 51 };
+	// // final byte[] content = { -128, 0, 0, 0, -1, -1, -1, -1, -128, 0, 65 };
+	// // final byte[] content = { 0, -2, -1, -1, -1, -1, 49, 0, 0, 10 };
+	// // packet.setPayload(content);
+	// final String result = test.parse(packet);
+	// if (result.equalsIgnoreCase("")) {
+	// System.out.println("<leer>");
+	// } else {
+	// System.out.println(result);
+	// }
+	// }
 
 }

@@ -272,6 +272,9 @@ public class SGIStringFormatter {
 	 *            the data binding context
 	 * @param statisticalInformationEvaluators
 	 *            a set containing the statistical information evaluators
+	 * @param setChangeListener
+	 *            a listener which listen to changes of the set of statistical information
+	 *            evaluators
 	 */
 	public void connectTableWithData(final DataBindingContext dbc, final Set<StatisticalInformationEvaluator> statisticalInformationEvaluators,
 			final ISetChangeListener setChangeListener) {
