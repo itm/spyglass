@@ -8,6 +8,7 @@
  */
 package de.uniluebeck.itm.spyglass.xmlconfig;
 
+import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
 
 import org.simpleframework.xml.Element;
@@ -24,16 +25,41 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
  */
 public abstract class PluginXMLConfig extends XMLConfig {
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link PluginXMLConfig#setSemanticTypes(int[])} yields a change
+	 */
 	public static final String PROPERTYNAME_SEMANTIC_TYPES = "semanticTypes";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link PluginXMLConfig#setTimeout(int)} yields a change
+	 */
 	public static final String PROPERTYNAME_TIMEOUT = "timeout";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link PluginXMLConfig#setName(String)} yields a change
+	 */
 	public static final String PROPERTYNAME_NAME = "name";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link PluginXMLConfig#setVisible(boolean)} yields a change
+	 */
 	public static final String PROPERTYNAME_VISIBLE = "visible";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired whenever the call of
+	 * {@link PluginXMLConfig#setActive(boolean)} yields a change
+	 */
 	public static final String PROPERTYNAME_ACTIVE = "active";
 
+	/**
+	 * The name of a {@link PropertyChangeEvent} which is fired when the call of
+	 * {@link PluginXMLConfig#setSemanticTypes(int[])} yields a change which makes the plug-in to
+	 * listen to all semantic types
+	 */
 	public static final String PROPERTYNAME_ALL_SEMANTIC_TYPES = "allSemanticTypes";
 
 	@Element(name = PROPERTYNAME_ACTIVE, required = false)
@@ -179,6 +205,7 @@ public abstract class PluginXMLConfig extends XMLConfig {
 		Arrays.sort(semanticTypes);
 		if (Arrays.binarySearch(semanticTypes, -1) >= 0) {
 			this.semanticTypes = new int[] { -1 };
+			firePropertyChange(PROPERTYNAME_ALL_SEMANTIC_TYPES, oldvalue, this.semanticTypes);
 		} else {
 			this.semanticTypes = semanticTypes.clone();
 		}
@@ -196,7 +223,6 @@ public abstract class PluginXMLConfig extends XMLConfig {
 	public synchronized boolean isAllSemanticTypes() {
 		return (semanticTypes.length == 1) && (semanticTypes[0] == -1);
 	}
-
 
 	@Override
 	public final PluginXMLConfig clone() {
