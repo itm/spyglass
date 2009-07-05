@@ -19,7 +19,7 @@ the numbering of the bytes of a packet starts with 0.
       \hline
       2 & uint8 & version & currently fixed to ``2'' \\
       \hline
-      3 & uint8 & syntaxtype &  0 = std \newline
+      3 & uint8 & syntax type &  0 = std \newline
 				1 = uint8List \newline
 				2 = uInt16List \newline
 				3 = Int16List \newline
@@ -42,7 +42,7 @@ the numbering of the bytes of a packet starts with 0.
       \hline
       17, 18 & int16 & z-coordinate of senders position & \\
     \end{tabular}
-    \caption{SpyGlass packetheader}
+    \caption{SpyGlass packet header}
     \label{packet_header}
   \end{center}
 \end{table}
@@ -53,11 +53,11 @@ the numbering of the bytes of a packet starts with 0.
 \label{packet_types}
 
 \subsection{Neighborhood-Packet}
-\label{subsection:neighbourhood_packet}
+\label{subsection:neighborhood_packet}
 
 The payload of a Neighborhood-Packet contains a list of uint16 values which represents a list of node IDs.
-Its syntaxtype is consequently ``uint16List''. The list must neither contain a node ID twice, nor the node
-ID of the sender itself. See an overview on the payload in table \ref{neighbourhood_packet_payload}.
+Its syntax type is consequently ``uint16List''. The list must neither contain a node ID twice, nor the node
+ID of the sender itself. See an overview on the payload in table \ref{neighborhood_packet_payload}.
 
 \begin{table}[htdp]
   \begin{center}
@@ -73,17 +73,17 @@ ID of the sender itself. See an overview on the payload in table \ref{neighbourh
       \hline
       ... & ... & ... \\
     \end{tabular}
-    \caption{Payload of a Neighbourhood-Packet}
-    \label{neighbourhood_packet_payload}
+    \caption{Payload of a Neighborhood-Packet}
+    \label{neighborhood_packet_payload}
   \end{center}
 \end{table}
 
 \subsection{Coordinates-List-Packet-2}
-\label{subsection:coordiantes-list-packet-2}
+\label{subsection:coordinates-list-packet-2}
 
-A Coordinates-List-Packet-2 contains a payload, which consists of a list of 2-dimensional coordiantes. Each coordinate is
-represented by an int16 value. Thus a 2-dimensional position needs two values and consequently the payload must have a lenght
-of a multiple of four bytes. Obviuosly its syntaxtype is ``int16List''. A tabular overview is given in table
+A Coordinates-List-Packet-2 contains a payload, which consists of a list of 2-dimensional coordinates. Each coordinate is
+represented by an int16 value. Thus a 2-dimensional position needs two values and consequently the payload must have a length
+of a multiple of four bytes. Obviously, its syntax type is ``int16List''. A tabular overview is given in table
 \ref{coordinates_list_packet_2_payload}.
 
 \begin{table}[htdp]
@@ -113,11 +113,11 @@ of a multiple of four bytes. Obviuosly its syntaxtype is ``int16List''. A tabula
 
 
 \subsection{Coordinates-List-Packet-3}
-\label{subsection:coordiantes-list-packet-3}
+\label{subsection:coordinates-list-packet-3}
 
 A Coordinates-List-Packet-3 is very similar to a Coordinates-List-2-Packet. The only difference is the dimensionality, because
 this packet contains positions with three dimensions instead of 2. As each coordinate is represented by an int16 value and
-a 3-dimensional position needs three values, the payload must have a lenght of a multiple of six bytes. The syntaxtype is
+a 3-dimensional position needs three values, the payload must have a length of a multiple of six bytes. The syntax type is
 ``int16List''. See table \ref{coordinates_list_packet_3_payload} for further details.
 
 \begin{table}[htdp]
@@ -150,8 +150,8 @@ a 3-dimensional position needs three values, the payload must have a lenght of a
 
 The payload of Trajectory-Packet-2 represents the way of an object via several 2-dimensional positions and the time it needs
 to come from one position to the next. So the payload contains a list of tuples, where the first two elements of each tuple
-represents a position. The third element represents the time in seconds, that the object spends between the position given 
-before and the next position. Although the syntaxtype is ``int16List'' and all elements are of type int16, the time
+represents a position. The third element represents the time in seconds, that the object spends between the position given
+before and the next position. Although the syntax type is ``int16List'' and all elements are of type int16, the time
 element must not contain negative values.
 
 Since the last position specifies the ending point, the last tuple is incomplete. It contains only the two elements
@@ -194,9 +194,9 @@ representing the position. Table \ref{trajectory_packet_2_payload} shows the con
 
 The payload of a Trajectory-Packet-3 is very similar to a Trajectory-Packet-2. The only difference is, that the positions
 are not given in 2D but in 3D. Thus each position consists of three coordinates. Between two positions the payload contains
-the duration, the objects needs to pass the way from one position to the next.  
+the duration, the objects needs to pass the way from one position to the next.
 
-The syntaxtype is ``int16List''. The duration value must be given in seconds und mus not contain a negative number
+The syntax type is ``int16List''. The duration value must be given in seconds and must not contain a negative number
 even though it is an int16 field. See table \ref{trajectory_packet_3_payload} for more details.
 
 \begin{table}[htdp]
@@ -240,7 +240,6 @@ even though it is an int16 field. See table \ref{trajectory_packet_3_payload} fo
 \subsection{Data-Packet}
 \label{subsection:datapacket}
 
-A Data-Packets payload contains arbitrary data. Its syntaxtype is flexible but must be defined in the header of the packet.
-The possible syntaxtypes are ``uint8List'', ``uint16List'', int16List``, ''uint32List``, ''int64List`` and ''floatList``.
-The length of the payload depends on the syntaxtype.
-	
+A Data-Packets payload contains arbitrary data. Its syntax type is flexible but must be defined in the header of the packet.
+The possible syntax types are ``uint8List'', ``uint16List'', int16List``, ''uint32List``, ''int64List`` and ''floatList``.
+The length of the payload depends on the syntax type.

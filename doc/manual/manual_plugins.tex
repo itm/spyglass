@@ -30,7 +30,7 @@ a \%, it must be masked as \%\%. A line break must be masked as \\n.
   \end{center}
 \end{table}
 
-In a packet a signed 16 bit integer must be provided in two's complement, while a float value must be given comform to norm
+In a packet a signed 16 bit integer must be provided in two's complement, while a float value must be given conform to norm
 IEEE 754 (IEEE Standard for Binary Floating-Point Arithmetic for microprocessor systems (ANSI/IEEE Std 754-1985)).
 
 In the following an example is given. Assume a packet with the following content (encoded in hexadecimal):
@@ -59,16 +59,16 @@ would result into the following String:
 \subsection{General information about plugins}
 
 Each plugin defines a specific functionality. To use this functionality one must create instances of the plugin.
-Some plugins do some background computing (e.g. PositionPacketNodePositioner), while others display someting
+Some plugins do some background computing (e.g. PositionPacketNodePositioner), while others display something
 on the screen (e.g. SimpleNodePainter).
 
 Usually there will be more than one visible instance to be displayed on the screen. Thus, one needs to define a ranking,
-which instance should be diplayed on top of another. So some content of an instance in the background might be hidden
+which instance should be displayed on top of another. So some content of an instance in the background might be hidden
 by content of another instance. This is done in the
 Plugin overview of the SpyGlass preference dialog (see \ref{subsection:pluginoverview}).
 
 But there is also another advantage for the existence of this ranking. Some plugins may provide actions, if the user
-clicks on an object on the screen, e.g. the NodePainter opens or closes an extended view when the doubleclicks on
+clicks on an object on the screen, e.g. the NodePainter opens or closes an extended view when the double-clicks on
 the node. It is always the topmost plugin instance that can handle those events, that catches the command and indeed
 handles the event. Since currently only the NodePainter handles events, this feature is more or less for
 future use.
@@ -78,7 +78,7 @@ future use.
 \subsubsection{General preferences}
 \label{section:generalpreferences}
 
-On the page for general preferences (see \ref{pic:generalpreferences}) one must befine basic values especially for the
+On the page for general preferences (see \ref{pic:generalpreferences}) one must define basic values especially for the
 relation between the position that
 the nodes send and their position on the screen. The unit of length is the unit that will be displayed on the
 preference pages of all plugins where parameters concerning any height or width must be set. It has no semantic effect, since
@@ -109,15 +109,15 @@ The button to restore the defaults sets all values to predefined default values.
 and 0 for the offset in both dimensions.
 
 The metric of time values are not used anywhere yet. So they are for future use. All values with respect to time have predefined
-timeunits in all current plugins.
+time units in all current plugins.
 
 \subsubsection{Basic preferences for all plugins}
 There is a group of basic preferences which must be configured for all plugin instances. This is the instances name,
 at least one semantic type (if the plugin computes packages), the activity status and the visibility.
 
 The name is used to reference to the instance, e.g. in dialog windows. The semantic types define, which packets
-will be delivered to this instance. ``-1'' means, that the instance will receive all packets indepently from the
-semantic type. One can define a comma sperated list of semantic types, a range or a combination of both, e.g.
+will be delivered to this instance. ``-1'' means, that the instance will receive all packets independently from the
+semantic type. One can define a comma separated list of semantic types, a range or a combination of both, e.g.
 ``3-5,8'' is the same as ``3,4,5,8''.
 
 If an instance is not able to compute a packet, because the payload is not
@@ -153,7 +153,7 @@ user about the mistake.
 Each plugin instance gets its own entry in the plugin tree of the preference dialog window. Here one can either delete
 the instance or change its configuration. If the button ``apply'' is pressed, then the new configuration will be
 activated. If one made a mistake while changing the configuration, the old values can be restored with the button
-``retore values'' until ``apply'' has been pressed.
+``restore values'' until ``apply'' has been pressed.
 
 \begin{figure}[htb]
   \begin{center}
@@ -189,12 +189,12 @@ should be on the bottom of this list in most cases. To change an
 instances position one must simply select the instance and click on ``Up'' or ``Down''.
 
 The button ``Reset instance'' sets all values of the selected instance to the default values which can be defined on the
-plugins specific page for instance creation. ``Delete instance'' deletes the selected instance unrecoverably.
+plugins specific page for instance creation. ``Delete instance'' deletes the selected instance irrecoverably.
 
 The next two buttons are to change the status of an instance. There labels change automatically on demand.
 
 \newpage
-\section{Nodepainter}
+\section{NodePainter}
 
 \subsection{SimpleNodePainter}
 
@@ -226,7 +226,7 @@ extended mode while the speed and the temp values are specific to a semantic typ
   \end{center}
 \end{figure}
 
-It is possible to switch between the display modes with a doubleclick on the node. If a node is in front of another and one
+It is possible to switch between the display modes with a double-click on the node. If a node is in front of another and one
 wants to bring the node from the background to the foreground, this can be done with a right-mouse-button-click on
 the area of the node in the background. This includes the hidden area of the background node.
 In case there is more than one button in the background of another, this click will
@@ -237,7 +237,7 @@ NodePositioner provides. This can be either an instance of the PositionPacketNod
 Both are described in the following chapter.
 
 \newpage
-\section{Nodepositioner}
+\section{NodePositioner}
 
 A NodePositioner collects and provides the information about the current positions of the nodes in the network. Every incoming
 packet will be forwarded to the active NodePositioner instance. This instance grabs the nodes ID, its current position and
@@ -249,7 +249,7 @@ of the instance. On the preference page one can decide, whether the instance is 
 active instance of the NodePositioner plugin, the current instance will be deactivated, when another instance is activated.
 The option ``visible'' cannot be set or changed since the plugin instance does not display anything anyway.
 
-There are two types of the NodePositioner plugin which are discribed in the following chapters \ref{subsection:ppnp} and
+There are two types of the NodePositioner plugin which are described in the following chapters \ref{subsection:ppnp} and
 \ref{subsection:sep}.
 
 \subsection{PositionPacketNodePositioner}
@@ -275,7 +275,7 @@ for the PositionPacketNodePositioner
 
 The SpringEmbedderPositioner does not provide absolute positions of the nodes. Instead of absolute positions
 a SpringEmbedderPositioner orders the nodes in such a way, that
-nodes being in a neighbourhood relationship attract each other while the others repulse. For this reason
+nodes being in a neighborhood relationship attract each other while the others repulse. For this reason
 the positions change dynamically.
 
 All attraction and repulsion forces are being computed for all nodes in the network one after another
@@ -304,11 +304,11 @@ which is longer than this time-to-live-interval, it will be removed.
   \end{center}
 \end{figure}
 
-The most important value is/are the semantic type(s) of the packets, that provide the neighbourhood information.
-If a node sends such a neighbourhood packet (see chapter \ref{subsection:neighbourhood_packet}), it will be
-attracted by all its neighbours contained in the packets payload. This does not include the reverse, so a sender of the
-packet does not attract all its neighbours. A node A is only being attracted by another node B, if node A is contained
-in a neighbourhood packet sent by node B.
+The most important value is/are the semantic type(s) of the packets, that provide the neighborhood information.
+If a node sends such a neighborhood packet (see chapter \ref{subsection:neighborhood_packet}), it will be
+attracted by all its neighbors contained in the packets payload. This does not include the reverse, so a sender of the
+packet does not attract all its neighbors. A node A is only being attracted by another node B, if node A is contained
+in a neighborhood packet sent by node B.
 
 The other configuration values are algorithm specific. The optimum spring length represents the distance, where the
 attraction force between to nodes comes into a resting state. The spring stiffness defines, how fast the positions
@@ -318,9 +318,9 @@ The repulsion factor defines the dimension of repulsion between all nodes, while
 the speed of the nodes movement. It must be greater than 0 and not greater than 1. Since these values are very
 network specific, they should be fitted to the current requirements on demand.
 
-The example given in figure \ref{pic:sep} bases on a network where nodes 1,2 and 3 have a neighbourhood relationship
+The example given in figure \ref{pic:sep} bases on a network where nodes 1,2 and 3 have a neighborhood relationship
 to the node 100 and vice versa. This is also true for 1 and 10-19, 2 and 20-29 and 3 and 30-39. Thus e.g. node 100 has
-three neighbours, node 2 has 11 neighbours and node 20 has one neighbour. The figure shows the final resting
+three neighbors, node 2 has 11 neighbors and node 20 has one neighbor. The figure shows the final resting
 position of the nodes. Actually there is no resting position since the algorithm for repositioning the nodes
 never comes to an end. But the changes decrease as longer the algorithm runs.
 
@@ -341,12 +341,12 @@ can be stopped. If a plugin needs metrical information or not is described in th
 
 
 
-\section{Relationpainter}
+\section{RelationPainter}
 
 \subsection{LinePainter}
 
-The LinePainter generally spoken draws a line between two nodes. The LinePainter needs DataPackets containg a uint16 value
-at the beginning. This uint16 value defines the neighbour where the line must be drawn to. All following payload starting
+The LinePainter generally spoken draws a line between two nodes. The LinePainter needs DataPackets containing a uint16 value
+at the beginning. This uint16 value defines the neighbor where the line must be drawn to. All following payload starting
 at byte 22 (respectively offset 21) of the packet is arbitrary data and can be displayed using
 StringFormatter expressions.
 
@@ -365,7 +365,7 @@ configuration.
 \end{figure}
 
 As one can see, the strings generated by the StringFormatter expressions are being displayed next to the
-sender and above the line between the sender and its neighbour.
+sender and above the line between the sender and its neighbor.
 
 \begin{figure}[htb]
   \begin{center}
@@ -381,8 +381,8 @@ The LinePainter does not need metric positions. It simply draws a line between t
 
 A VectorSequencePainter instance draws a sequence of lines. These lines are completely independent from
 node positions but could be drawn between arbitrary points. The starting point, edges and endpoint are given
-as coordinates via the payload of a Coordinates-List-Packet-2 (see \ref{subsection:coordiantes-list-packet-2}) or
-a Coordinates-List-Packet-3 (see \ref{subsection:coordiantes-list-packet-3}).
+as coordinates via the payload of a Coordinates-List-Packet-2 (see \ref{subsection:coordinates-list-packet-2}) or
+a Coordinates-List-Packet-3 (see \ref{subsection:coordinates-list-packet-3}).
 
 This dimensionality of the semantic types, the instance is registered for, must be configured in the preference page
 which is shown in figure \ref{pic:vsp_preferences}. All of these semantic types for an instance must have
@@ -409,13 +409,13 @@ sending node. In this example the data for the line sequence was sent by node 15
   \end{center}
 \end{figure}
 
-The VectorSequencePainter supports metric, since the starting- and endingpoints of the lines are
+The VectorSequencePainter supports metric, since the starting and ending points of the lines are
 given in coordinates with respect to the actual positions in the real world. An instance of the VectorSequencePainter can not
 be active while a SpringEmbedderPositioner instance is active as well. Thus it will be deactivated automatically when a
 SpringEmbedderPositioner instance is getting active.
 
 \newpage
-\section{Backgroundpainter}
+\section{BackgroundPainter}
 
 \subsection{GridPainter}
 
@@ -453,11 +453,11 @@ on the preference page.
 
 \subsection{ImagePainter}
 
-The ImagePainter is to draw an image on the background. This might be an arbitrary image from the local filesystem.
+The ImagePainter is to draw an image on the background. This might be an arbitrary image from the local file system.
 Supported images types are ``jpg'', ``gif'' and ``png''. See the preference page in figure \ref{pic:ip_preferences}.
 
 The position is set by setting the lower left point in absolute coordinates. The image can be resized either
-independently per dimensionor with keeping the proportions automatically when changing the value for one dimension.
+independently per dimension or with keeping the proportions automatically when changing the value for one dimension.
 
 \begin{figure}[htb]
   \begin{center}
@@ -502,12 +502,12 @@ Assume the maximum value is associated with black and the minimum value is assoc
 value close to but lower than the maximum value will be associated with a dark grey, while a value close to
 but higher than the minimum value will be associated with a bright grey.
 
-For each rectangle of the map, the appropriate value is computed by identifying the k nearest neighbours,
+For each rectangle of the map, the appropriate value is computed by identifying the k nearest neighbors,
 i.e. the k nearest positions, where a measured value is known and calculate the mean of these k values.
 
-Each map has framepoints. Framepoints are invisible points on the maps border, that behave like nodes with
-a fixed position and measured data. The positions of the framepoints are uniformly distributed on the frame, thus
-per dimension the distance between neighboured framepoints is equal. Each framepoint provides the
+Each map has frame points. Frame points are invisible points on the maps border, that behave like nodes with
+a fixed position and measured data. The positions of the frame points are uniformly distributed on the frame, thus
+per dimension the distance between neighbored frame points is equal. Each frame point provides the
 default value. The update frequency defines how often the map is being recomputed per second. As the algorithm
 to recalculate all the values is computational expensive, the actual update frequency could be slower than the
 configured.
@@ -588,7 +588,7 @@ The drawing options must be set below. At first one can resize the image either 
 setting width and height independently. The trajectory is the way the object takes on the screen. This way
 can be drawn on the screen with the specified color.
 
-The trajectory is given by the payload of a Trajectory-Packet. This can either contain 2D or 3D coordiantes discribing
+The trajectory is given by the payload of a Trajectory-Packet. This can either contain 2D or 3D coordinates discribing
 the way of the object. The packets are explained in the chapters \ref{subsection:trajectory2d} and
 \ref{subsection:trajectory3d}. All semantic types the plugin instance is registered for, must be of the same type.
 To mix both trajectory types in one network, one must define at least two ObjectPainter instances. Anyway in case of
@@ -630,8 +630,8 @@ This values will always be shown and can not be configured.
 
 The display of some standard information can be directly activated by selecting the appropriate box at the bottom
 of the preference page (see \ref{pic:sgi_preferences}). These standard informations are the number of nodes in the
-network and the average node degree, i.e. the mean number of neighbours. For this reason there must be one or more semantic
-type(s) defined, that contain the neighbourhood information (see \ref{subsection:neighbourhood_packet}).
+network and the average node degree, i.e. the mean number of neighbors. For this reason there must be one or more semantic
+type(s) defined, that contain the neighborhood information (see \ref{subsection:neighborhood_packet}).
 
 \begin{figure}[htb]
   \begin{center}
