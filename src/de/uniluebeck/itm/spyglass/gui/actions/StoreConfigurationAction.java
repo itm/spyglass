@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.actions;
 
 import java.io.File;
@@ -42,7 +51,7 @@ public class StoreConfigurationAction extends Action {
 				try {
 					ret = file.createNewFile();
 				} catch (final IOException e) {
-					log.error("",e);
+					log.error("", e);
 				} finally {
 					if (!ret) {
 						log.error("Could not create file!");
@@ -63,7 +72,7 @@ public class StoreConfigurationAction extends Action {
 			try {
 				SpyglassEnvironment.setConfigFileWorkingDirectory(file.getParent());
 			} catch (final IOException e) {
-				log.error("Could not store the new config path in my property file.",e);
+				log.error("Could not store the new config path in my property file.", e);
 			}
 
 		}

@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.actions;
 
 import java.util.Timer;
@@ -32,10 +41,8 @@ public class ZoomAction extends Action implements IPropertyChangeListener {
 	 */
 	private final static int ZOOM_PERIOD = 100;
 
-
 	public enum Type {
-		ZOOM_IN,
-		ZOOM_OUT
+		ZOOM_IN, ZOOM_OUT
 	}
 
 	private final DrawingArea drawingArea;
@@ -84,7 +91,6 @@ public class ZoomAction extends Action implements IPropertyChangeListener {
 		this.addPropertyChangeListener(this);
 	}
 
-
 	@Override
 	public void run() {
 
@@ -123,8 +129,11 @@ public class ZoomAction extends Action implements IPropertyChangeListener {
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.
+	 * PropertyChangeEvent)
 	 */
 	@Override
 	public void propertyChange(final PropertyChangeEvent event) {

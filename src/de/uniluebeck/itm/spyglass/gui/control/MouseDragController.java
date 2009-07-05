@@ -1,6 +1,11 @@
-// --------------------------------------------------------------------------------
-/**
- *
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui.control;
 
@@ -14,9 +19,9 @@ import de.uniluebeck.itm.spyglass.positions.PixelPosition;
 // --------------------------------------------------------------------------------
 /**
  * Listens to Mouse Drag events from the DrawingArea and moves the visible area accordingly.
- *
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class MouseDragController implements MouseListener, MouseMoveListener {
 
@@ -32,29 +37,38 @@ public class MouseDragController implements MouseListener, MouseMoveListener {
 	 */
 	private PixelPosition mouseDragStartPosition = null;
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param drawingArea
+	 *            the drawing area
+	 */
 	public MouseDragController(final DrawingArea drawingArea) {
 		this.drawingArea = drawingArea;
 		drawingArea.addMouseListener(this);
 		drawingArea.addMouseMoveListener(this);
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void mouseDown(final MouseEvent e) {
 		mouseDragInProgress = true;
 		mouseDragStartPosition = new PixelPosition(e.x, e.y);
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void mouseUp(final MouseEvent arg0) {
 		mouseDragInProgress = false;
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void mouseMove(final MouseEvent arg0) {
 
 		// if a movement is in progress, update the drawing area by
-		// appling the current
-		// delta.
+		// applying the current delta.
 		if (mouseDragInProgress) {
 
 			final PixelPosition mouseDragStopPosition = new PixelPosition(arg0.x, arg0.y);
@@ -70,13 +84,14 @@ public class MouseDragController implements MouseListener, MouseMoveListener {
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
 	 */
 	@Override
 	public void mouseDoubleClick(final MouseEvent e) {
 		//
-
 	}
 
 }

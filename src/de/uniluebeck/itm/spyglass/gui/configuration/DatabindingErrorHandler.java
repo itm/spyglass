@@ -1,6 +1,11 @@
-// --------------------------------------------------------------------------------
-/**
- *
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
@@ -39,9 +44,9 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * Displays validation errors as balloon tooltips at widgets.
- *
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class DatabindingErrorHandler implements IValueChangeListener, DisposeListener, ControlListener, IListChangeListener {
 
@@ -57,11 +62,17 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 
 	// --------------------------------------------------------------------------------
 	/**
-	 *
+	 * Constructor
+	 * 
 	 * @param dbc
+	 *            the data binding context
+	 * @param aggregateStatus
+	 *            class to be used to aggregate status values from a data binding context into a
+	 *            single status value
 	 * @param shell
+	 *            the shell to be used
 	 */
-	public DatabindingErrorHandler(final DataBindingContext dbc,final AggregateValidationStatus aggregateStatus, final Shell shell) {
+	public DatabindingErrorHandler(final DataBindingContext dbc, final AggregateValidationStatus aggregateStatus, final Shell shell) {
 		this.dbc = dbc;
 		this.shell = shell;
 
@@ -73,8 +84,12 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.databinding.observable.value.IValueChangeListener#handleValueChange(org.eclipse.core.databinding.observable.value.ValueChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.databinding.observable.value.IValueChangeListener#handleValueChange(org.
+	 * eclipse.core.databinding.observable.value.ValueChangeEvent)
 	 */
 	@Override
 	public void handleValueChange(final ValueChangeEvent event) {
@@ -111,23 +126,23 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 
 	}
 
-
+	// --------------------------------------------------------------------------------
 	private void updateToolTip(final Status status, final Control c) {
 		ToolTip tip = tipMap.get(c);
 
 		// destroy the tip if the severity changed.
 		if ((tip != null) && (tipStatus.get(tip) != status.getSeverity())) {
-			log.debug("Content of widget "+c+" changed: "+status, status.getException());
+			log.debug("Content of widget " + c + " changed: " + status, status.getException());
 			destroyToolTip(c, tip);
 			tip = null;
 		}
 
 		// only display errors. others are too complicated at the moment
 		if (status.getSeverity() == IStatus.ERROR) {
-			log.debug("Content of widget "+c+" became bad: "+status, status.getException());
+			log.debug("Content of widget " + c + " became bad: " + status, status.getException());
 
 			if (tip == null) {
-				tip = createNewToolTip(c,status.getSeverity());
+				tip = createNewToolTip(c, status.getSeverity());
 			}
 			tip.setVisible(false);
 			tip.setMessage(status.getMessage());
@@ -136,6 +151,7 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	private void destroyToolTip(final Control c, final ToolTip tip) {
 		tip.setVisible(false);
 		tip.dispose();
@@ -146,6 +162,7 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	private ToolTip createNewToolTip(final Control c, final int severity) {
 		ToolTip tip;
 		int flags = SWT.BALLOON;
@@ -167,7 +184,7 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 		// register control listener to all parent composites.
 		// this way we get notified if we need to move the balloon.
 		Composite parent = c.getParent();
-		while(parent != null) {
+		while (parent != null) {
 			parent.addControlListener(this);
 			parent = parent.getParent();
 		}
@@ -187,37 +204,42 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 		return tip;
 	}
 
-
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
 	 */
 	@Override
 	public void widgetDisposed(final DisposeEvent e) {
 		final ToolTip tip = tipMap.get(e.widget);
 		if (tip != null) {
-			destroyToolTip((Control)e.widget, tip);
+			destroyToolTip((Control) e.widget, tip);
 		}
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.swt.events.ControlListener#controlMoved(org.eclipse.swt.events.ControlEvent)
 	 */
 	@Override
 	public void controlMoved(final ControlEvent e) {
-		for(final Control c: tipMap.keySet()) {
+		for (final Control c : tipMap.keySet()) {
 			final ToolTip tip = tipMap.get(c);
 			updatePosition(c, tip);
 		}
 
 	}
 
+	// --------------------------------------------------------------------------------
 	private void updatePosition(final Control c, final ToolTip tip) {
 		final Point newPosition = Display.getCurrent().map(c, null, c.getSize().x, c.getSize().y);
 		final Point oldPosition = tipPos.get(tip);
 		if (!newPosition.equals(oldPosition)) {
-			log.debug("Moved tooltop for control "+c);
+			log.debug("Moved tooltop for control " + c);
 			tip.setVisible(false);
 			tip.setLocation(newPosition);
 			tip.setAutoHide(false);
@@ -227,8 +249,11 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.events.ControlListener#controlResized(org.eclipse.swt.events.ControlEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.ControlListener#controlResized(org.eclipse.swt.events.ControlEvent)
 	 */
 	@Override
 	public void controlResized(final ControlEvent e) {
@@ -236,15 +261,19 @@ public class DatabindingErrorHandler implements IValueChangeListener, DisposeLis
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.databinding.observable.list.IListChangeListener#handleListChange(org.eclipse.core.databinding.observable.list.ListChangeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.core.databinding.observable.list.IListChangeListener#handleListChange(org.eclipse
+	 * .core.databinding.observable.list.ListChangeEvent)
 	 */
 	@Override
 	public void handleListChange(final ListChangeEvent event) {
 
 		// if a binding gets disposed while it contains a validation error, we have to notice this
 		// to remove the information bubble
-		for(final ListDiffEntry e: event.diff.getDifferences()) {
+		for (final ListDiffEntry e : event.diff.getDifferences()) {
 			if (!e.isAddition()) {
 				final Binding b = (Binding) e.getElement();
 				if (b.getTarget() instanceof ISWTObservable) {

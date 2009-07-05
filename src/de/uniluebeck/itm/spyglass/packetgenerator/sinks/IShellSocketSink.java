@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.packetgenerator.sinks;
 
 import java.io.IOException;
@@ -25,75 +34,75 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * 
  */
 public class IShellSocketSink extends Sink {
-	
+
 	private static Logger log = SpyglassLoggerFactory.getLogger(IShellSocketSink.class);
-	
+
 	/**
 	 * Magic byte for the iShell communication protocol.
 	 */
 	private final byte PROTOCOL_MAGIC_STX = 0x02;
-	
+
 	/**
 	 * Magic byte for the iShell communication protocol.
 	 */
 	private final byte PROTOCOL_MAGIC_ETX = 0x03;
-	
+
 	/**
 	 * Magic byte for the iShell communication protocol.
 	 */
 	private final byte PROTOCOL_MAGIC_DLE = 0x10;
-	
+
 	/**
 	 * The packet type designated to spyglass packets.
 	 */
 	private final byte ISHELL_PACKET_TYPE_SPYGLASS = (byte) 0x91;
-	
+
 	/**
 	 * The packet type designated to spyglass packets.
 	 */
 	private final byte PROTOCOL_MAGIC_MESSAGE_TYPE = (byte) 0x0;
-	
+
 	/**
 	 * 
 	 * The interfaces to bind on (0.0.0.0) for all ifs.
 	 */
 	@Element
 	private String ip;
-	
+
 	/**
 	 * The port to bind on
 	 */
 	@Element
 	private int port;
-	
+
 	/**
 	 * The source node, from which the packet comes from. Note that this node ID is only used by
 	 * iShell is of no interest to Spyglass.
 	 */
 	@Element
 	private final short iShellSourceNode = 1;
-	
+
 	/**
 	 * The listenSocket.
 	 */
 	private ServerSocket listenSocket;
-	
+
 	/**
 	 * List of all currently connected clients on the socket. serialized since the socketlistener
 	 * may add new clients to this list asynchronously.
 	 */
 	private final List<Socket> clients = Collections.synchronizedList(new ArrayList<Socket>());
-	
+
 	/**
 	 * Reference to the listenerThread.
 	 */
 	private Thread listenerThread;
-	
+
 	/**
 	 * true as long as the socket shall remain open.
 	 */
 	private volatile boolean alive = true;
-	
+
 	/**
 	 * This Thread listens on the socket and opens connections to new clients if they arrive.
 	 * 
@@ -101,15 +110,16 @@ public class IShellSocketSink extends Sink {
 	 * 
 	 */
 	private class SocketListener extends Thread {
-		
+
 		public SocketListener() {
 			this.setName("PacketGenerator.IShellSocketSink");
 		}
-		
+
+		@SuppressWarnings("synthetic-access")
 		@Override
 		public void run() {
 			log.info("Server listening at port " + port);
-			
+
 			while (alive) {
 				try {
 					final Socket clientSocket = listenSocket.accept();
@@ -127,7 +137,7 @@ public class IShellSocketSink extends Sink {
 			log.info("SockenListener Thread terminated.");
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -135,11 +145,11 @@ public class IShellSocketSink extends Sink {
 	 */
 	@Override
 	public void sendPacket(final byte[] packet) throws Exception {
-		
+
 		if (this.clients.size() > 0) {
-			//log.debug("Sending a packet...");
+			// log.debug("Sending a packet...");
 		}
-		
+
 		// Iterate over all clients and send each the packet.
 		synchronized (clients) {
 			final Iterator<Socket> it = this.clients.iterator();
@@ -154,7 +164,7 @@ public class IShellSocketSink extends Sink {
 			}
 		}
 	}
-	
+
 	/**
 	 * Takes a Paket and sends it over the given Socket. Before sending the packet is wrapped in
 	 * another packet so that iShell can handle it.
@@ -167,14 +177,14 @@ public class IShellSocketSink extends Sink {
 	 *             if the socket makes problems
 	 */
 	private void sendPacketOverSocket(final Socket s, final byte[] packet) throws IOException {
-		
-		//log.debug("Sending a packet to " + s);
-		
+
+		// log.debug("Sending a packet to " + s);
+
 		// enough for the worstcase, isn't usually needed.
 		final ByteBuffer buf = ByteBuffer.allocate(2 * packet.length + 20);
-		
+
 		buf.order(ByteOrder.BIG_ENDIAN);
-		
+
 		// Introduction
 		buf.put(PROTOCOL_MAGIC_DLE);
 		buf.put(PROTOCOL_MAGIC_STX);
@@ -184,10 +194,10 @@ public class IShellSocketSink extends Sink {
 		buf.put(PROTOCOL_MAGIC_DLE);
 		buf.put(PROTOCOL_MAGIC_STX);
 		buf.put(ISHELL_PACKET_TYPE_SPYGLASS);
-		
+
 		for (int i = 0; i < packet.length; i++) {
 			final byte b = packet[i];
-			
+
 			// The magic DLE byte needs to be escaped *twice* (yes, four times.
 			// this is no bug.)
 			if (b == PROTOCOL_MAGIC_DLE) {
@@ -199,14 +209,14 @@ public class IShellSocketSink extends Sink {
 				buf.put(b);
 			}
 		}
-		
+
 		// Finale
 		buf.put(PROTOCOL_MAGIC_DLE);
 		buf.put(PROTOCOL_MAGIC_DLE);
 		buf.put(PROTOCOL_MAGIC_ETX);
 		buf.put(PROTOCOL_MAGIC_DLE);
 		buf.put(PROTOCOL_MAGIC_ETX);
-		
+
 		// Heartbeat packet: ishell expects a dedicated heartbeat message about once in three
 		// seconds
 		// for simplicity send it after every real message
@@ -215,26 +225,26 @@ public class IShellSocketSink extends Sink {
 		buf.put((byte) 0x01);
 		buf.put(PROTOCOL_MAGIC_DLE);
 		buf.put(PROTOCOL_MAGIC_ETX);
-		
+
 		s.getOutputStream().write(buf.array(), 0, buf.arrayOffset() + buf.position());
 		s.getOutputStream().flush();
 	}
-	
+
 	@Override
 	public void finalize() {
 		// Kill the thread.
 		this.listenerThread.interrupt();
 	}
-	
+
 	@Override
 	public void init() throws Exception {
 		listenSocket = new ServerSocket(port, 0, InetAddress.getByName(ip));
-		
+
 		listenerThread = new SocketListener();
 		listenerThread.start();
-		
+
 	}
-	
+
 	@Override
 	public void shutdown() {
 		alive = false;
@@ -250,6 +260,6 @@ public class IShellSocketSink extends Sink {
 				//
 			}
 		}
-		
+
 	}
 }

@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.drawing.primitive;
 
 import java.awt.geom.AffineTransform;
@@ -68,11 +77,13 @@ public class Image extends DrawingObject {
 		gc.setAdvanced(false);
 
 		// Transform from Image coordinate system to absolute coordinate system
-		final AffineTransform transform = AffineTransform.getScaleInstance(imageSizeX/((double)image.getBounds().width), imageSizeY/((double)image.getBounds().height));
-		transform.preConcatenate(AffineTransform.getTranslateInstance(this.getPosition().x,
-										-this.getPosition().y - this.getBoundingBox().getHeight()));
+		final AffineTransform transform = AffineTransform.getScaleInstance(imageSizeX / ((double) image.getBounds().width), imageSizeY
+				/ ((double) image.getBounds().height));
+		transform.preConcatenate(AffineTransform
+				.getTranslateInstance(this.getPosition().x, -this.getPosition().y - this.getBoundingBox().getHeight()));
 
-		// multiply transform from drawing area. now "transform" transforms from image coordinates to pixel coordinates
+		// multiply transform from drawing area. now "transform" transforms from image coordinates
+		// to pixel coordinates
 		transform.preConcatenate(getDrawingArea().getTransform());
 
 		// the inverse matrix. it transforms from pixel coordinates to image coordinates
@@ -98,26 +109,19 @@ public class Image extends DrawingObject {
 		imageSrcArea.rectangle.height += 2 * safetyMargin;
 
 		// but make sure that we don't overstep the limits of the original image
-		imageSrcArea =  imageSrcArea.intersection(new PixelRectangle(image.getBounds()));
+		imageSrcArea = imageSrcArea.intersection(new PixelRectangle(image.getBounds()));
 
-		// the destination area on the drawing area - calculated *from* the imageSrcArea to avoid numerical problems
+		// the destination area on the drawing area - calculated *from* the imageSrcArea to avoid
+		// numerical problems
 		final PixelRectangle imageDestArea = new PixelRectangle(imageSrcArea);
 		imageDestArea.transform(transform);
 
-		gc.drawImage(image,
-				imageSrcArea.getUpperLeft().x,
-				imageSrcArea.getUpperLeft().y,
-				imageSrcArea.getWidth(),
-				imageSrcArea.getHeight(),
-				imageDestArea.getUpperLeft().x,
-				imageDestArea.getUpperLeft().y,
-				imageDestArea.getWidth(),
-				imageDestArea.getHeight());
+		gc.drawImage(image, imageSrcArea.getUpperLeft().x, imageSrcArea.getUpperLeft().y, imageSrcArea.getWidth(), imageSrcArea.getHeight(),
+				imageDestArea.getUpperLeft().x, imageDestArea.getUpperLeft().y, imageDestArea.getWidth(), imageDestArea.getHeight());
 
 		gc.setAdvanced(advancedSubsystem);
 
 	}
-
 
 	@Override
 	public void destroy() {

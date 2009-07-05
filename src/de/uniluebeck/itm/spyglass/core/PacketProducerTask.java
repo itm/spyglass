@@ -19,7 +19,6 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 // ------------------------------------------------------------------------------
-// --
 /**
  * This class is a Runnable that represents a background task for producing Packet objects. It is
  * usually only be used by the <code>Spyglass</code> class to read new Packet objects from a given

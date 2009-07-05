@@ -16,25 +16,25 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // ------------------------------------------------------------------------------
 /**
  * In the M-V-C pattern, this is the CONTROL.
- *
- * It connects to the model and view. Events coming from the user and partly
- * coming from the plugins are handled by this class or its children.
- *
+ * 
+ * It connects to the model and view. Events coming from the user and partly coming from the plugins
+ * are handled by this class or its children.
+ * 
  * @author Dariush Forouher
  */
 public class UIController {
 
-	protected static Logger log = SpyglassLoggerFactory.getLogger(UIController.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(UIController.class);
 
 	// --------------------------------------------------------------------------
 	/**
 	 * Constructor
-	 *
+	 * 
 	 * @param spyglass
 	 *            the active {@link Spyglass} object
 	 * @param appWindow
 	 *            the application's GUI (view)
-	 *
+	 * 
 	 */
 	public static void connect(final Spyglass spyglass, final AppWindow appWindow) {
 

@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import java.beans.PropertyChangeListener;
@@ -6,13 +15,13 @@ import java.beans.PropertyChangeSupport;
 // --------------------------------------------------------------------------------
 /**
  * This class provides an number of property change listeners.
- *
+ * 
  * All implementing subclasses should call
  * {@link PropertyBean#firePropertyChange(String, Object, Object)} if a property changes.
- *
+ * 
  * @author Dariush Forouher
  * @author Sebastian Ebers
- *
+ * 
  */
 public abstract class PropertyBean implements SpyglassPropertyChangeSupport {
 
@@ -21,8 +30,11 @@ public abstract class PropertyBean implements SpyglassPropertyChangeSupport {
 
 	// --------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see de.uniluebeck.itm.spyglass.gui.configuration.SpyglassPropertyChangeSupport#addPropertyChangeListener(java.beans.PropertyChangeListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seede.uniluebeck.itm.spyglass.gui.configuration.SpyglassPropertyChangeSupport#
+	 * addPropertyChangeListener(java.beans.PropertyChangeListener)
 	 */
 	public void addPropertyChangeListener(final PropertyChangeListener listener) {
 		propertyChangeSupport.addPropertyChangeListener(listener);
@@ -30,8 +42,11 @@ public abstract class PropertyBean implements SpyglassPropertyChangeSupport {
 
 	// --------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see de.uniluebeck.itm.spyglass.gui.configuration.SpyglassPropertyChangeSupport#addPropertyChangeListeners(de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seede.uniluebeck.itm.spyglass.gui.configuration.SpyglassPropertyChangeSupport#
+	 * addPropertyChangeListeners(de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean)
 	 */
 	public void addPropertyChangeListeners(final PropertyBean other) {
 		final PropertyChangeListener[] listeners = other.propertyChangeSupport.getPropertyChangeListeners();
@@ -42,8 +57,11 @@ public abstract class PropertyBean implements SpyglassPropertyChangeSupport {
 
 	// --------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see de.uniluebeck.itm.spyglass.gui.configuration.SpyglassPropertyChangeSupport#addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seede.uniluebeck.itm.spyglass.gui.configuration.SpyglassPropertyChangeSupport#
+	 * addPropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
 	 */
 	public void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
 		propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
@@ -51,8 +69,11 @@ public abstract class PropertyBean implements SpyglassPropertyChangeSupport {
 
 	// --------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see de.uniluebeck.itm.spyglass.gui.configuration.SpyglassPropertyChangeSupport#removePropertyChangeListener(java.beans.PropertyChangeListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seede.uniluebeck.itm.spyglass.gui.configuration.SpyglassPropertyChangeSupport#
+	 * removePropertyChangeListener(java.beans.PropertyChangeListener)
 	 */
 	public void removePropertyChangeListener(final PropertyChangeListener listener) {
 		propertyChangeSupport.removePropertyChangeListener(listener);
@@ -60,8 +81,11 @@ public abstract class PropertyBean implements SpyglassPropertyChangeSupport {
 
 	// --------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see de.uniluebeck.itm.spyglass.gui.configuration.SpyglassPropertyChangeSupport#removePropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seede.uniluebeck.itm.spyglass.gui.configuration.SpyglassPropertyChangeSupport#
+	 * removePropertyChangeListener(java.lang.String, java.beans.PropertyChangeListener)
 	 */
 	public void removePropertyChangeListener(final String propertyName, final PropertyChangeListener listener) {
 		propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
@@ -71,11 +95,11 @@ public abstract class PropertyBean implements SpyglassPropertyChangeSupport {
 	/**
 	 * Report a bound property update to any registered listeners. No event is fired if old and new
 	 * are equal and non-null.
-	 *
+	 * 
 	 * <p>
 	 * This is merely a convenience wrapper around the more general firePropertyChange method that
 	 * takes {@code PropertyChangeEvent} value.
-	 *
+	 * 
 	 * @param propertyName
 	 *            The programmatic name of the property that was changed.
 	 * @param oldValue

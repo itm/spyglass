@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.packetgenerator.samples;
 
 import java.nio.ByteBuffer;
@@ -14,7 +23,7 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 /**
  * This type of sample allows abstract specifications of all headerelements. the payload must be
  * supplied as a hex string.
- *
+ * 
  * @author dariush
  */
 public class PayloadSample extends Sample {
@@ -22,40 +31,38 @@ public class PayloadSample extends Sample {
 	/**
 	 * The syntaxType. See the translate("Pflichtenheft") for a complete list.
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private String syntaxType = "int16List";
 
 	/**
 	 * a list of semantic types
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private String semanticTypes = "1";
 
 	/**
 	 * the payload in hex
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private String payload = null;
 
 	/**
 	 * a list of node ids.
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private String nodeIDs = "1";
 
 	/**
 	 * the position of the node.
 	 */
-	@Element(required=false)
-	private Position position = new Position("0","0","0");
+	@Element(required = false)
+	private Position position = new Position("0", "0", "0");
 
 	/**
-	 * Optional timestamp of the node
-	 * if unspecified, current systemtime will be used.
+	 * Optional timestamp of the node if unspecified, current systemtime will be used.
 	 */
-	@Element(required=false)
+	@Element(required = false)
 	private long timestamp = -1;
-
 
 	public PayloadSample() {
 		super();
@@ -92,9 +99,9 @@ public class PayloadSample extends Sample {
 
 	/**
 	 * Transforms the Payload from an hex string to an byte array.
-	 *
-	 * May be overwritten by any subclass to some fancier thing (like building the
-	 * payload from an abstract description)
+	 * 
+	 * May be overwritten by any subclass to some fancier thing (like building the payload from an
+	 * abstract description)
 	 */
 	protected byte[] getBytePayload() throws ParseException {
 		final int length = this.payload.length() / 2;
@@ -144,12 +151,12 @@ public class PayloadSample extends Sample {
 
 	/**
 	 * Parses a Integer-List and returns a ranom number from that list.
-	 *
+	 * 
 	 * Valid examples for intList are:
-	 *
+	 * 
 	 * 5 4,7,1,4 14-16,57,1-10
-	 *
-	 *
+	 * 
+	 * 
 	 * @param intList
 	 * @return
 	 * @throws ParseException
@@ -185,7 +192,7 @@ public class PayloadSample extends Sample {
 
 	/**
 	 * Maps the syntaxType to the corresponding number.
-	 *
+	 * 
 	 * @return
 	 * @throws ParseException
 	 */
@@ -222,7 +229,8 @@ public class PayloadSample extends Sample {
 		return generatePacketInternal(this.getRandomNodeID(), getByteSyntaxType(), getRandomSemanticType(), position, payload);
 	}
 
-	protected byte[] generatePacketInternal(final short nodeID, final byte syntaxType, final byte semType, final AbsolutePosition position, final byte[] payload) throws ParseException {
+	protected byte[] generatePacketInternal(final short nodeID, final byte syntaxType, final byte semType, final AbsolutePosition position,
+			final byte[] payload) throws ParseException {
 
 		// compute the packet length
 		final short packetLength = (short) (payload.length + HEADER_SIZE);
@@ -257,7 +265,7 @@ public class PayloadSample extends Sample {
 		buf.putInt((int) (time / 1000));
 		buf.putShort((short) (time % 1000));
 
-		buf.putShort((short) position.x); //Coordinates
+		buf.putShort((short) position.x); // Coordinates
 		buf.putShort((short) position.y);
 		buf.putShort((short) position.z);
 

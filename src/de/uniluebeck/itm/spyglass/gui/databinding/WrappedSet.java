@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.databinding;
 
 import java.util.AbstractSet;
@@ -11,11 +20,12 @@ import java.util.Map.Entry;
 
 import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 
+//--------------------------------------------------------------------------------
 /**
  * Wraps a map into an set. Modifications to the set reflect on the Hashmap and vice-versa. This
  * class makes use of the Map.Entry class describing an entry inside a Map. In this WrappedSet each
  * Map.Entry is wrapped inside an ObservableEntry object, which offers additional property event
- * fireing methods.
+ * firing methods.
  * 
  * The main use-case for this class is to connect a Map to an IObservableList to use it in JFace
  * databinding.
@@ -25,7 +35,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
  * get the same ObservableEntry back when calling the iterator. The ObservableEntry are comparable
  * with equals(), though.
  * 
- * This also means that modifing an ObservableEntry (which has not been pulled out of this set)
+ * This also means that modifying an ObservableEntry (which has not been pulled out of this set)
  * *after* it has been added to the set will not reflect to the corresponding object inside the set!
  * 
  * This class is not thread-safe in any way.
@@ -39,6 +49,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
  */
 public class WrappedSet<K extends Comparable<K>, V> extends AbstractSet<WrappedSet.ObservableEntry<K, V>> {
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 * @author dariush
@@ -90,6 +101,7 @@ public class WrappedSet<K extends Comparable<K>, V> extends AbstractSet<WrappedS
 		}
 	}
 
+	// --------------------------------------------------------------------------------
 	/**
 	 * 
 	 * 

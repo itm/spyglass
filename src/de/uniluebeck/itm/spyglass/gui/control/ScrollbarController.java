@@ -1,6 +1,11 @@
-// --------------------------------------------------------------------------------
-/**
- *
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui.control;
 
@@ -17,19 +22,25 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 
 // --------------------------------------------------------------------------------
 /**
- * Listens to movements on the scroll bar of the drawingArea and moves the
- * visible area accordingly.
- *
- * It also listens to changes of the drawingArea Transform and updates the scrollbars
- * to reflect the current zoomlevel and position.
- *
+ * Listens to movements on the scroll bar of the drawingArea and moves the visible area accordingly.
+ * 
+ * It also listens to changes of the drawingArea Transform and updates the scrollbars to reflect the
+ * current zoomlevel and position.
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class ScrollbarController implements SelectionListener, TransformChangedListener {
 
-	DrawingArea drawingArea;
+	private DrawingArea drawingArea;
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param drawingArea
+	 *            the drawing area
+	 */
 	public ScrollbarController(final DrawingArea drawingArea) {
 		this.drawingArea = drawingArea;
 
@@ -60,8 +71,11 @@ public class ScrollbarController implements SelectionListener, TransformChangedL
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.SelectionEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.eclipse.swt.events.SelectionListener#widgetDefaultSelected(org.eclipse.swt.events.
+	 * SelectionEvent)
 	 */
 	@Override
 	public void widgetDefaultSelected(final SelectionEvent e) {
@@ -70,14 +84,17 @@ public class ScrollbarController implements SelectionListener, TransformChangedL
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent
+	 * )
 	 */
 	@Override
 	public void widgetSelected(final SelectionEvent e) {
 		scroll();
 	}
-
 
 	/**
 	 * Handle a scroll event
@@ -110,13 +127,18 @@ public class ScrollbarController implements SelectionListener, TransformChangedL
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see de.uniluebeck.itm.spyglass.gui.control.TransformChangedListener#handleEvent(de.uniluebeck.itm.spyglass.gui.control.TransformChangedEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * de.uniluebeck.itm.spyglass.gui.control.TransformChangedListener#handleEvent(de.uniluebeck
+	 * .itm.spyglass.gui.control.TransformChangedEvent)
 	 */
 	@Override
 	public void handleEvent(final TransformChangedEvent e) {
 		drawingArea.getHorizontalBar().setSelection(drawingArea.getLowerLeft().x - DrawingArea.WORLD_LOWER_LEFT_X);
-		drawingArea.getVerticalBar().setSelection(-drawingArea.getLowerLeft().y - drawingArea.getAbsoluteDrawingRectangle().getHeight()  - DrawingArea.WORLD_LOWER_LEFT_Y);
+		drawingArea.getVerticalBar().setSelection(
+				-drawingArea.getLowerLeft().y - drawingArea.getAbsoluteDrawingRectangle().getHeight() - DrawingArea.WORLD_LOWER_LEFT_Y);
 		drawingArea.getHorizontalBar().setThumb(drawingArea.getAbsoluteDrawingRectangle().getWidth());
 		drawingArea.getVerticalBar().setThumb(drawingArea.getAbsoluteDrawingRectangle().getHeight());
 	}

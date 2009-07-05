@@ -1,6 +1,10 @@
-// --------------------------------------------------------------------------------
-/**
- *
+/*----------------------------------------------------------------------------------------
+ * This file is part of the
+ * WSN visualization framework SpyGlass. Copyright (C) 2004-2007 by the SwarmNet (www.swarmnet.de)
+ * project SpyGlass is free software; you can redistribute it and/or modify it under the terms of
+ * the BSD License. Refer to spyglass-licence.txt file in the root of the SpyGlass source tree for
+ * further details.
+ * ---------------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui.view;
 
@@ -32,7 +36,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  */
 public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 
-	protected static Logger log = SpyglassLoggerFactory.getLogger(DrawingAreaRenderer.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(DrawingAreaRenderer.class);
 
 	private Spyglass spyglass;
 	private DrawingArea drawingArea;
@@ -49,6 +53,15 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 
 	private final static boolean ENABLE_DRAW_PROFILING = false;
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param drawingArea
+	 *            a drawing area
+	 * @param spyglass
+	 *            a spyglass instance
+	 */
 	public DrawingAreaRenderer(final DrawingArea drawingArea, final Spyglass spyglass) {
 		this.spyglass = spyglass;
 		this.drawingArea = drawingArea;

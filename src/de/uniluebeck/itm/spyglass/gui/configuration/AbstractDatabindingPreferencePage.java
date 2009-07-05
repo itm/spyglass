@@ -1,6 +1,11 @@
-// --------------------------------------------------------------------------------
-/**
- *
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
@@ -32,10 +37,10 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 // --------------------------------------------------------------------------------
 /**
  * This is common superclass to all preference pages in spyglass which use databinding.
- *
- *
+ * 
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 
@@ -49,7 +54,7 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 	/**
 	 * This flag indicates if the page contains unsaved changes (or, correcty, has been touched in
 	 * some way).
-	 *
+	 * 
 	 * This flag will automatically be set to true if a field connected to the <code>dbc</code> is
 	 * modified.
 	 */
@@ -77,7 +82,7 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 
 	/**
 	 * Add error handling to the databindingcontext.
-	 *
+	 * 
 	 */
 	protected AggregateValidationStatus addErrorBinding() {
 
@@ -116,9 +121,9 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 	/**
 	 * Does the form contain unsaved data? The return value of this method is only an indicator, IOW
 	 * it may return false-positives.
-	 *
+	 * 
 	 * Subclasses overriding this method should include the return value of super() in their answer.
-	 *
+	 * 
 	 * @return true if this page contains unsaved data.
 	 */
 	public final boolean hasUnsavedChanges() {
@@ -142,7 +147,7 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 
 	/**
 	 * Store the form data into the model
-	 *
+	 * 
 	 * Subclasses overriding this method must call this method!
 	 */
 	protected void storeToModel() {
@@ -156,7 +161,7 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 
 	/**
 	 * Checks for errors in the dbc and displays an error message for each if there are so
-	 *
+	 * 
 	 * (these errors are likely bugs in the application, but we have to display them anyway.)
 	 */
 	private final void checkForErrors() {
@@ -165,11 +170,9 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 			for (final IStatus s : status.getChildren()) {
 				if (s.getSeverity() == IStatus.ERROR) {
 					log.error(s.getMessage(), s.getException());
-				}
-				else if (s.getSeverity() == IStatus.WARNING) {
+				} else if (s.getSeverity() == IStatus.WARNING) {
 					log.warn(s.getMessage(), s.getException());
-				}
-				else if (s.getSeverity() == IStatus.INFO) {
+				} else if (s.getSeverity() == IStatus.INFO) {
 					log.info(s.getMessage(), s.getException());
 				}
 			}
@@ -182,7 +185,7 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 
 	/**
 	 * ReStore the form data from the model
-	 *
+	 * 
 	 * Subclasses overriding this method must call this method!
 	 */
 	protected void loadFromModel() {
@@ -242,7 +245,6 @@ public abstract class AbstractDatabindingPreferencePage extends PreferencePage {
 		c.setLayoutData(gridData);
 		return c;
 	}
-
 
 	public void setImage(final Image image) {
 		this.image = image;

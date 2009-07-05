@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.databinding;
 
 import java.util.Collection;
@@ -9,6 +18,7 @@ import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.Realm;
 import org.eclipse.core.databinding.observable.set.ObservableSet;
 
+//--------------------------------------------------------------------------------
 /**
  * Wraps a Set into an ObservableSet. The original set is not copied, instead calls to an
  * WrappedObservableSet are passed through to the original wrapped set.
@@ -20,6 +30,16 @@ import org.eclipse.core.databinding.observable.set.ObservableSet;
 @SuppressWarnings("unchecked")
 public class WrappedObservableSet extends ObservableSet {
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * @param realm
+	 *            the data binding realm
+	 * @param set
+	 *            a set of object
+	 * @param sample
+	 *            element type
+	 * @see ObservableSet
+	 */
 	public WrappedObservableSet(final Realm realm, final Set set, final Object sample) {
 		super(realm, set, sample);
 	}
@@ -40,7 +60,7 @@ public class WrappedObservableSet extends ObservableSet {
 					newObject = member;
 				}
 			}
-			assert(newObject != null);
+			assert (newObject != null);
 			fireSetChange(Diffs.createSetDiff(Collections.singleton(newObject), Collections.EMPTY_SET));
 		}
 		return ret;

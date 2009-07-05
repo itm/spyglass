@@ -1,6 +1,11 @@
-// --------------------------------------------------------------------------------
-/**
- *
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui.control;
 
@@ -13,7 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
 
 import de.uniluebeck.itm.spyglass.drawing.BoundingBoxChangeListener;
@@ -27,7 +31,6 @@ import de.uniluebeck.itm.spyglass.plugin.DrawingObjectListener;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.positions.AbsoluteRectangle;
 import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -41,17 +44,29 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
  */
 public class PluginController {
 
-	private static Logger log = SpyglassLoggerFactory.getLogger(PluginController.class);
-
+	/** The controlled plug-in */
 	protected final Plugin plugin;
 
+	/** The display to be used */
 	protected final Display display;
 
+	/** The drawing area */
 	protected final DrawingArea drawingArea;
 
 	/** List of drawingObjects with out-dated bounding boxes */
 	protected final Set<DrawingObject> drawingObjectsWithDirtyBoundingBox = Collections.synchronizedSet(new HashSet<DrawingObject>());
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param display
+	 *            the display to be used
+	 * @param drawingArea
+	 *            the drawing area
+	 * @param plugin
+	 *            the plug-in to be controlled
+	 */
 	public PluginController(final Display display, final DrawingArea drawingArea, final Plugin plugin) {
 		if (!(plugin instanceof Drawable)) {
 			throw new IllegalArgumentException("Plugin must implement Drawable!");
@@ -198,6 +213,9 @@ public class PluginController {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Stuff to do when a new drawing object arrives on the scene.
+	 * 
+	 * @param dob
+	 *            a drawing object
 	 */
 	protected void handleDrawingObjectAdded(final DrawingObject dob) {
 
@@ -217,6 +235,12 @@ public class PluginController {
 	}
 
 	// --------------------------------------------------------------------------------
+	/**
+	 * Handles a change of a drawing object's parameter(s)
+	 * 
+	 * @param boundingBox
+	 *            a bounding box
+	 */
 	protected void handleDrawingObjectChanged(final AbsoluteRectangle boundingBox) {
 
 		// the drawing area might have been disposed while we were waiting

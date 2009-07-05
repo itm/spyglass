@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.actions;
 
 import java.util.ArrayList;
@@ -17,15 +26,15 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  * Auto Zoom.
- *
+ * 
  * This action modifies zoom and position to make all visible DrawingObjects fit exactly into the
  * drawing area.
- *
- * This action has two constructors since unfortunatly using it in SpyglassStandalone differs slightly
- * to Spyglass4iShell
- *
+ * 
+ * This action has two constructors since unfortunatly using it in SpyglassStandalone differs
+ * slightly to Spyglass4iShell
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class ZoomCompleteMapAction extends Action {
 
@@ -92,8 +101,8 @@ public class ZoomCompleteMapAction extends Action {
 	}
 
 	/**
-	 * This method gets the bounding boxes of all visible drawingObjects (which are applicable
-	 * for AutoZoom and scrollbars) and merges them.
+	 * This method gets the bounding boxes of all visible drawingObjects (which are applicable for
+	 * AutoZoom and scrollbars) and merges them.
 	 */
 	private AbsoluteRectangle calcBBox() {
 		final List<Plugin> list = spyglass.getPluginManager().getVisibleActivePlugins();

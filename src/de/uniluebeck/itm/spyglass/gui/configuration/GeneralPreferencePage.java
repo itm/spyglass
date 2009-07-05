@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.configuration;
 
 import org.apache.log4j.Logger;
@@ -9,20 +18,31 @@ import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 
+// --------------------------------------------------------------------------------
+/**
+ * Preference page used to administer the application's general settings
+ */
 public class GeneralPreferencePage extends AbstractDatabindingPreferencePage {
 
 	private static Logger log = SpyglassLoggerFactory.getLogger(GeneralPreferencePage.class);
 
 	/**
-	 * reference to the gen setting config
+	 * reference to the general setting config
 	 */
 	private final GeneralSettingsXMLConfig config;
 
-
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param spyglass
+	 *            the spyglass instance
+	 */
 	public GeneralPreferencePage(final Spyglass spyglass) {
 		config = spyglass.getConfigStore().getSpyglassConfig().getGeneralSettings();
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void createControl(final Composite parent) {
 		super.createControl(parent);
@@ -30,11 +50,13 @@ public class GeneralPreferencePage extends AbstractDatabindingPreferencePage {
 		getApplyButton().setEnabled(false);
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	protected Control createContents(final Composite parent) {
 		return createContentsInternal(parent);
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	protected Composite createContentsInternal(final Composite parent) {
 		final Composite composite = super.createContentsInternal(parent);
@@ -49,6 +71,7 @@ public class GeneralPreferencePage extends AbstractDatabindingPreferencePage {
 		return comp;
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	protected void performDefaults() {
 		log.info("Pressed button restore");
@@ -56,6 +79,7 @@ public class GeneralPreferencePage extends AbstractDatabindingPreferencePage {
 
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	protected void resetDirtyFlag() {
 		super.resetDirtyFlag();
@@ -68,7 +92,7 @@ public class GeneralPreferencePage extends AbstractDatabindingPreferencePage {
 		}
 	}
 
-
+	// --------------------------------------------------------------------------------
 	@Override
 	public void markFormDirty() {
 		super.markFormDirty();

@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.gui.databinding;
 
 import org.eclipse.core.databinding.Binding;
@@ -25,7 +34,8 @@ public class DatabindingTextEditingSupport extends ObservableValueEditingSupport
 	protected IValidator afterGetValidator;
 	protected IConverter converter;
 
-	public DatabindingTextEditingSupport(final ColumnViewer viewer, final DataBindingContext dbc,  final String elementName, final IConverter converter, final IValidator afterConvertValidator,final IValidator afterGetValidator) {
+	public DatabindingTextEditingSupport(final ColumnViewer viewer, final DataBindingContext dbc, final String elementName,
+			final IConverter converter, final IValidator afterConvertValidator, final IValidator afterGetValidator) {
 		super(viewer, dbc);
 		this.dbc = dbc;
 		this.cellEditor = new TextCellEditor((Composite) viewer.getControl());
@@ -36,7 +46,8 @@ public class DatabindingTextEditingSupport extends ObservableValueEditingSupport
 		this.elementName = elementName;
 	}
 
-	public DatabindingTextEditingSupport(final ColumnViewer viewer, final DataBindingContext dbc, final IConverter converter, final IValidator afterConvertValidator,final IValidator afterGetValidator) {
+	public DatabindingTextEditingSupport(final ColumnViewer viewer, final DataBindingContext dbc, final IConverter converter,
+			final IValidator afterConvertValidator, final IValidator afterGetValidator) {
 		super(viewer, dbc);
 		this.dbc = dbc;
 		this.cellEditor = new TextCellEditor((Composite) viewer.getControl());
@@ -44,7 +55,6 @@ public class DatabindingTextEditingSupport extends ObservableValueEditingSupport
 		this.afterGetValidator = afterGetValidator;
 		this.converter = converter;
 	}
-
 
 	@Override
 	protected CellEditor getCellEditor(final Object element) {
@@ -63,10 +73,8 @@ public class DatabindingTextEditingSupport extends ObservableValueEditingSupport
 
 	@Override
 	protected Binding createBinding(final IObservableValue target, final IObservableValue model) {
-		final UpdateValueStrategy s = new UpdateValueStrategy()
-						.setAfterConvertValidator(afterConvertValidator)
-						.setAfterGetValidator(afterGetValidator)
-						.setConverter(converter);
+		final UpdateValueStrategy s = new UpdateValueStrategy().setAfterConvertValidator(afterConvertValidator).setAfterGetValidator(
+				afterGetValidator).setConverter(converter);
 
 		return dbc.bindValue(target, model, s, null);
 

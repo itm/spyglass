@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.packetgenerator.sinks;
 
 import java.io.File;
@@ -17,43 +26,43 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * @author Sebastian Ebers
  */
 public class FileSink extends Sink {
-	
+
 	private static Logger log = SpyglassLoggerFactory.getLogger(FileSink.class);
-	
+
 	/**
 	 * The filename
 	 */
 	@Element
 	private File filename;
-	
+
 	/**
 	 * Should the file be appended or overwritten?
 	 */
 	@Element
 	private boolean append;
-	
+
 	/**
 	 * The writer. Will be assigned when the first packet is transmitted.
 	 */
 	private FileOutputStream writer;
-	
+
 	@Override
 	public void sendPacket(final byte[] packet) throws IOException, ParseException {
-		
+
 		if (packet != null) {
 			writer.write(packet.length);
 			writer.write(packet);
 			writer.flush();
 		}
-		
+
 	}
-	
+
 	@Override
 	public void init() throws Exception {
 		writer = new FileOutputStream(filename, append);
 		log.debug("Opened file " + this.filename);
 	}
-	
+
 	@Override
 	public void shutdown() {
 		try {
@@ -65,5 +74,5 @@ public class FileSink extends Sink {
 			log.error(e, e);
 		}
 	}
-	
+
 }

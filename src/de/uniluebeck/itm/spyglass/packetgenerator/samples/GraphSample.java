@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.packetgenerator.samples;
 
 import java.nio.ByteBuffer;
@@ -15,11 +24,10 @@ import de.uniluebeck.itm.spyglass.plugin.mappainter.AbstractDataStore;
 import de.uniluebeck.itm.spyglass.plugin.mappainter.MetricPoint;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
-
 /**
  * This type of sample allows abstract specifications of all headerelements. the payload must be
  * supplied as a hex string.
- *
+ * 
  * @author dariush
  */
 public class GraphSample extends PayloadSample {
@@ -30,22 +38,22 @@ public class GraphSample extends PayloadSample {
 
 	private GraphStore graph = new GraphStore();
 
-	@Element(required=false)
+	@Element(required = false)
 	private int numberOfNodes = 100;
 
-	@Element(required=false)
+	@Element(required = false)
 	private int neighborCount = 5;
 
 	/**
 	 * the velocity of the nodes.
 	 */
-	@Element(required=false)
-	private Position velocity = new Position("0","0","0");
+	@Element(required = false)
+	private Position velocity = new Position("0", "0", "0");
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * @author dariush
-	 *
+	 * 
 	 */
 	public final class GraphStore extends AbstractDataStore<NodePoint> {
 		public NodePoint getRandomElement() {
@@ -53,7 +61,7 @@ public class GraphSample extends PayloadSample {
 			final int ele = r.nextInt(this.size());
 			final Iterator<NodePoint> it = iterator();
 			NodePoint returnElement = it.next();
-			for(int i=0; i<ele-1; i++) {
+			for (int i = 0; i < ele - 1; i++) {
 				returnElement = it.next();
 			}
 
@@ -68,13 +76,15 @@ public class GraphSample extends PayloadSample {
 		byte semanticType;
 
 		// --------------------------------------------------------------------------------
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
 		@Override
 		public int compareTo(final MetricPoint o) {
 			if (o instanceof NodePoint) {
-				return nodeID-((NodePoint)o).nodeID;
+				return nodeID - ((NodePoint) o).nodeID;
 			} else {
 				return 0;
 			}
@@ -98,13 +108,13 @@ public class GraphSample extends PayloadSample {
 						p.position.z += deltaZ;
 
 					}
-					Thread.sleep(1000/numberOfNodes);
+					Thread.sleep(1000 / numberOfNodes);
 				}
 			} catch (final ParseException e) {
-				log.error("Could not parse int-list",e);
+				log.error("Could not parse int-list", e);
 				return;
 			} catch (final InterruptedException e) {
-				log.error("Got interrupted",e);
+				log.error("Got interrupted", e);
 				Thread.currentThread().interrupt();
 				return;
 			}
@@ -118,7 +128,7 @@ public class GraphSample extends PayloadSample {
 
 		log.debug("Generating graph");
 		synchronized (graph) {
-			for(int i=0; i<numberOfNodes; i++) {
+			for (int i = 0; i < numberOfNodes; i++) {
 				final NodePoint p = new NodePoint();
 				p.nodeID = (short) i;
 				p.semanticType = this.getRandomSemanticType();
@@ -134,7 +144,9 @@ public class GraphSample extends PayloadSample {
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.uniluebeck.itm.spyglass.packetgenerator.samples.Sample#generatePacket()
 	 */
 	@Override
@@ -151,7 +163,8 @@ public class GraphSample extends PayloadSample {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * @param numberOfNodes the numberOfNodes to set
+	 * @param numberOfNodes
+	 *            the numberOfNodes to set
 	 */
 	public void setNumberOfNodes(final int numberOfNodes) {
 		this.numberOfNodes = numberOfNodes;
@@ -167,20 +180,20 @@ public class GraphSample extends PayloadSample {
 
 	public byte[] getBytePayload(final NodePoint p) throws ParseException {
 
-		final ByteBuffer buf = ByteBuffer.allocate(getNeighborCount()*2);
+		final ByteBuffer buf = ByteBuffer.allocate(getNeighborCount() * 2);
 		buf.order(ByteOrder.BIG_ENDIAN);
 
 		// Now fill the array with data
 		synchronized (graph) {
-			final List<NodePoint> list = graph.kNN(p.position, getNeighborCount()+1);
+			final List<NodePoint> list = graph.kNN(p.position, getNeighborCount() + 1);
 			NodePoint p2 = list.get(r.nextInt(list.size()));
-			while(p==p2) {
+			while (p == p2) {
 				p2 = list.get(r.nextInt(list.size()));
 			}
 			// first entry is the node id
 			buf.putShort(p2.nodeID);
 			// second is the distance between the two nodes (as a float)
-			final float distance = (float)p2.position.getEuclideanDistance(p.position);
+			final float distance = (float) p2.position.getEuclideanDistance(p.position);
 			buf.putFloat(distance);
 		}
 
@@ -199,7 +212,8 @@ public class GraphSample extends PayloadSample {
 
 	// --------------------------------------------------------------------------------
 	/**
-	 * @param k the k to set
+	 * @param k
+	 *            the k to set
 	 */
 	public void setNeighborCount(final int k) {
 		neighborCount = k;

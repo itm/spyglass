@@ -221,6 +221,7 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 		initGUI();
 	}
 
+	// --------------------------------------------------------------------------------
 	private void initGUI() {
 		try {
 			final FillLayout thisLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
@@ -328,13 +329,5 @@ public class BasicGroupComposite extends org.eclipse.swt.widgets.Composite {
 			log.error("Problem while building the basicGroup composite.", e);
 		}
 	}
-
-	// /**
-	// * Auto-generated main method to display this org.eclipse.swt.widgets.Composite inside a new
-	// * Shell.
-	// */
-	// public static void main(final String[] args) {
-	// showGUI();
-	// }
 
 }

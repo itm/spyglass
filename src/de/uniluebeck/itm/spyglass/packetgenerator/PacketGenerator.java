@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.packetgenerator;
 
 import java.util.ArrayList;
@@ -92,6 +101,8 @@ public class PacketGenerator {
 	/**
 	 * Start the generator. this method will not terminate until an error happens or the generator
 	 * is killed by calling shutdown().
+	 * 
+	 * @throws Exception
 	 */
 	public void run() throws Exception {
 

@@ -1,6 +1,11 @@
-// --------------------------------------------------------------------------------
-/**
- *
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.gui.control;
 
@@ -19,11 +24,10 @@ import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 
 // --------------------------------------------------------------------------------
 /**
- * Listens to MouseClick events from the DrawingArea and dispatches them
- * to the plugins.
- *
+ * Listens to MouseClick events from the DrawingArea and dispatches them to the plugins.
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class MouseClickController implements MouseListener, PropertyChangeListener, DisposeListener {
 
@@ -31,6 +35,15 @@ public class MouseClickController implements MouseListener, PropertyChangeListen
 	private DrawingArea drawingArea;
 	private Spyglass spyglass;
 
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 * 
+	 * @param drawingArea
+	 *            the drawing area
+	 * @param spyglass
+	 *            the spyglass instance
+	 */
 	public MouseClickController(final DrawingArea drawingArea, final Spyglass spyglass) {
 		this.drawingArea = drawingArea;
 		this.spyglass = spyglass;
@@ -40,10 +53,10 @@ public class MouseClickController implements MouseListener, PropertyChangeListen
 		spyglass.getConfigStore().getSpyglassConfig().addPropertyChangeListener("pluginManager", this);
 	}
 
-
-
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.swt.events.MouseListener#mouseDoubleClick(org.eclipse.swt.events.MouseEvent)
 	 */
 	@Override
@@ -53,10 +66,10 @@ public class MouseClickController implements MouseListener, PropertyChangeListen
 		}
 	}
 
-
-
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.swt.events.MouseListener#mouseDown(org.eclipse.swt.events.MouseEvent)
 	 */
 	@Override
@@ -66,10 +79,10 @@ public class MouseClickController implements MouseListener, PropertyChangeListen
 		}
 	}
 
-
-
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.swt.events.MouseListener#mouseUp(org.eclipse.swt.events.MouseEvent)
 	 */
 	@Override
@@ -78,6 +91,7 @@ public class MouseClickController implements MouseListener, PropertyChangeListen
 
 	}
 
+	// --------------------------------------------------------------------------------
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt) {
 
@@ -89,8 +103,11 @@ public class MouseClickController implements MouseListener, PropertyChangeListen
 	}
 
 	// --------------------------------------------------------------------------------
-	/* (non-Javadoc)
-	 * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
 	 */
 	@Override
 	public void widgetDisposed(final DisposeEvent e) {
