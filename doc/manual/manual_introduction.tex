@@ -13,13 +13,13 @@
 		certain functionality. As said before, the primary focus of SpyGlass is the
 		visualization of a set of sensor nodes, forming a network. However, SpyGlass can
 		also be used in other, nearly arbitrary scenarios, where packet based communication 
-		can be used. This is because visualization is done based on network packets, 
+		is used. This is because visualization is done based on network packets, 
 		which represent statistical, structural or any other arbitrary data, sent by the 
 		nodes to the SpyGlass application. Those packets are then dispatched to the 
 		various plugins, which in turn, interpret the packet, draw things onto the screen 
-		and aggregate data contained in the packet. The whole range of visualization 
+		when appropriate and aggregate data contained in the packet. The whole range of visualization 
 		opportunities, delivered by the currently bundled plugins, will be explained in 
-		this document in the various chapters describing the bundled plugins.
+		this document in the various chapters describing the bundled plug ins.
 		
 		SpyGlass bases on the requests given by the Institute of Telematics (ITM) of 
 		the University of Lübeck and was developed by Daniel Bimschas, Sebastian 
@@ -207,21 +207,36 @@
 				pause button toggles to a play button when it was clicked and vice versa.
 				
 			\item Reset\\
-				Clicking the reset button will cause all active SpyGlass plugins to reset.				Resetting a plugin means that it forgets all aggregated data and removes				all drawings from the drawing area. You could say that, after all plugins
-				are reset, the application displays the same information as it displays				directly after startup. However, the configuration of plugin instances as				well as their preferences are kept.
+				Clicking the reset button will cause all active SpyGlass plugins to reset.
+				Resetting a plugin means that it forgets all aggregated data and removes
+				all drawings from the drawing area. You could say that, after all plugins
+				are reset, the application displays the same information as it displays
+				directly after startup. However, the configuration of plugin instances as
+				well as their preferences are kept.
 				
 			\item Output File / Record\\
 				
-				The record button is to start the recording of incoming packets. One must				specify a file, where the incoming packets will be written into. The file gets				the ending “.rec” and can be used later in both the standalone application				and the SpyGlass iShell plugin as a packet source. The record stops if one				clicks on the record button again. During the recording time, the button				is white. Otherwise it is red.
+				The record button is to start the recording of incoming packets. One must
+				specify a file, where the incoming packets will be written into. The file gets
+				the ending “.rec” and can be used later in both the standalone application
+				and the SpyGlass iShell plugin as a packet source. The record stops if one
+				clicks on the record button again. During the recording time, the button
+				is white. Otherwise it is red.
 				
 			\item Zoom In / Out / All\\
 				
-				The “+” and “-” buttons with the magnifier are pretty self-explanatory.				One zooms in (+) while the other zooms out (-). The third magnifier button				zooms exactly to the zoom level that all current network components				(nodes) are displayed on the drawing area.
+				The “+” and “-” buttons with the magnifier are pretty self-explanatory.
+				One zooms in (+) while the other zooms out (-). The third magnifier button
+				zooms exactly to the zoom level that all current network components
+				(nodes) are displayed on the drawing area.
 				
-				Additionally to the buttons, zooming can also be done with the scrollwheel				on the mouse, if the pointer is located on the drawing area.
+				Additionally to the buttons, zooming can also be done with the scrollwheel
+				on the mouse, if the pointer is located on the drawing area.
 				
 			\item Preferences\\
 				
-				The button opens the preferences dialog, where you can configure the				SpyGlass application, as well as the spyglass plugin instances. All that is				described in detail from chapter 5 on.
+				The button opens the preferences dialog, where you can configure the
+				SpyGlass application, as well as the spyglass plugin instances. All that is
+				described in detail from chapter 5 on.
 				
 		\end{itemize}
