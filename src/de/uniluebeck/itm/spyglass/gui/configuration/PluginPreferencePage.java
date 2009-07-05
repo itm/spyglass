@@ -418,7 +418,7 @@ public abstract class PluginPreferencePage<PluginClass extends Plugin, ConfigCla
 	 */
 	protected final void performRestore() {
 		log.info("Pressed button restore");
-		super.loadFromModel();
+		loadFromModel();
 	}
 
 	// --------------------------------------------------------------------------------
