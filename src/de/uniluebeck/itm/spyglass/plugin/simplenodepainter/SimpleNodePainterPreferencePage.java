@@ -2,6 +2,8 @@ package de.uniluebeck.itm.spyglass.plugin.simplenodepainter;
 
 import java.util.HashMap;
 
+import org.eclipse.core.databinding.observable.set.ISetChangeListener;
+import org.eclipse.core.databinding.observable.set.SetChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -21,12 +23,28 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 
 	private OptionsComposite optionsComposite;
 
+	private final ISetChangeListener setChangeListener;
+
 	public SimpleNodePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL);
+		setChangeListener = new ISetChangeListener() {
+			// --------------------------------------------------------------------------------
+			@Override
+			public void handleSetChange(final SetChangeEvent event) {
+				markFormDirty();
+			}
+		};
 	}
 
 	public SimpleNodePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final SimpleNodePainterPlugin plugin) {
 		super(dialog, spyglass, plugin, BasicOptions.ALL);
+		setChangeListener = new ISetChangeListener() {
+			// --------------------------------------------------------------------------------
+			@Override
+			public void handleSetChange(final SetChangeEvent event) {
+				markFormDirty();
+			}
+		};
 	}
 
 	@Override
@@ -38,11 +56,8 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 	@Override
 	protected void loadFromModel() {
 		super.loadFromModel();
-
-		// TODO: find a sane way to apply an UpdateSetStrategy to the Table, so we don't have
-		// to do this by hand
 		tempStringFormatterTable = config.getStringFormatters();
-		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatterTable);
+		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatterTable, setChangeListener);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -63,7 +78,7 @@ public class SimpleNodePainterPreferencePage extends PluginPreferencePage<Simple
 		optionsComposite.setDatabinding(dbc, config, this);
 
 		tempStringFormatterTable = config.getStringFormatters();
-		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatterTable);
+		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatterTable, setChangeListener);
 
 		// necessary to prevent the change listener to react on the initialization
 		return composite;

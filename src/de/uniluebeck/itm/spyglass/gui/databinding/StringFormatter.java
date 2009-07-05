@@ -8,6 +8,7 @@ import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
+import org.eclipse.core.databinding.observable.set.ISetChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
@@ -217,7 +218,8 @@ public class StringFormatter {
 		}
 	}
 
-	public void connectTableWithData(final DataBindingContext dbc, final HashMap<Integer, String> tempStringFormatterTable) {
+	public void connectTableWithData(final DataBindingContext dbc, final HashMap<Integer, String> tempStringFormatterTable,
+			final ISetChangeListener setChangeListener) {
 
 		// the hashmap is cloned inside the getter-method.
 		// tempStringFormatterTable = config.getStringFormatters();
@@ -226,6 +228,7 @@ public class StringFormatter {
 		final Set<ObservableEntry<Integer, String>> entrySet = new WrappedSet<Integer, String>(tempStringFormatterTable);
 		tableData = new WrappedObservableSet(dbc.getValidationRealm(), entrySet, null);
 		table.setInput(tableData);
+		tableData.addSetChangeListener(setChangeListener);
 	}
 
 }

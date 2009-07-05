@@ -13,6 +13,7 @@ import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.core.databinding.observable.set.IObservableSet;
+import org.eclipse.core.databinding.observable.set.ISetChangeListener;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.databinding.viewers.ObservableSetContentProvider;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -358,9 +359,10 @@ public class NodeSensorRangePerNodeConfigurationComposite {
 
 	}
 
-	public void connectTableWithData(final DataBindingContext dbc, final Set<Config> set) {
+	public void connectTableWithData(final DataBindingContext dbc, final Set<Config> set, final ISetChangeListener setChangeListener) {
 
 		tableData = new WrappedObservableSet(dbc.getValidationRealm(), set, null);
+		tableData.addSetChangeListener(setChangeListener);
 		table.setInput(tableData);
 
 		table.refresh();

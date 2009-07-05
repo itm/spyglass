@@ -2,6 +2,8 @@ package de.uniluebeck.itm.spyglass.plugin.linepainter;
 
 import java.util.HashMap;
 
+import org.eclipse.core.databinding.observable.set.ISetChangeListener;
+import org.eclipse.core.databinding.observable.set.SetChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -13,20 +15,35 @@ public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterP
 
 	private LinePainterOptionsComposite optionsComposite;
 	private HashMap<Integer, String> tempStringFormatters;
+	private final ISetChangeListener setChangeListener;
 
 	public LinePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL);
+		setChangeListener = new ISetChangeListener() {
+			// --------------------------------------------------------------------------------
+			@Override
+			public void handleSetChange(final SetChangeEvent event) {
+				markFormDirty();
+			}
+		};
 	}
 
 	public LinePainterPreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final LinePainterPlugin plugin) {
 		super(dialog, spyglass, plugin, BasicOptions.ALL);
+		setChangeListener = new ISetChangeListener() {
+			// --------------------------------------------------------------------------------
+			@Override
+			public void handleSetChange(final SetChangeEvent event) {
+				markFormDirty();
+			}
+		};
 	}
 
 	@Override
 	protected void loadFromModel() {
 		super.loadFromModel();
 		tempStringFormatters = config.getStringFormatters();
-		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatters);
+		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatters, setChangeListener);
 	}
 
 	@Override
@@ -42,7 +59,7 @@ public class LinePainterPreferencePage extends PluginPreferencePage<LinePainterP
 		optionsComposite = new LinePainterOptionsComposite(composite);
 		optionsComposite.setDatabinding(dbc, config, this);
 		tempStringFormatters = config.getStringFormatters();
-		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatters);
+		optionsComposite.stringFormatter.connectTableWithData(dbc, tempStringFormatters, setChangeListener);
 
 		return composite;
 	}

@@ -3,6 +3,8 @@ package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.databinding.observable.set.ISetChangeListener;
+import org.eclipse.core.databinding.observable.set.SetChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
@@ -15,6 +17,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSensorRangePlugin, NodeSensorRangeXMLConfig> {
 
 	private static final Logger log = SpyglassLoggerFactory.getLogger(NodeSensorRangePreferencePage.class);
+	private final ISetChangeListener setChangeListener;
 
 	/**
 	 * Reference to the map backing {@link tableData}. This map is a copy of the one from the
@@ -27,10 +30,24 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 
 	public NodeSensorRangePreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass) {
 		super(dialog, spyglass, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
+		setChangeListener = new ISetChangeListener() {
+			// --------------------------------------------------------------------------------
+			@Override
+			public void handleSetChange(final SetChangeEvent event) {
+				markFormDirty();
+			}
+		};
 	}
 
 	public NodeSensorRangePreferencePage(final PluginPreferenceDialog dialog, final Spyglass spyglass, final NodeSensorRangePlugin plugin) {
 		super(dialog, spyglass, plugin, BasicOptions.ALL_BUT_SEMANTIC_TYPES);
+		setChangeListener = new ISetChangeListener() {
+			// --------------------------------------------------------------------------------
+			@Override
+			public void handleSetChange(final SetChangeEvent event) {
+				markFormDirty();
+			}
+		};
 	}
 
 	@Override
@@ -43,7 +60,7 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 
 		tempTable = config.getPerNodeConfigsClone();
 
-		optionsComposite.getPerNodeConfigurationComposite().connectTableWithData(dbc, tempTable);
+		optionsComposite.getPerNodeConfigurationComposite().connectTableWithData(dbc, tempTable, setChangeListener);
 
 		return composite;
 	}
@@ -82,7 +99,7 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 		log.info("load from model");
 
 		tempTable = config.getPerNodeConfigsClone();
-		optionsComposite.getPerNodeConfigurationComposite().connectTableWithData(dbc, tempTable);
+		optionsComposite.getPerNodeConfigurationComposite().connectTableWithData(dbc, tempTable, setChangeListener);
 	}
 
 	// --------------------------------------------------------------------------------
@@ -103,7 +120,7 @@ public class NodeSensorRangePreferencePage extends PluginPreferencePage<NodeSens
 		}
 		config.setPerNodeConfigs(this.tempTable);
 		tempTable = config.getPerNodeConfigsClone();
-		optionsComposite.getPerNodeConfigurationComposite().connectTableWithData(dbc, tempTable);
+		optionsComposite.getPerNodeConfigurationComposite().connectTableWithData(dbc, tempTable, setChangeListener);
 	}
 
 }
