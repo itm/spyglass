@@ -182,7 +182,7 @@ public class OptionsComposite extends org.eclipse.swt.widgets.Composite {
 
 				}
 
-				stringFormatter.addStringFormatterFields(group1, 2);
+				stringFormatter.addStringFormatterFields(group1, 3);
 
 			}
 			this.layout();

@@ -37,6 +37,16 @@ import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 /**
  * Spring Embedder Plugin
  * 
+ * The SpringEmbedderPositioner provides information about the current position where nodes or other
+ * arbitrary network components that send SpyGlass packets must be drawn on the drawing area. The
+ * positions provided here are not with respect to the real positions but to the neighborhood
+ * mentioned above. Real positions are those which are given in the header of the SpyGlass packets.
+ * 
+ * This is done by permanently calculating repulsion forces between all nodes. Nodes with a
+ * neighborhood relationship do attract each other.
+ * 
+ * Additionally it holds the actual real positions in the background.
+ * 
  * @author Oliver Kleine
  * 
  */
@@ -68,11 +78,22 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 	 */
 	private volatile Map<Integer, PositionDataSE> nodeMap = new ConcurrentHashMap<Integer, PositionDataSE>(16, 0.75f, 2);
 
+	/**
+	 * Creates a new instance of the SpringEmbedderPositionerPlugin. All parameters are set in the
+	 * appropriate SpringEmbedderXMLConfig
+	 */
 	public SpringEmbedderPositionerPlugin() {
 		xmlConfig = new SpringEmbedderPositionerXMLConfig();
 
 	}
 
+	/**
+	 * Initiates the instance, e.g. starts the timer for the permanent recalculation of the nodes
+	 * positions on the drawing area and deleting of out of date data.
+	 * 
+	 * @param manager
+	 *            Current instance of the PluginManager for the running application
+	 */
 	@Override
 	public void init(final PluginManager manager) throws Exception {
 		super.init(manager);
@@ -107,6 +128,10 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 	}
 
+	/**
+	 * Shuts down the current instance (i.e. stops the thread) and stops the timer for recalculation
+	 * of the positions and deleting out of date data.
+	 */
 	@Override
 	public void shutdown() throws Exception {
 		super.shutdown();
@@ -115,6 +140,12 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		// this.repositionTimer.cancel();
 	}
 
+	/**
+	 * Provides the position where the node must be drawn on the drawing area
+	 * 
+	 * @param nodeId
+	 *            ID of the node whose position is asked
+	 */
 	@Override
 	public AbsolutePosition getPosition(final int nodeId) {
 		log.debug("SEP " + this.getInstanceName() + " was asked for position of node ID: " + nodeId);
@@ -145,7 +176,7 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
-		// TODO Auto-generated method stub
+		// this is never called and thus nothing is to do here
 	}
 
 	@Override
@@ -154,24 +185,42 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		this.neighbours.clear();
 	}
 
+	/**
+	 * Returns the number of nodes whose position information is provided by this instance
+	 * 
+	 * @return Number of nodes
+	 */
 	@Override
 	public int getNumNodes() {
 		return nodeMap.size();
 	}
 
+	/**
+	 * Returns false since the SpringEmbedderPositioner does not offer metrical data
+	 * 
+	 * @return false
+	 */
 	@Override
 	public boolean offersMetric() {
 		return false;
 	}
 
+	/**
+	 * Returns a list of all nodes whose positions are provided by this instance
+	 * 
+	 * @return list of node Ids
+	 */
 	@Override
 	public List<Integer> getNodeList() {
 		return new ArrayList<Integer>(this.nodeMap.keySet());
 	}
 
 	/**
-	 * Contrary to the usual convention for packet handling, a NodePositioner must handle packets
-	 * synchronously.
+	 * Handles the packet which is dispatched to this instance. Contrary to the usual convention for
+	 * packet handling, a NodePositioner must handle packets synchronously.
+	 * 
+	 * @param packet
+	 *            A SpyGlass packet
 	 */
 	@Override
 	public void handlePacket(final SpyglassPacket packet) {
@@ -417,6 +466,15 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		return result;
 	}
 
+	/**
+	 * Adds a list of new nodes to the current network. All the nodes in this list will be taken
+	 * into account from the next recalculation round on. Since this is method is used when one
+	 * wants to hold all known nodes information when starting a new NodePositioner, the parameter
+	 * is called oldNodeMap.
+	 * 
+	 * @param oldNodeMap
+	 *            Map<Integer, PositionData> with nodeID and the positions of the nodes
+	 */
 	@Override
 	public void addNodes(final Map<Integer, PositionData> oldNodeMap) {
 		final Iterator<Integer> it = oldNodeMap.keySet().iterator();
@@ -429,11 +487,13 @@ public class SpringEmbedderPositionerPlugin extends NodePositionerPlugin {
 		}
 	}
 
-	// --------------------------------------------------------------------------------
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Returns a Map of all known nodes and there real positions, i.e. the position set in the last
+	 * packets header
 	 * 
 	 * @see de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin#getNodeMap()
+	 * 
+	 * @return Map<Integer, PositionData> with node IDs and appropriate real positions
 	 */
 	@Override
 	public Map<Integer, PositionData> getNodeMap() {

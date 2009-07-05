@@ -142,10 +142,13 @@ public class LinePainterOptionsComposite extends Composite {
 
 				data = new GridData();
 				data.widthHint = 40;
-				data.horizontalSpan = 2;
+				// data.horizontalSpan = 2;
 
 				ttl = new Text(group, SWT.BORDER);
 				ttl.setLayoutData(data);
+
+				final Label label1 = new Label(group, SWT.NONE);
+				label1.setText("seconds");
 
 			}
 

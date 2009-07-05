@@ -14,7 +14,12 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
 
 // --------------------------------------------------------------------------------
 /**
- * @author olli
+ * The PositionDataSE is used by the SpringEmbedderPositioner to provide the nodes positions with
+ * respect to the calculated attraction and repulsion forces.
+ * 
+ * Additionally it keeps the real positions in the background.
+ * 
+ * @author Oliver Kleine
  * 
  */
 public class PositionDataSE extends PositionData {
