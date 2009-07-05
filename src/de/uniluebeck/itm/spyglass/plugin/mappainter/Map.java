@@ -1,3 +1,12 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.plugin.mappainter;
 
 import org.eclipse.swt.graphics.Color;
@@ -12,9 +21,9 @@ import de.uniluebeck.itm.spyglass.positions.PixelRectangle;
 
 /**
  * A map object for the MapPainterPlugin
- *
+ * 
  * @author Dariush Forouher
- *
+ * 
  */
 public class Map extends DrawingObject {
 
@@ -22,7 +31,7 @@ public class Map extends DrawingObject {
 
 	/**
 	 * This matrix contains the values which will be then converted to colors and drawn.
-	 *
+	 * 
 	 * storage format is: dataMatrix[row][column]
 	 */
 	private double[][] dataMatrix;
@@ -51,11 +60,11 @@ public class Map extends DrawingObject {
 		drawRect.setHeight(xmlConfig.getGridElementHeight());
 		drawRect.setWidth(xmlConfig.getGridElementWidth());
 
-		for(int row=0; row<xmlConfig.getRows(); row++) {
-			for(int col=0; col<xmlConfig.getCols(); col++) {
+		for (int row = 0; row < xmlConfig.getRows(); row++) {
+			for (int col = 0; col < xmlConfig.getCols(); col++) {
 				final AbsolutePosition newPos = new AbsolutePosition();
-				newPos.x = col*xmlConfig.getGridElementWidth() + xmlConfig.getLowerLeftX();
-				newPos.y = row*xmlConfig.getGridElementHeight() + xmlConfig.getLowerLeftY();
+				newPos.x = col * xmlConfig.getGridElementWidth() + xmlConfig.getLowerLeftX();
+				newPos.y = row * xmlConfig.getGridElementHeight() + xmlConfig.getLowerLeftY();
 				drawRect.setLowerLeft(newPos);
 
 				// Clipping
@@ -91,8 +100,7 @@ public class Map extends DrawingObject {
 		gc.fillRectangle(pxRect.toSWTRectangle());
 
 		if (DEBUG) {
-			gc.drawText(String.format("%.0f", average), pxRect.getUpperLeft().x, pxRect
-					.getUpperLeft().y);
+			gc.drawText(String.format("%.0f", average), pxRect.getUpperLeft().x, pxRect.getUpperLeft().y);
 		}
 
 		color.dispose();
@@ -104,14 +112,12 @@ public class Map extends DrawingObject {
 	private RGB calculateColor(final double value) {
 
 		// normalize value between minValue and maxValue to the range [0;1]
-		final double lambda = (value - xmlConfig.getMinValue())
-				/ (xmlConfig.getMaxValue() - xmlConfig.getMinValue());
+		final double lambda = (value - xmlConfig.getMinValue()) / (xmlConfig.getMaxValue() - xmlConfig.getMinValue());
 
 		// Calculate new Color
 		final int[] rgb = new int[3];
 		for (int k = 0; k < 3; k++) {
-			final double d = xmlConfig.getMinColorRGB()[k] + lambda
-					* (xmlConfig.getMaxColorRGB()[k] - xmlConfig.getMinColorRGB()[k]);
+			final double d = xmlConfig.getMinColorRGB()[k] + lambda * (xmlConfig.getMaxColorRGB()[k] - xmlConfig.getMinColorRGB()[k]);
 
 			if (d < 0) {
 				rgb[k] = 0;
@@ -125,12 +131,11 @@ public class Map extends DrawingObject {
 		// log.debug(String.format("Element %s with value %f gets color [%d,%d,%d]; lambda=%f",
 		// centerPoint, average, rgb[0], rgb[1], rgb[2], lambda));
 
-//		final Random r = new Random();
-//		return new RGB(r.nextInt(256), r.nextInt(256), r.nextInt(256));
+		// final Random r = new Random();
+		// return new RGB(r.nextInt(256), r.nextInt(256), r.nextInt(256));
 		return new RGB(rgb[0], rgb[1], rgb[2]);
 
 	}
-
 
 	@Override
 	protected AbsoluteRectangle calculateBoundingBox() {

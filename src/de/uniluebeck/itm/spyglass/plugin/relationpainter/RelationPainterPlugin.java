@@ -18,19 +18,23 @@ import de.uniluebeck.itm.spyglass.plugin.Plugin;
  * 
  */
 public abstract class RelationPainterPlugin extends Plugin implements Drawable {
-	
+
+	// --------------------------------------------------------------------------------
+	/**
+	 * Constructor
+	 */
 	public RelationPainterPlugin() {
 		super(true);
 	}
-	
+
 	public final int getTimeout() {
 		return getXMLConfig().getTimeout();
 	}
-	
+
 	public static String getHumanReadableName() {
 		return "RelationPainter";
 	}
-	
+
 	@Override
 	public String toString() {
 		return RelationPainterPlugin.getHumanReadableName() + "." + this.getInstanceName();

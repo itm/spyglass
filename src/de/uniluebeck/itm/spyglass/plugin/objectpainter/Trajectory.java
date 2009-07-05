@@ -1,6 +1,11 @@
-// --------------------------------------------------------------------------------
-/**
- *
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
  */
 package de.uniluebeck.itm.spyglass.plugin.objectpainter;
 
@@ -34,7 +39,7 @@ public class Trajectory extends TimerTask {
 
 	private Image image = null;
 
-	Trajectory(final ObjectPainterPlugin objectPainterPlugin,final List<TrajectorySection> list, final String filename) {
+	Trajectory(final ObjectPainterPlugin objectPainterPlugin, final List<TrajectorySection> list, final String filename) {
 		this.plugin = objectPainterPlugin;
 		this.image = new Image(filename);
 		this.list = list;
@@ -71,7 +76,7 @@ public class Trajectory extends TimerTask {
 
 		// Draw lines
 		for (final DrawingObject d : lines) {
-				this.plugin.layer.add(d);
+			this.plugin.layer.add(d);
 			this.plugin.fireDrawingObjectAddedInternal(d);
 		}
 
@@ -84,9 +89,8 @@ public class Trajectory extends TimerTask {
 	@Override
 	public void run() {
 
-		if (System.currentTimeMillis() - scheduledExecutionTime() >=
-	           50) {
-			return;  // Too late; skip this execution.
+		if (System.currentTimeMillis() - scheduledExecutionTime() >= 50) {
+			return; // Too late; skip this execution.
 		}
 
 		final long time = System.currentTimeMillis();

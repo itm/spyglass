@@ -1,23 +1,31 @@
+/*
+ * --------------------------------------------------------------------------------
+ * This file is part of the WSN visualization framework SpyGlass. Copyright (C)
+ * 2004-2007 by the SwarmNet (www.swarmnet.de) project SpyGlass is free
+ * software; you can redistribute it and/or modify it under the terms of the BSD
+ * License. Refer to spyglass-licence.txt file in the root of the SpyGlass
+ * source tree for further details.
+ * --------------------------------------------------------------------------------
+ */
 package de.uniluebeck.itm.spyglass.plugin.nodesensorrange;
 
 import org.eclipse.core.databinding.conversion.Converter;
 
 import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig.RANGE_TYPE;
 
-
 // --------------------------------------------------------------------------------
 /**
- * Converts from {@link RANGE_TYPE} to {@link String} and from {@link String} to
- * {@link RANGE_TYPE} respectively
- *
+ * Converts from {@link RANGE_TYPE} to {@link String} and from {@link String} to {@link RANGE_TYPE}
+ * respectively
+ * 
  * @author Sebastian Ebers
- *
+ * 
  */
 public class NodeSensorRangeTypeConverter extends Converter {
 
 	/**
 	 * Creates an instance of this class which converts one type into another
-	 *
+	 * 
 	 * @param fromType
 	 *            the class of the value which has to be converted
 	 * @param toType
