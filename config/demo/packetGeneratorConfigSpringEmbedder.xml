@@ -1,0 +1,107 @@
+<!-- a sample configuration file for the packet generator
+ -->
+<packetGenerator>
+
+	<!-- number of nodes sent per second -->
+	<packetsPerSecond>1</packetsPerSecond>
+
+	<!-- Sinks which will handle each generated packet. -->
+	<sinks>
+		<!-- this sink opens a socket, from which iShell can fetch the packets. -->
+		<sink class="de.uniluebeck.itm.spyglass.packetgenerator.sinks.IShellSocketSink">
+			<ip>0.0.0.0</ip>
+			<port>8472</port>
+			<iShellSourceNode>1</iShellSourceNode>
+		</sink>
+
+	</sinks>
+
+
+	<sampleChooser>
+	  <samples>
+		<!-- list of samples from which the packets are generated. each sample
+		 ! has a given probability of being selected -->
+
+
+<!-- SpringEmbedder Testcase -->
+			<!-- The center node (has neighbours 1 to 3)-->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>springembedder 100</name>
+				<probability>1</probability>
+				<nodeIDs>100</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+ 				<semanticTypes>9</semanticTypes>
+				<position x="0-5000" y="2000-4000" z="0"/>
+				<payload>000100020003</payload>
+			</sample>
+			
+			<!-- Node 1 (has neighbors 100 and 10-19) -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>springembedder 1</name>
+				<probability>1</probability>
+				<nodeIDs>1</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>9</semanticTypes>
+				<position x="0-5000" y="2000-4000" z="0"/>
+				<payload>000A000B000C000D000E000F00100011001200130064</payload>
+			</sample>
+			
+			<!-- Nodes 10-19 (have neighbour 1) -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>springembedder 10-19</name>
+				<probability>1</probability>
+				<nodeIDs>10-19</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>9</semanticTypes>
+				<position x="0-5000" y="2000-4000" z="0"/>
+				<payload>0001</payload>
+			</sample>
+			
+			<!-- Node 2 (has neighborurs 100 and 20-29) -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>springembedder 2</name>
+				<probability>1</probability>
+				<nodeIDs>2</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>9</semanticTypes>
+				<position x="0-5000" y="2000-4000" z="0"/>
+				<payload>001400150016001700180019001A001B001C001D0064</payload>
+			</sample>
+			
+			<!-- Nodes 20-29 (have neighbour 2) -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>springembedder 20-29</name>
+				<probability>1</probability>
+				<nodeIDs>20-29</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>9</semanticTypes>
+				<position x="0-5000" y="2000-4000" z="0"/>
+				<payload>0002</payload>
+			</sample>
+
+			<!-- Node 3 (has neighbours 30-39) -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>springembedder 3</name>
+				<probability>1</probability>
+				<nodeIDs>3</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>9</semanticTypes>
+				<position x="0-5000" y="2000-4000" z="0"/>
+				<payload>001E001F002000210022002300240025002600270064</payload>
+			</sample>
+			
+			<!-- Nodes 30-39 (have neighbour 3) -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>springembedder 30-39</name>
+				<probability>1</probability>
+				<nodeIDs>30-39</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>9</semanticTypes>
+				<position x="0-5000" y="2000-4000" z="0"/>
+				<payload>0003</payload>
+			</sample>
+
+		</samples>
+	</sampleChooser>
+	
+</packetGenerator>

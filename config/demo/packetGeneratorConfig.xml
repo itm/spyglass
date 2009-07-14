@@ -3,7 +3,7 @@
 <packetGenerator>
 
 	<!-- number of nodes sent per second -->
-	<packetsPerSecond>10</packetsPerSecond>
+	<packetsPerSecond>1</packetsPerSecond>
 
 	<!-- Sinks which will handle each generated packet. -->
 	<sinks>
@@ -16,138 +16,217 @@
 
 	</sinks>
 
+
 	<sampleChooser>
+	  <samples>
 		<!-- list of samples from which the packets are generated. each sample
 		 ! has a given probability of being selected -->
-		<samples>
-
-			<!-- Ein paar bewegende nodes mit nachbarschaftsinfos -->
-	
-			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.GraphSample">
-
-				<name>Graph</name>
-				
-				<!-- the probability that this sample is selected -->
-				<probability>50</probability>
-				
-				<!-- the syntaxType.
-				 ! Note that anything other than uint16List will break the LinePainterPlugin!
-				 !-->
-				<syntaxType>uint16List</syntaxType>
-				
-				<!-- a list of semantic types. the types can be seperated by commata. additionally
-				 ! they can be given as a range. for each packet a type is randomly selected.
-				 ! -->				 
-				<semanticTypes>10</semanticTypes>
-				
-				<!-- the position of the packets. as with the nodeIDs and the semanticTypes,
-				 ! lists or ranges can be given. -->
-				<position x="0-1000" y="0-1000" z="0"/>
-				
-				<!-- Number of neighbors each node has -->
-				<neighborCount>5</neighborCount>
-				
-				<!-- number of nodes in the graph -->
-				<numberOfNodes>50</numberOfNodes>
-				
-				<!-- Random velocity of the nodes (ranges) (plz don't use negative values a.t.m.) -->
-				<velocity x="0" y="0" z="0"/>
-				
-			</sample>
 
 
-			<!-- Mappainter Testcase -->
+<!-- Mappainter Testcase -->
 	
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>mappainter</name>
 				<probability>1</probability>
-				<nodeIDs>201-220</nodeIDs>
+				<nodeIDs>201-210</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>20</semanticTypes>
-				<position x="0-1000" y="20000" z="0"/>
+				<position x="8000-10000" y="1000" z="0"/>
 				<payload>FF</payload>
 			</sample>
 
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>mappainter</name>
 				<probability>1</probability>
-				<nodeIDs>221-240</nodeIDs>
+				<nodeIDs>211-220</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>20</semanticTypes>
-				<position x="0-1000" y="20100" z="0"/>
-				<payload>00</payload>
-			</sample>
-
-			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
-				<name>mappainter</name>
-				<probability>1</probability>
-				<nodeIDs>241-260</nodeIDs>
-				<syntaxType>uint8List</syntaxType>
-				<semanticTypes>20</semanticTypes>
-				<position x="0-1000" y="20200" z="0"/>
+				<position x="8000-10000" y="700" z="0"/>
 				<payload>A0</payload>
 			</sample>
 
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>mappainter</name>
 				<probability>1</probability>
-				<nodeIDs>261-280</nodeIDs>
+				<nodeIDs>221-230</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>20</semanticTypes>
-				<position x="0-1000" y="20300" z="0"/>
+				<position x="8000-10000" y="300" z="0"/>
 				<payload>30</payload>
 			</sample>
 
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
 				<name>mappainter</name>
 				<probability>1</probability>
-				<nodeIDs>281-300</nodeIDs>
+				<nodeIDs>231-240</nodeIDs>
 				<syntaxType>uint8List</syntaxType>
 				<semanticTypes>20</semanticTypes>
-				<position x="0-1000" y="20400" z="0"/>
+				<position x="8000-10000" y="0" z="0"/>
 				<payload>10</payload>
 			</sample>
-			
-			
-			<!-- VectorSequencePainter test case -->
 	
-			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
-				<name>demo sample7</name>
-				<probability>1</probability>
-				<nodeIDs>150</nodeIDs>
-				<syntaxType>int16List</syntaxType>
-				<semanticTypes>30</semanticTypes>
-				<position x="-500" y="500" z="0"/>
-				<payload>0000000003E8000003E803E8000003E800000000</payload>
-			</sample>
-			
-			<!-- ObjectPainter Testcase -->
+<!-- ObjectPainter Testcase -->
+			<!-- Krankenwagen vom Mönkhofer Weg -->
 			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySample">
 				<name>trajectory</name>
 				<probability>1</probability>
-				<semanticTypes>40</semanticTypes>
+				<nodeIDs>112</nodeIDs>
+				<semanticTypes>112</semanticTypes>
 				<sections class="java.util.ArrayList">
 					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
-						<pos x="-10000" y="10000" z="0"/>
+						<pos x="3300" y="640" z="0"/>
 						<duration>10</duration>
 					</section>
 					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
-						<pos x="10000" y="10000" z="0"/>
+						<pos x="3260" y="430" z="0"/>
+						<duration>5</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="3320" y="430" z="0"/>
 						<duration>10</duration>
 					</section>
 					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
-						<pos x="20000" y="10000" z="0"/>
-						<duration>10</duration>
-					</section>
-					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
-						<pos x="10000" y="20000" z="0"/>
+						<pos x="3520" y="100" z="0"/>
 						<duration>XX</duration>
 					</section>
 				</sections>
 			</sample>
 			
+			<!-- Krankenwagen von Ratzeburger Allee -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySample">
+				<name>trajectory</name>
+				<probability>1</probability>
+				<semanticTypes>112</semanticTypes>
+				<sections class="java.util.ArrayList">
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="3800" y="630" z="0"/>
+						<duration>10</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="3620" y="540" z="0"/>
+						<duration>5</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="3440" y="490" z="0"/>
+						<duration>10</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="3320" y="430" z="0"/>
+						<duration>10</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="3520" y="100" z="0"/>
+						<duration>XX</duration>
+					</section>
+				</sections>
+			</sample>
+			
+			<!-- Hubschrauber von links -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySample">
+				<name>trajectory</name>
+				<probability>1</probability>
+				<semanticTypes>113</semanticTypes>
+				<sections class="java.util.ArrayList">
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="3000" y="100-600" z="0"/>
+						<duration>10</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="3500-3700" y="300-400" z="0"/>
+						<duration>10</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="3500" y="0" z="0"/>
+						<duration>XX</duration>
+					</section>
+				</sections>
+			</sample>
+			
+			<!-- Hubschrauber von rechts -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySample">
+				<name>trajectory</name>
+				<probability>1</probability>
+				<semanticTypes>113</semanticTypes>
+				<sections class="java.util.ArrayList">
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="4000" y="100-600" z="0"/>
+						<duration>10</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="3500-3700" y="300-400" z="0"/>
+						<duration>10</duration>
+					</section>
+					<section class="de.uniluebeck.itm.spyglass.packetgenerator.samples.TrajectorySection">
+						<pos x="3500" y="0" z="0"/>
+						<duration>XX</duration>
+					</section>
+				</sections>
+			</sample>
 
 
+<!-- NodeSensorRange and LinePainter Testcase -->
+			<!-- beliebige Positionen innerhalb eines Bereichs -->
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>nsr+lp 1</name>
+				<probability>1</probability>
+				<nodeIDs>500</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>60</semanticTypes>
+				<position x="10000-10500" y="2000-2500" z="0"/>
+				<payload>01F5000001F5</payload>
+			</sample>
+			
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>nsr+lp 1</name>
+				<probability>1</probability>
+				<nodeIDs>501</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>60</semanticTypes>
+				<position x="14500-15000" y="2000-2500" z="0"/>
+				<payload>01F6000001F6</payload>
+			</sample>
+			
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>nsr+lp 1</name>
+				<probability>1</probability>
+				<nodeIDs>502</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>60</semanticTypes>
+				<position x="14500-15000" y="3000-3500" z="0"/>
+				<payload>01F7000001F7</payload>
+			</sample>
+			
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>nsr+lp 1</name>
+				<probability>1</probability>
+				<nodeIDs>503</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>60</semanticTypes>
+				<position x="12000-13000" y="3500-4000" z="0"/>
+				<payload>01F8000001F8</payload>
+			</sample>
+			
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>nsr+lp 1</name>
+				<probability>1</probability>
+				<nodeIDs>504</nodeIDs>
+				<syntaxType>uint16List</syntaxType>
+				<semanticTypes>60</semanticTypes>
+				<position x="10000-10500" y="3000-3500" z="0"/>
+				<payload>01F4000001F4</payload>
+			</sample>
+
+<!-- VectorSequencePainter test case -->
+	
+			<sample class="de.uniluebeck.itm.spyglass.packetgenerator.samples.PayloadSample">
+				<name>vectorsequence</name>
+				<probability>1</probability>
+				<nodeIDs>600</nodeIDs>
+				<syntaxType>int16List</syntaxType>
+				<semanticTypes>99</semanticTypes>
+				<position x="-500" y="500" z="0"/>
+				<payload>0000000003E8000003E803E8000003E800000000</payload>
+			</sample>			
 		</samples>
 	</sampleChooser>
 	
