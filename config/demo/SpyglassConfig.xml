@@ -6,7 +6,7 @@
       <plugins class="java.util.ArrayList">
          <plugin class="de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangePlugin">
             <parameters>
-               <active>true</active>
+               <active>false</active>
                <visible>true</visible>
                <name>NSR 1</name>
                <timeout>0</timeout>
@@ -32,29 +32,7 @@
                   </range>
                   <rangeType>Circle</rangeType>
                </defaultConfig>
-               <perNodeConfigs>
-                  <perNodeConfigs>
-                     <nodeId>500</nodeId>
-                     <lineWidth>1</lineWidth>
-                     <backgroundAlpha>30</backgroundAlpha>
-                     <backgroundRGB length="3">
-                        <int>0</int>
-                        <int>255</int>
-                        <int>0</int>
-                     </backgroundRGB>
-                     <colorRGB length="3">
-                        <int>0</int>
-                        <int>0</int>
-                        <int>0</int>
-                     </colorRGB>
-                     <range class="de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangeXMLConfig$ConeRange">
-                        <coneOrientation>30</coneOrientation>
-                        <coneRadius>400</coneRadius>
-                        <coneViewAngle>90</coneViewAngle>
-                     </range>
-                     <rangeType>Cone</rangeType>
-                  </perNodeConfigs>
-               </perNodeConfigs>
+               <perNodeConfigs/>
             </parameters>
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.mappainter.MapPainterPlugin">
@@ -137,7 +115,7 @@
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter.VectorSequencePainterPlugin">
             <parameters>
-               <active>true</active>
+               <active>false</active>
                <visible>true</visible>
                <name>VSP 1</name>
                <timeout>10</timeout>
@@ -381,7 +359,7 @@
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
             <parameters>
-               <active>true</active>
+               <active>false</active>
                <visible>true</visible>
                <name>NSR und LP Nodes</name>
                <timeout>0</timeout>
@@ -403,9 +381,9 @@
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.linepainter.LinePainterPlugin">
             <parameters>
-               <active>true</active>
+               <active>false</active>
                <visible>true</visible>
-               <name>default (2)</name>
+               <name>LP 1</name>
                <timeout>0</timeout>
                <semanticTypes length="1">
                   <int>60</int>
