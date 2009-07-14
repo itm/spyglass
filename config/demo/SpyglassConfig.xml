@@ -44,7 +44,7 @@
                <semanticTypes length="1">
                   <int>20</int>
                </semanticTypes>
-               <defaultValue>0.0</defaultValue>
+               <defaultValue>128.0</defaultValue>
                <gridElementHeight>10</gridElementHeight>
                <gridElementWidth>10</gridElementWidth>
                <lowerLeftX>8000</lowerLeftX>
@@ -133,7 +133,7 @@
          </plugin>
          <plugin class="de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin">
             <parameters>
-               <active>false</active>
+               <active>true</active>
                <visible>true</visible>
                <name>MP1 Nodes</name>
                <timeout>0</timeout>
@@ -143,17 +143,18 @@
                <stringFormatters/>
                <defaultStringFormatter>Temp: %u19</defaultStringFormatter>
                <extendedInformation>
-                  <isActive nodeID="205">false</isActive>
                   <isActive nodeID="275">false</isActive>
+                  <isActive nodeID="205">false</isActive>
                   <isActive nodeID="1">false</isActive>
-                  <isActive nodeID="207">false</isActive>
                   <isActive nodeID="2">false</isActive>
-                  <isActive nodeID="206">false</isActive>
-                  <isActive nodeID="3">false</isActive>
+                  <isActive nodeID="207">false</isActive>
                   <isActive nodeID="272">false</isActive>
+                  <isActive nodeID="3">false</isActive>
+                  <isActive nodeID="206">false</isActive>
                   <isActive nodeID="278">true</isActive>
                   <isActive nodeID="203">false</isActive>
                   <isActive nodeID="202">false</isActive>
+                  <isActive nodeID="220">false</isActive>
                   <isActive nodeID="221">false</isActive>
                   <isActive nodeID="216">false</isActive>
                   <isActive nodeID="217">false</isActive>
@@ -168,13 +169,15 @@
                   <isActive nodeID="100">false</isActive>
                   <isActive nodeID="235">false</isActive>
                   <isActive nodeID="234">false</isActive>
+                  <isActive nodeID="233">false</isActive>
                   <isActive nodeID="230">false</isActive>
                   <isActive nodeID="229">false</isActive>
                   <isActive nodeID="228">false</isActive>
                   <isActive nodeID="227">false</isActive>
                   <isActive nodeID="252">false</isActive>
-                  <isActive nodeID="300">false</isActive>
                   <isActive nodeID="242">false</isActive>
+                  <isActive nodeID="300">false</isActive>
+                  <isActive nodeID="240">false</isActive>
                </extendedInformation>
                <isExtendedDefaultValue>false</isExtendedDefaultValue>
                <lineColorRGB length="3">
@@ -293,7 +296,7 @@
                <imageSizeX>100</imageSizeX>
                <imageSizeY>50</imageSizeY>
                <keepProportions>false</keepProportions>
-               <drawLine>false</drawLine>
+               <drawLine>true</drawLine>
                <packetType3D>true</packetType3D>
                <lineColor length="3">
                   <int>255</int>
@@ -320,8 +323,8 @@
                   <isActive nodeID="511">false</isActive>
                   <isActive nodeID="512">false</isActive>
                   <isActive nodeID="505">false</isActive>
-                  <isActive nodeID="218">true</isActive>
                   <isActive nodeID="506">false</isActive>
+                  <isActive nodeID="218">true</isActive>
                   <isActive nodeID="503">false</isActive>
                   <isActive nodeID="226">true</isActive>
                </extendedInformation>
