@@ -54,7 +54,7 @@
           target: cleanup                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="cleanup">
-			<delete dir="${doc.dir}"/>
+			<delete dir="${doc.dir}/api"/>
 			<delete dir="${classes.dir}"/>
 	
 	</target>
@@ -163,7 +163,7 @@
 	<!-- target: doc -->
 	<!-- +++++++++++++++++++++++++++++++++++++ -->
 
-	<target name="doc" depends="init">
+	<target name="doc" depends="init" description="Make documentation">
 		
               <javadoc packagenames="de.*"
                    sourcepath="${src.dir}" 
