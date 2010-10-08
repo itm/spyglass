@@ -353,7 +353,7 @@ public abstract class DrawingObject implements Cloneable {
 		final int y = rect.getUpperLeft().y;
 		final int width = rect.getWidth();
 		final int height = rect.getHeight();
-		final Color color = new Color(gc.getDevice(), 255, 0, 0);
+		final Color color = new Color(Display.getCurrent(), 255, 0, 0);
 		gc.setLineWidth(1);
 		gc.setForeground(color);
 		gc.drawRectangle(x, y, width, height);

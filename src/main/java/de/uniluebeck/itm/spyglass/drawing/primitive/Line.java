@@ -10,6 +10,7 @@ package de.uniluebeck.itm.spyglass.drawing.primitive;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 import org.simpleframework.xml.Root;
 
 import de.uniluebeck.itm.spyglass.drawing.DrawingObject;
@@ -132,7 +133,7 @@ public class Line extends DrawingObject implements TransformChangedListener {
 	@Override
 	public void draw(final GC gc) {
 
-		final Color color = new Color(gc.getDevice(), this.getColor());
+		final Color color = new Color(Display.getCurrent(), this.getColor());
 		gc.setForeground(color);
 		gc.setLineWidth(this.getLineWidth());
 

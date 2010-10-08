@@ -87,6 +87,9 @@ public class SpyglassApp extends ApplicationWindow {
 	 */
 	public static void main(final String[] args) {
 
+		log.debug("java.library.path=" + System.getProperty("java.library.path"));
+		log.debug("java.class.path=" + System.getProperty("java.class.path"));
+
 		// Set an exception handler which will handle uncaught exceptions
 		Window.setExceptionHandler(new SpyglassExceptionHandler());
 

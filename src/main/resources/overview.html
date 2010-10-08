@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+</head>
+<body bgcolor="white">
+
+<h1>Spyglass</h1>
+A modular and extensible visualization framework for wireless sensor networks.
+
+<h2>Contents</h2>
+<ul>
+	<li><a href="#AnchorCompatibility">Compatibility</a></li>
+	<li><a href="#AnchorGetTheSources">Get the sources</a></li>
+	<li><a href="#AnchorCompiling">Compiling</a></li>
+	<li><a href="#AnchorRunning">Running</a></li>
+</ul>
+
+
+
+<a name="AnchorCompatibility"></a><h2>Compatibility</h2>
+
+<p>Spyglass only requires Java 6 in order to be successfully run. All libraries needed are
+contained in the projects sources. So generally speaking, it should run on every
+well-established OS.</p>
+
+<p>However, there's an issue with Mac OS X. As Spyglass is written using SWT
+(<a href="http://www.eclipse.org/swt/">http://www.eclipse.org/swt/</a>) and Java 6, at the
+time of writing this, it can currently not be run on Mac OS X. Since there's only a 64-bit
+implementation of Java 6 for Mac OS X and SWT is still based on 32-bit based Carbon
+UI-Framework it simply won't run. There's an implementation of SWT for Cocoa going on which
+will be shipped with Eclipse 3.5 (expected for May 2009 or later).</p>
+
+
+
+<a name="AnchorGetTheSources"></a><h2>Get the sources</h2>
+
+The Spyglass project is hosted on SourceForge.net
+(<a href="http://sourceforge.net/projects/itm-spyglass">http://sourceforge.net/projects/itm-spyglass</a>).<br/>
+You can check out it's sources with a Subversion client from 
+<a href="https://itm-spyglass.svn.sourceforge.net/svnroot/itm-spyglass">https://itm-spyglass.svn.sourceforge.net/svnroot/itm-spyglass</a>. 
+
+
+
+<a name="AnchorCompiling"></a><h2>Compiling</h2>
+
+<p>After checking out the sources there are some OS-specific project properties that must be set in
+order to get Spyglass up and running.</p>
+
+<h3>Adding libraries to the build path</h3>
+The folder <i>lib</i> contains all libraries that are needed to get Spyglass up and running.
+Make sure the following libraries are contained in your projects build path:
+<ul>
+	<li>lib/ishell-contained-libs/*.jar</li>
+	<li>lib/&lt;&lt;OS&gt;&gt;/*.jar where &lt;&lt;OS&gt;&gt; must be replaced with the folder
+	corresponding to your operating system. Make sure that libraries from other OS' are NOT on
+	the build path!</li>
+	<li>lib/*.jar</li>
+</ul>
+
+
+
+<a name="AnchorRunning"></a><h2>Running</h2>
+
+Once the project is set up and compiling there are several ways to run Spyglass:
+<ol>
+	<li>
+		<p><b>For Eclipse:</b><br/>
+		Eclipse launch configurations are part of the project checkout and are located in the projects
+		root folder and have the file name ending .launch. After checking out you should find the run
+		configurations in the well known Run/Debug dialogs of Eclipse.<br/>
+		If you can't find them it can mean, that the .launch file contains other project paths than your
+		checked out project. In this case, simply open the .launch file and search/replace the the
+		projects' paths corresponding to the name of your checkout folder in the workspace. This should
+		do it.</p>
+		
+		<ol>
+			<li>
+				<p><b>Stand-Alone</b><br/>
+				Use the configuration file <i>Spyglass Stand-Alone.launch</i>. This will start
+				the stand-alone version of Spyglass by calling
+				{@see de.uniluebeck.itm.spyglass.SpyglassApp}.</p>
+				
+			</li>
+			<li>
+				<p><b>As an iShell plugin</b><br/>
+				Use the launch configuration files <i>iShell Linux.launch</i> or
+				<i>iShell Windows.launch</i>. This will start Spyglass as a plugin for iShell.</p>
+				
+			</li>
+		</ol>
+	</li>
+	<li>
+		<p><b>As Ant build script:</b><br/>
+		The Ant build script defines targets for Linux and Windows, for stand-alone version and for
+		the iShell plugin. The resulting .jar file is executable (by running <i>java -jar filename.jar</i>).
+		It contains all libraries needed to run if JRE 6 is present.<br/>
+		If startup fails with an java.lang.OutOfMemoryError exception try to enlarge the VMs heap space
+		by adding <i>-Xmx128m</i> (128 Megs usually do it) to the shell command.</p>
+		
+		<ol>
+			<li>
+				<p><b>Stand-Alone</b><br/>
+				Simply run <i>ant standalone-win32</i> or <i>ant standalone-linux</i> to create a jar
+				file that can afterwards be run by <i>java -jar spyglass-win32-standalone.jar</i> or
+				<i>java -jar spyglass-linux-standalone.jar</i>.</p>
+				
+			</li>
+			<li>
+				<p><b>As an iShell plugin</b><br/>
+				Simply run <i>ant ishell-win32</i> or <i>ant ishell-linux</i> to create a jar file
+				that can afterwards be run by <i>java -jar ishell-win32-spyglass.jar</i> or
+				<i>java -jar ishell-linux-spyglass.jar</i>.</p>
+				
+			</li>
+		</ol>
+	</li>
+</ol>
+
+<hr />
+This introduction was written by Daniel Bimschas
+(<a href="mailto:daniel@bimschas.com">daniel@bimschas.com</a>).
+Feel free to contact me regarding questions or errors in this document.
+
+</body>
+</html>
