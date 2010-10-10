@@ -30,103 +30,165 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>de.uniluebeck.itm</groupId>
-	<artifactId>spyglass</artifactId>
-	<packaging>jar</packaging>
+	<groupId>de.uniluebeck.itm.spyglass</groupId>
+	<artifactId>spyglass-parent</artifactId>
+	<packaging>pom</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>Spyglass</name>
+	<name>SpyGlass</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.15</version>
-		</dependency>
-		<dependency>
-			<groupId>org.simpleframework</groupId>
-			<artifactId>simple-xml</artifactId>
-			<version>1.7.3</version>
-		</dependency>
-		<dependency>
-			<groupId>de.danbim.swtquadtree</groupId>
-			<artifactId>swtquadtree</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.ui.workbench</artifactId>
-			<version>3.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.ui.forms</artifactId>
-			<version>3.3.100</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.osgi</artifactId>
-			<version>3.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.jface</artifactId>
-			<version>3.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.jface.databinding</artifactId>
-			<version>1.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.equinox.common</artifactId>
-			<version>3.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.core.runtime</artifactId>
-			<version>3.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.core.databinding</artifactId>
-			<version>1.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.core.databinding.beans</artifactId>
-			<version>1.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.core.commands</artifactId>
-			<version>3.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.coalesenses.ishell</groupId>
-			<artifactId>ishell-linux</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.swt</groupId>
-			<artifactId>${swt.os-specific-dep}</artifactId>
-			<version>${swt.version}</version>
-		</dependency>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.source.version>1.6</java.source.version>
+		<java.target.version>1.6</java.target.version>
+	</properties>
 
-	</dependencies>
+	<modules>
+		<module>core</module>
+		<!--<module>ishell</module>-->
+		<module>standalone</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.8.1</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>de.uniluebeck.itm.spyglass</groupId>
+				<artifactId>spyglass-parent</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.uniluebeck.itm.spyglass</groupId>
+				<artifactId>spyglass-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.uniluebeck.itm.spyglass</groupId>
+				<artifactId>spyglass-standalone</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<!--<dependency>
+				<groupId>de.uniluebeck.itm.spyglass</groupId>
+				<artifactId>spyglass-ishell</artifactId>
+				<version>${project.version}</version>
+			</dependency>-->
+
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>1.2.15</version>
+			</dependency>
+			<dependency>
+				<groupId>org.simpleframework</groupId>
+				<artifactId>simple-xml</artifactId>
+				<version>1.7.3</version>
+			</dependency>
+			<dependency>
+				<groupId>de.danbim.swtquadtree</groupId>
+				<artifactId>swtquadtree</artifactId>
+				<version>1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse</groupId>
+				<artifactId>org.eclipse.ui.workbench</artifactId>
+				<version>3.4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse</groupId>
+				<artifactId>org.eclipse.ui.forms</artifactId>
+				<version>3.3.100</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse</groupId>
+				<artifactId>org.eclipse.osgi</artifactId>
+				<version>3.4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse</groupId>
+				<artifactId>org.eclipse.jface</artifactId>
+				<version>3.4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse</groupId>
+				<artifactId>org.eclipse.jface.databinding</artifactId>
+				<version>1.2.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse</groupId>
+				<artifactId>org.eclipse.equinox.common</artifactId>
+				<version>3.3.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse</groupId>
+				<artifactId>org.eclipse.core.runtime</artifactId>
+				<version>3.4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse</groupId>
+				<artifactId>org.eclipse.core.databinding</artifactId>
+				<version>1.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse</groupId>
+				<artifactId>org.eclipse.core.databinding.beans</artifactId>
+				<version>1.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse</groupId>
+				<artifactId>org.eclipse.core.commands</artifactId>
+				<version>3.4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>com.coalesenses.ishell</groupId>
+				<artifactId>ishell-linux</artifactId>
+				<version>1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.swt</groupId>
+				<artifactId>${swt.os-specific-dep}</artifactId>
+				<version>${swt.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<profiles>
 		<profile>
-			<id>unix</id>
+			<id>mac-x86_64</id>
 			<activation>
 				<os>
-					<family>unix</family>
+					<family>mac</family>
+					<name>mac os x</name>
+				</os>
+			</activation>
+			<properties>
+				<swt.os-specific-dep>swt-cocoa-macosx-x86_64</swt.os-specific-dep>
+				<swt.version>3.6.1</swt.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>mac-x86</id>
+			<activation>
+				<os>
+					<name>mac os x</name>
+					<arch>x86</arch>
+				</os>
+			</activation>
+			<properties>
+				<swt.os-specific-dep>swt-cocoa-macosx</swt.os-specific-dep>
+				<swt.version>3.6.1</swt.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<name>linux</name>
 				</os>
 			</activation>
 			<properties>
@@ -146,47 +208,7 @@
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
-		<profile>
-			<id>mac</id>
-			<activation>
-				<os>
-					<family>mac</family>
-					<arch>x86</arch>
-				</os>
-			</activation>
-			<properties>
-				<swt.os-specific-dep>swt-cocoa-macosx</swt.os-specific-dep>
-				<swt.version>3.6.1</swt.version>
-			</properties>
-		</profile>
-		<profile>
-			<id>mac-x86_64</id>
-			<activation>
-				<os>
-					<family>mac</family>
-					<arch>x86_64</arch>
-				</os>
-			</activation>
-			<properties>
-				<swt.os-specific-dep>swt-cocoa-macosx-x86_64</swt.os-specific-dep>
-				<swt.version>3.6.1</swt.version>
-			</properties>
-		</profile>
 	</profiles>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 
 	<repositories>
 		<repository>
@@ -250,8 +272,18 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>${java.source.version}</source>
+					<target>${java.target.version}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
