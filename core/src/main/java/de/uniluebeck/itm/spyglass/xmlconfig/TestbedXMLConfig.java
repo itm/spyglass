@@ -28,6 +28,18 @@ public class TestbedXMLConfig extends XMLConfig {
     private
     String sessionManagementUrl;
 
+    @Element(required = false)
+    private
+    String userName;
+
+    @Element(required = false)
+    private
+    String urnPrefix;
+
+    @Element(required = false)
+    private
+    String password;
+
     /**
      * Url of Authorization Service
      */
@@ -62,5 +74,32 @@ public class TestbedXMLConfig extends XMLConfig {
     public void setSessionManagementUrl(String sessionManagementUrl) {
         firePropertyChange("sessionManagementUrl", this.sessionManagementUrl, sessionManagementUrl);
         this.sessionManagementUrl = sessionManagementUrl;
+    }
+
+    /**
+     * Username for authentication
+     */
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUrnPrefix() {
+        return urnPrefix;
+    }
+
+    public void setUrnPrefix(String urnPrefix) {
+        this.urnPrefix = urnPrefix;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

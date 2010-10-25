@@ -49,7 +49,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 public class SpyglassApp extends ApplicationWindow {
 	private static final Logger log = SpyglassLoggerFactory.getLogger(SpyglassApp.class);
 
-	private Spyglass spyglass;
+	public static Spyglass spyglass;
 
 	private AppWindow appWindow;
 
@@ -64,7 +64,7 @@ public class SpyglassApp extends ApplicationWindow {
 	 * 
 	 * @throws Exception
 	 */
-	public SpyglassApp() throws Exception {
+	private SpyglassApp() throws Exception {
 		super(null);
 
 		// Model

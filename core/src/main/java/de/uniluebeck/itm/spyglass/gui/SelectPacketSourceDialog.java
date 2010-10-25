@@ -12,6 +12,7 @@ package de.uniluebeck.itm.spyglass.gui;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 
+import de.uniluebeck.itm.spyglass.gui.wizard.ExtendedWizardDialog;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -19,6 +20,7 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
@@ -62,13 +64,14 @@ import de.uniluebeck.itm.spyglass.io.PacketReader.SOURCE_TYPE;
  */
 public class SelectPacketSourceDialog extends TitleAreaDialog {
 
-	private Button buttoniShell, buttonFile, buttonOpenFileDialog;
+	private Button buttoniShell, buttonWiseBed, buttonFile, buttonOpenFileDialog;
 	private Text textPath2File;
 	private Spyglass spyglass;
 	private MyValues myvalues;
 	private String defaultDir = SpyglassEnvironment.getDefalutRecordDirectory();
+    private Composite startArea;
 
-	// --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
 	/**
 	 * Constructor
 	 * 
@@ -88,24 +91,28 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 	@Override
 	public void create() {
 		super.create();
-		setTitle("Packet Source");
-		setMessage("Pleas select the source of the packets which have to be evaluated.");
+        setStandardTitle();
 	}
 
-	// --------------------------------------------------------------------------------
+    private void setStandardTitle() {
+        setTitle("Packet Source");
+        setMessage("Pleas select the source of the packets which have to be evaluated.");
+    }
+
+    // --------------------------------------------------------------------------------
 	@Override
 	protected Control createDialogArea(final Composite parent) {
-		final Composite area = new Composite(parent, SWT.NONE);
+        startArea = new Composite(parent, SWT.NONE);
 		final FillLayout thisLayout = new FillLayout(org.eclipse.swt.SWT.HORIZONTAL);
-		area.setLayout(thisLayout);
+		startArea.setLayout(thisLayout);
 		final GridData gridData = new GridData();
 		gridData.horizontalAlignment = GridData.FILL;
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.verticalAlignment = GridData.FILL;
 		gridData.grabExcessVerticalSpace = true;
-		area.setLayoutData(gridData);
+		startArea.setLayoutData(gridData);
 
-		final Group group1 = new Group(area, SWT.NONE);
+		final Group group1 = new Group(startArea, SWT.NONE);
 		final GridLayout group1Layout = new GridLayout();
 		group1Layout.makeColumnsEqualWidth = false;
 		group1Layout.numColumns = 3;
@@ -116,6 +123,12 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 		buttoniShell.setText("iShell");
 
 		new Label(group1, SWT.NONE);
+		new Label(group1, SWT.NONE);
+
+        buttonWiseBed = new Button(group1, SWT.RADIO);
+        buttonWiseBed.setText("Testbed");
+
+        new Label(group1, SWT.NONE);
 		new Label(group1, SWT.NONE);
 
 		buttonFile = new Button(group1, SWT.RADIO);
@@ -171,10 +184,13 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 			dbc.bindValue(SWTObservables.observeSelection(buttonFile), SWTObservables.observeSelection(buttoniShell), new UpdateValueStrategy(
 					UpdateValueStrategy.POLICY_CONVERT).setConverter(new BooleanInversionConverter()), new UpdateValueStrategy(
 					UpdateValueStrategy.POLICY_CONVERT).setConverter(new BooleanInversionConverter()));
+            
 
 			// bind the button to select iShell to the corresponding property
 			final IObservableValue modelObservableIsIshell = BeansObservables.observeValue(dbc.getValidationRealm(), myvalues, "useIShell");
+            final IObservableValue modelObservableIsTestbed = BeansObservables.observeValue(dbc.getValidationRealm(), myvalues, "useTestbed");
 			dbc.bindValue(SWTObservables.observeSelection(buttoniShell), modelObservableIsIshell, null, null);
+            dbc.bindValue(SWTObservables.observeSelection(buttonWiseBed), modelObservableIsTestbed, null, null);
 
 			// binding of the text field which contains the path to the file to the corresponding
 			// string value
@@ -183,14 +199,14 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 		}
 		initializeValues();
 		group1.pack();
-		area.pack();
-		return area;
+		startArea.pack();
+		return startArea;
 	}
 
 	// --------------------------------------------------------------------------------
 	@Override
 	protected void okPressed() {
-		if (!myvalues.useIShell) {
+		if (!myvalues.useIShell && !myvalues.useTestbed) {
 			if ((myvalues.path2File == null) || myvalues.path2File.equals("")) {
 				MessageDialog.openError(getParentShell(), "Invalid file path", "The path to the file is invalid:\r\nThe new File was not set!");
 			} else {
@@ -203,10 +219,21 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 		} else if (myvalues.useIShell) {
 			setIShell();
 			super.okPressed();
-		}
+		} else if (myvalues.useTestbed){
+            super.okPressed();
+            startTestbedConfig();
+        }
 	}
 
-	// --------------------------------------------------------------------------------
+    /**
+     * Starts the Wisebed-Configuration Dialog
+     */
+    private void startTestbedConfig() {
+       final WizardDialog wizard = new ExtendedWizardDialog(getParentShell(), new TestbedWizard());
+       wizard.open();
+    }
+
+    // --------------------------------------------------------------------------------
 	/**
 	 * Initializes the values of the labels etc. using the currently defined ones of the application
 	 */
@@ -311,6 +338,7 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 	private class MyValues extends PropertyBean {
 		String path2File;
 		boolean useIShell;
+        boolean useTestbed;
 
 		// --------------------------------------------------------------------------------
 		/**
@@ -350,6 +378,15 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 			firePropertyChange("useIShell", oldValue, useIShell);
 		}
 
-	}
+        public boolean isUseTestbed() {
+            return useTestbed;
+        }
+
+        public void setUseTestbed(boolean useTestbed) {
+            final boolean oldValue = this.useTestbed;
+            this.useTestbed = useTestbed;
+            firePropertyChange("useTestbed", oldValue, useTestbed);
+        }
+    }
 
 }
