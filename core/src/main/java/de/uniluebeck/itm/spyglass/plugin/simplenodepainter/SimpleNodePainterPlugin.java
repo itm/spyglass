@@ -271,8 +271,6 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	 * 
 	 * @param nodeID
 	 *            the identifier to be used
-	 * @param drawingArea
-	 *            the area where the node object will be drawn
 	 * @return a new {@link Node} object
 	 */
 	private Node createNodeObject(final int nodeID) {
@@ -628,7 +626,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			}
 
 			// the plug-in does not listen to all semantic types any more
-			else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ALL_SEMANTIC_TYPES) && !((Boolean) evt.getNewValue())) {
+			else if (evt.getPropertyName().equals(PluginXMLConfig.PROPERTYNAME_ALL_SEMANTIC_TYPES) && ((int[]) evt.getNewValue())[0] != -1) {
 				data.purgeStringFormatterResults();
 				purgeNodeSemanticTypes();
 			}
