@@ -7,6 +7,14 @@
  */
 package de.uniluebeck.itm.spyglass.core;
 
+import de.uniluebeck.itm.spyglass.io.PacketReader;
+import de.uniluebeck.itm.spyglass.io.PacketRecorder;
+import de.uniluebeck.itm.spyglass.plugin.Plugin;
+import de.uniluebeck.itm.spyglass.plugin.PluginManager;
+import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
+import org.apache.log4j.Logger;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -14,27 +22,18 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
-
-import de.uniluebeck.itm.spyglass.io.PacketReader;
-import de.uniluebeck.itm.spyglass.io.PacketRecorder;
-import de.uniluebeck.itm.spyglass.plugin.Plugin;
-import de.uniluebeck.itm.spyglass.plugin.PluginManager;
-import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
-
 // ------------------------------------------------------------------------------
+
 /**
- * Spyglass is an application for visualizing network packets coming from an arbitrary source,
- * defined by a gateway instance. This class is the core of the Spyglass program. It reads the XML
- * configuration, instantiate objects, injects dependencies and handles the PacketReader and
- * Visualization threads. After instantiating of this class, call the <code>start()</code> method to
- * start the visualization. An arbitrary GUI can be used with Spyglass, since the visualization is
- * handled by a SpyglassCanvas, which can be easily adopted to other GUI libraries. Use the
- * <code>addSpyglassListener(...)</code> method to get informed when a redraw of the scene is
- * needed.
+ * Spyglass is an application for visualizing network packets coming from an arbitrary source, defined by a gateway
+ * instance. This class is the core of the Spyglass program. It reads the XML configuration, instantiate objects,
+ * injects dependencies and handles the PacketReader and Visualization threads. After instantiating of this class, call
+ * the <code>start()</code> method to start the visualization. An arbitrary GUI can be used with Spyglass, since the
+ * visualization is handled by a SpyglassCanvas, which can be easily adopted to other GUI libraries. Use the
+ * <code>addSpyglassListener(...)</code> method to get informed when a redraw of the scene is needed.
  */
 public class Spyglass {
+
 	private static Logger log = SpyglassLoggerFactory.getLogger(Spyglass.class);
 
 	private PacketDispatcher packetDispatcher = null;
@@ -57,10 +56,11 @@ public class Spyglass {
 	private boolean throttleBBoxUpdates = false;
 
 	// ------------------------------------------------------------------------------
+
 	/**
-	 * Returns if the redraw frequency which is determined by the frequency of the drawing objects'
-	 * bounding box updates is throttled
-	 * 
+	 * Returns if the redraw frequency which is determined by the frequency of the drawing objects' bounding box updates is
+	 * throttled
+	 *
 	 * @return <code>true</code> if throttled, <code>false</code> otherwise
 	 */
 	public boolean isThrottleBBoxUpdates() {
@@ -68,25 +68,24 @@ public class Spyglass {
 	}
 
 	// ------------------------------------------------------------------------------
+
 	/**
-	 * Sets if the redraw frequency which is determined by the frequency of the drawing objects'
-	 * bounding box updates is to be throttled
-	 * 
-	 * @param throttleBBoxUpdates
-	 *            <code>true</code> if throttled, <code>false</code> otherwise
+	 * Sets if the redraw frequency which is determined by the frequency of the drawing objects' bounding box updates is to
+	 * be throttled
+	 *
+	 * @param throttleBBoxUpdates <code>true</code> if throttled, <code>false</code> otherwise
 	 */
 	public void setThrottleBBoxUpdates(final boolean throttleBBoxUpdates) {
 		this.throttleBBoxUpdates = throttleBBoxUpdates;
 	}
 
 	// --------------------------------------------------------------------------
+
 	/**
-	 * Constructor. Invokes the XML configuration reading from the default configuration files.
-	 * Which file is used depends on the context (if Spyglass is used as stand alone application or
-	 * iShell plug-in).
-	 * 
+	 * Constructor. Invokes the XML configuration reading from the default configuration files. Which file is used depends
+	 * on the context (if Spyglass is used as stand alone application or iShell plug-in).
+	 *
 	 * @throws Exception
-	 * 
 	 */
 	public Spyglass() throws Exception {
 		Thread.setDefaultUncaughtExceptionHandler(new SpyglassExceptionHandler());
@@ -95,6 +94,7 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
+
 	/**
 	 * Initializes the Spyglass application
 	 */
@@ -118,12 +118,14 @@ public class Spyglass {
 					setPluginManager((PluginManager) evt.getNewValue());
 				}
 			}
-		});
+		}
+		);
 
 		log.info("Spyglass init done.");
 	}
 
 	// --------------------------------------------------------------------------
+
 	/**
 	 * Starts the packet dispatching
 	 */
@@ -132,11 +134,12 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
+
 	/**
-	 * Shuts down the Spyglass application.<br>
-	 * All Threads and plug-ins will be stopped.
+	 * Shuts down the Spyglass application.<br> All Threads and plug-ins will be stopped.
 	 */
 	public void shutdown() {
+
 		// Shutdown the packetProducerTask
 		executor.shutdownNow();
 
@@ -150,39 +153,37 @@ public class Spyglass {
 		pluginManager.shutdown();
 
 		log.info("Spyglass was shut down.");
+
 	}
 
 	// --------------------------------------------------------------------------
+
 	/**
-	 * Returns the facility which is responsible for dispatching incoming packets to all active
-	 * plug-ins.
-	 * 
-	 * @return the facility which is responsible for dispatching incoming packets to all active
-	 *         plug-ins.
+	 * Returns the facility which is responsible for dispatching incoming packets to all active plug-ins.
+	 *
+	 * @return the facility which is responsible for dispatching incoming packets to all active plug-ins.
 	 */
 	public PacketDispatcher getPacketDispatcher() {
 		return packetDispatcher;
 	}
 
 	// --------------------------------------------------------------------------
+
 	/**
-	 * Sets the facility which is responsible for dispatching incoming packets to all active
-	 * plug-ins.
-	 * 
-	 * @param packetDispatcher
-	 *            the facility which is responsible for dispatching incoming packets to all active
-	 *            plug-ins.
+	 * Sets the facility which is responsible for dispatching incoming packets to all active plug-ins.
+	 *
+	 * @param packetDispatcher the facility which is responsible for dispatching incoming packets to all active plug-ins.
 	 */
 	public void setPacketDispatcher(final PacketDispatcher packetDispatcher) {
 		this.packetDispatcher = packetDispatcher;
 	}
 
 	// --------------------------------------------------------------------------------
+
 	/**
 	 * Enables or disables the pause mode
-	 * 
-	 * @param paused
-	 *            indicates whether the pause mode is to be enabled
+	 *
+	 * @param paused indicates whether the pause mode is to be enabled
 	 */
 	public void setPaused(final boolean paused) {
 		synchronized (this.paused) {
@@ -194,9 +195,10 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------------
+
 	/**
 	 * Returns whether the pause mode is enabled or disabled
-	 * 
+	 *
 	 * @return whether the pause mode is enabled or disabled
 	 */
 	public Boolean isPaused() {
@@ -206,9 +208,10 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
+
 	/**
 	 * Returns the facility which manages the currently loaded plug-ins
-	 * 
+	 *
 	 * @return the facility which manages the currently loaded plug-ins
 	 */
 	public PluginManager getPluginManager() {
@@ -216,11 +219,11 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
+
 	/**
 	 * Sets the facility which manages the currently loaded plug-ins
-	 * 
-	 * @param pluginManager
-	 *            the facility which manages the currently loaded plug-ins
+	 *
+	 * @param pluginManager the facility which manages the currently loaded plug-ins
 	 */
 	protected void setPluginManager(final PluginManager pluginManager) {
 		if (this.pluginManager != null) {
@@ -231,21 +234,21 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
+
 	/**
-	 * Returns the facility which reads packets to be evaluated from a configurable source (e.g. a
-	 * file)
-	 * 
-	 * @return the facility which reads packets to be evaluated from a configurable source (e.g. a
-	 *         file)
+	 * Returns the facility which reads packets to be evaluated from a configurable source (e.g. a file)
+	 *
+	 * @return the facility which reads packets to be evaluated from a configurable source (e.g. a file)
 	 */
 	public PacketReader getPacketReader() {
 		return packetReader;
 	}
 
 	// --------------------------------------------------------------------------------
+
 	/**
 	 * Returns the currently active packet recorder or <code>null</code> if no recorder is active
-	 * 
+	 *
 	 * @return the packetRecorder
 	 */
 	public PacketRecorder getPacketRecorder() {
@@ -253,13 +256,11 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
+
 	/**
-	 * Sets the facility which reads packets to be evaluated from a configurable source (e.g. a
-	 * file)
-	 * 
-	 * @param packetReader
-	 *            the facility which reads packets to be evaluated from a configurable source (e.g.
-	 *            a file)
+	 * Sets the facility which reads packets to be evaluated from a configurable source (e.g. a file)
+	 *
+	 * @param packetReader the facility which reads packets to be evaluated from a configurable source (e.g. a file)
 	 */
 	public void setPacketReader(final PacketReader packetReader) {
 		packetReader.init(this);
@@ -267,9 +268,10 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------
+
 	/**
 	 * Returns the facility responsible for loading and storing the application's configuration
-	 * 
+	 *
 	 * @return the facility responsible for loading and storing the application's configuration
 	 */
 	public ConfigStore getConfigStore() {
@@ -277,6 +279,7 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------------
+
 	/**
 	 * @return the packetProducerTask
 	 */
@@ -285,6 +288,7 @@ public class Spyglass {
 	}
 
 	// --------------------------------------------------------------------------------
+
 	/**
 	 * Resets the application
 	 */
@@ -310,9 +314,13 @@ public class Spyglass {
 				log.debug("The plug-in named '" + plugin.getInstanceName() + "' was sucessfully resetted");
 			}
 		}
-		log.debug("The node positioner '" + pluginManager.getNodePositioner().getInstanceName() + "' will be resetted now");
+		log.debug(
+				"The node positioner '" + pluginManager.getNodePositioner().getInstanceName() + "' will be resetted now"
+		);
 		pluginManager.getNodePositioner().reset();
-		log.debug("The node positioner '" + pluginManager.getNodePositioner().getInstanceName() + "' was sucessfully resetted");
+		log.debug("The node positioner '" + pluginManager.getNodePositioner()
+				.getInstanceName() + "' was sucessfully resetted"
+		);
 		log.info("Spyglass was resetted successfully");
 		setPaused(wasPaused);
 	}

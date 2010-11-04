@@ -19,10 +19,7 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.DeviceData;
 import org.eclipse.swt.tools.internal.Sleak;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.*;
 
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.core.SpyglassExceptionHandler;
@@ -66,6 +63,9 @@ public class SpyglassApp extends ApplicationWindow {
 	 */
 	private SpyglassApp() throws Exception {
 		super(null);
+
+		Display.setAppName(Constants.SPYGLASS_APP_NAME);
+		Display.setAppVersion(Constants.SPYGLASS_APP_VERSION);
 
 		// Model
 		SpyglassEnvironment.setIShellPlugin(false);
@@ -113,10 +113,9 @@ public class SpyglassApp extends ApplicationWindow {
 		try {
 			app = new SpyglassApp();
 			app.addToolBar(SWT.None);
+			app.addMenuBar();
 
 			app.open();
-
-			app.addMenuBar();
 
 		} catch (final Exception e) {
 			log.error(e, e);
@@ -166,9 +165,10 @@ public class SpyglassApp extends ApplicationWindow {
 	// -------------------------------------------------------------------------
 	@Override
 	protected void configureShell(final Shell shell) {
+
 		super.configureShell(shell);
 
-		shell.setText("Spyglass");
+		shell.setText(Constants.SPYGLASS_APP_NAME);
 		shell.setSize(SpyglassEnvironment.getWindowSizeX(), SpyglassEnvironment.getWindowSizeY());
 
 		shell.addControlListener(new ControlAdapter() {
