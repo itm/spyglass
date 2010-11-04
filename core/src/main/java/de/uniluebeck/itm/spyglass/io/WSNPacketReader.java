@@ -14,6 +14,8 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 /**
@@ -24,7 +26,9 @@ import java.util.*;
 @WebService(name = "ProxyController", targetNamespace = "urn:ControllerService")
 public class WSNPacketReader extends AbstractPacketReader implements Controller {
 
-    public final static String CONTROLLER_URN = "http://localhost:8081/spyglass/controller";
+    //public final static String CONTROLLER_URN = "http://localhost:8081/spyglass/controller";
+	//public final static String CONTROLLER_URN = "http://"141.83.68.131":8081/spyglass/controller";
+	public static String CONTROLLER_URN;
 
     private SessionManagement smService;
     private List<SecretReservationKey> secretReservation;
@@ -32,7 +36,12 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
     private static Map<List<SecretReservationKey>, Endpoint> endpointMap = Maps.newHashMap();
 
     private WSNPacketReader(SessionManagement sessionManagementUrn, List<SecretReservationKey> rsList) {
-        secretReservation = rsList;
+    	 try {
+			CONTROLLER_URN = "http://"+InetAddress.getLocalHost().getHostAddress()+":8081/spyglass/controller";
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+    	secretReservation = rsList;
         smService = sessionManagementUrn;
         setSourceType(SOURCE_TYPE.OTHER);
     }
@@ -47,6 +56,7 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
             rsList.add(key);
         }
         WSNPacketReader reader = new WSNPacketReader(sm, rsList);
+        System.out.println("Start Controller Endpoint at "+CONTROLLER_URN);
         endpointMap.put(rsList, Endpoint.publish(CONTROLLER_URN, reader));
         try {
             sm.getInstance(rsList, CONTROLLER_URN);
@@ -60,8 +70,9 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
 
     @Override
     public void receive(@WebParam(name = "msg", targetNamespace = "") Message msg) {
-        if (msg.getBinaryMessage() != null && msg.getBinaryMessage().getBinaryType() == 145) {
+        if (msg.getBinaryMessage() != null && msg.getBinaryMessage().getBinaryType() == 111/*145*/) {
             try {
+    		System.out.println("message "+msg.getBinaryMessage().getBinaryType());
                 queue.add(factory.createInstance(msg.getBinaryMessage().getBinaryData()));
             } catch (SpyglassPacketException e) {
                 e.printStackTrace();
