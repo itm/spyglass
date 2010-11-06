@@ -152,4 +152,5 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
 		endpointMap.get(secretReservation).stop();
 		endpointMap.remove(secretReservation);
 	}
+
 }
