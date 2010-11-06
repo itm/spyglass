@@ -17,6 +17,7 @@ import de.uniluebeck.itm.spyglass.SpyglassApp;
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.gui.wizard.IExtendedWizardPage;
 import de.uniluebeck.itm.spyglass.io.WSNPacketReader;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.TestbedXMLConfig;
 import eu.wisebed.testbed.api.rs.RSServiceHelper;
 import eu.wisebed.testbed.api.rs.v1.ConfidentialReservationData;
@@ -27,6 +28,7 @@ import eu.wisebed.testbed.api.snaa.v1.AuthenticationTriple;
 import eu.wisebed.testbed.api.snaa.v1.SNAA;
 import eu.wisebed.testbed.api.snaa.v1.SecretAuthenticationKey;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
@@ -49,6 +51,7 @@ import java.util.Map;
  * @author jens kluttig
  */
 public class TestbedWizard extends Wizard {
+    private Logger logger = SpyglassLoggerFactory.getLogger(TestbedWizard.class);
     private TestbedXMLConfig config;
     private ConfigStore store;
     private Map<AuthenticationTriple, SecretAuthenticationKey> authMap = Maps.newHashMap();
@@ -90,6 +93,10 @@ public class TestbedWizard extends Wizard {
         return true;
     }
 
+    /**
+     * First Page for Service Addresses
+     * @author jens kluttig
+     */
     public class FirstPage extends WizardPage implements IExtendedWizardPage {
         Text snaaText, rsText, smText;
 
@@ -157,10 +164,13 @@ public class TestbedWizard extends Wizard {
         }
     }
 
+    /**
+     * Second Page for Authentication Data
+     */
     public class SecondPage extends WizardPage implements IExtendedWizardPage {
         protected SecondPage(String pageName) {
             super(pageName);
-            setMessage("Select your Reservation");
+            setMessage("Add Authentication Data");
         }
 
         @Override
@@ -197,7 +207,7 @@ public class TestbedWizard extends Wizard {
             Label none2 = new Label(upperArea, SWT.NONE);
             final Button loginButton = new Button(upperArea, SWT.NONE);
             loginButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, true, 1, 1));
-            loginButton.setText("check for reservations");
+            loginButton.setText("add Authentication");
 
             final Group lowerArea = new Group(area, SWT.NONE);
             lowerArea.setLayout(gridLayout);
@@ -219,7 +229,18 @@ public class TestbedWizard extends Wizard {
             loginButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
-                    if (authenticate(urnText.getText(), userText.getText(), pwText.getText())) {
+                    AuthenticationTriple triple = new AuthenticationTriple();
+                    triple.setPassword(pwText.getText());
+                    triple.setUrnPrefix(urnText.getText());
+                    triple.setUsername(userText.getText());
+                    for (AuthenticationTriple at : authMap.keySet()) {
+                        if (at.getUrnPrefix().equalsIgnoreCase(triple.getUrnPrefix()) &&
+                                at.getUsername().equalsIgnoreCase(triple.getUsername())) {
+                            MessageDialog.openInformation(getShell(), "Information", "User already added to Authentication Data");
+                            return;
+                        }
+                    }
+                    if (authenticate(triple)) {
                         TableItem item = new TableItem(rsList, SWT.NONE);
                         item.setText(new String[]{urnText.getText(), userText.getText()});
                         for (int i = 0, n = columns.length; i < n; i++) {
@@ -234,8 +255,8 @@ public class TestbedWizard extends Wizard {
 
                         config.setPassword(pwText.getText());
                         pwText.setText("");
-
-                        fillReservations();
+                    } else {
+                        MessageDialog.openWarning(getShell(), "Fehler", "Authentication Error");
                     }
                 }
             });
@@ -243,6 +264,7 @@ public class TestbedWizard extends Wizard {
 
         @Override
         public void nextPressed() {
+            fillReservations();
         }
 
         @Override
@@ -251,6 +273,9 @@ public class TestbedWizard extends Wizard {
         }
     }
 
+    /**
+     * Third Page for selecting Reservation
+     */
     public class ThirdPage extends WizardPage implements IExtendedWizardPage {
         private Table rsList;
         private TableColumn[] columns;
@@ -282,11 +307,19 @@ public class TestbedWizard extends Wizard {
             setControl(rsList);
         }
 
+        /**
+         * Clears all Reservation in Table
+         */
         public void clearReservations() {
             rsList.clearAll();
+            rsList.removeAll();
             reservationList.clear();
         }
 
+        /**
+         * Returns user selected Reservation
+         * @return
+         */
         public ConfidentialReservationData getSelectedReservation() {
             if (rsList.getSelectionIndex() >= 0)
                 return reservationList.get(rsList.getSelectionIndex());
@@ -306,6 +339,10 @@ public class TestbedWizard extends Wizard {
                     calendar.getHour(), calendar.getMinute());
         }
 
+        /**
+         * Adds new Reservation to Table
+         * @param data
+         */
         public void addReservation(ConfidentialReservationData data) {
             TableItem item = new TableItem(rsList, SWT.NONE);
             item.setText(new String[]{printDate(data.getFrom()), printDate(data.getTo()),
@@ -326,12 +363,13 @@ public class TestbedWizard extends Wizard {
         }
     }
 
-    private boolean authenticate(String urnPrefix, String username, String password) {
+    /**
+     * Authenticates User with his Authentication Triple (URN-Prefix, Username, Password)
+     * @param triple
+     * @return
+     */
+    private boolean authenticate(AuthenticationTriple triple) {
         SNAA snaa = SNAAServiceHelper.getSNAAService(config.getSnaaUrl());
-        AuthenticationTriple triple = new AuthenticationTriple();
-        triple.setPassword(password);
-        triple.setUrnPrefix(urnPrefix);
-        triple.setUsername(username);
         java.util.List<SecretAuthenticationKey> list = null;
         try {
             list = snaa.authenticate(ImmutableList.of(triple));
@@ -343,7 +381,9 @@ public class TestbedWizard extends Wizard {
 
     }
 
-
+    /**
+     * Returns all Reservation for current Authentication Data
+     */
     private void fillReservations() {
         RS rs = RSServiceHelper.getRSService(config.getReservationUrl());
         eu.wisebed.testbed.api.rs.v1.GetReservations getRs =
@@ -368,7 +408,7 @@ public class TestbedWizard extends Wizard {
         try {
             rsData = rs.getConfidentialReservations(list, getRs);
         } catch (RSExceptionException e) {
-            e.printStackTrace();
+            logger.error("Error retrieving Reservations", e);
         }
         thirdPage.clearReservations();
         for (ConfidentialReservationData data : rsData)
