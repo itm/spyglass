@@ -60,7 +60,7 @@ public class TestbedWizard extends Wizard {
 
 	private ConfigStore store;
 
-	private Map<AuthenticationTriple, SecretAuthenticationKey> authMap = Maps.newHashMap();
+	private final Map<AuthenticationTriple, SecretAuthenticationKey> authMap = Maps.newHashMap();
 
 	private ThirdPage thirdPage;
 
@@ -100,6 +100,7 @@ public class TestbedWizard extends Wizard {
 				config.getSessionManagementUrl(),
 				thirdPage.getSelectedReservation()
 		);
+        log.info("WSNPacketReader created by TestbedWizard.");
 		if (wsnPacketReader == null) {
 			return false;
 		}
@@ -113,6 +114,9 @@ public class TestbedWizard extends Wizard {
 		return firstPage.isComplete() && secondPage.isComplete() && thirdPage.isComplete();
 	}
 
+    /**
+     * Wizardpage for Service-Urls
+     */
 	public class FirstPage extends WizardPage implements IExtendedWizardPage {
 
 		Text snaaText, rsText, smText;
@@ -196,6 +200,9 @@ public class TestbedWizard extends Wizard {
 		}
 	}
 
+    /**
+     * WizardPage for Authentication Data
+     */
 	public class SecondPage extends WizardPage implements IExtendedWizardPage {
 
 		protected SecondPage(String pageName) {
@@ -237,7 +244,7 @@ public class TestbedWizard extends Wizard {
 			Label none2 = new Label(upperArea, SWT.NONE);
 			final Button loginButton = new Button(upperArea, SWT.NONE);
 			loginButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, true, 1, 1));
-			loginButton.setText("check for reservations");
+			loginButton.setText("add to Authentication Data");
 
 			final Group lowerArea = new Group(area, SWT.NONE);
 			lowerArea.setLayout(gridLayout);
@@ -258,40 +265,55 @@ public class TestbedWizard extends Wizard {
 
 			loginButton.addListener(SWT.Selection, new Listener() {
 				@Override
-				public void handleEvent(Event event) {
-					if (authenticate(urnText.getText(), userText.getText(), pwText.getText())) {
-						TableItem item = new TableItem(rsList, SWT.NONE);
-						item.setText(new String[]{urnText.getText(), userText.getText()});
-						for (int i = 0, n = columns.length; i < n; i++) {
-							columns[i].pack();
-						}
+				public void handleEvent(Event event){ AuthenticationTriple triple = new AuthenticationTriple();
+                    triple.setPassword(pwText.getText());
+                    triple.setUrnPrefix(urnText.getText());
+                    triple.setUsername(userText.getText());
+                    for (AuthenticationTriple at : authMap.keySet()) {
+                        if (at.getUrnPrefix().equalsIgnoreCase(triple.getUrnPrefix()) &&
+                                at.getUsername().equalsIgnoreCase(triple.getUsername())) {
+                            MessageDialog.openInformation(getShell(), "Information", "User already added to Authentication Data");
+                            return;
+                        }
+                    }
+                    if (authenticate(triple)) {
+                        TableItem item = new TableItem(rsList, SWT.NONE);
+                        item.setText(new String[]{urnText.getText(), userText.getText()});
+                        for (int i = 0, n = columns.length; i < n; i++) {
+                            columns[i].pack();
+                        }
 
-						config.setUrnPrefix(urnText.getText());
-						urnText.setText("");
+                        config.setUrnPrefix(urnText.getText());
+                        urnText.setText("");
 
-						config.setUserName(userText.getText());
-						userText.setText("");
+                        config.setUserName(userText.getText());
+                        userText.setText("");
 
-						config.setPassword(pwText.getText());
-						pwText.setText("");
+                        config.setPassword(pwText.getText());
+                        pwText.setText("");
+                    } else {
+                        MessageDialog.openWarning(getShell(), "Fehler", "Authentication Error");
+                    }
 
-						fillReservations();
-					}
-				}
-			}
+				}}
+
 			);
 		}
 
 		@Override
 		public void nextPressed() {
+            fillReservations();
 		}
 
 		@Override
 		public boolean isComplete() {
-			return true;
+			return !authMap.isEmpty();
 		}
 	}
 
+    /**
+     * WizardPage for Selecting Reservation
+     */
 	public class ThirdPage extends WizardPage implements IExtendedWizardPage {
 
 		private Table rsList;
@@ -334,6 +356,7 @@ public class TestbedWizard extends Wizard {
 		}
 
 		public void clearReservations() {
+            rsList.removeAll();
 			rsList.clearAll();
 			reservationList.clear();
 		}
@@ -383,23 +406,23 @@ public class TestbedWizard extends Wizard {
 		}
 	}
 
-	private boolean authenticate(String urnPrefix, String username, String password) {
-		SNAA snaa = SNAAServiceHelper.getSNAAService(config.getSnaaUrl());
-		AuthenticationTriple triple = new AuthenticationTriple();
-		triple.setPassword(password);
-		triple.setUrnPrefix(urnPrefix);
-		triple.setUsername(username);
-		java.util.List<SecretAuthenticationKey> list = null;
-		try {
-			list = snaa.authenticate(ImmutableList.of(triple));
-		} catch (Exception e) {
-			log.debug("" + e, e);
-			return false;
-		}
-		authMap.put(triple, list.get(0));
-		return true;
+	/**
+     * Authenticates User with his Authentication Triple (URN-Prefix, Username, Password)
+     * @param triple
+     * @return
+     */
+    private boolean authenticate(AuthenticationTriple triple) {
+        SNAA snaa = SNAAServiceHelper.getSNAAService(config.getSnaaUrl());
+        java.util.List<SecretAuthenticationKey> list = null;
+        try {
+            list = snaa.authenticate(ImmutableList.of(triple));
+        } catch (Exception e) {
+            return false;
+        }
+        authMap.put(triple, list.get(0));
+        return true;
 
-	}
+    }
 
 
 	private void fillReservations() {
@@ -430,7 +453,7 @@ public class TestbedWizard extends Wizard {
 		try {
 			rsData = rs.getConfidentialReservations(list, getRs);
 		} catch (RSExceptionException e) {
-			e.printStackTrace();
+			log.error("Error Retrieving Reservation.",e);
 		}
 		thirdPage.clearReservations();
 		for (ConfidentialReservationData data : rsData) {

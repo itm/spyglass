@@ -50,7 +50,7 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
 		try {
 			CONTROLLER_URN = "http://" + InetAddress.getLocalHost().getHostAddress() + ":8081/spyglass/controller";
 		} catch (UnknownHostException e) {
-			e.printStackTrace();
+			log.error("Unknown Host", e);
 		}
 		secretReservation = rsList;
 		smService = sessionManagementUrn;
