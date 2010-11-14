@@ -7,8 +7,9 @@
  * --------------------------------------------------------------------------------
  */
 
-package de.uniluebeck.itm.spyglass.xmlconfig;
+package de.uniluebeck.itm.spyglass.io.wisebed;
 
+import de.uniluebeck.itm.spyglass.xmlconfig.XMLConfig;
 import org.simpleframework.xml.Element;
 
 /**

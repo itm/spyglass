@@ -7,7 +7,7 @@
  * ---------------------------------------------------------------------------------------
  */
 
-package de.uniluebeck.itm.spyglass.gui;
+package de.uniluebeck.itm.spyglass.gui.wizard;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -15,9 +15,8 @@ import com.google.common.collect.Maps;
 import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 import de.uniluebeck.itm.spyglass.SpyglassApp;
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
-import de.uniluebeck.itm.spyglass.gui.wizard.IExtendedWizardPage;
-import de.uniluebeck.itm.spyglass.io.WSNPacketReader;
-import de.uniluebeck.itm.spyglass.xmlconfig.TestbedXMLConfig;
+import de.uniluebeck.itm.spyglass.io.wisebed.TestbedXMLConfig;
+import de.uniluebeck.itm.spyglass.io.wisebed.WSNPacketReader;
 import eu.wisebed.testbed.api.rs.RSServiceHelper;
 import eu.wisebed.testbed.api.rs.v1.ConfidentialReservationData;
 import eu.wisebed.testbed.api.rs.v1.RS;
