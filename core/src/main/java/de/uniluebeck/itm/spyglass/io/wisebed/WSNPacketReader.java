@@ -70,7 +70,7 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
         WSNPacketReader reader = new WSNPacketReader();
 
         if (startService(sessionManagementUrn, rsList, reader)) {
-            log.error("WSNPacketReader could not start");
+            log.error("WSNPacketReader could not start!");
             return null;
         }
 
@@ -90,10 +90,12 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
         try {
             sm.getInstance(rsList, CONTROLLER_URN);
         } catch (ExperimentNotRunningException_Exception e) {
-            log.error(e.toString(), e);
+            log.error("Experiment not found!");
+            controllerEndpoint.stop();
             return true;
         } catch (UnknownReservationIdException_Exception e) {
-            log.error(e.toString(), e);
+            log.error("Reservation is unknown!");
+            controllerEndpoint.stop();
             return true;
         }
         return false;
@@ -103,8 +105,8 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
     protected void initConfig(final Spyglass app) {
         super.initConfig(app);
         log.debug("initalized for SessionManagment-Service at " + sessionManagementUrn);
-        if (!startService(sessionManagementUrn, buildSecretReservationKey(), this))
-            log.error("Controllerservice could not start!");
+        if (startService(sessionManagementUrn, buildSecretReservationKey(), this))
+            log.error("WSNPacketReader could not start!");
     }
 
     private List<SecretReservationKey> buildSecretReservationKey() {
