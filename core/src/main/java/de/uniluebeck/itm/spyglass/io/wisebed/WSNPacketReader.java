@@ -1,6 +1,7 @@
 package de.uniluebeck.itm.spyglass.io.wisebed;
 
 import com.google.common.collect.Lists;
+import com.sun.xml.internal.ws.client.ClientTransportException;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.io.AbstractPacketReader;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
@@ -36,8 +37,6 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
 
     private static final Logger log = LoggerFactory.getLogger(WSNPacketReader.class);
 
-    public static String CONTROLLER_URN;
-
     private static Endpoint controllerEndpoint;
 
     private BlockingDeque<SpyglassPacket> queue = new LinkedBlockingDeque<SpyglassPacket>();
@@ -45,21 +44,19 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
     @Element(required = true)
     private String sessionManagementUrn;
 
+    @Element(required = true)
+    private String controllerUrn;
+
     @ElementList(type = StringTuple.class, required = true)
     private List<StringTuple> reservationData = Lists.newArrayList();
 
     public WSNPacketReader() {
         setSourceType(SOURCE_TYPE.OTHER);
-        try {
-            CONTROLLER_URN = "http://" + InetAddress.getLocalHost().getHostAddress() + ":8081/spyglass/controller";
-        } catch (UnknownHostException e) {
-            log.error("Unknown Host", e);
-        }
     }
 
-    public static WSNPacketReader createInstance(String sessionManagementUrn, ConfidentialReservationData reservation) {
-        List<SecretReservationKey> rsList = Lists.newArrayList();
+    public static WSNPacketReader createInstance(String sessionManagementUrn, String controllerUrn, ConfidentialReservationData reservation) {
 
+        List<SecretReservationKey> rsList = Lists.newArrayList();
         for (Data data : reservation.getData()) {
             SecretReservationKey key = new SecretReservationKey();
             key.setUrnPrefix(data.getUrnPrefix());
@@ -68,6 +65,7 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
         }
 
         WSNPacketReader reader = new WSNPacketReader();
+        reader.controllerUrn = controllerUrn;
 
         if (startService(sessionManagementUrn, rsList, reader)) {
             log.error("WSNPacketReader could not start!");
@@ -83,12 +81,12 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
 
     private static boolean startService(String sessionManagementUrn, List<SecretReservationKey> rsList, WSNPacketReader reader) {
         SessionManagement sm = WSNServiceHelper.getSessionManagementService(sessionManagementUrn);
-        log.debug("Started Controller endpoint at {}", CONTROLLER_URN);
         if (controllerEndpoint != null && controllerEndpoint.isPublished())
             controllerEndpoint.stop();
-        controllerEndpoint = Endpoint.publish(CONTROLLER_URN, reader);
+        controllerEndpoint = Endpoint.publish(reader.controllerUrn, reader);
+        log.debug("Started Controller endpoint at {}", reader.controllerUrn);
         try {
-            sm.getInstance(rsList, CONTROLLER_URN);
+            sm.getInstance(rsList, reader.controllerUrn);
         } catch (ExperimentNotRunningException_Exception e) {
             log.error("Experiment not found!");
             controllerEndpoint.stop();
@@ -97,8 +95,23 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
             log.error("Reservation is unknown!");
             controllerEndpoint.stop();
             return true;
+        } catch (ClientTransportException e) {
+            log.error("SessionManagment-Service on " + sessionManagementUrn + " offline!");
+            controllerEndpoint.stop();
+            return true;
         }
         return false;
+    }
+
+    public static String generateControllerURN() {
+        String controllerUrn = null;
+        try {
+            controllerUrn = "http://" + InetAddress.getLocalHost().getHostAddress() + ":8081/spyglass/controller";
+        } catch (UnknownHostException e) {
+            log.error("Unknown Host", e);
+            return null;
+        }
+        return controllerUrn;
     }
 
     @Override
@@ -180,13 +193,5 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
         log.debug("shutting down");
         if (controllerEndpoint.isPublished())
             controllerEndpoint.stop();
-    }
-
-    public String getSessionManagementUrn() {
-        return sessionManagementUrn;
-    }
-
-    public void setSessionManagementUrn(String sessionManagementUrn) {
-        this.sessionManagementUrn = sessionManagementUrn;
     }
 }

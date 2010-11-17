@@ -31,6 +31,10 @@ public class TestbedXMLConfig extends XMLConfig {
 
     @Element(required = false)
     private
+    String controllerUrn;
+
+    @Element(required = false)
+    private
     String userName;
 
     @Element(required = false)
@@ -102,5 +106,13 @@ public class TestbedXMLConfig extends XMLConfig {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getControllerUrn() {
+        return controllerUrn;
+    }
+
+    public void setControllerUrn(String controllerUrn) {
+        this.controllerUrn = controllerUrn;
     }
 }
