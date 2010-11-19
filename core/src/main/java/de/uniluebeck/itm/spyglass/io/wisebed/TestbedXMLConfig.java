@@ -7,8 +7,9 @@
  * --------------------------------------------------------------------------------
  */
 
-package de.uniluebeck.itm.spyglass.xmlconfig;
+package de.uniluebeck.itm.spyglass.io.wisebed;
 
+import de.uniluebeck.itm.spyglass.xmlconfig.XMLConfig;
 import org.simpleframework.xml.Element;
 
 /**
@@ -27,6 +28,10 @@ public class TestbedXMLConfig extends XMLConfig {
     @Element(required = false)
     private
     String sessionManagementUrl;
+
+    @Element(required = false)
+    private
+    String controllerUrn;
 
     @Element(required = false)
     private
@@ -101,5 +106,13 @@ public class TestbedXMLConfig extends XMLConfig {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getControllerUrn() {
+        return controllerUrn;
+    }
+
+    public void setControllerUrn(String controllerUrn) {
+        this.controllerUrn = controllerUrn;
     }
 }

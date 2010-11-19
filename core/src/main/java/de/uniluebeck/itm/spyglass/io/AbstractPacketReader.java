@@ -62,7 +62,16 @@ public abstract class AbstractPacketReader extends PropertyBean implements Packe
 	 */
 	public void init(final Spyglass spyglass) {
 		this.factory = new PacketFactory(spyglass);
+        initConfig(spyglass);
 	}
+
+    /**
+     * Initalization for WebService-Subclasses (JaxWs collides with init-Method)
+     * @param spyglass
+     */
+    protected void initConfig(final Spyglass spyglass){
+
+    }
 
 	// --------------------------------------------------------------------------------
 	/**

@@ -10,6 +10,8 @@
 
 package de.uniluebeck.itm.spyglass.util;
 
+import org.simpleframework.xml.Element;
+
 // --------------------------------------------------------------------------------
 /**
  * A simple type-safe helper class for methods returning or receiving tuples of data.
@@ -20,15 +22,15 @@ package de.uniluebeck.itm.spyglass.util;
  */
 public class Tuple<V, W> {
 
-	/**
-	 * The first element of the tuple.
-	 */
-	public V first;
+	@Element(required = true)
+    private V first;
 
-	/**
-	 * The second element of the tuple.
-	 */
-	public W second;
+	@Element(required = true)
+    private W second;
+
+    public Tuple(){
+       super(); 
+    }
 
 	// --------------------------------------------------------------------------------
 	/**
@@ -38,9 +40,30 @@ public class Tuple<V, W> {
 	 * @param second
 	 */
 	public Tuple(final V first, final W second) {
-		super();
+		this();
 		this.first = first;
 		this.second = second;
 	}
 
+    /**
+     * The first element of the tuple.
+     */
+    public V getFirst() {
+        return first;
+    }
+
+    public void setFirst(V first) {
+        this.first = first;
+    }
+
+    /**
+     * The second element of the tuple.
+     */
+    public W getSecond() {
+        return second;
+    }
+
+    public void setSecond(W second) {
+        this.second = second;
+    }
 }

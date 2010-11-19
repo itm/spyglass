@@ -13,6 +13,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 
 import de.uniluebeck.itm.spyglass.gui.wizard.ExtendedWizardDialog;
+import de.uniluebeck.itm.spyglass.gui.wizard.TestbedWizard;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;

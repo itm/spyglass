@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import de.uniluebeck.itm.spyglass.xmlconfig.TestbedXMLConfig;
+import de.uniluebeck.itm.spyglass.io.wisebed.TestbedXMLConfig;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
