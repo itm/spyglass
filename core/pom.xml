@@ -143,5 +143,49 @@
 		</dependency>
 		
 	</dependencies>
+
+	<build>
+		<plugins>
+
+			<!--
+			Using self-patched version of onejar-maven-plugin to support
+			newer version of One-Jar that includes some bug fixes we need.
+			Can be removed later as soon as onejar-maven-plugin supports
+			the newer versions
+			-->
+			<plugin>
+				<groupId>org.dstovall</groupId>
+				<artifactId>onejar-maven-plugin-rc8fix</artifactId>
+				<version>1.4.5</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<mainClass>de.uniluebeck.itm.spyglass.SpyglassApp</mainClass>
+							<onejarVersion>0.97-RC10</onejarVersion>
+							<attachToBuild>true</attachToBuild>
+                            <classifier>onejar</classifier>
+						</configuration>
+						<goals>
+							<goal>one-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+            <id>itm-maven-repository-releases</id>
+            <url>http://www.itm.uni-luebeck.de/projects/maven/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+	</repositories>
 	
 </project>
