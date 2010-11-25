@@ -143,8 +143,8 @@
 		</dependency>
 		
 	</dependencies>
-	
-		<build>
+
+	<build>
 		<plugins>
 
 			<!--
@@ -174,5 +174,18 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+            <id>itm-maven-repository-releases</id>
+            <url>http://www.itm.uni-luebeck.de/projects/maven/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+	</repositories>
 	
 </project>
