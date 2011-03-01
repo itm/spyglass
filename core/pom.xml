@@ -146,7 +146,6 @@
 
 	<build>
 		<plugins>
-
 			<!--
 			Using self-patched version of onejar-maven-plugin to support
 			newer version of One-Jar that includes some bug fixes we need.
@@ -156,7 +155,7 @@
 			<plugin>
 				<groupId>org.dstovall</groupId>
 				<artifactId>onejar-maven-plugin-rc8fix</artifactId>
-				<version>1.4.5</version>
+				<version>1.4.7</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
