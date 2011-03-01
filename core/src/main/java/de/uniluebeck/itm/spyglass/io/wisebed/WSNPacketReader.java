@@ -1,7 +1,6 @@
 package de.uniluebeck.itm.spyglass.io.wisebed;
 
 import com.google.common.collect.Lists;
-import com.sun.xml.internal.ws.client.ClientTransportException;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.io.AbstractPacketReader;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
@@ -95,7 +94,8 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
             log.error("Reservation is unknown!");
             controllerEndpoint.stop();
             return true;
-        } catch (ClientTransportException e) {
+        } catch (Exception e) {
+        	// original Exception ClientTransportException results in maven errors 
             log.error("SessionManagment-Service on " + sessionManagementUrn + " offline!");
             controllerEndpoint.stop();
             return true;
