@@ -215,9 +215,9 @@ class QuadTree implements Layer, BoundingBoxChangeListener {
 			final Rectangle rect = updatedDrawingObject.getBoundingBox().rectangle;
 			synchronized (lock) {
 				// the drawingObject might have been removed from the QuadTree in between.
-				// so check silenty if it is already there
-				// TODO: it would be more performant if moveItem() could be advised to return
+				// so check silently if it is already there
 				// silently instead of throwing an exception
+				// TODO: it would have better performance if moveItem() could be advised to return
 				if (tree.containsItem(updatedDrawingObject, oldBox.rectangle)) {
 					tree.moveItem(updatedDrawingObject, oldBox.rectangle, rect);
 				}

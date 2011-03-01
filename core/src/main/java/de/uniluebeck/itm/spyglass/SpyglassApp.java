@@ -44,6 +44,7 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * instantiate and injects the core classes that are needed to run the application.
  */
 public class SpyglassApp extends ApplicationWindow {
+
 	private static final Logger log = SpyglassLoggerFactory.getLogger(SpyglassApp.class);
 
 	public static Spyglass spyglass;

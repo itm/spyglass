@@ -37,6 +37,7 @@
 	<name>SpyGlass</name>
 
 	<properties>
+		<project.build.classifier>${finalName.os}-${finalName.arch}</project.build.classifier>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.source.version>1.6</java.source.version>
 		<java.target.version>1.6</java.target.version>
@@ -44,7 +45,7 @@
 
 	<modules>
 		<module>core</module>
-		<!--<module>ishell</module>-->
+		<!-- <module>ishell</module> -->
 	</modules>
 
 	<dependencyManagement>
@@ -72,12 +73,13 @@
 				<artifactId>spyglass-standalone</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<!--<dependency>
-							   <groupId>de.uniluebeck.itm.spyglass</groupId>
-							   <artifactId>spyglass-ishell</artifactId>
-							   <version>${project.version}</version>
-						   </dependency>-->
-
+			<!--
+			<dependency>
+				<groupId>de.uniluebeck.itm.spyglass</groupId>
+				<artifactId>spyglass-ishell</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			-->
 			<dependency>
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
@@ -91,7 +93,7 @@
 			<dependency>
 				<groupId>de.danbim.swtquadtree</groupId>
 				<artifactId>swtquadtree</artifactId>
-				<version>1.0</version>
+				<version>1.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse</groupId>
@@ -165,7 +167,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse.swt</groupId>
-				<artifactId>${swt.os-specific-dep}</artifactId>
+				<artifactId>${swt.artifactId}</artifactId>
 				<version>${swt.version}</version>
 			</dependency>
 		</dependencies>
@@ -181,7 +183,9 @@
 				</os>
 			</activation>
 			<properties>
-				<swt.os-specific-dep>swt-cocoa-macosx-x86_64</swt.os-specific-dep>
+				<finalName.os>macosx</finalName.os>
+				<finalName.arch>x86_64</finalName.arch>
+				<swt.artifactId>swt-cocoa-macosx-x86_64</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
@@ -194,7 +198,23 @@
 				</os>
 			</activation>
 			<properties>
-				<swt.os-specific-dep>swt-cocoa-macosx</swt.os-specific-dep>
+				<finalName.os>macosx</finalName.os>
+				<finalName.arch>x86</finalName.arch>
+				<swt.artifactId>swt-cocoa-macosx</swt.artifactId>
+				<swt.version>3.6.1</swt.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux-x86_64</id>
+			<activation>
+				<os>
+					<name>linux</name>
+				</os>
+			</activation>
+			<properties>
+				<finalName.os>linux</finalName.os>
+				<finalName.arch>x86_64</finalName.arch>
+				<swt.artifactId>swt-gtk-linux-x86_64</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
@@ -203,10 +223,27 @@
 			<activation>
 				<os>
 					<name>linux</name>
+					<arch>x86</arch>
 				</os>
 			</activation>
 			<properties>
-				<swt.os-specific-dep>swt-gtk-linux</swt.os-specific-dep>
+				<finalName.os>linux</finalName.os>
+				<finalName.arch>x86</finalName.arch>
+				<swt.artifactId>swt-gtk-linux</swt.artifactId>
+				<swt.version>3.6.1</swt.version>
+			</properties>
+		</profile>
+		<profile>
+			<id>windows-x86_64</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<finalName.os>windows</finalName.os>
+				<finalName.arch>x86_64</finalName.arch>
+				<swt.artifactId>swt-win32-x86_64</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
@@ -215,10 +252,13 @@
 			<activation>
 				<os>
 					<family>windows</family>
+					<arch>x86</arch>
 				</os>
 			</activation>
 			<properties>
-				<swt.os-specific-dep>swt-win32</swt.os-specific-dep>
+				<finalName.os>windows</finalName.os>
+				<finalName.arch>x86</finalName.arch>
+				<swt.artifactId>swt-win32</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
@@ -294,18 +334,38 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>itm-nexus-repository-releases</id>
+			<url>http://dev.itm.uni-luebeck.de:8882/content/repositories/releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>itm-nexus-repository-snapshots</id>
+			<url>http://dev.itm.uni-luebeck.de:8882/content/repositories/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<distributionManagement>
 		<repository>
-			<id>itm-maven-repository-releases</id>
-			<name>ITM UzL Maven releases repository</name>
-			<url>scp://itm01.itm.uni-luebeck.de/www/itm/projects/maven/releases</url>
+			<id>itm-nexus-repository-releases</id>
+			<name>ITM UzL Nexus releases repository</name>
+			<url>scp://dev.itm.uni-luebeck.de/opt/sonatype-work/nexus/storage/releases/</url>
 		</repository>
 		<snapshotRepository>
-			<id>itm-maven-repository-snapshots</id>
-			<name>ITM UzL Maven snapshots repository</name>
-			<url>scp://itm01.itm.uni-luebeck.de/www/itm/projects/maven/snapshots</url>
+			<id>itm-nexus-repository-snapshots</id>
+			<name>ITM UzL Nexus snapshots repository</name>
+			<url>scp://dev.itm.uni-luebeck.de/opt/sonatype-work/nexus/storage/snapshot/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
@@ -324,9 +384,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.7.2</version>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>

@@ -102,7 +102,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.swt</groupId>
-			<artifactId>${swt.os-specific-dep}</artifactId>
+			<artifactId>${swt.artifactId}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-lang</groupId>
@@ -155,21 +155,31 @@
 			<plugin>
 				<groupId>org.dstovall</groupId>
 				<artifactId>onejar-maven-plugin-rc8fix</artifactId>
-				<version>1.4.7</version>
+				<version>1.4.8</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
 						<configuration>
+							<filename>${project.artifactId}-${project.version}-${project.build.classifier}-onejar.jar</filename>
 							<mainClass>de.uniluebeck.itm.spyglass.SpyglassApp</mainClass>
 							<onejarVersion>0.97-RC10</onejarVersion>
 							<attachToBuild>true</attachToBuild>
-                            <classifier>onejar</classifier>
+                            <classifier>${project.build.classifier}-onejar</classifier>
+							<mainJarFilename>${project.artifactId}-${project.version}-${project.build.classifier}.jar</mainJarFilename>
 						</configuration>
 						<goals>
 							<goal>one-jar</goal>
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<classifier>${project.build.classifier}</classifier>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
