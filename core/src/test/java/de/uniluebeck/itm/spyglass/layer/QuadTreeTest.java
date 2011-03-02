@@ -62,11 +62,7 @@ public class QuadTreeTest {
 	}
 
 	private Rectangle createRect(final int upperLeftX, final int upperLeftY) {
-		final Rectangle rectangle = new Rectangle();
-		rectangle.setWidth(rectWidth);
-		rectangle.setHeight(rectHeight);
-		rectangle.setPosition(new AbsolutePosition(upperLeftX, upperLeftY, 0));
-		return rectangle;
+		return new Rectangle(upperLeftX, upperLeftY, rectWidth, rectHeight);
 	}
 
 	@Before
@@ -106,6 +102,7 @@ public class QuadTreeTest {
 
 		// move rect1 to upper right quadrant
 		rectangle1.setPosition(upperRightQuadrant.getLowerLeft());
+		rectangle1.syncBoundingBoxForce();
 		set = tree.getDrawingObjects(upperLeftQuadrant);
 		assertTrue(set.size() == 0);
 		assertTrue(!set.contains(rectangle1));
@@ -117,6 +114,7 @@ public class QuadTreeTest {
 
 		// move rect1 to lower right
 		rectangle1.setPosition(lowerRightQuadrant.getLowerLeft());
+		rectangle1.syncBoundingBoxForce();
 		set = tree.getDrawingObjects(upperRightQuadrant);
 		assertTrue(set.size() == 1);
 		assertTrue(set.contains(rectangle2));
@@ -127,6 +125,7 @@ public class QuadTreeTest {
 
 		// move rect1 to lower left
 		rectangle1.setPosition(lowerLeftQuadrant.getLowerLeft());
+		rectangle1.syncBoundingBoxForce();
 		set = tree.getDrawingObjects(lowerRightQuadrant);
 		assertTrue(set.size() == 1);
 		assertTrue(set.contains(rectangle3));
@@ -439,8 +438,8 @@ public class QuadTreeTest {
 
 		final Rectangle rectBorderLeft = new Rectangle(upperLeftX, upperLeftY + (height / 2), rectWidth, rectHeight);
 		final Rectangle rectBorderTop = new Rectangle(upperLeftX + (width / 2), upperLeftY, rectWidth, rectHeight);
-		final Rectangle rectBorderRight = new Rectangle(upperLeftX + width, upperLeftY + (height / 2), rectWidth, rectHeight);
-		final Rectangle rectBorderBottom = new Rectangle(upperLeftX + (width / 2), upperLeftY + height, rectWidth, rectHeight);
+		final Rectangle rectBorderRight = new Rectangle(upperLeftX + width - rectWidth, upperLeftY + (height / 2), rectWidth, rectHeight);
+		final Rectangle rectBorderBottom = new Rectangle(upperLeftX + (width / 2), upperLeftY + height - rectHeight, rectWidth, rectHeight);
 
 		try {
 			tree.add(rectBorderLeft);

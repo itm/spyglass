@@ -54,6 +54,7 @@ public class Rectangle extends DrawingObject {
 		setPosition(new AbsolutePosition(x, y));
 		setWidth(width);
 		setHeight(height);
+		syncBoundingBoxInternal();
 	}
 
 	@Override
@@ -105,7 +106,6 @@ public class Rectangle extends DrawingObject {
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param height
-	 * @param fireBoundingBoxChangeEvent
 	 */
 	public synchronized void setHeight(final int height) {
 		this.height = height;
@@ -124,7 +124,6 @@ public class Rectangle extends DrawingObject {
 	// --------------------------------------------------------------------------------
 	/**
 	 * @param width
-	 * @param fireBoundingBoxChangeEvent
 	 */
 	public void setWidth(final int width) {
 		this.width = width;

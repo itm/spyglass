@@ -109,10 +109,10 @@ public class StringFormatter {
 		int index = tmpExp.indexOf("%");
 		int indexNotNum = 0;
 		while (index != -1) {
-			// write substring until first occurence of "%" to the result string
+			// write substring until first occurrence of "%" to the result string
 			result += tmpExp.substring(0, index);
 
-			// shorten the remaining expression until first occurence of "%"
+			// shorten the remaining expression until first occurrence of "%"
 			tmpExp = tmpExp.substring(index);
 
 			// identify the offset of the value in the data packet

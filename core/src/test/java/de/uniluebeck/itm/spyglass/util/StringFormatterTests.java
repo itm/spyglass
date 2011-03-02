@@ -1,17 +1,16 @@
 package de.uniluebeck.itm.spyglass.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
-import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Some Testcases for the StringFormatter
@@ -72,20 +71,20 @@ public class StringFormatterTests {
 	/**
 	 * Tests if the given Fmt-String and packet produce the expected string.
 	 * 
-	 * @param fmt
+	 * @param format
 	 *            a fmt string
-	 * @param p
+	 * @param packet
 	 *            a spyglass packet
-	 * @param res
+	 * @param expectedResult
 	 *            the expected string
 	 */
-	private void testString(final String fmt, final SpyglassPacket p, final String res) {
-		final StringFormatter f = new StringFormatter(fmt);
-		final String r = f.parse(p);
-		System.out.println("Ergebnis: " + r);
-		assertEquals(res, r);
-		assertEquals(fmt, f.getOrigExpression());
-		
+	private void testString(final String format, final SpyglassPacket packet, final String expectedResult) {
+
+		final StringFormatter f = new StringFormatter(format);
+		final String parseResult = f.parse(packet);
+
+		assertEquals(expectedResult, parseResult);
+		assertEquals(format, f.getOrigExpression());
 	}
 	
 	// Some simple tests without any substitution
@@ -107,8 +106,7 @@ public class StringFormatterTests {
 	
 	@Test
 	public void testParse_percent_twice() {
-		testString("My name is Freddy \"percent_twice\" Krueger.", packet1,
-				"My name is Freddy \"percent_twice\" Krueger.");
+		testString("My name is Freddy \"%%\" Krueger.", packet1, "My name is Freddy \"%\" Krueger.");
 	}
 	
 	// failure tests - these should fail
@@ -187,26 +185,26 @@ public class StringFormatterTests {
 	
 	@Test
 	public void testParsePacket1() {
-		testString("a: %u0, %u1, %u2", packet1, "a: 0, 1, 2");
+		testString("a: %u19, %u20, %u21", packet1, "a: 0, 1, 2");
 	}
 	
 	@Test
 	public void testParsePacket1a() {
-		testString("a: %u0, %u1, %u0", packet1, "a: 0, 1, 0");
+		testString("a: %u19, %u20, %u19", packet1, "a: 0, 1, 0");
 	}
 	
 	// packet 2
 	
-	// Endianess test
+	// Endianness test
 	@Test
 	public void testParsePacket2() {
-		testString("a: %U0", packet2, "a: 4");
+		testString("a: %U19", packet2, "a: 4");
 	}
 	
-	// Endianess test
+	// Endianness test
 	@Test
 	public void testParsePacket2a() {
-		testString("a: %i2", packet2, "a: 4");
+		testString("a: %i21", packet2, "a: 4");
 	}
 	
 	// packet 3
@@ -214,31 +212,31 @@ public class StringFormatterTests {
 	// unsigned test - 32bit
 	@Test
 	public void testParsePacket3() {
-		testString("a: %U0", packet3, "a: 4294967294");
+		testString("a: %U19", packet3, "a: 4294967294");
 	}
 	
 	// unsigned test - 8 bit
 	@Test
 	public void testParsePacket3a() {
-		testString("a: %u3", packet3, "a: 254");
+		testString("a: %u22", packet3, "a: 254");
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket3b() {
-		testString("a: %i2", packet3, "a: -2");
+		testString("a: %i21", packet3, "a: -2");
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket3c() {
-		testString("a: %i0", packet3, "a: -1");
+		testString("a: %i19", packet3, "a: -1");
 	}
 	
 	// packet length
 	@Test
 	public void testParsePacketFailLength() {
-		testString("a: %i10", packet3, "a: <packet to short>");
+		testString("a: %i29", packet3, "a: <packet to short>");
 	}
 	
 	// packet 4 - float
@@ -246,43 +244,43 @@ public class StringFormatterTests {
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4() {
-		testString("a: %f0\n", packet4, "a: 14.7\n");
+		testString("a: %f19\n", packet4, "a: 14.7\n");
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4a() {
-		testString("a: %f4", packet4, "a: 9.380918E-8");
+		testString("a: %f23", packet4, "a: 9.380918E-8");
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4NaN() {
-		testString("a: %f8", packet4, "a: " + Float.NaN);
+		testString("a: %f27", packet4, "a: " + Float.NaN);
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4MinInf() {
-		testString("a: %f12", packet4, "a: " + Float.NEGATIVE_INFINITY);
+		testString("a: %f31", packet4, "a: " + Float.NEGATIVE_INFINITY);
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4MaxInf() {
-		testString("a: %f16", packet4, "a: " + Float.POSITIVE_INFINITY);
+		testString("a: %f35", packet4, "a: " + Float.POSITIVE_INFINITY);
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4MinValue() {
-		testString("a: %f20", packet4, "a: " + Float.MIN_VALUE);
+		testString("a: %f39", packet4, "a: " + Float.MIN_VALUE);
 	}
 	
 	// signed test - 16 bit
 	@Test
 	public void testParsePacket4MaxValue() {
-		testString("a: %f24", packet4, "a: " + Float.MAX_VALUE);
+		testString("a: %f43", packet4, "a: " + Float.MAX_VALUE);
 	}
 	
 	private class SpyglassPacketStub extends SpyglassPacket {

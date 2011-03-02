@@ -4,3 +4,5 @@ logs/
 *.iws
 *.ipr
 SpyGlassConfig.xml
+core/spyglass.properties
+spyglass.properties

@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------
 /**
- * 
+ *
  */
 package de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation;
 
@@ -17,7 +17,7 @@ import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.StatisticalInfo
 // --------------------------------------------------------------------------------
 /**
  * @author Sebastian Ebers
- * 
+ *
  */
 public class StatisticalOperationTest {
 
@@ -78,7 +78,7 @@ public class StatisticalOperationTest {
 		statisticalOperation.addValue(7);
 		statisticalOperation.addValue(8);
 		statisticalOperation.addValue(9);
-		assertEquals(55, statisticalOperation.addValue(10));
+		assertEquals(55, statisticalOperation.addValue(10), 0.0);
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class StatisticalOperationTest {
 		statisticalOperation.addValue(8);
 		statisticalOperation.addValue(9);
 		statisticalOperation.addValue(10);
-		assertEquals(66, statisticalOperation.addValue(11));
+		assertEquals(66, statisticalOperation.addValue(11), 0.0);
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class StatisticalOperationTest {
 	public final void testAddValueAVG() {
 		final StatisticalOperation statisticalOperation = new StatisticalOperation(10, STATISTICAL_OPERATIONS.AVG);
 		statisticalOperation.addValue(1);
-		assertEquals(2, statisticalOperation.addValue(3));
+		assertEquals(2, statisticalOperation.addValue(3), 0.0);
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class StatisticalOperationTest {
 	public final void testAddValueMAX() {
 		final StatisticalOperation statisticalOperation = new StatisticalOperation(10, STATISTICAL_OPERATIONS.MAX);
 		statisticalOperation.addValue(1);
-		assertEquals(3, statisticalOperation.addValue(3));
+		assertEquals(3, statisticalOperation.addValue(3), 0.0);
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class StatisticalOperationTest {
 	public final void testAddValueMIN() {
 		final StatisticalOperation statisticalOperation = new StatisticalOperation(10, STATISTICAL_OPERATIONS.MIN);
 		statisticalOperation.addValue(1);
-		assertEquals(1, statisticalOperation.addValue(3));
+		assertEquals(1, statisticalOperation.addValue(3), 0.0);
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class StatisticalOperationTest {
 	public final void testAddValueMEDIAN1() {
 		final StatisticalOperation statisticalOperation = new StatisticalOperation(10, STATISTICAL_OPERATIONS.MEDIAN);
 		statisticalOperation.addValue(1);
-		assertEquals(1, statisticalOperation.addValue(3));
+		assertEquals(1, statisticalOperation.addValue(3), 0.0);
 	}
 
 	/**
@@ -162,7 +162,7 @@ public class StatisticalOperationTest {
 		statisticalOperation.addValue(4);
 		statisticalOperation.addValue(7);
 		statisticalOperation.addValue(5);
-		assertEquals(4, statisticalOperation.addValue(3));
+		assertEquals(4, statisticalOperation.addValue(3), 0.0);
 	}
 
 	/**
@@ -188,7 +188,7 @@ public class StatisticalOperationTest {
 		statisticalOperation.addValue(1);
 		statisticalOperation.addValue(4);
 		statisticalOperation.addValue(7);
-		assertEquals(5, statisticalOperation.addValue(6));
+		assertEquals(5, statisticalOperation.addValue(6), 0.0);
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class StatisticalOperationTest {
 		so.addValue(5);
 		so.addValue(9);
 		so.addValue(9);
-		//assertEquals(35, so.getValue(STATISTICAL_OPERATIONS.SUM));
+		assertEquals((float) 35, so.getValue(STATISTICAL_OPERATIONS.SUM), 0.0);
 	}
 
 	/**
@@ -222,7 +222,7 @@ public class StatisticalOperationTest {
 		so.addValue(5);
 		so.addValue(9);
 		so.addValue(3);
-		//assertEquals(24 / 4, so.getValue(STATISTICAL_OPERATIONS.AVG));
+		assertEquals((float) (24 / 4), so.getValue(STATISTICAL_OPERATIONS.AVG), 0.0);
 	}
 
 	/**
@@ -239,7 +239,7 @@ public class StatisticalOperationTest {
 		so.addValue(5);
 		so.addValue(9);
 		so.addValue(3);
-		//assertEquals(24 / 4, so.getValue(STATISTICAL_OPERATIONS.AVG));
+		assertEquals((float) (24 / 4), so.getValue(STATISTICAL_OPERATIONS.AVG), 0.0);
 	}
 
 	/**
@@ -256,7 +256,7 @@ public class StatisticalOperationTest {
 		so.addValue(5);
 		so.addValue(9);
 		so.addValue(3);
-		//assertEquals(1, so.getValue(STATISTICAL_OPERATIONS.MIN));
+		assertEquals((float) 1, so.getValue(STATISTICAL_OPERATIONS.MIN), 0.0);
 	}
 
 	/**
@@ -273,7 +273,7 @@ public class StatisticalOperationTest {
 		so.addValue(5);
 		so.addValue(9);
 		so.addValue(3);
-		//assertEquals(1, so.getValue(STATISTICAL_OPERATIONS.MIN));
+		assertEquals((float) 1, so.getValue(STATISTICAL_OPERATIONS.MIN), 0.0);
 	}
 
 	/**
@@ -290,7 +290,7 @@ public class StatisticalOperationTest {
 		so.addValue(5);
 		so.addValue(9);
 		so.addValue(3);
-		//assertEquals(10, so.getValue(STATISTICAL_OPERATIONS.MAX));
+		assertEquals((float) 10, so.getValue(STATISTICAL_OPERATIONS.MAX), 0.0);
 	}
 
 	/**
@@ -307,7 +307,7 @@ public class StatisticalOperationTest {
 		so.addValue(5);
 		so.addValue(9);
 		so.addValue(3);
-		//assertEquals(10, so.getValue(STATISTICAL_OPERATIONS.MAX));
+		assertEquals((float) 10, so.getValue(STATISTICAL_OPERATIONS.MAX), 0.0);
 	}
 
 	/**
@@ -324,7 +324,7 @@ public class StatisticalOperationTest {
 		so.addValue(3);
 		so.addValue(9);
 		so.addValue(5);
-		//assertEquals(5, so.getValue(STATISTICAL_OPERATIONS.MEDIAN));
+		assertEquals((float) 5, so.getValue(STATISTICAL_OPERATIONS.MEDIAN), 0.0);
 	}
 
 	/**
@@ -341,7 +341,7 @@ public class StatisticalOperationTest {
 		so.addValue(5);
 		so.addValue(9);
 		so.addValue(3);
-		//assertEquals(5, so.getValue(STATISTICAL_OPERATIONS.MEDIAN));
+		assertEquals((float) 5, so.getValue(STATISTICAL_OPERATIONS.MEDIAN), 0.0);
 	}
 
 	/**
@@ -358,7 +358,7 @@ public class StatisticalOperationTest {
 		so.addValue(5);
 		so.addValue(9);
 		so.addValue(3);
-		//assertEquals(5, so.getValue(STATISTICAL_OPERATIONS.MEDIAN));
+		assertEquals((float) 5, so.getValue(STATISTICAL_OPERATIONS.MEDIAN), 0.0);
 	}
 
 }

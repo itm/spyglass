@@ -30,9 +30,9 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * @author dariush
  * 
  */
-public class QuadTreePerfTest {
+public class QuadTreePerformanceTest {
 
-	private static final Logger log = SpyglassLoggerFactory.getLogger(QuadTreePerfTest.class);
+	private static final Logger log = SpyglassLoggerFactory.getLogger(QuadTreePerformanceTest.class);
 
 	private ArrayList<DrawingObject> dobs = null;
 
