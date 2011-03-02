@@ -93,7 +93,7 @@
 			<dependency>
 				<groupId>de.danbim.swtquadtree</groupId>
 				<artifactId>swtquadtree</artifactId>
-				<version>1.1-SNAPSHOT</version>
+				<version>1.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.eclipse</groupId>
@@ -175,51 +175,52 @@
 
 	<profiles>
 		<profile>
-			<id>mac-x86_64</id>
+			<id>cocoa-macosx-x86_64</id>
 			<activation>
 				<os>
 					<family>mac</family>
-					<name>mac os x</name>
+					<name>Mac OS X</name>
 				</os>
 			</activation>
 			<properties>
-				<finalName.os>macosx</finalName.os>
+				<finalName.os>cocoa-macosx</finalName.os>
 				<finalName.arch>x86_64</finalName.arch>
 				<swt.artifactId>swt-cocoa-macosx-x86_64</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
 		<profile>
-			<id>mac-x86</id>
+			<id>cocoa-macosx-x86</id>
 			<activation>
 				<os>
-					<name>mac os x</name>
+					<family>mac</family>
+					<name>Mac OS X</name>
 					<arch>x86</arch>
 				</os>
 			</activation>
 			<properties>
-				<finalName.os>macosx</finalName.os>
+				<finalName.os>cocoa-macosx</finalName.os>
 				<finalName.arch>x86</finalName.arch>
 				<swt.artifactId>swt-cocoa-macosx-x86</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
 		<profile>
-			<id>linux-x86_64</id>
+			<id>gtk-linux-x86_64</id>
 			<activation>
 				<os>
 					<name>linux</name>
 				</os>
 			</activation>
 			<properties>
-				<finalName.os>linux</finalName.os>
+				<finalName.os>gtk-linux</finalName.os>
 				<finalName.arch>x86_64</finalName.arch>
 				<swt.artifactId>swt-gtk-linux-x86_64</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
 		<profile>
-			<id>linux</id>
+			<id>gtk-linux-x86</id>
 			<activation>
 				<os>
 					<name>linux</name>
@@ -227,7 +228,7 @@
 				</os>
 			</activation>
 			<properties>
-				<finalName.os>linux</finalName.os>
+				<finalName.os>gtk-linux</finalName.os>
 				<finalName.arch>x86</finalName.arch>
 				<swt.artifactId>swt-gtk-linux-x86</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
@@ -248,7 +249,7 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>windows</id>
+			<id>windows-x86</id>
 			<activation>
 				<os>
 					<family>windows</family>

@@ -38,7 +38,7 @@
 
 	<artifactId>spyglass-core</artifactId>
 	<packaging>jar</packaging>
-	<name>Spyglass :: Core</name>
+	<name>SpyGlass :: Core</name>
 
 	<dependencies>
 
