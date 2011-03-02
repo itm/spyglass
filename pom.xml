@@ -369,6 +369,10 @@
 		</snapshotRepository>
 	</distributionManagement>
 
+	<scm>
+		<connection>scm:git:https://itm@github.com/itm/spyglass.git</connection>
+	</scm>
+
 	<build>
 		<plugins>
 			<plugin>
