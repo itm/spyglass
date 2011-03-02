@@ -200,7 +200,7 @@
 			<properties>
 				<finalName.os>macosx</finalName.os>
 				<finalName.arch>x86</finalName.arch>
-				<swt.artifactId>swt-cocoa-macosx</swt.artifactId>
+				<swt.artifactId>swt-cocoa-macosx-x86</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
@@ -229,7 +229,7 @@
 			<properties>
 				<finalName.os>linux</finalName.os>
 				<finalName.arch>x86</finalName.arch>
-				<swt.artifactId>swt-gtk-linux</swt.artifactId>
+				<swt.artifactId>swt-gtk-linux-x86</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
@@ -243,7 +243,7 @@
 			<properties>
 				<finalName.os>windows</finalName.os>
 				<finalName.arch>x86_64</finalName.arch>
-				<swt.artifactId>swt-win32-x86_64</swt.artifactId>
+				<swt.artifactId>swt-windows-x86_64</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
@@ -258,7 +258,7 @@
 			<properties>
 				<finalName.os>windows</finalName.os>
 				<finalName.arch>x86</finalName.arch>
-				<swt.artifactId>swt-win32</swt.artifactId>
+				<swt.artifactId>swt-windows-x86</swt.artifactId>
 				<swt.version>3.6.1</swt.version>
 			</properties>
 		</profile>
