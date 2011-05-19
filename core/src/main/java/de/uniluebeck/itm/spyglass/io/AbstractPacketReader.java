@@ -20,6 +20,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PropertyBean;
 import de.uniluebeck.itm.spyglass.packet.PacketFactory;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
+import de.uniluebeck.itm.spyglass.xmlconfig.TestbedControlSettingsXMLConfig;
 
 // ------------------------------------------------------------------------------
 /**
@@ -188,6 +189,7 @@ public abstract class AbstractPacketReader extends PropertyBean implements Packe
 
 			this.config = config;
 			config.getGeneralSettings().addPropertyChangeListener(this);
+                        config.getTestbedControlSettings().addPropertyChangeListener(this);
 			config.getPacketReader().addPropertyChangeListener(this);
 			config.addPropertyChangeListener(this);
 
@@ -298,6 +300,12 @@ public abstract class AbstractPacketReader extends PropertyBean implements Packe
 				timeScale = ((GeneralSettingsXMLConfig) evt.getNewValue()).getTimeScale();
 
 			}
+                        if (evt.getPropertyName().equals("testbedControlSettings")) {
+				((TestbedControlSettingsXMLConfig) evt.getOldValue()).removePropertyChangeListener(this);
+				((TestbedControlSettingsXMLConfig) evt.getNewValue()).addPropertyChangeListener(this);
+				
+
+			}
 		}
 
 		/**
@@ -306,6 +314,7 @@ public abstract class AbstractPacketReader extends PropertyBean implements Packe
 		public void shutdown() {
 			config.getGeneralSettings().removePropertyChangeListener(this);
 			config.getPacketReader().removePropertyChangeListener(this);
+                        config.getTestbedControlSettings().removePropertyChangeListener(this);
 			config.removePropertyChangeListener(this);
 			reset();
 		}

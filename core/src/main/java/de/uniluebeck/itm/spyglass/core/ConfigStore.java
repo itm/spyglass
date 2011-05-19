@@ -211,6 +211,8 @@ public class ConfigStore extends PropertyBean {
 		spyglassConfig.getPluginManager().addPluginListChangeListener(pluginManagerListener);
 		spyglassConfig.getGeneralSettings().addPropertyChangeListener(pluginPropertyListener);
 		spyglassConfig.getGeneralSettings().getMetrics().addPropertyChangeListener(pluginPropertyListener);
+                spyglassConfig.getTestbedControlSettings().addPropertyChangeListener(pluginPropertyListener);
+		
 		for (final Plugin p : spyglassConfig.getDefaultPlugins()) {
 			p.getXMLConfig().addPropertyChangeListener(pluginPropertyListener);
 		}
@@ -223,6 +225,7 @@ public class ConfigStore extends PropertyBean {
 		spyglassConfig.getPluginManager().removePluginListChangeListener(pluginManagerListener);
 		spyglassConfig.getGeneralSettings().removePropertyChangeListener(pluginPropertyListener);
 		spyglassConfig.getGeneralSettings().getMetrics().removePropertyChangeListener(pluginPropertyListener);
+                spyglassConfig.getTestbedControlSettings().addPropertyChangeListener(pluginPropertyListener);
 		for (final Plugin p : spyglassConfig.getDefaultPlugins()) {
 			p.getXMLConfig().removePropertyChangeListener(pluginPropertyListener);
 		}

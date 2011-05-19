@@ -39,10 +39,12 @@ import de.uniluebeck.itm.spyglass.plugin.nodesensorrange.NodeSensorRangePlugin;
 import de.uniluebeck.itm.spyglass.plugin.objectpainter.ObjectPainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionData;
 import de.uniluebeck.itm.spyglass.plugin.positionpacketnodepositioner.PositionPacketNodePositionerPlugin;
+import de.uniluebeck.itm.spyglass.plugin.positionstaticnodepositioner.PositionStaticNodePositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInformationPlugin;
 import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.springembedderpositioner.SpringEmbedderPositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter.VectorSequencePainterPlugin;
+import de.uniluebeck.itm.spyglass.testbedControl.testbedControler;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -124,10 +126,12 @@ public class PluginManager {
 		availablePluginsTypes.add(SimpleGlobalInformationPlugin.class);
 		availablePluginsTypes.add(SimpleNodePainterPlugin.class);
 		availablePluginsTypes.add(PositionPacketNodePositionerPlugin.class);
+                availablePluginsTypes.add(PositionStaticNodePositionerPlugin.class);
 		availablePluginsTypes.add(SpringEmbedderPositionerPlugin.class);
 		availablePluginsTypes.add(LinePainterPlugin.class);
 		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
 		// availablePluginsTypes.add(TemplatePlugin.class);
+                //availablePluginsTypes.add(testbedControler.class);
 	}
 
 	// --------------------------------------------------------------------------
@@ -316,6 +320,7 @@ public class PluginManager {
 		}
 
 		log.info("PluginManager initialized.");
+               
 	}
 
 	/**

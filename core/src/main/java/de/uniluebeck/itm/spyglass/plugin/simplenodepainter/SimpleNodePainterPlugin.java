@@ -47,6 +47,7 @@ import de.uniluebeck.itm.spyglass.util.StringFormatter;
 import de.uniluebeck.itm.spyglass.util.Tools;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginWithStringFormatterXMLConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
+import java.util.Iterator;
 
 // --------------------------------------------------------------------------------
 /**
@@ -123,6 +124,12 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 		};
 		manager.addNodePositionListener(npcl);
 		xmlConfig.addPropertyChangeListener(pcl = new SNPPPropertyChangeListener());
+                
+                Iterator nodes = pluginManager.getNodePositioner().getNodeList().iterator();
+                while (nodes.hasNext()){
+                    int cur = (Integer) nodes.next();
+                    simulatePacket(cur);
+                }
 	}
 
 	// --------------------------------------------------------------------------------
@@ -179,7 +186,7 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 	/**
 	 * Returns the plug-in's denotation in a human readable style
 	 * 
-	 * @return the plug-in's denotation in a human readable style
+	 * @return the plug-in's denotation in a human readable styleprocessPacket
 	 */
 	public static String getHumanReadableName() {
 		return "SimpleNodePainter";
@@ -217,6 +224,29 @@ public class SimpleNodePainterPlugin extends NodePainterPlugin {
 			node.setDescription(data.getStringFormatterString(nodeID));
 		}
 	}
+        
+        public void simulatePacket(Integer nodeID){
+            
+            synchronized (nodeSemanticTypes) {
+			Collection<Integer> existingTypes = nodeSemanticTypes.get(nodeID);
+			if (existingTypes == null) {
+				// create a new set where the semantic types of packages of this node are stored
+				existingTypes = new HashSet<Integer>();
+				nodeSemanticTypes.put(nodeID, existingTypes);
+			}
+			existingTypes.add(0);
+		}
+
+		// get the instance of the node's visualization
+		final Node node = getMatchingNodeObject(nodeID);
+
+		// if the description was changed, an update is needed
+		//if (data.parsePayloadByStringFormatters(packet)) {
+			node.setDescription(data.getStringFormatterString(nodeID));
+		//}
+            
+            
+        }
 
 	// --------------------------------------------------------------------------------
 	/**

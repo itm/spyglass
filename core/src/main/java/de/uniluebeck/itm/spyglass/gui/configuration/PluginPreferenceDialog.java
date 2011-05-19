@@ -534,6 +534,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	private static final String NODE_ID_PLUGINMANAGER = "NodeIdPluginManager";
 
 	private static final String NODE_ID_GENERAL_SETTINGS = "NodeIdGeneralSettings";
+        
+        private static final String TESTBED_GENERAL_SETTINGS = "TestbedGeneralSettings";
 
 	private Button buttonClose;
 
@@ -567,6 +569,8 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 	private CustomPreferenceNode pluginManagerPreferenceNode;
 
 	private PreferenceNode generalPreferenceNode;
+        
+        private PreferenceNode testbedPreferenceNode;
 
 	public PluginPreferenceDialog(final Shell parentShell, final Spyglass spyglass) {
 
@@ -582,10 +586,13 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 
 		generalPreferenceNode = new CustomPreferenceNode(NODE_ID_GENERAL_SETTINGS, "General", createImageDescriptor("general.png"),
 				new GeneralPreferencePage(spyglass));
+                testbedPreferenceNode = new CustomPreferenceNode(TESTBED_GENERAL_SETTINGS, "Testbed", createImageDescriptor("testbed-runtime-logo.png"),
+				new TestbedControlPreferencePage(spyglass));
 		pluginManagerPreferenceNode = new CustomPreferenceNode(NODE_ID_PLUGINMANAGER, "Plugins", createImageDescriptor("plugin_manager.png"),
 				new PluginManagerPreferencePage(spyglass, this));
 
 		preferenceManager.addToRoot(generalPreferenceNode);
+                preferenceManager.addToRoot(testbedPreferenceNode);
 		preferenceManager.addToRoot(pluginManagerPreferenceNode);
 
 		final List<Class<? extends Plugin>> pluginTypes = PluginManager.getAvailablePluginTypes();
@@ -792,9 +799,14 @@ public class PluginPreferenceDialog implements PluginListChangeListener {
 			hashUnsavedChanges = !selectedPage.okToLeave();
 		}
 
-		// check if we're looking at general preference page or plug-in preference page
+                		// check if we're looking at general preference page or plug-in preference page
 		if (selectedPage instanceof GeneralPreferencePage) {
 			hashUnsavedChanges = ((GeneralPreferencePage) selectedPage).hasUnsavedChanges();
+		}
+                
+		// check if we're looking at testbed preference page or plug-in preference page
+		if (selectedPage instanceof TestbedControlPreferencePage) {
+			hashUnsavedChanges = ((TestbedControlPreferencePage) selectedPage).hasUnsavedChanges();
 		}
 
 		if (selectedPage instanceof PluginPreferencePage) {
