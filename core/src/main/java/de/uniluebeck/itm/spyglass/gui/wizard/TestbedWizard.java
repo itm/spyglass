@@ -17,15 +17,18 @@ import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.io.wisebed.TestbedXMLConfig;
 import de.uniluebeck.itm.spyglass.io.wisebed.WSNPacketReader;
 import de.uniluebeck.itm.wisebed.cmdlineclient.BeanShellHelper;
+import eu.wisebed.api.common.KeyValuePair;
 import eu.wisebed.api.rs.ConfidentialReservationData;
 import eu.wisebed.api.rs.GetReservations;
 import eu.wisebed.api.rs.RS;
 import eu.wisebed.api.rs.RSExceptionException;
+import eu.wisebed.api.sm.SessionManagement;
 import eu.wisebed.api.snaa.AuthenticationTriple;
 import eu.wisebed.api.snaa.SNAA;
 import eu.wisebed.api.snaa.SecretAuthenticationKey;
 import eu.wisebed.testbed.api.rs.RSServiceHelper;
 import eu.wisebed.testbed.api.snaa.helpers.SNAAServiceHelper;
+import eu.wisebed.testbed.api.wsn.WSNServiceHelper;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -48,6 +51,9 @@ import org.slf4j.LoggerFactory;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.Holder;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.List;
 
@@ -111,7 +117,7 @@ public class TestbedWizard extends Wizard {
 			return false;
 		}
 		WSNPacketReader wsnPacketReader = WSNPacketReader.createInstance(
-				config.getSessionManagementUrl(), config.getControllerUrn(),
+				config.getSmEndpointUrl(), config.getControllerEndpointUrl(),
 				thirdPage.getSelectedReservation()
 		);
 		log.info("WSNPacketReader created by TestbedWizard.");
@@ -133,7 +139,7 @@ public class TestbedWizard extends Wizard {
 	 */
 	public class FirstPage extends WizardPage implements IExtendedWizardPage {
 
-		Text snaaText, rsText, smText, controllerText;
+		Text sessionManagementText, controllerText;
 
 		protected FirstPage(String pageName) {
 			super(pageName);
@@ -147,59 +153,40 @@ public class TestbedWizard extends Wizard {
 			gridLayout.makeColumnsEqualWidth = true;
 			gridLayout.numColumns = 2;
 			area.setLayout(gridLayout);
-			Label snaaLabel = new Label(area, SWT.NONE);
-			snaaLabel.setText("SNAA Service");
-			snaaText = new Text(area, SWT.BORDER);
-			snaaText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			Label rsLabel = new Label(area, SWT.NONE);
-			rsLabel.setText("Reservation Service");
-			rsText = new Text(area, SWT.BORDER);
-			rsText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			Label smLabel = new Label(area, SWT.NONE);
-			smLabel.setText("SessionManagement Service");
-			smText = new Text(area, SWT.BORDER);
-			smText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			smLabel.setText("Session Management Service Endpoint URL");
+			sessionManagementText = new Text(area, SWT.BORDER);
+			sessionManagementText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			Label controllerLabel = new Label(area, SWT.NONE);
-			controllerLabel.setText("Local Controller Service");
+			controllerLabel.setText("Local Controller Service Endpoint URL");
 			controllerText = new Text(area, SWT.BORDER);
 			controllerText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			if (StringUtils.isBlank(TestbedWizard.this.config.getControllerUrn())) {
-				TestbedWizard.this.config.setControllerUrn(WSNPacketReader.generateControllerURN());
+			if (StringUtils.isBlank(TestbedWizard.this.config.getControllerEndpointUrl())) {
+				TestbedWizard.this.config.setControllerEndpointUrl(WSNPacketReader.generateControllerURN());
 			}
 			setControl(area);
+
 			final DataBindingContext context = new DataBindingContext(SWTObservables.getRealm(composite.getDisplay()));
-			IObservableValue snaaUrlObservable = PojoObservables
-					.observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config, "snaaUrl"
-					);
-			IObservableValue snaaTextObservable = SWTObservables.observeText(snaaText, SWT.Modify);
-			context.bindValue(snaaTextObservable, snaaUrlObservable,
+
+			IObservableValue smUrlObservable = PojoObservables.observeValue(
+					SWTObservables.getRealm(composite.getDisplay()),
+					TestbedWizard.this.config, TestbedXMLConfig.PROPERTYNAME_SM_ENDPOINT_URL
+			);
+
+			context.bindValue(
+					SWTObservables.observeText(sessionManagementText, SWT.Modify),
+					smUrlObservable,
 					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
 					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
 			);
-			IObservableValue rsUrlObservable = PojoObservables
-					.observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config,
-							"reservationUrl"
-					);
-			IObservableValue rsTextObservable = SWTObservables.observeText(rsText, SWT.Modify);
-			context.bindValue(rsTextObservable, rsUrlObservable,
-					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
-					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
+
+			IObservableValue controllerEndpointUrlObservable = PojoObservables.observeValue(
+					SWTObservables.getRealm(composite.getDisplay()),
+					TestbedWizard.this.config, TestbedXMLConfig.PROPERTYNAME_CONTROLLER_ENDPOINT_URL
 			);
-			IObservableValue smUrlObservable = PojoObservables
-					.observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config,
-							"sessionManagementUrl"
-					);
-			IObservableValue smTextObservable = SWTObservables.observeText(smText, SWT.Modify);
-			context.bindValue(smTextObservable, smUrlObservable,
-					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
-					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
-			);
-			IObservableValue cUrlObservable = PojoObservables
-					.observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config,
-							"controllerUrn"
-					);
+
 			IObservableValue cTextObservable = SWTObservables.observeText(controllerText, SWT.Modify);
-			context.bindValue(cTextObservable, cUrlObservable,
+			context.bindValue(cTextObservable, controllerEndpointUrlObservable,
 					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
 					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
 			);
@@ -209,24 +196,46 @@ public class TestbedWizard extends Wizard {
 		@Override
 		public void nextPressed() {
 			StringBuilder builder = new StringBuilder();
-			if (StringUtils.isBlank(snaaText.getText())) {
-				builder.append("URN of SNAA Service is missing!").append("\n");
-			}
-			if (StringUtils.isBlank(rsText.getText())) {
-				builder.append("URN of Reservation Service is missing!").append("\n");
-			}
-			if (StringUtils.isBlank(smText.getText())) {
-				builder.append("URN of SessionManagement Service is missing!").append("\n");
+			if (StringUtils.isBlank(sessionManagementText.getText())) {
+				builder.append("URN of Session Management Service is missing!").append("\n");
 			}
 			if (StringUtils.isNotBlank(builder.toString())) {
 				MessageDialog.openWarning(getShell(), "Warning", builder.toString());
 			}
+
+			fetchSnaaAndRsEndpointUrls();
+		}
+
+		private void fetchSnaaAndRsEndpointUrls() {
+
+			SessionManagement sessionManagement = WSNServiceHelper.getSessionManagementService(
+					sessionManagementText.getText()
+			);
+
+			final Holder<String> rsEndpointUrl = new Holder<String>();
+			final Holder<String> snaaEndpointUrl = new Holder<String>();
+			final Holder<List<KeyValuePair>> configurationOptions = new Holder<List<KeyValuePair>>();
+
+			sessionManagement.getConfiguration(rsEndpointUrl, snaaEndpointUrl, configurationOptions);
+
+			TestbedWizard.this.config.setRsEndpointUrl(rsEndpointUrl.value);
+			TestbedWizard.this.config.setSnaaEndpointUrl(snaaEndpointUrl.value);
 		}
 
 		@Override
 		public boolean isComplete() {
-			return StringUtils.isNotBlank(snaaText.getText()) && StringUtils.isNotBlank(rsText.getText()) && StringUtils
-					.isNotBlank(smText.getText());
+			boolean notBlank = StringUtils.isNotBlank(sessionManagementText.getText());
+			if (notBlank) {
+				String smEndpointUrl = sessionManagementText.getText();
+				try {
+					new URL(smEndpointUrl);
+				} catch (MalformedURLException e) {
+					return false;
+				}
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 
@@ -265,7 +274,7 @@ public class TestbedWizard extends Wizard {
 			urnText.setText(config.getUrnPrefix() == null ? "" : config.getUrnPrefix());
 			final Text userText = new Text(upperArea, SWT.BORDER);
 			userText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			userText.setText(config.getUserName() == null ? "" : config.getUserName());
+			userText.setText(config.getUsername() == null ? "" : config.getUsername());
 			final Text pwText = new Text(upperArea, SWT.BORDER);
 			pwText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			pwText.setText(config.getPassword() == null ? "" : config.getPassword());
@@ -319,7 +328,7 @@ public class TestbedWizard extends Wizard {
 						config.setUrnPrefix(urnText.getText());
 						urnText.setText("");
 
-						config.setUserName(userText.getText());
+						config.setUsername(userText.getText());
 						userText.setText("");
 
 						config.setPassword(pwText.getText());
@@ -448,7 +457,7 @@ public class TestbedWizard extends Wizard {
 	 * @return
 	 */
 	private boolean authenticate(AuthenticationTriple triple) {
-		SNAA snaa = SNAAServiceHelper.getSNAAService(config.getSnaaUrl());
+		SNAA snaa = SNAAServiceHelper.getSNAAService(config.getSnaaEndpointUrl());
 		java.util.List<SecretAuthenticationKey> list = null;
 		try {
 			list = snaa.authenticate(ImmutableList.of(triple));
@@ -463,7 +472,7 @@ public class TestbedWizard extends Wizard {
 
 	private void fillReservations() {
 
-		final RS rs = RSServiceHelper.getRSService(config.getReservationUrl());
+		final RS rs = RSServiceHelper.getRSService(config.getRsEndpointUrl());
 		final GetReservations getReservationsRequest = new GetReservations();
 		final DateTime from = new DateTime();
 		final DateTime until = from.plusHours(1);

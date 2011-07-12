@@ -14,105 +14,116 @@ import org.simpleframework.xml.Element;
 
 /**
  * Configuration for Testbed-Connection
+ *
  * @author jens kluttig
  */
 public class TestbedXMLConfig extends XMLConfig {
-    @Element(required = false)
-    private
-    String snaaUrl;
 
-    @Element(required = false)
-    private
-    String reservationUrl;
+	public static final String PROPERTYNAME_SNAA_ENDPOINT_URL = "snaaEndpointUrl";
 
-    @Element(required = false)
-    private
-    String sessionManagementUrl;
+	public static final String PROPERTYNAME_RS_ENDPOINT_URL = "rsEndpointUrl";
 
-    @Element(required = false)
-    private
-    String controllerUrn;
+	public static final String PROPERTYNAME_SM_ENDPOINT_URL = "smEndpointUrl";
 
-    @Element(required = false)
-    private
-    String userName;
+	public static final String PROPERTYNAME_CONTROLLER_ENDPOINT_URL = "controllerEndpointUrl";
 
-    @Element(required = false)
-    private
-    String urnPrefix;
+	public static final String PROPERTYNAME_USERNAME = "username";
 
-    @Element(required = false)
-    private
-    String password;
+	public static final String PROPERTYNAME_URN_PREFIX = "urnPrefix";
 
-    /**
-     * Url of Authorization Service
-     */
-    public String getSnaaUrl() {
-        return snaaUrl;
-    }
+	public static final String PROPERTYNAME_PASSWORD = "password";
 
-    public void setSnaaUrl(String snaaUrl) {
-        firePropertyChange("snaaUrl", this.snaaUrl, snaaUrl);
-        this.snaaUrl = snaaUrl;
-    }
+	/**
+	 * URL of the Sensor Network Authentication and Authorization (SNAA) Service
+	 */
+	@Element(required = false, name = PROPERTYNAME_SNAA_ENDPOINT_URL)
+	private String snaaEndpointUrl;
 
-    /**
-     * Url of Reservation Service
-     */
-    public String getReservationUrl() {
-        return reservationUrl;
-    }
+	/**
+	 * URL of the Reservation Service
+	 */
+	@Element(required = false, name = PROPERTYNAME_RS_ENDPOINT_URL)
+	private String rsEndpointUrl;
 
-    public void setReservationUrl(String reservationUrl) {
-        firePropertyChange("reservationUrl", this.reservationUrl, reservationUrl);
-        this.reservationUrl = reservationUrl;
-    }
+	/**
+	 * URL of the Session Management Service
+	 */
+	@Element(required = false, name = PROPERTYNAME_SM_ENDPOINT_URL)
+	private String smEndpointUrl;
 
-    /**
-     * Url of Session Management Service
-     */
-    public String getSessionManagementUrl() {
-        return sessionManagementUrl;
-    }
+	@Element(required = false, name = PROPERTYNAME_CONTROLLER_ENDPOINT_URL)
+	private String controllerEndpointUrl;
 
-    public void setSessionManagementUrl(String sessionManagementUrl) {
-        firePropertyChange("sessionManagementUrl", this.sessionManagementUrl, sessionManagementUrl);
-        this.sessionManagementUrl = sessionManagementUrl;
-    }
+	/**
+	 * Username used for authentication with the SNAA
+	 */
+	@Element(required = false, name = PROPERTYNAME_USERNAME)
+	private String username;
 
-    /**
-     * Username for authentication
-     */
-    public String getUserName() {
-        return userName;
-    }
+	@Element(required = false, name = PROPERTYNAME_URN_PREFIX)
+	private String urnPrefix;
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
+	@Element(required = false, name = PROPERTYNAME_PASSWORD)
+	private String password;
 
-    public String getUrnPrefix() {
-        return urnPrefix;
-    }
+	public String getSnaaEndpointUrl() {
+		return snaaEndpointUrl;
+	}
 
-    public void setUrnPrefix(String urnPrefix) {
-        this.urnPrefix = urnPrefix;
-    }
+	public void setSnaaEndpointUrl(String snaaEndpointUrl) {
+		firePropertyChange("snaaEndpointUrl", this.snaaEndpointUrl, snaaEndpointUrl);
+		this.snaaEndpointUrl = snaaEndpointUrl;
+	}
 
-    public String getPassword() {
-        return password;
-    }
+	public String getRsEndpointUrl() {
+		return rsEndpointUrl;
+	}
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+	public void setRsEndpointUrl(String rsEndpointUrl) {
+		firePropertyChange("rsEndpointUrl", this.rsEndpointUrl, rsEndpointUrl);
+		this.rsEndpointUrl = rsEndpointUrl;
+	}
 
-    public String getControllerUrn() {
-        return controllerUrn;
-    }
+	public String getSmEndpointUrl() {
+		return smEndpointUrl;
+	}
 
-    public void setControllerUrn(String controllerUrn) {
-        this.controllerUrn = controllerUrn;
-    }
+	public void setSmEndpointUrl(String smEndpointUrl) {
+		firePropertyChange("smEndpointUrl", this.smEndpointUrl,
+				smEndpointUrl
+		);
+		this.smEndpointUrl = smEndpointUrl;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getUrnPrefix() {
+		return urnPrefix;
+	}
+
+	public void setUrnPrefix(String urnPrefix) {
+		this.urnPrefix = urnPrefix;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getControllerEndpointUrl() {
+		return controllerEndpointUrl;
+	}
+
+	public void setControllerEndpointUrl(String controllerEndpointUrl) {
+		this.controllerEndpointUrl = controllerEndpointUrl;
+	}
 }
