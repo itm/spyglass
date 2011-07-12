@@ -97,18 +97,23 @@ public class WSNPacketReader extends AbstractPacketReader implements Controller 
 		controllerEndpoint = Endpoint.publish(reader.controllerUrn, reader);
 		log.debug("Started Controller endpoint at {}", reader.controllerUrn);
 		try {
+
 			sm.getInstance(BeanShellHelper.copyRsToWsn(rsList), reader.controllerUrn);
+
 		} catch (ExperimentNotRunningException_Exception e) {
-			log.error("Experiment not found!");
+			log.warn("Experiment not running!");
 			controllerEndpoint.stop();
 			return true;
 		} catch (UnknownReservationIdException_Exception e) {
-			log.error("Reservation is unknown!");
+			log.warn("Reservation is unknown!");
 			controllerEndpoint.stop();
 			return true;
 		} catch (Exception e) {
 			// original Exception ClientTransportException results in maven errors
-			log.error("SessionManagement-Service on " + sessionManagementUrn + " offline!");
+			log.error(
+					"Calling getInstance() on the Session Management service resulted in the following Exception: {}" + e,
+					e
+			);
 			controllerEndpoint.stop();
 			return true;
 		}
