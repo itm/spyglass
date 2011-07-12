@@ -90,8 +90,8 @@ public class PacketProducerTask implements Runnable {
 				packet = getPacketReader().getNextPacket(true);
 
 				if (packet == null) {
-					log
-							.warn("Received a null packet from the PacketReader which will be skipped! If this occured in case of a reset, everyting is fine");
+					log.warn("Received a null packet from the PacketReader which will be skipped! "
+							+ "If this occurred in case of a reset, everything is fine");
 					continue;
 				}
 

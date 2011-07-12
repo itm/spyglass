@@ -12,19 +12,20 @@ package de.uniluebeck.itm.spyglass.gui.wizard;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 import de.uniluebeck.itm.spyglass.SpyglassApp;
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.io.wisebed.TestbedXMLConfig;
 import de.uniluebeck.itm.spyglass.io.wisebed.WSNPacketReader;
+import de.uniluebeck.itm.wisebed.cmdlineclient.BeanShellHelper;
+import eu.wisebed.api.rs.ConfidentialReservationData;
+import eu.wisebed.api.rs.GetReservations;
+import eu.wisebed.api.rs.RS;
+import eu.wisebed.api.rs.RSExceptionException;
+import eu.wisebed.api.snaa.AuthenticationTriple;
+import eu.wisebed.api.snaa.SNAA;
+import eu.wisebed.api.snaa.SecretAuthenticationKey;
 import eu.wisebed.testbed.api.rs.RSServiceHelper;
-import eu.wisebed.testbed.api.rs.v1.ConfidentialReservationData;
-import eu.wisebed.testbed.api.rs.v1.RS;
-import eu.wisebed.testbed.api.rs.v1.RSExceptionException;
 import eu.wisebed.testbed.api.snaa.helpers.SNAAServiceHelper;
-import eu.wisebed.testbed.api.snaa.v1.AuthenticationTriple;
-import eu.wisebed.testbed.api.snaa.v1.SNAA;
-import eu.wisebed.testbed.api.snaa.v1.SecretAuthenticationKey;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
@@ -40,11 +41,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 /**
  * Wizard for creating connection to Testbed
@@ -53,429 +58,434 @@ import java.util.Map;
  */
 public class TestbedWizard extends Wizard {
 
-    private static final Logger log = LoggerFactory.getLogger(TestbedWizard.class);
+	private static final Logger log = LoggerFactory.getLogger(TestbedWizard.class);
 
-    private TestbedXMLConfig config;
+	private static final DatatypeFactory datatypeFactory;
 
-    private ConfigStore store;
+	static {
+		try {
+			datatypeFactory = DatatypeFactory.newInstance();
+		} catch (DatatypeConfigurationException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    private final Map<AuthenticationTriple, SecretAuthenticationKey> authMap = Maps.newHashMap();
+	private TestbedXMLConfig config;
 
-    private ThirdPage thirdPage;
+	private ConfigStore store;
 
-    private SecondPage secondPage;
+	private final Map<AuthenticationTriple, SecretAuthenticationKey> authMap = Maps.newHashMap();
 
-    private FirstPage firstPage;
+	private ThirdPage thirdPage;
 
-    public TestbedWizard() {
-        super();
-        try {
-            store = SpyglassApp.spyglass.getConfigStore();
-            config = store.getSpyglassConfig().getTestbedSettings();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        setWindowTitle("Testbed Configuration");
-        firstPage = new FirstPage("Testbed URLs");
-        secondPage = new SecondPage("Authorization");
-        thirdPage = new ThirdPage("Reservation");
+	private SecondPage secondPage;
 
-        addPage(firstPage);
-        addPage(secondPage);
-        addPage(thirdPage);
-    }
+	private FirstPage firstPage;
 
-    @Override
-    public boolean performFinish() {
-        if (!firstPage.isComplete()) {
-            MessageDialog.openWarning(getShell(), "Warning", "Not all Service URNs specified!");
-            return false;
-        }
-        if (!thirdPage.isComplete()) {
-            MessageDialog.openWarning(getShell(), "Warning", "No Reservation selected!");
-            return false;
-        }
-        WSNPacketReader wsnPacketReader = WSNPacketReader.createInstance(
-                config.getSessionManagementUrl(), config.getControllerUrn(),
-                thirdPage.getSelectedReservation()
-        );
-        log.info("WSNPacketReader created by TestbedWizard.");
-        if (wsnPacketReader == null) {
-            return false;
-        }
-        SpyglassApp.spyglass.getConfigStore().getSpyglassConfig().setPacketReader(wsnPacketReader);
-        store.store();
-        return true;
-    }
+	public TestbedWizard() {
+		super();
+		try {
+			store = SpyglassApp.spyglass.getConfigStore();
+			config = store.getSpyglassConfig().getTestbedSettings();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		setWindowTitle("Testbed Configuration");
+		firstPage = new FirstPage("Testbed URLs");
+		secondPage = new SecondPage("Authorization");
+		thirdPage = new ThirdPage("Reservation");
 
-    @Override
-    public boolean canFinish() {
-        return firstPage.isComplete() && secondPage.isComplete() && thirdPage.isComplete();
-    }
+		addPage(firstPage);
+		addPage(secondPage);
+		addPage(thirdPage);
+	}
 
-    /**
-     * Wizardpage for Service-Urls
-     */
-    public class FirstPage extends WizardPage implements IExtendedWizardPage {
+	@Override
+	public boolean performFinish() {
+		if (!firstPage.isComplete()) {
+			MessageDialog.openWarning(getShell(), "Warning", "Not all Service URNs specified!");
+			return false;
+		}
+		if (!thirdPage.isComplete()) {
+			MessageDialog.openWarning(getShell(), "Warning", "No Reservation selected!");
+			return false;
+		}
+		WSNPacketReader wsnPacketReader = WSNPacketReader.createInstance(
+				config.getSessionManagementUrl(), config.getControllerUrn(),
+				thirdPage.getSelectedReservation()
+		);
+		log.info("WSNPacketReader created by TestbedWizard.");
+		if (wsnPacketReader == null) {
+			return false;
+		}
+		SpyglassApp.spyglass.getConfigStore().getSpyglassConfig().setPacketReader(wsnPacketReader);
+		store.store();
+		return true;
+	}
 
-        Text snaaText, rsText, smText, controllerText;
+	@Override
+	public boolean canFinish() {
+		return firstPage.isComplete() && secondPage.isComplete() && thirdPage.isComplete();
+	}
 
-        protected FirstPage(String pageName) {
-            super(pageName);
-            setMessage("Enter Service URLs");
-        }
+	/**
+	 * Wizardpage for Service-Urls
+	 */
+	public class FirstPage extends WizardPage implements IExtendedWizardPage {
 
-        @Override
-        public void createControl(Composite composite) {
-            final Composite area = new Composite(composite, SWT.NONE);
-            final GridLayout gridLayout = new GridLayout();
-            gridLayout.makeColumnsEqualWidth = true;
-            gridLayout.numColumns = 2;
-            area.setLayout(gridLayout);
-            Label snaaLabel = new Label(area, SWT.NONE);
-            snaaLabel.setText("SNAA Service");
-            snaaText = new Text(area, SWT.BORDER);
-            snaaText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            Label rsLabel = new Label(area, SWT.NONE);
-            rsLabel.setText("Reservation Service");
-            rsText = new Text(area, SWT.BORDER);
-            rsText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            Label smLabel = new Label(area, SWT.NONE);
-            smLabel.setText("SessionManagement Service");
-            smText = new Text(area, SWT.BORDER);
-            smText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            Label controllerLabel = new Label(area, SWT.NONE);
-            controllerLabel.setText("Local Controller Service");
-            controllerText = new Text(area, SWT.BORDER);
-            controllerText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            if (StringUtils.isBlank(TestbedWizard.this.config.getControllerUrn()))
-                TestbedWizard.this.config.setControllerUrn(WSNPacketReader.generateControllerURN());
-            setControl(area);
-            final DataBindingContext context = new DataBindingContext(SWTObservables.getRealm(composite.getDisplay()));
-            IObservableValue snaaUrlObservable = PojoObservables
-                    .observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config, "snaaUrl"
-                    );
-            IObservableValue snaaTextObservable = SWTObservables.observeText(snaaText, SWT.Modify);
-            context.bindValue(snaaTextObservable, snaaUrlObservable,
-                    new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
-                    new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
-            );
-            IObservableValue rsUrlObservable = PojoObservables
-                    .observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config,
-                            "reservationUrl"
-                    );
-            IObservableValue rsTextObservable = SWTObservables.observeText(rsText, SWT.Modify);
-            context.bindValue(rsTextObservable, rsUrlObservable,
-                    new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
-                    new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
-            );
-            IObservableValue smUrlObservable = PojoObservables
-                    .observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config,
-                            "sessionManagementUrl"
-                    );
-            IObservableValue smTextObservable = SWTObservables.observeText(smText, SWT.Modify);
-            context.bindValue(smTextObservable, smUrlObservable,
-                    new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
-                    new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
-            );
-            IObservableValue cUrlObservable = PojoObservables
-                    .observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config,
-                            "controllerUrn"
-                    );
-            IObservableValue cTextObservable = SWTObservables.observeText(controllerText, SWT.Modify);
-            context.bindValue(cTextObservable, cUrlObservable,
-                    new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
-                    new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
-            );
+		Text snaaText, rsText, smText, controllerText;
 
-        }
+		protected FirstPage(String pageName) {
+			super(pageName);
+			setMessage("Enter Service URLs");
+		}
 
-        @Override
-        public void nextPressed() {
-            StringBuilder builder = new StringBuilder();
-            if (StringUtils.isBlank(snaaText.getText())) {
-                builder.append("URN of SNAA Service is missing!").append("\n");
-            }
-            if (StringUtils.isBlank(rsText.getText())) {
-                builder.append("URN of Reservation Service is missing!").append("\n");
-            }
-            if (StringUtils.isBlank(smText.getText())) {
-                builder.append("URN of SessionManagement Service is missing!").append("\n");
-            }
-            if (StringUtils.isNotBlank(builder.toString())) {
-                MessageDialog.openWarning(getShell(), "Warning", builder.toString());
-            }
-        }
+		@Override
+		public void createControl(Composite composite) {
+			final Composite area = new Composite(composite, SWT.NONE);
+			final GridLayout gridLayout = new GridLayout();
+			gridLayout.makeColumnsEqualWidth = true;
+			gridLayout.numColumns = 2;
+			area.setLayout(gridLayout);
+			Label snaaLabel = new Label(area, SWT.NONE);
+			snaaLabel.setText("SNAA Service");
+			snaaText = new Text(area, SWT.BORDER);
+			snaaText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			Label rsLabel = new Label(area, SWT.NONE);
+			rsLabel.setText("Reservation Service");
+			rsText = new Text(area, SWT.BORDER);
+			rsText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			Label smLabel = new Label(area, SWT.NONE);
+			smLabel.setText("SessionManagement Service");
+			smText = new Text(area, SWT.BORDER);
+			smText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			Label controllerLabel = new Label(area, SWT.NONE);
+			controllerLabel.setText("Local Controller Service");
+			controllerText = new Text(area, SWT.BORDER);
+			controllerText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			if (StringUtils.isBlank(TestbedWizard.this.config.getControllerUrn())) {
+				TestbedWizard.this.config.setControllerUrn(WSNPacketReader.generateControllerURN());
+			}
+			setControl(area);
+			final DataBindingContext context = new DataBindingContext(SWTObservables.getRealm(composite.getDisplay()));
+			IObservableValue snaaUrlObservable = PojoObservables
+					.observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config, "snaaUrl"
+					);
+			IObservableValue snaaTextObservable = SWTObservables.observeText(snaaText, SWT.Modify);
+			context.bindValue(snaaTextObservable, snaaUrlObservable,
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
+			);
+			IObservableValue rsUrlObservable = PojoObservables
+					.observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config,
+							"reservationUrl"
+					);
+			IObservableValue rsTextObservable = SWTObservables.observeText(rsText, SWT.Modify);
+			context.bindValue(rsTextObservable, rsUrlObservable,
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
+			);
+			IObservableValue smUrlObservable = PojoObservables
+					.observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config,
+							"sessionManagementUrl"
+					);
+			IObservableValue smTextObservable = SWTObservables.observeText(smText, SWT.Modify);
+			context.bindValue(smTextObservable, smUrlObservable,
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
+			);
+			IObservableValue cUrlObservable = PojoObservables
+					.observeValue(SWTObservables.getRealm(composite.getDisplay()), TestbedWizard.this.config,
+							"controllerUrn"
+					);
+			IObservableValue cTextObservable = SWTObservables.observeText(controllerText, SWT.Modify);
+			context.bindValue(cTextObservable, cUrlObservable,
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
+			);
 
-        @Override
-        public boolean isComplete() {
-            return StringUtils.isNotBlank(snaaText.getText()) && StringUtils.isNotBlank(rsText.getText()) && StringUtils
-                    .isNotBlank(smText.getText());
-        }
-    }
+		}
 
-    /**
-     * WizardPage for Authentication Data
-     */
-    public class SecondPage extends WizardPage implements IExtendedWizardPage {
+		@Override
+		public void nextPressed() {
+			StringBuilder builder = new StringBuilder();
+			if (StringUtils.isBlank(snaaText.getText())) {
+				builder.append("URN of SNAA Service is missing!").append("\n");
+			}
+			if (StringUtils.isBlank(rsText.getText())) {
+				builder.append("URN of Reservation Service is missing!").append("\n");
+			}
+			if (StringUtils.isBlank(smText.getText())) {
+				builder.append("URN of SessionManagement Service is missing!").append("\n");
+			}
+			if (StringUtils.isNotBlank(builder.toString())) {
+				MessageDialog.openWarning(getShell(), "Warning", builder.toString());
+			}
+		}
 
-        protected SecondPage(String pageName) {
-            super(pageName);
-            setMessage("Select your Reservation");
-        }
+		@Override
+		public boolean isComplete() {
+			return StringUtils.isNotBlank(snaaText.getText()) && StringUtils.isNotBlank(rsText.getText()) && StringUtils
+					.isNotBlank(smText.getText());
+		}
+	}
 
-        @Override
-        public void createControl(Composite composite) {
-            final Composite area = new Composite(composite, SWT.NONE);
-            final GridLayout gridLayout = new GridLayout();
-            gridLayout.makeColumnsEqualWidth = true;
-            gridLayout.numColumns = 1;
-            area.setLayout(gridLayout);
-            final Composite upperArea = new Composite(area, SWT.NONE);
-            final GridLayout upperLayout = new GridLayout();
-            upperLayout.makeColumnsEqualWidth = true;
-            upperLayout.numColumns = 3;
-            upperArea.setLayout(upperLayout);
-            upperArea.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+	/**
+	 * WizardPage for Authentication Data
+	 */
+	public class SecondPage extends WizardPage implements IExtendedWizardPage {
 
-            final Label urnLabel = new Label(upperArea, SWT.NONE);
-            urnLabel.setText("URN-Prefix");
-            final Label userLabel = new Label(upperArea, SWT.NONE);
-            userLabel.setText("Username");
-            final Label pwLabel = new Label(upperArea, SWT.NONE);
-            pwLabel.setText("Password");
-            final Text urnText = new Text(upperArea, SWT.BORDER);
-            urnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            urnText.setText(config.getUrnPrefix() == null ? "" : config.getUrnPrefix());
-            final Text userText = new Text(upperArea, SWT.BORDER);
-            userText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            userText.setText(config.getUserName() == null ? "" : config.getUserName());
-            final Text pwText = new Text(upperArea, SWT.BORDER);
-            pwText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-            pwText.setText(config.getPassword() == null ? "" : config.getPassword());
-            pwText.setEchoChar('*');
-            Label none1 = new Label(upperArea, SWT.NONE);
-            Label none2 = new Label(upperArea, SWT.NONE);
-            final Button loginButton = new Button(upperArea, SWT.NONE);
-            loginButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, true, 1, 1));
-            loginButton.setText("add to Authentication Data");
+		protected SecondPage(String pageName) {
+			super(pageName);
+			setMessage("Select your Reservation");
+		}
 
-            final Group lowerArea = new Group(area, SWT.NONE);
-            lowerArea.setLayout(gridLayout);
-            lowerArea.setText("Authentication Data");
-            lowerArea.setLayoutData(new GridData(GridData.FILL_BOTH));
-            final Table rsList = new Table(lowerArea, SWT.NONE);
-            rsList.setHeaderVisible(true);
-            rsList.setLayoutData(new GridData(GridData.FILL_BOTH));
-            final TableColumn[] columns = new TableColumn[2];
-            TableColumn urnColumn = new TableColumn(rsList, SWT.NONE);
-            urnColumn.setText("URN-Prefix");
-            columns[0] = urnColumn;
-            TableColumn usrColumn = new TableColumn(rsList, SWT.NONE);
-            usrColumn.setText("Username");
-            columns[1] = usrColumn;
+		@Override
+		public void createControl(Composite composite) {
+			final Composite area = new Composite(composite, SWT.NONE);
+			final GridLayout gridLayout = new GridLayout();
+			gridLayout.makeColumnsEqualWidth = true;
+			gridLayout.numColumns = 1;
+			area.setLayout(gridLayout);
+			final Composite upperArea = new Composite(area, SWT.NONE);
+			final GridLayout upperLayout = new GridLayout();
+			upperLayout.makeColumnsEqualWidth = true;
+			upperLayout.numColumns = 3;
+			upperArea.setLayout(upperLayout);
+			upperArea.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-            setControl(area);
+			final Label urnLabel = new Label(upperArea, SWT.NONE);
+			urnLabel.setText("URN-Prefix");
+			final Label userLabel = new Label(upperArea, SWT.NONE);
+			userLabel.setText("Username");
+			final Label pwLabel = new Label(upperArea, SWT.NONE);
+			pwLabel.setText("Password");
+			final Text urnText = new Text(upperArea, SWT.BORDER);
+			urnText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			urnText.setText(config.getUrnPrefix() == null ? "" : config.getUrnPrefix());
+			final Text userText = new Text(upperArea, SWT.BORDER);
+			userText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			userText.setText(config.getUserName() == null ? "" : config.getUserName());
+			final Text pwText = new Text(upperArea, SWT.BORDER);
+			pwText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			pwText.setText(config.getPassword() == null ? "" : config.getPassword());
+			pwText.setEchoChar('*');
+			Label none1 = new Label(upperArea, SWT.NONE);
+			Label none2 = new Label(upperArea, SWT.NONE);
+			final Button loginButton = new Button(upperArea, SWT.NONE);
+			loginButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, true, 1, 1));
+			loginButton.setText("add to Authentication Data");
 
-            loginButton.addListener(SWT.Selection, new Listener() {
-                @Override
-                public void handleEvent(Event event) {
-                    AuthenticationTriple triple = new AuthenticationTriple();
-                    triple.setPassword(pwText.getText());
-                    triple.setUrnPrefix(urnText.getText());
-                    triple.setUsername(userText.getText());
-                    for (AuthenticationTriple at : authMap.keySet()) {
-                        if (at.getUrnPrefix().equalsIgnoreCase(triple.getUrnPrefix()) &&
-                                at.getUsername().equalsIgnoreCase(triple.getUsername())) {
-                            MessageDialog.openInformation(getShell(), "Information", "User already added to Authentication Data");
-                            return;
-                        }
-                    }
-                    if (authenticate(triple)) {
-                        TableItem item = new TableItem(rsList, SWT.NONE);
-                        item.setText(new String[]{urnText.getText(), userText.getText()});
-                        for (int i = 0, n = columns.length; i < n; i++) {
-                            columns[i].pack();
-                        }
+			final Group lowerArea = new Group(area, SWT.NONE);
+			lowerArea.setLayout(gridLayout);
+			lowerArea.setText("Authentication Data");
+			lowerArea.setLayoutData(new GridData(GridData.FILL_BOTH));
+			final Table rsList = new Table(lowerArea, SWT.NONE);
+			rsList.setHeaderVisible(true);
+			rsList.setLayoutData(new GridData(GridData.FILL_BOTH));
+			final TableColumn[] columns = new TableColumn[2];
+			TableColumn urnColumn = new TableColumn(rsList, SWT.NONE);
+			urnColumn.setText("URN-Prefix");
+			columns[0] = urnColumn;
+			TableColumn usrColumn = new TableColumn(rsList, SWT.NONE);
+			usrColumn.setText("Username");
+			columns[1] = usrColumn;
 
-                        config.setUrnPrefix(urnText.getText());
-                        urnText.setText("");
+			setControl(area);
 
-                        config.setUserName(userText.getText());
-                        userText.setText("");
+			loginButton.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+					AuthenticationTriple triple = new AuthenticationTriple();
+					triple.setPassword(pwText.getText());
+					triple.setUrnPrefix(urnText.getText());
+					triple.setUsername(userText.getText());
+					for (AuthenticationTriple at : authMap.keySet()) {
+						if (at.getUrnPrefix().equalsIgnoreCase(triple.getUrnPrefix()) &&
+								at.getUsername().equalsIgnoreCase(triple.getUsername())) {
+							MessageDialog.openInformation(getShell(), "Information",
+									"User already added to Authentication Data"
+							);
+							return;
+						}
+					}
+					if (authenticate(triple)) {
+						TableItem item = new TableItem(rsList, SWT.NONE);
+						item.setText(new String[]{urnText.getText(), userText.getText()});
+						for (int i = 0, n = columns.length; i < n; i++) {
+							columns[i].pack();
+						}
 
-                        config.setPassword(pwText.getText());
-                        pwText.setText("");
-                    } else {
-                        MessageDialog.openWarning(getShell(), "Fehler", "Authentication Error");
-                    }
+						config.setUrnPrefix(urnText.getText());
+						urnText.setText("");
 
-                }
-            }
+						config.setUserName(userText.getText());
+						userText.setText("");
 
-            );
-        }
+						config.setPassword(pwText.getText());
+						pwText.setText("");
+					} else {
+						MessageDialog.openWarning(getShell(), "Fehler", "Authentication Error");
+					}
 
-        @Override
-        public void nextPressed() {
-            fillReservations();
-        }
+				}
+			}
 
-        @Override
-        public boolean isComplete() {
-            return !authMap.isEmpty();
-        }
-    }
+			);
+		}
 
-    /**
-     * WizardPage for Selecting Reservation
-     */
-    public class ThirdPage extends WizardPage implements IExtendedWizardPage {
+		@Override
+		public void nextPressed() {
+			fillReservations();
+		}
 
-        private Table rsList;
+		@Override
+		public boolean isComplete() {
+			return !authMap.isEmpty();
+		}
+	}
 
-        private TableColumn[] columns;
+	/**
+	 * WizardPage for Selecting Reservation
+	 */
+	public class ThirdPage extends WizardPage implements IExtendedWizardPage {
 
-        private java.util.List<ConfidentialReservationData> reservationList = Lists.newArrayList();
+		private Table rsList;
 
-        protected ThirdPage(String pageName) {
-            super(pageName);
-            setMessage("Please choose your Reservation");
-        }
+		private TableColumn[] columns;
 
-        @Override
-        public void createControl(Composite composite) {
-            rsList = new Table(composite, SWT.SINGLE);
-            rsList.setLayoutData(new GridData(GridData.FILL));
-            rsList.setHeaderVisible(true);
-            columns = new TableColumn[4];
-            TableColumn fromColumn = new TableColumn(rsList, SWT.NONE);
-            fromColumn.setText("From");
-            columns[0] = fromColumn;
-            TableColumn toColumn = new TableColumn(rsList, SWT.NONE);
-            toColumn.setText("To");
-            columns[1] = toColumn;
-            TableColumn nodeColumn = new TableColumn(rsList, SWT.NONE);
-            nodeColumn.setText("Node URNs");
-            columns[2] = nodeColumn;
-            TableColumn dataColumn = new TableColumn(rsList, SWT.NONE);
-            dataColumn.setText("UserData");
-            columns[3] = dataColumn;
-            setControl(rsList);
-            rsList.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(final SelectionEvent selectionEvent) {
-                    setPageComplete(rsList.getSelectionCount() == 1);
-                }
-            }
-            );
-        }
+		private java.util.List<ConfidentialReservationData> reservationList = Lists.newArrayList();
 
-        public void clearReservations() {
-            rsList.removeAll();
-            rsList.clearAll();
-            reservationList.clear();
-        }
+		protected ThirdPage(String pageName) {
+			super(pageName);
+			setMessage("Please choose your Reservation");
+		}
 
-        public ConfidentialReservationData getSelectedReservation() {
-            if (rsList.getSelectionIndex() >= 0) {
-                return reservationList.get(rsList.getSelectionIndex());
-            } else {
-                return null;
-            }
-        }
+		@Override
+		public void createControl(Composite composite) {
+			rsList = new Table(composite, SWT.SINGLE);
+			rsList.setLayoutData(new GridData(GridData.FILL));
+			rsList.setHeaderVisible(true);
+			columns = new TableColumn[4];
+			TableColumn fromColumn = new TableColumn(rsList, SWT.NONE);
+			fromColumn.setText("From");
+			columns[0] = fromColumn;
+			TableColumn toColumn = new TableColumn(rsList, SWT.NONE);
+			toColumn.setText("To");
+			columns[1] = toColumn;
+			TableColumn nodeColumn = new TableColumn(rsList, SWT.NONE);
+			nodeColumn.setText("Node URNs");
+			columns[2] = nodeColumn;
+			TableColumn dataColumn = new TableColumn(rsList, SWT.NONE);
+			dataColumn.setText("UserData");
+			columns[3] = dataColumn;
+			setControl(rsList);
+			rsList.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(final SelectionEvent selectionEvent) {
+					setPageComplete(rsList.getSelectionCount() == 1);
+				}
+			}
+			);
+		}
 
-        private String toStringWithSeperator(java.util.List list, String sep) {
-            StringBuilder builder = new StringBuilder();
-            for (Object o : list) {
-                builder.append(o.toString()).append(sep);
-            }
-            return builder.toString();
-        }
+		public void clearReservations() {
+			rsList.removeAll();
+			rsList.clearAll();
+			reservationList.clear();
+		}
 
-        private String printDate(XMLGregorianCalendar calendar) {
-            return String.format("%d-%d-%d %d:%d", calendar.getYear(), calendar.getMonth(), calendar.getDay(),
-                    calendar.getHour(), calendar.getMinute()
-            );
-        }
+		public ConfidentialReservationData getSelectedReservation() {
+			if (rsList.getSelectionIndex() >= 0) {
+				return reservationList.get(rsList.getSelectionIndex());
+			} else {
+				return null;
+			}
+		}
 
-        public void addReservation(ConfidentialReservationData data) {
-            TableItem item = new TableItem(rsList, SWT.NONE);
-            item.setText(new String[]{
-                    printDate(data.getFrom()), printDate(data.getTo()),
-                    toStringWithSeperator(data.getNodeURNs(), ";"), data.getUserData()
-            }
-            );
-            for (int i = 0, n = columns.length; i < n; i++) {
-                columns[i].pack();
-            }
-            reservationList.add(data);
-        }
+		private String toStringWithSeperator(java.util.List list, String sep) {
+			StringBuilder builder = new StringBuilder();
+			for (Object o : list) {
+				builder.append(o.toString()).append(sep);
+			}
+			return builder.toString();
+		}
 
-        @Override
-        public void nextPressed() {
-        }
+		private String printDate(XMLGregorianCalendar calendar) {
+			return String.format("%d-%d-%d %d:%d", calendar.getYear(), calendar.getMonth(), calendar.getDay(),
+					calendar.getHour(), calendar.getMinute()
+			);
+		}
 
-        @Override
-        public boolean isComplete() {
-            return getSelectedReservation() != null;
-        }
-    }
+		public void addReservation(ConfidentialReservationData data) {
+			TableItem item = new TableItem(rsList, SWT.NONE);
+			item.setText(new String[]{
+					printDate(data.getFrom()), printDate(data.getTo()),
+					toStringWithSeperator(data.getNodeURNs(), ";"), data.getUserData()
+			}
+			);
+			for (int i = 0, n = columns.length; i < n; i++) {
+				columns[i].pack();
+			}
+			reservationList.add(data);
+		}
 
-    /**
-     * Authenticates User with his Authentication Triple (URN-Prefix, Username, Password)
-     *
-     * @param triple
-     * @return
-     */
-    private boolean authenticate(AuthenticationTriple triple) {
-        SNAA snaa = SNAAServiceHelper.getSNAAService(config.getSnaaUrl());
-        java.util.List<SecretAuthenticationKey> list = null;
-        try {
-            list = snaa.authenticate(ImmutableList.of(triple));
-        } catch (Exception e) {
-            return false;
-        }
-        authMap.put(triple, list.get(0));
-        return true;
+		@Override
+		public void nextPressed() {
+		}
 
-    }
+		@Override
+		public boolean isComplete() {
+			return getSelectedReservation() != null;
+		}
+	}
+
+	/**
+	 * Authenticates User with his Authentication Triple (URN-Prefix, Username, Password)
+	 *
+	 * @param triple
+	 *
+	 * @return
+	 */
+	private boolean authenticate(AuthenticationTriple triple) {
+		SNAA snaa = SNAAServiceHelper.getSNAAService(config.getSnaaUrl());
+		java.util.List<SecretAuthenticationKey> list = null;
+		try {
+			list = snaa.authenticate(ImmutableList.of(triple));
+		} catch (Exception e) {
+			return false;
+		}
+		authMap.put(triple, list.get(0));
+		return true;
+
+	}
 
 
-    private void fillReservations() {
-        RS rs = RSServiceHelper.getRSService(config.getReservationUrl());
-        eu.wisebed.testbed.api.rs.v1.GetReservations getRs =
-                new eu.wisebed.testbed.api.rs.v1.GetReservations();
-        org.joda.time.DateTime date = new org.joda.time.DateTime();
-        getRs.setFrom(XMLGregorianCalendarImpl.createDateTime(date.getYear(), date.getMonthOfYear(),
-                date.getDayOfMonth(), date.getHourOfDay(), date.getMinuteOfHour(), 0
-        )
-        );
-        date = date.plusHours(1);
-        getRs.setTo(XMLGregorianCalendarImpl.createDateTime(date.getYear(), date.getMonthOfYear(),
-                date.getDayOfMonth(), date.getHourOfDay(), date.getMinuteOfHour(), 0
-        )
-        );
-        java.util.List<eu.wisebed.testbed.api.rs.v1.SecretAuthenticationKey> list
-                = Lists.newArrayList();
-        for (SecretAuthenticationKey key : authMap.values()) {
-            eu.wisebed.testbed.api.rs.v1.SecretAuthenticationKey newKey =
-                    new eu.wisebed.testbed.api.rs.v1.SecretAuthenticationKey();
-            newKey.setSecretAuthenticationKey(key.getSecretAuthenticationKey());
-            newKey.setUrnPrefix(key.getUrnPrefix());
-            newKey.setUsername(key.getUsername());
-            list.add(newKey);
-        }
-        java.util.List<ConfidentialReservationData> rsData = null;
-        try {
-            rsData = rs.getConfidentialReservations(list, getRs);
-        } catch (RSExceptionException e) {
-            log.error("Error Retrieving Reservation.", e);
-        }
-        thirdPage.clearReservations();
-        for (ConfidentialReservationData data : rsData) {
-            thirdPage.addReservation(data);
-        }
-    }
+	private void fillReservations() {
+
+		final RS rs = RSServiceHelper.getRSService(config.getReservationUrl());
+		final GetReservations getReservationsRequest = new GetReservations();
+		final DateTime from = new DateTime();
+		final DateTime until = from.plusHours(1);
+
+		getReservationsRequest.setFrom(datatypeFactory.newXMLGregorianCalendar(from.toGregorianCalendar()));
+		getReservationsRequest.setTo(datatypeFactory.newXMLGregorianCalendar(until.toGregorianCalendar()));
+
+		List<eu.wisebed.api.rs.SecretAuthenticationKey> secretAuthenticationKeys =
+				BeanShellHelper.copySnaaToRs(Lists.<SecretAuthenticationKey>newArrayList(authMap.values()));
+
+		final List<ConfidentialReservationData> rsData;
+		try {
+			rsData = rs.getConfidentialReservations(secretAuthenticationKeys, getReservationsRequest);
+		} catch (RSExceptionException e) {
+			throw new RuntimeException(e);
+		}
+
+		thirdPage.clearReservations();
+
+		for (ConfidentialReservationData data :rsData) {
+			thirdPage.addReservation(data);
+		}
+	}
 
 }
