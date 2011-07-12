@@ -16,6 +16,7 @@ import de.uniluebeck.itm.spyglass.SpyglassApp;
 import de.uniluebeck.itm.spyglass.core.ConfigStore;
 import de.uniluebeck.itm.spyglass.io.wisebed.TestbedXMLConfig;
 import de.uniluebeck.itm.spyglass.io.wisebed.WSNPacketReader;
+import de.uniluebeck.itm.tr.util.UrlUtils;
 import de.uniluebeck.itm.wisebed.cmdlineclient.BeanShellHelper;
 import eu.wisebed.api.common.KeyValuePair;
 import eu.wisebed.api.rs.ConfidentialReservationData;
@@ -35,6 +36,8 @@ import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.jface.databinding.swt.SWTObservables;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
@@ -52,10 +55,14 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.ws.Holder;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.ServerSocket;
 import java.net.URL;
-import java.util.*;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 /**
  * Wizard for creating connection to Testbed
@@ -82,11 +89,11 @@ public class TestbedWizard extends Wizard {
 
 	private final Map<AuthenticationTriple, SecretAuthenticationKey> authMap = Maps.newHashMap();
 
-	private ThirdPage thirdPage;
+	private SelectReservationPage selectReservationPage;
 
-	private SecondPage secondPage;
+	private AuthenticationPage authenticationPage;
 
-	private FirstPage firstPage;
+	private SessionManagementEndpointUrlPage sessionManagementEndpointUrlPage;
 
 	public TestbedWizard() {
 		super();
@@ -97,28 +104,38 @@ public class TestbedWizard extends Wizard {
 			e.printStackTrace();
 		}
 		setWindowTitle("Testbed Configuration");
-		firstPage = new FirstPage("Testbed URLs");
-		secondPage = new SecondPage("Authorization");
-		thirdPage = new ThirdPage("Reservation");
+		sessionManagementEndpointUrlPage = new SessionManagementEndpointUrlPage("Testbed URLs");
+		authenticationPage = new AuthenticationPage("Authorization");
+		selectReservationPage = new SelectReservationPage("Reservation");
 
-		addPage(firstPage);
-		addPage(secondPage);
-		addPage(thirdPage);
+		addPage(sessionManagementEndpointUrlPage);
+		addPage(authenticationPage);
+		addPage(selectReservationPage);
 	}
 
 	@Override
 	public boolean performFinish() {
-		if (!firstPage.isComplete()) {
-			MessageDialog.openWarning(getShell(), "Warning", "Not all Service URNs specified!");
+		if (!sessionManagementEndpointUrlPage.isComplete()) {
+			MessageDialog
+					.openWarning(getShell(), "Warning", "Please fill in the Session Management service endpoint URL.");
 			return false;
 		}
-		if (!thirdPage.isComplete()) {
-			MessageDialog.openWarning(getShell(), "Warning", "No Reservation selected!");
+		if (!selectReservationPage.isComplete()) {
+			MessageDialog.openWarning(getShell(), "Warning", "Please select a reservation.");
 			return false;
+		}
+		String localControllerEndpointUrl = tryToAutoDetectLocalControllerEndpointUrl();
+		if (localControllerEndpointUrl == null) {
+			localControllerEndpointUrl = tryToGetLocalControllerEndpointUrlFromUser();
+		}
+		if (localControllerEndpointUrl == null) {
+			return false;
+		} else {
+			TestbedWizard.this.config.setControllerEndpointUrl(localControllerEndpointUrl);
 		}
 		WSNPacketReader wsnPacketReader = WSNPacketReader.createInstance(
 				config.getSmEndpointUrl(), config.getControllerEndpointUrl(),
-				thirdPage.getSelectedReservation()
+				selectReservationPage.getSelectedReservation()
 		);
 		log.info("WSNPacketReader created by TestbedWizard.");
 		if (wsnPacketReader == null) {
@@ -129,41 +146,119 @@ public class TestbedWizard extends Wizard {
 		return true;
 	}
 
+	private String tryToGetLocalControllerEndpointUrlFromUser() {
+
+		String localControllerEndpointUrl = askLocalControllerEndpointUrlFromUser();
+		if (localControllerEndpointUrl != null) {
+			try {
+				URL url = new URL(localControllerEndpointUrl);
+				if (checkIfServerSocketCanBeOpened(url.getHost(), url.getPort())) {
+					return localControllerEndpointUrl;
+				}
+				return null;
+			} catch (MalformedURLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		return null;
+	}
+
+	private String tryToAutoDetectLocalControllerEndpointUrl() {
+		Vector<String> externalHostIps = BeanShellHelper.getExternalHostIps();
+		final String localControllerEndpointUrl;
+		String host = externalHostIps.get(0);
+		int port = UrlUtils.getRandomUnprivilegedPort();
+		int tries = 0;
+		while (!checkIfServerSocketCanBeOpened(host, port)) {
+			if (++tries == 3) {
+				break;
+			}
+			int oldPort = port;
+			port = UrlUtils.getRandomUnprivilegedPort();
+			log.warn("Could not open ServerSocket on {}:{}. Retrying on port {}!", new Object[]{host, oldPort, port});
+		}
+
+		localControllerEndpointUrl = "http://" + host + ":" + port + "/controller";
+		return tries == 3 ? null : localControllerEndpointUrl;
+	}
+
+	private boolean checkIfServerSocketCanBeOpened(String host, int port) {
+		try {
+			ServerSocket socket = new ServerSocket();
+			socket.bind(new InetSocketAddress(host, port));
+			socket.close();
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
+	private String askLocalControllerEndpointUrlFromUser() {
+		final InputDialog inputDialog = new InputDialog(
+				null,
+				"Please provide the local controller endpoint URL.",
+				"Spyglass was unable to detect the external public IP of your computer. Please provide an "
+						+ "endpoint URL for this computer which can be contacted from outside. The host and port "
+						+ "in this URL must not be behind a firewall or NAT in order to work.",
+				"http://REPLACE_WITH_FQDN.TLD:PORT/",
+				new IInputValidator() {
+					@Override
+					public String isValid(final String s) {
+						try {
+							new URL(s);
+							return null;
+						} catch (MalformedURLException e) {
+							return "The string \"" + s + "\" is not a valid URL!";
+						}
+					}
+				}
+		);
+		inputDialog.setBlockOnOpen(true);
+		int open = inputDialog.open();
+		if (SWT.OK == open) {
+			return inputDialog.getValue();
+		}
+		return null;
+	}
+
 	@Override
 	public boolean canFinish() {
-		return firstPage.isComplete() && secondPage.isComplete() && thirdPage.isComplete();
+		return sessionManagementEndpointUrlPage.isComplete() &&
+				authenticationPage.isComplete() &&
+				selectReservationPage.isComplete();
 	}
 
 	/**
 	 * Wizardpage for Service-Urls
 	 */
-	public class FirstPage extends WizardPage implements IExtendedWizardPage {
+	public class SessionManagementEndpointUrlPage extends WizardPage implements IExtendedWizardPage {
 
-		Text sessionManagementText, controllerText;
+		private Text sessionManagementText;
 
-		protected FirstPage(String pageName) {
+		protected SessionManagementEndpointUrlPage(String pageName) {
 			super(pageName);
-			setMessage("Enter Service URLs");
+			setMessage(
+					"Please enter the endpoint URL of the Session Management service of the testbed you want to "
+							+ "connect to."
+			);
 		}
 
 		@Override
 		public void createControl(Composite composite) {
-			final Composite area = new Composite(composite, SWT.NONE);
+
 			final GridLayout gridLayout = new GridLayout();
 			gridLayout.makeColumnsEqualWidth = true;
 			gridLayout.numColumns = 2;
+
+			final Composite area = new Composite(composite, SWT.NONE);
 			area.setLayout(gridLayout);
-			Label smLabel = new Label(area, SWT.NONE);
+
+			final Label smLabel = new Label(area, SWT.NONE);
 			smLabel.setText("Session Management Service Endpoint URL");
+
 			sessionManagementText = new Text(area, SWT.BORDER);
 			sessionManagementText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			Label controllerLabel = new Label(area, SWT.NONE);
-			controllerLabel.setText("Local Controller Service Endpoint URL");
-			controllerText = new Text(area, SWT.BORDER);
-			controllerText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			if (StringUtils.isBlank(TestbedWizard.this.config.getControllerEndpointUrl())) {
-				TestbedWizard.this.config.setControllerEndpointUrl(WSNPacketReader.generateControllerURN());
-			}
+
 			setControl(area);
 
 			final DataBindingContext context = new DataBindingContext(SWTObservables.getRealm(composite.getDisplay()));
@@ -179,18 +274,6 @@ public class TestbedWizard extends Wizard {
 					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
 					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
 			);
-
-			IObservableValue controllerEndpointUrlObservable = PojoObservables.observeValue(
-					SWTObservables.getRealm(composite.getDisplay()),
-					TestbedWizard.this.config, TestbedXMLConfig.PROPERTYNAME_CONTROLLER_ENDPOINT_URL
-			);
-
-			IObservableValue cTextObservable = SWTObservables.observeText(controllerText, SWT.Modify);
-			context.bindValue(cTextObservable, controllerEndpointUrlObservable,
-					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE),
-					new UpdateValueStrategy(UpdateValueStrategy.POLICY_UPDATE)
-			);
-
 		}
 
 		@Override
@@ -202,7 +285,6 @@ public class TestbedWizard extends Wizard {
 			if (StringUtils.isNotBlank(builder.toString())) {
 				MessageDialog.openWarning(getShell(), "Warning", builder.toString());
 			}
-
 			fetchSnaaAndRsEndpointUrls();
 		}
 
@@ -242,11 +324,11 @@ public class TestbedWizard extends Wizard {
 	/**
 	 * WizardPage for Authentication Data
 	 */
-	public class SecondPage extends WizardPage implements IExtendedWizardPage {
+	public class AuthenticationPage extends WizardPage implements IExtendedWizardPage {
 
-		protected SecondPage(String pageName) {
+		protected AuthenticationPage(String pageName) {
 			super(pageName);
-			setMessage("Select your Reservation");
+			setMessage("Please provide your authentication credentials.");
 		}
 
 		@Override
@@ -357,7 +439,7 @@ public class TestbedWizard extends Wizard {
 	/**
 	 * WizardPage for Selecting Reservation
 	 */
-	public class ThirdPage extends WizardPage implements IExtendedWizardPage {
+	public class SelectReservationPage extends WizardPage implements IExtendedWizardPage {
 
 		private Table rsList;
 
@@ -365,9 +447,9 @@ public class TestbedWizard extends Wizard {
 
 		private java.util.List<ConfidentialReservationData> reservationList = Lists.newArrayList();
 
-		protected ThirdPage(String pageName) {
+		protected SelectReservationPage(String pageName) {
 			super(pageName);
-			setMessage("Please choose your Reservation");
+			setMessage("Please choose the experiment reservation you want to connect to.");
 		}
 
 		@Override
@@ -490,10 +572,10 @@ public class TestbedWizard extends Wizard {
 			throw new RuntimeException(e);
 		}
 
-		thirdPage.clearReservations();
+		selectReservationPage.clearReservations();
 
-		for (ConfidentialReservationData data :rsData) {
-			thirdPage.addReservation(data);
+		for (ConfidentialReservationData data : rsData) {
+			selectReservationPage.addReservation(data);
 		}
 	}
 
