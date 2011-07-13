@@ -52,13 +52,6 @@
 		<dependencies>
 
 			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.8.1</version>
-				<scope>test</scope>
-			</dependency>
-
-			<dependency>
 				<groupId>de.uniluebeck.itm.spyglass</groupId>
 				<artifactId>spyglass-parent</artifactId>
 				<version>${project.version}</version>
@@ -73,13 +66,65 @@
 				<artifactId>spyglass-standalone</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+
 			<!--
 			<dependency>
 				<groupId>de.uniluebeck.itm.spyglass</groupId>
 				<artifactId>spyglass-ishell</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.coalesenses.ishell</groupId>
+				<artifactId>ishell-linux</artifactId>
+				<version>1.0</version>
+			</dependency>
 			-->
+			<dependency>
+				<groupId>de.uniluebeck.itm</groupId>
+				<artifactId>tr.wsn-api</artifactId>
+				<version>0.7.2-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>de.uniluebeck.itm</groupId>
+				<artifactId>tr.snaa-api</artifactId>
+				<version>0.7.2-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>de.uniluebeck.itm</groupId>
+				<artifactId>tr.rs-api</artifactId>
+				<version>0.7.2-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>de.uniluebeck.itm</groupId>
+				<artifactId>tr.scripting-client</artifactId>
+				<version>0.7.2-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>de.uniluebeck.itm.itmutils</groupId>
+				<artifactId>itmutils</artifactId>
+				<version>0.3-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>de.danbim.swtquadtree</groupId>
+				<artifactId>swtquadtree</artifactId>
+				<version>1.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>2.5</version>
+			</dependency>
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>1.6</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>r05</version>
+			</dependency>
 			<dependency>
 				<groupId>log4j</groupId>
 				<artifactId>log4j</artifactId>
@@ -90,11 +135,7 @@
 				<artifactId>simple-xml</artifactId>
 				<version>1.7.3</version>
 			</dependency>
-			<dependency>
-				<groupId>de.danbim.swtquadtree</groupId>
-				<artifactId>swtquadtree</artifactId>
-				<version>1.1</version>
-			</dependency>
+
 			<dependency>
 				<groupId>org.eclipse</groupId>
 				<artifactId>org.eclipse.ui.workbench</artifactId>
@@ -146,30 +187,23 @@
 				<version>3.4.0</version>
 			</dependency>
 			<dependency>
-				<groupId>com.coalesenses.ishell</groupId>
-				<artifactId>ishell-linux</artifactId>
-				<version>1.0</version>
+				<groupId>org.eclipse.swt</groupId>
+				<artifactId>${swt.artifactId}</artifactId>
+				<version>${swt.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.ibm.icu</groupId>
 				<artifactId>icu4j</artifactId>
 				<version>4.0.1</version>
 			</dependency>
+
 			<dependency>
-				<groupId>joda-time</groupId>
-				<artifactId>joda-time</artifactId>
-				<version>1.6</version>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.8.1</version>
+				<scope>test</scope>
 			</dependency>
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>r05</version>
-			</dependency>
-			<dependency>
-				<groupId>org.eclipse.swt</groupId>
-				<artifactId>${swt.artifactId}</artifactId>
-				<version>${swt.version}</version>
-			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
