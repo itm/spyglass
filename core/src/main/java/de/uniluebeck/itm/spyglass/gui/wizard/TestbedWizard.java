@@ -9,6 +9,7 @@
 
 package de.uniluebeck.itm.spyglass.gui.wizard;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -67,7 +68,7 @@ import java.util.Vector;
 /**
  * Wizard for creating connection to Testbed
  *
- * @author jens kluttig
+ * @author Jens Kluttig, Daniel Bimschas
  */
 public class TestbedWizard extends Wizard {
 
@@ -441,7 +442,13 @@ public class TestbedWizard extends Wizard {
 	 */
 	public class SelectReservationPage extends WizardPage implements IExtendedWizardPage {
 
-		private Table rsList;
+		private static final int RESERVATION_TABLE_COLUMN_FROM = 0;
+
+		private static final int RESERVATION_TABLE_COLUMN_TO = 1;
+
+		private static final int RESERVATION_TABLE_COLUMN_NODE_URNS = 2;
+
+		private Table reservationsTable;
 
 		private TableColumn[] columns;
 
@@ -454,70 +461,62 @@ public class TestbedWizard extends Wizard {
 
 		@Override
 		public void createControl(Composite composite) {
-			rsList = new Table(composite, SWT.SINGLE);
-			rsList.setLayoutData(new GridData(GridData.FILL));
-			rsList.setHeaderVisible(true);
-			columns = new TableColumn[4];
-			TableColumn fromColumn = new TableColumn(rsList, SWT.NONE);
+
+			reservationsTable = new Table(composite, SWT.SINGLE);
+			reservationsTable.setLayoutData(new GridData(GridData.FILL));
+			reservationsTable.setHeaderVisible(true);
+
+			TableColumn fromColumn = new TableColumn(reservationsTable, SWT.NONE);
 			fromColumn.setText("From");
-			columns[0] = fromColumn;
-			TableColumn toColumn = new TableColumn(rsList, SWT.NONE);
+
+			TableColumn toColumn = new TableColumn(reservationsTable, SWT.NONE);
 			toColumn.setText("To");
-			columns[1] = toColumn;
-			TableColumn nodeColumn = new TableColumn(rsList, SWT.NONE);
-			nodeColumn.setText("Node URNs");
-			columns[2] = nodeColumn;
-			TableColumn dataColumn = new TableColumn(rsList, SWT.NONE);
-			dataColumn.setText("UserData");
-			columns[3] = dataColumn;
-			setControl(rsList);
-			rsList.addSelectionListener(new SelectionAdapter() {
+
+			TableColumn nodeUrnsColumn = new TableColumn(reservationsTable, SWT.NONE);
+			nodeUrnsColumn.setText("Node URNs");
+
+			columns = new TableColumn[3];
+			columns[RESERVATION_TABLE_COLUMN_FROM] = fromColumn;
+			columns[RESERVATION_TABLE_COLUMN_TO] = toColumn;
+			columns[RESERVATION_TABLE_COLUMN_NODE_URNS] = nodeUrnsColumn;
+
+			setControl(reservationsTable);
+			reservationsTable.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(final SelectionEvent selectionEvent) {
-					setPageComplete(rsList.getSelectionCount() == 1);
+					setPageComplete(reservationsTable.getSelectionCount() == 1);
 				}
 			}
 			);
 		}
 
 		public void clearReservations() {
-			rsList.removeAll();
-			rsList.clearAll();
+			reservationsTable.removeAll();
+			reservationsTable.clearAll();
 			reservationList.clear();
 		}
 
 		public ConfidentialReservationData getSelectedReservation() {
-			if (rsList.getSelectionIndex() >= 0) {
-				return reservationList.get(rsList.getSelectionIndex());
+			if (reservationsTable.getSelectionIndex() >= 0) {
+				return reservationList.get(reservationsTable.getSelectionIndex());
 			} else {
 				return null;
 			}
 		}
 
-		private String toStringWithSeperator(java.util.List list, String sep) {
-			StringBuilder builder = new StringBuilder();
-			for (Object o : list) {
-				builder.append(o.toString()).append(sep);
-			}
-			return builder.toString();
-		}
-
-		private String printDate(XMLGregorianCalendar calendar) {
-			return String.format("%d-%d-%d %d:%d", calendar.getYear(), calendar.getMonth(), calendar.getDay(),
-					calendar.getHour(), calendar.getMinute()
-			);
-		}
-
 		public void addReservation(ConfidentialReservationData data) {
-			TableItem item = new TableItem(rsList, SWT.NONE);
-			item.setText(new String[]{
-					printDate(data.getFrom()), printDate(data.getTo()),
-					toStringWithSeperator(data.getNodeURNs(), ";"), data.getUserData()
-			}
-			);
+
+			String from = new DateTime(data.getFrom().toGregorianCalendar()).toString("dd.MM.yyyy HH:mm");
+			String to = new DateTime(data.getTo().toGregorianCalendar()).toString("dd.MM.yyyy HH:mm");
+			String nodeUrns = Joiner.on(",").join(data.getNodeURNs());
+
+			TableItem item = new TableItem(reservationsTable, SWT.NONE);
+			item.setText(new String[]{from, to, nodeUrns});
+
 			for (int i = 0, n = columns.length; i < n; i++) {
 				columns[i].pack();
 			}
+
 			reservationList.add(data);
 		}
 
