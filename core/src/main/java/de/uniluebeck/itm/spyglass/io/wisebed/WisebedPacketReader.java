@@ -2,8 +2,7 @@ package de.uniluebeck.itm.spyglass.io.wisebed;
 
 import com.google.common.collect.Lists;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
-import de.uniluebeck.itm.spyglass.io.AbstractPacketReader;
-import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.io.SpyglassPacketRecorder;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.util.StringTuple;
 import de.uniluebeck.itm.tr.util.StringUtils;
@@ -24,8 +23,6 @@ import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -34,7 +31,7 @@ import static com.google.common.collect.Lists.newArrayList;
  *
  * @author Jens Kluttig, Daniel Bimschas
  */
-public class WisebedPacketReader extends AbstractPacketReader {
+public class WisebedPacketReader extends SpyglassPacketRecorder {
 
 	private static final Logger log = LoggerFactory.getLogger(WisebedPacketReader.class);
 
@@ -73,7 +70,7 @@ public class WisebedPacketReader extends AbstractPacketReader {
 							);
 						}
 
-						queue.add(factory.createInstance(extractBinaryPayload(msg)));
+						add(factory.createInstance(extractBinaryPayload(msg)));
 
 					} catch (SpyglassPacketException e) {
 						log.warn("Exception while parsing SpyGlass packet. Ignoring packet from \"\" @ {}: {}",
@@ -127,7 +124,7 @@ public class WisebedPacketReader extends AbstractPacketReader {
 
 	private Endpoint controllerEndpoint;
 
-	private BlockingDeque<SpyglassPacket> queue = new LinkedBlockingDeque<SpyglassPacket>();
+	/*private BlockingDeque<SpyglassPacket> queue = new LinkedBlockingDeque<SpyglassPacket>();*/
 
 	@Element(required = true)
 	private String sessionManagementEndpointUrl;
@@ -141,6 +138,7 @@ public class WisebedPacketReader extends AbstractPacketReader {
 	/**
 	 * Constructor for Simple XML reflection instantiation
 	 */
+	@SuppressWarnings("unused")
 	WisebedPacketReader() {
 		setSourceType(SOURCE_TYPE.OTHER);
 	}
@@ -173,23 +171,24 @@ public class WisebedPacketReader extends AbstractPacketReader {
 		}
 	}
 
-	@Override
+	/*@Override
 	public SpyglassPacket getNextPacket(boolean block) throws SpyglassPacketException, InterruptedException {
 		return block ? queue.take() : queue.poll();
-	}
+	}*/
 
-	@Override
+	/*@Override
 	public void reset() throws IOException {
 		log.debug("resetting");
 		queue.clear();
-	}
+	}*/
 
 	@Override
 	public void shutdown() throws IOException {
-		log.debug("shutting down");
+		log.debug("Shutting down WisebedPacketReader...");
 		if (controllerEndpoint.isPublished()) {
 			controllerEndpoint.stop();
 		}
+		super.shutdown();
 	}
 
 	private void stopLocalControllerEndpointIfRunning() {

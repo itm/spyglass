@@ -101,13 +101,13 @@ public class SpyglassPacketRecorder extends SpyGlassPacketQueue implements Packe
 
 	// --------------------------------------------------------------------------------
 	@Override
-	public void push(final SpyglassPacket packet) {
+	public void add(final SpyglassPacket packet) {
 		if (!recorderShutDown) {
 			// the packets could be pushed in the super classes queue but when the readFromFile time
 			// lasts to long, an out of memory exception might occur
 			if (!getSourceType().equals(SOURCE_TYPE.FILE)) {
 				recModule.handlePacket(packet);
-				super.push(packet);
+				super.add(packet);
 			}
 		} else {
 			log.warn("The packet will not be pushed into the packet queue since this instance was shut down!");
