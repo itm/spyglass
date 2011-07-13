@@ -124,8 +124,6 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
 
 	private Endpoint controllerEndpoint;
 
-	/*private BlockingDeque<SpyglassPacket> queue = new LinkedBlockingDeque<SpyglassPacket>();*/
-
 	@Element(required = true)
 	private String sessionManagementEndpointUrl;
 
@@ -171,17 +169,6 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
 			throw new RuntimeException(e);
 		}
 	}
-
-	/*@Override
-	public SpyglassPacket getNextPacket(boolean block) throws SpyglassPacketException, InterruptedException {
-		return block ? queue.take() : queue.poll();
-	}*/
-
-	/*@Override
-	public void reset() throws IOException {
-		log.debug("resetting");
-		queue.clear();
-	}*/
 
 	@Override
 	public void shutdown() throws IOException {
