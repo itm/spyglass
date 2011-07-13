@@ -284,10 +284,12 @@ public class Spyglass {
 	 */
 	public void setPacketReader(final PacketReader packetReader) {
 		final PacketReader oldPacketReader = this.packetReader;
-		try {
-			oldPacketReader.shutdown();
-		} catch (Exception e) {
-			log.warn("Exception while shutting down PacketReader: " + e, e);
+		if (oldPacketReader != null) {
+			try {
+				oldPacketReader.shutdown();
+			} catch (Exception e) {
+				log.warn("Exception while shutting down PacketReader: " + e, e);
+			}
 		}
 		packetReader.init(this);
 		this.packetReader = packetReader;
