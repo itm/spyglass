@@ -9,6 +9,7 @@ package de.uniluebeck.itm.spyglass.core;
 
 import de.uniluebeck.itm.spyglass.io.PacketReader;
 import de.uniluebeck.itm.spyglass.io.PacketRecorder;
+import de.uniluebeck.itm.spyglass.io.SpyGlassPacketQueue;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.plugin.nodepositioner.NodePositionerPlugin;
@@ -102,9 +103,16 @@ public class Spyglass {
         // Create and inject objects
         setPluginManager(configStore.getSpyglassConfig().getPluginManager());
 
-        setPacketReader(configStore.getSpyglassConfig().getPacketReader());
+		try {
+			setPacketReader(configStore.getSpyglassConfig().getPacketReader());
+		} catch (Exception e) {
+			log.error("Exception while loading the packet reader: " + e, e);
+			SpyGlassPacketQueue failSafePacketReader = new SpyGlassPacketQueue();
+			configStore.getSpyglassConfig().setPacketReader(failSafePacketReader);
+			setPacketReader(failSafePacketReader);
+		}
 
-        packetDispatcher = new PacketDispatcher(this);
+		packetDispatcher = new PacketDispatcher(this);
 
         packetProducerTask = new PacketProducerTask(this);
 

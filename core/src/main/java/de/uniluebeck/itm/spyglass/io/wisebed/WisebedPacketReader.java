@@ -166,6 +166,7 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
 		try {
 			connectToExperiment();
 		} catch (Exception e) {
+			log.warn("Exception while connecting to experiment: " + e, e);
 			stopLocalControllerEndpointIfRunning();
 			throw new RuntimeException(e);
 		}
