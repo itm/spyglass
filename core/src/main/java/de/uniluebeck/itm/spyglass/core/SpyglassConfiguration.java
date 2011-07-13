@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import de.uniluebeck.itm.spyglass.io.wisebed.TestbedXMLConfig;
+import de.uniluebeck.itm.spyglass.io.wisebed.WisebedPacketReaderXMLConfig;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
@@ -61,8 +61,8 @@ public class SpyglassConfiguration extends XMLConfig {
     /**
      * Testbed settings
      */
-    @Element(name = "testbedSettings", required = false)
-    private final TestbedXMLConfig testbedSettings = new TestbedXMLConfig();
+    @Element(name = "wisebedPacketReaderSettings", required = false)
+    private final WisebedPacketReaderXMLConfig wisebedPacketReaderSettings = new WisebedPacketReaderXMLConfig();
 
 	/**
 	 * The default configurations for all plug-ins
@@ -189,7 +189,7 @@ public class SpyglassConfiguration extends XMLConfig {
 		firePropertyChange("packetReader", oldReader, packetReader);
 	}
 
-    public TestbedXMLConfig getTestbedSettings() {
-        return testbedSettings;
+    public WisebedPacketReaderXMLConfig getWisebedPacketReaderSettings() {
+        return wisebedPacketReaderSettings;
     }
 }
