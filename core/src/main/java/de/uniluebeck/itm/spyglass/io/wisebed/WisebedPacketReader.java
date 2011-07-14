@@ -3,7 +3,6 @@ package de.uniluebeck.itm.spyglass.io.wisebed;
 import com.google.common.collect.Lists;
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.io.SpyglassPacketRecorder;
-import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 import de.uniluebeck.itm.spyglass.util.StringTuple;
 import de.uniluebeck.itm.tr.util.StringUtils;
@@ -24,8 +23,6 @@ import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 import java.io.IOException;
 import java.util.List;
-
-import de.unisiegen.zess.spyglass.plugin.dataanalyzer.DataAnalyzerPlugin;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -72,11 +69,8 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
 									}
 							);
 						}
-						SpyglassPacket spkg = factory.createInstance(extractBinaryPayload(msg));
-						
-						dataPlugin.processPacket(spkg);
 
-						add(spkg);
+						add(factory.createInstance(extractBinaryPayload(msg)));
 
 					} catch (SpyglassPacketException e) {
 						log.warn("Exception while parsing SpyGlass packet. Ignoring packet from \"\" @ {}: {}",
@@ -139,8 +133,6 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
 	@ElementList(type = StringTuple.class, required = true)
 	private List<StringTuple> secretReservationKeys = Lists.newArrayList();
 
-	private DataAnalyzerPlugin dataPlugin;
-
 	/**
 	 * Constructor for Simple XML reflection instantiation
 	 */
@@ -176,9 +168,6 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
 			stopLocalControllerEndpointIfRunning();
 			throw new RuntimeException(e);
 		}
-
-		dataPlugin = new DataAnalyzerPlugin();
-		dataPlugin.init(this);
 	}
 
 	@Override
@@ -234,9 +223,5 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
 			reservation.add(key);
 		}
 		return reservation;
-	}
-
-	public void InjectPackage(SpyglassPacket pkg) {
-		add(pkg);	
 	}
 }
