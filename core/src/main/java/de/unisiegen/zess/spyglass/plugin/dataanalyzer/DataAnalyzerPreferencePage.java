@@ -18,7 +18,7 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.IntegerRangeValidator;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 
-public class DataAnalyzerPreferencePage
+/*public class DataAnalyzerPreferencePage
 		extends
 		PluginPreferencePage<DataAnalyzerPlugin, DataAnalyzerXMLConfig> {
 
@@ -86,4 +86,4 @@ public class DataAnalyzerPreferencePage
 		return DataAnalyzerPlugin.class;
 	}
 
-}
+}*/

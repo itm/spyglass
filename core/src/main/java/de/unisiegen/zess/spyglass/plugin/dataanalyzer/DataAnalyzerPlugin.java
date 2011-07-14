@@ -3,6 +3,8 @@ package de.unisiegen.zess.spyglass.plugin.dataanalyzer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.apache.log4j.Logger;
+
 import de.uniluebeck.itm.spyglass.core.Spyglass;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
@@ -18,12 +20,15 @@ import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPref
 import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterXMLConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 import de.uniluebeck.itm.spyglass.io.wisebed.WisebedPacketReader;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 
 /**
  */
 public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ {
 	public native int ProcessData(byte[] packet);
 	public native byte[] AnalyzeData();
+
+	private static final Logger log = SpyglassLoggerFactory.getLogger(DataAnalyzerPlugin.class);
 
 	private int cols = 0;
 	private int rows = 0;
@@ -42,12 +47,14 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 		//super(true);
 		//xmlConfig = new DataAnalyzerXMLConfig();
 		try {
-			//System.loadLibrary("ClusterInfo.dll");			
-			/*dllok = true;
+			log.debug("Loading library ...");
+			System.load("c:\\upload\\clusterinfo.dll");
+			System.out.println("ZESS: Library loaded");
+			dllok = true;
 
-			String j = "Felditentifikation_Lib.dll";
+			String j = "c:\\upload\\Felditentifikation_Lib.dll";
 			int len  = j.length();
-			byte[] data = new byte[2 + len];
+			byte[] data = new byte[1 + len];
 			data[0] = 0;
 			for (int i = 1; i <= len; i++) {
 				data[i] = (byte)j.charAt(i - 1);
@@ -55,16 +62,16 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 			
 			int r = ProcessData(data);
 
-			String k = "Cluster-vollständig.xml";
+			String k = "c:\\upload\\Cluster-map.xml";
 			int len2  = k.length();
-			byte[] data2 = new byte[2 + len2];
+			byte[] data2 = new byte[1 + len2];
 			data2[0] = 1;
 			for (int i = 1; i <= len2; i++)
 			{
 				data2[i] = (byte)k.charAt(i - 1);
 			}
 			
-			int r2 = ProcessData(data2);*/
+			int r2 = ProcessData(data2);
 
 			// set IP of Handheld			
 			/*byte[] data3 = new byte[5];
@@ -75,7 +82,8 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 			data3[4] = 1;
 			int r3 = ProcessData(data3);*/
 		}
-		catch(Exception e) {
+		catch(Error e) {
+			System.out.println("ZESS: Error loading library on " + System.getProperty("java.library.path"));
 			e.printStackTrace();
 		}
 	}
@@ -93,8 +101,10 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 	public void init(WisebedPacketReader reader) { /*final PluginManager manager) throws Exception {
 		super.init(manager);*/
 		pkgReader = reader;
-
+	
+		log.debug("Init ...");
 		if (dllok) {
+			log.debug("Starting Timer ...");
 			timer = new Timer("Data Analysis Timer");
 			timer.schedule(new TimerTask() {
 			    @Override
@@ -144,6 +154,9 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 	}*/
 
 	private void Parse(final byte[] buf) throws Exception {
+		if (buf == null) {
+			return;
+		}
 		String[] result = (new String(buf)).split(",");
 		for (int i = 0; i < result.length; ++i) {
 			int ptype = Integer.parseInt(result[i]);
@@ -173,6 +186,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					SpyglassGridPackage gp = new SpyglassGridPackage(pkg);
 					if (pkgReader != null) {
 						pkgReader.InjectPackage(gp);
+						log.debug("New package: " + gp.toString());
 					}
 
 					pkg = new byte[SpyglassNorthPackage.PACKET_SIZE];
@@ -185,6 +199,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					SpyglassNorthPackage nop = new SpyglassNorthPackage(pkg);
 					if (pkgReader != null) {
 						pkgReader.InjectPackage(nop);
+						log.debug("New package: " + nop.toString());
 					}
 					i += 5;
 				}
@@ -218,6 +233,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					SpyglassNodePackage np = new SpyglassNodePackage(pkg);
 					if (pkgReader != null) {
 						pkgReader.InjectPackage(np);
+						log.debug("New package: " + np.toString());
 					}
 					i += 8;
 				}
@@ -247,6 +263,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						SpyglassGridActivityPackage ap = new SpyglassGridActivityPackage(pkg);
 						if (pkgReader != null) {
 							pkgReader.InjectPackage(ap);
+							log.debug("New package: " + ap.toString());
 						}
 						pos++;
 						gnum = Integer.parseInt(result[pos])-1;
@@ -271,6 +288,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					SpyglassGridPackage cp = new SpyglassGridPackage(pkg);
 					if (pkgReader != null) {
 						pkgReader.InjectPackage(cp);
+						log.debug("New package: " + cp.toString());
 					}
 					i += 1;
 				}
