@@ -13,7 +13,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 
 import de.uniluebeck.itm.spyglass.gui.wizard.ExtendedWizardDialog;
-import de.uniluebeck.itm.spyglass.gui.wizard.TestbedWizard;
+import de.uniluebeck.itm.spyglass.gui.wizard.WisebedPacketReaderConfigurationWizard;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.BeansObservables;
@@ -230,7 +230,7 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
      * Starts the Wisebed-Configuration Dialog
      */
     private void startTestbedConfig() {
-       final WizardDialog wizard = new ExtendedWizardDialog(getParentShell(), new TestbedWizard());
+       final WizardDialog wizard = new ExtendedWizardDialog(getParentShell(), new WisebedPacketReaderConfigurationWizard());
        wizard.open();
     }
 

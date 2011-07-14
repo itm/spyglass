@@ -17,6 +17,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 
+import org.apache.commons.lang.SystemUtils;
 import org.apache.log4j.Logger;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.load.Persister;
@@ -36,22 +37,23 @@ import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
  * Instances of this class are used to load and store the spyglass configuration from and into the
  * local file system, respectively.<br>
  * Additionally, configuration parameters can be loaded and stored partially.
- * 
+ *
  * @author Sebastian Ebers
  * @author Dariush Forouher
- * 
+ *
  */
 public class ConfigStore extends PropertyBean {
 
-	/** Config file. It is always expected to be in the current working directory */
-	final private File CONFIG_FILE_NAME = new File(new File("."), "SpyGlassConfig.xml");
+	private final File CONFIG_DIR = new File(SystemUtils.USER_HOME + File.separator + ".spyglass");
+
+	private final File CONFIG_FILE = new File(CONFIG_DIR, "spyglass-config.xml");
 
 	// --------------------------------------------------------------------------------
 	/**
 	 * Thread, which is responsible for storing into the default config file.
-	 * 
+	 *
 	 * @author Dariush Forouher
-	 * 
+	 *
 	 */
 	protected final class AsyncStoreRunnable implements Runnable {
 
@@ -84,7 +86,7 @@ public class ConfigStore extends PropertyBean {
 					synchronized (storePendingMutex) {
 						// allow new store requests to be made
 						storePending = false;
-						storeSync(CONFIG_FILE_NAME);
+						storeSync(CONFIG_FILE);
 					}
 
 				}
@@ -150,12 +152,12 @@ public class ConfigStore extends PropertyBean {
 	/**
 	 * Reads the configuration from an hard-coded standard-path (which is stored internally in this
 	 * class)
-	 * 
-	 * @throws Exception
-	 * 
+	 *
+	 * @throws Exception if anything goes wrong
+	 *
 	 */
 	public ConfigStore() throws Exception {
-		final File f = CONFIG_FILE_NAME;
+		final File f = CONFIG_FILE;
 
 		boolean newFile = false;
 		// create the file if necessary
@@ -163,7 +165,9 @@ public class ConfigStore extends PropertyBean {
 			if (!f.getParentFile().exists() && !f.getParentFile().mkdirs()) {
 				throw new IOException("Could not create directory " + f.getParent());
 			}
-			f.createNewFile();
+			if (!f.createNewFile()) {
+				throw new IOException("Could not create config file " + f.getAbsolutePath());
+			}
 			newFile = true;
 		}
 
@@ -242,12 +246,11 @@ public class ConfigStore extends PropertyBean {
 	// --------------------------------------------------------------------------
 	/**
 	 * Overwrites the current config with the one inside the given file.
-	 * 
-	 * @param file
-	 *            the configuration file
-	 * 
-	 * @throws Exception
-	 * 
+	 *
+	 * @param file the configuration file
+	 *
+	 * @throws Exception if anything goes wrong
+	 *
 	 */
 	public void importConfig(final File file) throws Exception {
 		if (spyglassConfig == null) {
@@ -285,10 +288,10 @@ public class ConfigStore extends PropertyBean {
 	// --------------------------------------------------------------------------
 	/**
 	 * Exports the config into the given file
-	 * 
+	 *
 	 * Note: Do this synchronized, since users generally don't mind waiting on this occasions (lots
 	 * of programs hang when saving their files after explicitly been commanded by the user).
-	 * 
+	 *
 	 * @param file
 	 *            the export operation's target
 	 */
@@ -299,12 +302,12 @@ public class ConfigStore extends PropertyBean {
 	// --------------------------------------------------------------------------
 	/**
 	 * Loads and returns the configuration from a file
-	 * 
-	 * @param configFile
-	 *            the file containing the configuration data
-	 * @returns a valid SpyglassConfiguration
-	 * @throws an
-	 *             Exception if anything goes wrong
+	 *
+	 * @param configFile the file containing the configuration data
+	 *
+	 * @throws Exception if anything goes wrong
+	 *
+	 * @return a valid SpyglassConfiguration
 	 */
 	private static SpyglassConfiguration load(final File configFile) throws Exception {
 		log.debug("Initializing. Reading config from file: " + configFile);
@@ -331,7 +334,7 @@ public class ConfigStore extends PropertyBean {
 	// --------------------------------------------------------------------------
 	/**
 	 * Store the config into the system-given file.
-	 * 
+	 *
 	 * Stores the configuration in an extra {@link Thread} to improve the performance.<br>
 	 * The storing operation will be delayed for one second. Every call received within this second
 	 * will be ignored.
@@ -347,9 +350,9 @@ public class ConfigStore extends PropertyBean {
 	// --------------------------------------------------------------------------
 	/**
 	 * Stores the configuration persistently into the given file.
-	 * 
+	 *
 	 * This method is synchronized to avoid storing into the same file concurrently.
-	 * 
+	 *
 	 * @param configFile
 	 *            the file which will contain the configuration data afterwards
 	 */
@@ -372,7 +375,7 @@ public class ConfigStore extends PropertyBean {
 			// Note: In theory this may lead to StackOverflow. But since under normal circumstances
 			// the chances of hitting this Exception are already pretty small, we probably can risk
 			// it.
-			log.debug("Configuration was modified while the configstore tried to store the config. I'll just try again.", e);
+			log.debug("Configuration was modified while the ConfigStore tried to store the config. Trying again...", e);
 			storeSync(configFile);
 			return;
 		} catch (final IOException e) {
@@ -391,9 +394,9 @@ public class ConfigStore extends PropertyBean {
 	/**
 	 * Notify the ConfigStore that Spyglass is shutting down and thus we should not accept any mre
 	 * store requests.
-	 * 
+	 *
 	 * This method blocks until async-store thread has died.
-	 * 
+	 *
 	 * @throws InterruptedException
 	 *             if the executing thread is interrupted while this method is called.
 	 */

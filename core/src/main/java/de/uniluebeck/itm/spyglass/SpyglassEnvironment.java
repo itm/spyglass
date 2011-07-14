@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+import org.apache.commons.lang.SystemUtils;
 import org.eclipse.swt.graphics.Rectangle;
 
 import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
@@ -35,10 +36,9 @@ import de.uniluebeck.itm.spyglass.util.Tools;
  */
 public class SpyglassEnvironment {
 
-	/**
-	 * Name of the property file
-	 */
-	private static final String PROPERTY_FILE = "spyglass.properties";
+	private static final File CONFIG_DIR = new File(SystemUtils.USER_HOME + File.separator + ".spyglass");
+
+	private static final File PROPERTY_FILE = new File(CONFIG_DIR, "spyglass-environment.properties");
 
 	/**
 	 * property names
@@ -60,15 +60,14 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Read the properties from file.
-	 * 
+	 *
 	 * Fail early if the file is not readable
 	 */
 	static {
-		final File f = new File(PROPERTY_FILE);
 
 		try {
-			if (!f.exists()) {
-				createDefaultConfig(f);
+			if (!PROPERTY_FILE.exists()) {
+				createDefaultConfig(PROPERTY_FILE);
 			}
 
 			final InputStream input = new FileInputStream(PROPERTY_FILE);
@@ -96,6 +95,7 @@ public class SpyglassEnvironment {
 	// --------------------------------------------------------------------------------
 	/**
 	 * Create a default property file
+	 * @param f the file to write to
 	 */
 	private static void createDefaultConfig(final File f) throws IOException {
 		if (!f.createNewFile()) {

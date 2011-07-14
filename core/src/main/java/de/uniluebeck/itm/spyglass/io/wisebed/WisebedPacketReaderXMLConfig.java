@@ -17,7 +17,7 @@ import org.simpleframework.xml.Element;
  *
  * @author jens kluttig
  */
-public class TestbedXMLConfig extends XMLConfig {
+public class WisebedPacketReaderXMLConfig extends XMLConfig {
 
 	public static final String PROPERTYNAME_SNAA_ENDPOINT_URL = "snaaEndpointUrl";
 
