@@ -7,8 +7,22 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 
 public class SpyglassNodePackage extends SpyglassPacket
 {
-	public static final int PACKET_TYPE = 102;
-	public static final int PACKET_SIZE = 24;
+	// 10 SPIR - geo
+	// 11 SPIR + geo
+	// 12 MPIR - geo
+	// 13 MPIR + geo
+	// 14 LPIR - geo
+
+	public static byte PACKET_TYPE(int PIR_TYPE, boolean geophone) {
+		if (PIR_TYPE == 1) {
+			return 14;
+		}
+		if (geophone) {
+			PIR_TYPE += 1;
+		}
+		return (byte) (PIR_TYPE + 10);
+	}
+	public static final int PACKET_SIZE = 19;
 
 	public SpyglassNodePackage(final byte[] buf) throws SpyglassPacketException  {
 		deserialize(buf);
@@ -17,19 +31,24 @@ public class SpyglassNodePackage extends SpyglassPacket
 
 	void deserialize(final byte[] buf) throws SpyglassPacketException {
 		if (deserializeUint16(buf[0], buf[1]) + 2 != buf.length) {
-			throw new SpyglassPacketException("Wrong SpyglassPacket-Size");
+			throw new SpyglassPacketException("Wrong SpyglassPacket-Size: Got " + deserializeUint16(buf[0], buf[1]) + " have " + buf.length);
 		}
 		
 		setRawData(buf);
 
-		if (getLength() != PACKET_SIZE || getSemanticType() != PACKET_TYPE) {
-			throw new SpyglassPacketException("Packet is not a SpyglassNodePackage!");
+		if (getLength() != PACKET_SIZE || getSemanticType() < 10 || getSemanticType() > 14) {
+			throw new SpyglassPacketException("Packet is not a SpyglassNodePackage! Type: " + getSemanticType() + " size: " + getLength());
+	
 		}
 		
-		type = deserializeUint8(buf[19]);
-		orientation = deserializeUint16(buf[20], buf[21]);
-		hasMagnetsensor = deserializeUint8(buf[22]) != 0;
-		hasGeophone = deserializeUint8(buf[23]) != 0;
+		orientation = deserializeUint16(buf[19], buf[20]);
+		if (getSemanticType() == 14) {type = 2;}
+		else {	if (getSemanticType() <= 11) {type = 0;}
+			else {type = 1;}
+		}
+
+		hasMagnetsensor = getSemanticType() < 14;
+		hasGeophone = getSemanticType() == 11 || getSemanticType() == 13;
 	}
 	
 	private int type = -1;

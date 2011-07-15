@@ -8,7 +8,7 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 public class SpyglassGridActivityPackage extends SpyglassPacket
 {
 	public static final int PACKET_TYPE = 104;
-	public static final int PACKET_SIZE = 23;
+	public static final int PACKET_SIZE = 17;
 
 	public SpyglassGridActivityPackage(final byte[] buf) throws SpyglassPacketException  {
 		deserialize(buf);
@@ -23,7 +23,7 @@ public class SpyglassGridActivityPackage extends SpyglassPacket
 		setRawData(buf);
 
 		if (getLength() != PACKET_SIZE || getSemanticType() != PACKET_TYPE) {
-			throw new SpyglassPacketException("Packet is not a SpyglassNorthPackage!");
+			throw new SpyglassPacketException("Packet is not a SpyglassGridActivityPackage!");
 		}
 		
 		row = deserializeUint16(buf[19], buf[20]);

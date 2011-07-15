@@ -7,8 +7,14 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 
 public class SpyglassClassificationPackage extends SpyglassPacket
 {
-	public static final int PACKET_TYPE = 105;
-	public static final int PACKET_SIZE = 20;
+	public static byte PACKET_TYPE(int type) {
+		if (type >= 0 && type <= 3) {
+			return (byte) (type + 20);
+		}
+		return (byte) (3 + 20);
+	}
+
+	public static final int PACKET_SIZE = 17;
 
 	public SpyglassClassificationPackage(final byte[] buf) throws SpyglassPacketException  {
 		deserialize(buf);
@@ -22,11 +28,11 @@ public class SpyglassClassificationPackage extends SpyglassPacket
 		
 		setRawData(buf);
 
-		if (getLength() != PACKET_SIZE || getSemanticType() != PACKET_TYPE) {
-			throw new SpyglassPacketException("Packet is not a SpyglassNorthPackage!");
+		if (getLength() != PACKET_SIZE || getSemanticType() < 0 || getSemanticType() > 3) {
+			throw new SpyglassPacketException("Packet is not a SpyglassClassificationPackage!");
 		}
-		
-		type = deserializeUint8(buf[19]);
+
+		type = getSemanticType() - 20;
 	}
 	
 	private int type = -1;

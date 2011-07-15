@@ -54,7 +54,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 
 			String j = "c:\\upload\\Felditentifikation_Lib.dll";
 			int len  = j.length();
-			byte[] data = new byte[1 + len];
+			byte[] data = new byte[2 + len];
 			data[0] = 0;
 			for (int i = 1; i <= len; i++) {
 				data[i] = (byte)j.charAt(i - 1);
@@ -64,7 +64,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 
 			String k = "c:\\upload\\Cluster-map.xml";
 			int len2  = k.length();
-			byte[] data2 = new byte[1 + len2];
+			byte[] data2 = new byte[2 + len2];
 			data2[0] = 1;
 			for (int i = 1; i <= len2; i++)
 			{
@@ -157,24 +157,28 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 		if (buf == null) {
 			return;
 		}
+		
+		log.debug("Parse: " + new String(buf));
+	
 		String[] result = (new String(buf)).split(",");
 		for (int i = 0; i < result.length; ++i) {
 			int ptype = Integer.parseInt(result[i]);
-	
+
 			switch (ptype) {
 				case -1: { // Grid event
 					if (i + 6 > result.length) {
+						log.debug("Error parsing data from Movedetect DLL!");
 						throw new Exception("Error parsing data from Movedetect DLL!");
 					}
-					byte pkg[] = new byte[SpyglassGridPackage.PACKET_SIZE];
+					byte pkg[] = new byte[SpyglassGridPackage.PACKET_SIZE+2];
 					pkg[0] = 0;
 					pkg[1] = SpyglassGridPackage.PACKET_SIZE;
 					pkg[2] = 2;
 					pkg[3] = 7;
 					pkg[4] = SpyglassGridPackage.PACKET_TYPE;
 					
-					rows = Integer.parseInt(result[i+1]);		// cols
-					cols = Integer.parseInt(result[i+2]);		// rows
+					cols = Integer.parseInt(result[i+1]);		// cols
+					rows = Integer.parseInt(result[i+2]);		// rows
 					gwidth = Integer.parseInt(result[i+3]);		// grid element width
 					gheight = Integer.parseInt(result[i+4]);	// grid element height
 
@@ -189,7 +193,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						log.debug("New package: " + gp.toString());
 					}
 
-					pkg = new byte[SpyglassNorthPackage.PACKET_SIZE];
+					pkg = new byte[SpyglassNorthPackage.PACKET_SIZE+2];
 					pkg[0] = 0;
 					pkg[1] = SpyglassNorthPackage.PACKET_SIZE;
 					pkg[2] = 2;
@@ -204,17 +208,22 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					i += 5;
 				}
 				break;
-				case -2: { // New node event
+				case -2: 
+					{ // New node event
 					if (i + 9 > result.length) {
 						throw new Exception("Error parsing data from Movedetect DLL!");
 					}
-					byte pkg[] = new byte[SpyglassNodePackage.PACKET_SIZE];
+
+					byte pkg[] = new byte[SpyglassNodePackage.PACKET_SIZE+2];
+					int type = Integer.parseInt(result[i+5]);
+					boolean hasGeo = Integer.parseInt(result[i+8]) != 0;
+
 					pkg[0] = 0;
 					pkg[1] = SpyglassNodePackage.PACKET_SIZE;
 					pkg[2] = 2;
 					pkg[3] = 7;
-					pkg[4] = SpyglassNodePackage.PACKET_TYPE;
-					
+					pkg[4] = SpyglassNodePackage.PACKET_TYPE(type, hasGeo);
+
 					int gnum = Integer.parseInt(result[i+2])-1;
 					int col = gnum % cols;
 					int row = gnum / cols;
@@ -224,26 +233,24 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					SerializeUInt16(Integer.parseInt(result[i+1],16), pkg, 5);	// ID
 					SerializeUInt16(px+col*gwidth, pkg, 13);			// Pos x
 					SerializeUInt16(py+row*gheight, pkg, 15);			// Pos y
-					SerializeUInt8(Integer.parseInt(result[i+5]), pkg, 19);		// PIR Type
-					SerializeUInt16(Integer.parseInt(result[i+5]), pkg, 20);	// Orientation
-					SerializeUInt8(Integer.parseInt(result[i+6]), pkg, 22);		// Has Magnetsensor
-					SerializeUInt8(Integer.parseInt(result[i+7]), pkg, 23);		// Has Geophon
-
+					SerializeUInt16(Integer.parseInt(result[i+6]), pkg, 19);	// Orientation
 
 					SpyglassNodePackage np = new SpyglassNodePackage(pkg);
 					if (pkgReader != null) {
 						pkgReader.InjectPackage(np);
 						log.debug("New package: " + np.toString());
 					}
+
 					i += 8;
 				}
 				break;
 				case -33: {	// List of active grid elements
-					if (i + 4 > result.length) {
+					if (i + 3 > result.length) {
+						log.debug("Error parsing data from Movedetect DLL!");
 						throw new Exception("Error parsing data from Movedetect DLL!");
 					}
 					
-					byte pkg[] = new byte[SpyglassGridActivityPackage.PACKET_SIZE];
+					byte pkg[] = new byte[SpyglassGridActivityPackage.PACKET_SIZE+2];
 					pkg[0] = 0;
 					pkg[1] = SpyglassGridActivityPackage.PACKET_SIZE;
 					pkg[2] = 2;
@@ -251,14 +258,18 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					pkg[4] = SpyglassGridActivityPackage.PACKET_TYPE;
 
 					int pos = i + 3;
-					int gnum = Integer.parseInt(result[pos])-1;
-					while (pos < result.length && gnum >= 1) {
-						
+		
+					while (pos < result.length) {
+						int gnum = Integer.parseInt(result[pos])-1;
+						if (gnum < 0) {
+							break;
+						}
+
 						int col = gnum % cols;
 						int row = gnum / cols;
 
-						SerializeUInt16(row, pkg, 19);
-						SerializeUInt16(col, pkg, 21);
+						SerializeUInt16(col*gwidth+gwidth/2, pkg, 13);			// Pos x
+						SerializeUInt16(row*gheight+gheight/2, pkg, 15);			// Pos y
 
 						SpyglassGridActivityPackage ap = new SpyglassGridActivityPackage(pkg);
 						if (pkgReader != null) {
@@ -266,26 +277,30 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 							log.debug("New package: " + ap.toString());
 						}
 						pos++;
-						gnum = Integer.parseInt(result[pos])-1;
 					}
 					i = pos - 1;
 				}
 				break;
 				case -22: {	// classification: 0 = Person, 1 = Person + Waffe, 2 = Auto
 					if (i + 2 > result.length) {
+						log.debug("Error parsing data from Movedetect DLL!");
 						throw new Exception("Error parsing data from Movedetect DLL!");
 					}
 
-					byte pkg[] = new byte[SpyglassClassificationPackage.PACKET_SIZE];
+					int type = Integer.parseInt(result[i+1]);
+
+					byte pkg[] = new byte[SpyglassClassificationPackage.PACKET_SIZE+2];
 					pkg[0] = 0;
 					pkg[1] = SpyglassClassificationPackage.PACKET_SIZE;
 					pkg[2] = 2;
 					pkg[3] = 7;
-					pkg[4] = SpyglassClassificationPackage.PACKET_TYPE;
+					pkg[4] = SpyglassClassificationPackage.PACKET_TYPE(type);
 			
-					SerializeUInt8(Integer.parseInt(result[i+1]), pkg, 19); // type
+					SerializeUInt16(0, pkg, 13);			// Pos x
+					SerializeUInt16(0, pkg, 15);			// Pos y
+
 					
-					SpyglassGridPackage cp = new SpyglassGridPackage(pkg);
+					SpyglassClassificationPackage cp = new SpyglassClassificationPackage(pkg);
 					if (pkgReader != null) {
 						pkgReader.InjectPackage(cp);
 						log.debug("New package: " + cp.toString());
@@ -295,6 +310,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 				break;
 				case -11: {	// IDs of sensornode which should activate their magnetic sensors
 					if (i + 2 > result.length) {
+						log.debug("Error parsing data from Movedetect DLL!");
 						throw new Exception("Error parsing data from Movedetect DLL!");
 					}
 					
@@ -306,6 +322,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 				}
 				break;
 				default: // parse error
+					log.debug("Error parsing data from Movedetect DLL!");
 					throw new Exception("Error parsing data from Movedetect DLL!");
 			}
 		}
@@ -313,8 +330,8 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 
 	private void SerializeUInt16(int value, byte[] msg, int pos) {
 		if (msg == null || msg.length - 2 < pos) return;
-		msg[pos] = (byte) (value & 0xFF);
-		msg[pos+1] = (byte)  (value>>8 & 0xFF);
+		msg[pos+1] = (byte) (value & 0xFF);
+		msg[pos] = (byte)  (value>>8 & 0xFF);
 	}
 
 	private void SerializeUInt8(int value, byte[] msg, int pos) {

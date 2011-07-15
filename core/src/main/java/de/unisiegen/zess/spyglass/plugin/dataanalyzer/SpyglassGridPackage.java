@@ -8,7 +8,7 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 public class SpyglassGridPackage extends SpyglassPacket
 {
 	public static final int PACKET_TYPE = 101;
-	public static final int PACKET_SIZE = 27;
+	public static final int PACKET_SIZE = 25;
 
 	public SpyglassGridPackage(final byte[] buf) throws SpyglassPacketException  {
 		deserialize(buf);
@@ -17,13 +17,13 @@ public class SpyglassGridPackage extends SpyglassPacket
 
 	void deserialize(final byte[] buf) throws SpyglassPacketException {
 		if (deserializeUint16(buf[0], buf[1]) + 2 != buf.length) {
-			throw new SpyglassPacketException("Wrong SpyglassPacket-Size");
+			throw new SpyglassPacketException("Wrong SpyglassPacket-Size: Got " + deserializeUint16(buf[0], buf[1]) + " have " + buf.length);
 		}
 		
 		setRawData(buf);
 
 		if (getLength() != PACKET_SIZE || getSemanticType() != PACKET_TYPE) {
-			throw new SpyglassPacketException("Packet is not a SpyglassGridPackage!");
+			throw new SpyglassPacketException("Packet is not a SpyglassGridPackage! Type: " + getSemanticType() + " size: " + getLength());
 		}
 		
 		height = deserializeUint16(buf[19], buf[20]);

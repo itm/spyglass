@@ -8,7 +8,7 @@ import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
 public class SpyglassNorthPackage extends SpyglassPacket
 {
 	public static final int PACKET_TYPE = 103;
-	public static final int PACKET_SIZE = 21;
+	public static final int PACKET_SIZE = 19;
 
 	public SpyglassNorthPackage(final byte[] buf) throws SpyglassPacketException  {
 		deserialize(buf);

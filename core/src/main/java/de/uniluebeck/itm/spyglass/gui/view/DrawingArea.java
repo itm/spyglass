@@ -114,7 +114,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	 */
 	public DrawingArea(final Composite parent, final int style) {
 		//
-		super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
+		super(parent, style | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.DOUBLE_BUFFERED); //| SWT.NO_BACKGROUND 
 
 		addControlListener(this);
 		addDisposeListener(this);
@@ -826,7 +826,7 @@ public class DrawingArea extends Canvas implements ControlListener, DisposeListe
 	 */
 	@Override
 	public void controlMoved(final ControlEvent e) {
-		// 
+		//
 	}
 
 	// --------------------------------------------------------------------------------
