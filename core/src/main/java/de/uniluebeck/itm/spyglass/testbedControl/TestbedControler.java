@@ -32,9 +32,10 @@ import sun.util.logging.resources.logging;
 public class TestbedControler implements PropertyChangeListener {
 
     private TestbedControlSettingsXMLConfig config;
-
-    private String wisebedSkriptsHome;
-    private String skriptExtension;
+    private static String wisebedSkriptsHome;
+    private static String skriptExtension;
+    private static String commaSkip;
+    private static String shellProg;
 
     public TestbedControler(TestbedControlSettingsXMLConfig config) {
 
@@ -49,15 +50,51 @@ public class TestbedControler implements PropertyChangeListener {
         if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
 
             skriptExtension = "";
+            commaSkip = "";
+            shellProg = "";
 
         } else {
 
             skriptExtension = ".bat";
+            commaSkip = "\"";
+            shellProg = "cmd /c start ";
 
         }
 
 
 
+    }
+
+    public static void send(String message) {
+
+
+
+        SecretReservationKey key = new SecretReservationKey();
+        key.setSecretReservationKey(WisebedPacketReader.getCurrentSecretReservationKey());
+
+        key.setUrnPrefix(WisebedPacketReader.getCurrentUrnPrefix());
+
+        Runtime rt = Runtime.getRuntime();
+        try {
+            Process proc = rt.exec(new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "send" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, commaSkip + message + commaSkip});
+            proc.waitFor();
+            BufferedReader buf = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+            String line = "";
+            while ((line = buf.readLine()) != null) {
+                System.out.println(line);
+            }
+
+
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch (IOException ex) {
+            Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+
+        System.out.println("send");
     }
 
     public void send() {
@@ -71,7 +108,7 @@ public class TestbedControler implements PropertyChangeListener {
 
         Runtime rt = Runtime.getRuntime();
         try {
-            Process proc = rt.exec(new String[]{wisebedSkriptsHome + "/send" + skriptExtension, wisebedSkriptsHome + "/movedetect.properties", key.getUrnPrefix() + "," + key.getSecretReservationKey(), message});
+            Process proc = rt.exec(new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "send" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, commaSkip + message + commaSkip});
             proc.waitFor();
             BufferedReader buf = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             String line = "";
@@ -103,7 +140,7 @@ public class TestbedControler implements PropertyChangeListener {
         Runtime rt = Runtime.getRuntime();
         try {
             System.out.println("flashing");
-            Process proc = rt.exec(new String[]{wisebedSkriptsHome + "/flash" + skriptExtension, wisebedSkriptsHome + "/movedetect.properties", key.getUrnPrefix() + "," + key.getSecretReservationKey(), image});
+            Process proc = rt.exec(new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "flash" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, image});
 
             proc.waitFor();
             BufferedReader buf = new BufferedReader(new InputStreamReader(proc.getInputStream()));
@@ -132,7 +169,7 @@ public class TestbedControler implements PropertyChangeListener {
 
         Runtime rt = Runtime.getRuntime();
         try {
-            Process proc = rt.exec(new String[]{wisebedSkriptsHome + "/reset" + skriptExtension, wisebedSkriptsHome + "/movedetect.property", key.getUrnPrefix() + "," + key.getSecretReservationKey()});
+            Process proc = rt.exec(new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + System.getProperty("file.separator") + "reset" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip});
             proc.waitFor();
             BufferedReader buf = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             String line = "";
@@ -161,36 +198,46 @@ public class TestbedControler implements PropertyChangeListener {
 
         String nodeId = config.getNodeID();
 
-        BigInteger nodeInteger = new BigInteger(nodeId, 16);
 
-        byte[] nodeIdByte = nodeInteger.toByteArray();
 
         String nodeKey = config.getNodeKey();
 
-        BigInteger keyInt = new BigInteger(nodeKey, 16);
+        BigInteger keyInt = null;
+
+        if (!nodeKey.equals("")) {
+
+            keyInt = new BigInteger(nodeKey, 16);
+
+        }
+
+        messageToGW = "0x0A,";
 
         byte type = 60;
 
-        messageToGW = StringUtils.toHexString(type);
+        messageToGW += StringUtils.toHexString(type);
         messageToGW += ",";
 
-        messageToGW += StringUtils.toHexString(nodeIdByte[1]);
+        messageToGW += "0x" + nodeId.substring(0, 2);
         messageToGW += ",";
 
 
-        messageToGW += StringUtils.toHexString(nodeIdByte[0]);
-        messageToGW += ",";
+        messageToGW += "0x" + nodeId.substring(2, 4);
 
-        byte[] keyByte = keyInt.toByteArray();
-
-        for (int i = 0; i < 15; i++) {
-
-            messageToGW += StringUtils.toHexString(keyByte[i]);
+        if (keyInt != null) {
             messageToGW += ",";
+
+            byte[] keyByte = keyInt.toByteArray();
+
+            for (int i = 0; i < keyByte.length - 1; i++) {
+
+                messageToGW += StringUtils.toHexString(keyByte[i]);
+                messageToGW += ",";
+            }
+
+
+            messageToGW += StringUtils.toHexString(keyByte[keyByte.length - 1]);
+
         }
-
-
-        messageToGW += StringUtils.toHexString(keyByte[15]);
 
         SecretReservationKey key = new SecretReservationKey();
 
@@ -198,10 +245,10 @@ public class TestbedControler implements PropertyChangeListener {
 
         key.setUrnPrefix(WisebedPacketReader.getCurrentUrnPrefix());
 
-        String[] commandString = new String[]{wisebedSkriptsHome + "/send" + skriptExtension, wisebedSkriptsHome + "/movedetect.property", key.getUrnPrefix() + "," + key.getSecretReservationKey(), messageToGW, key.getUrnPrefix() + ":0x" + gateway};
-        for (int i = 0; i < commandString.length; i++) {
-            System.out.print(commandString[i] + " ");
-        }
+        String[] commandString = new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "send" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, commaSkip + messageToGW + commaSkip, key.getUrnPrefix() + "0x" + gateway};
+//        for (int i = 0; i < commandString.length; i++) {
+//            System.out.print(commandString[i] + " ");
+//        }
 
 
         Runtime rt = Runtime.getRuntime();
@@ -233,21 +280,18 @@ public class TestbedControler implements PropertyChangeListener {
 
         String nodeId = config.getNodeID();
 
-        BigInteger nodeInteger = new BigInteger(nodeId, 16);
 
-        byte[] nodeIdByte = nodeInteger.toByteArray();
-
-
+        messageToGW = "0x0A,";
         byte type = 61;
 
-        messageToGW = StringUtils.toHexString(type);
+        messageToGW += StringUtils.toHexString(type);
         messageToGW += ",";
 
-        messageToGW += StringUtils.toHexString(nodeIdByte[1]);
+        messageToGW += "0x" + nodeId.substring(0, 2);
         messageToGW += ",";
 
 
-        messageToGW += StringUtils.toHexString(nodeIdByte[0]);
+        messageToGW += "0x" + nodeId.substring(2, 4);
 
 
 
@@ -258,7 +302,7 @@ public class TestbedControler implements PropertyChangeListener {
 
         key.setUrnPrefix(WisebedPacketReader.getCurrentUrnPrefix());
 
-        String[] commandString = new String[]{wisebedSkriptsHome + "/send" + skriptExtension, wisebedSkriptsHome +"/movedetect.property", key.getUrnPrefix() + "," + key.getSecretReservationKey(), messageToGW, key.getUrnPrefix() + ":" + gateway};
+        String[] commandString = new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "send" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, commaSkip + messageToGW + commaSkip, key.getUrnPrefix() + "0x" + gateway};
         for (int i = 0; i < commandString.length; i++) {
             System.out.print(commandString[i] + " ");
         }
