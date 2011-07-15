@@ -25,6 +25,7 @@ import de.uniluebeck.itm.spyglass.plugin.PluginFactory;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
 import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
+import de.uniluebeck.itm.spyglass.xmlconfig.TestbedControlSettingsXMLConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.XMLConfig;
 
 // --------------------------------------------------------------------------------
@@ -57,6 +58,12 @@ public class SpyglassConfiguration extends XMLConfig {
 	 */
 	@Element(name = "generalSettings")
 	private final GeneralSettingsXMLConfig generalSettings = new GeneralSettingsXMLConfig();
+        
+        	/**
+	 * testbed controller settings
+	 */
+	@Element(name = "testbedControllerWindow")
+	private final TestbedControlSettingsXMLConfig testbedControllerWindow = new TestbedControlSettingsXMLConfig();
 
     /**
      * Testbed settings
@@ -96,6 +103,18 @@ public class SpyglassConfiguration extends XMLConfig {
 	}
 
 	// --------------------------------------------------------------------------------
+        
+        
+        	// --------------------------------------------------------------------------------
+	/**
+	 * @return the testbedControllerWindow
+	 */
+	public TestbedControlSettingsXMLConfig getTestbedControlSettings() {
+		return testbedControllerWindow;
+	}
+
+	// --------------------------------------------------------------------------------
+        
 	/**
 	 * @param defaults
 	 *            the defaults to set
