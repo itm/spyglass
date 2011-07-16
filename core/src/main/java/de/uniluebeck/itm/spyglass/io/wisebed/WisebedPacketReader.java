@@ -36,207 +36,207 @@ import static com.google.common.collect.Lists.newArrayList;
  */
 public class WisebedPacketReader extends SpyglassPacketRecorder {
 
-	private static final Logger log = LoggerFactory.getLogger(WisebedPacketReader.class);
+    private static final Logger log = LoggerFactory.getLogger(WisebedPacketReader.class);
 
-	@WebService(name = "ProxyController", targetNamespace = "urn:ControllerService")
-	public class WisebedPacketReaderController implements Controller {
+    @WebService(name = "ProxyController", targetNamespace = "urn:ControllerService")
+    public class WisebedPacketReaderController implements Controller {
 
-		@Override
-		public void experimentEnded() {
-			MessageDialog.openInformation(
-					null,
-					"Testbed experiment ended",
-					"The experiment on the testbed ended and all data was received."
-			);
-		}
+        @Override
+        public void experimentEnded() {
+            MessageDialog.openInformation(
+                    null,
+                    "Testbed experiment ended",
+                    "The experiment on the testbed ended and all data was received.");
+        }
 
-		@Override
-		public void receive(@WebParam(name = "msg", targetNamespace = "") final List<Message> messages) {
+        @Override
+        public void receive(@WebParam(name = "msg", targetNamespace = "") final List<Message> messages) {
 
-			for (Message msg : messages) {
+            for (Message msg : messages) {
 
-				boolean isValidSpyglassPacket = msg.getBinaryData() != null &&
-						msg.getBinaryData().length > 0 &&
-						msg.getBinaryData()[0] == 111;
+                boolean isValidSpyglassPacket = msg.getBinaryData() != null
+                        && msg.getBinaryData().length > 0
+                        && msg.getBinaryData()[0] == 111;
 
-				if (isValidSpyglassPacket) {
+                if (isValidSpyglassPacket) {
 
-					try {
+                    try {
 
-						if (log.isDebugEnabled()) {
-							log.debug("Received SpyGlass packet from \"{}\" @ {}: {}",
-									new Object[]{
-											msg.getSourceNodeId(),
-											msg.getTimestamp(),
-											StringUtils.toPrintableString(msg.getBinaryData())
-									}
-							);
-						}
-						SpyglassPacket spkg = factory.createInstance(extractBinaryPayload(msg));
-						
-						dataPlugin.processPacket(spkg);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Received SpyGlass packet from \"{}\" @ {}: {}",
+                                    new Object[]{
+                                        msg.getSourceNodeId(),
+                                        msg.getTimestamp(),
+                                        StringUtils.toPrintableString(msg.getBinaryData())
+                                    });
+                        }
+                        SpyglassPacket spkg = factory.createInstance(extractBinaryPayload(msg));
 
-						add(spkg);
+                        dataPlugin.processPacket(spkg);
 
-					} catch (SpyglassPacketException e) {
-						log.warn("Exception while parsing SpyGlass packet. Ignoring packet from \"\" @ {}: {}",
-								new Object[]{
-										msg.getSourceNodeId(),
-										msg.getTimestamp(),
-										StringUtils.toPrintableString(msg.getBinaryData())
-								}
-						);
-					}
+                        add(spkg);
 
-				} else if (log.isDebugEnabled()) {
-					log.debug("Received non-SpyGlass binary packet from \"{}\" @ {}: {}",
-							new Object[]{
-									msg.getSourceNodeId(),
-									msg.getTimestamp(),
-									StringUtils.toPrintableString(msg.getBinaryData())
-							}
-					);
-				}
-			}
-		}
+                    } catch (SpyglassPacketException e) {
+                        log.warn("Exception while parsing SpyGlass packet. Ignoring packet from \"\" @ {}: {}",
+                                new Object[]{
+                                    msg.getSourceNodeId(),
+                                    msg.getTimestamp(),
+                                    StringUtils.toPrintableString(msg.getBinaryData())
+                                });
+                    }
 
-		@Override
-		public void receiveNotification(
-				@WebParam(name = "msg", targetNamespace = "") final List<String> notifications) {
-			for (String notification : notifications) {
-				MessageDialog.openInformation(
-						null,
-						"Testbed Notification",
-						notification
-				);
-			}
-		}
+                } else if (log.isDebugEnabled()) {
+                    log.debug("Received non-SpyGlass binary packet from \"{}\" @ {}: {}",
+                            new Object[]{
+                                msg.getSourceNodeId(),
+                                msg.getTimestamp(),
+                                StringUtils.toPrintableString(msg.getBinaryData())
+                            });
+                }
+            }
+        }
 
-		@Override
-		public void receiveStatus(
-				@WebParam(name = "status", targetNamespace = "") final List<RequestStatus> requestStatuses) {
-			// nothing to do
-		}
+        @Override
+        public void receiveNotification(
+                @WebParam(name = "msg", targetNamespace = "") final List<String> notifications) {
+            for (String notification : notifications) {
+                MessageDialog.openInformation(
+                        null,
+                        "Testbed Notification",
+                        notification);
+            }
+        }
 
-		private byte[] extractBinaryPayload(final Message msg) {
-			byte[] binaryData = msg.getBinaryData();
-			byte[] binaryPayload = new byte[binaryData.length - 1];
-			System.arraycopy(binaryData, 1, binaryPayload, 0, binaryPayload.length);
-			return binaryPayload;
-		}
-	}
+        @Override
+        public void receiveStatus(
+                @WebParam(name = "status", targetNamespace = "") final List<RequestStatus> requestStatuses) {
+            // nothing to do
+        }
 
-	private WisebedPacketReaderController controller = new WisebedPacketReaderController();
+        private byte[] extractBinaryPayload(final Message msg) {
+            byte[] binaryData = msg.getBinaryData();
+            byte[] binaryPayload = new byte[binaryData.length - 1];
+            System.arraycopy(binaryData, 1, binaryPayload, 0, binaryPayload.length);
+            return binaryPayload;
+        }
+    }
+    private WisebedPacketReaderController controller = new WisebedPacketReaderController();
+    private Endpoint controllerEndpoint;
+    @Element(required = true)
+    private String sessionManagementEndpointUrl;
+    @Element(required = true)
+    private String controllerEndpointUrl;
+    @ElementList(type = StringTuple.class, required = true)
+    private List<StringTuple> secretReservationKeys = Lists.newArrayList();
+    private DataAnalyzerPlugin dataPlugin;
+    private static String currentSecretReservationKey;
+    private static String currentUrnPrefix;
 
-	private Endpoint controllerEndpoint;
+    public static String getCurrentUrnPrefix() {
+        return currentUrnPrefix;
+    }
 
-	@Element(required = true)
-	private String sessionManagementEndpointUrl;
+    public static String getCurrentSecretReservationKey() {
+        return currentSecretReservationKey;
+    }
 
-	@Element(required = true)
-	private String controllerEndpointUrl;
+    /**
+     * Constructor for Simple XML reflection instantiation
+     */
+    @SuppressWarnings("unused")
+    WisebedPacketReader() {
+        setSourceType(SOURCE_TYPE.OTHER);
+    }
 
-	@ElementList(type = StringTuple.class, required = true)
-	private List<StringTuple> secretReservationKeys = Lists.newArrayList();
+    public WisebedPacketReader(final String controllerEndpointUrl, final String sessionManagementEndpointUrl,
+            final List<SecretReservationKey> secretReservationKeys) {
 
-	private DataAnalyzerPlugin dataPlugin;
+        this.controllerEndpointUrl = controllerEndpointUrl;
+        this.sessionManagementEndpointUrl = sessionManagementEndpointUrl;
 
-	/**
-	 * Constructor for Simple XML reflection instantiation
-	 */
-	@SuppressWarnings("unused")
-	WisebedPacketReader() {
-		setSourceType(SOURCE_TYPE.OTHER);
-	}
+        copySRKsToXMLRepresentation(secretReservationKeys);
+    }
 
-	public WisebedPacketReader(final String controllerEndpointUrl, final String sessionManagementEndpointUrl,
-							   final List<SecretReservationKey> secretReservationKeys) {
+    @Override
+    public void init(final Spyglass spyglass) {
 
-		this.controllerEndpointUrl = controllerEndpointUrl;
-		this.sessionManagementEndpointUrl = sessionManagementEndpointUrl;
+        super.init(spyglass);
 
-		copySRKsToXMLRepresentation(secretReservationKeys);
-	}
+        try {
+            startLocalControllerEndpoint();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
-	@Override
-	public void init(final Spyglass spyglass) {
+        try {
+            connectToExperiment();
+        } catch (Exception e) {
+            log.warn("Exception while connecting to experiment: " + e, e);
+            stopLocalControllerEndpointIfRunning();
+            throw new RuntimeException(e);
+        }
 
-		super.init(spyglass);
+        dataPlugin = new DataAnalyzerPlugin();
+        dataPlugin.init(this);
+    }
 
-		try {
-			startLocalControllerEndpoint();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+    @Override
+    public void shutdown() throws IOException {
+        log.debug("Shutting down WisebedPacketReader...");
+        if (controllerEndpoint.isPublished()) {
+            controllerEndpoint.stop();
+        }
+        super.shutdown();
+    }
 
-		try {
-			connectToExperiment();
-		} catch (Exception e) {
-			log.warn("Exception while connecting to experiment: " + e, e);
-			stopLocalControllerEndpointIfRunning();
-			throw new RuntimeException(e);
-		}
+    private void stopLocalControllerEndpointIfRunning() {
+        if (controllerEndpoint != null && controllerEndpoint.isPublished()) {
+            controllerEndpoint.stop();
+        }
+    }
 
-		dataPlugin = new DataAnalyzerPlugin();
-		dataPlugin.init(this);
-	}
+    private void startLocalControllerEndpoint() throws Exception {
+        stopLocalControllerEndpointIfRunning();
+        controllerEndpoint = Endpoint.publish(controllerEndpointUrl, controller);
+        log.debug("Started local Controller endpoint at {}", controllerEndpointUrl);
+    }
 
-	@Override
-	public void shutdown() throws IOException {
-		log.debug("Shutting down WisebedPacketReader...");
-		if (controllerEndpoint.isPublished()) {
-			controllerEndpoint.stop();
-		}
-		super.shutdown();
-	}
+    private void connectToExperiment() throws Exception {
+        try {
 
-	private void stopLocalControllerEndpointIfRunning() {
-		if (controllerEndpoint != null && controllerEndpoint.isPublished()) {
-			controllerEndpoint.stop();
-		}
-	}
+            SessionManagement sm = WSNServiceHelper.getSessionManagementService(sessionManagementEndpointUrl);
+            sm.getInstance(copyXMLRepresentationToSRKs(), controllerEndpointUrl);
+            log.debug("Successfully connected to experiment!");
 
-	private void startLocalControllerEndpoint() throws Exception {
-		stopLocalControllerEndpointIfRunning();
-		controllerEndpoint = Endpoint.publish(controllerEndpointUrl, controller);
-		log.debug("Started local Controller endpoint at {}", controllerEndpointUrl);
-	}
+        } catch (Exception e) {
+            log.error("Calling getInstance() on the Session Management service failed: {}" + e, e);
+            throw e;
+        }
+    }
 
-	private void connectToExperiment() throws Exception {
-		try {
+    private void copySRKsToXMLRepresentation(final List<SecretReservationKey> secretReservationKeys) {
+        this.secretReservationKeys = newArrayList();
+        for (SecretReservationKey secretReservationKey : secretReservationKeys) {
+            this.secretReservationKeys.add(new StringTuple(secretReservationKey.getUrnPrefix(),
+                    secretReservationKey.getSecretReservationKey()));
+            
+            this.currentSecretReservationKey = secretReservationKey.getSecretReservationKey();
+            this.currentUrnPrefix = secretReservationKey.getUrnPrefix();
+        }
+    }
 
-			SessionManagement sm = WSNServiceHelper.getSessionManagementService(sessionManagementEndpointUrl);
-			sm.getInstance(copyXMLRepresentationToSRKs(), controllerEndpointUrl);
-			log.debug("Successfully connected to experiment!");
+    private List<SecretReservationKey> copyXMLRepresentationToSRKs() {
+        List<SecretReservationKey> reservation = Lists.newArrayList();
+        for (StringTuple tuple : this.secretReservationKeys) {
+            SecretReservationKey key = new SecretReservationKey();
+            key.setUrnPrefix(tuple.first);
+            key.setSecretReservationKey(tuple.second);
+            reservation.add(key);
+        }
+        return reservation;
+    }
 
-		} catch (Exception e) {
-			log.error("Calling getInstance() on the Session Management service failed: {}" + e, e);
-			throw e;
-		}
-	}
-
-	private void copySRKsToXMLRepresentation(final List<SecretReservationKey> secretReservationKeys) {
-		this.secretReservationKeys = newArrayList();
-		for (SecretReservationKey secretReservationKey : secretReservationKeys) {
-			this.secretReservationKeys.add(new StringTuple(secretReservationKey.getUrnPrefix(),
-					secretReservationKey.getSecretReservationKey()
-			)
-			);
-		}
-	}
-
-	private List<SecretReservationKey> copyXMLRepresentationToSRKs() {
-		List<SecretReservationKey> reservation = Lists.newArrayList();
-		for (StringTuple tuple : this.secretReservationKeys) {
-			SecretReservationKey key = new SecretReservationKey();
-			key.setUrnPrefix(tuple.first);
-			key.setSecretReservationKey(tuple.second);
-			reservation.add(key);
-		}
-		return reservation;
-	}
-
-	public void InjectPackage(SpyglassPacket pkg) {
-		add(pkg);	
-	}
+    public void InjectPackage(SpyglassPacket pkg) {
+        add(pkg);
+    }
 }
