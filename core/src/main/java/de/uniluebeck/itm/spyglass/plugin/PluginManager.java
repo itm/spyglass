@@ -43,6 +43,7 @@ import de.uniluebeck.itm.spyglass.plugin.simpleglobalinformation.SimpleGlobalInf
 import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlugin;
 import de.uniluebeck.itm.spyglass.plugin.springembedderpositioner.SpringEmbedderPositionerPlugin;
 import de.uniluebeck.itm.spyglass.plugin.vectorsequencepainter.VectorSequencePainterPlugin;
+import de.uniluebeck.itm.spyglass.testbedControl.TestbedControler;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 
@@ -127,6 +128,7 @@ public class PluginManager {
 		availablePluginsTypes.add(SpringEmbedderPositionerPlugin.class);
 		availablePluginsTypes.add(LinePainterPlugin.class);
 		availablePluginsTypes.add(VectorSequencePainterPlugin.class);
+                //availablePluginsTypes.add(TestbedControler.class);
 		// availablePluginsTypes.add(TemplatePlugin.class);
 	}
 
