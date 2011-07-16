@@ -36,7 +36,6 @@ import de.uniluebeck.itm.spyglass.SpyglassEnvironment;
 
 import de.uniluebeck.itm.spyglass.gui.databinding.validator.StringRegExValidator;
 import de.uniluebeck.itm.spyglass.testbedControl.TestbedControler;
-import de.uniluebeck.itm.spyglass.xmlconfig.GeneralSettingsXMLConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.TestbedControlSettingsXMLConfig;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.FileDialog;
@@ -99,7 +98,9 @@ public class TestbedControlPreferencesComposite extends org.eclipse.swt.widgets.
     public static void showGUI() {
         final Display display = Display.getDefault();
         final Shell shell = new Shell(display);
-        final GeneralPreferencesComposite inst = new GeneralPreferencesComposite(shell, SWT.NULL);
+        //final GeneralPreferencesComposite inst = new GeneralPreferencesComposite(shell, SWT.NULL);
+        final TestbedControlPreferencesComposite inst = new TestbedControlPreferencesComposite(shell, SWT.NULL);
+
         final Point size = inst.getSize();
         shell.setLayout(new FillLayout());
         shell.layout();
@@ -529,11 +530,9 @@ public class TestbedControlPreferencesComposite extends org.eclipse.swt.widgets.
         this.dbc = dbc;
 
 
-
         final IObservableValue observableVisible = BeansObservables.observeValue(dbc.getValidationRealm(), config, "showRuler");
         dbc.bindValue(SWTObservables.observeSelection(this.showRuler), observableVisible,
                 new UpdateValueStrategy(UpdateValueStrategy.POLICY_CONVERT), null);
-
 
         final IObservableValue observableVisible2 = BeansObservables.observeValue(dbc.getValidationRealm(), config, "FlashProgramImage");
         dbc.bindValue(SWTObservables.observeSelection(this.FlashBrowseButton), observableVisible2,
