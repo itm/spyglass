@@ -219,8 +219,8 @@
 			<properties>
 				<finalName.os>cocoa-macosx</finalName.os>
 				<finalName.arch>x86_64</finalName.arch>
-				<swt.artifactId>swt-cocoa-macosx-x86_64</swt.artifactId>
-				<swt.version>3.6.1</swt.version>
+				<swt.artifactId>org.eclipse.swt.cocoa.macosx.x86_64</swt.artifactId>
+				<swt.version>3.6.2</swt.version>
 			</properties>
 		</profile>
 		<profile>
@@ -235,8 +235,8 @@
 			<properties>
 				<finalName.os>cocoa-macosx</finalName.os>
 				<finalName.arch>x86</finalName.arch>
-				<swt.artifactId>swt-cocoa-macosx-x86</swt.artifactId>
-				<swt.version>3.6.1</swt.version>
+				<swt.artifactId>org.eclipse.swt.cocoa.macosx</swt.artifactId>
+				<swt.version>3.6.2</swt.version>
 			</properties>
 		</profile>
 		<profile>
@@ -250,8 +250,8 @@
 			<properties>
 				<finalName.os>gtk-linux</finalName.os>
 				<finalName.arch>x86_64</finalName.arch>
-				<swt.artifactId>swt-gtk-linux-x86_64</swt.artifactId>
-				<swt.version>3.6.1</swt.version>
+				<swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</swt.artifactId>
+				<swt.version>3.6.2</swt.version>
 			</properties>
 		</profile>
 		<profile>
@@ -265,8 +265,8 @@
 			<properties>
 				<finalName.os>gtk-linux</finalName.os>
 				<finalName.arch>x86</finalName.arch>
-				<swt.artifactId>swt-gtk-linux-x86</swt.artifactId>
-				<swt.version>3.6.1</swt.version>
+				<swt.artifactId>org.eclipse.swt.gtk.linux.x86</swt.artifactId>
+				<swt.version>3.6.2</swt.version>
 			</properties>
 		</profile>
 		<profile>
@@ -279,8 +279,8 @@
 			<properties>
 				<finalName.os>windows</finalName.os>
 				<finalName.arch>x86_64</finalName.arch>
-				<swt.artifactId>swt-windows-x86_64</swt.artifactId>
-				<swt.version>3.6.1</swt.version>
+				<swt.artifactId>org.eclipse.swt.win32.win32.x86_64</swt.artifactId>
+				<swt.version>3.6.2</swt.version>
 			</properties>
 		</profile>
 		<profile>
@@ -294,8 +294,8 @@
 			<properties>
 				<finalName.os>windows</finalName.os>
 				<finalName.arch>x86</finalName.arch>
-				<swt.artifactId>swt-windows-x86</swt.artifactId>
-				<swt.version>3.6.1</swt.version>
+				<swt.artifactId>org.eclipse.swt.win32.win32.x86</swt.artifactId>
+				<swt.version>3.6.2</swt.version>
 			</properties>
 		</profile>
 	</profiles>
@@ -388,6 +388,16 @@
 			</releases>
 			<snapshots>
 				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>eclipse-testing</id>
+			<url>http://maven.eclipse.org/nexus/content/repositories/testing/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 	</repositories>
