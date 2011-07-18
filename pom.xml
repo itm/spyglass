@@ -82,27 +82,27 @@
 			<dependency>
 				<groupId>de.uniluebeck.itm</groupId>
 				<artifactId>tr.wsn-api</artifactId>
-				<version>0.7.2-SNAPSHOT</version>
+				<version>0.7.2</version>
 			</dependency>
 			<dependency>
 				<groupId>de.uniluebeck.itm</groupId>
 				<artifactId>tr.snaa-api</artifactId>
-				<version>0.7.2-SNAPSHOT</version>
+				<version>0.7.2</version>
 			</dependency>
 			<dependency>
 				<groupId>de.uniluebeck.itm</groupId>
 				<artifactId>tr.rs-api</artifactId>
-				<version>0.7.2-SNAPSHOT</version>
+				<version>0.7.2</version>
 			</dependency>
 			<dependency>
 				<groupId>de.uniluebeck.itm</groupId>
 				<artifactId>tr.scripting-client</artifactId>
-				<version>0.7.2-SNAPSHOT</version>
+				<version>0.7.2</version>
 			</dependency>
 			<dependency>
 				<groupId>de.uniluebeck.itm.itmutils</groupId>
 				<artifactId>itmutils</artifactId>
-				<version>0.3-SNAPSHOT</version>
+				<version>0.3</version>
 			</dependency>
 			<dependency>
 				<groupId>de.danbim.swtquadtree</groupId>
