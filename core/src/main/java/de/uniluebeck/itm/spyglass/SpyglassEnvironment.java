@@ -66,6 +66,11 @@ public class SpyglassEnvironment {
 	static {
 
 		try {
+
+			if (!PROPERTY_FILE.getParentFile().exists() && !PROPERTY_FILE.getParentFile().mkdirs()) {
+				throw new IOException("Could not create directory " + PROPERTY_FILE.getParent());
+			}
+
 			if (!PROPERTY_FILE.exists()) {
 				createDefaultConfig(PROPERTY_FILE);
 			}
