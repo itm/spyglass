@@ -7,9 +7,16 @@
  */
 package de.uniluebeck.itm.spyglass;
 
-import java.io.IOException;
-
-import org.apache.log4j.Logger;
+import de.uniluebeck.itm.spyglass.core.Spyglass;
+import de.uniluebeck.itm.spyglass.core.SpyglassExceptionHandler;
+import de.uniluebeck.itm.spyglass.gui.actions.*;
+import de.uniluebeck.itm.spyglass.gui.control.UIController;
+import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
+import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
+import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
+import de.uniluebeck.itm.tr.util.Logging;
+import org.apache.commons.lang.SystemUtils;
+import org.apache.log4j.*;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.window.ApplicationWindow;
@@ -19,29 +26,19 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.DeviceData;
 import org.eclipse.swt.tools.internal.Sleak;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
-import de.uniluebeck.itm.spyglass.core.Spyglass;
-import de.uniluebeck.itm.spyglass.core.SpyglassExceptionHandler;
-import de.uniluebeck.itm.spyglass.gui.actions.ExitSpyglassAction;
-import de.uniluebeck.itm.spyglass.gui.actions.LoadConfigurationAction;
-import de.uniluebeck.itm.spyglass.gui.actions.OpenPreferencesAction;
-import de.uniluebeck.itm.spyglass.gui.actions.PlayPlayPauseAction;
-import de.uniluebeck.itm.spyglass.gui.actions.PlaySelectInputAction;
-import de.uniluebeck.itm.spyglass.gui.actions.RecordRecordAction;
-import de.uniluebeck.itm.spyglass.gui.actions.RecordSelectOutputAction;
-import de.uniluebeck.itm.spyglass.gui.actions.StoreConfigurationAction;
-import de.uniluebeck.itm.spyglass.gui.actions.ZoomAction;
-import de.uniluebeck.itm.spyglass.gui.actions.ZoomCompleteMapAction;
-import de.uniluebeck.itm.spyglass.gui.control.UIController;
-import de.uniluebeck.itm.spyglass.gui.view.AppWindow;
-import de.uniluebeck.itm.spyglass.gui.view.DrawingArea;
-import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
+import java.io.File;
+import java.io.IOException;
 
 // ------------------------------------------------------------------------------
+
 /**
- * Application class for wrapping the Spyglass core class and it's user interface/GUI. It
- * instantiate and injects the core classes that are needed to run the application.
+ * Application class for wrapping the Spyglass core class and it's user interface/GUI. It instantiate and injects the
+ * core classes that are needed to run the application.
  */
 public class SpyglassApp extends ApplicationWindow {
 
@@ -57,9 +54,10 @@ public class SpyglassApp extends ApplicationWindow {
 	public static final boolean ENABLE_SLEAK = false;
 
 	// -------------------------------------------------------------------------
+
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	private SpyglassApp() throws Exception {
@@ -80,13 +78,15 @@ public class SpyglassApp extends ApplicationWindow {
 	}
 
 	// -------------------------------------------------------------------------
+
 	/**
 	 * The stand-alone application's entry point
-	 * 
-	 * @param args
-	 *            an array of arguments
+	 *
+	 * @param args an array of arguments
 	 */
 	public static void main(final String[] args) {
+
+		tryToSetLoggingDefaults();
 
 		log.debug("java.library.path=" + System.getProperty("java.library.path"));
 		log.debug("java.class.path=" + System.getProperty("java.class.path"));
@@ -126,6 +126,33 @@ public class SpyglassApp extends ApplicationWindow {
 			}
 		}
 
+	}
+
+	private static void tryToSetLoggingDefaults() {
+
+		final File spyglassConfigDir = new File(SystemUtils.USER_HOME + File.separator + ".spyglass");
+		final File logFile = new File(spyglassConfigDir, "spyglass.log");
+
+		if (!spyglassConfigDir.exists() && !spyglassConfigDir.mkdirs()) {
+			System.err.println("Can not create directory \"" + spyglassConfigDir.getAbsolutePath() + "\"!");
+			System.exit(1);
+		}
+
+		final String defaultPatternLayout = "%-23d{yyyy-MM-dd HH:mm:ss,SSS} | %-30.30t | %-30.30c{1} | %-5p | %m%n";
+		final PatternLayout patternLayout = new PatternLayout(defaultPatternLayout);
+
+		try {
+
+			Logging.setLoggingDefaults(
+					Level.INFO,
+					new FileAppender(patternLayout, logFile.getAbsolutePath()),
+					new ConsoleAppender(patternLayout)
+			);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 
 	// -------------------------------------------------------------------------
@@ -186,14 +213,16 @@ public class SpyglassApp extends ApplicationWindow {
 
 			}
 
-		});
+		}
+		);
 
 	}
 
 	// -------------------------------------------------------------------------
+
 	/**
 	 * Returns the area where plug-ins can place their objects to be displayed
-	 * 
+	 *
 	 * @return the area where plug-ins can place their objects to be displayed
 	 */
 	public DrawingArea getDrawingArea() {
@@ -201,6 +230,7 @@ public class SpyglassApp extends ApplicationWindow {
 	}
 
 	// -------------------------------------------------------------------------
+
 	/**
 	 * Shuts the application down
 	 */
@@ -213,9 +243,10 @@ public class SpyglassApp extends ApplicationWindow {
 	}
 
 	// -------------------------------------------------------------------------
+
 	/**
 	 * Creates the part of the menu where the source can be selected
-	 * 
+	 *
 	 * @return the part of the menu where the source can be selected
 	 */
 	private MenuManager createSourceMenu() {
@@ -228,9 +259,10 @@ public class SpyglassApp extends ApplicationWindow {
 	}
 
 	// -------------------------------------------------------------------------
+
 	/**
 	 * Creates the part of the menu where the recording options can be selected
-	 * 
+	 *
 	 * @return the part of the menu where the recording options can be selected
 	 */
 	private MenuManager createRecordMenu() {
@@ -243,12 +275,11 @@ public class SpyglassApp extends ApplicationWindow {
 	}
 
 	// -------------------------------------------------------------------------
+
 	/**
-	 * Creates the part of the menu where the manipulations of the {@link DrawingArea} can be
-	 * performed
-	 * 
-	 * @return the part of the menu where the manipulations of the {@link DrawingArea} can be
-	 *         performed
+	 * Creates the part of the menu where the manipulations of the {@link DrawingArea} can be performed
+	 *
+	 * @return the part of the menu where the manipulations of the {@link DrawingArea} can be performed
 	 */
 	private MenuManager createMapMenu() {
 		final MenuManager mapMenu = new MenuManager("&Map");
@@ -261,9 +292,10 @@ public class SpyglassApp extends ApplicationWindow {
 	}
 
 	// -------------------------------------------------------------------------
+
 	/**
 	 * Creates the file part of the menu
-	 * 
+	 *
 	 * @return the file part of the menu
 	 */
 	private MenuManager createFileMenu() {
