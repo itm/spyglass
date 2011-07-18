@@ -406,12 +406,12 @@
 		<repository>
 			<id>itm-nexus-repository-releases</id>
 			<name>ITM UzL Nexus releases repository</name>
-			<url>scp://dev.itm.uni-luebeck.de/opt/sonatype-work/nexus/storage/releases/</url>
+			<url>scpexe://dev.itm.uni-luebeck.de/opt/sonatype-work/nexus/storage/releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>itm-nexus-repository-snapshots</id>
 			<name>ITM UzL Nexus snapshots repository</name>
-			<url>scp://dev.itm.uni-luebeck.de/opt/sonatype-work/nexus/storage/snapshot/</url>
+			<url>scpexe://dev.itm.uni-luebeck.de/opt/sonatype-work/nexus/storage/snapshot/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
@@ -420,6 +420,13 @@
 	</scm>
 
 	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh-external</artifactId>
+				<version>1.0</version>
+			</extension>
+		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
