@@ -159,8 +159,7 @@ public class DrawingAreaRenderer implements PaintListener, DisposeListener {
 			log.debug("Rendering plugin " + plugin + " on " + area);
 		}
 
-		final List<DrawingObject> dos = new LinkedList<DrawingObject>(plugin.getDrawingObjects(area));
-		for (final DrawingObject object : dos) {
+		for (final DrawingObject object : plugin.getDrawingObjects(area)) {
 
 			switch (object.getState()) {
 				case ALIVE:
