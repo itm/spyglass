@@ -416,7 +416,7 @@
 	</distributionManagement>
 
 	<scm>
-		<connection>scm:git:https://itm@github.com/itm/spyglass.git</connection>
+		<connection>scm:git:git@github.com:itm/spyglass.git</connection>
 	</scm>
 
 	<build>
