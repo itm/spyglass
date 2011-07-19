@@ -142,70 +142,35 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2.1</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-					<finalName>${project.artifactId}-${project.version}-${project.build.classifier}-onejar.jar</finalName>
-                    <archive>
-                        <manifest>
-                            <mainClass>de.uniluebeck.itm.spyglass.SpyglassApp</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-			<!--
-			Using self-patched version of onejar-maven-plugin to support
-			newer version of One-Jar that includes some bug fixes we need.
-			Can be removed later as soon as onejar-maven-plugin supports
-			the newer versions
-			-->
-			<!--<plugin>
-				<groupId>org.dstovall</groupId>
-				<artifactId>onejar-maven-plugin-rc8fix</artifactId>
-				<version>1.4.8</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<configuration>
-							<filename>${project.artifactId}-${project.version}-${project.build.classifier}-onejar.jar</filename>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<configuration>
+					<finalName>${project.artifactId}-${project.version}-${project.build.classifier}</finalName>
+					<descriptors>
+						<descriptor>assembly.xml</descriptor>
+					</descriptors>
+					<archive>
+						<manifest>
 							<mainClass>de.uniluebeck.itm.spyglass.SpyglassApp</mainClass>
-							<onejarVersion>0.97-RC10</onejarVersion>
-							<attachToBuild>true</attachToBuild>
-                            <classifier>${project.build.classifier}-onejar</classifier>
-							<mainJarFilename>${project.artifactId}-${project.version}-${project.build.classifier}.jar</mainJarFilename>
-						</configuration>
+						</manifest>
+					</archive>
+				</configuration>
+				<!--<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
 						<goals>
-							<goal>one-jar</goal>
+							<goal>single</goal>
 						</goals>
 					</execution>
-				</executions>
-			</plugin>-->
-			<!--<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<classifier>${project.build.classifier}</classifier>
-				</configuration>
-			</plugin>-->
+				</executions>-->
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -228,15 +193,15 @@
 
 	<repositories>
 		<repository>
-            <id>itm-maven-repository-releases</id>
-            <url>http://www.itm.uni-luebeck.de/projects/maven/releases/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
+			<id>itm-maven-repository-releases</id>
+			<url>http://www.itm.uni-luebeck.de/projects/maven/releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
-	
+
 </project>
