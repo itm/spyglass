@@ -21,6 +21,7 @@ import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterXMLC
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
 import de.uniluebeck.itm.spyglass.io.wisebed.WisebedPacketReader;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
+import de.uniluebeck.itm.spyglass.testbedControl.TestbedControler;
 
 /**
  */
@@ -88,6 +89,12 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 		}
 	}
 
+	public void shutdown() {
+		if (timer != null) {
+			timer.cancel();		
+		}
+	}
+
 	public static String getHumanReadableName() {
 		return "Data Analyzer";
 	}
@@ -138,10 +145,20 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 	}*/
 
 	//@Override
-	public void processPacket(SpyglassPacket packet) {
+	public void processPacket(byte[] packet) {
 		if (dllok) {
-			ProcessData(packet.getPayload());
+			ProcessData(packet);
+			log.debug("New package: " + getHexString(packet));
 		}
+	}
+
+
+	public static String getHexString(byte[] b) {
+		String result = "";
+		for (int i=0; i < b.length; i++) {
+			result += Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+		}
+		return result;
 	}
 
 	/*@Override
@@ -231,8 +248,8 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					int py = Integer.parseInt(result[i+4]);
 
 					SerializeUInt16(Integer.parseInt(result[i+1],16), pkg, 5);	// ID
-					SerializeUInt16(px+col*gwidth, pkg, 13);			// Pos x
-					SerializeUInt16(py+row*gheight, pkg, 15);			// Pos y
+					SerializeUInt16(px + col*gwidth, pkg, 13);			// Pos x
+					SerializeUInt16(rows*gheight - py - row*gheight, pkg, 15);			// Pos y
 					SerializeUInt16(Integer.parseInt(result[i+6]), pkg, 19);	// Orientation
 
 					SpyglassNodePackage np = new SpyglassNodePackage(pkg);
@@ -268,8 +285,8 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						int col = gnum % cols;
 						int row = gnum / cols;
 
-						SerializeUInt16(col*gwidth+gwidth/2, pkg, 13);			// Pos x
-						SerializeUInt16(row*gheight+gheight/2, pkg, 15);			// Pos y
+						SerializeUInt16(col*gwidth + gwidth/2, pkg, 13);			// Pos x
+						SerializeUInt16(rows*gheight - row*gheight - gheight/2, pkg, 15);			// Pos y
 
 						SpyglassGridActivityPackage ap = new SpyglassGridActivityPackage(pkg);
 						if (pkgReader != null) {
@@ -316,9 +333,49 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					
 					while (i + 1 < result.length) {
 						int ID = Integer.parseInt(result[i+1],16);
+						String nodeID = Integer.toHexString(ID);
 						// Activate sensor node with id ID as int or with id result[i+1] as string (hex)
+						String messageToGW = "0x0a,0x42,";
+						messageToGW += "0x" + nodeID.substring(0, 2);
+						messageToGW += ",";
+						messageToGW += "0x" + nodeID.substring(2, 4);
+						TestbedControler.send(messageToGW);
 						i++;
 					}
+				}
+				break;
+				case -44: {	// Sensor node event
+					if (i + 6 > result.length) {
+						log.debug("Error parsing data from Movedetect DLL!");
+						throw new Exception("Error parsing data from Movedetect DLL!");
+					}
+					
+					int type = Integer.parseInt(result[i+5]);
+
+					byte pkg[] = new byte[SpyglassNodeActivityPackage.PACKET_SIZE+2];
+					pkg[0] = 0;
+					pkg[1] = SpyglassNodeActivityPackage.PACKET_SIZE;
+					pkg[2] = 2;
+					pkg[3] = 7;
+					pkg[4] = SpyglassNodeActivityPackage.PACKET_TYPE(type-1);
+
+					int gnum = Integer.parseInt(result[i+4])-1;
+					int col = gnum % cols;
+					int row = gnum / cols;
+					int px = Integer.parseInt(result[i+2]);
+					int py = Integer.parseInt(result[i+3]);
+
+					SerializeUInt16(Integer.parseInt(result[i+1],16), pkg, 5);	// ID
+					SerializeUInt16(px + col*gwidth, pkg, 13);			// Pos x
+					SerializeUInt16(rows*gheight - py - row*gheight, pkg, 15);	// Pos y
+
+					SpyglassNodeActivityPackage np = new SpyglassNodeActivityPackage(pkg);
+					if (pkgReader != null) {
+						pkgReader.InjectPackage(np);
+						log.debug("New package: " + np.toString());
+					}
+
+					i += 5;
 				}
 				break;
 				default: // parse error

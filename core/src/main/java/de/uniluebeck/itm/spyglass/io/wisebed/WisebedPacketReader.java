@@ -70,11 +70,8 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
                                         StringUtils.toPrintableString(msg.getBinaryData())
                                     });
                         }
-                        SpyglassPacket spkg = factory.createInstance(extractBinaryPayload(msg));
 
-                        dataPlugin.processPacket(spkg);
-
-                        add(spkg);
+                        add(factory.createInstance(extractBinaryPayload(msg)));
 
                     } catch (SpyglassPacketException e) {
                         log.warn("Exception while parsing SpyGlass packet. Ignoring packet from \"\" @ {}: {}",
@@ -85,14 +82,18 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
                                 });
                     }
 
-                } else if (log.isDebugEnabled()) {
+                } else {
+			dataPlugin.processPacket(extractBinaryPayload(msg));
+		}
+
+			/*if (log.isDebugEnabled()) {
                     log.debug("Received non-SpyGlass binary packet from \"{}\" @ {}: {}",
                             new Object[]{
                                 msg.getSourceNodeId(),
                                 msg.getTimestamp(),
                                 StringUtils.toPrintableString(msg.getBinaryData())
                             });
-                }
+	                }*/
             }
         }
 
@@ -186,6 +187,7 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
         if (controllerEndpoint.isPublished()) {
             controllerEndpoint.stop();
         }
+	dataPlugin.shutdown();
         super.shutdown();
     }
 

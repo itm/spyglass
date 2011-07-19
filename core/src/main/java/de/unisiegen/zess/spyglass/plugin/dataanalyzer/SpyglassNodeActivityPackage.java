@@ -22,7 +22,6 @@ public class SpyglassNodeActivityPackage extends SpyglassPacket
 		deserialize(buf);
 	}
 
-
 	void deserialize(final byte[] buf) throws SpyglassPacketException {
 		if (deserializeUint16(buf[0], buf[1]) + 2 != buf.length) {
 			throw new SpyglassPacketException("Wrong SpyglassPacket-Size");

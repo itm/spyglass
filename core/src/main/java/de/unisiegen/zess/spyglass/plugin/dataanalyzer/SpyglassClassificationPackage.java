@@ -28,7 +28,7 @@ public class SpyglassClassificationPackage extends SpyglassPacket
 		
 		setRawData(buf);
 
-		if (getLength() != PACKET_SIZE || getSemanticType() < 0 || getSemanticType() > 3) {
+		if (getLength() != PACKET_SIZE || getSemanticType() < 0 || getSemanticType() > 20+3) {
 			throw new SpyglassPacketException("Packet is not a SpyglassClassificationPackage!");
 		}
 
