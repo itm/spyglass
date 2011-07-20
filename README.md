@@ -4,7 +4,7 @@ SpyGlass is an modular and extensible application designed to visualize sensor n
 It displays a set of sensor nodes at their location on a map, as well as arbitrary data sent by the
 nodes, e.g. connectivity status between nodes or aggregated data collected by the nodes' sensors.
 
-WISEBED Support: SpyGlass now supports the [WISEBED][wisebed] WSN testbeds! Simply connect to a
+SpyGlass now supports the [WISEBED][wisebed] WSN testbeds! Simply connect to a
 running experiment from SpyGlass to use it as a packet source for your visualization.
 
 The SpyGlass application itself is a framework, designed to be extendable by plugins that visualize
@@ -40,7 +40,7 @@ downloads.
 Building
 --------
 
-Testbed Runtime is based on the [Apache Maven][maven] build system. Clone the project and
+SpyGlass is based on the [Apache Maven][maven] build system. Clone the project and
 simply run 'mvn install' (or 'mvn clean install' to be on the safe side) for building. For building
 the various platform specific distributions (SpyGlass is based on SWT) run one of
 
