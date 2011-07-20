@@ -41,7 +41,7 @@ Building
 --------
 
 SpyGlass is based on the [Apache Maven][maven] build system. Clone the project and
-simply run 'mvn install' (or 'mvn clean install' to be on the safe side) for building. For building
+simply run ```mvn install``` (or ```mvn clean install``` to be on the safe side) for building. For building
 the various platform specific distributions (SpyGlass is based on SWT) run one of
 
 ```
