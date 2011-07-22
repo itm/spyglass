@@ -54,6 +54,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.ws.Holder;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.URL;
@@ -536,7 +537,7 @@ public class WisebedPacketReaderConfigurationWizard extends Wizard {
 
 	private String tryToGetLocalControllerEndpointUrlFromUser() {
 
-		String localControllerEndpointUrl = askLocalControllerEndpointUrlFromUser();
+		/*String localControllerEndpointUrl = askLocalControllerEndpointUrlFromUser();
 		if (localControllerEndpointUrl != null) {
 			try {
 				URL url = new URL(localControllerEndpointUrl);
@@ -547,15 +548,29 @@ public class WisebedPacketReaderConfigurationWizard extends Wizard {
 			} catch (MalformedURLException e) {
 				throw new RuntimeException(e);
 			}
+		}*/
+		String host = "";
+		try {
+			host = InetAddress.getLocalHost().getCanonicalHostName();
 		}
-		return null;
+		catch (Exception e) {
+		}
+
+		return "http://" + host+ ":8091/";
 	}
 
 	private String tryToAutoDetectLocalControllerEndpointUrl() {
 		Vector<String> externalHostIps = BeanShellHelper.getExternalHostIps();
 		final String localControllerEndpointUrl;
-		String host = externalHostIps.get(0);
-		int port = UrlUtils.getRandomUnprivilegedPort();
+		String host = "";
+		try {
+			host = "http://"+InetAddress.getLocalHost().getCanonicalHostName();//externalHostIps.get(0);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		int port = 8091;//UrlUtils.getRandomUnprivilegedPort();
 		int tries = 0;
 		while (!checkIfServerSocketCanBeOpened(host, port)) {
 			if (++tries == 3) {
@@ -567,6 +582,7 @@ public class WisebedPacketReaderConfigurationWizard extends Wizard {
 		}
 
 		localControllerEndpointUrl = "http://" + host + ":" + port + "/controller";
+	
 		return tries == 3 ? null : localControllerEndpointUrl;
 	}
 

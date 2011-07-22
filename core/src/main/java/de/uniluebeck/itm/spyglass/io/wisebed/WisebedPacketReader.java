@@ -176,7 +176,7 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
             stopLocalControllerEndpointIfRunning();
             throw new RuntimeException(e);
         }
-
+	
         dataPlugin = new DataAnalyzerPlugin();
         dataPlugin.init(this);
     }
@@ -234,6 +234,9 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
             key.setUrnPrefix(tuple.first);
             key.setSecretReservationKey(tuple.second);
             reservation.add(key);
+	    this.currentSecretReservationKey = tuple.second;
+            this.currentUrnPrefix = tuple.first;
+
         }
         return reservation;
     }

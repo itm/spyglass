@@ -100,8 +100,7 @@ public class ObjectPainterPlugin extends BackgroundPainterPlugin implements Need
 
 	@Override
 	protected void processPacket(final SpyglassPacket packet) {
-
-		// Requirement for a trajectory packet
+		// Requirement for a trajectory packet´		
 		if (!(packet instanceof Int16ListPacket)) {
 			return;
 		}

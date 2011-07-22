@@ -66,35 +66,33 @@ public class TestbedControler implements PropertyChangeListener {
     }
 
     public static void send(String message) {
+ 	wisebedSkriptsHome = System.getenv("WISEBED_HOME");
 
-
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
+            skriptExtension = "";
+            commaSkip = "";
+            shellProg = "";
+        } else {
+            skriptExtension = ".bat";
+            commaSkip = "\"";
+            shellProg = "cmd.exe";
+        }
 
         SecretReservationKey key = new SecretReservationKey();
         key.setSecretReservationKey(WisebedPacketReader.getCurrentSecretReservationKey());
-
         key.setUrnPrefix(WisebedPacketReader.getCurrentUrnPrefix());
-
+//shellProg, "/c", "start", 
         Runtime rt = Runtime.getRuntime();
-        try {
-            Process proc = rt.exec(new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "send" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, commaSkip + message + commaSkip});
-            proc.waitFor();
-            BufferedReader buf = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-            String line = "";
-            while ((line = buf.readLine()) != null) {
-                System.out.println(line);
-            }
+        String args[] = new String[]{"java", "-Dtestbed.secretreservationkeys=" + commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, "-Dtestbed.message=" + commaSkip + message + commaSkip, "-Dtestbed.nodeurns=", "-jar", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\lib\\tr.scripting-client-0.7.2-SNAPSHOT-onejar.jar" + commaSkip, "-p", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties" + commaSkip,  "-f", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\scripts\\send.java" + commaSkip, "-v"};
 
+	try {
 
-        } catch (InterruptedException ex) {
-            Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+		Process proc = rt.exec(args);
 
-        } catch (IOException ex) {
-            Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-
-
-        System.out.println("send");
+	} catch (IOException ex) {
+		Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+	}
     }
 
     public void send() {

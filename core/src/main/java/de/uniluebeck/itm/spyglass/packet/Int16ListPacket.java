@@ -23,6 +23,12 @@ import de.uniluebeck.itm.spyglass.positions.AbsolutePosition;
  */
 public class Int16ListPacket extends IntListPacket {
 
+	public Int16ListPacket() {}
+	
+	public Int16ListPacket(final byte[] buf) throws SpyglassPacketException {
+		deserialize(buf);
+	}
+
 	// --------------------------------------------------------------------------------
 	/**
 	 * Instances of this class are sections in a trajectory

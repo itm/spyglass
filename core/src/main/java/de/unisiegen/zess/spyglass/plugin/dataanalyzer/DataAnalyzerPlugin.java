@@ -10,6 +10,8 @@ import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferenceDialog;
 import de.uniluebeck.itm.spyglass.gui.configuration.PluginPreferencePage;
 import de.uniluebeck.itm.spyglass.gui.view.GlobalInformationWidget;
 import de.uniluebeck.itm.spyglass.packet.SpyglassPacket;
+import de.uniluebeck.itm.spyglass.packet.SpyglassPacketException;
+import de.uniluebeck.itm.spyglass.packet.Int16ListPacket;
 import de.uniluebeck.itm.spyglass.plugin.GlobalInformation;
 import de.uniluebeck.itm.spyglass.plugin.Plugin;
 import de.uniluebeck.itm.spyglass.plugin.PluginManager;
@@ -35,6 +37,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 	private int rows = 0;
 	private int gwidth = 0;
 	private int gheight = 0;
+	private int lastClassification = 3;
 	private Timer timer = null;
 	private boolean dllok = false;
 	private WisebedPacketReader pkgReader = null;
@@ -47,6 +50,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 	public DataAnalyzerPlugin() {
 		//super(true);
 		//xmlConfig = new DataAnalyzerXMLConfig();
+
 		try {
 			log.debug("Loading library ...");
 			System.load("c:\\upload\\clusterinfo.dll");
@@ -77,10 +81,10 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 			// set IP of Handheld			
 			/*byte[] data3 = new byte[5];
 			data3[0] = 9;
-			data3[1] = 127;
-			data3[2] = 0;
-			data3[3] = 0;
-			data3[4] = 1;
+			data3[1] = (byte) 192;
+			data3[2] = (byte) 168;
+			data3[3] = 39;
+			data3[4] = 98;
 			int r3 = ProcessData(data3);*/
 		}
 		catch(Error e) {
@@ -109,7 +113,6 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 		super.init(manager);*/
 		pkgReader = reader;
 	
-		log.debug("Init ...");
 		if (dllok) {
 			log.debug("Starting Timer ...");
 			timer = new Timer("Data Analysis Timer");
@@ -125,6 +128,14 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 		
 			    }
 			}, 1000, 750);
+		}
+
+		try {
+			String testAmr = "-11,FF33";
+			Parse(testAmr.getBytes());
+		}
+		catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -171,7 +182,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 	}*/
 
 	private void Parse(final byte[] buf) throws Exception {
-		if (buf == null) {
+		if (buf == null || buf.length == 0) {
 			return;
 		}
 		
@@ -267,12 +278,12 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						throw new Exception("Error parsing data from Movedetect DLL!");
 					}
 					
-					byte pkg[] = new byte[SpyglassGridActivityPackage.PACKET_SIZE+2];
+					byte pkg[] = new byte[29];
 					pkg[0] = 0;
-					pkg[1] = SpyglassGridActivityPackage.PACKET_SIZE;
+					pkg[1] = 27;
 					pkg[2] = 2;
-					pkg[3] = 7;
-					pkg[4] = SpyglassGridActivityPackage.PACKET_TYPE;
+					pkg[3] = 3;
+					pkg[4] = (byte) (20 + lastClassification);
 
 					int pos = i + 3;
 		
@@ -285,13 +296,19 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						int col = gnum % cols;
 						int row = gnum / cols;
 
-						SerializeUInt16(col*gwidth + gwidth/2, pkg, 13);			// Pos x
-						SerializeUInt16(rows*gheight - row*gheight - gheight/2, pkg, 15);			// Pos y
+						SerializeUInt16(gwidth / 2 + col*gwidth + gwidth/2, pkg, 13);			// Pos x
+						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 15);	// Pos y
+						SerializeUInt16(col*gwidth  + gwidth/2, pkg, 19);			// Pos x
+						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 21);	// Pos y
+						SerializeUInt16(5, pkg, 23);						// time
+						SerializeUInt16(col*gwidth + gwidth/2, pkg, 25);			// Pos x
+						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 27);	// Pos y
 
-						SpyglassGridActivityPackage ap = new SpyglassGridActivityPackage(pkg);
+						Int16ListPacket np = new Int16ListPacket(pkg);
+				
 						if (pkgReader != null) {
-							pkgReader.InjectPackage(ap);
-							log.debug("New package: " + ap.toString());
+							pkgReader.InjectPackage(np);
+							log.debug("New package: " + np.toString());
 						}
 						pos++;
 					}
@@ -304,24 +321,8 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						throw new Exception("Error parsing data from Movedetect DLL!");
 					}
 
-					int type = Integer.parseInt(result[i+1]);
-
-					byte pkg[] = new byte[SpyglassClassificationPackage.PACKET_SIZE+2];
-					pkg[0] = 0;
-					pkg[1] = SpyglassClassificationPackage.PACKET_SIZE;
-					pkg[2] = 2;
-					pkg[3] = 7;
-					pkg[4] = SpyglassClassificationPackage.PACKET_TYPE(type);
-			
-					SerializeUInt16(0, pkg, 13);			// Pos x
-					SerializeUInt16(0, pkg, 15);			// Pos y
-
-					
-					SpyglassClassificationPackage cp = new SpyglassClassificationPackage(pkg);
-					if (pkgReader != null) {
-						pkgReader.InjectPackage(cp);
-						log.debug("New package: " + cp.toString());
-					}
+					lastClassification = Integer.parseInt(result[i+1]);
+					 
 					i += 1;
 				}
 				break;
@@ -331,17 +332,25 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						throw new Exception("Error parsing data from Movedetect DLL!");
 					}
 					
-					while (i + 1 < result.length) {
-						int ID = Integer.parseInt(result[i+1],16);
+					i++;
+					int t = Integer.parseInt(result[i], 16);
+					while (i < result.length && t >= 0) {
+						int ID = Integer.parseInt(result[i],16);
 						String nodeID = Integer.toHexString(ID);
 						// Activate sensor node with id ID as int or with id result[i+1] as string (hex)
+						if (nodeID.length() != 4) {
+							log.debug("Error parsing data from Movedetect DLL!");
+							throw new Exception("Error parsing data from Movedetect DLL!");
+						}	
 						String messageToGW = "0x0a,0x42,";
 						messageToGW += "0x" + nodeID.substring(0, 2);
 						messageToGW += ",";
 						messageToGW += "0x" + nodeID.substring(2, 4);
+						log.debug("Sending: " + messageToGW);
 						TestbedControler.send(messageToGW);
-						i++;
+						i++;	
 					}
+					i--;
 				}
 				break;
 				case -44: {	// Sensor node event
@@ -351,25 +360,30 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					}
 					
 					int type = Integer.parseInt(result[i+5]);
-
-					byte pkg[] = new byte[SpyglassNodeActivityPackage.PACKET_SIZE+2];
-					pkg[0] = 0;
-					pkg[1] = SpyglassNodeActivityPackage.PACKET_SIZE;
-					pkg[2] = 2;
-					pkg[3] = 7;
-					pkg[4] = SpyglassNodeActivityPackage.PACKET_TYPE(type-1);
-
-					int gnum = Integer.parseInt(result[i+4])-1;
+					int gnum = Integer.parseInt(result[i+2])-1;
 					int col = gnum % cols;
 					int row = gnum / cols;
-					int px = Integer.parseInt(result[i+2]);
-					int py = Integer.parseInt(result[i+3]);
+					int px = Integer.parseInt(result[i+3]);
+					int py = Integer.parseInt(result[i+4]);
 
+					byte pkg[] = new byte[29];
+					pkg[0] = 0;
+					pkg[1] = 27;
+					pkg[2] = 2;
+					pkg[3] = 3;
+					pkg[4] = (byte) (30+type-1);
+	
 					SerializeUInt16(Integer.parseInt(result[i+1],16), pkg, 5);	// ID
 					SerializeUInt16(px + col*gwidth, pkg, 13);			// Pos x
 					SerializeUInt16(rows*gheight - py - row*gheight, pkg, 15);	// Pos y
+					SerializeUInt16(px + col*gwidth, pkg, 19);			// Pos x
+					SerializeUInt16(rows*gheight - py - row*gheight, pkg, 21);	// Pos y
+					SerializeUInt16(5, pkg, 23);					// time
+					SerializeUInt16(px + col*gwidth, pkg, 25);			// Pos x
+					SerializeUInt16(rows*gheight - py - row*gheight, pkg, 27);	// Pos y
 
-					SpyglassNodeActivityPackage np = new SpyglassNodeActivityPackage(pkg);
+					Int16ListPacket np = new Int16ListPacket(pkg);
+				
 					if (pkgReader != null) {
 						pkgReader.InjectPackage(np);
 						log.debug("New package: " + np.toString());
