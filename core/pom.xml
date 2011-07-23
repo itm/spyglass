@@ -27,183 +27,196 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>de.uniluebeck.itm.spyglass</groupId>
-		<artifactId>spyglass-parent</artifactId>
-		<version>1.0-SNAPSHOT</version>
-		<relativePath>../</relativePath>
-	</parent>
+    <parent>
+        <groupId>de.uniluebeck.itm.spyglass</groupId>
+        <artifactId>spyglass-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
 
-	<artifactId>spyglass-core</artifactId>
-	<packaging>jar</packaging>
-	<name>SpyGlass :: Core</name>
+    <artifactId>spyglass-core</artifactId>
+    <packaging>jar</packaging>
+    <name>SpyGlass :: Core</name>
 
-	<dependencies>
+    <dependencies>
 
-		<dependency>
-			<groupId>de.uniluebeck.itm</groupId>
-			<artifactId>tr.wsn-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.uniluebeck.itm</groupId>
-			<artifactId>tr.snaa-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.uniluebeck.itm</groupId>
-			<artifactId>tr.rs-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.uniluebeck.itm</groupId>
-			<artifactId>tr.scripting-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.uniluebeck.itm.itmutils</groupId>
-			<artifactId>itmutils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.danbim.swtquadtree</groupId>
-			<artifactId>swtquadtree</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>de.uniluebeck.itm</groupId>
+            <artifactId>tr.wsn-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.uniluebeck.itm</groupId>
+            <artifactId>tr.snaa-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.uniluebeck.itm</groupId>
+            <artifactId>tr.rs-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.uniluebeck.itm</groupId>
+            <artifactId>tr.scripting-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.uniluebeck.itm.itmutils</groupId>
+            <artifactId>itmutils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>de.danbim.swtquadtree</groupId>
+            <artifactId>swtquadtree</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.simpleframework</groupId>
-			<artifactId>simple-xml</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.ibm.icu</groupId>
-			<artifactId>icu4j</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.simpleframework</groupId>
+            <artifactId>simple-xml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.ui.workbench</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.ui.forms</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.osgi</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.jface</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.jface.databinding</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.equinox.common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.core.runtime</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.core.databinding</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.core.databinding.beans</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse</groupId>
-			<artifactId>org.eclipse.core.commands</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.swt</groupId>
-			<artifactId>${swt.artifactId}</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>org.eclipse.ui.workbench</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>org.eclipse.ui.forms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>org.eclipse.osgi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>org.eclipse.jface</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>org.eclipse.jface.databinding</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>org.eclipse.equinox.common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>org.eclipse.core.runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>org.eclipse.core.databinding</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>org.eclipse.core.databinding.beans</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>org.eclipse.core.commands</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.swt</groupId>
+            <artifactId>${swt.artifactId}</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.7.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.tmatesoft.sqljet</groupId>
+            <artifactId>sqljet</artifactId>
+            <version>1.0.4</version>
+            <type>jar</type>
+        </dependency>
 		
-	</dependencies>
+    </dependencies>
 
-	<build>
-		<plugins>
+    <build>
+        <plugins>
 			<!--
 			Using self-patched version of onejar-maven-plugin to support
 			newer version of One-Jar that includes some bug fixes we need.
 			Can be removed later as soon as onejar-maven-plugin supports
 			the newer versions
 			-->
-			<plugin>
-				<groupId>org.dstovall</groupId>
-				<artifactId>onejar-maven-plugin-rc8fix</artifactId>
-				<version>1.4.8</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<configuration>
-							<filename>${project.artifactId}-${project.version}-${project.build.classifier}-onejar.jar</filename>
-							<mainClass>de.uniluebeck.itm.spyglass.SpyglassApp</mainClass>
-							<onejarVersion>0.97-RC10</onejarVersion>
-							<attachToBuild>true</attachToBuild>
+            <plugin>
+                <groupId>org.dstovall</groupId>
+                <artifactId>onejar-maven-plugin-rc8fix</artifactId>
+                <version>1.4.8</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <configuration>
+                            <filename>${project.artifactId}-${project.version}-${project.build.classifier}-onejar.jar</filename>
+                            <mainClass>de.uniluebeck.itm.spyglass.SpyglassApp</mainClass>
+                            <onejarVersion>0.97-RC10</onejarVersion>
+                            <attachToBuild>true</attachToBuild>
                             <classifier>${project.build.classifier}-onejar</classifier>
-							<mainJarFilename>${project.artifactId}-${project.version}-${project.build.classifier}.jar</mainJarFilename>
-						</configuration>
-						<goals>
-							<goal>one-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<classifier>${project.build.classifier}</classifier>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.7.2</version>
-				<configuration>
+                            <mainJarFilename>${project.artifactId}-${project.version}-${project.build.classifier}.jar</mainJarFilename>
+                        </configuration>
+                        <goals>
+                            <goal>one-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <classifier>${project.build.classifier}</classifier>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.7.2</version>
+                <configuration>
 					<!-- includes needed as some test classes were simply ignored if not present -->
-					<includes>
-						<include>**/*</include>
-					</includes>
-					<excludes>
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                    <excludes>
 						<!-- don't run performance tests, they take too much time on a normal build -->
-						<exclude>**/*PerformanceTest*</exclude>
+                        <exclude>**/*PerformanceTest*</exclude>
 						<!-- test classes are broken, temporarily disable them -->
-						<exclude>de/uniluebeck/itm/spyglass/gui/DrawingAreaTests.java</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+                        <exclude>de/uniluebeck/itm/spyglass/gui/DrawingAreaTests.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-	<repositories>
-		<repository>
+    <repositories>
+        <repository>
             <id>itm-maven-repository-releases</id>
             <url>http://www.itm.uni-luebeck.de/projects/maven/releases/</url>
             <releases>
@@ -213,6 +226,6 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-	</repositories>
+    </repositories>
 	
 </project>
