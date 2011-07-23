@@ -19,6 +19,7 @@ import org.simpleframework.xml.ElementList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.Thread;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
@@ -83,7 +84,10 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
                     }
 
                 } else {
-			dataPlugin.processPacket(extractBinaryPayload(msg));
+			if (msg != null && msg.getBinaryData() != null
+                        && msg.getBinaryData().length > 0) {
+				dataPlugin.processPacket(extractBinaryPayload(msg));
+			}
 		}
 
 			/*if (log.isDebugEnabled()) {
@@ -176,7 +180,7 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
             stopLocalControllerEndpointIfRunning();
             throw new RuntimeException(e);
         }
-	
+
         dataPlugin = new DataAnalyzerPlugin();
         dataPlugin.init(this);
     }
@@ -188,6 +192,8 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
             controllerEndpoint.stop();
         }
 	dataPlugin.shutdown();
+	dataPlugin = null;
+	System.gc();
         super.shutdown();
     }
 

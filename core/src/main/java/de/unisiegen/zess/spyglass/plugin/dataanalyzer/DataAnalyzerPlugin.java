@@ -159,7 +159,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 	public void processPacket(byte[] packet) {
 		if (dllok) {
 			ProcessData(packet);
-			log.debug("New package: " + getHexString(packet));
+			//log.debug("New package: " + getHexString(packet));
 		}
 	}
 
@@ -333,21 +333,22 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					}
 					
 					i++;
-					int t = Integer.parseInt(result[i], 16);
-					while (i < result.length && t >= 0) {
-						int ID = Integer.parseInt(result[i],16);
-						String nodeID = Integer.toHexString(ID);
+					
+					while (i < result.length && !result[i].startsWith("-")) {
+						int t = Integer.parseInt(result[i], 16);
+						String nodeID = Integer.toHexString(t);
+
 						// Activate sensor node with id ID as int or with id result[i+1] as string (hex)
 						if (nodeID.length() != 4) {
-							log.debug("Error parsing data from Movedetect DLL!");
+							log.debug("Error parsing data from Movedetect DLL! " + nodeID);
 							throw new Exception("Error parsing data from Movedetect DLL!");
 						}	
 						String messageToGW = "0x0a,0x42,";
 						messageToGW += "0x" + nodeID.substring(0, 2);
 						messageToGW += ",";
 						messageToGW += "0x" + nodeID.substring(2, 4);
-						log.debug("Sending: " + messageToGW);
-						TestbedControler.send(messageToGW);
+						//log.debug("Sending: " + messageToGW);
+						//TestbedControler.send(messageToGW);
 						i++;	
 					}
 					i--;
