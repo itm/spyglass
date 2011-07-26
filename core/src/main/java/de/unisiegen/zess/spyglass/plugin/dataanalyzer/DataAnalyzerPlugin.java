@@ -130,13 +130,15 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 			}, 1000, 750);
 		}
 
-		try {
+		/*try {
 			String testAmr = "-11,FF33";
 			Parse(testAmr.getBytes());
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
+
+                //TestbedControler.send("012345");
 	}
 
 	/*@Override
@@ -289,7 +291,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 		
 					while (pos < result.length) {
 						int gnum = Integer.parseInt(result[pos])-1;
-						if (gnum < 0) {
+					        if (gnum < 0) {
 							break;
 						}
 
@@ -300,7 +302,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 15);	// Pos y
 						SerializeUInt16(col*gwidth  + gwidth/2, pkg, 19);			// Pos x
 						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 21);	// Pos y
-						SerializeUInt16(5, pkg, 23);						// time
+						SerializeUInt16(1, pkg, 23);						// time
 						SerializeUInt16(col*gwidth + gwidth/2, pkg, 25);			// Pos x
 						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 27);	// Pos y
 
@@ -359,38 +361,47 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						log.debug("Error parsing data from Movedetect DLL!");
 						throw new Exception("Error parsing data from Movedetect DLL!");
 					}
-					
-					int type = Integer.parseInt(result[i+5]);
-					int gnum = Integer.parseInt(result[i+2])-1;
-					int col = gnum % cols;
-					int row = gnum / cols;
-					int px = Integer.parseInt(result[i+3]);
-					int py = Integer.parseInt(result[i+4]);
-
-					byte pkg[] = new byte[29];
-					pkg[0] = 0;
-					pkg[1] = 27;
-					pkg[2] = 2;
-					pkg[3] = 3;
-					pkg[4] = (byte) (30+type-1);
-	
-					SerializeUInt16(Integer.parseInt(result[i+1],16), pkg, 5);	// ID
-					SerializeUInt16(px + col*gwidth, pkg, 13);			// Pos x
-					SerializeUInt16(rows*gheight - py - row*gheight, pkg, 15);	// Pos y
-					SerializeUInt16(px + col*gwidth, pkg, 19);			// Pos x
-					SerializeUInt16(rows*gheight - py - row*gheight, pkg, 21);	// Pos y
-					SerializeUInt16(5, pkg, 23);					// time
-					SerializeUInt16(px + col*gwidth, pkg, 25);			// Pos x
-					SerializeUInt16(rows*gheight - py - row*gheight, pkg, 27);	// Pos y
-
-					Int16ListPacket np = new Int16ListPacket(pkg);
 				
-					if (pkgReader != null) {
-						pkgReader.InjectPackage(np);
-						log.debug("New package: " + np.toString());
-					}
+                                        i++;
+                                        while (i < result.length && !result[i].startsWith("-")) {
+                                            int type = Integer.parseInt(result[i+4]);
+                                            int gnum = Integer.parseInt(result[i+1])-1;
+                                            int col = gnum % cols;
+                                            int row = gnum / cols;
+                                            int px = Integer.parseInt(result[i+2]);
+                                            int py = Integer.parseInt(result[i+3]);
 
-					i += 5;
+                                            byte pkg[] = new byte[29];
+                                            pkg[0] = 0;
+                                            pkg[1] = 27;
+                                            pkg[2] = 2;
+                                            pkg[3] = 3;
+                                            pkg[4] = (byte) (30+type-1);
+
+                                            int dx = 2;
+                                            if (type == 2) {dx = 4;}
+                                            if (type == 3) {dx = 6;}
+                                            if (type == 9) {dx = 0;}
+
+                                            SerializeUInt16(Integer.parseInt(result[i],16), pkg, 5);	// ID
+                                            SerializeUInt16(px + col*gwidth, pkg, 13);			// Pos x
+                                            SerializeUInt16(rows*gheight - py - row*gheight, pkg, 15);	// Pos y
+                                            SerializeUInt16(px + col*gwidth + dx, pkg, 19);			// Pos x
+                                            SerializeUInt16(rows*gheight - py - row*gheight, pkg, 21);	// Pos y
+                                            SerializeUInt16(1, pkg, 23);					// time
+                                            SerializeUInt16(px + col*gwidth + dx, pkg, 25);			// Pos x
+                                            SerializeUInt16(rows*gheight - py - row*gheight, pkg, 27);	// Pos y
+
+                                            Int16ListPacket np = new Int16ListPacket(pkg);
+
+                                            if (pkgReader != null) {
+                                                    pkgReader.InjectPackage(np);
+                                                    log.debug("New package: " + np.toString());
+                                            }
+
+                                            i += 5;
+                                    }
+                                    i--;
 				}
 				break;
 				default: // parse error

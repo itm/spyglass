@@ -22,12 +22,49 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.datatype.DatatypeConfigurationException;
 import org.apache.log4j.spi.LoggerFactory;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import sun.util.logging.resources.logging;
+
+import java.util.*;
+import java.nio.*;
+
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.math.BigInteger;
+
+import eu.wisebed.testbed.api.rs.RSServiceHelper;
+//import eu.wisebed.testbed.api.rs.v1.PublicReservationData;
+//import eu.wisebed.testbed.api.rs.v1.RS;
+
+//import eu.wisebed.testbed.api.snaa.v1.SNAA;
+//import eu.wisebed.testbed.api.snaa.v1.AuthenticationTriple;
+//import eu.wisebed.testbed.api.snaa.v1.SecretAuthenticationKey;
+import eu.wisebed.testbed.api.snaa.helpers.SNAAServiceHelper;
+
+import eu.wisebed.testbed.api.wsn.WSNServiceHelper;
+import eu.wisebed.api.controller.*;
+import eu.wisebed.api.common.*;
+import eu.wisebed.api.sm.*;
+import eu.wisebed.api.wsn.*;
+
+import de.uniluebeck.itm.tr.util.*;
+import de.itm.uniluebeck.tr.wiseml.WiseMLHelper;
+
+import de.uniluebeck.itm.wisebed.cmdlineclient.*;
+import de.uniluebeck.itm.wisebed.cmdlineclient.wrapper.*;
+import java.util.concurrent.Future;
+import com.google.common.collect.*;
+import de.uniluebeck.itm.wisebed.cmdlineclient.jobs.JobResult;
+import java.net.InetAddress;
+import java.util.concurrent.TimeUnit;
 
 public class TestbedControler implements PropertyChangeListener {
 
@@ -66,7 +103,145 @@ public class TestbedControler implements PropertyChangeListener {
     }
 
     public static void send(String message) {
- 	wisebedSkriptsHome = System.getenv("WISEBED_HOME");
+
+        
+        String localControllerEndpointURL = null;
+        try {
+            localControllerEndpointURL = "http://" + InetAddress.getLocalHost().getCanonicalHostName() + ":8089/controller";
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //String secretReservationKeys = System.getProperty("testbed.secretreservationkeys");
+        String messageToSend = message;
+        String nodeUrnToFlash = null;//System.getProperty("testbed.nodeurns");
+
+        // Endpoint URLs of Authentication (SNAA), Reservation (RS) and Experimentation (iWSN) services
+        String sessionManagementEndpointURL = WisebedPacketReader.getSessionManagementEndpointUrl();//System.getProperty("testbed.sm.endpointurl");
+
+        // Retrieve Java proxies of the endpoint URLs above
+        SessionManagement sessionManagement = WSNServiceHelper.getSessionManagementService(sessionManagementEndpointURL);
+
+
+//--------------------------------------------------------------------------
+// Application logic
+//--------------------------------------------------------------------------
+        String wsnEndpointURL = null;
+
+        List keys = new ArrayList();
+        keys.add(WisebedPacketReader.getCurrentWholeReservationKey());
+        try {
+            try {
+                wsnEndpointURL = sessionManagement.getInstance(keys, localControllerEndpointURL);
+            } catch (ExperimentNotRunningException_Exception ex) {
+                Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (UnknownReservationIdException_Exception e) {
+            //log.warn("There was not reservation found with the given secret reservation key. Exiting.");
+            System.exit(1);
+        }
+
+        //log.info("Got a WSN instance URL, endpoint is: {}", wsnEndpointURL);
+        WSN wsnService = WSNServiceHelper.getWSNService(wsnEndpointURL);
+        final WSNAsyncWrapper wsn = WSNAsyncWrapper.of(wsnService);
+        Controller controller = new Controller() {
+
+            public void receive(List msg) {
+                // nothing to do
+            }
+
+            public void receiveStatus(List requestStatuses) {
+                wsn.receive(requestStatuses);
+            }
+
+            public void receiveNotification(List msgs) {
+//                for (int i = 0; i < msgs.size(); i++) {
+//                    log.info(msgs.get(i));
+//                }
+            }
+
+            public void experimentEnded() {
+                //log.info("Experiment ended");
+                System.exit(0);
+            }
+        };
+
+        DelegatingController delegator = new DelegatingController(controller);
+        try {
+            delegator.publish(localControllerEndpointURL);
+            //log.info("Local controller published on url: {}", localControllerEndpointURL);
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //log.info("Local controller published on url: {}", localControllerEndpointURL);
+
+
+
+
+
+        // retrieve reserved node URNs from testbed
+        List nodeURNs = null;
+        if (nodeUrnToFlash != null && !"".equals(nodeUrnToFlash)) {
+            nodeURNs = Lists.newArrayList(nodeUrnToFlash.split(","));
+        } else {
+            try {
+                nodeURNs = WiseMLHelper.getNodeUrns(wsn.getNetwork().get(), new String[]{});
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ExecutionException ex) {
+                Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        //log.info("Retrieved the following node URNs: {}", nodeURNs);
+
+        // Constructing UART Message from Input String (Delimited by ",")
+        // Supported Prefixes are "0x" and "0b", otherwise Base_10 (DEZ) is assumed
+        String[] splitMessage = messageToSend.split(",");
+        byte[] messageToSendBytes = new byte[splitMessage.length];
+        String messageForOutputInLog = "";
+        for (int i = 0; i < splitMessage.length; i++) {
+            int type = 10;
+            if (splitMessage[i].startsWith("0x")) {
+                type = 16;
+                splitMessage[i] = splitMessage[i].replace("0x", "");
+            } else if (splitMessage[i].startsWith("0b")) {
+                type = 2;
+                splitMessage[i] = splitMessage[i].replace("0b", "");
+            }
+            BigInteger b = new BigInteger(splitMessage[i], type);
+            messageToSendBytes[i] = (byte) b.intValue();
+            messageForOutputInLog = messageForOutputInLog + b.intValue() + " ";
+        }
+
+        //log.info("Sending Message [ " + messageForOutputInLog + "] to nodes...");
+
+        // Constructing the Message
+        Message binaryMessage = new Message();
+        binaryMessage.setBinaryData(messageToSendBytes);
+
+        GregorianCalendar c = new GregorianCalendar();
+        c.setTimeInMillis(System.currentTimeMillis());
+        try {
+            binaryMessage.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(c));
+        } catch (DatatypeConfigurationException ex) {
+            Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        binaryMessage.setSourceNodeId("urn:wisebed:uzl1:0xFFFF");
+
+        Future sendFuture = wsn.send(nodeURNs, binaryMessage, 3, TimeUnit.MINUTES);
+        try {
+            JobResult sendJobResult = (JobResult) sendFuture.get();
+            // log.info("{}", sendJobResult);
+            // log.info("Shutting down...");
+            // System.exit(0);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ExecutionException ex) {
+            Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public static void send2(String message) {
+        wisebedSkriptsHome = System.getenv("WISEBED_HOME");
 
         String os = System.getProperty("os.name").toLowerCase();
         if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
@@ -84,15 +259,15 @@ public class TestbedControler implements PropertyChangeListener {
         key.setUrnPrefix(WisebedPacketReader.getCurrentUrnPrefix());
 //shellProg, "/c", "start", 
         Runtime rt = Runtime.getRuntime();
-        String args[] = new String[]{"java", "-Dtestbed.secretreservationkeys=" + commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, "-Dtestbed.message=" + commaSkip + message + commaSkip, "-Dtestbed.nodeurns=", "-jar", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\lib\\tr.scripting-client-0.7.2-SNAPSHOT-onejar.jar" + commaSkip, "-p", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties" + commaSkip,  "-f", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\scripts\\send.java" + commaSkip, "-v"};
+        String args[] = new String[]{"java", "-Dtestbed.secretreservationkeys=" + commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, "-Dtestbed.message=" + commaSkip + message + commaSkip, "-Dtestbed.nodeurns=", "-jar", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\lib\\tr.scripting-client-0.7.2-SNAPSHOT-onejar.jar" + commaSkip, "-p", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties" + commaSkip, "-f", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\scripts\\send.java" + commaSkip, "-v"};
 
-	try {
+        try {
 
-		Process proc = rt.exec(args);
+            Process proc = rt.exec(args);
 
-	} catch (IOException ex) {
-		Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
-	}
+        } catch (IOException ex) {
+            Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void send() {
