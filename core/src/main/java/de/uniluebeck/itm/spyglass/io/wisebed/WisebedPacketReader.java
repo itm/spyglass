@@ -112,51 +112,44 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
                                 });
                     }
 
-                    SpyglassPacket spyglassPacket = null;
-                    try {
-                        spyglassPacket = factory.createInstance(extractBinaryPayload(msg));
-                        long logTime = System.currentTimeMillis();
-                        int nodeID = spyglassPacket.getSenderId();
-                        int posx = spyglassPacket.getPosition().x;
-                        int posy = spyglassPacket.getPosition().y;
-                        long eventTime = spyglassPacket.getTime().getMillis();
-                        String eventType = String.valueOf(spyglassPacket.getSemanticType());
-                        try {
-                            db = SqlJetDb.open(dbFile, true);
-                        } catch (SqlJetException ex) {
-                            java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
-                        System.out.println();
-                        System.out.println(">Database schema objects:");
-                        System.out.println();
-                        //System.out.println(db.getSchema());
-                        //System.out.println(db.getOptions());
-
-                        // insert rows:
+                    if (db != null) {
+                         SpyglassPacket spyglassPacket = null;
 
                         try {
-                            db.beginTransaction(SqlJetTransactionMode.WRITE);
-                            ISqlJetTable table = db.getTable(TABLE_NAME);
-                            table.insert(logTime, nodeID, posx, posy, eventTime, eventType);
+                            spyglassPacket = factory.createInstance(extractBinaryPayload(msg));
+                            long logTime = System.currentTimeMillis();
+                            int nodeID = spyglassPacket.getSenderId();
+                            int posx = spyglassPacket.getPosition().x;
+                            int posy = spyglassPacket.getPosition().y;
+                            long eventTime = spyglassPacket.getTime().getMillis();
+                            String eventType = String.valueOf(spyglassPacket.getSemanticType());
 
+                            System.out.println();
+                            System.out.println(">Database schema objects:");
+                            System.out.println();
+                            //System.out.println(db.getSchema());
+                            //System.out.println(db.getOptions());
 
+                            // insert rows:
 
-
-                        } catch (SqlJetException ex) {
-                            java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
-                        } finally {
                             try {
-                                db.commit();
+                                db.beginTransaction(SqlJetTransactionMode.WRITE);
+                                ISqlJetTable table = db.getTable(TABLE_NAME);
+                                table.insert(logTime, nodeID, posx, posy, eventTime, eventType);
                             } catch (SqlJetException ex) {
                                 java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
+                            } finally {
+                                try {
+                                    db.commit();
+                                } catch (SqlJetException ex) {
+                                    java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }
+                        } catch (SpyglassPacketException ex) {
+                            java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
+                            ex.printStackTrace();
                         }
-                    } catch (SpyglassPacketException ex) {
-                        java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
-                        ex.printStackTrace();
                     }
-
                 } else {
                     if (dataPlugin != null && msg != null && msg.getBinaryData() != null
                             && msg.getBinaryData().length > 0) {
@@ -279,7 +272,6 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
         }
         dbFile = new File(DB_NAME);
         if (!dbFile.exists()) {
-            try {
 
                 dbFile.delete();
 
@@ -346,12 +338,6 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
                         java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                // close DB and open it again (as part of example code)
-
-                db.close();
-            } catch (SqlJetException ex) {
-                java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
 
         dataPlugin = new DataAnalyzerPlugin();
@@ -365,12 +351,22 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
         if (controllerEndpoint.isPublished()) {
             controllerEndpoint.stop();
         }
+
         if (dataPlugin != null) {
             dataPlugin.shutdown();
             dataPlugin = null;
             System.gc();
         }
 
+        if (db != null) {
+            try {
+                // close DB and open it again (as part of example code)
+                db.close();
+                db = null;
+            } catch (SqlJetException ex) {
+                java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         super.shutdown();
     }
 
@@ -429,44 +425,35 @@ public class WisebedPacketReader extends SpyglassPacketRecorder {
     public void InjectPackage(SpyglassPacket pkg) {
         add(pkg);
 
-/*
-        long logTime = System.currentTimeMillis();
-        int nodeID = pkg.getSenderId();
-        int posx = pkg.getPosition().x;
-        int posy = pkg.getPosition().y;
-        long eventTime = pkg.getTime().getMillis();
-        String eventType = String.valueOf(pkg.getSemanticType());
-        try {
-            db = SqlJetDb.open(dbFile, true);
-        } catch (SqlJetException ex) {
-            java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        if (db != null) {
+            long logTime = System.currentTimeMillis();
+            int nodeID = pkg.getSenderId();
+            int posx = pkg.getPosition().x;
+            int posy = pkg.getPosition().y;
+            long eventTime = pkg.getTime().getMillis();
+            String eventType = String.valueOf(pkg.getSemanticType());
 
-        System.out.println();
-        System.out.println(">Database schema objects:");
-        System.out.println();
-        //System.out.println(db.getSchema());
-        //System.out.println(db.getOptions());
+            System.out.println();
+            System.out.println(">Database schema objects:");
+            System.out.println();
+            //System.out.println(db.getSchema());
+            //System.out.println(db.getOptions());
 
-        // insert rows:
+            // insert rows:
 
-        try {
-            db.beginTransaction(SqlJetTransactionMode.WRITE);
-            ISqlJetTable table = db.getTable(TABLE_NAME);
-            table.insert(logTime, nodeID, posx, posy, eventTime, eventType);
-
-
-
-
-        } catch (SqlJetException ex) {
-            java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
             try {
-                db.commit();
+                db.beginTransaction(SqlJetTransactionMode.WRITE);
+                ISqlJetTable table = db.getTable(TABLE_NAME);
+                table.insert(logTime, nodeID, posx, posy, eventTime, eventType);
             } catch (SqlJetException ex) {
                 java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                try {
+                    db.commit();
+                } catch (SqlJetException ex) {
+                    java.util.logging.Logger.getLogger(WisebedPacketReader.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-        }*/
-
+        }
     }
 }
