@@ -12,6 +12,7 @@ package de.uniluebeck.itm.spyglass.gui;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 
+import de.uniluebeck.itm.spyglass.SpyglassApp;
 import de.uniluebeck.itm.spyglass.gui.wizard.ExtendedWizardDialog;
 import de.uniluebeck.itm.spyglass.gui.wizard.WisebedPacketReaderConfigurationWizard;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -52,6 +53,7 @@ import de.uniluebeck.itm.spyglass.io.PacketRecorder;
 import de.uniluebeck.itm.spyglass.io.SpyGlassPacketQueue;
 import de.uniluebeck.itm.spyglass.io.SpyglassPacketRecorder;
 import de.uniluebeck.itm.spyglass.io.PacketReader.SOURCE_TYPE;
+import de.unisiegen.zess.spyglass.plugin.dataanalyzer.ZessPacketRecorder;
 
 // --------------------------------------------------------------------------------
 /**
@@ -65,7 +67,7 @@ import de.uniluebeck.itm.spyglass.io.PacketReader.SOURCE_TYPE;
  */
 public class SelectPacketSourceDialog extends TitleAreaDialog {
 
-	private Button buttoniShell, buttonWiseBed, buttonFile, buttonOpenFileDialog;
+	private Button buttoniShell, buttonWiseBed, buttonFile, buttonDLL, buttonOpenFileDialog;
 	private Text textPath2File;
 	private Spyglass spyglass;
 	private MyValues myvalues;
@@ -132,9 +134,15 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
         new Label(group1, SWT.NONE);
 		new Label(group1, SWT.NONE);
 
+		buttonDLL = new Button(group1, SWT.RADIO);
+		buttonDLL.setText("ZESS DLL");
+		
+		new Label(group1, SWT.NONE);
+		new Label(group1, SWT.NONE);
+		
 		buttonFile = new Button(group1, SWT.RADIO);
 		buttonFile.setText("File");
-
+		
 		// disable the button if we're running standalone
 		if (!SpyglassEnvironment.isIshellPlugin()) {
 			buttoniShell.setEnabled(false);
@@ -197,6 +205,9 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 			// string value
 			final IObservableValue modelObservable1 = BeansObservables.observeValue(dbc.getValidationRealm(), myvalues, "path2File");
 			dbc.bindValue(SWTObservables.observeText(textPath2File, SWT.Modify), modelObservable1, null, null);
+			
+			final IObservableValue modelObservableIsZessDll = BeansObservables.observeValue(dbc.getValidationRealm(), myvalues, "useZessDll");
+			dbc.bindValue(SWTObservables.observeSelection(buttonDLL), modelObservableIsZessDll, null, null);
 		}
 		initializeValues();
 		group1.pack();
@@ -207,7 +218,7 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 	// --------------------------------------------------------------------------------
 	@Override
 	protected void okPressed() {
-		if (!myvalues.useIShell && !myvalues.useTestbed) {
+		if (!myvalues.useIShell && !myvalues.useTestbed && !myvalues.useZessDll) {
 			if ((myvalues.path2File == null) || myvalues.path2File.equals("")) {
 				MessageDialog.openError(getParentShell(), "Invalid file path", "The path to the file is invalid:\r\nThe new File was not set!");
 			} else {
@@ -223,6 +234,12 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 		} else if (myvalues.useTestbed){
             super.okPressed();
             startTestbedConfig();
+        }
+		else if (myvalues.useZessDll){
+			PacketReader packetReader = new ZessPacketRecorder();
+			SpyglassApp.spyglass.getConfigStore().getSpyglassConfig().setPacketReader(packetReader);
+			SpyglassApp.spyglass.getConfigStore().store();
+			super.okPressed();
         }
 	}
 
@@ -340,7 +357,8 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 		String path2File;
 		boolean useIShell;
         boolean useTestbed;
-
+        boolean useZessDll;
+        
 		// --------------------------------------------------------------------------------
 		/**
 		 * @return the path2File
@@ -387,6 +405,16 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
             final boolean oldValue = this.useTestbed;
             this.useTestbed = useTestbed;
             firePropertyChange("useTestbed", oldValue, useTestbed);
+        }
+        
+        public boolean isUseZessDll() {
+			return useZessDll;
+		}
+        
+        public void setUseZessDll(boolean useZessDll) {
+            final boolean oldValue = this.useZessDll;
+            this.useZessDll = useZessDll;
+            firePropertyChange("useZessDll", oldValue, useZessDll);
         }
     }
 
