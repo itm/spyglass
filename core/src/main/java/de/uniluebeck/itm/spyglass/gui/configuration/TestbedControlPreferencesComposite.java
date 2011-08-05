@@ -82,6 +82,7 @@ public class TestbedControlPreferencesComposite extends org.eclipse.swt.widgets.
     private Button send;
     private Button RemoveNodeButton;
     private Button AddNodeButton;
+    private Button confNodeButton;
 
     /**
      * Auto-generated main method to display this org.eclipse.swt.widgets.Composite inside a new
@@ -511,6 +512,72 @@ public class TestbedControlPreferencesComposite extends org.eclipse.swt.widgets.
 
                         }
                     });
+
+                    confNodeButton = new Button(group3, SWT.PUSH | SWT.FLAT);
+                    final GridData NodeL2Data = new GridData();
+                    NodeL2Data.verticalAlignment = GridData.BEGINNING;
+                    NodeL2Data.horizontalAlignment = GridData.BEGINNING;
+                    NodeL2Data.grabExcessHorizontalSpace = true;
+                    confNodeButton.setLayoutData(NodeL2Data);
+                    confNodeButton.setText("Change Configeration");
+
+
+                    confNodeButton.addSelectionListener(new SelectionAdapter() {
+
+                        @Override
+                        public void widgetSelected(final SelectionEvent evt) {
+                            
+                            org.eclipse.swt.program.Program.launch("topology.xml");
+
+                            String wisebedSkriptsHome = System.getenv("WISEBED_HOME");
+                            String skriptExtension = "";
+                            /*String commaSkip = "";
+                            String shellProg = "bash";
+
+                            String os = System.getProperty("os.name").toLowerCase();
+                            if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
+
+                                skriptExtension = "";
+                                commaSkip = "";
+                                shellProg = "bash";
+
+                            } else {
+
+                                skriptExtension = ".bat";
+                                commaSkip = "\"";
+                                shellProg = "cmd.exe";
+
+                            }*/
+
+               
+
+//                            Runtime rt = Runtime.getRuntime();
+//                            String args[] = new String[]{shellProg, "/C", "start", "nodepad.exe", "-Dtestbed.secretreservationkeys=" + commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, "-Dtestbed.nodeurns=", "-jar", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\lib\\tr.scripting-client-0.7.2-SNAPSHOT-onejar.jar" + commaSkip, "-p", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties" + commaSkip, "-f", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\scripts\\reset.java" + commaSkip, "-v"};
+//                            try {
+//                                Process proc = rt.exec(args);
+//                                proc.waitFor();
+//                                BufferedReader buf = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+//                                String line = "";
+//                                while ((line = buf.readLine()) != null) {
+//                                    System.out.println(line);
+//                                }
+//
+//
+//                            } catch (InterruptedException ex) {
+//                                Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+//
+//                            } catch (IOException ex) {
+//                                Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+//                            }
+
+                        }
+                    });
+
+
+
+
+
+
                 }
                 {
                 }
