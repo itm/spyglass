@@ -161,7 +161,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 	public void processPacket(byte[] packet) {
 		if (dllok) {
 			ProcessData(packet);
-			//log.debug("New package: " + getHexString(packet));
+			log.debug("New package: " + getHexString(packet));
 		}
 	}
 
@@ -337,7 +337,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					i++;
 					
 					while (i < result.length && !result[i].startsWith("-")) {
-						int t = Integer.parseInt(result[i], 16);
+						/*int t = Integer.parseInt(result[i], 16);
 						String nodeID = Integer.toHexString(t);
 
 						// Activate sensor node with id ID as int or with id result[i+1] as string (hex)
@@ -348,7 +348,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						String messageToGW = "0x0a,0x42,";
 						messageToGW += "0x" + nodeID.substring(0, 2);
 						messageToGW += ",";
-						messageToGW += "0x" + nodeID.substring(2, 4);
+						messageToGW += "0x" + nodeID.substring(2, 4);*/
 						//log.debug("Sending: " + messageToGW);
 						//TestbedControler.send(messageToGW);
 						i++;	
@@ -445,6 +445,40 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						pos++;
 					}
 					i = pos - 1;
+				}
+				break;
+				case -66: {
+					if (i + 2 > result.length) {
+						log.debug("Error parsing data from Movedetect DLL!");
+						throw new Exception("Error parsing data from Movedetect DLL!");
+					}
+
+					byte pkg[] = new byte[29];
+					pkg[0] = 0;
+					pkg[1] = 27;
+					pkg[2] = 2;
+					pkg[3] = 3;
+					pkg[4] = (byte) (66);
+
+					int gnum = Integer.parseInt(result[i+1])-1;
+					int col = gnum % cols;
+					int row = gnum / cols;
+
+					SerializeUInt16(gwidth / 2 + col*gwidth + gwidth/2, pkg, 13);			// Pos x
+					SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 15);	// Pos y
+					SerializeUInt16(col*gwidth  + gwidth/2, pkg, 19);			// Pos x
+					SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 21);	// Pos y
+					SerializeUInt16(1, pkg, 23);						// time
+					SerializeUInt16(col*gwidth + gwidth/2, pkg, 25);			// Pos x
+					SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 27);	// Pos y
+
+					Int16ListPacket np = new Int16ListPacket(pkg);
+					if (pkgReader != null) {
+						pkgReader.InjectPackage(np);
+						log.debug("New package: " + np.toString());
+					}
+								 
+					i += 1;
 				}
 				break;
                                 default: // parse error
