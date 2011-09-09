@@ -21,6 +21,7 @@ import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPlug
 import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterPreferencePage;
 import de.uniluebeck.itm.spyglass.plugin.simplenodepainter.SimpleNodePainterXMLConfig;
 import de.uniluebeck.itm.spyglass.xmlconfig.PluginXMLConfig;
+import de.uniluebeck.itm.spyglass.io.SpyglassPacketRecorder;
 import de.uniluebeck.itm.spyglass.io.wisebed.WisebedPacketReader;
 import de.uniluebeck.itm.spyglass.util.SpyglassLoggerFactory;
 import de.uniluebeck.itm.spyglass.testbedControl.TestbedControler;
@@ -40,7 +41,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 	private int lastClassification = 3;
 	private Timer timer = null;
 	private boolean dllok = false;
-	private WisebedPacketReader pkgReader = null;
+	private Injectable pkgReader = null;
 
 	//private DataAnalyzerXMLConfig xmlConfig;
 	
@@ -109,7 +110,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 	}*/
 
 	//@Override
-	public void init(WisebedPacketReader reader) { /*final PluginManager manager) throws Exception {
+	public void init(Injectable reader) { /*final PluginManager manager) throws Exception {
 		super.init(manager);*/
 		pkgReader = reader;
 	

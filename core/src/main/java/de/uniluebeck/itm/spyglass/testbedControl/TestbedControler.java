@@ -88,13 +88,13 @@ public class TestbedControler implements PropertyChangeListener {
 
             skriptExtension = "";
             commaSkip = "";
-            shellProg = "";
+            shellProg = "bash";
 
         } else {
 
             skriptExtension = ".bat";
             commaSkip = "\"";
-            shellProg = "cmd /c start ";
+            shellProg = "cmd.exe /c start ";
 
         }
 
@@ -104,12 +104,13 @@ public class TestbedControler implements PropertyChangeListener {
 
     public static void send(String message) {
 
-        
+
         String localControllerEndpointURL = null;
         try {
             localControllerEndpointURL = "http://" + InetAddress.getLocalHost().getCanonicalHostName() + ":8089/controller";
         } catch (UnknownHostException ex) {
             Logger.getLogger(TestbedControler.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("ERROR cannot create Controller");
         }
         //String secretReservationKeys = System.getProperty("testbed.secretreservationkeys");
         String messageToSend = message;
@@ -247,7 +248,7 @@ public class TestbedControler implements PropertyChangeListener {
         if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
             skriptExtension = "";
             commaSkip = "";
-            shellProg = "";
+            shellProg = "bash";
         } else {
             skriptExtension = ".bat";
             commaSkip = "\"";
@@ -272,6 +273,23 @@ public class TestbedControler implements PropertyChangeListener {
 
     public void send() {
 
+        wisebedSkriptsHome = System.getenv("WISEBED_HOME");
+
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
+
+            skriptExtension = "";
+            commaSkip = "";
+            shellProg = "bash";
+
+        } else {
+
+            skriptExtension = ".bat";
+            commaSkip = "\"";
+            shellProg = "cmd.exe";
+
+        }
+
 
         String message = config.getSentMessage();
         SecretReservationKey key = new SecretReservationKey();
@@ -280,8 +298,10 @@ public class TestbedControler implements PropertyChangeListener {
         key.setUrnPrefix(WisebedPacketReader.getCurrentUrnPrefix());
 
         Runtime rt = Runtime.getRuntime();
+        String args[] = new String[]{shellProg, "/c", "start", "java", "-Dtestbed.secretreservationkeys=" + commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, "-Dtestbed.message=" + commaSkip + message + commaSkip, "-Dtestbed.nodeurns=", "-jar", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\lib\\tr.scripting-client-0.7.2-SNAPSHOT-onejar.jar" + commaSkip, "-p", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties" + commaSkip, "-f", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\scripts\\send.java" + commaSkip, "-v"};
         try {
-            Process proc = rt.exec(new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "send" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, commaSkip + message + commaSkip});
+            //Process proc = rt.exec(new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "send" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, commaSkip + message + commaSkip});
+            Process proc = rt.exec(args);
             proc.waitFor();
             BufferedReader buf = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             String line = "";
@@ -304,6 +324,23 @@ public class TestbedControler implements PropertyChangeListener {
 
     public void flash() {
 
+        wisebedSkriptsHome = System.getenv("WISEBED_HOME");
+
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
+
+            skriptExtension = "";
+            commaSkip = "";
+            shellProg = "bash";
+
+        } else {
+
+            skriptExtension = ".bat";
+            commaSkip = "\"";
+            shellProg = "cmd.exe";
+
+        }
+
         String image = config.getFlashProgramImage();
         SecretReservationKey key = new SecretReservationKey();
         key.setSecretReservationKey(WisebedPacketReader.getCurrentSecretReservationKey());
@@ -311,9 +348,10 @@ public class TestbedControler implements PropertyChangeListener {
         key.setUrnPrefix(WisebedPacketReader.getCurrentUrnPrefix());
 
         Runtime rt = Runtime.getRuntime();
+        String args[] = new String[]{shellProg, "/c", "start", "java", "-Dtestbed.secretreservationkeys=" + commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, "-Dtestbed.image=" + image, "-Dtestbed.nodeurns=", "-jar", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\lib\\tr.scripting-client-0.7.2-SNAPSHOT-onejar.jar" + commaSkip, "-p", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties" + commaSkip, "-f", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\scripts\\flash.java" + commaSkip, "-v"};
         try {
             System.out.println("flashing");
-            Process proc = rt.exec(new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "flash" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, image});
+            Process proc = rt.exec(args);
 
             proc.waitFor();
             BufferedReader buf = new BufferedReader(new InputStreamReader(proc.getInputStream()));
@@ -335,14 +373,33 @@ public class TestbedControler implements PropertyChangeListener {
 
     public void resetNode() {
 
+
+        wisebedSkriptsHome = System.getenv("WISEBED_HOME");
+
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
+
+            skriptExtension = "";
+            commaSkip = "";
+            shellProg = "bash";
+
+        } else {
+
+            skriptExtension = ".bat";
+            commaSkip = "\"";
+            shellProg = "cmd.exe";
+
+        }
+
         SecretReservationKey key = new SecretReservationKey();
         key.setSecretReservationKey(WisebedPacketReader.getCurrentSecretReservationKey());
 
         key.setUrnPrefix(WisebedPacketReader.getCurrentUrnPrefix());
 
         Runtime rt = Runtime.getRuntime();
+        String args[] = new String[]{shellProg, "/C", "start", "java", "-Dtestbed.secretreservationkeys=" + commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, "-Dtestbed.nodeurns=", "-jar", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\lib\\tr.scripting-client-0.7.2-SNAPSHOT-onejar.jar" + commaSkip, "-p", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties" + commaSkip, "-f", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\scripts\\reset.java" + commaSkip, "-v"};
         try {
-            Process proc = rt.exec(new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + System.getProperty("file.separator") + "reset" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip});
+            Process proc = rt.exec(args);
             proc.waitFor();
             BufferedReader buf = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             String line = "";
@@ -364,6 +421,23 @@ public class TestbedControler implements PropertyChangeListener {
     }
 
     public void addNode() {
+
+        wisebedSkriptsHome = System.getenv("WISEBED_HOME");
+
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
+
+            skriptExtension = "";
+            commaSkip = "";
+            shellProg = "bash";
+
+        } else {
+
+            skriptExtension = ".bat";
+            commaSkip = "\"";
+            shellProg = "cmd.exe";
+
+        }
 
         String gateway = config.getGWID();
 
@@ -418,15 +492,16 @@ public class TestbedControler implements PropertyChangeListener {
 
         key.setUrnPrefix(WisebedPacketReader.getCurrentUrnPrefix());
 
-        String[] commandString = new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "send" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, commaSkip + messageToGW + commaSkip, key.getUrnPrefix() + "0x" + gateway};
+        //String[] commandString = new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "send" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, commaSkip + messageToGW + commaSkip, key.getUrnPrefix() + "0x" + gateway};
 //        for (int i = 0; i < commandString.length; i++) {
 //            System.out.print(commandString[i] + " ");
 //        }
+        String args[] = new String[]{shellProg, "/C", "start", "java", "-Dtestbed.secretreservationkeys=" + commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, "-Dtestbed.message=" + commaSkip + messageToGW + commaSkip, "-Dtestbed.nodeurns=" + key.getUrnPrefix() + "0x" + gateway, "-jar", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\lib\\tr.scripting-client-0.7.2-SNAPSHOT-onejar.jar" + commaSkip, "-p", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties" + commaSkip, "-f", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\scripts\\send.java" + commaSkip, "-v"};
 
 
         Runtime rt = Runtime.getRuntime();
         try {
-            Process proc = rt.exec(commandString);
+            Process proc = rt.exec(args);
             proc.waitFor();
             BufferedReader buf = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             String line = "";
@@ -446,6 +521,23 @@ public class TestbedControler implements PropertyChangeListener {
     }
 
     public void removeNode() {
+
+        wisebedSkriptsHome = System.getenv("WISEBED_HOME");
+
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
+
+            skriptExtension = "";
+            commaSkip = "";
+            shellProg = "bash";
+
+        } else {
+
+            skriptExtension = ".bat";
+            commaSkip = "\"";
+            shellProg = "cmd.exe";
+
+        }
 
         String gateway = config.getGWID();
 
@@ -475,15 +567,16 @@ public class TestbedControler implements PropertyChangeListener {
 
         key.setUrnPrefix(WisebedPacketReader.getCurrentUrnPrefix());
 
-        String[] commandString = new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "send" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, commaSkip + messageToGW + commaSkip, key.getUrnPrefix() + "0x" + gateway};
-        for (int i = 0; i < commandString.length; i++) {
-            System.out.print(commandString[i] + " ");
-        }
+        //String[] commandString = new String[]{shellProg + wisebedSkriptsHome + System.getProperty("file.separator") + "send" + skriptExtension, wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties", commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, commaSkip + messageToGW + commaSkip, key.getUrnPrefix() + "0x" + gateway};
+        String args[] = new String[]{shellProg, "/C", "start", "java", "-Dtestbed.secretreservationkeys=" + commaSkip + key.getUrnPrefix() + "," + key.getSecretReservationKey() + commaSkip, "-Dtestbed.message=" + commaSkip + messageToGW + commaSkip, "-Dtestbed.nodeurns=" + key.getUrnPrefix() + "0x" + gateway, "-jar", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\lib\\tr.scripting-client-0.7.2-SNAPSHOT-onejar.jar" + commaSkip, "-p", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "movedetect.properties" + commaSkip, "-f", commaSkip + wisebedSkriptsHome + System.getProperty("file.separator") + "..\\scripts\\send.java" + commaSkip, "-v"};
+//        for (int i = 0; i < commandString.length; i++) {
+//            System.out.print(commandString[i] + " ");
+//        }
 
 
         Runtime rt = Runtime.getRuntime();
         try {
-            Process proc = rt.exec(commandString);
+            Process proc = rt.exec(args);
             proc.waitFor();
             BufferedReader buf = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             String line = "";

@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.List;
 
 import de.unisiegen.zess.spyglass.plugin.dataanalyzer.DataAnalyzerPlugin;
+import de.unisiegen.zess.spyglass.plugin.dataanalyzer.Injectable;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -47,7 +48,7 @@ import static com.google.common.collect.Lists.newArrayList;
  *
  * @author Jens Kluttig, Daniel Bimschas
  */
-public class WisebedPacketReader extends SpyglassPacketRecorder {
+public class WisebedPacketReader extends SpyglassPacketRecorder implements Injectable {
 
     private static final Logger log = LoggerFactory.getLogger(WisebedPacketReader.class);
     private static final String DB_NAME = "dbsqlite";
