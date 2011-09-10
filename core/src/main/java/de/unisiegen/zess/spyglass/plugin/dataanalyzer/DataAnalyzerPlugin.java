@@ -416,7 +416,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					pkg[1] = 27;
 					pkg[2] = 2;
 					pkg[3] = 3;
-					pkg[4] = (byte) (25);
+					pkg[4] = (byte) (55);
 
 					int pos = i + 1;
 

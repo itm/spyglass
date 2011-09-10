@@ -166,7 +166,7 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 			@SuppressWarnings("synthetic-access")
 			public void handleEvent(final Event event) {
 				final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
-				fd.setFilterExtensions(new String[] { "*.rec" });
+				fd.setFilterExtensions(new String[] { "*.rec", "*.txt", "*.*" });
 				fd.setFilterPath(new File(defaultDir).getAbsoluteFile().toString());
 				final String path = fd.open();
 				if (path != null) {
@@ -208,6 +208,15 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 			
 			final IObservableValue modelObservableIsZessDll = BeansObservables.observeValue(dbc.getValidationRealm(), myvalues, "useZessDll");
 			dbc.bindValue(SWTObservables.observeSelection(buttonDLL), modelObservableIsZessDll, null, null);
+
+			// binding of select button to use ZESS DLL and text file with its path
+			dbc.bindValue(SWTObservables.observeSelection(buttonDLL), SWTObservables.observeEnabled(textPath2File), null, new UpdateValueStrategy(
+					UpdateValueStrategy.POLICY_NEVER));
+
+			// binding of select button to use ZESS DLL and open a file selection dialog
+			dbc.bindValue(SWTObservables.observeSelection(buttonDLL), SWTObservables.observeEnabled(buttonOpenFileDialog), null,
+					new UpdateValueStrategy(UpdateValueStrategy.POLICY_NEVER));
+
 		}
 		initializeValues();
 		group1.pack();
@@ -236,7 +245,7 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
             startTestbedConfig();
         }
 		else if (myvalues.useZessDll){
-			PacketReader packetReader = new ZessPacketRecorder();
+			PacketReader packetReader = new ZessPacketRecorder(myvalues.path2File);
 			SpyglassApp.spyglass.getConfigStore().getSpyglassConfig().setPacketReader(packetReader);
 			SpyglassApp.spyglass.getConfigStore().store();
 			super.okPressed();
