@@ -79,7 +79,7 @@ public class ZessPacketRecorder extends SpyglassPacketRecorder implements Inject
 			public void run() {
 				ReadFromFile();
 			}
-		}, 1000, 1000);
+		}, 3000, 100);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class ZessPacketRecorder extends SpyglassPacketRecorder implements Inject
 					log.debug("Read line: " + line);
 					
 					if (IsValidLine(line)) {
-						String[] parts = line.split("\\|");
+						String[] parts = line.split(" \\| ");
 						startTimeDiff = (new Date()).getTime() - timeParser.parse(parts[0].trim()).getTime();
 					
 						log.debug("Start reading from file. Starting time difference is " + startTimeDiff);
@@ -137,46 +137,97 @@ public class ZessPacketRecorder extends SpyglassPacketRecorder implements Inject
 		}
 
 		Date currentTime = new Date();
-		do {
-			String line;
-			if (!newLines.isEmpty()) {
-				line = newLines.remove(0);
-			}
-			else {
-				try {
-					line = reader.readLine();
-					log.debug("Read line: " + line);
+		if (false) {
+			// read and deliver line consequtively
+			do {
+				String line;
+				if (!newLines.isEmpty()) {
+					line = newLines.remove(0);
 				}
-				catch (Exception e) {
-					timer.cancel();
-					log.debug("Log file is invalid. Stopped reading it.");
-					return;
-				}
-			}
-
-			if (IsValidLine(line)) {
-				String[] parts = line.split("\\|");
-				try {
-					Date ltime = timeParser.parse(parts[0].trim());
-					long diff = currentTime.getTime() - startTimeDiff;
-					if (diff >= ltime.getTime()) {
-						log.debug("Read from file. time is " + ltime.toString());
-											
-						dataPlugin.processPacket(ToByteArray(parts[3].trim()));
+				else {
+					try {
+						line = reader.readLine();
+						log.debug("Read line: " + line);
 					}
-					else {
-						newLines.add(0, line);
+					catch (Exception e) {
+						timer.cancel();
+						log.debug("Log file is invalid. Stopped reading it.");
 						return;
 					}
 				}
-				catch (Exception e) {return;}
+
+				if (IsValidLine(line)) {
+					String[] parts = line.split(" \\| ");
+					try {
+						Date ltime = timeParser.parse(parts[0].trim());
+						long diff = currentTime.getTime() - startTimeDiff;
+						if (diff >= ltime.getTime()) {
+							log.debug("Read from file. time is " + ltime.toString());
+											
+							dataPlugin.processPacket(ToByteArray(parts[3].trim()));
+						}
+						else {
+							newLines.add(0, line);
+							return;
+						}
+					}
+					catch (Exception e) {return;}
+				}
+				else {
+					timer.cancel();
+					log.debug("Log file contains invalid line. Stopped reading it.");
+					return;
+				}
+			} while (true);
+		}
+		else {
+			// use cluser time stamp to determine time to deliver line in log file
+			// fill buffer
+			try {
+				while (newLines.size() < 100 && reader.ready()) {
+					String line = reader.readLine();
+					log.debug("Read line: " + line);
+					newLines.add(line);
+			
+				}
 			}
-			else {
+			catch (Exception e) {}
+
+			if (newLines.isEmpty()) {
+				log.debug("EOF");
 				timer.cancel();
-				log.debug("Log file contains invalid line. Stopped reading it.");
 				return;
 			}
-		} while (true);			
+
+			for (int i = 0; i < newLines.size(); ++i) {
+				String line = newLines.elementAt(i);				
+				if (IsValidLine(line)) {
+					String[] parts = line.split(" \\| ");
+					try {
+						Date ltime = timeParser.parse(parts[0].trim());
+						long diff = currentTime.getTime() - startTimeDiff;
+						if (diff >= ltime.getTime()) {
+							log.debug("Read from file. time is " + ltime.toString());
+							System.err.println("Read from file. time is " + ltime.toString());
+							dataPlugin.processPacket(ToByteArray(parts[3].trim()));
+							newLines.remove(i);
+							i--;
+						}
+					}
+					catch (Exception e) {
+						log.debug("Parse error at line : " + line);
+						System.err.println("Parse error at line : " + line);
+						e.printStackTrace();
+						newLines.remove(i);
+						return;
+					}
+				}
+				else {
+					newLines.remove(i);
+					i--;
+				}
+			}
+		}
 	}
 
 	private boolean IsValidLine(String line) {

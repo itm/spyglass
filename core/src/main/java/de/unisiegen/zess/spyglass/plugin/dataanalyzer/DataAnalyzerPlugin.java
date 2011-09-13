@@ -1,5 +1,7 @@
 package de.unisiegen.zess.spyglass.plugin.dataanalyzer;
 
+import java.lang.Integer;
+import java.util.Vector;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -42,6 +44,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 	private Timer timer = null;
 	private boolean dllok = false;
 	private Injectable pkgReader = null;
+	private int lastActiveElement;
 
 	//private DataAnalyzerXMLConfig xmlConfig;
 	
@@ -189,9 +192,12 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 			return;
 		}
 		
-		log.debug("Parse: " + new String(buf));
-	
-		String[] result = (new String(buf)).split(",");
+		String inBuf = new String(buf);
+
+		log.debug("Parse: " + inBuf);
+		System.err.println("Parse: " + inBuf);
+
+		String[] result = inBuf.split(",");
 		for (int i = 0; i < result.length; ++i) {
 			int ptype = Integer.parseInt(result[i]);
 
@@ -290,18 +296,21 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 
 					int pos = i + 3;
 		
+					lastActiveElement = -1;
 					while (pos < result.length) {
 						int gnum = Integer.parseInt(result[pos])-1;
 					        if (gnum < 0) {
 							break;
 						}
 
+						if (lastActiveElement == -1) {lastActiveElement = gnum;}
+
 						int col = gnum % cols;
 						int row = gnum / cols;
 
-						SerializeUInt16(gwidth / 2 + col*gwidth + gwidth/2, pkg, 13);			// Pos x
+						SerializeUInt16(col*gwidth + gwidth/2, pkg, 13);			// Pos x
 						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 15);	// Pos y
-						SerializeUInt16(col*gwidth  + gwidth/2, pkg, 19);			// Pos x
+						SerializeUInt16(col*gwidth + gwidth/2, pkg, 19);			// Pos x
 						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 21);	// Pos y
 						SerializeUInt16(1, pkg, 23);						// time
 						SerializeUInt16(col*gwidth + gwidth/2, pkg, 25);			// Pos x
@@ -313,6 +322,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 							pkgReader.InjectPackage(np);
 							log.debug("New package: " + np.toString());
 						}
+						pkg[4] = (byte) (25 + lastClassification);
 						pos++;
 					}
 					i = pos - 1;
@@ -379,9 +389,13 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
                                             pkg[3] = 3;
                                             pkg[4] = (byte) (30+type-1);
 
-                                            int dx = 2;
-                                            if (type == 2) {dx = 4;}
-                                            if (type == 3) {dx = 6;}
+					    if (type == 7) {System.err.println("Long Range ON!");}
+					    if (type == 8) {System.err.println("Long Range Off!");}
+                                            
+					    int dx = 1;
+                                            if (type == 1) {dx = 0;}
+					    if (type == 2) {dx = 0;}
+                                            if (type == 4 || type == 6 || type == 8) {dx = 2;}
                                             if (type == 9) {dx = 0;}
 
                                             SerializeUInt16(Integer.parseInt(result[i],16), pkg, 5);	// ID
@@ -405,7 +419,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
                                     i--;
 				}
 				break;
-                                case -55: {
+                                case -66: {
                                         if (i + 1 > result.length) {
 						log.debug("Error parsing data from Movedetect DLL!");
 						throw new Exception("Error parsing data from Movedetect DLL!");
@@ -416,7 +430,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					pkg[1] = 27;
 					pkg[2] = 2;
 					pkg[3] = 3;
-					pkg[4] = (byte) (55);
+					pkg[4] = (byte) (66);
 
 					int pos = i + 1;
 
@@ -429,9 +443,9 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						int col = gnum % cols;
 						int row = gnum / cols;
 
-						SerializeUInt16(gwidth / 2 + col*gwidth + gwidth/2, pkg, 13);			// Pos x
+						SerializeUInt16(col*gwidth + gwidth/2, pkg, 13);			// Pos x
 						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 15);	// Pos y
-						SerializeUInt16(col*gwidth  + gwidth/2, pkg, 19);			// Pos x
+						SerializeUInt16(col*gwidth + gwidth/2, pkg, 19);			// Pos x
 						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 21);	// Pos y
 						SerializeUInt16(1, pkg, 23);						// time
 						SerializeUInt16(col*gwidth + gwidth/2, pkg, 25);			// Pos x
@@ -448,38 +462,33 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 					i = pos - 1;
 				}
 				break;
-				case -66: {
-					if (i + 2 > result.length) {
-						log.debug("Error parsing data from Movedetect DLL!");
-						throw new Exception("Error parsing data from Movedetect DLL!");
-					}
-
+				case -55: {
 					byte pkg[] = new byte[29];
 					pkg[0] = 0;
 					pkg[1] = 27;
 					pkg[2] = 2;
 					pkg[3] = 3;
-					pkg[4] = (byte) (66);
+					pkg[4] = (byte) (55);
 
-					int gnum = Integer.parseInt(result[i+1])-1;
+					int gnum = lastActiveElement;
+
 					int col = gnum % cols;
 					int row = gnum / cols;
 
-					SerializeUInt16(gwidth / 2 + col*gwidth + gwidth/2, pkg, 13);			// Pos x
+					SerializeUInt16(col*gwidth + gwidth/2, pkg, 13);			// Pos x
 					SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 15);	// Pos y
-					SerializeUInt16(col*gwidth  + gwidth/2, pkg, 19);			// Pos x
+					SerializeUInt16(col*gwidth + gwidth/2, pkg, 19);			// Pos x
 					SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 21);	// Pos y
 					SerializeUInt16(1, pkg, 23);						// time
 					SerializeUInt16(col*gwidth + gwidth/2, pkg, 25);			// Pos x
 					SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 27);	// Pos y
 
 					Int16ListPacket np = new Int16ListPacket(pkg);
+
 					if (pkgReader != null) {
 						pkgReader.InjectPackage(np);
 						log.debug("New package: " + np.toString());
 					}
-								 
-					i += 1;
 				}
 				break;
                                 default: // parse error
