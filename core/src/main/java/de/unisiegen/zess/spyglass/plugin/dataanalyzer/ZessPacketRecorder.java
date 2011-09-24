@@ -86,15 +86,15 @@ public class ZessPacketRecorder extends SpyglassPacketRecorder implements Inject
 	public void shutdown() throws IOException {
 		log.debug("Shutting down ZessPacketRecorder...");
 
+		if (timer != null) {
+			timer.cancel();		
+		}
+
 		if (dataPlugin != null) {
 			dataPlugin.shutdown();
 			dataPlugin = null;
 			System.gc();
-		}
-
-		if (timer != null) {
-			timer.cancel();		
-		}
+		}		
 
 		if (reader != null) {
 			reader.close();
