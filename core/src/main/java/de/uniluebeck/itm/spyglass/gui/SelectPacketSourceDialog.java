@@ -166,7 +166,7 @@ public class SelectPacketSourceDialog extends TitleAreaDialog {
 			@SuppressWarnings("synthetic-access")
 			public void handleEvent(final Event event) {
 				final FileDialog fd = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
-				fd.setFilterExtensions(new String[] { "*.rec;*.txt", "*.*" });
+				fd.setFilterExtensions(new String[] { "*.rec;*.txt;*.log", "*.*" });
 				fd.setFilterPath(new File(defaultDir).getAbsoluteFile().toString());
 				final String path = fd.open();
 				if (path != null) {

@@ -316,7 +316,7 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						SerializeUInt16(col*gwidth + gwidth/2, pkg, 25);			// Pos x
 						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 27);	// Pos y
 
-						Int16ListPacket np = new Int16ListPacket(pkg);
+						Int16ListPacket np = new Int16ListPacket(pkg.clone());
 				
 						if (pkgReader != null) {
 							pkgReader.InjectPackage(np);
@@ -451,7 +451,50 @@ public class DataAnalyzerPlugin /*extends Plugin implements GlobalInformation*/ 
 						SerializeUInt16(col*gwidth + gwidth/2, pkg, 25);			// Pos x
 						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 27);	// Pos y
 
-						Int16ListPacket np = new Int16ListPacket(pkg);
+						Int16ListPacket np = new Int16ListPacket(pkg.clone());
+
+						if (pkgReader != null) {
+							pkgReader.InjectPackage(np);
+							log.debug("New package: " + np.toString());
+						}
+						pos++;
+					}
+					i = pos - 1;
+				}
+				break;
+                                case -77: {
+                                        if (i + 1 > result.length) {
+						log.debug("Error parsing data from Movedetect DLL!");
+						throw new Exception("Error parsing data from Movedetect DLL!");
+					}
+
+					byte pkg[] = new byte[29];
+					pkg[0] = 0;
+					pkg[1] = 27;
+					pkg[2] = 2;
+					pkg[3] = 3;
+					pkg[4] = (byte) (77);
+
+					int pos = i + 1;
+
+					while (pos < result.length) {
+						int gnum = Integer.parseInt(result[pos])-1;
+					        if (gnum < 0) {
+							break;
+						}
+
+						int col = gnum % cols;
+						int row = gnum / cols;
+
+						SerializeUInt16(col*gwidth + gwidth/2, pkg, 13);			// Pos x
+						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 15);	// Pos y
+						SerializeUInt16(col*gwidth + gwidth/2, pkg, 19);			// Pos x
+						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 21);	// Pos y
+						SerializeUInt16(1, pkg, 23);						// time
+						SerializeUInt16(col*gwidth + gwidth/2, pkg, 25);			// Pos x
+						SerializeUInt16(rows*gheight - row*gheight - gheight + gheight/2, pkg, 27);	// Pos y
+
+						Int16ListPacket np = new Int16ListPacket(pkg.clone());
 
 						if (pkgReader != null) {
 							pkgReader.InjectPackage(np);

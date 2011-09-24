@@ -79,7 +79,7 @@ public class ZessPacketRecorder extends SpyglassPacketRecorder implements Inject
 			public void run() {
 				ReadFromFile();
 			}
-		}, 3000, 100);
+		}, 500, 100);
     }
 
     @Override
@@ -108,22 +108,30 @@ public class ZessPacketRecorder extends SpyglassPacketRecorder implements Inject
     }
 
 	public void ReadFromFile() {
+	
+		Date currentTime = new Date();
+	
 		if (reader == null) {
 			try {
+				startTimeDiff = 0;
 				reader = new BufferedReader(new FileReader(logFile));
 				do {
 					String line = reader.readLine();
 					log.debug("Read line: " + line);
-					
+				
 					if (IsValidLine(line)) {
 						String[] parts = line.split(" \\| ");
-						startTimeDiff = (new Date()).getTime() - timeParser.parse(parts[0].trim()).getTime();
-					
-						log.debug("Start reading from file. Starting time difference is " + startTimeDiff);
+						Date ltime = timeParser.parse(parts[0].trim());
+						long tdiff = currentTime.getTime() - ltime.getTime();
+						if (tdiff > startTimeDiff) startTimeDiff = tdiff;					
 						newLines.add(line);
-						return;
 					}
-				} while (reader.ready());
+				} while (newLines.size() < 1000 && reader.ready());
+
+				if (startTimeDiff > 0) {
+					log.debug("Start reading from file. Starting time difference is " + startTimeDiff);
+					return;
+				}
 			}
 			catch (Exception e) {
 				timer.cancel();
@@ -136,96 +144,49 @@ public class ZessPacketRecorder extends SpyglassPacketRecorder implements Inject
 			return;
 		}
 
-		Date currentTime = new Date();
-		if (false) {
-			// read and deliver line consequtively
-			do {
-				String line;
-				if (!newLines.isEmpty()) {
-					line = newLines.remove(0);
-				}
-				else {
-					try {
-						line = reader.readLine();
-						log.debug("Read line: " + line);
-					}
-					catch (Exception e) {
-						timer.cancel();
-						log.debug("Log file is invalid. Stopped reading it.");
-						return;
-					}
-				}
+		// use cluser time stamp to determine time to deliver line in log file
+		// fill buffer
+		try {
+			while (newLines.size() < 1000 && reader.ready()) {
+				String line = reader.readLine();
+				log.debug("Read line: " + line);
+				newLines.add(line);
+			}
+		}
+		catch (Exception e) {}
 
-				if (IsValidLine(line)) {
-					String[] parts = line.split(" \\| ");
-					try {
-						Date ltime = timeParser.parse(parts[0].trim());
-						long diff = currentTime.getTime() - startTimeDiff;
-						if (diff >= ltime.getTime()) {
-							log.debug("Read from file. time is " + ltime.toString());
-											
-							dataPlugin.processPacket(ToByteArray(parts[3].trim()));
-						}
-						else {
-							newLines.add(0, line);
-							return;
-						}
+		if (newLines.isEmpty()) {
+			log.debug("EOF");
+			timer.cancel();
+			return;
+		}
+
+		for (int i = 0; i < newLines.size(); ++i) {
+			String line = newLines.elementAt(i);				
+			if (IsValidLine(line)) {
+				String[] parts = line.split(" \\| ");
+				try {
+					Date ltime = timeParser.parse(parts[0].trim());
+					long diff = currentTime.getTime() - startTimeDiff;
+					if (diff >= ltime.getTime()) {
+						log.debug("Read from file. time is " + ltime.toString());
+						System.err.println("Read from file. time is " + ltime.toString());
+						dataPlugin.processPacket(ToByteArray(parts[3].trim()));
+						newLines.remove(i);
+						i--;
 					}
-					catch (Exception e) {return;}
 				}
-				else {
-					timer.cancel();
-					log.debug("Log file contains invalid line. Stopped reading it.");
+				catch (Exception e) {
+					log.debug("Parse error at line : " + line);
+					System.err.println("Parse error at line : " + line);
+					e.printStackTrace();
+					newLines.remove(i);
 					return;
 				}
-			} while (true);
-		}
-		else {
-			// use cluser time stamp to determine time to deliver line in log file
-			// fill buffer
-			try {
-				while (newLines.size() < 100 && reader.ready()) {
-					String line = reader.readLine();
-					log.debug("Read line: " + line);
-					newLines.add(line);
-			
-				}
 			}
-			catch (Exception e) {}
-
-			if (newLines.isEmpty()) {
-				log.debug("EOF");
-				timer.cancel();
-				return;
-			}
-
-			for (int i = 0; i < newLines.size(); ++i) {
-				String line = newLines.elementAt(i);				
-				if (IsValidLine(line)) {
-					String[] parts = line.split(" \\| ");
-					try {
-						Date ltime = timeParser.parse(parts[0].trim());
-						long diff = currentTime.getTime() - startTimeDiff;
-						if (diff >= ltime.getTime()) {
-							log.debug("Read from file. time is " + ltime.toString());
-							System.err.println("Read from file. time is " + ltime.toString());
-							dataPlugin.processPacket(ToByteArray(parts[3].trim()));
-							newLines.remove(i);
-							i--;
-						}
-					}
-					catch (Exception e) {
-						log.debug("Parse error at line : " + line);
-						System.err.println("Parse error at line : " + line);
-						e.printStackTrace();
-						newLines.remove(i);
-						return;
-					}
-				}
-				else {
-					newLines.remove(i);
-					i--;
-				}
+			else {
+				newLines.remove(i);
+				i--;
 			}
 		}
 	}
